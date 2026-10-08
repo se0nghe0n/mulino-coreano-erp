@@ -362,6 +362,7 @@
     그러면 "eligibility-response-1" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-2" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-3" assertion으로 "eligibility-response"를 확인한다
+    그러면 "eligibility-positive-control" assertion으로 "W 내부 보관 A의 판정 = ALLOWED 1행(양성 대조)"를 확인한다
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
@@ -380,6 +381,7 @@
     그러면 "eligibility-response-1" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-2" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-3" assertion으로 "eligibility-response"를 확인한다
+    그러면 "eligibility-positive-control" assertion으로 "W 내부 보관 A의 판정 = ALLOWED 1행(양성 대조)"를 확인한다
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
@@ -398,6 +400,7 @@
     그러면 "eligibility-response-1" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-2" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-3" assertion으로 "eligibility-response"를 확인한다
+    그러면 "eligibility-positive-control" assertion으로 "W 내부 보관 A의 판정 = ALLOWED 1행(양성 대조)"를 확인한다
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
@@ -423,6 +426,7 @@
     그러면 "eligibility-response-1" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-2" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-3" assertion으로 "eligibility-response"를 확인한다
+    그러면 "eligibility-positive-control" assertion으로 "W 내부 보관 A의 판정 = ALLOWED 1행(양성 대조)"를 확인한다
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
@@ -442,6 +446,7 @@
     그러면 "eligibility-response-1" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-2" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-3" assertion으로 "eligibility-response"를 확인한다
+    그러면 "eligibility-positive-control" assertion으로 "W 내부 보관 A의 판정 = ALLOWED 1행(양성 대조)"를 확인한다
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다

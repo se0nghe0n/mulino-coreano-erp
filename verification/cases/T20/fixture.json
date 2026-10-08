@@ -384,10 +384,12 @@
       "type": "Manufacturer"
     },
     "W": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
     },
     "W2": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
     },
     "C": {
       "type": "Customer"
@@ -413,6 +415,7 @@
       "itemAlias": "P",
       "lotAlias": "L",
       "locationAlias": "W",
+      "custodianAlias": "warehouse",
       "quantity": "60",
       "unit": "BOX",
       "physicalScope": "T20-A60"
@@ -422,6 +425,7 @@
       "itemAlias": "P",
       "lotAlias": "L",
       "locationAlias": "W",
+      "custodianAlias": "warehouse",
       "quantity": "40",
       "unit": "BOX",
       "physicalScope": "T20-B40"
@@ -473,6 +477,10 @@
     },
     "supervisor": {
       "type": "Human"
+    },
+    "warehouse": {
+      "type": "Human",
+      "name": "내부 창고 보관 담당"
     }
   },
   "baseline": {
@@ -483,6 +491,7 @@
         "quantity": "60",
         "unit": "BOX",
         "locationAlias": "W",
+        "custodianAlias": "warehouse",
         "lotAlias": "L"
       },
       {
@@ -490,6 +499,7 @@
         "quantity": "40",
         "unit": "BOX",
         "locationAlias": "W",
+        "custodianAlias": "warehouse",
         "lotAlias": "L"
       }
     ],

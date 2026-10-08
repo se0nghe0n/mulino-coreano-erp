@@ -36,10 +36,18 @@ case.json·fixture·Gherkin은 `verification/mcp-tests/author_cases.py`의
   400·-32020, 필수 `_meta` 누락은 400·-32602, 미지원 version은
   400·-32022와 `data.supported=["2026-07-28"]`·`data.requested`다.
   프로젝트가 만든 `error.data.category`는 oracle에서 뺐다. `_meta`
-  전체 누락은 두 규칙이 겹쳐 -32602와 -32020이 모두 규격에 맞으므로
-  400 오류 envelope만 고정한다. 401/403은 JSON-RPC 처리 전 거부라
-  HTTP status와 업무 효과0만 본다. 값이 있으나 형식이 틀린
-  clientInfo는 -32602로 거부한다(`wire-invalid-client-info`).
+  전체 누락은 400·-32602로 고정한다(`wire-missing-meta`). 본문에
+  version header와 비교할 값이 없으므로 -32020이 아니다. 이 판단은
+  `contracts/mcp/s0-protocol.md` 오류 우선순위 절에 적었다. 401/403/406은
+  JSON-RPC 처리 전 거부라 HTTP status와 업무 효과0만 본다. 값이 있으나
+  형식이 틀린 clientInfo는 -32602로 거부한다(`wire-invalid-client-info`).
+- Streamable HTTP 요청은 모두 `Accept: application/json, text/event-stream`을
+  보내고 Origin을 보내지 않는다(Step 2 round 6). 계약이 허용 origin을
+  선언하지 않고 Origin 없는 요청은 허용되기 때문이다. Origin은
+  `wire-bad-origin`(403)만, Accept 누락은 `wire-missing-accept`(406)만
+  보낸다. 이전 생성기는 Accept 없이 `isolated-client.example.invalid`
+  Origin을 보내 계약을 지키는 서버가 모든 HTTP subcase를 406/403으로
+  답해야 했다.
 - tools/list는 별도 request로 보내고 HTTP200(stdio는 transport),
   jsonrpc·id echo, resultType=complete, raw method·header·meta를
   모두 검증한다.

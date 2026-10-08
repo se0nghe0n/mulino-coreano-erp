@@ -2290,6 +2290,426 @@
         }
       ],
       "oracleExplanation": "실물40은 유지되며 기존 약속20을 삭제하지 않는다. 처분 허용 철회는 앞으로의 배분/출고0과 owner 있는 의무를 남긴다."
+    },
+    {
+      "id": "unrecognized-place-kind",
+      "title": "계약 어휘 밖 장소 종류의 위탁40은 적격0·UNKNOWN이고 내부 보관 위탁40만 적격이다",
+      "fixtureRef": "verification/cases/C1/fixtures/unrecognized-place-kind.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "oracleExplanation": "같은 조건의 위탁40 두 묶음 중 INTERNAL_STORAGE 내부 보관분만 SELL 적격40이고, 어휘 밖 장소 종류(WAREHOUSE)의 40은 적격0·UNKNOWN이다. 품목 보유80·적격40. contracts/fixture-place-kinds.json의 명시 반례다.",
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "fixtureRef": "verification/cases/C1/fixtures/unrecognized-place-kind.json",
+          "evidenceRefs": [
+            "setup:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "known-kind",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "segmentId": {
+                "$alias": "CON40"
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "known-kind:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "unrecognized-kind",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "evaluateEligibility",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "segmentId": {
+                "$alias": "UNK40"
+              }
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "unrecognized-kind:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "inventory",
+          "kind": "query",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-unrecognized-place-kind"
+            },
+            "action": "SELL",
+            "customerId": {
+              "$alias": "CUSTOMER"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "inventory:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "inventory-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseKey": "C1-unrecognized-place-kind"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "inventory",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "genealogy",
+              "allocations",
+              "obligations",
+              "assignments",
+              "restrictions",
+              "dispositionBases",
+              "audit",
+              "outbox",
+              "commandResults",
+              "events",
+              "evidenceLinks",
+              "logisticsMemberships",
+              "shipments",
+              "intakes",
+              "stocktakes",
+              "decisions",
+              "locks",
+              "retryAttempts",
+              "dbPrivileges",
+              "boundaries",
+              "transactions"
+            ]
+          },
+          "evidenceRefs": [
+            "inventory-db:actual-adapter-artifact"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "known-kind-eligible-40",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "known-kind",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "known-kind:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "양성 대조: INTERNAL_STORAGE W에서 내부 custodian이 보관하고 QC·규제·고객·처분이 모두 허용된 위탁40은 SELL 적격 40 BOX다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "known-kind",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "known-kind-allowed",
+          "op": "equals",
+          "source": {
+            "actionId": "known-kind",
+            "pointer": "/response/data/eligibilityStatus"
+          },
+          "expected": "ALLOWED",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "known-kind:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "같은 위탁40의 판정 상태는 ALLOWED다. 아래 0이 다른 조건 부족이 아니라 장소 종류 때문임을 보이는 대조다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          }
+        },
+        {
+          "id": "unrecognized-kind-eligible-0",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "unrecognized-kind",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "0",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "unrecognized-kind:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "반례: 조건이 같은 UNK40이 계약 어휘 밖 Place.kind(WAREHOUSE, kindControl=UNRECOGNIZED_PLACE_KIND)에 있으면 적격 0 BOX다. 미확인 보관을 적격으로 세지 않는다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "unrecognized-kind",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "unrecognized-kind-unknown",
+          "op": "equals",
+          "source": {
+            "actionId": "unrecognized-kind",
+            "pointer": "/response/data/eligibilityStatus"
+          },
+          "expected": "UNKNOWN",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "unrecognized-kind:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "그 0은 확정 거부(DENIED)가 아니라 UNKNOWN이다. 인식하지 못한 장소 종류는 외부 보관의 증거가 아니다(계획 §3.1).",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          }
+        },
+        {
+          "id": "item-held-80",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/response/data/heldQuantity"
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "inventory:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "품목 범위 보유량은 두 실물 40+40=80 BOX다. 장소 종류를 모른다고 실물을 지우지 않는다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "inventory",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "item-eligible-40",
+          "op": "decimalEquals",
+          "source": {
+            "actionId": "inventory",
+            "pointer": "/response/data/eligibleQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "inventory:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "품목 범위 판매 적격은 INTERNAL_STORAGE의 40 BOX뿐이다. 80이면 미확인 장소를 적격으로 센 것이다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "sell-eligible"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "inventory",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "installed-physical-rows",
+          "op": "relationSet",
+          "source": {
+            "actionId": "inventory-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "active": true
+            },
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "locationId"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "CON40"
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "W"
+              }
+            ],
+            [
+              {
+                "$alias": "UNK40"
+              },
+              "40",
+              "BOX",
+              {
+                "$alias": "W-UNRECOGNIZED"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D05"
+          ],
+          "evidenceRefs": [
+            "inventory-db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseKey": "C1-unrecognized-place-kind"
+          },
+          "oracleExplanation": "독립 DB 원행에 두 실물의 ID·수량·단위·위치가 설치 그대로 있다. 반례의 0은 실물 누락이 아니다.",
+          "oracleRef": {
+            "oracleId": "C1.initial-eligibility",
+            "observationNames": [
+              "held"
+            ]
+          }
+        }
+      ]
     }
   ]
 }

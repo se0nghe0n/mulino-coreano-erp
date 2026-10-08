@@ -76,20 +76,29 @@ requestState, approval hash/revision과 externalOperationId는 이 S0 slice의
 |---|---|---|
 | 인증 누락/유효하지 않은 token | 401 | 인증 단계, business tool 실행0 |
 | 허용되지 않은 Origin | 403 | transport 거부, business tool 실행0 |
+| `Accept` 누락 또는 `application/json, text/event-stream` 아님 | 406 | transport 거부, JSON-RPC 처리·business tool 실행0 |
 | 필수 mirrored header 누락/불일치 | 400 | error.code=-32020 HeaderMismatch |
 | 지원하지 않는 version | 400 | error.code=-32022, data.supported/requested |
 | 지원하지 않는 RPC/modern initialize | 404 | error.code=-32601 |
 | malformed JSON/invalid envelope | 400 | parse/invalid-request JSON-RPC 오류 |
+| 필수 `_meta` 누락, `_meta`의 clientInfo·clientCapabilities 내용 오류 | 400 | error.code=-32602 Invalid params |
 | 잘못된 tool arguments/미지원 tool | 별도 protocol 오류 | 유효한 request ID와 error 보존 |
 | 업무 권한/revision/멱등 충돌 | 200 | resultType=complete, isError=true, structuredContent에 domain outcome |
 
 한 요청이 본문 envelope 오류와 mirrored header 오류를 함께 가지면
 envelope 오류 하나로 답한다. JSON parse 실패는 -32700, JSON-RPC batch
 배열·object가 아닌 본문·`jsonrpc`/`id`/`method`/`params` 형식 위반은
-400 -32600이다. mirrored header(`MCP-Protocol-Version`, `Mcp-Method`,
-tools/call의 `Mcp-Name`)의 누락/불일치(400 -32020)는 envelope이 유효할
-때만 판정한다. 인증·Origin·Accept·Content-Type 같은 transport 거부와
-다른 행 사이의 상대 순서는 이 절이 정하지 않는다.
+400 -32600이다. 여기서 `params` 형식 위반은 `params`가 object나 array가
+아닌 경우뿐이다. `params`가 object이면 envelope은 유효하다. 그 안의
+필수 `_meta` 누락, `_meta`의 clientInfo·clientCapabilities 값 형식 오류는
+params 내용 오류이며 400 -32602다(T20 `wire-missing-meta`,
+`wire-invalid-client-info`, `wire-missing-capabilities`). mirrored
+header(`MCP-Protocol-Version`, `Mcp-Method`, tools/call의 `Mcp-Name`)의
+누락/불일치(400 -32020)는 envelope이 유효할 때만 판정한다. `_meta`가
+없는 요청에는 version header와 비교할 본문 값이 없으므로 -32020이 아니라
+-32602다. 인증·Origin·Accept·Content-Type 같은 transport 거부와 다른
+행 사이의 상대 순서는 이 절이 정하지 않는다. 그래서 transport 거부를
+보지 않는 case 요청은 필수 `Accept`를 보내고 `Origin`을 보내지 않는다.
 
 envelope 검사가 header 검사보다 먼저인 이유는 header가 비교할 단일
 method/name이 envelope이 유효할 때만 있기 때문이다. batch 배열에는
@@ -104,6 +113,12 @@ backend의 `PlatformMcp`(S0)와 `OntologyMcp`도 envelope(-32600)을 header
 Mcp-Name의 `=?base64?<UTF8base64>?=` 표기는 decode 후 본문과 비교한다.
 S0 schema에는 x-mcp-header가 없으므로 추가 매핑을 광고하지 않는다.
 Origin이 없으면 CLI 요청을 허용하며 있으면 허용 origin만 받는다.
+이 계약과 case fixture는 허용 origin을 선언하지 않는다. 따라서 T20·V4의
+Streamable HTTP 요청은 Origin을 보내지 않고, Origin을 보내는 요청은
+허용 목록 밖 origin의 403 반례(T20 `wire-bad-origin`)뿐이다. `Accept`가
+없는 요청은 406 반례(T20 `wire-missing-accept`)뿐이다. `./verify prepare`
+(`ContractValidator.wireTransportProblems`)는 그 밖의 요청이 이 두 header를
+어기면 준비 실패로 낸다.
 local server는 loopback에 bind한다. 요청 artifact는 Authorization을
 `[REDACTED_SECRET]`으로 치환하며 response credential echo를 발견하면
 저장을 중단한다. 이 fixture 인증은 운영 OAuth/IAS discovery 인수가 아니다.

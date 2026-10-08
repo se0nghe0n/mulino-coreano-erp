@@ -6799,8 +6799,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -6841,8 +6841,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/list",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -8271,8 +8271,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -9129,8 +9129,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchQuantity"
             },
             "body": {
@@ -10036,8 +10036,8 @@
             "headers": {
               "MCP-Protocol-Version": "2025-11-25",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -10894,8 +10894,8 @@
             "headers": {
               "MCP-Protocol-Version": "1900-01-01",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -11822,8 +11822,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -12656,8 +12656,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -12694,8 +12694,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/list",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -14112,8 +14112,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -14964,8 +14964,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -15812,8 +15812,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -16534,6 +16534,7 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
               "Origin": "https://untrusted.example.invalid"
             },
@@ -17155,6 +17156,727 @@
       "oracleExplanation": "raw stateless MCP bad-origin — T20.mcp-stateless-wire의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
     },
     {
+      "id": "wire-missing-accept",
+      "title": "raw stateless MCP missing-accept",
+      "fixtureRef": "verification/cases/T20/fixture.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db",
+        "wire"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-hash-and-alias-map"
+          ]
+        },
+        {
+          "id": "noun",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "noun:actual-response",
+            "noun:wire-or-command"
+          ]
+        },
+        {
+          "id": "db-before",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "noun",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "approvals",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "evidenceLinks",
+              "relations",
+              "audit",
+              "outbox",
+              "commandResults",
+              "claims"
+            ]
+          },
+          "evidenceRefs": [
+            "db-before:raw-rows",
+            "db-before:source-query",
+            "db-before:snapshot"
+          ]
+        },
+        {
+          "id": "wire",
+          "kind": "invoke",
+          "actorRef": "reader",
+          "route": "wire",
+          "protocolOperation": "server/discover",
+          "request": {
+            "transport": "streamable-http",
+            "httpMethod": "POST",
+            "headers": {
+              "MCP-Protocol-Version": "2026-07-28",
+              "Mcp-Method": "server/discover",
+              "Content-Type": "application/json"
+            },
+            "body": {
+              "jsonrpc": "2.0",
+              "id": "wire",
+              "method": "server/discover",
+              "params": {
+                "_meta": {
+                  "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+                  "io.modelcontextprotocol/clientInfo": {
+                    "name": "ontology-channel-contract",
+                    "version": "1.0.0"
+                  },
+                  "io.modelcontextprotocol/clientCapabilities": {
+                    "elicitation": {
+                      "form": {}
+                    }
+                  }
+                }
+              }
+            },
+            "credentialProfileRef": "reader"
+          },
+          "evidenceRefs": [
+            "wire:redacted-raw-wire",
+            "wire:authenticated-context",
+            "wire:server-response"
+          ]
+        },
+        {
+          "id": "after",
+          "kind": "query",
+          "actorRef": "reader",
+          "route": "api",
+          "capabilityId": "getInventory",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "after:actual-response",
+            "after:wire-or-command"
+          ]
+        },
+        {
+          "id": "db-after",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              }
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "approvals",
+              "works",
+              "goals",
+              "assessments",
+              "obligations",
+              "evidenceLinks",
+              "relations",
+              "audit",
+              "outbox",
+              "commandResults",
+              "claims"
+            ]
+          },
+          "evidenceRefs": [
+            "db-after:raw-rows",
+            "db-after:source-query",
+            "db-after:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "wire-http",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/response/httpStatus"
+          },
+          "expected": 406,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-http: /response/httpStatus의 실제 equals 기대값은 406다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-segments",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "locationId",
+              "active"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "quantity",
+              "unit",
+              "locationId",
+              "active"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-movements",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "id",
+              "segmentId",
+              "quantity",
+              "unit",
+              "kind"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/movements",
+            "field": [
+              "id",
+              "segmentId",
+              "quantity",
+              "unit",
+              "kind"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-allocations",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-approvals",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/approvals",
+            "field": [
+              "id",
+              "proposalId",
+              "decision"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/approvals",
+            "field": [
+              "id",
+              "proposalId",
+              "decision"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-works",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/works",
+            "field": [
+              "id",
+              "status"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/works",
+            "field": [
+              "id",
+              "status"
+            ]
+          }
+        },
+        {
+          "id": "unchanged-outbox",
+          "op": "sameAs",
+          "source": {
+            "actionId": "db-after",
+            "pointer": "/data/rawRows/outbox",
+            "field": [
+              "id",
+              "capabilityId",
+              "externalOperationId"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "db-after:actual-observation",
+            "db-after:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          },
+          "baseline": {
+            "actionId": "db-before",
+            "pointer": "/data/rawRows/outbox",
+            "field": [
+              "id",
+              "capabilityId",
+              "externalOperationId"
+            ]
+          }
+        },
+        {
+          "id": "wire-raw-method",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/request/body/method"
+          },
+          "expected": "server/discover",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-raw-method: /data/transcript/request/body/method의 실제 equals 기대값은 \"server/discover\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "wire-raw-jsonrpc-id",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/request/body/id"
+          },
+          "expected": "wire",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-raw-jsonrpc-id: /data/transcript/request/body/id의 실제 equals 기대값은 \"wire\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "wire-raw-MCP-Protocol-Version",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/request/headers/MCP-Protocol-Version"
+          },
+          "expected": "2026-07-28",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-raw-MCP-Protocol-Version: /data/transcript/request/headers/MCP-Protocol-Version의 실제 equals 기대값은 \"2026-07-28\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "wire-raw-Mcp-Method",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/request/headers/Mcp-Method"
+          },
+          "expected": "server/discover",
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-raw-Mcp-Method: /data/transcript/request/headers/Mcp-Method의 실제 equals 기대값은 \"server/discover\"다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        },
+        {
+          "id": "wire-raw-meta",
+          "op": "equals",
+          "source": {
+            "actionId": "wire",
+            "pointer": "/data/transcript/request/body/params/_meta"
+          },
+          "expected": {
+            "io.modelcontextprotocol/protocolVersion": "2026-07-28",
+            "io.modelcontextprotocol/clientInfo": {
+              "name": "ontology-channel-contract",
+              "version": "1.0.0"
+            },
+            "io.modelcontextprotocol/clientCapabilities": {
+              "elicitation": {
+                "form": {}
+              }
+            }
+          },
+          "requirementRefs": [
+            "D20"
+          ],
+          "evidenceRefs": [
+            "wire:actual-observation",
+            "wire:source-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            }
+          },
+          "oracleExplanation": "wire-raw-meta: /data/transcript/request/body/params/_meta의 실제 equals 기대값은 {\"io.modelcontextprotocol/protocolVersion\": \"2026-07-28\", \"io.modelcontextprotocol/clientInfo\": {\"name\": \"ontology-channel-contract\", \"version\": \"1.0.0\"}, \"io.modelcontextprotocol/clientCapabilities\": {\"elicitation\": {\"form\": {}}}}다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleRef": {
+            "oracleId": "T20.mcp-stateless-wire",
+            "observationNames": [
+              "wire-protocol"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "raw stateless MCP missing-accept — T20.mcp-stateless-wire의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다."
+    },
+    {
       "id": "wire-initialize-not-required",
       "title": "raw stateless MCP initialize-not-required",
       "fixtureRef": "verification/cases/T20/fixture.json",
@@ -17256,8 +17978,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -17302,8 +18024,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/list",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -18736,8 +19458,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -18779,8 +19501,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/list",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -21534,8 +22256,8 @@
             "headers": {
               "MCP-Protocol-Version": "2025-11-25",
               "Mcp-Method": "server/discover",
-              "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid"
+              "Accept": "application/json, text/event-stream",
+              "Content-Type": "application/json"
             },
             "body": {
               "jsonrpc": "2.0",
@@ -23212,8 +23934,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "getInventory"
             },
             "body": {
@@ -23855,8 +24577,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -24963,8 +25685,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -25887,8 +26609,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "createDraft"
             },
             "body": {
@@ -26104,8 +26826,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "createDraft"
             },
             "body": {
@@ -27165,8 +27887,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "reserveQuantity"
             },
             "body": {
@@ -28210,8 +28932,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "reserveQuantity"
             },
             "body": {
@@ -29502,8 +30224,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -30198,8 +30920,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -30279,8 +31001,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -31455,8 +32177,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -31536,8 +32258,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -32683,8 +33405,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -32780,8 +33502,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -33920,8 +34642,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -34017,8 +34739,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -35193,8 +35915,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -35274,8 +35996,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -35383,8 +36105,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -35464,8 +36186,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -37172,8 +37894,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -37253,8 +37975,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "resources/read",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "ontology://definitions/definition-v1"
             },
             "body": {
@@ -38349,8 +39071,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -38430,8 +39152,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -39570,8 +40292,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -39651,8 +40373,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -40908,8 +41630,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -40998,8 +41720,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -41258,8 +41980,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -43360,8 +44082,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -43450,8 +44172,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -43711,8 +44433,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "dispatchPurchaseOrder"
             },
             "body": {
@@ -45692,8 +46414,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -45769,8 +46491,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "structureIntent"
             },
             "body": {
@@ -47024,8 +47746,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "approvePurchase"
             },
             "body": {
@@ -47129,8 +47851,8 @@
               "headers": {
                 "MCP-Protocol-Version": "2026-07-28",
                 "Mcp-Method": "tools/call",
+                "Accept": "application/json, text/event-stream",
                 "Content-Type": "application/json",
-                "Origin": "https://isolated-client.example.invalid",
                 "Mcp-Name": "approvePurchase"
               },
               "body": {
@@ -47271,8 +47993,8 @@
               "headers": {
                 "MCP-Protocol-Version": "2026-07-28",
                 "Mcp-Method": "tools/call",
+                "Accept": "application/json, text/event-stream",
                 "Content-Type": "application/json",
-                "Origin": "https://isolated-client.example.invalid",
                 "Mcp-Name": "approvePurchase"
               },
               "body": {
@@ -58551,8 +59273,8 @@
             "headers": {
               "MCP-Protocol-Version": "2026-07-28",
               "Mcp-Method": "tools/call",
+              "Accept": "application/json, text/event-stream",
               "Content-Type": "application/json",
-              "Origin": "https://isolated-client.example.invalid",
               "Mcp-Name": "reserveQuantity"
             },
             "body": {

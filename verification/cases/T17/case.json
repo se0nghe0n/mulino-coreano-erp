@@ -14678,6 +14678,44 @@
           }
         },
         {
+          "id": "eligibility-positive-control",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "A"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "양성 대조: 같은 DB 관찰에서 INTERNAL_STORAGE W·내부 custodian의 A는 ALLOWED 1행이다. 그래서 eligibility-response-3의 0(규제 UNKNOWN인데 ALLOWED인 실물 0)은 모든 실물이 장소 때문에 미확인인 공허한 0이 아니다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
           "id": "eligibility-response-4",
           "op": "equals",
           "source": {
@@ -15527,6 +15565,44 @@
           }
         },
         {
+          "id": "eligibility-positive-control",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "A"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "양성 대조: 같은 DB 관찰에서 INTERNAL_STORAGE W·내부 custodian의 A는 ALLOWED 1행이다. 그래서 eligibility-response-3의 0(규제 UNKNOWN인데 ALLOWED인 실물 0)은 모든 실물이 장소 때문에 미확인인 공허한 0이 아니다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
           "id": "eligibility-response-4",
           "op": "equals",
           "source": {
@@ -16368,6 +16444,44 @@
             "scenarioId": "eligibility-fefo-no-reason"
           },
           "oracleExplanation": "eligibility-response는 조건별 근거·FEFO·인도 끝점과 FEFO-no-reason 실행 경계를 확인한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "eligibility-positive-control",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "A"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "양성 대조: 같은 DB 관찰에서 INTERNAL_STORAGE W·내부 custodian의 A는 ALLOWED 1행이다. 그래서 eligibility-response-3의 0(규제 UNKNOWN인데 ALLOWED인 실물 0)은 모든 실물이 장소 때문에 미확인인 공허한 0이 아니다.",
           "oracleRef": {
             "oracleId": "T17.eligibility-fefo-contract",
             "observationNames": [
@@ -17500,6 +17614,44 @@
           }
         },
         {
+          "id": "eligibility-positive-control",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "A"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "양성 대조: 같은 DB 관찰에서 INTERNAL_STORAGE W·내부 custodian의 A는 ALLOWED 1행이다. 그래서 eligibility-response-3의 0(규제 UNKNOWN인데 ALLOWED인 실물 0)은 모든 실물이 장소 때문에 미확인인 공허한 0이 아니다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
           "id": "eligibility-response-4",
           "op": "equals",
           "source": {
@@ -18431,6 +18583,44 @@
             "scenarioId": "eligibility-packaging-unapproved"
           },
           "oracleExplanation": "eligibility-response는 조건별 근거·FEFO·인도 끝점과 packaging-unapproved 실행 경계를 확인한다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "eligibility-positive-control",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$alias": "A"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "양성 대조: 같은 DB 관찰에서 INTERNAL_STORAGE W·내부 custodian의 A는 ALLOWED 1행이다. 그래서 eligibility-response-3의 0(규제 UNKNOWN인데 ALLOWED인 실물 0)은 모든 실물이 장소 때문에 미확인인 공허한 0이 아니다.",
           "oracleRef": {
             "oracleId": "T17.eligibility-fefo-contract",
             "observationNames": [

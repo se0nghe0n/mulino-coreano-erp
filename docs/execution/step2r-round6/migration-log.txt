@@ -1,0 +1,1834 @@
+verification/cases/C1/fixtures/custody-not-sale.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/C1/fixtures/revoked-basis.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/C2/fixtures/cumulative-versus-state.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    segment A60@PORT(EXTERNAL_PORT): custodian warehouse
+    segment B40@PORT(EXTERNAL_PORT): custodian warehouse
+verification/cases/C3/fixture-acceptHandover.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-activateDefinition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-activatePolicy.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-activateWork.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-adjustQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-approveDefinition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-approvePolicy.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-approvePurchase.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-approveRecall.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-assignCapability.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-attachEvidence.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-authorizeReturn.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-cancelDraft.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-cancelPurchase.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-closeRecall.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-closeWork.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-confirmReceipt.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-correctEvidence.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createDefinitionDraft.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createDraft.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createFollowup.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createGrant.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createPolicyDraft.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createSalesOrder.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createShipment.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createWork.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-createWorkLink.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-decideReturnDisposition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-dispatchPurchaseOrder.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-dispatchQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-disposeQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-emergencyReassign.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-emergencyRepair.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-linkCanonicalOccurrence.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-linkExternalId.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-matchInvoice.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-matchSourceIdentity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-mergeQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-migrateWorkDefinition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-moveQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-openInvestigation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-pickQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-placeHold.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-prepareRegulatoryProcedure.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-proposeHandover.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-proposePurchase.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-proposeRecall.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-publishDefinition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-receiveProvisional.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-receiveReturn.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordActivity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordCharge.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordDelivery.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordDispositionBasis.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordExternalReconciliation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordHandover.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordInvoice.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordLegEvent.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordObservedMovement.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordPaymentReference.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordRecallNotice.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordRecovery.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordRegulatoryDecision.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordRelation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordSettlementAdjustment.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordStocktake.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordSubmission.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-recordSupplierReply.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-registerItem.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-rejectHandover.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-releaseAllocation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-releaseHold.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-replaceAllocation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-reserveQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-resolveEvidenceConflict.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-resolveObligation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-resumeWork.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-retireDefinition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-retirePolicy.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-retrySafeCommand.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-reviseGoal.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-revisePurchase.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-reviseSalesOrder.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-revokeCapability.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-revokeDispositionBasis.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-revokeGrant.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-splitQuantity.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-submitDefinitionReview.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-transferObligation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-validateDefinition.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-verifyLabel.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-waitWork.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture-waiveObligation.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C3/fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/C4/fixtures/corrected-delivery-98.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/C4/fixtures/resolved-no-resurrection-resolved.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/C4/fixtures/resolved-no-resurrection-waived.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/C4/fixtures/return-not-correction.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/C5/fixtures/failed-link.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/C5/fixtures/missing-intake-owner.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/C5/fixtures/missing-supervisor.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/C5/fixtures/normal-observation-no-work.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/C5/fixtures/same-anomaly-three-retries.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/E1/fixtures/full-flow-quantities.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+verification/cases/E1/fixtures/independent-goals-and-owners.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+verification/cases/E1/fixtures/whole-runtime-and-model-reference.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+verification/cases/E2/fixtures/exception-responsibility.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/E2/fixtures/overlapping-holds.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/E2/fixtures/qc-release-only-control.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/E2/fixtures/same-25-not-50.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T02/fixtures/conversion-no-substitution.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment PACK1@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T02/fixtures/issuer-and-lot-context.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T02/fixtures/period-boundary-nonoverlap.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T02/fixtures/period-overlap.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T03/fixtures/indistinguishable-mixture.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/pallet-two-lots.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/reject-consumeRetiredParent.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/reject-cycle.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/reject-mergeDifferentControl.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/reject-mergeDifferentPlace.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/reject-mergeIncompatibleUnit.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T03/fixtures/split-merge.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/hold-dispose.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/indivisible-ea.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/precision-overflow.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/primitive-guards.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/rollback-afterAllocationBeforeAudit.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/rollback-afterAuditBeforeOutbox.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/rollback-afterMovementBeforeAllocation.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/rollback-afterOutboxBeforeCommittedResult.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T04/fixtures/scale-overflow.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T05/fixtures/custody-not-sale.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T05/fixtures/manager-disposition.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T05/fixtures/planned-not-actual.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T07/fixtures/cardinality-overflow.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T07/fixtures/date-as-place.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T07/fixtures/db-reference-failure.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/extension-eligible.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T07/fixtures/extension-role.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/hash-mismatch.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/immutable-authorized-download.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/incomplete-upload.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/orphan-upload.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/predicate-truth-and-conflict.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/relation-without-work.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T07/fixtures/two-documents-one-receipt.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/unreadable-uri.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/unsupported-operator.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T07/fixtures/wrong-endpoint.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T08/fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/T08/unresolved-policy-fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/T09/fixtures/cumulative-versus-state.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    segment A60@PORT(EXTERNAL_PORT): custodian warehouse
+    segment B40@PORT(EXTERNAL_PORT): custodian warehouse
+verification/cases/T09/fixtures/exists-versus-end-throughout.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/lot-not-yet-required.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/missing-dueAt.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/missing-endpoint.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/missing-quantity.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/receipt-missing-lot.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/throughout-complete.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T09/fixtures/throughout-gap.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/admin-emergency.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/closed-target.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/cycle.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/handover-absent.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/handover-accepted.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/handover-expired.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/handover-proposed.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/handover-rejected.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/link-failure.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/missing-next-action.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/missing-next-check.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/missing-owner.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/ordinary-emergency.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/partial-commit.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/partial-failure.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/reason-missing.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/resolve-no-proof.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/successful-transfer.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T10/fixtures/waive-wrong-authority.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/cancel-after-shipment.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/closed-followup.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/dependency-cycle.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/draft-cancel.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/parent90-cancelled.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/parent90-impossible.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/parent90-superseded.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/pending-correction.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/shared-distinct60.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/stale-revision.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/unsupported-evaluator.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T11/fixtures/wait-timeout.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T12/fixtures/conflicting-claims.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T12/fixtures/deadline-revision-and-correction.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T12/fixtures/insufficient-source-scope.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T12/fixtures/no-receipt-evidence.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T12/fixtures/wrong-warehouse.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+verification/cases/T13/fixtures/cancel-unexecuted.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment R60@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T13/fixtures/changed-destinationId.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/changed-dueAt.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/changed-endpoint.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/changed-itemId.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/changed-price.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/changed-quantity.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/changed-supplierId.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/decision-conditional.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/decision-expired.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/decision-reject.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/decision-unauthorized.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/partial-excess-return-relocation.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/policy-rechecked.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/supplier-accept.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/supplier-change.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T13/fixtures/supplier-reject.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T14/fixtures/discrepancy-transit2.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@TRANSIT(TRANSIT): custodian warehouse
+verification/cases/T14/fixtures/discrepancy-unobserved2.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@TRANSIT(TRANSIT): custodian warehouse
+verification/cases/T14/fixtures/many-to-many.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T14/fixtures/orphan-temperature.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment B40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T15/fixtures/agency30-qc100.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T15/fixtures/missing-applicableDate.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T15/fixtures/missing-officialSource.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T15/fixtures/missing-reviewer.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T15/fixtures/procedure-lifecycle.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+    segment Q100@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T16/fixtures/expiry-delayed-sweep.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T16/fixtures/expiry-sweeper.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T16/fixtures/provisional-holds.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T16/fixtures/stocktake-adjust-move.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/T17/fixtures/claim-conflictingquantity.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/claim-falseclaim.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/claim-nopriordispatch.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/claim-scopeoverflow.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/claim-unidentifiedscope.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/eligibility-conflict.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+    segment EARLY@W(INTERNAL_STORAGE): custodian receiver
+    segment U@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/eligibility-fefo-no-reason.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+    segment EARLY@W(INTERNAL_STORAGE): custodian receiver
+    segment U@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/eligibility-fefo-with-reason.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+    segment EARLY@W(INTERNAL_STORAGE): custodian receiver
+    segment U@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/eligibility-packaging-unapproved.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+    segment EARLY@W(INTERNAL_STORAGE): custodian receiver
+    segment U@W(INTERNAL_STORAGE): custodian receiver
+    segment OTHERPACK@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/eligibility-unknown.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+    segment EARLY@W(INTERNAL_STORAGE): custodian receiver
+    segment U@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/late-restriction-actual-delivery.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/normal-consumed-delivery.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/post-dispatch-expiry.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/replacement-no-revival.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T17/fixtures/reserve-pick-dispatch.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+    segment B@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T18/fixtures/recall-closure-accounting.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T18/fixtures/return-new-receipt.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T18/fixtures/trace-and-recall-decisions.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T18/fixtures/unidentified-return-provisional.json
+    place W: None -> INTERNAL_STORAGE
+    place TRANSIT: None -> TRANSIT
+    place CUSTOMER: None -> CUSTOMER
+    place SUPPLIER_PLACE: None -> SUPPLIER
+    segment A@W(INTERNAL_STORAGE): custodian receiver
+verification/cases/T19/fixtures/fx-commercial.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/fx-correction.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/fx-credit_note.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/fx-domestic_tax.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/invoice-match-difference.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/invoice-quantity-difference.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/settlement-stale.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/settlement-unauthorized.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T19/fixtures/settlement-valid.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W-alt: WAREHOUSE -> INTERNAL_STORAGE
+    place IT-port: PORT -> EXTERNAL_PORT
+    place KR-port: PORT -> EXTERNAL_PORT
+    place TRANSIT: TRANSPORT -> TRANSIT
+verification/cases/T21/fixtures/active-pointer-rollback-preserves-effects.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T21/fixtures/approval-required-and-rejected-revision.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T21/fixtures/approved-lifecycle.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T21/fixtures/explicit-authorized-migration.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T21/fixtures/invalid-executable-payloads.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T21/fixtures/pinned-meaning-current-policy.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T21/fixtures/published-content-immutable.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T21/fixtures/six-impact-diff-classes.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T21/fixtures/unsupported-v1-held.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T21/fixtures/validation-constraints.json
+    place W: None -> INTERNAL_STORAGE
+verification/cases/T26/fixtures/disposition-expiry-delayed-guard.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/disposition-expiry-no-event.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/due-wait-db-rediscovery.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/emergency-repair-dryrun-apply.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/grant-expiry-delayed-guard.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/grant-expiry-no-event.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/lot-expiry-delayed-guard.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/lot-expiry-no-event.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/operational-nine-categories.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/orphan-intake-recovered.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/outbox-exhaustion-alert-dedupe.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/planned-transition-reindexes.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/policy-expiry-delayed-guard.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/policy-expiry-no-event.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/restore-complete.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/restore-missing-blob.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/restore-missing-v1-evaluator.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/safe-retry-canonical-current-grant.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/safe-retry-revoked-blocked.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/T26/fixtures/unknown-external-reconcile-before-retry.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V1/fixtures/pinned-meaning-current-policy.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V1/fixtures/skill-hash-no-runtime-proof.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V1/fixtures/unsupported-v1-held.json
+    place W: None -> INTERNAL_STORAGE
+    alias warehouse: new internal Human custodian
+    segment A40@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V2/fixtures/actual50-correction.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/V2/fixtures/reserve-commits-first.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/V2/fixtures/split-commits-first.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/V3/fixtures/dispatch-first.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/V3/fixtures/hold-first.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/V3/fixtures/late-v1-release.json
+    place W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    place PORT: PORT -> EXTERNAL_PORT
+    custodian CUSTODIAN: Organization(WAREHOUSE) -> internal Human
+verification/cases/V4/fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/V5/fixtures/bounded-retry-exhausted-owner.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V5/fixtures/repeated-crash-no-duplicate.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V5/fixtures/two-workers-expired-fence.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V5/fixtures/waiting-full-restart.json
+    place W: WAREHOUSE -> INTERNAL_STORAGE
+    place W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    segment Q20@W(INTERNAL_STORAGE): custodian warehouse
+verification/cases/V6/fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/V6/receipt-fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/V6/two-po-fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/V7/fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+verification/cases/V7/restart-fixture.json
+    place W: None -> INTERNAL_STORAGE
+    place W2: None -> INTERNAL_STORAGE
+    place CUSTOMER-PLACE: None -> CUSTOMER
+    place W-B: None -> INTERNAL_STORAGE
+    baseline.places W: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places W2: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+    baseline.places CUSTOMER-PLACE: EXTERNAL_CUSTOMER -> CUSTOMER
+    baseline.places W-B: INTERNAL_WAREHOUSE -> INTERNAL_STORAGE
+WRITTEN 306 fixture files

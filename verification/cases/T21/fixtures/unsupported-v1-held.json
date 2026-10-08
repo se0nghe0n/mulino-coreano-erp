@@ -377,7 +377,8 @@
       "baseUnit": "BUNDLE"
     },
     "W": {
-      "type": "Place"
+      "type": "Place",
+      "kind": "INTERNAL_STORAGE"
     },
     "C": {
       "type": "Customer"
@@ -410,7 +411,8 @@
       "itemAlias": "P",
       "lotAlias": "L",
       "locationAlias": "W",
-      "physicalScope": "initial-40"
+      "physicalScope": "initial-40",
+      "custodianAlias": "warehouse"
     },
     "PHYS60": {
       "type": "PhysicalScope",
@@ -452,6 +454,10 @@
     },
     "INITIAL_RECEIPT40": {
       "type": "Activity"
+    },
+    "warehouse": {
+      "type": "Human",
+      "name": "내부 창고 보관 담당"
     }
   },
   "baseline": {
@@ -580,7 +586,8 @@
         "itemAlias": "P",
         "lotAlias": "L",
         "locationAlias": "W",
-        "physicalScope": "initial-40"
+        "physicalScope": "initial-40",
+        "custodianAlias": "warehouse"
       }
     ],
     "works": [

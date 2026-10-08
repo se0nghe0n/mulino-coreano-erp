@@ -150,8 +150,10 @@ def wire(aid, method, actor='reader', args=None):
     body['params']['_meta'] = {'io.modelcontextprotocol/protocolVersion': '2026-07-28',
                                'io.modelcontextprotocol/clientInfo': {'name': 'ontology-v4-surface', 'version': '1.0.0'},
                                'io.modelcontextprotocol/clientCapabilities': {}}
-    headers = {'MCP-Protocol-Version': '2026-07-28', 'Mcp-Method': method, 'Content-Type': 'application/json',
-               'Origin': 'https://isolated-client.example.invalid'}
+    # contracts/mcp/s0-protocol.md "독립 요청": Accept is required (406 otherwise); no Origin is sent because no contract
+    # declares an allowed one and an Origin-less request is accepted.
+    headers = {'MCP-Protocol-Version': '2026-07-28', 'Mcp-Method': method, 'Accept': 'application/json, text/event-stream',
+               'Content-Type': 'application/json'}
     return {'id': aid, 'kind': 'invoke', 'actorRef': actor, 'route': 'wire', 'protocolOperation': method,
             'request': {'transport': 'streamable-http', 'httpMethod': 'POST', 'headers': headers, 'body': body,
                         'credentialProfileRef': actor},

@@ -156,6 +156,7 @@ final class StepTwoRoundFiveRegressionTest {
         c.host().set("command",rows.path("command").deepCopy()); // the watcher's own argv/interval
         c.host().set("operationEvidence",rows.path("operationEvidence").deepCopy());
         ObjectNode params=(ObjectNode)c.control().path("parameters");params.put("trigger","OBSERVE_NEXT_NATURAL_TICK").put("observationWindowSeconds",30).put("triggeredBy","SCHEDULER_LOOP");
+        params.put("observeFrom","2026-10-07T00:00:00Z"); // step2r round 6: the harness-resolved boundary the host adapter receives
         c.host().set("requestedInputs",params.deepCopy());
         Path copy=Files.createTempFile(root.resolve("verification/harness/target"),"round5-rows-",".json");Json.write(copy,rows);
         String refPath=root.relativize(copy).toString();((ObjectNode)c.host().path("extractor")).put("rawRowsArtifactRef",refPath);
@@ -169,9 +170,11 @@ final class StepTwoRoundFiveRegressionTest {
         // The watcher thread started late (00:00:02.5) but the loop submitted at 00:00:02 after the boundary: durable rows still count.
         HostObservationValidatorTest.Capture late=shifted("2026-10-07T00:00:02.500Z","2026-10-07T00:00:03Z","2026-10-07T00:00:02Z");
         HostObservationValidator.validate(v,late.control(),late.result(),false,boundary);
-        assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(v,late.control(),late.result(),false,null),"without the boundary the late watcher loses the submission");
+        // Round 6: the boundary travels in the request as observeFrom, so the same rows also validate without the side channel.
+        HostObservationValidator.validate(v,late.control(),late.result(),false,null);
         // A watcher command cannot claim to have started before the group existed.
         HostObservationValidatorTest.Capture early=shifted("2026-10-07T00:00:01Z","2026-10-07T00:00:03Z","2026-10-07T00:00:02Z");
+        ((ObjectNode)early.control().path("parameters")).put("observeFrom","2026-10-07T00:00:01.500Z");early.host().set("requestedInputs",early.control().path("parameters").deepCopy());
         assertTrue(assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(v,early.control(),early.result(),false,Instant.parse("2026-10-07T00:00:01.500Z"))).getMessage().contains("boundary"));
         // The window still ends 30 s after the boundary.
         HostObservationValidatorTest.Capture tooLate=shifted("2026-10-07T00:00:25Z","2026-10-07T00:00:32Z","2026-10-07T00:00:31Z");
@@ -188,8 +191,25 @@ final class StepTwoRoundFiveRegressionTest {
         branches.add(Json.object().put("id","loop").set("actions",Json.array().add(control("start-loop",start.control()))));
         group.set("branches",branches);
         Path file=caseFile(List.of(group),List.of(assertion("acked","group","/data/submissionAcknowledged",Json.MAPPER.valueToTree(true))));
+        // The port answers the request it actually receives: the watcher's host echo carries the harness-resolved observeFrom.
+        ((ObjectNode)watcher.control().path("parameters")).remove("observeFrom");
         Port port=new Port(Map.of("watch",as("watch",watcher.result()),"start-loop",as("start-loop",start.result())),q->{throw new AssertionError("no observe");});
-        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),port,new AgentRunner.Scripted(),file,"hold-preserves-physical");
+        AcceptanceDriver echo=new AcceptanceDriver() {
+            public Set<String> availableAdapters(){return port.availableAdapters();}
+            public StepResult installFixture(String id,JsonNode f){return port.installFixture(id,f);}
+            public StepResult invoke(String id,String r,JsonNode a,String c,JsonNode q){return port.invoke(id,r,a,c,q);}
+            public StepResult query(String id,String r,JsonNode a,String c,JsonNode q){return port.query(id,r,a,c,q);}
+            public StepResult observe(String id,JsonNode q){return port.observe(id,q);}
+            public StepResult start(String id,String r,JsonNode a,String c,JsonNode q){return port.start(id,r,a,c,q);}
+            public StepResult await(String id,JsonNode h,int t){return port.await(id,h,t);}
+            public StepResult control(String id,JsonNode q){
+                StepResult r=port.control(id,q);if(!id.equals("watch")) return r;
+                assertTrue(q.path("parameters").path("observeFrom").isTextual(),"the watcher request carries the harness-resolved observeFrom");
+                ObjectNode data=r.data().deepCopy();((ObjectNode)data.path("hostObservation")).set("requestedInputs",q.path("parameters").deepCopy());
+                return new StepResult(id,r.driverStatus(),data,r.response(),r.reason(),r.provenance(),r.artifactRefs());
+            }
+        };
+        CaseRunner runner=CaseRunner.harnessSelftest(new ContractValidator(root),echo,new AgentRunner.Scripted(),file,"hold-preserves-physical");
         // The watcher's SUBMITTED task has no awaited terminal here, so the selftest stays NOT_RUN; the group itself executed.
         assertEquals("NOT_RUN",runner.run(false));
         assertEquals("EXECUTED",runner.results().get("group").path("driverStatus").asText());

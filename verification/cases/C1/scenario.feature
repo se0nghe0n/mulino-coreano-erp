@@ -65,3 +65,18 @@
     그러면 "actual-baseline-physical-rows" assertion으로 "서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다."를 확인한다
     그러면 "new-reservation-quantity-primary" assertion으로 "실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다."를 확인한다
     그러면 "new-dispatch-quantity-primary" assertion으로 "실제 독립DB의 해당 명령 효과 원행 quantity 합계는0이며, 같은 실물CON40 원행에서 관찰한 단위는BOX다. 완료된 빈 효과 scope만0으로 합산하며 누락/null/미구현은 거부한다."를 확인한다
+
+  시나리오: 계약 어휘 밖 장소 종류의 위탁40은 적격0·UNKNOWN이고 내부 보관 위탁40만 적격이다
+    먼저 사례 파일 "verification/cases/C1/case.json"의 "unrecognized-place-kind"를 준비한다
+    만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "warehouse" 역할이 "known-kind" 행동을 수행한다
+    만일 "warehouse" 역할이 "unrecognized-kind" 행동을 수행한다
+    만일 "warehouse" 역할이 "inventory" 행동을 수행한다
+    만일 "시스템" 역할이 "inventory-db" 행동을 수행한다
+    그러면 "known-kind-eligible-40" assertion으로 "내부 보관 W의 위탁 판매 적격 = 40 BOX"를 확인한다
+    그러면 "known-kind-allowed" assertion으로 "내부 보관 위탁40의 판정 = ALLOWED"를 확인한다
+    그러면 "unrecognized-kind-eligible-0" assertion으로 "어휘 밖 장소 종류(WAREHOUSE)의 위탁 판매 적격 = 0 BOX"를 확인한다
+    그러면 "unrecognized-kind-unknown" assertion으로 "어휘 밖 장소 종류의 판정 = UNKNOWN(확정 거부 아님)"를 확인한다
+    그러면 "item-held-80" assertion으로 "품목 보유 = 40+40 = 80 BOX"를 확인한다
+    그러면 "item-eligible-40" assertion으로 "품목 판매 적격 = 내부 보관 40 BOX만"를 확인한다
+    그러면 "installed-physical-rows" assertion으로 "설치 실물 CON40 40 BOX@W, UNK40 40 BOX@W-UNRECOGNIZED"를 확인한다

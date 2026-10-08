@@ -32,6 +32,8 @@ public final class CaseRunner {
     private final Map<RuntimeIdentity,RuntimeSubmission> runtimeSubmissions=new ConcurrentHashMap<>();
     /** Harness instant captured right before an autonomous-loop parallel group starts, keyed by its watcher action id. */
     private final Map<String,Instant> observationBoundaries=new ConcurrentHashMap<>();
+    /** The control request actually sent to the port, including the harness-resolved observeFrom of a passive watcher. */
+    private final Map<String,JsonNode> resolvedControls=new ConcurrentHashMap<>();
     private final Set<RuntimeIdentity> runtimeTerminals=ConcurrentHashMap.newKeySet();
     private final List<ObjectNode> parallelFailures=new CopyOnWriteArrayList<>();
     private final Object executionGate=new Object();
@@ -81,7 +83,7 @@ public final class CaseRunner {
                 case "invoke" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
                 case "query" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
                 case "observe" -> dispatch(() -> driver.observe(id,observationRequest(a.path("observation"))));
-                case "control" -> dispatch(() -> driver.control(id,resolve(a.path("control"))));
+                case "control" -> {JsonNode control=controlRequest(id,a);yield dispatch(() -> driver.control(id,control));}
                 case "agent" -> {
                     // A UAT-only subcase needs the real client host; the scripted runner must not stand in for it.
                     if(validator.requiresActualClient(subcase) && !agentRunner.actualClient())
@@ -112,7 +114,7 @@ public final class CaseRunner {
                 if(!result.data().path("controlType").asText().equals(a.path("control").path("type").asText()) || !result.data().path("operation").asText().equals(a.path("control").path("operation").asText()))
                     throw new IllegalArgumentException("Control ACK does not match requested control type/operation");
                 if(!result.data().hasNonNull("acknowledgedAt")) throw new IllegalArgumentException("Control ACK time absent");
-                JsonNode requested=resolve(a.path("control"));
+                JsonNode requested=resolvedControls.containsKey(id)?resolvedControls.get(id):resolve(a.path("control"));
                 HostObservationValidator.validate(validator,requested,result,policy==EvidencePolicy.PRODUCT,observationBoundaries.get(id));
                 if(requested.path("type").asText().equals("barrier")) for(String field:List.of("barrierId","participantId","transactionId","point","state"))
                     if(!requested.path("parameters").hasNonNull(field) || !result.data().hasNonNull(field) || !result.data().path(field).equals(requested.path("parameters").path(field)))
@@ -293,6 +295,22 @@ public final class CaseRunner {
             if(Instant.parse(Json.required(task,"completedAt")).isBefore(submission.submittedAt())) throw new IllegalArgumentException("Runtime task completed before actual submission");
             if(!runtimeTerminals.add(key)) throw new IllegalArgumentException("Runtime task has more than one terminal observation");
         }
+    }
+    /**
+     * Resolves a control action. A passive natural-tick watcher (HostObservationValidator.passiveWatch) gets the observation
+     * boundary as the resolved request parameter observeFrom: the group's pre-submission boundary for the autonomous-loop
+     * watcher, otherwise the harness instant taken just before this watcher is dispatched. The host adapter's extractor reads
+     * the scheduler's durable submission rows in [observeFrom, observeFrom+observationWindowSeconds] and the validator checks
+     * the same window, so a group watcher cannot lose an early loop submission and a standalone repeat watcher does not
+     * report an earlier sweep's row (host-observation-guide.md). observeFrom is harness-owned; a case never authors it.
+     */
+    private JsonNode controlRequest(String id,JsonNode action) {
+        JsonNode control=resolve(action.path("control"));
+        if(HostObservationValidator.passiveWatch(control) && control.path("parameters").isObject()) {
+            Instant from=observationBoundaries.computeIfAbsent(id,k->Instant.now());
+            ObjectNode copy=((ObjectNode)control).deepCopy();((ObjectNode)copy.path("parameters")).put(HostObservationValidator.OBSERVE_FROM,from.toString());control=copy;
+        }
+        resolvedControls.put(id,control);return control;
     }
     private StepResult parallel(JsonNode action) throws IOException {
         // One deadline covers all branches; ExecutorService.close() would wait forever on a blocked port.

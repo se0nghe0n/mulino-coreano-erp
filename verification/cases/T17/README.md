@@ -117,3 +117,13 @@ C4/evidence/review-outcomes/selftest-commands.json에 보존했다.
   remaining-transit, new-warehouse-dispatch, new-executable-allocation,
   fact-not-permission, late-restriction-duty에 연결했다. 회수 의무는
   만료 쪽에 없으므로 RECALL_INVESTIGATION assertion은 넣지 않았다.
+
+## Step 2 round 6 장소 종류
+
+fixture의 W·TRANSIT·CUSTOMER·SUPPLIER_PLACE에 계약 kind(INTERNAL_STORAGE·
+TRANSIT·CUSTOMER·SUPPLIER)를 주고 W의 실물에 내부 보관자 `receiver`를
+두었다(`contracts/fixture-place-kinds.md`). 전에는 W에 kind가 없어 계약을
+지키는 제품에서 모든 실물이 UNKNOWN·적격0이었다. 그러면
+eligibility-* 다섯 subcase의 `eligibility-response-3`(규제 UNKNOWN인데
+ALLOWED인 실물 0)이 장소만으로 통과했다. 같은 DB 관찰에서 A가 ALLOWED
+1행이라는 `eligibility-positive-control`을 더해 그 0이 공허하지 않게 했다.

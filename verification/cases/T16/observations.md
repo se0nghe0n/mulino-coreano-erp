@@ -21,6 +21,7 @@ lockProbeScopeOnly는 fixture가 지정한 segment/allocation/fence 세 scope의
 ## provisional-holds
 
 운송 실물60은 확인 수령에서 이동하며 재생성되지 않는다. QC20만 해제해도 회수60은ACTIVE라 판매0이다.
+`confirmed-eligible-control`(step2r round 6)은 확인 수령 직후·보류 전 W의 60이 판매 적격 60 BOX임을 본다. 그래서 임시 접수의 0과 QC만 해제한 뒤의 0은 장소 종류가 아니라 임시 상태와 남은 RECALL60 때문이다.
 
 - `provisional-eligible-1` → `T16.provisional-and-independent-holds / provisional-eligible`: 실물량·단위와 독립 손계산을 대조한다.
 - `provisional-eligible-2` → `T16.provisional-and-independent-holds / provisional-eligible`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.

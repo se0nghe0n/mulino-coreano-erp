@@ -29,6 +29,7 @@
     그러면 "provisional-eligible-2" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "receipt-transit-double-creation-3" assertion으로 "독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다."를 확인한다
     그러면 "receipt-transit-double-creation-4" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
+    그러면 "confirmed-eligible-control" assertion으로 "확인 수령 직후·보류 전 W 판매 적격 = 60 BOX(양성 대조)"를 확인한다
     그러면 "receipt-transit-double-creation-5" assertion으로 "실물량·단위와 독립 손계산을 대조한다."를 확인한다
     그러면 "receipt-transit-double-creation-6" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
     그러면 "receipt-transit-double-creation-7" assertion으로 "독립 원 행의 실물·수량·관계·범위를 정확히 대조한다."를 확인한다
