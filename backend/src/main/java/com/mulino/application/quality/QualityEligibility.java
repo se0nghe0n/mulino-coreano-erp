@@ -59,8 +59,12 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
  private static Instant minimumFuture(Instant a,Instant b,Instant at){return b.isAfter(at)?minimum(a,b):a;}
  private static Instant minimum(Instant a,Instant b){return b==null?a:a==null?b:a.isBefore(b)?a:b;}
  public static List<Map<String,Object>>dto(Collection<QualityRanges.Range>ranges){return QualityRanges.union(ranges).stream().map(x->Map.<String,Object>of("startQuantity",InventoryQuantity.text(x.start()),"quantity",InventoryQuantity.text(x.end().subtract(x.start())))).toList();}
- /** Places whose stock already left warehouse custody: dispatched cargo in transit, goods delivered to a customer, supplier sites (plan §4.2, §6). */
- static final Set<String> OUTSIDE_WAREHOUSE=Set.of("TRANSIT","CUSTOMER","SUPPLIER");
+ /**
+  * Only stock in controlled internal storage under a known internal custodian can be sale-eligible (plan §4.2, §6); this is an
+  * allowlist matching the fulfillment write gate (FulfillmentCommands.requireWarehouse), so a place of any other or unknown kind
+  * (in transit, delivered to a customer, at a supplier, or a free-text kind such as EXTERNAL_CUSTOMER) is never counted.
+  */
+ private boolean inWarehouse(DomainContext c,Map<String,Object> segment){return "INTERNAL_STORAGE".equals(r.object(c,"Places",(String)segment.get("placeId")).get("kind"))&&segment.get("custodianId")!=null&&r.internalCustodian(c,(String)segment.get("custodianId"));}
  /**
   * Item-scope SELL facts. Stock that is in transit or at a customer/supplier place is held history, not sale-eligible warehouse
   * stock (plan §13.3 E1 "현재 판매 적격0"), so it is never assessed as eligible. Without a current eligibility policy the
@@ -68,7 +72,7 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   */
  public Facts read(DomainContext c,String operation,String itemId,Map<String,Object>scope,List<Map<String,Object>>segments){
   BigDecimal eligible=BigDecimal.ZERO,reserved=BigDecimal.ZERO,unreserved=BigDecimal.ZERO;var unknowns=new TreeSet<String>();var refs=new TreeSet<String>();boolean partial=false,undeterminable=false;
-  for(var segment:segments){Result result;if(OUTSIDE_WAREHOUSE.contains(r.object(c,"Places",(String)segment.get("placeId")).get("kind")))result=new Result("DENIED",BigDecimal.ZERO,List.of(),List.of(),List.of(),List.of(),null);else result=assess(c,segment,"SELL",(String)scope.get("customerId"));undeterminable|=result.unknowns().contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED");eligible=eligible.add(result.eligibleQuantity());unknowns.addAll(result.unknowns());refs.addAll(result.evidenceRefs());partial|=!"ALLOWED".equals(result.state());
+  for(var segment:segments){Result result;if(!inWarehouse(c,segment))result=new Result("DENIED",BigDecimal.ZERO,List.of(),List.of(),List.of(),List.of(),null);else result=assess(c,segment,"SELL",(String)scope.get("customerId"));undeterminable|=result.unknowns().contains("CURRENT_ELIGIBILITY_POLICY_UNRESOLVED");eligible=eligible.add(result.eligibleQuantity());unknowns.addAll(result.unknowns());refs.addAll(result.evidenceRefs());partial|=!"ALLOWED".equals(result.state());
    var allocations=r.rows(c,"SegmentAllocations").stream().filter(a->segment.get("ID").equals(a.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(a.get("state"))).toList();var ranges=new ArrayList<QualityRanges.Range>();BigDecimal unidentified=BigDecimal.ZERO;for(var a:allocations){reserved=reserved.add((BigDecimal)a.get("quantity"));if(a.get("startQuantity")==null)unidentified=unidentified.add((BigDecimal)a.get("quantity"));else ranges.add(range(a));}
    unreserved=unreserved.add(QualityRanges.quantity(QualityRanges.subtract(result.ranges(),ranges)).subtract(unidentified).max(BigDecimal.ZERO));
   }

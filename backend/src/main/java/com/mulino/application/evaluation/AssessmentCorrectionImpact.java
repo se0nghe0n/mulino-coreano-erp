@@ -11,8 +11,8 @@ import org.springframework.stereotype.Component;
 /** Exact persisted input matches and typed target scopes. All changes share the evidence transaction. */
 @Component
 public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
- private final AssessmentService service;private final AssessmentRepository repository;private final ObjectProvider<ResponsibilityService> duties;private final ObjectMapper json=new ObjectMapper();private final ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections;private final com.mulino.domain.evidence.EvidenceRepository evidence;
- public AssessmentCorrectionImpact(AssessmentService service,AssessmentRepository repository,ObjectProvider<ResponsibilityService> duties,ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections,com.mulino.domain.evidence.EvidenceRepository evidence){this.service=service;this.repository=repository;this.duties=duties;this.deliveryCorrections=deliveryCorrections;this.evidence=evidence;}
+ private final AssessmentService service;private final AssessmentRepository repository;private final ObjectProvider<ResponsibilityService> duties;private final ObjectMapper json=new ObjectMapper();private final ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections;private final com.mulino.domain.evidence.EvidenceRepository evidence;private final ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements;
+ public AssessmentCorrectionImpact(AssessmentService service,AssessmentRepository repository,ObjectProvider<ResponsibilityService> duties,ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections,com.mulino.domain.evidence.EvidenceRepository evidence,ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements){this.settlements=settlements;this.service=service;this.repository=repository;this.duties=duties;this.deliveryCorrections=deliveryCorrections;this.evidence=evidence;}
  public void apply(DomainContext c,Correction correction){
   var ids=affected(c,correction.previousId(),correction.currentId(),correction.affectedWorkIds());
   var occurrences=relatedOccurrences(c,correction.previousId());
@@ -40,6 +40,11 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
    if(deliveries.size()!=1)throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Delivery correction requires one applied original delivery");
    var ports=deliveryCorrections.stream().toList();if(ports.size()!=1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact delivery correction responsibility provider required");
    ports.getFirst().correctionImpact(c,deliveries.getFirst().get("ID").toString(),canonicalId);
+  }
+  // A verified correcting canonical may change the recognized contribution behind an invoice match: settlement owns that difference (plan §6 정산, §4.3).
+  if(canonical.get("supersedesId")!=null&&Set.of("PHYSICAL_DELIVERY","PHYSICAL_RECEIPT").contains(canonical.get("kind"))){
+   var settlement=settlements.stream().toList();if(settlement.size()>1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact settlement contribution provider required");
+   if(settlement.size()==1)settlement.getFirst().contributionChanged(c,canonicalId);
   }
  }
  private record Raw(String kind,Map<String,Object> row){}

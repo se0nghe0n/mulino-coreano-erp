@@ -58,8 +58,17 @@ actor에서 추론하지 않는다.
   서로 다르거나 검증 출처끼리 다른 보관 주체를 지명하면 HELD
   EVIDENCE_CONFLICT, 아무도 지명하지 않거나 slot과 다르면 HELD
   EVIDENCE_UNVERIFIED다. 지명하지 않는 출처(예: 운송 증빙)는 중립이다.
-- 이미 기록된 범위의 중복 출처가 slot으로 다른 보관 주체를 주장하면
-  EVIDENCE_CONFLICT다.
+- 이미 기록된 범위의 중복 출처 확정은 slot 유무와 관계없이 모든 현재
+  검증 chain의 보관 주체 지명을 다시 읽는다(s4h-native 개정). slot이
+  기록된 보관 주체와 다르거나, 검증 출처가 지명한 보관 주체가 이미
+  기록된 segment의 보관 주체와 다르면 HELD EVIDENCE_CONFLICT이고 효과는
+  0이며 그 관측의 RECEIPT_RECONCILIATION 의무는 OPEN으로 남는다.
+- 첫 확정이 slot 없이 끝나 보관 주체가 미확인인 segment에 뒤늦게 보관
+  주체를 붙이는 공개 경로는 없다(scenario B). 그 segment는
+  `requireWarehouse`에서 예약·출고가 거부되는 fail-closed 상태이며,
+  중복 출처 확정으로 보관 주체를 덧쓰지 않는다. 검증 연결 시점의
+  재검사도 하지 않으므로 다음 확정 전까지는 새 의무가 생기지 않는다
+  (`docs/execution/s4i-closure/README.md`).
 - slot이 없으면 S3 동작 그대로 보관 주체·소유 모두 미확인이다.
   `ReceiptGatewayPostgresTest`의 기존 null assertion은 유지한다.
 - schema 변경은 없다. 기존 `QuantitySegments.custodianId`를 쓴다.

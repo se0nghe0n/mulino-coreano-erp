@@ -25,7 +25,8 @@ class AssessmentCorrectionLinkTest {
   when(assessments.rows(c,"mulino.trade.sales.Deliveries")).thenReturn(List.of(Map.of("ID",DELIVERY,"observationId",SCOPE)));
   when(evidence.require(eq("CanonicalOccurrences"),eq(ORG),anyString())).thenThrow(DomainError.forbidden());
   ObjectProvider<ResponsibilityService> duties=mock(ObjectProvider.class);ObjectProvider<DeliveryCorrectionPort> ports=mock(ObjectProvider.class);when(ports.stream()).thenAnswer(i->java.util.stream.Stream.of(port));
-  impact=new AssessmentCorrectionImpact(mock(AssessmentService.class),assessments,duties,ports,evidence);
+  ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements=mock(ObjectProvider.class);when(settlements.stream()).thenAnswer(i->java.util.stream.Stream.empty());
+  impact=new AssessmentCorrectionImpact(mock(AssessmentService.class),assessments,duties,ports,evidence,settlements);
  }
  @Test void deliveryCorrectionWrittenAfterKnownAtReachesExactOriginalDelivery(){
   doReturn(new LinkedHashMap<String,Object>(Map.of("ID",CANONICAL,"organizationId",ORG,"kind","PHYSICAL_DELIVERY","supersedesId",PRIOR,"physicalScopeId",SCOPE,"recordedAt",KNOWN.plusSeconds(1)))).when(evidence).require("CanonicalOccurrences",ORG,CANONICAL);
