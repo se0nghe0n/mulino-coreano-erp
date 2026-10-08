@@ -42,3 +42,14 @@ harness 결과는 `evidence/`에 기록하며 준비 PASS와 제품 인수를 �
 실패한 뒤 남은 assertion은 실행되지 않았다. 제품 recovery는 exit2
 `NOT_RUN`이며 91개 assertion의 관찰 source가 미실행이다.
 `evidence/authoring-summary.json`에 실제 입력 hash와 명령을 기록했다.
+
+## barrier 표기(Step 2 재검토 2차)
+
+worker barrier는 `pause-*` fault arm의 `testTransactionId`·
+`testParticipantId`·`testBarrierId`·`testBarrierPoint`로 건다. barrier
+control은 같은 고정 label을 쓴다. 이전 판은 barrierId·participantId·
+transactionId를 claim 관찰 원행에서 읽어 control에 되돌려 넣었다.
+그 값은 제품이 쓴 것이라 요청과 ACK의 exact 대조가 echo가 됐다.
+worker는 API 요청으로 시작하지 않으므로 arming 위치만 request 대신
+fault arm이다. 필드 의미는
+[V2 경합 관찰 계약](../V2/race-observation-contract.md)과 같다.

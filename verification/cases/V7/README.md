@@ -36,3 +36,16 @@ claim fence나 업무 terminal로 해석하지 않는다. 현재 grant 철회에
 V7 claim fence와 timeout 이후 metadata dispatch 경계의 후속 검사·
 4개 시나리오 RED는 `evidence/host-closure/checks.json`에 있다.
 고정 host 표본과 실제 JVM selftest를 제품 실행 성공으로 세지 않는다.
+
+## Step 2 재검토 2차 보완
+
+- barrier arming은 [V2 경합 관찰 계약](../V2/race-observation-contract.md)의
+  top-level `testTransactionId`·`testParticipantId`·`testBarrierId`·
+  `testBarrierPoint`다. control의 transactionId는 label이며 start ACK의
+  값을 되돌려 넣지 않는다. effect-first의 두 ACK는 서로 다른 실제
+  DB transaction이어야 한다.
+- safe retry 요청은 `slots={commandId, reason, claimFencingToken}`만
+  보낸다. 원 멱등키·actor·hash는 서버가 command record에서 유도한다.
+  감사 원행(actor delegator, retrySafeCommand, REJECTED)과 원
+  command new20의 stableRequestOwner(warehouse) 보존을 확인한다.
+- `observation-bindings.json`은 `bind_observations.py V7`로 만든다.

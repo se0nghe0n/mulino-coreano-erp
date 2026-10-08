@@ -1800,7 +1800,11 @@
               "point": "worker.afterClaimBeforeCommit",
               "workerId": "worker-a",
               "disableHeartbeat": true,
-              "times": 1
+              "times": 1,
+              "testTransactionId": "tx-worker-a",
+              "testParticipantId": "worker-a",
+              "testBarrierId": "V5-two-workers-expired-fence-worker-a",
+              "testBarrierPoint": "afterClaimBeforeCommit"
             }
           },
           "evidenceRefs": [
@@ -1874,24 +1878,9 @@
                 "caseId": "V5",
                 "subcaseId": "two-workers-expired-fence"
               },
-              "barrierId": {
-                "$result": {
-                  "actionId": "claim-a",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/barrierId"
-                }
-              },
-              "participantId": {
-                "$result": {
-                  "actionId": "claim-a",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/workerId"
-                }
-              },
-              "transactionId": {
-                "$result": {
-                  "actionId": "claim-a",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/transactionId"
-                }
-              },
+              "barrierId": "V5-two-workers-expired-fence-worker-a",
+              "participantId": "worker-a",
+              "transactionId": "tx-worker-a",
               "point": "afterClaimBeforeCommit",
               "state": "REACHED"
             }
@@ -2029,7 +2018,11 @@
               "point": "worker.afterClaimBeforeCommit",
               "workerId": "worker-b",
               "disableHeartbeat": true,
-              "times": 1
+              "times": 1,
+              "testTransactionId": "tx-worker-b",
+              "testParticipantId": "worker-b",
+              "testBarrierId": "V5-two-workers-expired-fence-worker-b",
+              "testBarrierPoint": "afterClaimBeforeCommit"
             }
           },
           "evidenceRefs": [
@@ -2103,24 +2096,9 @@
                 "caseId": "V5",
                 "subcaseId": "two-workers-expired-fence"
               },
-              "barrierId": {
-                "$result": {
-                  "actionId": "claim-b",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/barrierId"
-                }
-              },
-              "participantId": {
-                "$result": {
-                  "actionId": "claim-b",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/workerId"
-                }
-              },
-              "transactionId": {
-                "$result": {
-                  "actionId": "claim-b",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/transactionId"
-                }
-              },
+              "barrierId": "V5-two-workers-expired-fence-worker-b",
+              "participantId": "worker-b",
+              "transactionId": "tx-worker-b",
               "point": "afterClaimBeforeCommit",
               "state": "REACHED"
             }
@@ -2232,24 +2210,9 @@
                 "caseId": "V5",
                 "subcaseId": "two-workers-expired-fence"
               },
-              "barrierId": {
-                "$result": {
-                  "actionId": "claim-b",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/barrierId"
-                }
-              },
-              "participantId": {
-                "$result": {
-                  "actionId": "claim-b",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/workerId"
-                }
-              },
-              "transactionId": {
-                "$result": {
-                  "actionId": "claim-b",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/transactionId"
-                }
-              },
+              "barrierId": "V5-two-workers-expired-fence-worker-b",
+              "participantId": "worker-b",
+              "transactionId": "tx-worker-b",
               "point": "afterClaimBeforeCommit",
               "state": "RESUMED"
             }
@@ -2306,24 +2269,9 @@
                 "caseId": "V5",
                 "subcaseId": "two-workers-expired-fence"
               },
-              "barrierId": {
-                "$result": {
-                  "actionId": "claim-a",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/barrierId"
-                }
-              },
-              "participantId": {
-                "$result": {
-                  "actionId": "claim-a",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/workerId"
-                }
-              },
-              "transactionId": {
-                "$result": {
-                  "actionId": "claim-a",
-                  "pointer": "/data/hostObservation/extractor/rawRows/claims/0/transactionId"
-                }
-              },
+              "barrierId": "V5-two-workers-expired-fence-worker-a",
+              "participantId": "worker-a",
+              "transactionId": "tx-worker-a",
               "point": "afterClaimBeforeCommit",
               "state": "RESUMED"
             }

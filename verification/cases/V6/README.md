@@ -32,3 +32,11 @@ capability/key를 독립 catalog로 확인한다. 가상 retention sweep
 구체 subcase/action/assertion 및 JSON pointer에 연결한다.
 고정 수량 oracle의 primary와 보조 관계/assertion을 함께 보존한다.
 이 연결은 작성 증거이며 실제 제품 효과를 관측한 결과가 아니다.
+
+## barrier 표기(Step 2 재검토 2차)
+
+동시 재시도 두 start는 [V2 경합 관찰 계약](../V2/race-observation-contract.md)의
+top-level `testTransactionId`·`testParticipantId`·`testBarrierId`·
+`testBarrierPoint`로 barrier를 건다. control의 transactionId는 같은
+label이다. 두 ACK의 `data.database.transactionId`가 서로 다른 실제
+transaction임을 `race-distinct-db-transactions`로 확인한다.
