@@ -1,0 +1,129 @@
+{
+ "fix": {
+  "commits": [
+   "232cbe39 fix(skills): repository-harness의 V4 열거와 증거 기준을 실제 도구에 맞춘다",
+   "aa6a88a1 fix(skills): V4 열거 요구와 현재 한계를 분리하고 증거 보고 기준을 맞춘다",
+   "543f0229 docs: round 2 검증 결과와 요청 항목을 step1r 기록에 더한다",
+   "1f43a000 docs: cross-owner 요청에서 이미 정정된 문서와 남은 행을 구분한다"
+  ],
+  "findings": [
+   "P2 fixed: V4 enumeration is now stated as a requirement only. The skills say verification/cases/V4 is a fixed 92-subcase route inventory with no $metadata, tools/list or worker-registry subcase. Until the case owner adds one, the V4 exposed-surface part is reported NOT_RUN. The 'update this enumeration check' wording became an owner request. Files: repository-harness.md, implementation-contracts.md, case-routing.md, scenario SKILL.md, agent SKILL.md.",
+   "P3 fixed: PASS is now defined as item/profile status PASS in runtime-manifest.json, and validate.py VALID means consistency only. STUB and LOGIC_REVIEW are report-only categories, since the index schema enum is ACTUAL, SELFTEST and CONTRACT_RED. The skills now say the current tooling cannot produce a coverage PASS: no execution-receipt producer exists outside test_coverage.py, Main actual mode sets gateComplete=false, and Main does not emit the discovered, started and completed keys that assemble.py requires. Runtime claims stay NOT_RUN, and native actual-sN results are reported separately as bounded custody evidence.",
+   "P3 fixed: ./verify mcp and skills are NOT_RUN (exit 2) without --actual, and --actual selects the real driver. model and deployment reject --actual, so model has no actual path. Both facts are now in the repository-harness.md command table and the agent SKILL.md.",
+   "P3 fixed: copy-source guidance. HARNESS-EXAMPLE is labelled a grammar selftest (no oracleRef, canned observations) that cannot serve as a product case. Product case.json and fixture skeletons follow E1 structure. The E1 'complete example' wording is removed, and existing Then explanations are noted as bare-ID and not to be copied. New counterexamples must be new subcases of the fixed 41 cases, with registry subcaseIds and expectedSubcases updated by the owners, not new caseIds. humanExplanation is now the second argument, per ScenarioGlue.assertion.",
+   "P3 fixed: nextCursor is removed from the noun/verb field-by-field equality list, because cursors are entry-point specific. Paging is checked by stable ID order across pages under a fixed snapshot, deterministic tie-break, and declared time drift. implementation-contracts.md keeps nextCursor only as a list response field.",
+   "P3 fixed: the run-receipt recordType wording is now 'recordType SN_DISPOSABLE_RUN_RECEIPT' (N=1-4). The runtime-manifest path is now the full verification/harness/target/evidence/runtime-manifest.json, matching assemble.py and validate.py.",
+   "P3 owner issue (opus-xhigh, claude-rereview-steps-1-2.md): claude-rereview-steps-1-2.md was already corrected in b93b6363. docs/execution/task-status.md line 28 still lists Step 1 as GPT-6.1 Sol / high, and it is coordinator-owned, so I did not edit it. See the cross-owner request below.",
+   "Factual correction: the closure review described V4 as having 5 raw-crud subcases, but case.json has 4 raw-crud-* ids among 92. The skill text states only the 92 total."
+  ],
+  "checks": [
+   "Frontmatter of the 3 skills: name and description present, OK",
+   "Relative links: 27 checked, 0 broken (includes the new cross-owner-requests.md). The 3 .claude/skills symlinks resolve to the .agents/skills directories.",
+   "git diff --check b93b6363..HEAD: exit 0",
+   "acceptance-oracles.md has no diff, so the hash lock is intact",
+   "python3 verification/platform/inventory/check.py: status PASS",
+   "All results are appended to docs/execution/step1r/checks.txt (ROUND 2 section). Not run: ./verify harness, validate, contract-red and prepare, because the Gherkin template and harness are unchanged. No product runtime, coverage assemble or model runs."
+  ],
+  "cross_owner_requests": [
+   "V4/registry/catalog owners (Step 2): add an enumeration subcase to verification/cases/V4 that reads $metadata, MCP tools/list and server/discover, the worker registry and management endpoints, and probes $batch, deep insert, upsert and draft. It must be a new subcase of V4, not a new caseId. The registry owner updates subcaseIds and expectedSubcases in verification/cases/registry.json, and the catalog owner updates the mandatory-oracles.json links. Until then the skills report the V4 exposed-surface part as NOT_RUN. Recorded in docs/execution/step1r/cross-owner-requests.md.",
+   "Coordinator: docs/execution/task-status.md line 28 still shows Step 1 as GPT-6.1 Sol / high, contradicting AGENTS.md (Claude Sonnet 5.5 high). claude-rereview-steps-1-2.md was already fixed in b93b6363.",
+   "Step 2/coverage owners: no execution-receipt producer exists, and Main actual mode does not emit the gateComplete=true and discovered/started/completed keys that assemble.py requires. A coverage PASS therefore cannot be produced, and the skills now say so. A producer or adapter is needed before any runtime PASS.",
+   "Hash-locked acceptance-oracles.md V4 row still describes enumeration without the current-gap caveat. This is the known deviation and was left unchanged by design."
+  ]
+ },
+ "reviews": [
+  {
+   "reviewer": "opus-xhigh",
+   "verdict": "PASS",
+   "resolution": [
+    "opus-xhigh P2 (V4 enumeration credited to a nonexistent V4 check): RESOLVED. The skills now separate the requirement from the current limit. implementation-contracts.md:72-78 says V4 does not run the enumeration, has no $metadata/tools/list/worker-registry subcase, reports the exposed-surface part NOT_RUN, and asks the V4/registry owners for the subcase. repository-harness.md:132-153 says even if all 92 fixed subcases pass, that does not count as enumeration, and it is not something a skill or PR updates. scenario SKILL.md:90-93 says not to report it as PASS. case-routing.md:50 and agent SKILL.md:36-37 agree. cross-owner-requests.md:6-22 records the Step 2 item. Checked against the repo: V4/case.json has 92 subcases and none mentions metadata, tools or registry. raw-crud-quantitymovement sends PATCH /core/QuantityMovement/fixture-target and asserts unexposed-http-route == 404 plus unchanged-* rows. V4/README.md:3-6 says '존재하는 endpoint 주장이 아니다'. Taken with SKILL.md:132-135 (a partly executed case is NOT_RUN overall), a fixed-inventory V4 PASS can no longer be reported as V4 PASS.",
+    "opus-xhigh P3 (PASS tied to VALID; PASS path unreachable; mcp/skills/model wording): RESOLVED. repository-harness.md:109-113 now defines PASS as runtime-manifest item/profile/overall status PASS and says VALID only means consistency, which can hold for a NOT_RUN manifest. This matches validate.py:18, which prints VALID alongside runtimeStatus. :105-107 says the index evidenceClass values are only ACTUAL/SELFTEST/CONTRACT_RED (runtime-evidence-index.schema.json:45-49) and that STUB/LOGIC_REVIEW are report-only categories. :119-128 says the current tooling cannot produce coverage PASS. git grep confirms that executionIdentity receipts are built only in test_coverage.py. Main.java:59 forces gateComplete=false under the actual driver. assemble.py:332 needs gateComplete True and discovered==started==completed, but Main.java:53 emits discoveredSubcases/selectedSubcases. Runtime claims therefore stay NOT_RUN, and native actual-sN results are reported separately. Command table :17-18 and agent SKILL.md:83-85 match verify:25 (model/deployment reject --actual, exit3) and Main.java:58 (no --actual means NOT_RUN exit2, or FAIL exit1 on a violation). impl SKILL.md:72-78 and scenario SKILL.md:140-147 agree.",
+    "opus-xhigh P3 / fable-low P3 (copy sources contradict rules; fixed 41-case set ignored): RESOLVED. repository-harness.md:38-41 labels HARNESS-EXAMPLE a grammar selftest that cannot become a product case. Checked: its case.json has requirementRefs ['HARNESS-EXAMPLE'] and 0 oracleRef, it ships canned-observations.json, and ContractValidator.java:29,51 exempts only HARNESS-* from the oracleRef requirement. :42-45 points to E1-style case.json/fixture skeletons (E1 has 93/93 assertions with oracleRef) and warns not to copy the old bare-ID Then explanations. :46-51 and SKILL.md:30-31 say new counterexamples become subcases of the fixed 41 cases, with the owners updating registry subcaseIds/expectedSubcases (Main.java:64; PreparationValidator.java:81-84,105; registry expectedCases 41, expectedSubcases 789). :69 now names humanExplanation as the second argument, which matches ScenarioGlue.java:25-26. The 'complete example' wording is gone.",
+    "opus-xhigh P3 (nextCursor in the noun/verb equality list): RESOLVED in the oracle text. repository-harness.md:159-163 drops nextCursor from the field-by-field list, calls it opaque per entry point and query, and checks paging by stable ID order under a fixed snapshot, a deterministic tie-break and declared drift between pages. This matches plan §3.4 (plan:89). The accompanying edit to implementation-contracts.md introduced a new P3; see new_findings.",
+    "fable-low P3 (run-receipt recordType shown as an identifier): RESOLVED. repository-harness.md:96 now reads 'recordType은 SN_DISPOSABLE_RUN_RECEIPT, N은 1–4', which matches verification/actual/s1..s4/receipt.py ('S1_'..'S4_DISPOSABLE_RUN_RECEIPT'). The manifest path at :99 is now verification/harness/target/evidence/runtime-manifest.json, which matches assemble.py:769 and validate.py:12. A trivial gap remains: the native path at :96 is still written 'target/evidence/actual-sN-run-<uuid>', while run.sh:8 puts it under verification/harness/target.",
+    "opus-xhigh / fable-low P3 (Step 1 owner record): RESOLVED for claude-rereview-steps-1-2.md. Commit b93b6363 corrected lines 25-29 to Claude Sonnet 5.5 high. The remaining task-status.md:28 row 'GPT-6.1 Sol / high' is coordinator-owned and is accurately logged in cross-owner-requests.md:24-29. AGENTS.md:59-60 keeps the Sol authorship as a historical record, so this is not a blocker.",
+    "Worker factual correction checked: V4/case.json has exactly 4 raw-crud-* ids (quantitymovement, quantitysegment, allocation, approval) plus raw-primitive, out of 92. The correction is accurate. git diff --check b93b6363..HEAD exits 0. Relative links in the 3 skills plus cross-owner-requests.md: 27 checked, 0 broken. The 3 .claude/skills symlinks point at the real .agents/skills directories. The diff touches only .agents/skills/** and docs/execution/step1r/**. acceptance-oracles.md is unchanged, so the hash lock holds."
+   ],
+   "new_findings": [
+    {
+     "severity": "P3",
+     "title": "The nextCursor fix narrows plan §3.4's response contract so that only list responses carry nextCursor",
+     "file": ".agents/skills/ontology-implementation/references/implementation-contracts.md",
+     "line": 84,
+     "failure_scenario": "An S5 implementer builds a separate MCP or OData output schema for getObject/getInventory/getWork from the skill text, which says '응답은 data…evidenceRefs를 포함하고 목록은 nextCursor도 반환한다'. They leave nextCursor out of single-object responses. The two entry points then return different envelopes from the shared query, and the result no longer matches plan §3.4 or the existing backend envelope.",
+     "evidence": "plan:91 says '조회 응답은 data, asOf, knownAt, scope, unknowns, conflicts, evidenceRefs, nextCursor를 포함한다', for all query responses. backend ApplicationQueries.java:88 always puts nextCursor on the shared envelope, and QueryResult.java:8 has it as a field. The round-1 finding asked only to remove nextCursor from the cross-entry-point equality list, not to change the response field list.",
+     "fix": "Restore the plan wording: every query response includes nextCursor, null when there is no next page. Keep the new rule only in the equality section: cursor tokens are not compared across entry points."
+    },
+    {
+     "severity": "P3",
+     "title": "The PASS rule no longer states that validate.py must succeed against current inputs",
+     "file": ".agents/skills/ontology-scenario-testing/references/repository-harness.md",
+     "line": 109,
+     "failure_scenario": "Later, when coverage PASS becomes reachable, an agent cites an item with status PASS from a runtime-manifest.json assembled at an older commit. The code has changed since, and the agent does not rerun validate.py. Rule 1 and agent SKILL.md:80-81 only require 'status PASS' and describe VALID as 'just consistency', so the stale PASS looks allowed. Only rule 4's indirect 'report the mismatch' wording blocks it.",
+     "evidence": "repository-harness.md:109-113 and agent SKILL.md:80-81 ('PASS는 manifest item/profile status가 PASS인 것뿐이며 validate.py의 VALID는 일관성이다'). impl SKILL.md:75-76 says the same. validate_saved (assemble.py:738-755) is the only check that rejects a stale or hand-edited manifest. This is latent today because coverage PASS is unreachable.",
+     "fix": "Write PASS as: status PASS in runtime-manifest.json AND validate.py exit 0 on the current checkout. VALID is necessary but not sufficient."
+    },
+    {
+     "severity": "P3",
+     "title": "The acceptance-case schema caseId pattern is cited as enforcing the fixed 41 IDs, but it does not",
+     "file": ".agents/skills/ontology-scenario-testing/references/repository-harness.md",
+     "line": 46,
+     "failure_scenario": "An author trusts the schema citation, creates T27, and sees './verify validate' pass. They report the case as valid. It then fails only at prepare with 'Discovered case membership differs from expected cases'.",
+     "evidence": "contracts/acceptance-case.schema.json:9 has pattern '^(T[0-9]{2}|C[1-5]|V[1-8]|E[12]|HARNESS-[A-Z0-9-]+)$', which admits T00, T27-T99 and HARNESS-*. The 41-ID restriction comes only from Main.java:64 (expected set) and PreparationValidator.java:81-84,107 together with registry expectedCases 41.",
+     "fix": "Drop the schema pattern from the list of 41-ID enforcers, or note that it only bounds the ID shape. Name Main.prepare and the registry as the binding constraints."
+    },
+    {
+     "severity": "P3",
+     "title": "The Gherkin template still describes writing a whole new scenario.feature, while the guidance now says to add subcases to existing cases",
+     "file": ".agents/skills/ontology-scenario-testing/assets/scenario.feature.template",
+     "line": 2,
+     "failure_scenario": "An author follows SKILL.md:30-31 and adds a counterexample as a new subcase of V4. They copy the template as the instructions say: '…verification/cases/<ID>/scenario.feature로 둔다', including the '# language' line, the tags and '기능:'. The file either replaces the existing feature, which drops its other Scenarios and causes a subcase/Scenario mismatch, or ends up with a second Feature, which is a parse error and exit3. This fails closed, but the documented path does not work.",
+     "evidence": "Template lines 1-2 and 8-9 (feature header plus instruction to place it as the case's scenario.feature). repository-harness.md:29 says one subcase is one Scenario in the existing feature. Existing features such as V4/scenario.feature:1-3 already contain the header.",
+     "fix": "Say in the template header that, for a new subcase of an existing case, you append only the '시나리오:' block to the existing scenario.feature. The full header applies only when a case's feature does not exist yet."
+    },
+    {
+     "severity": "P3",
+     "title": "The interim manual V4 enumeration is routed to a 'PR description', which this fork's workflow does not have",
+     "file": ".agents/skills/ontology-scenario-testing/references/repository-harness.md",
+     "line": 152,
+     "failure_scenario": "A Step 3 or S5 worker adds a CDS projection and does the manual enumeration. Under AGENTS.md, workers return commits and checks to the coordinator, who integrates into the Task branch with no per-change PR. The 'PR 설명' therefore never exists, so the only interim evidence for the exposed surface is lost.",
+     "evidence": "repository-harness.md:152-153 says '구현 PR은 직접 열거 결과를 PR 설명에 남기고'. implementation-contracts.md:75-76 says '구현 PR은 직접 열거한 결과를 근거로 남긴다'. AGENTS.md:82-89 says workers return commit, files and checks and the coordinator alone integrates, and that main merge and PRs are done by the user (AGENTS.md:60-61).",
+     "fix": "Record the manual enumeration (command, endpoints read, writable items found, allowlist diff) in the worker's docs/execution checks file or handoff, and keep it labelled as manual or NOT_RUN evidence."
+    },
+    {
+     "severity": "P3",
+     "title": "The cross-owner request overstates its plan source and leaves out the coverage owner",
+     "file": "docs/execution/step1r/cross-owner-requests.md",
+     "line": 7,
+     "failure_scenario": "The Step 2 owner implements the enumeration subcase with a new named catalog observation. They update only case, registry and catalog, as the request lists. assemble.py:725 hard-codes oracleCount 122 and observationCount 499, so validate_manifest can never accept a PASS after that. Separately, a reader looking for the quoted '모든 쓰기 경로 열거' with $metadata/tools/list details in plan §4.2 and D01/D08 will not find it.",
+     "evidence": "The plan has no '모든 쓰기 경로 열거'. plan:126 (§4.2) says only '실제 노출된 direct/nested/batch/projection 경로 모두 검사한다'. D01 (plan:400) is about query answers, not write paths. The $metadata/tools/list/server/discover detail comes from the skill. assemble.py:725 has 'oracleCount') != 122 or ... 'observationCount') != 499', and mandatory-oracles.json has 122 oracles.",
+     "fix": "Cite plan:126 (§4.2) and V4 (plan:444) as the source, and present the $metadata/tools/list procedure as the skill's operationalization. Add a line saying that if the subcase adds catalog oracles or observations, the coverage owner must update the assemble.py counts and test_coverage.py."
+    }
+   ]
+  },
+  {
+   "reviewer": "fable-low",
+   "verdict": "PASS",
+   "resolution": [
+    "P2 (V4 enumeration credited to a non-existent check): RESOLVED. implementation-contracts.md:69-77 now states the enumeration is a requirement, that verification/cases/V4 is a fixed route inventory with no $metadata/tools/list/worker-registry subcase, that the exposed-surface part is reported NOT_RUN until an enumeration subcase exists, and that the subcase is requested from the V4/registry owner (docs/execution/step1r/cross-owner-requests.md §1). repository-harness.md:138-156 ('요구:' / '현재 상태:') says the same and explicitly '고정 inventory 92개가 모두 통과해도 노출 면 열거를 확인했다고 하지 않는다'; the '같은 PR에서 이 열거 검사를 갱신한다' sentence is gone. case-routing.md:50, scenario SKILL.md:90-93 and agent SKILL.md:36-37 carry the caveat. Verified against the repo: V4/case.json has 92 subcases, 4 raw-crud-* ids, and no subcase mentioning metadata/tools/list/registry/discover; V4/README.md:5-6 says the inventory is not a claim of existing endpoints. The '92 subcase' count (not 'five raw-crud') is correct.",
+    "P3 (PASS tied to validate.py VALID; unreachable PASS path; mcp/skills/model wording): RESOLVED. repository-harness.md:107-112 rule 1 defines PASS as runtime-manifest.json item/profile status PASS and says VALID is consistency only and a NOT_RUN manifest can be VALID (matches validate.py:18, which prints VALID with runtimeStatus/gateComplete for any self-consistent manifest). repository-harness.md:103-105 states the index enum is only ACTUAL/SELFTEST/CONTRACT_RED (runtime-evidence-index.schema.json:45-49) and STUB/LOGIC_REVIEW are report-only. repository-harness.md:118-126 states no execution-receipt producer exists outside test_coverage.py (grep confirms: only test_coverage.py and assemble.py reference the receipt schema; CaseRunner/ModelBindingRunner use different evidenceClass fields), Main sets gateComplete=false in actual mode (Main.java:59) and assemble.py:332 requires gateComplete True plus discovered==started==completed keys Main never emits (Main.java:53 emits discoveredSubcases/selectedSubcases). Scenario SKILL.md:140-147, impl SKILL.md:72-78 and agent SKILL.md:80-85 repeat this. repository-harness.md:17-18 table rows and agent SKILL.md:83-85: mcp/skills NOT_RUN exit2 without --actual (Main.java:58), model/deployment reject --actual with exit3 (verify:25). Verified.",
+    "P3 (copy-source guidance / new-case IDs / 'third argument'): RESOLVED. scenario SKILL.md:26-30 and repository-harness.md:36-51 label HARNESS-EXAMPLE as a grammar selftest without oracleRef, point product skeletons to verification/cases/E1 structure, warn that existing Then explanations are bare-ID and not to be copied, state the fixed 41 IDs (Main.java:64 expected set, contracts/acceptance-case.schema.json:9 pattern, registry.json:3 expectedCases 41) and that new counterexamples are new subcases with registry subcaseIds/expectedSubcases changed by owners. repository-harness.md:69 now says '두 번째 인자', matching ScenarioGlue.java:26 assertion(String id, String humanExplanation).",
+    "P3 (nextCursor in cross-entry-point equality): RESOLVED. repository-harness.md:158-163 drops nextCursor from the field list, says cursors are entry-point/query-specific opaque state, and checks stable ID order across pages under a fixed snapshot, deterministic tie-break and declared time drift. implementation-contracts.md:84-86 keeps nextCursor only as a list-response field, consistent with plan §3.4.",
+    "P3 (run-receipt recordType labelled like a variable; manifest path): RESOLVED. repository-harness.md:96 reads '안의 recordType은 SN_DISPOSABLE_RUN_RECEIPT, N은 1–4' (verification/actual/s1-s4/receipt.py recordType values confirmed). Line 99 gives the full verification/harness/target/evidence/runtime-manifest.json path, matching validate.py:12 and Main.java:60 directory.",
+    "P3 (Step 1 owner recorded as GPT-6.1 Sol high): RESOLVED for the file in scope. docs/execution/claude-rereview-steps-1-2.md:24-29 already reads 'Claude Sonnet 5.5 high' (fixed in b93b6363, confirmed by git log). docs/execution/task-status.md:28 still says 'GPT-6.1 Sol / high'; it is coordinator-owned and is correctly listed as an open row in cross-owner-requests.md §2 rather than silently edited. Accepted as a tracked cross-owner item.",
+    "Hygiene: all 27 relative links in the three skills and cross-owner-requests.md resolve; .claude/skills symlinks point to the real .agents/skills directories; acceptance-oracles.md unchanged (hash lock preserved); git diff --check clean per checks.txt R2-2."
+   ],
+   "new_findings": [
+    {
+     "severity": "P3",
+     "title": "cross-owner-requests.md quotes a plan phrase that does not appear in the plan",
+     "file": "docs/execution/step1r/cross-owner-requests.md",
+     "line": 8,
+     "failure_scenario": "A V4/registry owner reading the request greps the plan for the quoted phrase '모든 쓰기 경로 열거' under §4.2 or D01/D08 to confirm the normative basis, finds no match, and may treat the request as unfounded or delay it while asking for the source.",
+     "evidence": "grep '쓰기 경로' docs/ontology-implementation-plan.md hits only line 433 (C3 fixture: '모든 공개/worker 쓰기 경로는 ... 효과0'); plan §4.2 line 126 says '실제 노출된 direct/nested/batch/projection 경로 모두 검사한다'; D01/D08 rows (plan:400,407) do not contain the phrase. The skill text itself (repository-harness.md '모든 쓰기 경로 열거(V4)') is the origin of the wording.",
+     "fix": "Reword the request bullet to cite plan §4.2 line 126 ('실제 노출된 direct/nested/batch/projection 경로 모두 검사한다') and C3 (plan:433) directly instead of presenting the skill's section title as a plan quotation."
+    }
+   ]
+  }
+ ]
+}

@@ -135,3 +135,32 @@ Step 1을 Claude Sonnet 5.5 high로 바꿨다. T3 위임 경로의 rate limit �
 `./verify harness`, `./verify prepare`, 관련 validator가 통과하고, 같은
 두 reviewer의 closure 검토가 PASS해야 Step 1·2를 다시 닫는다. 이
 검토는 runtime PASS를 뜻하지 않는다.
+
+## Step 1 closure 결과
+
+| 회차 | 대상 | Opus xhigh | Fable low | 처리 |
+|---|---|---|---|---|
+| 1차 수정 | `22d833eb`(worker `9c660d66`~`1a63c0c4`) | FAIL: 원 지적 11건 RESOLVED, 새 P2 1건 확정(반박 실패)·P3 4건 | PASS: P3 3건 | 2차 수정 |
+| 2차 수정 | worker `232cbe39`~`1f43a000` | PASS: 모든 지적 RESOLVED, 새 P3 6건 | PASS: 새 P3 1건 | 통합, Step 1 종료 |
+
+1차 확정 P2는 skill이 아직 없는 V4 노출 쓰기 표면 열거 검사를 근거로
+V4 PASS를 주장할 수 있게 쓴 문제였다. 2차에서 요구와 현재 한계를
+분리하고, V4의 해당 부분을 열거 subcase 추가 전까지 NOT_RUN으로
+보고하게 했다. 수정은 모두 Claude Sonnet 5.5 high worker가 했다.
+원문 판정은 [1차](evidence/claude-rereview/step1-closure-1.json),
+[2차](evidence/claude-rereview/step1-closure-2.json)에 보존했다.
+
+남은 P3는 다음 반복(사용자 Step 7)의 Step 1 정리 대상이다.
+
+- The nextCursor fix narrows plan §3.4's response contract so that only list responses carry nextCursor (`.agents/skills/ontology-implementation/references/implementation-contracts.md:84`)
+- The PASS rule no longer states that validate.py must succeed against current inputs (`.agents/skills/ontology-scenario-testing/references/repository-harness.md:109`)
+- The acceptance-case schema caseId pattern is cited as enforcing the fixed 41 IDs, but it does not (`.agents/skills/ontology-scenario-testing/references/repository-harness.md:46`)
+- The Gherkin template still describes writing a whole new scenario.feature, while the guidance now says to add subcases to existing cases (`.agents/skills/ontology-scenario-testing/assets/scenario.feature.template:2`)
+- The interim manual V4 enumeration is routed to a 'PR description', which this fork's workflow does not have (`.agents/skills/ontology-scenario-testing/references/repository-harness.md:152`)
+- The cross-owner request overstates its plan source and leaves out the coverage owner (`docs/execution/step1r/cross-owner-requests.md:7`)
+- cross-owner-requests.md quotes a plan phrase that does not appear in the plan (`docs/execution/step1r/cross-owner-requests.md:8`)
+
+Step 1에서 넘긴 cross-owner 항목: V4 노출 표면 열거 subcase(Step 2
+V4·registry·catalog 소유자), execution-receipt producer 부재로 coverage
+PASS를 만들 수 없는 문제(Step 2 coverage·harness), hash-lock된
+acceptance-oracles.md V4 문구, 계획 §9.1·§13.4의 낡은 경로.

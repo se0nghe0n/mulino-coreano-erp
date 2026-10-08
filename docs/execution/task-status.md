@@ -25,7 +25,7 @@
 
 | Step | 작업 | 실행 모델 / effort | 상태 |
 |---|---|---|---|
-| 1 | 새 skills와 실행 지침 | GPT-6.1 Sol / high | COMPLETE (Claude 검토 재수행 중) |
+| 1 | 새 skills와 실행 지침 | Claude Sonnet 5.5 / high (최초 작성 GPT-6.1 Sol high) | COMPLETE (Claude 재검토 closure PASS) |
 | 2 | 전체 계획의 tests | Claude Opus / high | COMPLETE (Claude 검토 재수행 중) |
 | 3 | 새 시스템 구현 | Claude Opus / medium | ACTIVE |
 | 4 | 실제 E2E | Claude Sonnet / medium | PENDING |
