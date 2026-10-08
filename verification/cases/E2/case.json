@@ -115,7 +115,8 @@
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
-              }
+              },
+              "action": "SELL"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "E2-overlapping-holds-reserve",
@@ -198,6 +199,126 @@
           "evidenceRefs": [
             "split:api-response",
             "split:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick20",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/0/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "split",
+                "pointer": "/response/allocations/0/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-overlapping-holds-pick20",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick20:api-response",
+            "pick20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick40",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              },
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "split",
+                "pointer": "/response/allocations/1/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-overlapping-holds-pick40",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick40:api-response",
+            "pick40:actual-command-artifact"
           ]
         },
         {
@@ -498,7 +619,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "recall-hold60",
+                "actionId": "qc-hold20",
                 "pointer": "/response/revision"
               }
             },
@@ -607,7 +728,47 @@
           ]
         },
         {
-          "id": "dispatch60",
+          "id": "dispatch20-target",
+          "kind": "query",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "subjectRefs": [
+              {
+                "type": "Allocation",
+                "id": {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/allocations/0/id"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "audit"
+            ]
+          },
+          "evidenceRefs": [
+            "dispatch20-target:api-response"
+          ]
+        },
+        {
+          "id": "dispatch20",
           "kind": "invoke",
           "actorRef": "sales",
           "route": "api",
@@ -625,58 +786,33 @@
               }
             ],
             "slots": {
-              "orderLineId": {
+              "allocationId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "split",
+                  "pointer": "/response/allocations/0/id"
                 }
-              },
-              "allocationIds": [
-                {
-                  "$result": {
-                    "actionId": "split",
-                    "pointer": "/response/allocations/0/id"
-                  }
-                },
-                {
-                  "$result": {
-                    "actionId": "split",
-                    "pointer": "/response/allocations/1/id"
-                  }
-                }
-              ],
-              "segmentIds": [
-                {
-                  "$result": {
-                    "actionId": "split",
-                    "pointer": "/response/children/0/id"
-                  }
-                },
-                {
-                  "$result": {
-                    "actionId": "split",
-                    "pointer": "/response/children/1/id"
-                  }
-                }
-              ],
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
               },
               "originId": {
                 "$alias": "W"
               },
               "destinationId": {
                 "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
               }
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "qc-release20",
-                "pointer": "/response/revision"
+                "actionId": "dispatch20-target",
+                "pointer": "/response/data/revision"
               }
             },
-            "commandIdempotencyKey": "E2-overlapping-holds-dispatch60",
+            "commandIdempotencyKey": "E2-overlapping-holds-dispatch20",
             "evidenceRefs": [
               {
                 "$alias": "delivery-proof"
@@ -696,8 +832,117 @@
             "knownAt": "2026-10-07T09:00:01Z"
           },
           "evidenceRefs": [
-            "dispatch60:api-response",
-            "dispatch60:actual-command-artifact"
+            "dispatch20:api-response",
+            "dispatch20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "dispatch40-target",
+          "kind": "query",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "subjectRefs": [
+              {
+                "type": "Allocation",
+                "id": {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/allocations/1/id"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "audit"
+            ]
+          },
+          "evidenceRefs": [
+            "dispatch40-target:api-response"
+          ]
+        },
+        {
+          "id": "dispatch40",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch40-target",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-overlapping-holds-dispatch40",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "overlapping-holds"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch40:api-response",
+            "dispatch40:actual-command-artifact"
           ]
         },
         {
@@ -1943,9 +2188,1298 @@
               "dispatched-after-QC-only-release"
             ]
           }
+        },
+        {
+          "id": "dispatch20-rejected",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch20",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "dispatch20:api-response"
+          ],
+          "oracleExplanation": "QC20만 해제한 뒤에도 회수 보류60이 출고를 막는다. 피킹을 마친 같은 형식(단일 allocationId·cargoPlaceId TRANSIT·직전 조회한 현재 revision)의 출고가 REJECTED와 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다(계획 §3.4·§13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "dispatch20-reason",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch20",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "dispatch20:api-response"
+          ],
+          "oracleExplanation": "QC20만 해제한 뒤에도 회수 보류60이 출고를 막는다. 피킹을 마친 같은 형식(단일 allocationId·cargoPlaceId TRANSIT·직전 조회한 현재 revision)의 출고가 REJECTED와 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다(계획 §3.4·§13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "dispatch20-denial-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "E2-overlapping-holds-dispatch20",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "oracleExplanation": "QC20만 해제한 뒤에도 회수 보류60이 출고를 막는다. 피킹을 마친 같은 형식(단일 allocationId·cargoPlaceId TRANSIT·직전 조회한 현재 revision)의 출고가 REJECTED와 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다(계획 §3.4·§13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "dispatch40-rejected",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch40",
+            "pointer": "/response/outcome"
+          },
+          "expected": "REJECTED",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "dispatch40:api-response"
+          ],
+          "oracleExplanation": "QC20만 해제한 뒤에도 회수 보류60이 출고를 막는다. 피킹을 마친 같은 형식(단일 allocationId·cargoPlaceId TRANSIT·직전 조회한 현재 revision)의 출고가 REJECTED와 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다(계획 §3.4·§13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "dispatch40-reason",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch40",
+            "pointer": "/response/error/code"
+          },
+          "expected": "INSUFFICIENT_ELIGIBLE_QUANTITY",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "dispatch40:api-response"
+          ],
+          "oracleExplanation": "QC20만 해제한 뒤에도 회수 보류60이 출고를 막는다. 피킹을 마친 같은 형식(단일 allocationId·cargoPlaceId TRANSIT·직전 조회한 현재 revision)의 출고가 REJECTED와 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다(계획 §3.4·§13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "dispatch40-denial-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "E2-overlapping-holds-dispatch40",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "oracleExplanation": "QC20만 해제한 뒤에도 회수 보류60이 출고를 막는다. 피킹을 마친 같은 형식(단일 allocationId·cargoPlaceId TRANSIT·직전 조회한 현재 revision)의 출고가 REJECTED와 INSUFFICIENT_ELIGIBLE_QUANTITY로 거부되고 거부 감사가 1건 남는다(계획 §3.4·§13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "recall-suspends-untouched40-before",
+          "op": "exactSet",
+          "source": {
+            "actionId": "before-dispatch-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              }
+            },
+            "field": "status"
+          },
+          "expected": [
+            "SUSPENDED"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "before-dispatch-db:raw-rows"
+          ],
+          "oracleExplanation": "QC 보류가 닿지 않은 자식40의 피킹된 배분은 회수 보류60만으로 SUSPENDED가 되고 출고 시도 뒤에도 소비되지 않는다. 따라서 출고 거부의 원인은 회수 보류다(계획 §6 영향 예약 정지).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "recall-suspends-untouched40-after",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              }
+            },
+            "field": "status"
+          },
+          "expected": [
+            "SUSPENDED"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "overlapping-holds"
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "oracleExplanation": "QC 보류가 닿지 않은 자식40의 피킹된 배분은 회수 보류60만으로 SUSPENDED가 되고 출고 시도 뒤에도 소비되지 않는다. 따라서 출고 거부의 원인은 회수 보류다(계획 §6 영향 예약 정지).",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 동일 LOT60의 QC20만 해제해도 회수 조사60 제한과 조사 책임은 남는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
+    },
+    {
+      "id": "qc-release-only-control",
+      "title": "회수 보류가 없으면 같은 QC20 해제 뒤 같은 형식의 출고40이 적용된다(대조군)",
+      "fixtureRef": "verification/cases/E2/fixtures/qc-release-only-control.json",
+      "requiredAdapters": [
+        "fixture",
+        "api",
+        "db"
+      ],
+      "actions": [
+        {
+          "id": "setup",
+          "kind": "installFixture",
+          "evidenceRefs": [
+            "setup:fixture-installation"
+          ]
+        },
+        {
+          "id": "order",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "createSalesOrder",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "createSalesOrder",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-qc-release-only-control-order",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order:api-response",
+            "order:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "reserve",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "reserveQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reserveQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "orderLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "60",
+                "unit": "BOX"
+              },
+              "action": "SELL"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-qc-release-only-control-reserve",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "reserve:api-response",
+            "reserve:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "split",
+          "kind": "invoke",
+          "actorRef": "procurement",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "reason": "IDENTIFIABLE_QC_SCOPE"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-qc-release-only-control-split",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "split:api-response",
+            "split:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick20",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/0/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "split",
+                "pointer": "/response/allocations/0/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-qc-release-only-control-pick20",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick20:api-response",
+            "pick20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "pick40",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "pickQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "pickQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              },
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "split",
+                "pointer": "/response/allocations/1/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-qc-release-only-control-pick40",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "pick40:api-response",
+            "pick40:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "qc-hold20",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "placeHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "placeHold",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/0/id"
+                }
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              },
+              "action": "SELL",
+              "reason": "QC_REVIEW"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "E2-qc-release-only-control-qc-hold20",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "qc-hold20:api-response",
+            "qc-hold20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-release",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-release:api-response"
+          ]
+        },
+        {
+          "id": "before-release-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-release",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "restrictions",
+              "investigations",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-release-db:raw-rows",
+            "before-release-db:source-query",
+            "before-release-db:snapshot"
+          ]
+        },
+        {
+          "id": "qc-release20",
+          "kind": "invoke",
+          "actorRef": "qc",
+          "route": "api",
+          "capabilityId": "releaseHold",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "releaseHold",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "restrictionId": {
+                "$result": {
+                  "actionId": "qc-hold20",
+                  "pointer": "/response/restrictionId"
+                }
+              },
+              "evidenceId": {
+                "$alias": "qc-proof"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "qc-hold20",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-qc-release-only-control-qc-release20",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "qc-release20:api-response",
+            "qc-release20:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "before-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-dispatch:api-response"
+          ]
+        },
+        {
+          "id": "before-dispatch-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "before-dispatch",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "restrictions",
+              "investigations",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "before-dispatch-db:raw-rows",
+            "before-dispatch-db:source-query",
+            "before-dispatch-db:snapshot"
+          ]
+        },
+        {
+          "id": "dispatch40-target",
+          "kind": "query",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "subjectRefs": [
+              {
+                "type": "Allocation",
+                "id": {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/allocations/1/id"
+                  }
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "audit"
+            ]
+          },
+          "evidenceRefs": [
+            "dispatch40-target:api-response"
+          ]
+        },
+        {
+          "id": "dispatch40",
+          "kind": "invoke",
+          "actorRef": "sales",
+          "route": "api",
+          "capabilityId": "dispatchQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "dispatchQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "allocationId": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              },
+              "originId": {
+                "$alias": "W"
+              },
+              "destinationId": {
+                "$alias": "CUSTOMER"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "quantity": {
+                "value": "40",
+                "unit": "BOX"
+              }
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "dispatch40-target",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "E2-qc-release-only-control-dispatch40",
+            "evidenceRefs": [
+              {
+                "$alias": "delivery-proof"
+              }
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "dispatch40:api-response",
+            "dispatch40:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "after-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "include": [
+              "inventory",
+              "trade",
+              "evidence",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-dispatch:api-response"
+          ]
+        },
+        {
+          "id": "after-dispatch-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "E2",
+              "scenarioId": "qc-release-only-control"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-dispatch",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "restrictions",
+              "investigations",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows",
+            "after-dispatch-db:source-query",
+            "after-dispatch-db:snapshot"
+          ]
+        }
+      ],
+      "assertions": [
+        {
+          "id": "control-dispatch40-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch40",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "dispatch40:api-response"
+          ],
+          "oracleExplanation": "대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED이고 창고 출고40·배분 CONSUMED가 실제로 생긴다. overlapping-holds의 거부가 요청 형식이나 revision 때문이 아님을 보인다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "control-warehouse-dispatch40",
+          "op": "decimalDelta",
+          "source": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "after-dispatch:actual-response-or-host-artifact"
+          ],
+          "oracleExplanation": "대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED이고 창고 출고40·배분 CONSUMED가 실제로 생긴다. overlapping-holds의 거부가 요청 형식이나 revision 때문이 아님을 보인다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/warehouseDispatchQuantity"
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch",
+            "pointer": "/response/data/unit"
+          },
+          "baselineUnitSource": {
+            "actionId": "before-dispatch",
+            "pointer": "/response/data/unit"
+          }
+        },
+        {
+          "id": "control-dispatch40-movement",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandKey": "E2-qc-release-only-control-dispatch40"
+            },
+            "field": "quantity"
+          },
+          "expected": "40",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "oracleExplanation": "대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED이고 창고 출고40·배분 CONSUMED가 실제로 생긴다. overlapping-holds의 거부가 요청 형식이나 revision 때문이 아님을 보인다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/movements",
+            "where": {
+              "commandKey": "E2-qc-release-only-control-dispatch40"
+            },
+            "field": "unit"
+          }
+        },
+        {
+          "id": "control-allocation40-consumed",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-dispatch-db",
+            "pointer": "/data/rawRows/allocations",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/allocations/1/id"
+                }
+              }
+            },
+            "field": "status"
+          },
+          "expected": [
+            "CONSUMED"
+          ],
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "after-dispatch-db:raw-rows"
+          ],
+          "oracleExplanation": "대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED이고 창고 출고40·배분 CONSUMED가 실제로 생긴다. overlapping-holds의 거부가 요청 형식이나 revision 때문이 아님을 보인다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        },
+        {
+          "id": "control-qc-release-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "qc-release20",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "qc-release-only-control"
+          },
+          "evidenceRefs": [
+            "qc-release20:api-response"
+          ],
+          "oracleExplanation": "대조군: 회수 보류가 없으면 같은 형식의 출고40은 APPLIED이고 창고 출고40·배분 CONSUMED가 실제로 생긴다. overlapping-holds의 거부가 요청 형식이나 revision 때문이 아님을 보인다.",
+          "oracleRef": {
+            "oracleId": "E2.overlapping-holds",
+            "observationNames": [
+              "dispatched-after-QC-only-release"
+            ]
+          }
+        }
+      ],
+      "oracleExplanation": "대조군이다. overlapping-holds와 같은 fixture·예약·분할·피킹·QC20 보류/해제와 같은 형식의 출고40 요청을 쓰되 회수 조사와 회수 보류60만 뺀다. 같은 요청이 여기서 APPLIED이고 overlapping-holds에서 REJECTED이면 거부 원인은 형식·revision·피킹 누락이 아니라 회수 보류다."
     },
     {
       "id": "same-25-not-50",
@@ -2898,11 +4432,26 @@
                   "pointer": "/response/id"
                 }
               },
+              "scopeVersion": {
+                "$result": {
+                  "actionId": "recall-approve",
+                  "pointer": "/response/revision"
+                }
+              },
+              "scopeHash": {
+                "$result": {
+                  "actionId": "recall-proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
               "claimedProcessedQuantity": {
                 "value": "50",
                 "unit": "BOX"
               },
-              "reason": "RECOVERED_AND_DISPOSED_SUM"
+              "reason": "RECOVERED_AND_DISPOSED_SUM",
+              "evidenceId": {
+                "$alias": "dispose-proof"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -3565,6 +5114,78 @@
             "scenarioId": "same-25-not-50"
           },
           "oracleExplanation": "unapproved-unknown-close는 승인50 중 회수25와 동일 실물 폐기25는 최종25이며 미확인25의 종료를 막는다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-reason",
+          "op": "equals",
+          "source": {
+            "actionId": "false-close",
+            "pointer": "/response/error/code"
+          },
+          "expected": "RECALL_RESIDUAL_UNKNOWN",
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "evidenceRefs": [
+            "false-close:actual-response-or-host-artifact"
+          ],
+          "oracleExplanation": "같은 scopeVersion·scopeHash·근거를 보낸 정상 형식의 종료 요청도 회수25+동일 실물 폐기25를 처리50으로 합산해 종료할 수 없다. 거부 이유는 미확인 잔여25다(계획 §13.3 E2).",
+          "oracleRef": {
+            "oracleId": "E2.same-25-not-50",
+            "observationNames": [
+              "unapproved-unknown-close"
+            ]
+          }
+        },
+        {
+          "id": "unapproved-unknown-close-audit",
+          "op": "count",
+          "source": {
+            "actionId": "after-close-db",
+            "pointer": "/data/rawRows/audit",
+            "where": {
+              "commandKey": "E2-same-25-not-50-false-close",
+              "outcome": "REJECTED"
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D03",
+            "D16",
+            "D18"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "E2",
+            "scenarioId": "same-25-not-50"
+          },
+          "evidenceRefs": [
+            "after-close-db:raw-rows"
+          ],
+          "oracleExplanation": "같은 scopeVersion·scopeHash·근거를 보낸 정상 형식의 종료 요청도 회수25+동일 실물 폐기25를 처리50으로 합산해 종료할 수 없다. 거부 이유는 미확인 잔여25다(계획 §13.3 E2).",
           "oracleRef": {
             "oracleId": "E2.same-25-not-50",
             "observationNames": [
