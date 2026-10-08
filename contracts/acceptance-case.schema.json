@@ -293,6 +293,14 @@
         "protocolOperation": {
           "type": "string",
           "minLength": 1
+        },
+        "custodyControl": {
+          "enum": [
+            "SCOPE_INELIGIBLE",
+            "EVIDENCE_CONFLICT",
+            "EVIDENCE_UNVERIFIED"
+          ],
+          "description": "Declared receiving-custody negative on a confirmReceipt that carries receivingCustodianId (contracts/fixture-place-kinds.json directReceiptCustody.custodyControl). Harness-side declaration; never sent to the product."
         }
       },
       "required": [

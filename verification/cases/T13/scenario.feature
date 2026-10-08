@@ -345,6 +345,7 @@
     만일 "warehouse" 역할이 "return" 행동을 수행한다
     만일 "procurement" 역할이 "after-return" 행동을 수행한다
     만일 "시스템" 역할이 "return-db" 행동을 수행한다
+    만일 "warehouse" 역할이 "split40" 행동을 수행한다
     만일 "warehouse" 역할이 "move" 행동을 수행한다
     만일 "procurement" 역할이 "after-move" 행동을 수행한다
     만일 "시스템" 역할이 "move-db" 행동을 수행한다
@@ -363,7 +364,13 @@
     그러면 "excess-owner-owner" assertion으로 "고정 oracle excess-owner의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "distinct-contributions" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "canonical-contributions" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-sale-applied" assertion으로 "판매 출고10 = APPLIED"를 확인한다
+    그러면 "return-applied" assertion으로 "반품10 접수 = APPLIED"를 확인한다
+    그러면 "returned-at-W" assertion으로 "W 활성 = 105 − 10 + 10 = 105 BOX"를 확인한다
     그러면 "return-no-new-contribution" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
+    그러면 "move-applied" assertion으로 "분할 20의 W→W-alt 이동 = APPLIED"를 확인한다
+    그러면 "relocated-at-W-alt" assertion으로 "W-alt 활성 = 20 BOX"를 확인한다
+    그러면 "left-at-W" assertion으로 "W 활성 = 105 − 20 = 85 BOX"를 확인한다
     그러면 "relocation-no-new-contribution" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "new-goal80" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "new-goal-revision" assertion으로 "고정 oracle contribution-scope의 실제 값과 범위를 확인한다"를 확인한다

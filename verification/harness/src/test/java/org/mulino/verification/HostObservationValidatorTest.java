@@ -234,7 +234,10 @@ public final class HostObservationValidatorTest {
         // NO_TASK with no scheduler row in the window is a valid observation (the case's DB assertions then fail).
         Capture none=naturalTick("tickScheduler");ObjectNode rows=(ObjectNode)none.host.path("extractor").path("rawRows");
         ObjectNode e=(ObjectNode)rows.path("operationEvidence");e.remove(List.of("taskId","invocationHandle","submittedAt"));e.put("submissionStatus","NO_TASK");rows.set("schedulerSubmissions",Json.array());
-        none.host.set("operationEvidence",e.deepCopy());StepResult result=rebind(none);
+        none.host.set("operationEvidence",e.deepCopy());
+        // step2r round 8: the extractor reads the scheduler rows after the watcher completed (00:00:03).
+        ((ObjectNode)none.host.path("extractor").path("command")).put("startedAt","2026-10-07T00:00:03Z").put("completedAt","2026-10-07T00:00:04Z");
+        StepResult result=rebind(none);
         HostObservationValidator.validate(new ContractValidator(root),none.control,result);
     }
     /** Round 4 item 4: a PREPARATION input names its commit and clean state, recomputed from the bound report bytes. */

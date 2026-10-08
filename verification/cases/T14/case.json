@@ -1837,6 +1837,61 @@
           ]
         },
         {
+          "id": "split98",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "children": {
+                "value": [
+                  {
+                    "alias": "RECEIVED98",
+                    "quantity": "98",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "REMAINDER2",
+                    "quantity": "2",
+                    "unit": "BOX"
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "reason": {
+                "value": "부분 수령 전 수령 범위 분리",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-transit2-split98",
+            "evidenceRefs": [
+              "warehouse-receipt"
+            ]
+          },
+          "evidenceRefs": [
+            "split98:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "receive98",
           "kind": "invoke",
           "actorRef": "warehouse",
@@ -1863,7 +1918,10 @@
               },
               "existingSegmentId": {
                 "value": {
-                  "$alias": "Q100"
+                  "$result": {
+                    "actionId": "split98",
+                    "pointer": "/response/children/RECEIVED98/segmentId"
+                  }
                 },
                 "provenance": "CONTEXT"
               },
@@ -1941,8 +1999,8 @@
               "segmentId": {
                 "value": {
                   "$result": {
-                    "actionId": "receive98",
-                    "pointer": "/response/remainder/segmentId"
+                    "actionId": "split98",
+                    "pointer": "/response/children/REMAINDER2/segmentId"
                   }
                 },
                 "provenance": "CONTEXT"
@@ -2038,6 +2096,38 @@
       ],
       "assertions": [
         {
+          "id": "split98-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "split98",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "split98:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "부분 수령 전에 출하 실물 Q100을 수령 범위98과 나머지2로 나눈다(계획 §4.2 부분 이동은 먼저 분할). 제품은 운송 leaf의 정확한 수량만 수령하므로 이 분할 없이는 수령98이 거부된다.",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          }
+        },
+        {
           "id": "received-api98",
           "op": "decimalEquals",
           "source": {
@@ -2121,7 +2211,8 @@
             "where": {
               "locationId": {
                 "$alias": "W"
-              }
+              },
+              "active": true
             }
           },
           "expected": "98",
@@ -2141,7 +2232,7 @@
               "$alias": "P"
             }
           },
-          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleExplanation": "수령 뒤 W의 활성 실물은 분할 자식98을 수령한 98 BOX다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -2156,7 +2247,8 @@
             "where": {
               "locationId": {
                 "$alias": "W"
-              }
+              },
+              "active": true
             }
           }
         },
@@ -2201,6 +2293,47 @@
             }
           },
           "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          }
+        },
+        {
+          "id": "received-leaf-retired",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/RECEIVED98/segmentId"
+                }
+              },
+              "active": true
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령98은 분할 자식98 전체를 소비한다. 그 운송 자식이 활성으로 남으면 같은 98이 운송과 W에 두 번 있다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -2334,7 +2467,10 @@
           "source": {
             "actionId": "db",
             "pointer": "/data/rawRows/segments",
-            "field": "quantity"
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
           },
           "expected": "100",
           "requirementRefs": [
@@ -2353,7 +2489,7 @@
               "$alias": "P"
             }
           },
-          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleExplanation": "분할·수령이 부모를 retire하므로 활성 실물만 더한다. W 98 + 운송 자식 2 = 100 BOX이며 수령 차이2를 손실로 지우거나 실물을 중복하지 않는다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -2364,7 +2500,54 @@
           "unitSource": {
             "actionId": "db",
             "pointer": "/data/rawRows/segments",
-            "field": "unit"
+            "field": "unit",
+            "where": {
+              "active": true
+            }
+          }
+        },
+        {
+          "id": "remainder2-active",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/REMAINDER2/segmentId"
+                }
+              },
+              "locationId": {
+                "$alias": "TRANSIT"
+              },
+              "active": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-transit2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령하지 않은 나머지2는 분할 자식 그대로 TRANSIT에 활성 1행으로 남는다. 손실이나 0으로 바꾸지 않는다.",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "transit"
+            ]
           }
         },
         {
@@ -2414,7 +2597,8 @@
             "where": {
               "locationId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "active": true
             }
           },
           "expected": "2",
@@ -2434,7 +2618,7 @@
               "$alias": "P"
             }
           },
-          "oracleExplanation": "고정 oracle transit의 실제 값과 범위를 확인한다",
+          "oracleExplanation": "운송 중으로 확인된 나머지는 TRANSIT의 활성 분할 자식 2 BOX다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -2449,7 +2633,8 @@
             "where": {
               "locationId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "active": true
             }
           }
         },
@@ -2677,6 +2862,61 @@
           ]
         },
         {
+          "id": "split98",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "splitQuantity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "splitQuantity",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "segmentId": {
+                "value": {
+                  "$alias": "Q100"
+                },
+                "provenance": "CONTEXT"
+              },
+              "children": {
+                "value": [
+                  {
+                    "alias": "RECEIVED98",
+                    "quantity": "98",
+                    "unit": "BOX"
+                  },
+                  {
+                    "alias": "REMAINDER2",
+                    "quantity": "2",
+                    "unit": "BOX"
+                  }
+                ],
+                "provenance": "USER"
+              },
+              "reason": {
+                "value": "부분 수령 전 수령 범위 분리",
+                "provenance": "USER"
+              }
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T14-discrepancy-unobserved2-split98",
+            "evidenceRefs": [
+              "warehouse-receipt"
+            ]
+          },
+          "evidenceRefs": [
+            "split98:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "receive98",
           "kind": "invoke",
           "actorRef": "warehouse",
@@ -2703,7 +2943,10 @@
               },
               "existingSegmentId": {
                 "value": {
-                  "$alias": "Q100"
+                  "$result": {
+                    "actionId": "split98",
+                    "pointer": "/response/children/RECEIVED98/segmentId"
+                  }
                 },
                 "provenance": "CONTEXT"
               },
@@ -2814,6 +3057,38 @@
       ],
       "assertions": [
         {
+          "id": "split98-applied",
+          "op": "equals",
+          "source": {
+            "actionId": "split98",
+            "pointer": "/response/outcome"
+          },
+          "expected": "APPLIED",
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "split98:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "부분 수령 전에 출하 실물 Q100을 수령 범위98과 나머지2로 나눈다(계획 §4.2 부분 이동은 먼저 분할). 제품은 운송 leaf의 정확한 수량만 수령하므로 이 분할 없이는 수령98이 거부된다.",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
+          }
+        },
+        {
           "id": "received-api98",
           "op": "decimalEquals",
           "source": {
@@ -2897,7 +3172,8 @@
             "where": {
               "locationId": {
                 "$alias": "W"
-              }
+              },
+              "active": true
             }
           },
           "expected": "98",
@@ -2917,7 +3193,7 @@
               "$alias": "P"
             }
           },
-          "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleExplanation": "수령 뒤 W의 활성 실물은 분할 자식98을 수령한 98 BOX다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -2932,7 +3208,8 @@
             "where": {
               "locationId": {
                 "$alias": "W"
-              }
+              },
+              "active": true
             }
           }
         },
@@ -2977,6 +3254,47 @@
             }
           },
           "oracleExplanation": "고정 oracle received의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "received"
+            ]
+          }
+        },
+        {
+          "id": "received-leaf-retired",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/RECEIVED98/segmentId"
+                }
+              },
+              "active": true
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령98은 분할 자식98 전체를 소비한다. 그 운송 자식이 활성으로 남으면 같은 98이 운송과 W에 두 번 있다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -3110,7 +3428,10 @@
           "source": {
             "actionId": "db",
             "pointer": "/data/rawRows/segments",
-            "field": "quantity"
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
           },
           "expected": "100",
           "requirementRefs": [
@@ -3129,7 +3450,7 @@
               "$alias": "P"
             }
           },
-          "oracleExplanation": "고정 oracle separate-observations의 실제 값과 범위를 확인한다",
+          "oracleExplanation": "분할·수령이 부모를 retire하므로 활성 실물만 더한다. W 98 + 운송 자식 2 = 100 BOX이며 수령 차이2를 손실로 지우거나 실물을 중복하지 않는다.",
           "oracleRef": {
             "oracleId": "T14.arrival-discrepancy-not-loss",
             "observationNames": [
@@ -3140,7 +3461,54 @@
           "unitSource": {
             "actionId": "db",
             "pointer": "/data/rawRows/segments",
-            "field": "unit"
+            "field": "unit",
+            "where": {
+              "active": true
+            }
+          }
+        },
+        {
+          "id": "remainder2-active",
+          "op": "count",
+          "source": {
+            "actionId": "db",
+            "pointer": "/data/rawRows/segments",
+            "where": {
+              "id": {
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/REMAINDER2/segmentId"
+                }
+              },
+              "locationId": {
+                "$alias": "TRANSIT"
+              },
+              "active": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D14"
+          ],
+          "evidenceRefs": [
+            "db:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T14",
+            "subcaseId": "discrepancy-unobserved2",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "수령하지 않은 나머지2는 분할 자식 그대로 TRANSIT에 활성 1행으로 남는다. 손실이나 0으로 바꾸지 않는다.",
+          "oracleRef": {
+            "oracleId": "T14.arrival-discrepancy-not-loss",
+            "observationNames": [
+              "separate-observations"
+            ]
           }
         },
         {

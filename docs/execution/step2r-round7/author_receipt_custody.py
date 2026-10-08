@@ -86,6 +86,8 @@ def e1():
     path = ROOT / 'verification/cases/E1/case.json'
     case = load(path)
     for sub in case['subcases']:
+        if sub['id'] not in E1_CONTROL:  # step2r round 8: the declared custody negative receipt-custody-unverified keeps its slot
+            continue
         fpath = ROOT / sub['fixtureRef']
         fixture = load(fpath)
         grant_receive(fixture, E1_CUSTODIAN)

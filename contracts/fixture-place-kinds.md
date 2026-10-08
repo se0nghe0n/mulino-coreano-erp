@@ -39,9 +39,12 @@ kind를 외부로 보지만 fixture는 선언한 EXTERNAL_PORT만 쓴다.
 - INTERNAL_STORAGE에 있는 segment(alias나 `baseline.segments`의
   `locationAlias`·`placeAlias`)는 같은 조직의 내부 보관자를 가져야 한다.
 - 수입 중인 자기 화물(TRANSIT·EXTERNAL_PORT)도 내부 보관자를 둔다.
-  운송 실물의 확인 수령은 보관자를 이어받는다(제품 S3 transit fixture와
-  같다). 이 보관자는 외부 장소의 적격을 만들지 않는다. 장소가 외부면
-  적격은 0이다.
+  이 보관자는 외부 장소의 적격을 만들지 않는다. 장소가 외부면 적격은
+  0이다.
+- 운송 실물의 확인 수령이 보관자를 이어받는 것은 TRANSIT 장소의 식별된
+  leaf를 수량 그대로 받을 때뿐이다(아래 "운송 수령", 제품 S3 transit
+  fixture와 같다). EXTERNAL_PORT·SUPPLIER·CUSTOMER 장소의 실물이나 leaf
+  일부를 운송 수령으로 확인하는 명령은 제품이 거부한다.
 - 고객·공급자 장소의 실물은 작성한 보관자를 그대로 둔다.
 
 ## 반례 선언
@@ -68,10 +71,44 @@ CUSTOMER, SUPPLIER_PLACE·IT-origin은 SUPPLIER, PORT·IT-port·KR-port는
 EXTERNAL_PORT다. 전환 기록과 script는
 `docs/execution/step2r-round6/`에 있다.
 
+## 운송 수령
+
+confirmReceipt가 slot에서 fixture QuantitySegment(`{"$alias":…}` 또는
+typed `{"value":{"$alias":…}}`)를 지명하거나, 그런 leaf를 나눈 앞선
+splitQuantity의 명시 자식(`/response/children/<alias>/segmentId`)을
+`$result`로 지명하면 운송 수령이다. 제품 `ReceiptStockPrimitives.receive`
+(읽기만 했다)는 운송 수령을 다음 조건에서만 받는다. 아니면 INVALID
+"Exact identified transit leaf required; split partial cargo first"다.
+
+- leaf는 하나이고 Place.kind가 TRANSIT인 장소에 있다.
+- leaf는 식별돼 있다(identifiability가 INDISTINGUISHABLE_MIXTURE가 아니고,
+  identificationStatus가 있으면 CONFIRMED다).
+- 수령 수량·단위가 leaf와 decimal로 정확히 같다. 일부만 받으면 먼저
+  split한다(계획 §4.2 "부분 이동·보류·출고는 먼저 범위가 구별되도록
+  분할한다", `docs/execution/s3-receipt/contracts.md`).
+- 수령 itemId·lotId가 있으면 leaf의 itemAlias·lotAlias와 같다.
+- 수령 장소(placeId·destinationId·locationId)는 INTERNAL_STORAGE다.
+
+운송 수령은 `receivingCustodianId`를 보내지 않고 leaf의 보관자를 이어받는다.
+그 실물을 뒤에서 예약·pick·출고·이동하면 leaf 보관자는 내부 보관자여야
+한다. 기계 규칙은 [fixture-place-kinds.json](fixture-place-kinds.json)의
+`transitReceipt`이고 `ContractValidator.receiptCustodyProblems`가 강제한다.
+
+round 6 전환에서 PORT가 EXTERNAL_PORT가 됐는데, 그 장소의 leaf를 운송
+수령으로 확인하는 case가 남았다. 계약을 지키는 제품은 그 수령을 거부해
+C2·T09 `cumulative-versus-state`, T16 `provisional-holds`를 통과할 수
+없었다. T14의 수령98은 100 BOX leaf를 나누지 않고 일부만 받았다(Step 2
+closure review 5, P2). 적용 결과는 다음과 같다.
+
+| case | 수령 | leaf | 처리 |
+|---|---|---|---|
+| C2·T09 `cumulative-versus-state` | receive60·receive40 | A60·B40 | PORT(EXTERNAL_PORT)에서 TRANSIT 장소로 옮겼다. 내부 보관자 warehouse는 그대로다. PORT를 읽는 assertion은 없었다 |
+| T16 `provisional-holds` | confirm | TRANSIT60 | PORT(IT-port, EXTERNAL_PORT)에서 TRANSIT 장소로 옮겼다. 보관자 CUSTODIAN·owner SUPPLIER는 그대로다. grant 장소 scope와 `receipt-transit-double-creation-7`(확인 뒤 운송 장소에 남은 활성 실물 0)도 새 장소를 따른다 |
+| T14 `discrepancy-transit2`·`discrepancy-unobserved2` | receive98 | Q100의 자식 RECEIVED98 | 수령 전에 warehouse가 Q100을 98+2로 나눈다(`split98`). 수령98은 자식98 전체를 받고, 운송 중 확인(`transit2`)은 자식2에 기록한다. DB 합계는 활성 행만 읽고, 분할 적용·소비된 자식98·활성 자식2를 단언한다 |
+
 ## 직접 수령의 보관자
 
-기존 fixture QuantitySegment를 확인하지 않는 confirmReceipt는 직접
-수령이다. 이어받을 운송 leaf가 없으므로 수령한 실물의 보관자는 명령의
+운송 수령이 아닌 confirmReceipt는 직접 수령이다. 이어받을 운송 leaf가 없으므로 수령한 실물의 보관자는 명령의
 `receivingCustodianId` slot에서만 생긴다. slot이 없으면 제품
 (`ReceiptCommands`, 읽기만)은 보관자 없는 segment를 만들고, 그 실물의
 예약·pick·출고·이동은 SCOPE_INELIGIBLE, 적격은 UNKNOWN이다. 계약을 지키는
@@ -84,22 +121,52 @@ EXTERNAL_PORT다. 전환 기록과 script는
 - 직접 수령의 실물(또는 그 실물에서 split·이동·보류·예약으로 이어진
   결과)을 뒤에서 `reserveQuantity`·`replaceAllocation`·`pickQuantity`·
   `dispatchQuantity`·`moveQuantity`로 쓰면 그 수령은 slot을 보낸다.
-- slot은 같은 조직의 Human/Agent alias이며 fixture actor로서
-  confirmReceipt role과 grant를 갖고, grant의 장소 scope가 있으면 수령
-  장소를 포함한다. 제품은 수령 보관자에게 그 장소의 현재 수령 권한을
-  요구한다.
-- 인용한 수령 원본(slot `evidenceId`나 요청 `evidenceRefs`의
-  DocumentVersion alias)의 `fixtureContent.receivingCustodianAlias`가 같은
-  alias를 지명한다. 다른 보관자를 지명하는 원본은 없어야 하고, 지명한
-  원본의 fixture evidence sha256은 canonical content(key 정렬, 공백 없음,
-  UTF-8)의 SHA-256이다. adapter는 그 alias를 원본과 event payload의
+- slot은 확인한 actor와 같은 조직(`organizationAlias`)의 Human/Agent
+  alias이며 fixture actor로서 confirmReceipt role과 grant를 갖고, grant의
+  장소 scope가 있으면 수령 장소를 포함한다. 제품은 수령 보관자에게 그
+  장소의 현재 수령 권한을 요구한다.
+- 인용한 수령 원본이 같은 alias를 지명한다. 원본은 증거 slot(`evidenceId`·
+  `evidenceIds`·`verifiedEvidenceIds`·`evidence` 등)과 요청 `evidenceRefs`의
+  DocumentVersion alias(`$alias`, typed `value`, alias 이름 문자열)와,
+  `$result`로 인용한 앞선 action이 첨부한 문서(그 action이 인용한
+  DocumentVersion alias, 그리고 inline JSON content가 밝힌
+  `receivingCustodianAlias`)다. DocumentVersion은
+  `fixtureContent.receivingCustodianAlias`로 지명하며 fixture evidence
+  sha256은 canonical content(key 정렬, 공백 없음, UTF-8)의 SHA-256이다.
+  inline 문서의 sha256은 content의 SHA-256이다. 다른 보관자를 지명하는
+  원본은 없어야 한다. adapter는 그 alias를 원본과 event payload의
   `receivingCustodianId`로 설치한다. 제품은 검증된 수령 증거가 지명한
   보관자만 slot으로 받기 때문이다.
 - 같은 수령(같은 `canonicalOccurrenceKey`, 없으면 같은
   `commandIdempotencyKey`)의 모든 confirm·retry는 같은 slot 값을 보내거나
   모두 보내지 않는다. 중복 출처나 재시도가 보관자를 바꾸지 못한다.
-- 운송 수령(기존 fixture QuantitySegment를 확인하는 수령)은 slot을 보내지
-  않는다. leaf의 보관자를 이어받는다.
+- 운송 수령은 slot을 보내지 않는다. leaf의 보관자를 이어받는다.
+
+### 보관자 반례 선언
+
+위 규칙은 양성 대조만 쓰게 했다. 그래서 slot을 증거·권한 확인 없이 그대로
+보관자로 쓰는 제품도 모든 case를 통과했다(Step 2 closure review 5, P3).
+slot을 가진 confirmReceipt action에 `custodyControl`을 두면 제품의 거부를
+단언하는 반례가 된다. 값은 SCOPE_INELIGIBLE(outcome REJECTED),
+EVIDENCE_CONFLICT(HELD), EVIDENCE_UNVERIFIED(HELD)다.
+
+- 선언 값은 제품(`ReceiptCommands`)이 처음 걸리는 검사여야 한다. 준비
+  단계의 권한·조직(외부 actor, 다른 조직, confirmReceipt role·grant나 장소
+  scope 없음)이 먼저고, 원본끼리 다른 보관자를 지명하면 EVIDENCE_CONFLICT,
+  원본이 정확히 slot 보관자를 지명하지 않으면 EVIDENCE_UNVERIFIED다.
+- subcase는 그 action의 `/response/outcome`과 `/response/error/code`를
+  고정하고, 뒤의 observe action에서 `/data/rawRows/segments`나
+  `/data/rawRows/receipts`의 count 0으로 효과 0을 단언한다.
+- 반례 수령의 결과를 뒤에서 쓰지 않는다. 같은 수령의 slot 일치 검사에서
+  반례는 빠진다. 증거가 지명한 보관자로 다시 확인하는 것은 정상이다.
+- 이 field는 harness 선언이며 제품에 보내지 않는다(`CaseRunner`는
+  `request`만 보낸다).
+
+E1 `receipt-custody-unverified`가 첫 반례다. full-flow-quantities fixture와
+구매·출하 선행 명령을 그대로 쓰고 receipt60의 slot만 procurement로
+바꿨다. procurement는 W 수령 권한이 있는 내부 Human이지만 원본
+warehouse-60은 receiver를 지명한다. 기대는 HELD·EVIDENCE_UNVERIFIED, W
+활성 실물 0행, procurement 보관 실물 0행, 수령 원장 0행이다.
 
 적용 case는 다음과 같다. 보관자는 확인한 actor와 다르게 둘 수 있으면
 다르게 두어, 호출자에서 보관자를 추론하는 제품이 양성 대조에서 드러나게
@@ -109,6 +176,9 @@ EXTERNAL_PORT다. 전환 기록과 script는
 |---|---|---|---|---|
 | E1 세 subcase | receipt60·receipt40(procurement가 확인) | receiver(내부 Human, confirmReceipt grant 추가) | warehouse-60·warehouse-40 | `received-custody-control`: 두 수령 뒤·첫 QC 보류 전 W 활성 실물은 수령60·수령40 두 행이고 보관자는 receiver다 |
 | T13 `partial-excess-return-relocation` | receipt60·receipt40·receipt5(warehouse가 확인) | warehouse(그 장소의 유일한 수령 권한자) | warehouse-receipt(새 DocumentVersion alias) | `received-custody-control`: W 활성 실물 60·40·5의 보관자는 warehouse다 |
+
+T13은 receipt40의 20 BOX를 W-alt로 옮기기 전에 20+20으로 나눈다
+(`split40`). 제품 moveQuantity는 leaf 전체를 옮기기 때문이다(round 8).
 
 그 밖의 직접 수령(T02·T06·T07·T09·T11·T12·T21·T22·C3·V1·V6·V8)은 수령한
 실물을 뒤에서 예약·출고·이동하지 않아 slot이 필요 없다. 그 case의 기대는
@@ -125,3 +195,11 @@ case도 없다.
 - INTERNAL_STORAGE에서 보관자가 미확인·외부인 segment의 선언 반례와,
   location 없는 segment의 보고는 아직 없다
   (`docs/execution/step2r-round7/README.md` DEFERRED).
+- 운송 수령의 leaf slot(`segmentId`·`existingSegmentId`·
+  `existingTransitSegmentId`)을 제품 receiveProvisional의
+  `transitSegmentId`로, splitQuantity의 명시 `children`을 제품
+  `quantities[]`와 `/response/children/<alias>/segmentId` 응답으로 옮기는 것은
+  Step 3 actual adapter의 몫이다(round 8 cross-owner 요청).
+- round 8은 confirmReceipt만 전수 점검했다. leaf 일부를 split 없이
+  이동·보류·출고하는 다른 명령(계획 §4.2)은 전수 점검하지 않았다. T13의
+  move만 이번에 split을 앞세웠다.

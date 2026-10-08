@@ -79,7 +79,8 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     (공개되지 않은 감사 source·field·where)와 `runtimeProfileProblems`
     (fixture runtimeProfile과 tick 방식, 자율 loop 패턴, case가 직접 쓴
     watcher `observeFrom`·`naturalTickSeconds`, 수동 관찰 fixture의
-    `tickSeconds` 누락·창 초과, `verification/host-observation-guide.md`)가
+    `tickSeconds` 누락·창 절반 초과(NO_TASK는 두 tick을 관찰한다),
+    `verification/host-observation-guide.md`)가
     어긋나면 준비 문제다.
   - **fixture 장소 종류**: `ContractValidator.placeKindProblems`가 subcase
     fixture(baseRefs 포함)의 모든 Place alias에
@@ -90,16 +91,35 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
     segment는 같은 조직의 Human/Agent alias를 `custodianAlias`로 가져야
     한다. kind 누락·옛 kind(INTERNAL_WAREHOUSE·WAREHOUSE·PORT·TRANSPORT)는
     준비 실패다(step2r round 6).
-  - **직접 수령의 보관자**: `ContractValidator.receiptCustodyProblems`가
-    기존 fixture QuantitySegment를 확인하지 않는 confirmReceipt(직접 수령)의
-    실물을 뒤에서 예약·배분 교체·pick·출고·이동하는 subcase에
-    `receivingCustodianId` slot을 요구한다. slot은 confirmReceipt 권한과
-    수령 장소 scope를 가진 내부 Human/Agent fixture actor여야 하고, 인용한
-    수령 원본(DocumentVersion `fixtureContent.receivingCustodianAlias`)이 같은
-    alias를 지명하며 그 evidence sha256이 canonical content의 hash여야 한다.
-    같은 수령의 모든 confirm은 같은 slot을 보내고, 운송 수령은 slot을 보내지
-    않는다(`contracts/fixture-place-kinds.json` directReceiptCustody, step2r
-    round 7).
+  - **운송 수령**: `ContractValidator.receiptCustodyProblems`는 fixture
+    QuantitySegment(또는 그 leaf를 나눈 splitQuantity의 명시 children 자식,
+    `/response/children/<alias>/segmentId`)를 지명하는 confirmReceipt를 운송
+    수령으로 본다. leaf는 하나이고 TRANSIT 장소에 있으며 식별돼 있어야
+    한다(INDISTINGUISHABLE_MIXTURE 아님). 수령 수량·단위는 leaf와 정확히 같고
+    itemId·lotId는 leaf와 같으며 수령 장소는 INTERNAL_STORAGE다. 일부만 받으면
+    먼저 split한다(계획 §4.2, 제품 `ReceiptStockPrimitives.receive`). 운송
+    수령의 실물을 뒤에서 쓰면 leaf 보관자가 내부 보관자여야 한다
+    (`contracts/fixture-place-kinds.json` transitReceipt, step2r round 8).
+  - **직접 수령의 보관자**: 그 밖의 confirmReceipt(직접 수령)의 실물을 뒤에서
+    예약·배분 교체·pick·출고·이동하는 subcase에 `receivingCustodianId` slot을
+    요구한다. slot은 확인한 actor와 같은 조직이며 confirmReceipt 권한과 수령
+    장소 scope를 가진 내부 Human/Agent fixture actor여야 한다. 인용한 수령
+    원본이 같은 alias를 지명해야 한다. 원본은 증거 slot(evidenceId·
+    evidenceIds·verifiedEvidenceIds 등)과 요청 evidenceRefs의 DocumentVersion
+    alias(`fixtureContent.receivingCustodianAlias`, evidence sha256은
+    canonical content의 hash)와, `$result`로 인용한 앞선 action이 첨부한
+    문서(그 action이 인용한 alias와 inline JSON content)다. 같은 수령의 모든
+    confirm은 같은 slot을 보내고, 운송 수령은 slot을 보내지 않는다(directReceiptCustody,
+    step2r round 7·8).
+  - **보관자 반례 선언**: slot을 가진 confirmReceipt action에
+    `custodyControl`(SCOPE_INELIGIBLE·EVIDENCE_CONFLICT·EVIDENCE_UNVERIFIED)을
+    두면 위 검사를 뒤집는다. 선언 값은 제품이 처음 걸리는 검사여야 한다
+    (권한·조직 → 원본끼리 상충 → 원본이 slot을 지명하지 않음). subcase는 그
+    action의 `/response/outcome`(REJECTED 또는 HELD)과
+    `/response/error/code`를 고정하고, 뒤의 observe에서
+    `/data/rawRows/segments`나 `/data/rawRows/receipts`의 count 0으로 효과
+    0을 단언한다. 그 수령의 결과를 뒤에서 쓰지 않는다. 이 field는 harness
+    선언이며 제품에 보내지 않는다. 예: E1 `receipt-custody-unverified`.
   - **Streamable HTTP transport header**: `ContractValidator.wireTransportProblems`가
     `route=wire`·`transport=streamable-http` 요청의 Accept가
     `application/json`과 `text/event-stream`을 모두 나열하기를 요구하고

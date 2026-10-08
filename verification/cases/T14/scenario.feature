@@ -42,18 +42,22 @@
     만일 "warehouse" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "source" 역할이 "shipped" 행동을 수행한다
+    만일 "warehouse" 역할이 "split98" 행동을 수행한다
     만일 "warehouse" 역할이 "receive98" 행동을 수행한다
     만일 "source" 역할이 "transit2" 행동을 수행한다
     만일 "warehouse" 역할이 "view" 행동을 수행한다
     만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "split98-applied" assertion으로 "수령 전 분할 Q100 → 수령 범위98 + 나머지2 = APPLIED"를 확인한다
     그러면 "received-api98" assertion으로 "고정 oracle received의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "loss-api0" assertion으로 "고정 oracle automatic-loss의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "received98" assertion으로 "고정 oracle received의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "receipt98" assertion으로 "고정 oracle received의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "received-leaf-retired" assertion으로 "수령98이 소비한 분할 자식98의 활성 행 = 0"를 확인한다
     그러면 "shipclaim100" assertion으로 "고정 oracle separate-observations의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "no-loss-movement" assertion으로 "고정 oracle automatic-loss의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "loss-before-after" assertion으로 "고정 oracle automatic-loss의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "physical-total100" assertion으로 "고정 oracle separate-observations의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "remainder2-active" assertion으로 "TRANSIT의 활성 분할 자식2 = 1행"를 확인한다
     그러면 "transit-api2" assertion으로 "고정 oracle transit의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "transit2" assertion으로 "고정 oracle transit의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "discrepancy-owner-one" assertion으로 "고정 oracle discrepancy-responsibility의 실제 값과 범위를 확인한다"를 확인한다
@@ -65,17 +69,21 @@
     만일 "warehouse" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "source" 역할이 "shipped" 행동을 수행한다
+    만일 "warehouse" 역할이 "split98" 행동을 수행한다
     만일 "warehouse" 역할이 "receive98" 행동을 수행한다
     만일 "warehouse" 역할이 "view" 행동을 수행한다
     만일 "시스템" 역할이 "db" 행동을 수행한다
+    그러면 "split98-applied" assertion으로 "수령 전 분할 Q100 → 수령 범위98 + 나머지2 = APPLIED"를 확인한다
     그러면 "received-api98" assertion으로 "고정 oracle received의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "loss-api0" assertion으로 "고정 oracle automatic-loss의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "received98" assertion으로 "고정 oracle received의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "receipt98" assertion으로 "고정 oracle received의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "received-leaf-retired" assertion으로 "수령98이 소비한 분할 자식98의 활성 행 = 0"를 확인한다
     그러면 "shipclaim100" assertion으로 "고정 oracle separate-observations의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "no-loss-movement" assertion으로 "고정 oracle automatic-loss의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "loss-before-after" assertion으로 "고정 oracle automatic-loss의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "physical-total100" assertion으로 "고정 oracle separate-observations의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "remainder2-active" assertion으로 "TRANSIT의 활성 분할 자식2 = 1행"를 확인한다
     그러면 "unobserved-is-unknown" assertion으로 "고정 oracle separate-observations의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "unobserved-not-zero" assertion으로 "고정 oracle separate-observations의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "discrepancy-owner-one" assertion으로 "고정 oracle discrepancy-responsibility의 실제 값과 범위를 확인한다"를 확인한다

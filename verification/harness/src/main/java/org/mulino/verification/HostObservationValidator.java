@@ -100,10 +100,14 @@ public final class HostObservationValidator {
     public static final String OBSERVE_FROM="observeFrom";
     /**
      * The fixture runtimeProfile tickSeconds, resolved by CaseRunner into a passive watcher request (step2r round 7). A
-     * NO_TASK observation must have watched at least one natural tick after observeFrom, otherwise a watcher that returns
-     * before the loop's next tick would report "nothing due" for a sweeper that re-submits already handled work.
+     * NO_TASK observation must have watched two natural ticks after observeFrom (step2r round 8): observeFrom has an
+     * arbitrary phase against the loop, and a fixed-delay scheduler's period is the tick plus its processing time, so one
+     * tick does not guarantee that a tick started and recorded its submission inside the watched interval. The extractor
+     * must also start reading the scheduler's rows only after the watcher completed, so it sees every row up to completedAt.
      */
     public static final String NATURAL_TICK_SECONDS="naturalTickSeconds";
+    /** Natural tick periods a NO_TASK passive observation must cover after observeFrom (step2r round 8). */
+    public static final int NO_TASK_TICKS=2;
     /** A passive natural-tick watcher request (OBSERVE_NEXT_NATURAL_TICK parameters on tickScheduler/sweepDue). */
     static boolean passiveWatch(JsonNode control) {
         if(!"process".equals(control.path("type").asText()) || !Set.of("tickScheduler","sweepDue").contains(control.path("operation").asText())) return false;
@@ -168,12 +172,16 @@ public final class HostObservationValidator {
             if(first==null || at.isBefore(instant(first,"submittedAt"))) first=row;
         }
         JsonNode tick=requested.path(NATURAL_TICK_SECONDS);
-        if(!tick.isMissingNode()) ContractValidator.require(tick.isIntegralNumber() && tick.asInt()>=1 && tick.asInt()<=window.asInt(),
-            NATURAL_TICK_SECONDS+" must be an integer 1..observationWindowSeconds (fixture runtimeProfile tickSeconds)");
+        if(!tick.isMissingNode()) ContractValidator.require(tick.isIntegralNumber() && tick.asInt()>=1 && NO_TASK_TICKS*tick.asLong()<=window.asLong(),
+            NATURAL_TICK_SECONDS+" must be an integer 1..observationWindowSeconds/"+NO_TASK_TICKS+" (fixture runtimeProfile tickSeconds)");
         if(identity.path("submissionStatus").asText().equals("NO_TASK")) {
-            // An absence is only evidence after the loop has had its next tick inside the observed interval.
+            // An absence is only evidence after the loop has had a full tick inside the observed interval, whatever the
+            // phase of observeFrom and the scheduler's processing delay: two tick periods, still inside the window.
             ContractValidator.require(tick.isIntegralNumber(),"NO_TASK passive observation needs the harness-resolved "+NATURAL_TICK_SECONDS+" (fixture runtimeProfile tickSeconds)");
-            ContractValidator.require(!end.isBefore(start.plusSeconds(tick.asLong())),"NO_TASK passive observation ended before one natural tick ("+NATURAL_TICK_SECONDS+") after "+OBSERVE_FROM+"; it cannot show that the next tick submitted nothing");
+            ContractValidator.require(!end.isBefore(start.plusSeconds(NO_TASK_TICKS*tick.asLong())),"NO_TASK passive observation ended before "+NO_TASK_TICKS+" natural ticks ("+NATURAL_TICK_SECONDS+") after "+OBSERVE_FROM+"; it cannot show that the next tick submitted nothing");
+            // The extractor reads the durable submission rows only after the watcher completed, so no row up to completedAt is missed.
+            ContractValidator.require(!instant(host.path("extractor").path("command"),"startedAt").isBefore(end),
+                "NO_TASK passive observation needs the extractor to read scheduler rows after the watcher completed (extractor command startedAt >= watcher completedAt)");
         }
         if(identity.path("submissionStatus").asText().equals("SUBMITTED")) {
             ContractValidator.require(first!=null,"SUBMITTED natural tick has no scheduler-recorded submission row");
