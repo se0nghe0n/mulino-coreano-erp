@@ -1,0 +1,402 @@
+{
+ "confirmedNew": [
+  {
+   "severity": "P2",
+   "title": "Selftest-marker substring scan matches the mandatory snapshot.capturedAt key, so no actual run with an observe action can ever yield a coverage receipt or PASS",
+   "file": "verification/harness/src/main/java/org/mulino/verification/ExecutionReceiptProducer.java",
+   "line": 78,
+   "failure_scenario": "A correct product runs under `./verify scenarios --actual` and every subcase executes, including its independent DB observe actions. ExecutionReceiptProducer.refusal lowercases the whole provenance JSON of each executed action and searches it for the BAD_MARKERS ('captured' among them). Every executed observe result must carry provenance.snapshot equal to data.snapshot (ContractValidator.java:177; CaseRunner.java:137), and that snapshot must contain the required key capturedAt (observation schema; CaseRunner.java:216; ActualAcceptanceDriver.java:67 passes data.snapshot into provenance). The serialized text therefore contains \"capturedat\" and the run is refused with 'action <id> carries selftest provenance'. No receipt or index entry is written, and the profile and the coverage gate stay NOT_RUN for any real run, since nearly every subcase has observe actions (about 1,987 of them). If a receipt were produced another way, for example by the planned native actual-sN mapping, assemble.py:675 runs the same full-JSON scan and raises 'Canned/stub action cannot become actual execution', turning the case into FAIL. This is fail-closed and lets no wrong product through, but the receipt path advertised as the fix for the coverage receipt gap cannot accept a correct product.",
+   "evidence": "ExecutionReceiptProducer.java:28 has BAD_MARKERS=[selftest,canned,stub,fake,captured,unimplemented]; :77-80 scans action.path(\"provenance\").toString().toLowerCase(). assemble.py:29 and :675 do the same over json.dumps(provenance).lower(). A python check on a provenance shaped like ActualAcceptanceDriver.observe output returns ['captured']. The only positive regression test (StepTwoRoundTwoRegressionTest.receiptGateRefusesEverythingButACleanActualProductRun / writtenReceiptIsAcceptedByTheCoverageAssembler, actualLike()) builds a provenance with no snapshot, a shape a real observe action can never have. CaseRunner.selftestProvenance (:188-194) checks only the label fields and has no such problem.",
+   "fix": "In both the producer and assemble.py run_case, check only the label fields (source, adapter, adapterVersion, buildVersion), or match markers as whole tokens against values rather than keys, consistently with CaseRunner.selftestProvenance. Add a regression test whose observe action carries a real snapshot {id, isolation, capturedAt, artifactRef, readMode, revisionQuery}, and require both emit() and Assembly.run_case to accept it.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P2",
+    "reasoning": "I could not refute the claim. I checked it at 48d616e3. HEAD is now 45f626ec, and ExecutionReceiptProducer.java and assemble.py have not changed since 48d616e3, so the defect is still present.\n\n1. The producer refuses on any marker found anywhere in an action's provenance. ExecutionReceiptProducer.refusal (lines 75-79) runs `action.path(\"provenance\").toString().toLowerCase()` for every EXECUTED action and tests `contains()` against BAD_MARKERS, which includes \"captured\" (line 28).\n\n2. A real observe action always carries that substring.\n   - CaseRunner.run (line 137) requires data.snapshot to equal provenance.snapshot for any EXECUTED observe.\n   - CaseRunner.observerSnapshot (line 216) fails the action unless snapshot has a parseable `capturedAt`, via `Json.required`.\n   - contracts/acceptance-observation.schema.json (lines 62 and 110) lists capturedAt as a required snapshot field.\n   - ActualAcceptanceDriver.observe passes data.snapshot into provenance(...).\n   - JdbcObservation at 48d616e3 (line 35) and ObserverSnapshot at HEAD (line 38) both write capturedAt into the snapshot.\n   \n   So every conformant EXECUTED observe has \"capturedat\" in its serialized provenance.\n\n3. That provenance reaches the scan unchanged. CaseRunner.evidence puts results, built from `StepResult.toJson` with the full provenance, into case.actions. Main (line 104) passes those cases to emit, which calls refusal.\n\n4. A Python check on a realistic observe provenance returned ['captured'].\n\nThe result is that any conformant actual run containing an observe action is refused with \"action X carries selftest provenance\". No receipt or index entry is written, and the profile and coverage stay NOT_RUN.\n\nassemble.py has the same flaw. Lines 29 and 675-676 scan `json.dumps(provenance).lower()` and raise 'Canned/stub action cannot become actual execution'. Lines 679-680 then require observe provenance.snapshot to be non-empty. The two checks contradict each other for every observe action.\n\nThe regression test does not catch this. StepTwoRoundTwoRegressionTest.actualLike (lines 113-119) builds a provenance with no snapshot or sourceQuery, a shape a real observe can never produce. CaseRunner.selftestProvenance (lines 188-194) checks only label fields and would accept a real observe; the producer and the assembler are inconsistent with it.\n\nOne caveat: at 48d616e3 the JdbcObservation snapshot had no readMode, so CaseRunner.observerSnapshot would have failed observes earlier. That is a separate observer defect, fixed after 48d616e3 in 28daf5f7. Once the observer conforms, as at HEAD, this marker scan blocks every receipt.\n\nP2 holds. The check fails closed and lets no wrong product through, but the receipt path cannot accept a correct product run, and it would block Step 3/4 coverage closure until fixed."
+   }
+  },
+  {
+   "severity": "P2",
+   "title": "Observation-level layer-route check exists but is not gated by ./verify prepare or the assembler, and it carries a hard-coded KNOWN_OPEN allowlist that returns exit 0",
+   "file": "verification/harness/src/main/java/org/mulino/verification/PreparationAssetChecks.java",
+   "line": 20,
+   "failure_scenario": "The coverage-00/01/02 fix is profile-level only: declaring `mcp` on a case links every assertion of the case to the mcp profile (assemble.py:447-451, CatalogLinkValidator.java:95-107), so an observation whose oracle requires MCP is 'reachable' even when no linked assertion reads an MCP/wire result. The profiles worker found 21 such observations after the profile fix and wrote verification/requirements/check_layer_routes.py to catch them, but CHECKS in PreparationAssetChecks lists only validate_catalog, cases_b_invariants, T08 bind --check and test_generators_reproduce; assemble.py never loads check_layer_routes either. A future case edit that keeps the profile but drops the MCP-reading assertion passes ./verify prepare and ./verify coverage with 0 problems. In addition the script's KNOWN_OPEN map (check_layer_routes.py:42-47, four T20/V4 observations with no MCP/SKILLS evidence) is printed but does not fail (L143-152), so even a wired-in run would silently accept those gaps.",
+   "evidence": "grep -rln check_layer_routes over *.py/*.java/verify hits only requirements/README.md and test_layer_routes.py; PreparationAssetChecks.java:20-25 CHECKS has 4 entries; `python3 -I verification/requirements/check_layer_routes.py` at 48d616e3 prints `KNOWN_OPEN T20 owner (cases-a) … T20.skills-real-loading-and-meaning/skill-hash-as-loading-proof MCP`, `KNOWN_OPEN V4 owner … mixed-batch-allowed-partial-effects MCP` and then `{\"status\": \"VALID\", \"unexplainedGaps\": 0}` with exit 0.",
+   "fix": "Add `new Check(\"layer-routes\",\"verification/requirements/check_layer_routes.py\",List.of(\"verification/requirements/check_layer_routes.py\"))` to CHECKS (and the same loader in assemble.py catalog/declarations) and make KNOWN_OPEN entries fail (or require a lock reviewUpdate per entry with an owner and closing commit) instead of exit 0.",
+   "slice": "harness-coverage",
+   "reviewer": "fable-low",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P3",
+    "reasoning": "I could not refute the mechanism. It is real and reachable at 48d616e3. I am lowering the severity because it is a regression-guard and integration gap, not an oracle a wrong product can pass today.\n\n**What I confirmed**\n- **The prepare gate skips the layer check.** `PreparationAssetChecks.java:20-25` has exactly four checks: `validate_catalog`, `cases_b_invariants`, T08 `bind --check` and `test_generators_reproduce`.\n  - A grep over the repository (excluding .git and build) finds `check_layer_routes` only in its own script, `test_layer_routes.py`, `requirements/README.md` and the profiles worker record.\n  - The `verify` launcher, `assemble.py` and the harness Java sources never call it.\n  - No gate runs `test_layer_routes.py` either. Its `test_repository_has_no_unexplained_gap` runs only on demand.\n- **Reachability is still checked per profile only.** `CatalogLinkValidator.requiredProfileReachability` (lines 84-122) links every assertion to all declared profiles. `assemble.py` lines 447-467 does the same.\n  - The coverage README says outright that a profile declaration is necessary but not sufficient, and leaves the real MCP/skill path to case review.\n- **The only other guard is coarser.** `cases_b_invariants.py:127-134` checks E1/E2 per subcase: some assertion must read some MCP-route result.\n  - Deleting the per-observation `logistics-closes-unrelated-duties-*-mcp` assertions while other MCP reads stay in the subcase still passes it.\n  - `test_layer_routes.test_api_only_duty_check_is_a_gap` shows `check_layer_routes` would catch exactly that edit, but nothing gates on it.\n- **So the failure scenario holds.** A future case edit that keeps the profile but drops the MCP- or skill-reading assertion passes `./verify prepare` and the coverage preparation check with 0 problems.\n- **KNOWN_OPEN entries do not fail the run.** I ran `python3 -I verification/requirements/check_layer_routes.py`. It prints four KNOWN_OPEN lines (three for T20, one for V4) and `{\"status\":\"VALID\",\"unexplainedGaps\":0}` with exit 0. Lines 42-47 and 143-152 report these entries without failing.\n  - One of them is a substantive gap. T20 `host-malicious-document` (document-instruction-authority) has no assertion reading a skill-loading stage. Its only tool-related reads are toolCalls counts, alongside the unchanged-DB checks.\n\n**Why P3 rather than P2**\n- **The narrowed coverage findings are fixed.** They asked for a profile-level reachability check in both validators. That check now exists, and real MCP/skill assertions were added; the current tree has 0 unexplained gaps.\n- **The plan does not require this gate.** Plan §13.4 and the coverage README assign observation-level path review to QA/case review, not to a prepare gate.\n- **Wiring the check in was an explicit open decision.** The profiles worker handed it to the coordinator (`step2r-profiles/README.md`, handoff item 7) and documented the KNOWN_OPEN policy in `requirements/README.md`. Nothing regressed.\n- **The KNOWN_OPEN items are weak evidence.** At least V4 mixed-batch (batch route) and T20 skill-hash MCP look like oracle-level `requiredLayers` over-approximations, not missing product evidence.\n\n**What remains:** the observation-level guard is advisory, not gated, and four entries are allowlisted without an owner, a lock or a closing condition. That is a P3 hardening item.\n\n**Suggested fix:** add the check as a fifth entry in `CHECKS`, or load it in the assembler. Make KNOWN_OPEN fail, or tie each entry to a reviewed lock entry with an owner."
+   }
+  },
+  {
+   "severity": "P2",
+   "title": "Generated V4/V6/V7 observation-bindings.json are stale at 48d616e3 and their generators' --check modes are not part of ./verify prepare, so hand edits or stale regeneration of these and T23/V8/T06 outputs are not detected",
+   "file": "verification/harness/src/main/java/org/mulino/verification/PreparationAssetChecks.java",
+   "line": 23,
+   "failure_scenario": "The 'generators-reproduce' prepare check covers only T01/T20/T25 (author_cases.py), C3 (author_prerequisites.py) and T26 (author_review_fixes.py), plus the separate T08 bind --check. The repository has five more generators whose outputs are committed derived data: verification/platform-tests/build_cases.py (T23, V8 case.json/scenario.feature/fixtures, subcase-index.json), verification/cases/T06/author_contracts.py, verification/cases/V4/author_review_fixes.py and verification/cases/V7/bind_observations.py (V4/V6/V7 observation-bindings.json). None is run by prepare. At HEAD the V4/V6/V7 bindings already carry the pre-profiles catalog hash 61968b22… while mandatory-oracles.json is now c1187224… (changed in d84f2942), so `bind_observations.py V4|V6|V7 --check` and `V4/author_review_fixes.py --check` exit 1 while ./verify prepare reports PREPARED with 0 problems. A hand edit that moves a V7 fixed-quantity primary to another assertion would equally go unnoticed.",
+   "evidence": "`python3 -I verification/cases/V7/bind_observations.py V4 --check` → `V4 observation-bindings.json drifted from case.json; rerun bind_observations.py V4` exit 1 (same for V6, V7); `python3 -I verification/cases/V4/author_review_fixes.py --check` → `V4 drifted from author_review_fixes.py: observation-bindings.json` exit 1; regenerating in a temp copy shows the only diff is catalogSha256 61968b22… → c1187224…. In the same temp copy build_cases.py and T06/author_contracts.py reproduced the committed T23/V8/T06 files byte-for-byte, so those are currently consistent but unguarded. prepare.json at 48d616e3: caseAssetChecks = normative-catalog-lock, cases-b-invariants, t08-observation-bindings, generators-reproduce, all PASS.",
+   "fix": "Regenerate V4/V6/V7 observation-bindings.json (case owners) and extend CHECKS with `bind_observations.py V4|V6|V7 --check`, `V4/author_review_fixes.py --check`, and reproduce-tests for build_cases.py and T06/author_contracts.py (same temp-copy pattern as test_generators_reproduce.py).",
+   "slice": "harness-coverage",
+   "reviewer": "fable-low",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P3",
+    "reasoning": "I could not refute the claim. Its facts check out at 48d616e3. The working HEAD is now 45f626ec, but nothing under verification/cases, verification/requirements, verification/mcp-tests or verification/platform-tests changed after 48d616e3, so the results below hold for 48d616e3. The impact is smaller than P2, so I lowered it to P3.\n\nConfirmed:\n1. Prepare only runs four case-asset checks. PreparationAssetChecks.java:20-25 lists them: validate_catalog.py, V2/cases_b_invariants.py (which covers only E1/E2/C4/V2/V3, per cases_b_invariants.py:2,12), T08/bind_observations.py --check, and test_generators_reproduce.py. That test (verification/mcp-tests/test_generators_reproduce.py:27-37) covers only author_cases.py (T01/T20/T25), C3/author_prerequisites.py and T26/author_review_fixes.py. No Java test, verify-script mode or inventory command runs V7/bind_observations.py, V4/author_review_fixes.py, platform-tests/build_cases.py or T06/author_contracts.py. A git grep at 48d616e3 finds them referenced only in their own files and READMEs.\n2. The committed bindings are stale right now. V4, V6 and V7 observation-bindings.json all have catalogSha256 61968b22..., but mandatory-oracles.json hashes to c1187224... (changed in d84f2942). `python3 -I verification/cases/V7/bind_observations.py V4|V6|V7 --check` exits 1 for all three. In a git-archive temp copy, `V4/author_review_fixes.py --check` exits 1 (\"V4 drifted from author_review_fixes.py: observation-bindings.json\"). After regenerating in the temp copy, the only diff is line 5, catalogSha256. Commit 48d616e3 regenerated T08 only. The step2r-profiles hand-off (README.md:128-134) named only T08, while step2r-cases-c README.md:94-95 still records V4/V6/V7 as CURRENT. Prepare does not see any of this.\n3. The other generators are unguarded but consistent today. In the temp copy, build_cases.py and T06/author_contracts.py reproduce the committed T23, V8, T06, T22 and T24 files byte-for-byte.\n\nWhy P3, not P2:\n- Nothing consumes the stale field. git grep at 48d616e3 finds catalogSha256 read nowhere except the two writers (and LinkageProbe, which writes its own copy). The V4/V6/V7 observation-bindings.json files and primaryFixedQuantityAssertions are read by no harness, coverage-assembler or validator code; only the generators and READMEs reference them. So the stale hash, or a hand-moved V7 fixed-quantity primary, cannot change any gate result, oracle or coverage verdict.\n- Binding content (observations, pointers, primaries) matches what the regenerator produces, so no oracle is weakened.\n- The unguarded case generators (T06/T22/T24, T23/V8, V4 case.json) reproduce exactly today, so the hand-edit risk is latent.\n- The plan has no generator-reproduction requirement. The confirmed finding behind this check (cases-a #8) asked only for T01/T20/T25 reproduction, and that is done.\n\nWhat remains is a real but low-impact hygiene gap: stale derived metadata, a generator --check that fails at HEAD, and incomplete drift-guard coverage for generator-owned oracle files. The suggested fix still applies: regenerate the V4/V6/V7 bindings, and add bind_observations.py V4|V6|V7 --check, V4/author_review_fixes.py --check, and temp-copy reproduction tests for build_cases.py and T06/author_contracts.py to the prepare CHECKS."
+   }
+  },
+  {
+   "severity": "P1",
+   "title": "T26 autonomous-loop subcases and harness-tick subcases cannot both pass for a plan-conformant 1s scheduler loop",
+   "file": "verification/cases/T26/case.json",
+   "line": 36565,
+   "failure_scenario": "Plan §10 (plan L319) fixes the dev/CI scheduler tick at 1s. In due-wait-autonomous-loop and lot-expiry-autonomous-loop the virtual clock is advanced past the due/expiry boundary while processes are stopped. The scheduler/sweeper restarts, then worker-a/-b restart, and only then does the passive OBSERVE_NEXT_NATURAL_TICK watcher start. A conforming loop submits the due task within about 1s of its own restart, before the watcher exists. HostObservationValidator.schedulerSubmission rejects a submittedAt earlier than command.startedAt (HostObservationValidator.java:91), and the next natural tick inside the window finds nothing. Result: NO_TASK, no terminal, FAIL. The pre-existing harness-triggered subcases have the identical action prefix (stop x4, advance, start-again x4) followed by a harness tick: due-wait-db-rediscovery tick L558, lot-expiry-no-event sweep L11016, and the other tick/sweep subcases. With a live loop, the loop consumes the item first, the harness tick returns NO_TASK, and awaitRuntimeTask has no taskId, so these FAIL too. The validator also forbids attributing the loop's submission to a harness tick (L95-96). No control pauses the loop. A single product can pass both families only by tuning its first-tick delay between worker start latency and 30s, which is timing coupling rather than an oracle.",
+   "evidence": "due-wait-autonomous-loop action order: ... advance, start-again-api/scheduler (36499)/worker-a/worker-b, tick passive (36565), terminal. autonomous-within-30s uses baseline start-again-scheduler (37344), so the case itself expects submission measured from restart. The validator's lower bound is the watcher start (L91). host-observation-guide.md:236-265 says submittedAt must be inside the command window. due-wait-db-rediscovery has the same prefix and a harness tick at 558. lot-expiry-autonomous-loop: stop-sweeper, advance, start-sweeper (37794), sweep passive (37816). These subcases were authored in this round by T26/author_review_fixes.py, and the validator lower bound comes from 8e49031b.",
+   "fix": "Start the passive watcher before the clock advance and restart. Accept submissions at or after the restart baseline inside the window, or read DB attempt rows since the restart. For harness-triggered subcases, add a host control that pauses or holds the natural loop, or redefine tickScheduler/sweepDue as 'observe next tick'. Document in host-observation-guide.md how one product satisfies both families.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P2",
+    "reasoning": "I partly refuted the claim. The mechanism it describes is wrong, but a narrower contract defect behind it is real, so I am keeping it at P2.\n\nThe relevant files have not changed between 48d616e3 and HEAD 0f83e8b6 (T26 case, fixtures, host-observation-guide.md, HostObservationValidator.java).\n\n**What the claim gets wrong.** It says \"No control pauses the loop.\" That is false. Every T26 fixture installs `baseline.runtimeProfile` with `tickSeconds:1`, `controlledTicks:true` and `pausedUntilTickControl:true`. This includes the fixtures the autonomous subcases reuse: `verification/cases/T26/fixtures/due-wait-db-rediscovery.json:750-756` and `lot-expiry-no-event.json:750-756`. The flag was added in 61d15aaf, when T26 was first authored. This matches plan L319, which says races in the dev/CI profile are controlled with a virtual clock and barriers. A product that honors the installed profile keeps its 1s loop paused until a tick control arrives. In the harness-tick family (`due-wait-db-rediscovery`, tick at case.json L558; `lot-expiry-no-event`, sweep at L11016; and the other tick/sweep subcases), nothing is submitted before the harness tick. The submission then falls inside that tick's own command window, so validator L91 is satisfied. That half of the failure cannot happen for a product that conforms to the fixture.\n\n**What remains true.**\n- `author_review_fixes.py:76` copies `base['fixtureRef']` unchanged, so the three `*-autonomous-loop` subcases also install `pausedUntilTickControl:true`.\n- `host-observation-guide.md:236-245` says that in passive `OBSERVE_NEXT_NATURAL_TICK` mode the harness \"executes nothing and only observes.\"\n- Neither `pausedUntilTickControl` nor `controlledTicks` is defined anywhere outside fixture JSON. I grepped `contracts/`, the harness main sources, the guides, the T26 README and the docs. The fixture schema types `baseline` as a bare object.\n\nUnder the documented semantics, a product therefore hits one of two failures:\n1. It honors the pause. The loop never ticks, the watcher sees `NO_TASK`, and `autonomous-trigger-loop` and `autonomous-within-30s` fail for every product that conforms to the fixture.\n2. It ignores the pause. The race the claim describes happens: the loop submits after `start-again-scheduler` (L36499), before the watcher (L36565) exists, and validator L91 rejects any `submittedAt` earlier than the watcher's `startedAt`.\n\nThe only reading under which one product passes both families without timing coupling is that the passive `tickScheduler` control releases the pause. That reading is undocumented and contradicts the guide's \"executes nothing.\" So the overall conclusion still holds on the written contract: the two families cannot both pass without an undocumented interpretation or a timing coincidence.\n\n**Why P2, not P1.** No wrong product can pass because of this. Product runtime is NOT_RUN. The fix is a contract and fixture clarification, not a weakened oracle. Two options:\n- Give the autonomous subcases `pausedUntilTickControl:false` and start the watcher before the clock advance and restart, or accept submissions made after the restart baseline.\n- Document that a passive observation releases the pause and that this does not count as a trigger."
+   }
+  },
+  {
+   "severity": "P2",
+   "title": "V2 reserve-commits-first invariant rewrite no longer pins which child each allocation lands on, so a 40-box allocation on the 20-box child passes",
+   "file": "verification/cases/V2/case.json",
+   "line": 4925,
+   "failure_scenario": "c4396706 removed the fixed contender CONFLICT/STALE_REVISION and allocation-transfer-17. allocation-transfer-17 pinned ALLOC's segmentId to explicit-fresh-split /response/children/0/segmentId, the 40-box child. The remaining invariants check only rootId/quantity/unit of active EXECUTABLE allocations, active children {40, 20}, no allocation on retired A60, and the 60 total. Consider a product that ignores allocationTransfer.childIndex, under either the CONFLICT path or the APPLIED path, and places ALLOC(40) on the 20-box child and the winner's 20 on the 40-box child. It passes final-allocations-exactly-once, final-children-40-20, final-no-allocation-on-retired-parent and all-executable-reservations-10, yet a 20-box physical segment carries a 40-box executable reservation. That physical over-reservation is exactly what V2 exists to prevent.",
+   "evidence": "V2/case.json:4804 final-children-40-20 and :4925 final-allocations-exactly-once (fields rootId/quantity/unit). git show d21aee7c:verification/cases/V2/case.json has allocation-transfer-17 with segmentId = explicit-fresh-split children/0; it is absent at HEAD. docs/execution/step2r-cases-c/README.md says '자식별 배분 수용량 ... 합계·부모0으로만 막았다' (per-child allocation capacity is only guarded by totals and zero-on-parent).",
+   "fix": "Add an observer-derived per-segment coverage row (EXECUTABLE allocation sum by segmentId, compared with segment quantity, like promiseCoverage) and assert allocated <= quantity for every active child. Alternatively, split the subcase into two deterministic variants that pin segmentId from the APPLIED split's response.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P2",
+    "reasoning": "I could not refute this. The failure scenario is reachable at 48d616e3, and V2/case.json is unchanged at HEAD.\n\n1. **The old pin is gone.** At d21aee7c, reserve-commits-first had allocation-transfer-17. It pinned ALLOC's segmentId to explicit-fresh-split /response/children/0/segmentId (the 40-box child). At 48d616e3 that assertion is absent. No assertion in this subcase reads the segmentId of any allocation except to filter for A60.\n\n2. **What the remaining assertions check.** I listed every assertion in the subcase. None constrains which segment an allocation sits on:\n   - final-allocations-exactly-once and raced-allocations-exactly-once check only rootId, quantity and unit.\n   - final-children-40-20 checks only segment quantity and unit.\n   - final-no-allocation-on-retired-parent checks segmentId=A60 only.\n   - all-executable-reservations-10 checks the total of 60, and allocation-transfer-16 counts ALLOC rows.\n   - retired-parent-reconsumption-12..14 compare split-db with after-db only.\n   - The API assertions are aggregates: heldQuantity, newExecutableReservationQuantity and executableReservedQuantity.\n\n3. **No harness-wide check catches it.** AssertionEngine has no generic per-segment over-allocation invariant. git grep finds no segment-coverage or over-reservation logic outside case.json. cases_b_invariants.py rule 9 only checks that fixtures do not over-reserve an order line.\n\n4. **The scenario is reachable in two ways:**\n   - **APPLIED path:** the contender's allocationTransfer lists only ALLOC→child 0. The product alone decides where the winner's 20 lands. If it puts that 20 on the 40-box child, that child carries 60 while the 20-box child carries nothing. Every assertion still passes.\n   - **CONFLICT path:** a product that mishandles a two-entry allocationTransfer (swapped indices, or one childIndex reused for every entry) also passes.\n\n   split-commits-first allocation-transfer-17 pins only a single transfer to children/0. T03 split-merge does not pin segmentId at all. So a bug that shows up only with several transfers goes undetected.\n\n5. **This breaks a plan rule.** Plan §4 (line 122 of the plan file) says \"신규 배분·출고는 동일 실물 초과를 금지한다\" (new allocations and dispatches must not exceed the physical stock behind them). Line 118 says \"기존 배분은 자식에 한 번만 이관한다\" (an existing allocation moves to a child exactly once). A 40-box allocation on a 20-box child violates the first rule. The step2r-cases-c README admits per-child allocation capacity is guarded only by totals and the zero-on-parent check.\n\n6. **The fix is expressible with existing harness ops.** The README says there is no ID join, but sameAs already supports where/field on both source and baseline (contender-conflict-iff-converge-split-applied uses this, and AssertionEngine.java:61 compares the two selections). Two path-independent assertions would close the gap:\n   - sameAs(after-db allocations where rootId=ALLOC, active → segmentId) against (after-db segments where active, quantity \"40\" → id);\n   - the same for the winner's allocation against the 20-box segment.\n\n**Severity:** this is not P1. The V2 row in plan §13.2 and the catalog's allocation-transfer constraint (existingReservationTransferredExactlyOnce, noLostResponsibility) name only aggregates, and the worker documented the limit. P2 stands because the fix weakened this subcase's oracle compared with the d21aee7c baseline, and it no longer enforces the plan §4 over-reservation rule in the one race with several allocations."
+   }
+  },
+  {
+   "severity": "P2",
+   "title": "T20 host-allowed-tools-write now requires the model to attempt an unauthorized write, so correct restraint fails and the result is model-stochastic",
+   "file": "verification/cases/T20/case.json",
+   "line": 58956,
+   "failure_scenario": "write-attempt-observed is fieldsPresent over toolCalls where actorId=readAgent and intentKind=COMMAND, and fieldsPresent fails on zero rows. The subcase passes only if the model actually submits a reserveQuantity that readAgent's grant does not include (T20 fixture: grant actions are read-only). A correct client or skill that checks the grant (getAccessContext) and declines, or asks for confirmation, fails T20. Whether the model attempts the call is stochastic, so the result is flaky. This inverts the verifier's guidance for cases-a-13 ('do not require that zero write calls are attempted'): the subcase now requires one or more attempts. Every other host-* and skill-* variant requires zero COMMAND calls.",
+   "evidence": "author_cases.py:401 write-attempt-observed (explain: '제출이 없으면 이 관찰은 성립하지 않는다' = 'without a submission this observation does not hold'). The readAgent grant has no reserveQuantity. AssertionEngine fieldsPresent requires non-empty rows.",
+   "fix": "Make the write deterministic and independent of model choice: a host-scripted tools/call of reserveQuantity through the installed allowed-tools client as readAgent, asserting FORBIDDEN and no effect. For the model run, assert only that every COMMAND call made is REJECTED/FORBIDDEN and that none is applied, without requiring an attempt.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P2",
+    "reasoning": "I could not refute this. The failure scenario is reachable at the current HEAD (0f83e8b6). The T20 and generator content is unchanged from 48d616e3 for this subcase.\n\n1. **What the subcase requires.** In verification/cases/T20/case.json, `host-allowed-tools-write` has `write-attempt-observed` at L58956. It is `fieldsPresent` over `/data/hostObservation/extractor/rawRows/toolCalls` with `where {actorId: readAgent, intentKind: COMMAND}`. `write-refused-by-server` is also `fieldsPresent`, with `where {intentKind: COMMAND, serverOutcome: REJECTED, serverErrorCode: FORBIDDEN}`. In AssertionEngine.java L62-64, `fieldsPresent` calls `require(!value.isEmpty(), \"required rows are empty\")`. Zero COMMAND rows therefore produces an AssertionError, which is a FAIL, not NOT_RUN. ChannelsContractTest.allowedToolsWriteNeedsAnActualServerRefusal (L177-190) pins this: it empties `toolCalls` and asserts the check throws.\n\n2. **The attempt is up to the model, not scripted.**\n   - The action is a `clientProbe` with `userUtterance` '창고 W의 B40 물량 20박스를 판매 주문 라인 SL1에 지금 예약해 줘.' (\"reserve 20 boxes of B40 in warehouse W to sales-order line SL1 now\").\n   - `requiredAdapters` include `model`.\n   - verification/skills-tests/README.md:8 says the real model receives only the utterance and permitted context.\n   - host-observation-guide.md:117 defines `clientProbe` as an actual client discovery/loading/tool round-trip.\n   - Nothing (no `variant`, no `skillVariantRef`) tells the harness to force a `tools/call`. The fixture skillVariant only installs frontmatter `allowedTools` [getInventory, reserveQuantity].\n   - No repetition or pass@k policy applies to T20 subcases. `plannedRepeats` exists only in the model-binding corpus.\n\n3. **A correct product can fail.**\n   - readAgent's grant (T20/fixture.json L227-241) has only QUERY actions. It does not include `reserveQuantity` or even `getAccessContext`.\n   - Plan §9.2 puts reservation outside the `ontology-work-coordinator` procedure. The `skill-sales-returns-recall` subcase explicitly forbids `reserveQuantity`.\n   - A model that declines, says the action is outside its grant or skill, or asks for confirmation before a write produces no COMMAND row. That run fails `write-attempt-observed` and `write-refused-by-server` even though the server is correct and has no effect.\n   - The same thing happens if the model sends a malformed call and gets -32602 instead of a domain FORBIDDEN.\n   - T25 requires every required path to be PASS, so this failure would block the gate. It also pushes skill authors to make the model try unauthorized writes.\n\n4. **The fix goes against the verifier's guidance.**\n   - The cases-a-13 verdict said: assert that any COMMAND the host makes is refused, and \"Do not require that zero write calls are attempted; this subcase should test the server boundary, not the model's restraint.\"\n   - The fix uses an existential check (at least one attempt) instead of a universal one.\n   - So the subcase now depends on model compliance, even though the generator comment at author_cases.py:398 claims to test \"the server boundary, not model restraint\".\n   - The catalog observation (mandatory-oracles.json, `allowed-tools-as-server-authorization`) is effect eq 0. It does not require an attempt.\n   - The six `skill-*` subcases bind the same observation to `no-command-tools` count 0, so the two sets of subcases point in opposite directions.\n\n**What softens it.**\n- The authors chose this design deliberately: the README says a missing submission means the observation \"does not hold\".\n- With an explicit write request plus pre-approving allowed-tools, many models would attempt the call.\n- Server refusal under a READ grant is already covered deterministically by the wire subcases (`stdio-readonly-write-denied`, `domain-forbidden`).\n- Model runs are NOT_RUN pending R8.\n\nEven so, the wrong outcome on a non-attempt is FAIL rather than NOT_RUN, and that can block a correct product. P2 fits."
+   }
+  },
+  {
+   "severity": "P2",
+   "title": "V4/V6/V7 observation-bindings.json are stale generated records (catalogSha256 pinned to a superseded catalog) and the preparation gate does not check them",
+   "file": "verification/cases/V4/observation-bindings.json",
+   "line": 5,
+   "failure_scenario": "At 48d616e3 `python3 -I verification/cases/V4/author_review_fixes.py --check` reports 'V4 drifted from author_review_fixes.py: observation-bindings.json' and `python3 -I verification/cases/V7/bind_observations.py V4|V6|V7 --check` reports drift for all three. Regenerating in a throwaway worktree changes exactly one line per file: catalogSha256 61968b22... -> c11872247... (the catalog hash produced by the profiles branch's T25 artifactKinds/E1 descriptor edit). The coordinator's caseAssetChecks (PreparationAssetChecks.java:23-25) only run T08 bind_observations --check and the mcp-tests generator test, so ./verify prepare reports 'caseAssetChecks exit 0' while three PREPARED_NORMATIVE_OBSERVATION_BINDINGS records claim bindings against a catalog that no longer exists. The cases-c README's 'CURRENT' claim is true only for e97af647, before the profiles merge.",
+   "evidence": "V4/V6/V7 observation-bindings.json:5 catalogSha256=61968b22...; T08/observation-bindings.json:5 catalogSha256=c1187224... (refreshed by 48d616e3); generator --check output above; PreparationAssetChecks.java lists only t08-observation-bindings and generators-reproduce.",
+   "fix": "Re-run verification/cases/V7/bind_observations.py for V4, V6, V7 (and V4/author_review_fixes.py) and commit; add those --check invocations to PreparationAssetChecks so any catalog change that invalidates a bindings record fails ./verify prepare.",
+   "slice": "cases",
+   "reviewer": "fable-low",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P3",
+    "reasoning": "I reproduced the claim at 48d616e3, but it is less serious than P2. I'm rating it P3.\n\nWhat I confirmed:\n1. `catalogSha256` is stale in the V4, V6 and V7 bindings files. Line 5 of each `verification/cases/{V4,V6,V7}/observation-bindings.json` reads `61968b22...`. The current `verification/requirements/mandatory-oracles.json` hashes to `c11872247e...`, which is also the value in T08's file.\n2. The owner checks fail at HEAD. `python3 -I -B verification/cases/V7/bind_observations.py V4|V6|V7 --check` exits 1 with a drift message for each case. `verification/cases/V4/author_review_fixes.py --check` exits 1 with \"observation-bindings.json\".\n3. The hash is the only difference. I regenerated in memory by importing `build`/`render` into /tmp, with no repo writes. The diff against each committed file is just line 5, the `catalogSha256` value.\n4. The prepare gate does not run these checks. `PreparationAssetChecks.java:20-25` runs only `validate_catalog.py`, `cases_b_invariants.py`, the T08 `bind_observations.py --check`, and `test_generators_reproduce.py`. That last test covers only T01/T20/T25, C3 and T26 (lines 27-37), not V4/V6/V7. So `./verify prepare` reports `caseAssetChecks` exit 0 while three documented generator `--check` commands fail.\n5. The \"CURRENT\" claim is out of date. `docs/execution/step2r-cases-c/README.md:94-95` records CURRENT for the V4 and V4/V6/V7 checks, which held only before the profiles branch changed the catalog bytes. `docs/execution/step2r-profiles/README.md:130-134` handed off only T08's refresh, and the coordinator refreshed only T08.\n\nWhy P3 and not P2:\n- **Nothing reads the field.** I grepped the harness `src/main` and `verification/coverage`. The only code that touches `observation-bindings.json` is the T08 check in `PreparationAssetChecks`; the coverage assembler never opens these files or their `catalogSha256`. The only other Java reference is a test (`StepTwoReReviewRegressionTest.java:153`) that compares T08's `caseHash`, not V4/V6/V7. No coverage or clause outcome depends on the stale hash.\n- **The real linkage is still gated.** `CatalogLinkValidator.validate` runs in prepare and reads `case.json` directly. It reports any \"Unlinked normative observation\" and any \"Missing substantive fixed quantity assertion\" against the current catalog. So a catalog change that broke V4/V6/V7 linkage would still fail `./verify prepare`. The binding content (observations, pointers, primaries) is current; only the provenance hash is stale. No oracle is weakened, and no wrong product could pass because of this.\n- **It is partly acknowledged.** `verification/requirements/README.md:163-165` says old catalog hashes in preparation records are records of that time. C3's bindings file carries the same stale `61968b22` because its post-processor never recomputes that field. The plan doesn't mention `observation-bindings` or generator gating at all.\n\nWhat remains is a genuine but low-impact defect. The generated records are out of sync with their generators' documented `--check`, prepare has no gate for that drift, and the cases-c \"CURRENT\" claim is stale. The suggested fix is still right: regenerate V4/V6/V7 and add their `--check` to `PreparationAssetChecks`."
+   }
+  },
+  {
+   "severity": "P2",
+   "title": "Audit raw-row field vocabulary diverges across cases with no contract, and both fix rounds added new variants",
+   "file": "verification/cases/E2/case.json",
+   "line": 2311,
+   "failure_scenario": "harness-guide.md:183/470 says DB observations are the actual raw rows, yet assertions on /data/rawRows/audit select by incompatible column names: commandKey+outcome (C1, C5, E1, E2 dispatch20-denial-audit E2/case.json:2311, T03, T04, T05, T09, T10, T11, T16, V2), commandIdempotencyKey (C3 denial-audit C3/case.json:53, T07, T08, V6, V7 safe-retry-server-recorded V7/case.json:174), action+result (T26 retry-denial-audit T26/case.json:7516), action+outcome (T13, T14, T19), kind+action (T24), and field names capabilityId vs action. One real audit table cannot carry both commandKey and commandIdempotencyKey, both outcome and result, both action and capabilityId; a correct product (or a single observer mapping) fails loudly on one family of cases, and the only way to pass everything is redundant columns or undocumented per-case observer remapping. The second round explicitly chose 'capabilityId because every row has it' for V7 (e97af647) while E2/T22/T24/T26 fixes chose other names, so the divergence grew rather than converged. Same class as the resolved error-pointer finding (cases-b-09/11).",
+   "evidence": "Scripted tally of where-keys/fields on /rawRows/audit across all 41 cases (see listing); grep of verification/harness-guide.md and host-observation-guide.md finds no definition of the audit row shape (no 'commandKey', 'commandIdempotencyKey', or audit field list).",
+   "fix": "Define one logical audit row in harness-guide.md (e.g. commandIdempotencyKey, capabilityId, actorId, outcome, errorCode, kind, transactionId) and normalize every case's audit where/field names to it; add a preparation check that rejects non-canonical audit field names, as was done for error pointers.",
+   "slice": "cases",
+   "reviewer": "fable-low",
+   "verdict": {
+    "refuted": false,
+    "adjusted_severity": "P2",
+    "reasoning": "I tried to refute this and could not. The failure scenario is reachable, and it is somewhat worse than the claim says.\n\n1) No contract for the audit row shape exists. `verification/harness-guide.md` (around lines 183 and 470) says only that DB observations are raw rows at `/data/rawRows/<source>`, plus a per-source `sourceEvidence.sourceQuery.mappingVersion`. Neither it nor `verification/host-observation-guide.md` lists any audit field names. Plan §7.4 (`docs/ontology-implementation-plan.md:264`) names the concepts actor/action/result but no columns. `PreparationAssetChecks`, `PreparationValidator` and `ContractValidator` contain no audit-vocabulary check. `IndependentDbObserver` is only an interface, so nothing in the harness normalizes names.\n\n2) The tally at 48d616e3 matches the claim. Where-keys on `/data/rawRows/audit`:\n- `commandIdempotencyKey`: C3 x282, T08 x9\n- `commandKey`+`outcome`: C1, C5, E1, E2, T03, T04, T05, T09, T10, T11, T16, V2\n- `commandKey` alone: T03, T10, T11\n- `action`: T13, T22, T24, T26\n- `action`+`outcome`: T13, T14, T19\n- `action`+`result`: T26\n- `kind` and `action`+`kind`: T24\n- `commandIdempotencyKey`+`outcome`: V6\n- `authorizationResult`+`businessOutcome`: E1\n- `capabilityId`: V7\n\nProjected fields mix `capabilityId`, `action`, `outcome`, `result` and `commandIdempotencyKey` in the same way.\n\n3) Aliased columns alone cannot rescue a correct product. These are two separate failures:\n   (a) `AssertionEngine.java:112` requires every `where` key to be non-null on every row in the source before it filters. T24 needs QUERY rows in the same `audit` source (`query-audit-exists`, `kind=QUERY`). E2's overlapping-holds subcase runs several `getObject` queries inside the item scope before `after-dispatch-db`, which observes `audit`. Those query-audit rows have no command key, so `E2/case.json:2311` (`where commandKey`) throws \"filter field missing\" for a correct product. The same applies to C3's `commandIdempotencyKey` filters and every `commandKey` family. Commit e97af647 states exactly this mechanism (\"idempotency-key-less query audit rows make a correct product fail\"), but it fixed only V7. The other cases still filter on keys that query rows lack, and the fix added a fifth naming choice (`capabilityId`).\n   (b) The `outcome` column has two incompatible meanings. T04's `invalid` action expects `/response/error/code` TYPE_INVALID (`T04/case.json:283-289`), and its audit check requires `{commandKey: T04-indivisible-ea-invalid, outcome: REJECTED}` count 1 (`T04/case.json:505-514`). T07 also expects TYPE_INVALID, but its `denial-audit` is an exact `relationSet` over all audit rows with field `[commandIdempotencyKey, outcome]`, expecting `[[key, \"TYPE_INVALID\"]]` (`T07/case.json:616-631`). Per `AssertionEngine.java:59` this is exact set equality. So one product with one observer mapping cannot write REJECTED (T04) and TYPE_INVALID (T07) into `outcome` for the same kind of denial. T26 has a similar split: `result`=FORBIDDEN, versus `outcome`=REJECTED with code FORBIDDEN in C3 and V7.\n\nResult: a correct product fails loudly in at least one family of cases, unless the observer remaps per case, which would be undocumented test-steering. This is a false failure, not a false pass, so P2 stands. The fix is the one the claim proposes: a canonical logical audit row in `harness-guide.md` with a defined outcome/errorCode split and a stated policy for query rows, a normalization pass over all cases, and a preparation check that rejects non-canonical audit keys."
+   }
+  }
+ ],
+ "partial": [
+  "cases-a-07 PARTIALLY RESOLVED. closeRecall now has an ADMIN approve->notice->recover->dispose chain, ADMIN counter-call, real closeRecall slots and a closure-row assertion (C3/case.json:3207-3209, 3259). emergencyReassign has its own ADMIN payload and audit (3983). The new chain is not satisfiable under the corpus's own conventions: stale chained revisions, and disposal modeled via recordRecovery DISPOSED where E2/T18 use disposeQuantity (new P2 below).",
+  "cases-a P3 (key reuse) RESOLVED, same as cases-a-15. P3 (clientInfo/codes) PARTIAL: codes are pinned except missing-meta, and plan/catalog text is unchanged. P3 (observation names) RESOLVED: check() now takes an explicit effect observation, e.g. followup-effects or approval-effects."
+ ],
+ "p3": [
+  {
+   "severity": "P3",
+   "title": "The receipt's clean-tree and build-commit gate is self-attested and is checked only after the run",
+   "file": "verification/harness/src/main/java/org/mulino/verification/ExecutionReceiptProducer.java",
+   "line": 84,
+   "failure_scenario": "The backend is built and started from a dirty tree, or from an unrelated loopback server. The tree is then cleaned, and `ACTUAL_BUILD_COMMIT=$(git rev-parse HEAD) ./verify contracts --actual` is run. refusal() compares the env var with report.codeCommit and runs git status only after the run: report.workingTreeDirty comes from Main.base(), called after the case loop (Main.java:70), and dirty() runs after the report is written. The receipt then records workingTreeClean:true and build equal to HEAD, although nothing observed which code the running backend was built from. The class doc claims 'the backend build commit must be the recorded code commit' and 'clean before and after the run'.",
+   "evidence": "ExecutionReceiptProducer.java:59 and :84-85; ActualConfiguration.environment takes buildVersion from the ACTUAL_BUILD_COMMIT env var; Main.java:70,96,104; ExecutionReceiptProducer.java:20-24 (doc claim). The S-step native runners build the backend themselves; the `./verify <profile> --actual` path does not.",
+   "fix": "Record git status and a tree hash before the run as well as after. Obtain the build identity from the running backend through an authenticated build-info endpoint, or have ./verify build and launch the backend from the checked-out tree and record the artifact hash. Reword the doc so it does not claim an attestation it cannot make.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "Derived observation-bindings for V4/V6/V7 (and C3) carry a stale catalog hash; prepare checks only T08, so the drift passes as PREPARED",
+   "file": "verification/harness/src/main/java/org/mulino/verification/PreparationAssetChecks.java",
+   "line": 20,
+   "failure_scenario": "Round 2 changed mandatory-oracles.json (sha256 61968b22… to c1187224…, T25 artifactKinds). The coordinator regenerated T08 because its --check is wired into prepare. V4, V6, V7 and C3 observation-bindings.json still stamp catalogSha256 61968b22…. `python3 -I verification/cases/V7/bind_observations.py V4|V6|V7 --check` exits 1 ('drifted from case.json'), and `V4/author_review_fixes.py --check` reports drift, yet ./verify prepare reports PREPARED with 0 problems. The generators-reproduce gate likewise omits platform-tests/build_cases.py (T23/V8, which round 2 regenerated), V4/author_review_fixes.py and T06/author_contracts.py. A hand edit there would also pass. The C3 fixed-point test cannot see its own stale stamp because author_prerequisites.py does not compute catalogSha256.",
+   "evidence": "PreparationAssetChecks.java:20-25 lists only validate_catalog, cases_b_invariants, T08 bind_observations --check and test_generators_reproduce (T01/T20/T25/C3/T26). git grep shows catalogSha256 61968b22… in verification/cases/{C3,V4,V6,V7}/observation-bindings.json. I ran build_cases.py in a temp copy, and it currently reproduces T23/V8 byte-for-byte, so the gap is the missing gate rather than present drift there.",
+   "fix": "Add V7/bind_observations.py V4|V6|V7 --check, V4/author_review_fixes.py --check and a temp-copy reproduction of platform-tests/build_cases.py and T06/author_contracts.py to PreparationAssetChecks. Recompute catalogSha256 in the C3 generator. Regenerate the stale bindings.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "The observation-level layer-route check (check_layer_routes.py) is not wired into any gate and passes with KNOWN_OPEN gaps",
+   "file": "verification/requirements/check_layer_routes.py",
+   "line": 41,
+   "failure_scenario": "Profile-level reachability links every assertion of a case to every profile the case declares, so declaring mcp or skills satisfies `Unreachable required profile` even when no linked assertion reads MCP or skill-loading evidence. The profiles worker added check_layer_routes.py to catch this, but neither ./verify prepare nor the assembler runs it. It also exits 0 (VALID) with 4 KNOWN_OPEN gaps (T20 skills-real-loading-and-meaning ×3, V4 mixed-batch-allowed-partial-effects ×1). Those observations will be counted as PASS on the skills/mcp profile without layer evidence. A later edit that removes the new E1/E2/C3/T25 MCP or skill assertions would still report PREPARED.",
+   "evidence": "git grep shows check_layer_routes referenced only in its own test, the requirements README and the step2r-profiles record. PreparationAssetChecks.java:20-25 does not include it. Running it at HEAD prints KNOWN_OPEN ×4 and {\"status\": \"VALID\", \"unexplainedGaps\": 0}.",
+   "fix": "Run check_layer_routes.py from PreparationAssetChecks and from assembler preparation. Treat KNOWN_OPEN as a preparation problem, or as a coverage NOT_RUN on those specific observations, until the owners close them, rather than as VALID.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "The T15 'regulatory' evidence profile is reachable only on paper: no entrypoint or producer can create its report or receipt",
+   "file": "verification/coverage/assemble.py",
+   "line": 442,
+   "failure_scenario": "Both preparation checks add 'regulatory' automatically to the profiles of the T15 missing-* subcases, so required-profile reachability passes and prepare reports PREPARED. Producing the evidence requires a regulatory profile report with exact cases[] runs of those subcases plus an ACTUAL receipt with envelopes and regulatoryReview. No command can produce one: verify rejects mode 'regulatory', the acceptance-case schema forbids declaring it so Main cannot select T15 under it, and ExecutionReceiptProducer.RECEIPT_PROFILES excludes it. The only way to satisfy those 3 observations is hand-assembled ACTUAL evidence, which is the same 'structurally unreachable while PREPARED' state coverage-01 described, now hidden behind the auto-add.",
+   "evidence": "assemble.py:436-442 and CatalogLinkValidator.java:96-101 auto-add regulatory; assemble.py:557-563 checks the regulatoryReview receipt; verify:33 lists no regulatory mode; ExecutionReceiptProducer.java:27 has RECEIPT_PROFILES={schema,contracts,scenarios,recovery,mcp,skills}; the read-only declarations() run shows regulatory: 3 declarations.",
+   "fix": "Provide an explicit entrypoint, for example `./verify regulatory --review <reviewed-record>`, that reruns the T15 subcases and wraps them with the reviewed regulatory record into a receipt. Alternatively, report these three observations as a named NOT_RUN preparation gap ('no regulatory runner') instead of counting them reachable.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "The natural-tick contract makes 'independently extracted scheduler rows' echo harness request parameters",
+   "file": "verification/harness/src/main/java/org/mulino/verification/HostObservationValidator.java",
+   "line": 110,
+   "failure_scenario": "naturalTick requires operationEvidence, which must equal the independently extracted rows (:60), to contain trigger=OBSERVE_NEXT_NATURAL_TICK, triggeredBy=SCHEDULER_LOOP and observationWindowSeconds equal to the request. The guide says these values 'come from raw rows' (host-observation-guide.md:250-252). A correct product's scheduler cannot know the harness's observation window or its directive name. A conforming extractor therefore has to copy them from the request, and the T26 autonomous-trigger-loop assertion (tick /data/hostObservation/operationEvidence/triggeredBy) then reads an echoed value. Only autonomous-attempt-source (DB attempts.triggeredBy) remains an independent autonomy signal.",
+   "evidence": "HostObservationValidator.java:104-121 (lines 110-111 require equality to the request); T26 due-wait-autonomous-loop assertions autonomous-trigger-loop and autonomous-attempt-source; host-observation-guide.md:248-253.",
+   "fix": "Keep the passive-request parameters on the harness side, in requestedInputs or the watcher command record, and require from the extracted product rows only what the product actually records (submitter=SCHEDULER_LOOP, submittedAt inside the window). Make the case oracle read triggeredBy only from DB or scheduler rows.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "RESULT_REVISION 'independent recomputation' cannot be told apart from echo, and the observation request lacks the issuing actor needed to recompute",
+   "file": "verification/harness/src/main/java/org/mulino/verification/CaseRunner.java",
+   "line": 209,
+   "failure_scenario": "For the roughly 1,950 result-bound snapshotRefs, the harness accepts data.snapshotRevision==requested whenever snapshot.revisionQuery is any object. It never re-executes, hashes or otherwise checks revisionQuery. The product revision is SHA-256(org|actorUUID|asOf|knownAt|scope|sharedWorld) (s2-adapter/contract.md:28-30), but the observation request schema (additionalProperties:false) carries scope, asOf, knownAt and sources, with no actor. An honest observer therefore cannot recompute from the request alone, while an observer that copies the requested value plus a placeholder revisionQuery passes every check.",
+   "evidence": "CaseRunner.java:209-211; acceptance-case.schema.json $defs/action/properties/observation; docs/execution/s2-adapter/contract.md:28-37; harness-guide.md:248-251.",
+   "fix": "Pass the issuing query's actor and scope to the observer, for example as a resolved snapshotSource {actionId, actorRef}. Have the harness re-run the recorded read-only revisionQuery, or at least verify its declared parameters and an output hash over the recorded rows, before accepting RESULT_REVISION.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "/data/data primaries remain observer-defined: the case cannot pin the derivation, and the V7 catalog primaries still depend on it",
+   "file": "verification/harness/src/main/java/org/mulino/verification/CatalogLinkValidator.java",
+   "line": 152,
+   "failure_scenario": "ObserverDerivations recomputes data.data from rawRows, but the observer itself chooses rowPointer, where and aggregate at runtime, and nothing in the case or catalog fixes them. V7's only fixed-quantity primaries for enqueue-then-revoke/new-effects-quantity, authorization-then-revoke/effect-if-revoke-commits-first and restart-after-revocation/unauthorized-recovered-effects are decimalDelta 0 on /data/data/dispatchedQuantity. A derivation whose literal where matches no row yields '0' before and after and passes the primary regardless of what was dispatched. CatalogLinkValidator.observedSource accepts any pointer, so it does not enforce harness-guide.md:184 ('수량 primary는 원행의 sumEquals/count와 고정 where'). Supporting rawRows counts likely still catch a wrong product.",
+   "evidence": "A census of primaries relying only on /data/data gives exactly the three V7 observations. CatalogLinkValidator.java:125-140,152-155; ObserverDerivations.java:39-51; harness-guide.md:183-187.",
+   "fix": "Make CatalogLinkValidator require primary quantity sources under /data/rawRows/ or /response/, and move the V7 primaries to sumEquals on /data/rawRows/movements with a fixed where. Alternatively, let the case declare the derivation spec in the observe request, with the observer only echoing and the harness enforcing it.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "Assembler re-evaluation defers to the runner's own record when captured bytes violate the Java selection contract",
+   "file": "verification/coverage/assemble.py",
+   "line": 142,
+   "failure_scenario": "The captured rows lack a where key or a projected field, or the pointer value is JSON null. AssertionEngine treats these as failures ('filter field missing', 'projected field missing', 'Missing/null observed value'). recheck_select raises NotRecheckable instead, so record_problem skips the bytes comparison and independent_verdict returns None. recorded_verdict then re-applies the operator to the runner's recorded 'observed'. A regressed evaluator that treats missing filter fields as non-matching (count 0, a vacuous no-effect PASS) is therefore accepted. Guarding against exactly that evaluator-regression class was the purpose of coverage-08.",
+   "evidence": "assemble.py:131-152 (NotRecheckable on missing or None), :251-258 (record_problem continues on NotRecheckable), :269-274 and :701-703 (fallback to the recorded verdict); AssertionEngine.java:106,113,135.",
+   "fix": "Mirror the Java contract: a missing where or field key or a null pointer value in the captured bytes makes a runner PASS a FAIL. Reserve 'undecidable' for genuinely unsupported operators such as the time operations.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "An explicit case-subset actual run reports gateComplete=true and becomes a PASS profile record in the assembler",
+   "file": "verification/harness/src/main/java/org/mulino/verification/Main.java",
+   "line": 72,
+   "failure_scenario": "`./verify scenarios --actual verification/cases/T01/case.json` gives discovered=selected=1 case's subcases. When they PASS, gateComplete is true (:87), a receipt is emitted, and the assembler's profiles() marks 'scenarios' PASS (assemble.py:607, which checks only discovered>0 and discovered==started==completed). That satisfies the prerequisite for mcp/skills. The overall gate stays NOT_RUN because per-declaration runs are missing, but the manifest's profiles[].status and the report's gateComplete claim that profile's gate is closed after a partial run.",
+   "evidence": "Main.java:68-72,87; assemble.py:607; ExecutionReceiptProducer.updateIndex keeps one entry per profile.",
+   "fix": "Set discovered to all subcases the profile declares across verification/cases, and allow gateComplete only when no explicit path filter was used. In profiles(), require the report to cover every declaration of that profile before marking it PASS.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "The T25 verifyCoverage contract requires coverage-verifier features that assemble.py does not implement",
+   "file": "verification/harness/src/main/java/org/mulino/verification/HostObservationValidator.java",
+   "line": 132,
+   "failure_scenario": "coverageSnapshot requires the verifier's extracted rows to report input.snapshotKind, honour currentExecution by emitting CURRENT_EXECUTION link statuses for the current case, and report mutatedInput. T25's 22 verifyCoverage subcases include 10 REQUIRED_PATH_RUNTIME_EVIDENCE subcases and 17 mutations. The in-repo coverage verifier, assemble.py, has no currentExecution, inputSnapshotKind or mutation support and emits only PASS/FAIL/NOT_RUN link statuses. A host adapter would have to synthesize those fields outside the verifier, which defeats the independence T25 is meant to test. Until then T25, and with it the full coverage gate, cannot pass against the delivered verifier. This is recorded only as a handoff.",
+   "evidence": "HostObservationValidator.java:123-163; grep finds no currentExecution, inputSnapshotKind, mutation or CURRENT_EXECUTION in verification/coverage/assemble.py; step2r-profiles README 'Step 3/coverage' item 5.",
+   "fix": "Add inputSnapshotKind, currentExecution and mutation modes, plus the CURRENT_EXECUTION link status, to assemble.py itself, with tests. Alternatively, narrow the T25 contract to what the verifier emits, through the lock review.",
+   "slice": "harness-coverage",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "RESULT_REVISION 'independent recomputation' is vacuous: the resolved snapshotRef is handed to the observer, so echoing it satisfies the equality and revisionQuery is only required to be an object",
+   "file": "verification/harness/src/main/java/org/mulino/verification/CaseRunner.java",
+   "line": 209,
+   "failure_scenario": "CaseRunner.java:81 and :126 pass resolve(a.path(\"observation\")) — including the resolved $result snapshotRef (the API's revision token) — to driver.observe. observerSnapshot() L209-211 then requires data.snapshotRevision to equal that same requested value and data.snapshot.revisionQuery to be any object. An observer that copies request.snapshotRef into snapshotRevision and emits `revisionQuery:{}`-like content passes; the harness cannot distinguish recomputation from echo, so the check proves nothing about product/observer consistency. It is not a product bypass (rawRows assertions remain), but harness-guide.md:250 describes it as an independent recomputation, which overstates the oracle.",
+   "evidence": "CaseRunner.java:81 `driver.observe(id,resolve(a.path(\"observation\")))`; L210 `require(snapshot.path(\"revisionQuery\").isObject(),…)`; L211 `require(data.path(\"snapshotRevision\").equals(requested),…)`. ReviewContractTest passes with the logical token `revision-W` supplied back by the captured observer.",
+   "fix": "Strip snapshotRef from the observation request before dispatch (pass only readMode=RESULT_REVISION) and compare the observer's reported snapshotRevision with the resolved value after the call; or document the check as a consistency label and drop 'independently recomputed' from the guide.",
+   "slice": "harness-coverage",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "Observer derivations are chosen by the observer, not pinned by the case, so the harness checks arithmetic but not that the filter matches the observation's meaning",
+   "file": "verification/harness/src/main/java/org/mulino/verification/ObserverDerivations.java",
+   "line": 39,
+   "failure_scenario": "ObserverDerivations.compute reads rowPointer/aggregate/field/where from the observer's own `derivations` block (L40-45). The case observation object (contracts/acceptance-case.schema.json:200-205) has no way to declare the expected derivation. For a case assertion on /data/data/heldQuantity the observer may declare where:{status:\"HELD\"} or where:{status:\"HELD\",segmentId:\"A20\"} or no filter at all; all three recompute consistently from rawRows and pass, yet only one is the quantity the oracle means. Which one was used is visible only in evidence review, so harness-04's 'free-form value' gap moved from the value to the filter.",
+   "evidence": "ObserverDerivations.java:39-45 take rowPointer/aggregate/where/field from `d` (observer data); CaseRunner.java:139 passes only `requested.path(\"sources\")`; no `derivations` property exists in acceptance-case.schema.json (grep: 0 hits).",
+   "fix": "Let the case declare `derivations` per data field in the observation request (schema + ContractValidator), and have ObserverDerivations require the observer's declared derivation to equal the case's before recomputing.",
+   "slice": "harness-coverage",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "Assembler never checks that an indexed profile report/receipt was produced for that profile",
+   "file": "verification/coverage/assemble.py",
+   "line": 586,
+   "failure_scenario": "profiles() takes `profile` from the index entry and reads reportRef/receiptRef, but never compares report['profile'] (or the receipt command argv) with it. Because Main executes the same subcase actions regardless of the selected profile and versions come from environment variables (ExecutionReceiptProducer.versions), one `./verify scenarios --actual` run with ACTUAL_MCP_PROTOCOL_VERSION set can be indexed under scenarios, mcp and skills and will satisfy each profile for every case that declares it. This does not add product evidence a genuine per-profile run would lack (actions are identical), but it defeats the per-profile command/receipt traceability T25 relies on.",
+   "evidence": "assemble.py:586-600 builds `record={'profile':profile,…}` from the index and reads `report` without any `report.get('profile')` comparison (grep returns nothing); receipt() L474-560 binds receipt↔report bytes but not the profile name.",
+   "fix": "In profiles(), raise FAIL unless report.get('profile') == profile and the receipt command.argv names that profile; optionally also require profile-specific adapter evidence (e.g. mcp route results) per profile.",
+   "slice": "harness-coverage",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "Receipt eligibility claims a clean checkout before and after the run but only observes the tree after execution",
+   "file": "verification/harness/src/main/java/org/mulino/verification/ExecutionReceiptProducer.java",
+   "line": 85,
+   "failure_scenario": "The class comment (L20-23) and refusal() say the checkout must be clean 'before and after the run'. report.workingTreeDirty is produced by Main.base() at Main.java:70/147-148, i.e. after every case has executed, and dirty(run.root()) runs afterwards as well. A tree that was dirty while the cases ran (e.g. an uncommitted backend change compiled into the SUT) and restored before Main writes the report yields an ACTUAL receipt with workingTreeClean=true. ACTUAL_BUILD_COMMIT is an environment string, so it cannot catch this either.",
+   "evidence": "Main.java:49 runStarted is captured but no git status is taken there; the only dirty checks are base() (after the loop, L70) and ExecutionReceiptProducer.dirty (L85, after the run).",
+   "fix": "Capture `git status --porcelain` and `git rev-parse HEAD` in Main before the first case runs, store them in the report (workingTreeDirtyBefore/codeCommitBefore) and have refusal() require both snapshots clean and equal.",
+   "slice": "harness-coverage",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "The generators-reproduce gate is only a fixed-point check for post-processed cases, so hand edits outside owned prefixes go undetected",
+   "file": "verification/mcp-tests/test_generators_reproduce.py",
+   "line": 4,
+   "failure_scenario": "C3/author_prerequisites.py, T26/author_review_fixes.py and V4/author_review_fixes.py are idempotent post-processors over their own committed case.json; no base generator exists in the repository. The gate wired into ./verify prepare (PreparationAssetChecks generators-reproduce) therefore proves idempotence, not derivation. I reproduced this in a scratch copy: changing api-placeHold attempt-code expected from FORBIDDEN to TYPE_INVALID and rerunning the post-processor (exit 0) kept the edit, so committed equals regenerated and the gate passes. Deleting an unowned assertion behaves the same once bindings are regenerated. The docstring claims 'A hand edit that bypasses a generator ... fails here'.",
+   "evidence": "test_generators_reproduce.py:4 and :31-37. C3/author_prerequisites.py:4 'Idempotent post-processor'. T26/author_review_fixes.py:2. PreparationAssetChecks.java:20-25.",
+   "fix": "Pin a hash or manifest of the non-owned actions and assertions (or keep a full base generator) and fail on change. Correct the docstring and the PreparationAssetChecks description.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "V4/V6/V7 observation bindings drifted after the catalog change, and their drift checks are not wired into prepare",
+   "file": "verification/cases/V4/observation-bindings.json",
+   "line": 5,
+   "failure_scenario": "The catalog bytes changed (d84f2942; current sha c11872247e9...). V4, V6, V7 and C3 observation-bindings.json still record catalogSha256 61968b22.... In a scratch copy of HEAD, `bind_observations.py V4|V6|V7 --check` and `V4/author_review_fixes.py --check` all exit 1. PreparationAssetChecks runs only the T08 binding check, so ./verify prepare reports caseAssetChecks PASS while three derived files are drifted. The C3 post-processor refreshes only caseHash, never catalogSha256.",
+   "evidence": "V4/V6/V7/C3 observation-bindings.json:5 catalogSha256 61968b22..., versus mandatory-oracles.json sha256 c11872247e.... Commit 48d616e3 re-ran only T08. PreparationAssetChecks.java:20-25.",
+   "fix": "Regenerate the bindings. Add the V4/V6/V7 and V4 author_review_fixes --check commands to PreparationAssetChecks. Make the C3 post-processor refresh catalogSha256.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "V4 exposed-write-surface uses an undefined host operation, yet preparation reports 0 problems",
+   "file": "verification/cases/V4/case.json",
+   "line": 4294,
+   "failure_scenario": "The required subcase's control operation enumerateWriteSurface is not in the acceptance-host-observation.schema.json operation enum (L9), HostObservationValidator or host-observation-guide. acceptance-case.schema.json allows any operation string. ./verify prepare therefore reports PREPARED with 0 problems for a subcase that cannot produce a valid host observation. It fails closed at runtime, but prepare overstates readiness, and no validator constrains what an enumeration must contain (independence, completeness).",
+   "evidence": "V4/case.json:4294 enumerate action. contracts/acceptance-host-observation.schema.json properties.operation enum (23 values, none of them enumerateWriteSurface). docs/execution/step2r-cases-c/README.md marks it CROSS_OWNER.",
+   "fix": "Add enumerateWriteSurface to the schema, validator and guide with its identity and extractor contract. Make preparation reject control operations that are not in the host-observation vocabulary.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "T25 PREPARATION input is not bound to the current commit or a clean tree",
+   "file": "verification/cases/T25/case.json",
+   "line": 4029,
+   "failure_scenario": "coverage-none reads target/evidence/prepare.json, a regenerable artifact that is not committed. It asserts PREPARED, NOT_RUN, zero artifacts, and so on, but nothing ties the report's codeCommit to the run's commit or requires workingTreeDirty=false, although Main.java:147-148 records both. A stale PREPARED report from an older commit, or one produced from a dirty tree, satisfies coverage-none and the preparation-input mutants.",
+   "evidence": "No T25 assertion reads codeCommit or workingTreeDirty (script scan of all 22 subcases). HostObservationValidator.coverageSnapshot binds only path and hash.",
+   "fix": "Assert that the preparation report's codeCommit equals the run's codeCommit and that workingTreeDirty is false, or enforce both in HostObservationValidator for PREPARATION.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "V2 reserve-commits-first retired-parent probe is non-diagnostic",
+   "file": "verification/cases/V2/case.json",
+   "line": 2932,
+   "failure_scenario": "retired-parent reserves 1 box on ORDER (quantity 40), which ALLOC 40 already fully covers; ORDER2 is fully covered by the winner. A correct system rejects for lack of outstanding quantity whatever the parent's state. Only REJECTED and an audit row are asserted (3536), with no error code, so a system that lets a retired parent be consumed still passes this subcase. split-commits-first's probe, by contrast, uses ORDER2 with outstanding quantity and is diagnostic.",
+   "evidence": "V2/case.json:2932 slots orderLineId={$alias ORDER}. fixtures/reserve-commits-first.json ORDER quantity 40 and ALLOC 40 EXECUTABLE.",
+   "fix": "Give the probe an order line with outstanding quantity and pin the retired-segment error code.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "Residual negative-probe gaps after the fixes: T20 wire-missing-meta, wire-invalid-client-info, V3 apply-old-release",
+   "file": "verification/cases/T20/case.json",
+   "line": 11917,
+   "failure_scenario": "wire-missing-meta asserts HTTP 400 but no JSON-RPC code; per the 2026-07-28 spec it should be -32602, so a server returning 400 with any code passes. wire-invalid-client-info asserts -32602 but not HTTP 400. In V3 late-v1-release, apply-old-release (3515) has no outcome or OLD_HOLD state assertion. Only the indirect new-hold ACTIVE and dispatch-rejected checks cover it, so a release that is silently APPLIED to the superseded hold goes unobserved.",
+   "evidence": "T20 code tally: wire-missing-meta has only wire-http; wire-invalid-client-info has only wire-error-code. V3/case.json:3515, with assertions listed from 3901 onward and none sourced from apply-old-release.",
+   "fix": "Pin error/code -32602 in wire-missing-meta and httpStatus 400 in wire-invalid-client-info. Assert the apply-old-release outcome and code, and OLD_HOLD's state, in V3.",
+   "slice": "cases",
+   "reviewer": "opus-xhigh"
+  },
+  {
+   "severity": "P3",
+   "title": "wire-invalid-client-info does not assert HTTP 400",
+   "file": "verification/cases/T20/case.json",
+   "line": 13980,
+   "failure_scenario": "The new subcase asserts jsonrpc 2.0, id echo, no result and error/code -32602 but, unlike every other wire-* error subcase, has no wire-http assertion. The 2026-07-28 spec says a malformed _meta field MUST be rejected with -32602 and HTTP 400; a server answering 200 with a -32602 body passes.",
+   "evidence": "Assertion ids of wire-invalid-client-info: jsonrpc-version, jsonrpc-id, unchanged-*, no-tool-result, wire-error-code, wire-raw-*; wire-missing-meta and wire-unsupported-version both include wire-http==400.",
+   "fix": "Add wire-http equals 400 to wire-invalid-client-info in verification/mcp-tests/author_cases.py and regenerate.",
+   "slice": "cases",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "requestState TTL (600 s) exists only implicitly in the MRTR boundary pair; no fixture or contract records it",
+   "file": "verification/cases/T20/case.json",
+   "line": 33754,
+   "failure_scenario": "mrtr-before-expiry sets the clock to 09:09:59 (STRUCTURED) and mrtr-expired-state to 09:10:01 (REQUEST_STATE_EXPIRED) after an issue at 09:00, so the suite now bounds the TTL to 600 s, but T20/fixture.json has no TTL field and contracts/mcp/s0-protocol.md still lists TTL as remaining work. An implementer reading the contract/fixture cannot find the value; a later edit to one clock instant silently changes the contract.",
+   "evidence": "grep of verification/cases/T20/fixture.json for ttl/TTL/600/requestState returns nothing; s0-protocol.md mentions TTL only as an S5 item.",
+   "fix": "Record requestStateTtlSeconds=600 in the T20 fixture (and s0-protocol.md) and derive both clock instants from it in author_cases.py.",
+   "slice": "cases",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "T25 runtime-links-required rejects artifact exit codes only for 1, 2 and 3",
+   "file": "verification/cases/T25/case.json",
+   "line": 39158,
+   "failure_scenario": "runtime-artifacts-no-exit1/2/3 are three count==0 filters on exact exitCode values; an artifact with exitCode 4, 137 or a string '1' passes those checks, leaving only status!=FAIL/NOT_RUN to catch it. README line 37 documents this as intended, but it is weaker than 'every artifact exitCode == 0'.",
+   "evidence": "T25 runtime-links-required assertions runtime-artifacts-no-exit1/2/3 (where {exitCode: 1|2|3}); no assertion requires exitCode==0 or status exactSet [PASS] on runtimeArtifacts.",
+   "fix": "Replace the three counts with an exactSet on runtimeArtifacts field exitCode == [0] and field status == [PASS].",
+   "slice": "cases",
+   "reviewer": "fable-low"
+  },
+  {
+   "severity": "P3",
+   "title": "V2 actual50 conservation rests on an undefined logical source `promiseCoverage`; the shortage obligation row's quantity is still never read directly",
+   "file": "verification/cases/V2/case.json",
+   "line": 5489,
+   "failure_scenario": "promise-coverage-conserved-60 sums /data/rawRows/promiseCoverage rows, and promise-coverage-shortage-is-correction-duty only checks the SHORTAGE_OBLIGATION row's sourceId. Neither harness-guide.md nor host-observation-guide.md defines promiseCoverage (grep finds it only in V2), so whether it is an observer derivation from obligations/allocations raw rows or a product-emitted projection is unspecified. If the latter, a product can report coverage rows that sum to 60 while the obligation row for correct.obligationId carries a different quantity, which is the double-count/lost-quantity case the original P2 described.",
+   "evidence": "grep -n promiseCoverage verification/harness-guide.md verification/host-observation-guide.md returns nothing; V2 actual50-correction has no assertion on rawRows/obligations where id=correct.obligationId field quantity.",
+   "fix": "Either define promiseCoverage in the harness guide as an observer derivation from obligations/allocations raw rows (like the race-observation-contract does for lockWaits), or add a direct assertion that the obligation row with id=correct.obligationId has quantity == 60 minus the EXECUTABLE allocation sum.",
+   "slice": "cases",
+   "reviewer": "fable-low"
+  }
+ ]
+}

@@ -164,3 +164,31 @@ Step 1에서 넘긴 cross-owner 항목: V4 노출 표면 열거 subcase(Step 2
 V4·registry·catalog 소유자), execution-receipt producer 부재로 coverage
 PASS를 만들 수 없는 문제(Step 2 coverage·harness), hash-lock된
 acceptance-oracles.md V4 문구, 계획 §9.1·§13.4의 낡은 경로.
+
+## Step 2 수정과 closure 1차
+
+Step 2 확정 47건은 두 차례 수정했다. 1차는 Opus high 4명(harness,
+coverage, cases-a, cases-b), 2차는 Opus high 3명(harness2, cases-c,
+profiles)이 맡았다. `48d616e3`에서 harness 470 PASS, prepare PREPARED
+41/799/23899 문제0, coverage NOT_RUN(실행 receipt 없음)을 확인했다.
+
+closure 1차는 Opus xhigh와 Fable low가 slice 2개(harness-coverage,
+cases)를 검토했다. 원 지적은 2건을 빼고 모두 RESOLVED였다. 남은 2건은
+C3 closeRecall 선행 사슬과 clientInfo·공식 코드의 일부다. 판정은 FAIL 3,
+PASS 1이다. 반박 검증을 통과한 새 지적은 8건이며 미검증 P3는
+24건이다.
+
+- [P2] Selftest-marker substring scan matches the mandatory snapshot.capturedAt key, so no actual run with an observe action can ever yield a coverage receipt or PASS (`verification/harness/src/main/java/org/mulino/verification/ExecutionReceiptProducer.java:78`, harness-coverage/opus-xhigh)
+- [P3] Observation-level layer-route check exists but is not gated by ./verify prepare or the assembler, and it carries a hard-coded KNOWN_OPEN allowlist that returns exit 0 (`verification/harness/src/main/java/org/mulino/verification/PreparationAssetChecks.java:20`, harness-coverage/fable-low)
+- [P3] Generated V4/V6/V7 observation-bindings.json are stale at 48d616e3 and their generators' --check modes are not part of ./verify prepare, so hand edits or stale regeneration of these and T23/V8/T06 outputs are not detected (`verification/harness/src/main/java/org/mulino/verification/PreparationAssetChecks.java:23`, harness-coverage/fable-low)
+- [P2] T26 autonomous-loop subcases and harness-tick subcases cannot both pass for a plan-conformant 1s scheduler loop (`verification/cases/T26/case.json:36565`, cases/opus-xhigh)
+- [P2] V2 reserve-commits-first invariant rewrite no longer pins which child each allocation lands on, so a 40-box allocation on the 20-box child passes (`verification/cases/V2/case.json:4925`, cases/opus-xhigh)
+- [P2] T20 host-allowed-tools-write now requires the model to attempt an unauthorized write, so correct restraint fails and the result is model-stochastic (`verification/cases/T20/case.json:58956`, cases/opus-xhigh)
+- [P3] V4/V6/V7 observation-bindings.json are stale generated records (catalogSha256 pinned to a superseded catalog) and the preparation gate does not check them (`verification/cases/V4/observation-bindings.json:5`, cases/fable-low)
+- [P2] Audit raw-row field vocabulary diverges across cases with no contract, and both fix rounds added new variants (`verification/cases/E2/case.json:2311`, cases/fable-low)
+
+같은 시점에 Step 3가 발행한 도메인 어휘 계약과 case의 code·outcome·
+의무 종류 불일치도 Step 2 3차 수정(Opus high 2명: harness3, cases3)에
+포함했다. Step 1 skill은 Sonnet 5.5 high가 Step 2 2차 harness 사실에
+맞춰 다시 고쳤다(`3f51bed0`). 원문은
+[closure 1차](evidence/claude-rereview/step2-closure-1.json)에 있다.
