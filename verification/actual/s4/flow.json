@@ -4,11 +4,11 @@
   "requiredCases": [
     "E1",
     "E2",
-    "C4",
-    "C1"
+    "C1",
+    "C4"
   ],
   "fullCaseCoverageClaimed": false,
-  "note": "E1 runs first in the initially installed organization; every later flow begins with its own setup, which clears all earlier bindings.",
+  "note": "E1 runs first in the initially installed organization; every later flow begins with its own setup, which clears all earlier bindings. C4 runs last because it advances the shared backend clock to 09:00:03Z, while C1 records and queries at 09:00:02Z.",
   "actions": [
     {
       "id": "suite-include-e1",
@@ -21,14 +21,14 @@
       "scriptRef": "verification/actual/s4/e2-flow.json"
     },
     {
-      "id": "suite-include-c4",
-      "type": "include",
-      "scriptRef": "verification/actual/s4/c4-flow.json"
-    },
-    {
       "id": "suite-include-c1",
       "type": "include",
       "scriptRef": "verification/actual/s4/c1-flow.json"
+    },
+    {
+      "id": "suite-include-c4",
+      "type": "include",
+      "scriptRef": "verification/actual/s4/c4-flow.json"
     }
   ]
 }
