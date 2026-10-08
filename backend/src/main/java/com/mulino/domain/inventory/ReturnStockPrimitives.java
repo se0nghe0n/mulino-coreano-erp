@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class ReturnStockPrimitives {
  private final InventoryRepository r;private final StockPrimitives stock;private final PhysicalRanges ranges;private final QualityPrimitives quality;
  public ReturnStockPrimitives(InventoryRepository r,StockPrimitives stock,PhysicalRanges ranges,QualityPrimitives quality){this.r=r;this.stock=stock;this.ranges=ranges;this.quality=quality;}
- public Map<String,String> receive(DomainContext c,Map<String,Object>receipt,Map<String,Object>delivery,String evidence,String command,String policyHash){
+ public Map<String,String> receive(DomainContext c,Map<String,Object>receipt,Map<String,Object>delivery,String evidence,String document,String command,String policyHash){
   String destination=receipt.get("placeId").toString();if(!"INTERNAL_STORAGE".equals(r.current(c,"Places",destination).get("kind")))throw DomainError.invalid("Return destination must be internal storage");
   var at=StockPrimitives.instant(receipt.get("occurredAt"));var q=(BigDecimal)receipt.get("quantity");var start=((BigDecimal)receipt.get("startQuantity")).subtract((BigDecimal)delivery.get("startQuantity"));var ancestor=delivery.get("segmentId").toString();
   var fences=new TreeSet<String>(List.of("inventory/item/"+receipt.get("itemId"),"return/range/"+receipt.get("rangeRootId"),"inventory/place/"+destination));
@@ -19,6 +19,8 @@ public class ReturnStockPrimitives {
   if(matches.size()!=1)throw new DomainError("HELD","IDENTITY_UNRESOLVED","Return must match one existing exact customer leaf; reconcile partial or uncertain identity first");
   var source=matches.getFirst();String segment=stock.transferRange(c,source.get("ID").toString(),local.get(source.get("ID").toString()),q,destination,c.actorId(),at,evidence,command,"RETURN_MOVE");
   var hold=new LinkedHashMap<String,Object>();hold.putAll(Map.of("segmentId",segment,"controlScope",r.current(c,"QuantitySegments",segment).get("controlScope"),"action","ALL","category","QC","state","ACTIVE","startQuantity",BigDecimal.ZERO,"quantity",q,"unit",receipt.get("unit"),"validFrom",at));hold.put("validUntil",java.time.Instant.parse("9999-12-31T23:59:59Z"));hold.put("policyHash",policyHash);hold.put("workId",receipt.get("workId"));hold.put("nextCheckAt",receipt.get("nextCheckAt"));hold.put("evidenceRef",evidence);hold.put("commandId",command);
+  // Default return QC hold is a system policy effect; its immutable decision cites the verified basis document, never a release.
+  var decision=new LinkedHashMap<String,Object>();decision.putAll(Map.of("actorId",c.actorId(),"operation","RETURN_DEFAULT_HOLD","segmentId",segment,"evidenceId",document,"policyHash",policyHash,"commandId",command,"reason","반품 실물 기본 QC 보류"));hold.put("decisionId",quality.decision(c,decision));
   var restriction=quality.record(c,"Restrictions",hold);return Map.of("segmentId",segment,"restrictionId",restriction.get("ID").toString());
  }
 }
