@@ -261,6 +261,18 @@ clean tree 재실행 결과는 아래 "커밋 뒤" 표에 있다.
 | `bind_observations.py V4/V6/V7 --check`, `V4/author_review_fixes.py --check` | 1 | baseline부터의 catalog hash drift(harness3 소유, 이 branch 변경 없음) |
 | `python3 -I verification/requirements/check_layer_routes.py` | 0 | VALID, unexplained 0, KNOWN_OPEN 4(baseline과 같음) |
 
+### 커밋 뒤(clean tree, HEAD `e1bc23c8`)
+
+| 명령 | exit | 결과 |
+|---|---|---|
+| `./verify prepare` | 0 | PREPARED, codeCommit `e1bc23c8`, workingTreeDirty=false, 41/799/23936, problem0 |
+| `./verify coverage` | 2 | NOT_RUN, preparationStatus PREPARED, runtimeStatus NOT_RUN, preparationProblems 0, coverageProblems 0(baseline과 같은 상태) |
+| `./verify harness`(patch 없음) | 1 | 473 중 failure 9·error 1, 모두 harness-test-updates.patch가 고치는 10건 |
+| `git apply harness-test-updates.patch && ./verify harness` | 0 | 473 PASS. 실행 뒤 test 파일을 되돌려 tree를 clean으로 남겼다 |
+| `python3 -m unittest discover -s verification/coverage -p 'test_*.py'` | 0 | 61 OK(264s, 커밋 직전 같은 내용의 tree) |
+| `verification/model-binding/run selftest` | 0 | 61 tests, failure0 |
+| `verification/model-binding/run prepare` | 0 | corpusIntegrity VALID, PREPARED |
+
 ## 하지 않은 일
 
 - 제품·host·모델 실행은 없다. 새 단언은 모두 NOT_RUN이다.
