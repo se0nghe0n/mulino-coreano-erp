@@ -135,9 +135,38 @@ NOT_IMPLEMENTED 실패4·undefined0·scenario skip0·exit1을 관찰했다.
 - 자율 loop 세 subcase는 harness가 process 재시작과 가상 clock 전진만
   한다. `tickScheduler`/`sweepDue`는 `trigger=OBSERVE_NEXT_NATURAL_TICK`,
   `clockInstant` 없음, 관찰창30초로 다음 자연 tick의 제출만 관찰한다.
-  `triggeredBy=SCHEDULER_LOOP`, scheduler RUNNING 뒤30초 안의 제출
+  `triggeredBy=SCHEDULER_LOOP`, scheduler 시작 command 뒤30초 안의 제출
   (`timeAtMostSeconds`), 독립 DB attempt의 triggeredBy를 함께 본다.
   tick hook만 있고 loop가 없는 구현은 통과할 수 없다(plan §10).
+
+## 자율 loop와 harness tick의 공존(step2r-cases3)
+
+계획 §10의 개발/CI scheduler tick은1초다. 두 subcase 계열이 한 제품에서
+함께 통과하도록 fixture `baseline.runtimeProfile`의 두 flag 의미를 이
+case에서 고정한다.
+
+| flag | 의미 |
+|---|---|
+| `controlledTicks=true`, `pausedUntilTickControl=true` | harness tick 계열 fixture. scheduler·sweeper loop는 스스로 due 업무를 제출하지 않고, harness의 `tickScheduler`/`sweepDue` 요청이 그 tick 하나를 일으킨다. 제출은 그 요청 command 구간 안에 있다 |
+| `controlledTicks=false`, `pausedUntilTickControl=false` | `*-autonomous-loop` 전용 fixture(`fixtures/<subcase>.json`). loop가 harness 신호 없이1초마다 스스로 돈다 |
+
+자율 loop subcase는 loop가 가상 clock 전진에 반응할 수 있는 process를
+모두 먼저 멈춘다(lot-expiry는 due-sweeper와 scheduler). clock을 전진한
+뒤 그 process들의 start와 수동 watcher(`OBSERVE_NEXT_NATURAL_TICK`)를
+한 `parallel` action(`restart-while-observing`)으로 함께 시작한다. watcher
+branch가 먼저 제출되고 loop는 process가 뜬 뒤에만 제출할 수 있으므로,
+HostObservationValidator가 요구하는 "submittedAt은 watcher command 구간
+안" 조건을 만족한다. orphan-intake는 기존 restart를 중지(clock 전진
+전)와 시작(parallel 안)으로 나눴다. `autonomous-within-30s`의 기준은
+scheduler(lot-expiry는 due-sweeper) 시작 command의 `startedAt`이다.
+제출은 이 시각보다 앞설 수 없고30초 안이어야 한다.
+
+남은 한계: parallel은 barrier가 아니다. watcher host command가 process
+기동보다 늦게 시작되는 비정상 지연이 있으면 첫 제출을 놓쳐 NO_TASK가
+되고 subcase는 FAIL·NOT_RUN 쪽으로 닫힌다(잘못된 PASS는 없다).
+`pausedUntilTickControl`·`controlledTicks`의 정의를
+`host-observation-guide.md`와 fixture schema에 옮기는 일은 공통 harness
+소유자 몫이다.
 
 이 관찰 의미(observe-only tick)는 host 관찰 계약의 operation 표에 아직
 없다. 공통 harness 소유자가 `host-observation-guide.md`와
