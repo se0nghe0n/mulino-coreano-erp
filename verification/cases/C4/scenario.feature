@@ -106,7 +106,6 @@
     그러면 "reconfirm-effective-98-12" assertion으로 "valid-resolution"를 확인한다
     그러면 "reconfirm-old-revision-13" assertion으로 "valid-resolution"를 확인한다
     그러면 "reconfirm-same-responsibility-id-14" assertion으로 "valid-resolution"를 확인한다
-    그러면 "valid-resolution-target-is-deficit" assertion으로 "해소·면제 대상은 정정이 만든 OPEN 인도 부족 의무다"를 확인한다
 
   시나리오: 정정으로 생긴 부족2를 WAIVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다
     먼저 사례 파일 "verification/cases/C4/case.json"의 "resolved-no-resurrection-waived"를 준비한다
@@ -143,4 +142,3 @@
     그러면 "reconfirm-effective-98-12" assertion으로 "valid-resolution"를 확인한다
     그러면 "reconfirm-old-revision-13" assertion으로 "valid-resolution"를 확인한다
     그러면 "reconfirm-same-responsibility-id-14" assertion으로 "valid-resolution"를 확인한다
-    그러면 "valid-resolution-target-is-deficit" assertion으로 "해소·면제 대상은 정정이 만든 OPEN 인도 부족 의무다"를 확인한다

@@ -4653,59 +4653,6 @@
               "resolutionDecisionId"
             ]
           }
-        },
-        {
-          "id": "valid-resolution-target-is-deficit",
-          "op": "relationSet",
-          "source": {
-            "actionId": "corrected-db",
-            "pointer": "/data/rawRows/obligations",
-            "where": {
-              "id": {
-                "$result": {
-                  "actionId": "duty",
-                  "pointer": "/response/data/obligations/0/id"
-                }
-              }
-            },
-            "field": [
-              "kind",
-              "status",
-              "current"
-            ]
-          },
-          "expected": [
-            [
-              "DELIVERY_DEFICIT",
-              "OPEN",
-              true
-            ]
-          ],
-          "requirementRefs": [
-            "D06",
-            "D12",
-            "D18"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "caseId": "C4",
-            "scenarioId": "resolved-no-resurrection-resolved"
-          },
-          "evidenceRefs": [
-            "corrected-db:raw-rows"
-          ],
-          "oracleExplanation": "해소·면제 명령이 참조한 의무는 정정이 만든 현재 OPEN 인도 부족 의무다. 조회 결과의 첫 행이 다른 의무여도 통과하지 않는다. current는 status와 독립인 행 유효성이다.",
-          "oracleRef": {
-            "oracleId": "C4.resolved-debt-no-resurrection",
-            "observationNames": [
-              "valid-resolution"
-            ]
-          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 정정으로 생긴 부족2를 RESOLVED 근거로 해소한 뒤 재대조해도 같은 의무는 부활하지 않는다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -6367,59 +6314,6 @@
               "ownerId",
               "status",
               "resolutionDecisionId"
-            ]
-          }
-        },
-        {
-          "id": "valid-resolution-target-is-deficit",
-          "op": "relationSet",
-          "source": {
-            "actionId": "corrected-db",
-            "pointer": "/data/rawRows/obligations",
-            "where": {
-              "id": {
-                "$result": {
-                  "actionId": "duty",
-                  "pointer": "/response/data/obligations/0/id"
-                }
-              }
-            },
-            "field": [
-              "kind",
-              "status",
-              "current"
-            ]
-          },
-          "expected": [
-            [
-              "DELIVERY_DEFICIT",
-              "OPEN",
-              true
-            ]
-          ],
-          "requirementRefs": [
-            "D06",
-            "D12",
-            "D18"
-          ],
-          "scope": {
-            "organizationId": {
-              "$alias": "ORG"
-            },
-            "itemId": {
-              "$alias": "P"
-            },
-            "caseId": "C4",
-            "scenarioId": "resolved-no-resurrection-waived"
-          },
-          "evidenceRefs": [
-            "corrected-db:raw-rows"
-          ],
-          "oracleExplanation": "해소·면제 명령이 참조한 의무는 정정이 만든 현재 OPEN 인도 부족 의무다. 조회 결과의 첫 행이 다른 의무여도 통과하지 않는다. current는 status와 독립인 행 유효성이다.",
-          "oracleRef": {
-            "oracleId": "C4.resolved-debt-no-resurrection",
-            "observationNames": [
-              "valid-resolution"
             ]
           }
         }
