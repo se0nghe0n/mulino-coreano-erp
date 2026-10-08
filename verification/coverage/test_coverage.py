@@ -265,6 +265,55 @@ class CoverageSelftest(unittest.TestCase):
         self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
         self.assertEqual('FAIL', declaration['status'])
 
+    def captured_run(self, observed_quantity):
+        declaration, case, fixture = self.declaration()
+        report, receipt, raw = self.protocol_fixture()
+        action = {'actionId': 'read', 'driverStatus': 'EXECUTED', 'response': {'quantity': observed_quantity},
+                  'provenance': {'scopeComplete': True, 'source': 'ACTUAL_API'}, 'artifactRefs': ['raw.json']}
+        assertion = dict(assertionId='quantity', expected='80', source=declaration['_sub']['assertions'][0]['source'], status='PASS')
+        run = dict(caseId='T01', subcaseId='only', status='PASS', runtimeComplete=True,
+                   caseHash=case['sha256'], fixtureHash=fixture['sha256'], versions=receipt['versions'],
+                   startedAt='2026-10-07T00:00:01Z', finishedAt='2026-10-07T00:00:03Z',
+                   actions={'read': action}, assertions=[assertion])
+        report['cases'] = [run]
+        raw['observations'] = {'read': copy.deepcopy(action)}
+        raw['profileResult'] = copy.deepcopy(report)
+        receipt['inputs'].extend([case, fixture])
+        checked = self.receipt_check(report, receipt, raw)
+        self.assertIsNotNone(checked)
+        self.a.run_case(declaration, {'schema': {'_report': report, '_receipt': checked, 'status': 'PASS'}})
+        return declaration
+
+    def test_runner_pass_is_rechecked_against_captured_bytes(self):
+        self.assertEqual('PASS', self.captured_run('80')['status'])
+        self.a = m.Assembly(self.root, COMMIT)
+        declaration = self.captured_run('100')  # consistent capture, but the runner claimed PASS for 80
+        self.assertEqual('FAIL', declaration['status'])
+        self.assertTrue(any('contradicts independent re-evaluation' in p['reason'] for p in self.a.problems))
+
+    def test_independent_verdict_projection_ops_and_undecidable_references(self):
+        results = {'x': {'data': {'rows': [{'k': 'A', 'q': '80', 'u': 'BOX'}, {'k': 'B', 'q': '20', 'u': 'BOX'}], 'v': '80', 'n': None}}}
+        src = lambda pointer, **extra: dict(actionId='x', pointer=pointer, **extra)
+        cases = [
+            (dict(op='count', source=src('/data/rows', where={'k': 'A'}), expected=1), True),
+            (dict(op='count', source=src('/data/rows', where={'k': 'A'}), expected=2), False),
+            (dict(op='sumEquals', source=src('/data/rows', field='q'), expected='100'), True),
+            (dict(op='sumEquals', source=src('/data/rows', field='q'), expected='90'), False),
+            (dict(op='exactSet', source=src('/data/rows', field=['k', 'q']), expected=[['B', '20'], ['A', '80']]), True),
+            (dict(op='exactSet', source=src('/data/rows', field=['k', 'q']), expected=[['A', '80']]), False),
+            (dict(op='decimalEquals', source=src('/data/v'), expected='80.0', unit='BOX', unitSource=src('/data/rows', field='u')), True),
+            (dict(op='decimalEquals', source=src('/data/v'), expected='80', unit='EA', unitSource=src('/data/rows', field='u')), False),
+            (dict(op='decimalAtMost', source=src('/data/v'), expected='79'), False),
+            (dict(op='absent', source=src('/data/n'), expected=True), False),
+            (dict(op='absent', source=src('/data/missing'), expected=True), True),
+            (dict(op='equals', source=src('/data/v'), expected={'$result': {'actionId': 'x', 'pointer': '/data/v'}}), None),
+            (dict(op='count', source=src('/data/rows', where={'k': {'$alias': 'A'}}), expected=1), None),
+            (dict(op='timeEquals', source=src('/data/v'), expected='80'), None),
+        ]
+        for declared, verdict in cases:
+            with self.subTest(declared=declared):
+                self.assertEqual(verdict, m.independent_verdict(declared, results))
+
     def test_missing_model_usage_remains_null_and_not_run(self):
         model = self.a.model({}, {})
         self.assertEqual('NOT_RUN', model['status'])

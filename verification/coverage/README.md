@@ -108,6 +108,10 @@ case 결과는 caseHash·fixture/base hash·version·command interval·정확한
 EXECUTED이고 captured artifact의 StepResult와 같아야 한다. 독립 DB 관찰은
 query/snapshot/scopeComplete/independent를 요구한다. assertion의 실제
 source bytes를 observed로 남기며 미관찰을0이나 빈 배열로 바꾸지 않는다.
+runner의 PASS를 그대로 믿지 않는다. 참조(`$result`/`$alias`)가 없는
+assertion은 선언된 op·unit·where·field·baseline으로 캡처된 action bytes에서
+다시 판정하고, runner PASS와 모순되면 FAIL이다. 시간 연산과 참조가 있는
+assertion처럼 결정할 수 없는 경우는 판정하지 않고 review에 남긴다.
 일부 action/assertion/profile 미실행이나 skip은 NOT_RUN이다. 확인된 FAIL은
 receipt/artifact가 나중에 누락돼도 NOT_RUN으로 낮추지 않는다.
 

@@ -2,6 +2,7 @@
 """Read-only evidence assembly. No product adapter, model call, deployment or waiver."""
 import argparse
 import datetime as dt
+import decimal
 import hashlib
 import importlib.util
 import json
@@ -69,6 +70,113 @@ def flatten(actions):
         for branch in action.get('branches', []):
             result.extend(flatten(branch.get('actions', [])))
     return result
+
+
+RECHECK_OPS = {'equals', 'notEquals', 'present', 'absent', 'decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'sumEquals',
+               'decimalDelta', 'count', 'exactSet', 'relationSet', 'sameAs', 'fieldsPresent'}
+DECIMAL = re.compile(r'-?(0|[1-9][0-9]*)(\.[0-9]+)?')
+
+
+class NotRecheckable(Exception):
+    """The independent re-evaluation cannot decide; it never turns into PASS or FAIL by itself."""
+
+
+def has_reference(node):
+    if isinstance(node, dict):
+        return any(k.startswith('$') for k in node) or any(has_reference(v) for v in node.values())
+    if isinstance(node, list):
+        return any(has_reference(v) for v in node)
+    return False
+
+
+def same_json(left, right):
+    return json.dumps(left, sort_keys=True) == json.dumps(right, sort_keys=True)
+
+
+def recheck_select(results, source):
+    """Mirror of the runner's documented pointer/where/field projection over captured StepResults."""
+    if not isinstance(source, dict) or has_reference(source.get('where')):
+        raise NotRecheckable()
+    try:
+        value = pointer(results[source['actionId']], source['pointer'])
+    except (KeyError, IndexError, TypeError, ValueError) as error:
+        raise NotRecheckable() from error
+    if value is None:
+        raise NotRecheckable()
+    if 'where' in source:
+        if not isinstance(value, list) or any(not isinstance(r, dict) or any(r.get(k) is None for k in source['where']) for r in value):
+            raise NotRecheckable()
+        value = [r for r in value if all(same_json(r[k], v) for k, v in source['where'].items())]
+    if 'field' in source:
+        names = source['field'] if isinstance(source['field'], list) else [source['field']]
+        if not isinstance(value, list) or any(not isinstance(r, dict) or r.get(n) is None for r in value for n in names):
+            raise NotRecheckable()
+        value = [[r[n] for n in names] if isinstance(source['field'], list) else r[names[0]] for r in value]
+    return value
+
+
+def recheck_decimal(value):
+    if not isinstance(value, str) or not DECIMAL.fullmatch(value):
+        return None
+    return decimal.Decimal(value)
+
+
+def independent_verdict(declared, results):
+    """Re-evaluate a declared assertion from captured action bytes. True/False, or None when undecidable."""
+    op, expected = declared.get('op'), declared.get('expected')
+    if op not in RECHECK_OPS or has_reference(expected):
+        return None
+    try:
+        if op == 'absent':
+            try:
+                pointer(results[declared['source']['actionId']], declared['source']['pointer'])
+                return False
+            except (KeyError, IndexError):
+                return True
+        value = recheck_select(results, declared.get('source'))
+        if 'unit' in declared:
+            unit = recheck_select(results, declared.get('unitSource'))
+            units = unit if isinstance(unit, list) else [unit]
+            if not units or any(not same_json(u, declared['unit']) for u in units):
+                return False
+        if op == 'equals':
+            return same_json(value, expected)
+        if op == 'notEquals':
+            return not same_json(value, expected)
+        if op == 'present':
+            return True
+        if op in ('decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'decimalDelta'):
+            left, right = recheck_decimal(value), recheck_decimal(expected)
+            if left is None or right is None:
+                return False
+            if op == 'decimalDelta':
+                if 'unit' in declared:
+                    base_unit = recheck_select(results, declared.get('baselineUnitSource'))
+                    if any(not same_json(u, declared['unit']) for u in (base_unit if isinstance(base_unit, list) else [base_unit])):
+                        return False
+                base = recheck_decimal(recheck_select(results, declared.get('baseline')))
+                return base is not None and left - base == right
+            return left == right if op == 'decimalEquals' else left <= right if op == 'decimalAtMost' else left >= right
+        if op == 'sumEquals':
+            parts = [recheck_decimal(v) for v in value] if isinstance(value, list) else [None]
+            right = recheck_decimal(expected)
+            return None not in parts and right is not None and sum(parts, decimal.Decimal(0)) == right
+        if op == 'count':
+            return isinstance(value, list) and type(expected) is int and len(value) == expected
+        if op in ('exactSet', 'relationSet'):
+            if not isinstance(value, list) or not isinstance(expected, list):
+                return False
+            observed = [json.dumps(v, sort_keys=True) for v in value]
+            wanted = [json.dumps(v, sort_keys=True) for v in expected]
+            return len(observed) == len(set(observed)) and set(observed) == set(wanted)
+        if op == 'sameAs':
+            return same_json(value, recheck_select(results, declared.get('baseline')))
+        if op == 'fieldsPresent':
+            return (isinstance(value, list) and value and isinstance(expected, list)
+                    and all(isinstance(r, dict) and r.get(f) is not None and not (isinstance(r.get(f), str) and not r[f].strip()) for r in value for f in expected))
+    except NotRecheckable:
+        return None
+    return None
 
 
 class Assembly:
@@ -445,6 +553,10 @@ class Assembly:
                 if state in ('PASS', 'FAIL'):
                     if actual.get('expected') != declared.get('expected') or actual.get('source') != declared.get('source'):
                         raise ValueError('Runtime assertion differs from declared oracle/source')
+                    # Do not take the runner's PASS on trust: re-evaluate what can be decided from the captured
+                    # action bytes with the declared op/unit/where/field/baseline. Undecidable cases are left to review.
+                    if state == 'PASS' and independent_verdict(declared, action_results) is False:
+                        raise ValueError(f'Runner PASS contradicts independent re-evaluation of {aid} over captured bytes')
                     sources = [declared[key] for key in ['source', 'baseline', 'unitSource', 'baselineUnitSource'] if key in declared]
                     observed = {}
                     for source in sources:
