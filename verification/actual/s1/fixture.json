@@ -48,6 +48,39 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "supervisor": {
+      "issuer": "https://mulino-native.invalid",
+      "subject": "s1-actual-supervisor",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getInventory",
+        "getWork",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "searchObjects"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getObject",
+          "getInventory",
+          "getWork",
+          "getObligations",
+          "getAssessment",
+          "traceLot",
+          "searchObjects"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
