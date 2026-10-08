@@ -157,6 +157,23 @@ schema = load('contracts/command-response.schema.json')
 if schema['properties']['error'].get('required') != ['code'] or '/error/code' not in schema.get('$comment', ''):
     problems.append('contracts/command-response.schema.json: error.code is not the declared canonical pointer')
 
+# 11. V2 reserve-commits-first accepts APPLIED or CONFLICT only through the invariant bundle
+#     (race-observation-contract.md "두 허용 결과"); neither branch may be pinned alone.
+case = load('verification/cases/V2/case.json')
+sub = next(s for s in case['subcases'] if s['id'] == 'reserve-commits-first')
+pinned = [x['id'] for x in sub['assertions'] if x['source']['actionId'] == 'terminal'
+          and x['source']['pointer'] in ('/response/outcome', CANONICAL_ERROR) and x['op'] == 'equals']
+if pinned:
+    problems.append(f'V2/reserve-commits-first: contender result pinned to one branch by {pinned}')
+need = {'contender-reported-equals-recorded', 'contender-conflict-is-stale-revision',
+        'contender-conflict-iff-converge-split-applied', 'raced-allocations-exactly-once',
+        'final-allocations-exactly-once', 'final-children-40-20', 'final-no-allocation-on-retired-parent'}
+need |= {'contender-outcome-not-' + o for o in ('rejected', 'waiting-approval', 'needs-input',
+                                               'accepted-pending-external', 'pending-external', 'held')}
+missing = need - {x['id'] for x in sub['assertions']}
+if missing:
+    problems.append(f'V2/reserve-commits-first: invariant oracle missing {sorted(missing)}')
+
 for p in problems:
     print('FAIL', p)
 print(f'cases-b invariants: {len(problems)} problem(s) across {", ".join(CASES)}')

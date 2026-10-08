@@ -64,11 +64,9 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 
 ## reserve-commits-first
 
-실물60/기존 약속40은 보존되고 신규 주문 ORDER2의 실행 배분은 20 이하다. 기존 배분은 한 번만 자식으로 이관한다. contender는 초기 read 뒤 멈추고, winner가 같은 scope lock을 잡은 채 멈춘 동안 재개돼 그 lock에서 실제로 기다린다. winner commit 뒤 contender는 lock 아래에서 revision을 다시 읽어 CONFLICT/STALE_REVISION이다. explicit fresh split은 별도 명령이다.
+실물60·기존 약속40·신규 약속20이 보존되고 신규 실행 배분은 20 이하다. reserve가 먼저 commit한 뒤 contender 분할의 결과는 계획이 고정하지 않는다. 예약이 A60 revision을 올리면 CONFLICT/STALE_REVISION·효과0, 올리지 않으면 두 배분을 한 번씩 자식으로 옮기는 APPLIED가 맞다. 어느 쪽이든 응답·감사·lock 뒤 재검증이 같은 결과를 말하고 실물·배분 불변식을 지켜야 한다. 이어서 현재 revision으로 수렴 분할을 시도해 두 경로의 최종 상태를 같게 만든다(계획 §4.2, §13.2 V2).
 
 - `allocation-transfer-1` → `V2.split-reserve-race / allocation-transfer`: 공개 명령의 구조화 outcome을 확인한다.
-- `allocation-transfer-2` → `V2.split-reserve-race / allocation-transfer`: 공개 명령의 구조화 outcome을 확인한다.
-- `allocation-transfer-3` → `V2.split-reserve-race / allocation-transfer`: 검증 실패를 해당 오류 코드로 구별한다.
 - `active-physical-4` → `V2.split-reserve-race / active-physical`: 실물량·단위와 독립 손계산을 대조한다.
 - `active-physical-5` → `V2.split-reserve-race / active-physical`: 실물량·단위와 독립 손계산을 대조한다.
 - `existing-obligation-6` → `V2.split-reserve-race / existing-obligation`: 독립 원 행을 해당 범위에서 합산하며 부모와 자식을 이중 합산하지 않는다.
@@ -85,7 +83,6 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `retired-parent-reconsumption-14` → `V2.split-reserve-race / retired-parent-reconsumption`: 금지 효과의 동일 scope 전후 원 행을 비교한다. 조회/거부 감사는 별도 scope다.
 - `retired-parent-reconsumption-15` → `V2.split-reserve-race / retired-parent-reconsumption`: 허용된 denial 감사1과 금지된 업무 효과0을 분리한다.
 - `allocation-transfer-16` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
-- `allocation-transfer-17` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `allocation-transfer-18` → `V2.split-reserve-race / allocation-transfer`: 독립 원 행의 실물·수량·관계·범위를 정확히 대조한다.
 - `allocation-transfer-19` → `V2.split-reserve-race / allocation-transfer`: contender는 초기 read 뒤 scope lock 전에 실제로 멈췄다(barrier reached ACK).
 - `allocation-transfer-23` → `V2.split-reserve-race / allocation-transfer`: 제출 ACK가 아닌 terminal await를 확인한다.
@@ -95,13 +92,28 @@ pg_catalog 관찰과 `lockRevalidations` trace다.
 - `race-both-transactions-open-at-wait` → `V2.split-reserve-race / allocation-transfer`: winner가 scope lock을 잡고 commit 전 멈춘 동안 재개된 contender는 같은 scope lock에서 실제로 기다린다. 독립 read-only connection이 pg_locks·pg_stat_activity·pg_blocking_pids로 이를 관찰한 뒤에만 winner를 놓는다. 순차 실행이나 hook 위치 오류는 이 WAIT를 만들 수 없다(계획 §4.2, V8 lock 계약). 이 시점 두 transaction은 모두 OPEN이므로 contender의 초기 read는 winner commit 전에 시작된 같은 transaction 안에 있다.
 - `race-distinct-db-transactions` → `V2.split-reserve-race / allocation-transfer`: 두 참가자는 서로 다른 실제 DB transaction이다.
 - `race-winner-reached-after-lock` → `V2.split-reserve-race / allocation-transfer`: winner는 scope lock 획득 뒤 commit 전 지점에 실제로 멈췄다.
-- `race-contender-revalidated-after-lock` → `V2.split-reserve-race / allocation-transfer`: contender는 lock을 얻은 뒤 현재 상태를 다시 읽고 결정한다. 재검증 trace는 실제 application transaction의 SQL/CQN으로 기록하며 오류 응답에서 만들지 않는다(계획 §4.2 lock 뒤 재조회).
 - `genuine-two-transactions` → `V2.split-reserve-race / allocation-transfer`: 독립 DB transaction 원 행이 contender와 winner 각 하나씩이다. command ID로 거래 증거를 대신하지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.
 - `genuine-distinct-transaction-identities` → `V2.split-reserve-race / allocation-transfer`: 서로 다른 실제 DB transaction ID가 중복되지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.
 - `genuine-two-capabilities` → `V2.split-reserve-race / allocation-transfer`: 실제 거래는 분할과 예약 각각이며 mock lock이나 제출 ACK만으로 대신하지 않는다. application 원장의 거래 행은 보조 증거이며 경합 증거는 contender-waits의 pg_catalog 관찰이다.
 - `active-physical-identities` → `V2.split-reserve-race / allocation-transfer`: 현재 active 실물 identity를 한 번씩만 합산하며 중복 실물은 거부한다.
 - `response-definition-version` → `V2.split-reserve-race / allocation-transfer`: 수량/제한을 읽는 실제 정의 버전은 고정 v1이며 다른 의미로 대체하지 않는다.
 - `actual-baseline-physical-rows` → `V2.split-reserve-race / allocation-transfer`: 서버에 실제 설치된 시작 실물의 ID·decimal·unit을 원 행에서 확인한다. baseline 자체는 업무 실행 coverage가 아니다.
+- `contender-outcome-not-rejected` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 REJECTED를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
+- `contender-outcome-not-waiting-approval` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 WAITING_APPROVAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
+- `contender-outcome-not-needs-input` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 NEEDS_INPUT를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
+- `contender-outcome-not-accepted-pending-external` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 ACCEPTED_PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
+- `contender-outcome-not-pending-external` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 PENDING_EXTERNAL를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
+- `contender-outcome-not-held` → `V2.split-reserve-race / allocation-transfer`: contender 분할의 결과는 APPLIED 또는 CONFLICT 둘 중 하나다. command-response outcome enum에서 HELD를 제외한다. 두 결과 모두 아래 불변식과 기록 일치를 함께 만족해야 한다(계획 §4.2, §13.2 V2).
+- `contender-reported-equals-recorded` → `V2.split-reserve-race / allocation-transfer`: contender 응답 outcome은 같은 거래가 남긴 감사 원행의 outcome(raced-db derivation contenderOutcome)과 같다. 응답만 CONFLICT로 꾸미고 실제로 적용하거나 그 반대로 보고하면 실패한다.
+- `contender-conflict-is-stale-revision` → `V2.split-reserve-race / allocation-transfer`: contender가 CONFLICT면 감사 오류 코드는 STALE_REVISION이고 lock 뒤 재검증도 STALE_REVISION이다. APPLIED면 두 쪽 모두 빈 집합이다. 재검증이 STALE인데 적용하면(낡은 의도를 몰래 실행) 또는 재검증이 최신인데 충돌로 거부하면 실패한다(계획 §4.2).
+- `contender-conflict-iff-converge-split-applied` → `V2.split-reserve-race / allocation-transfer`: contender가 CONFLICT(효과0)일 때만 뒤의 수렴 분할이 APPLIED다. contender가 APPLIED면 A60은 이미 retired라 수렴 분할은 적용되지 않는다. CONFLICT로 기록하고 분할 효과를 남기면 수렴 분할이 막혀 실패한다.
+- `raced-physical-60` → `V2.split-reserve-race / active-physical`: 경합 직후 active 실물 합은 두 결과 모두 60 BOX다(분할 전 A60 하나 또는 자식 40+20).
+- `raced-allocations-exactly-once` → `V2.split-reserve-race / allocation-transfer`: 경합 직후 실행 배분은 기존 ALLOC 40 BOX와 신규 예약 20 BOX가 각각 정확히 한 번이다. contender가 적용됐다면 둘 다 자식으로 한 번씩 이관됐고, 충돌이면 A60에 그대로 있다. 유실·중복은 실패한다.
+- `race-contender-revalidated-after-lock` → `V2.split-reserve-race / allocation-transfer`: contender는 lock을 얻은 뒤 A60을 다시 읽고 요청 revision1과 비교한다. 그 결과(STALE_REVISION 또는 최신)는 contender-conflict-is-stale-revision이 응답·감사와 묶는다. 재검증 trace는 실제 application transaction에서 만든다(계획 §4.2).
+- `final-children-40-20` → `V2.split-reserve-race / active-physical`: 두 결과 모두 최종 active 실물은 분할 한 번의 자식 40 BOX와 20 BOX뿐이다. 분할이 두 번 적용되거나 부모가 남으면 실패한다.
+- `final-parent-retired` → `V2.split-reserve-race / retired-parent-reconsumption`: 최종적으로 A60은 retired다.
+- `final-no-allocation-on-retired-parent` → `V2.split-reserve-race / allocation-transfer`: retired A60을 가리키는 active 배분은0이다. 분할은 기존·신규 배분을 모두 자식으로 옮긴다.
+- `final-allocations-exactly-once` → `V2.split-reserve-race / allocation-transfer`: 최종 실행 배분도 ALLOC 40 BOX와 신규 예약 20 BOX 각각 한 번이다(합 60 = 실물 60).
 
 ## actual50-correction
 
