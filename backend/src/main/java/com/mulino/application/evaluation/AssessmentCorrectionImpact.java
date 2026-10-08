@@ -18,9 +18,13 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
   // context that covers exactly that row (plan §4.2 lock-then-reread, §4.3 정정 재평가).
   var c=request.knownThrough(recordedAt(request,correction.currentId()));
   var ids=affected(c,correction.previousId(),correction.currentId(),correction.affectedWorkIds());
-  var occurrences=relatedOccurrences(c,correction.previousId());
+  var occurrences=relatedOccurrences(c,correction.previousId());var imported=imported(c);
   for(String id:ids){
-    service.invalidate(c,id);
+    // An IMPORTED S1 Work is an immutable reference (V9 work_lifecycle_guard): its row is not rewritten, but the correction still
+    // re-evaluates the duties resolved on the now-invalid evidence in this unit (plan §4.3 129행), so its owned follow-up opens below.
+    // Where no duty can be recorded for it, the correction stops with the typed lifecycle answer instead of dropping it (s4l[4]/[6]).
+    if(imported.containsKey(id)){if(!Set.of("ACTIVE","WAITING","CLOSED").contains(imported.get(id)))throw new DomainError("NEEDS_INPUT","IMPORTED_WORK","Imported reference requires explicit lifecycle migration");}
+    else service.invalidate(c,id);
     var duty=duties.getIfAvailable();if(duty==null)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Correction requires retained responsibility");
     if(occurrences.isEmpty()){
       var raw=rawEvidence(c,correction.currentId());
@@ -58,7 +62,8 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
   // settlement re-derivation must read exactly these just-written rows, so knowledge time is extended to cover them and no
   // further (plan §4.2 lock-then-reread, §4.3 정정 재평가). asOf is unchanged.
   var c=request.knownThrough(written(request,canonicalId,canonical));
-  for(String id:affected(c,claimId,canonicalId,Set.of()))service.invalidate(c,id);
+  // A link only invalidates assessments; an immutable IMPORTED Work has none it can rewrite (plan §5.1), so it is not marked.
+  var imported=imported(c);for(String id:affected(c,claimId,canonicalId,Set.of()))if(!imported.containsKey(id))service.invalidate(c,id);
   if("PHYSICAL_DELIVERY".equals(canonical.get("kind"))&&canonical.get("supersedesId")!=null){
    var deliveries=repository.rows(c,"mulino.trade.sales.Deliveries").stream().filter(x->Objects.equals(x.get("observationId"),canonical.get("physicalScopeId"))).toList();
    if(deliveries.size()!=1)throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Delivery correction requires one applied original delivery");
@@ -96,12 +101,13 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
     }
     for(var credit:repository.rows(c,"mulino.work.WorkContributions"))if(Objects.equals(occurrence.get("ID"),credit.get("occurrenceId")))ids.add(credit.get("targetWorkId").toString());
   }
-  // An IMPORTED S1 Work is an immutable reference (V9 work_lifecycle_guard); later evidence does not rewrite it, it only affects
-  // command-managed Works (plan §5.1 "폐쇄 업무의 원 사건을 다시 쓰는 reopen은 기본 action으로 제공하지 않는다", §4.3).
-  // Imported rows never change after import, so the knownAt view sees them; a command Work this transaction just rewrote stays included.
-  for(var work:repository.rows(c,"mulino.work.read.Works"))if("IMPORTED".equals(work.get("lifecycleMode")))ids.remove(Objects.toString(work.get("ID"),""));
   return ids;
  }
+ /**
+  * IMPORTED S1 Works by ID with their status. Their row is never rewritten (plan §5.1 "폐쇄 업무의 원 사건을 다시 쓰는 reopen은 기본
+  * action으로 제공하지 않는다"); imported rows never change after import, so the knownAt view sees them.
+  */
+ private Map<String,String> imported(DomainContext c){var out=new HashMap<String,String>();for(var work:repository.rows(c,"mulino.work.read.Works"))if("IMPORTED".equals(work.get("lifecycleMode")))out.put(Objects.toString(work.get("ID"),""),Objects.toString(work.get("status"),""));return out;}
  private List<Map<String,Object>> relatedOccurrences(DomainContext c,String id){
   var claimIds=new HashSet<String>();var canonicalIds=new HashSet<String>();
   for(var claim:repository.rows(c,"mulino.evidence.Claims"))if(id.equals(claim.get("ID"))||id.equals(claim.get("eventId"))||id.equals(claim.get("documentVersionId")))claimIds.add(claim.get("ID").toString());

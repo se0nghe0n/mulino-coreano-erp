@@ -56,5 +56,6 @@ public class ResponsibilityEvidenceGate implements ResponsibilityEvidence {
   var assignment=r.require("Assignments",c.organizationId(),assignmentId);
   if(!root.equals(assignment.get("rootId"))||!"OPEN".equals(assignment.get("status")))throw DomainError.invalid("Waiver target mismatch");
  }
+ public String waiverCoverage(DomainContext c,String kind,String root){var resolvers=kindResolvers.stream().filter(x->kind.equals(x.kind())).toList();return resolvers.size()==1?resolvers.getFirst().waiverCoverage(c,root):null;}
  private static java.time.Instant instant(Object v){return v instanceof java.time.Instant t?t:v instanceof java.sql.Timestamp s?s.toInstant():java.time.Instant.parse(v.toString());}
 }

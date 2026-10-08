@@ -575,6 +575,49 @@ class FulfillmentPostgresTest {
   var view=(Map<?,?>)((Map<?,?>)read("getObject",invoice[0],map("organizationId",org,"objectType","Invoice","itemId",item),clock.instant(),clock.instant()).get("data")).get("settlement");assertEquals("UNVERIFIED",view.get("contributionState"),view.toString());
   var open=settlementDuties("OPEN");assertEquals(1,open.size(),open.toString());assertEquals(d.canonical(),open.getFirst().get("source"));assertEquals(actor,open.getFirst().get("owner"));assertNotNull(open.getFirst().get("next"));assertNotNull(open.getFirst().get("check"));}
 
+ // ---- s4l closure 4 (plan §4.3 129행 정정 재평가·134행 "해소/면제 결정이 이미 유효하면 자동 부활시키지 않는다", §5.3 waive 현재 scope/revision, §6 정산) ----
+ Map<String,Object> confirmAdjustment(String iid,String amount,String reason){var proposed=adjust(iid,"PROPOSE",amount,reason,null,null);assertEquals("APPLIED",proposed.get("outcome"),proposed.toString());var confirmed=adjust(iid,"CONFIRM",amount,reason,proposed,null);assertEquals("APPLIED",confirmed.get("outcome"),confirmed.toString());return confirmed;}
+ /** MUST s4l[5] (astra): R0 (original 3) is waived after a confirmed +1, so the waiver covered 2. A 30→28 root R1 takes a confirmed −1 and
+  * is waived. Restoring 30 leaves a CURRENT residual 3 that no waiver covered, so a new owned root opens (old code: R0's immutable
+  * originalDifference 3 suppressed it and the residual had no owner). */
+ @Test void restorationReopensAResidualLargerThanTheAdjustedOriginalWaiverCovered(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1.1");assertEquals("DIFFERENCE",apply(matchEnvelope(invoice)).get("businessStatus"));String iid=invoice[0];settlementManager();
+  var r0=settlementDuties("OPEN");assertEquals(1,r0.size());confirmAdjustment(iid,"1","단가 차이 일부 감액");
+  assertEquals("APPLIED",settlementWaiver(r0.getFirst().get("assignment").toString(),"남은 단가 차이 2를 별도 계약으로 정리했다").get("outcome"));
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);var r1=settlementDuties("OPEN");assertEquals(1,r1.size(),r1.toString());
+  confirmAdjustment(iid,"-1","정정 인도 28 기준으로 앞선 감액 취소");
+  assertEquals("APPLIED",settlementWaiver(r1.getFirst().get("assignment").toString(),"28 인도 차이를 고객과 정리했다").get("outcome"));assertEquals(0,settlementDuties("OPEN").size());
+  var v3=correctDelivery(d.content(),d.external(),d.deliveryId(),v2[1],"30",3);
+  var owned=settlementDuties("OPEN");assertEquals(1,owned.size(),"residual 3 was never waived at CURRENT: "+owned);assertEquals(v3[0],owned.getFirst().get("source"));assertEquals(actor,owned.getFirst().get("owner"));assertNotNull(owned.getFirst().get("next"));assertNotNull(owned.getFirst().get("check"));
+  var view=(Map<?,?>)((Map<?,?>)read("getObject",iid,map("organizationId",org,"objectType","Invoice","itemId",item),clock.instant(),clock.instant()).get("data")).get("settlement");assertEquals("CURRENT",view.get("contributionState"));assertEquals("UNSATISFIED",view.get("result"));assertEquals(true,view.get("differenceDutyOpen"));}
+ /** MUST s4l[1] (opus): R0 is credited +3 and waived at a residual of 0; R1 (30→28) reverses the credit (−3) and is waived. Restoring 30
+  * leaves +3 that the R0 waiver never covered, so it gets an owned root (old code: originalDifference 3 matched and nothing opened). */
+ @Test void restorationReopensAResidualThatTheZeroResidualWaiverNeverCovered(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1.1");assertEquals("DIFFERENCE",apply(matchEnvelope(invoice)).get("businessStatus"));String iid=invoice[0];settlementManager();
+  var r0=settlementDuties("OPEN");assertEquals(1,r0.size());confirmAdjustment(iid,"3","단가 차이 전액 감액");
+  assertEquals("APPLIED",settlementWaiver(r0.getFirst().get("assignment").toString(),"감액으로 남은 차이 0을 정리했다").get("outcome"));
+  var v2=correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"28",2);var r1=settlementDuties("OPEN");assertEquals(1,r1.size(),r1.toString());
+  confirmAdjustment(iid,"-3","정정 인도 28 기준으로 감액 취소");
+  assertEquals("APPLIED",settlementWaiver(r1.getFirst().get("assignment").toString(),"28 인도 차이를 고객과 정리했다").get("outcome"));
+  var v3=correctDelivery(d.content(),d.external(),d.deliveryId(),v2[1],"30",3);
+  var owned=settlementDuties("OPEN");assertEquals(1,owned.size(),"residual 3 after the reversal was never waived: "+owned);assertEquals(v3[0],owned.getFirst().get("source"));assertEquals(actor,owned.getFirst().get("owner"));
+  // The waiver coverage is recorded when the waiver executes, not reconstructed from the match.
+  assertEquals(1,count("SELECT COUNT(*) FROM mulino_work_read_ObligationReferences WHERE ID=? AND status='WAIVED' AND basis LIKE '%[SETTLEMENT_COVERED CURRENT 0]'",r0.getFirst().get("assignment")));}
+ /** SHOULD s4l[2]: a same-quantity supersession (30→30) changes nothing an open root owns, so the open original-difference root is not
+  * re-issued and a waiver decided before it still executes (old code: revision bump, STALE_REVISION). */
+ @Test void sameQuantityCorrectionDoesNotReissueTheOpenDifferenceRoot(){var d=delivered30();var invoice=invoice30(d.deliveryId(),"1.1");assertEquals("DIFFERENCE",apply(matchEnvelope(invoice)).get("businessStatus"));
+  var r0=settlementDuties("OPEN");assertEquals(1,r0.size());String assignment=r0.getFirst().get("assignment").toString();String reason="단가 차이를 별도 계약으로 정리했다";int decided=revision(assignment);
+  var approval=effectsOf(waiverDecision("manager","decideQuantityDutyWaiver",assignment,"APPROVE",reason));assertEquals("APPROVED",approval.get("decision"));
+  correctDelivery(d.content(),d.external(),d.deliveryId(),d.event(),"30",2);assertEquals(decided,revision(assignment),"a no-op correction re-issued the open root");
+  var request=envelope("waiveObligation",map("assignmentId",assignment,"reason",reason),decided);request.put("approvalId",approval.get("approvalId"));var waived=apply(request);assertEquals("APPLIED",waived.get("outcome"),waived.toString());assertEquals(0,settlementDuties("OPEN").size());}
+ /** SHOULD s4l[3]: an invalidating correction opens an UNVERIFIED root U on the original delivery canonical. Relinking that correction's
+  * own claim adopts U (re-issued for the new contribution) instead of opening a second root beside it (old code: two open roots). */
+ @Test void relinkingAnInvalidatingCorrectionAdoptsItsUnverifiedRoot()throws Exception{var d=delivered30();var invoice=invoice30(d.deliveryId(),"1");assertEquals("MATCHED",apply(matchEnvelope(invoice)).get("businessStatus"));now=now.plusSeconds(1);
+  var corrected=new LinkedHashMap<String,Object>(d.content());corrected.put("quantity","28");corrected.put("correctionOfDeliveryId",d.deliveryId());corrected.put("invalidates",d.event());String bytes=json.writeValueAsString(corrected);var subject=map("kind","DISPATCH","id",d.content().get("dispatchId"));
+  var doc=run("attachEvidence",map("subject",subject,"sourceNamespace","quality-source","sourceReference",id(),"mediaType","application/json","expectedHash",com.mulino.adapters.blob.LocalBlobStore.hash(bytes.getBytes()),"provenance","SYNTHETIC","contentBase64",Base64.getEncoder().encodeToString(bytes.getBytes())),null).get("id").toString();
+  var event=run("correctEvidence",map("subject",subject,"kind","PHYSICAL_DELIVERY","sourceNamespace","quality-source","externalEventId",d.external(),"sourceVersion","2","effectiveFrom",d.content().get("occurredAt"),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","payload",bytes,"supersedesId",d.event(),"invalidatesId",d.event(),"documentId",doc,"assertion","Delivery report invalidated and restated","quantity","28","unit","EA","evidenceType","EVENT"),1);
+  var unverified=settlementDuties("OPEN");assertEquals(1,unverified.size(),unverified.toString());assertEquals(d.canonical(),unverified.getFirst().get("source"));String u=unverified.getFirst().get("root").toString(),assignment=unverified.getFirst().get("assignment").toString();int before=revision(assignment);
+  String claim=event.get("claimId").toString();var review=apply(envelope("matchSourceIdentity",map("claimId",claim,"basisDocumentId",doc,"physicalScopeId",d.content().get("physicalScopeId"),"policyVersion","fixture-v1","sourceIdentity","quality-source:"+d.external()+":2","quantity","28","unit","EA","effectiveFrom",d.content().get("occurredAt"),"reason","Synthetic invalidating correction review"),1));assertEquals("APPLIED",review.get("outcome"),review.toString());
+  var linked=run("linkCanonicalOccurrence",map("reconciliationId",review.get("id")),1);assertNotNull(linked);
+  var open=settlementDuties("OPEN");assertEquals(1,open.size(),"the relink must adopt the UNVERIFIED root: "+open);assertEquals(u,open.getFirst().get("root"));assertEquals(actor,open.getFirst().get("owner"));assertTrue(revision(assignment)>before,"the adopted root is re-issued for the relinked contribution");}
  /** SHOULD opus[5]/[6]: only explicit external place kinds are a known zero; an unrecognized kind (WAREHOUSE) is unknown, and the
   * segment-scope evaluateEligibility applies the same custody condition for SELL and DISPATCH. */
  @Test void unrecognizedPlaceKindIsUnknownCustodyAndSegmentEligibilityAppliesCustody(){allow("100");insert("mulino_identity_CapabilityAssignments",map("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","evaluateEligibility","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(now.minusSeconds(1000)),"validUntil",Timestamp.from(now.plusSeconds(10000))));insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","evaluateEligibility"));
