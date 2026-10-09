@@ -40,6 +40,48 @@ def classify_reason(reason):
     return 'ADAPTER'
 
 
+APPROXIMATE = set(json.loads((ROOT / 'verification/actual/scenarios/observation-sources.json').read_text()).get('approximate', []))
+
+
+def missing_fields(evidence, src):
+    """Fields an assertion filters or reads that no observed row of that source carries (an observer projection gap)."""
+    action = evidence.get('actions', {}).get(src.get('actionId')) or {}
+    rows = ((action.get('data') or {}).get('rawRows') or {}).get(src.get('pointer', '').split('/')[3])
+    if not isinstance(rows, list) or not rows:
+        return []
+    wanted = list((src.get('where') or {}).keys())
+    f = src.get('field')
+    wanted += f if isinstance(f, list) else [f] if f else []
+    present = set().union(*(r.keys() for r in rows if isinstance(r, dict)))
+    return [w for w in wanted if w not in present]
+
+
+QUERY_FIELDS = set(re.findall(r'"([A-Za-z]+)"', re.search(r'FIELDS=Set\.of\(([^)]*)\)', (ROOT / 'backend/src/main/java/com/mulino/application/core/QueryRequests.java').read_text()).group(1)))
+INTENT = json.loads((ROOT / 'contracts/intent.schema.json').read_text())
+
+
+def find_action(actions, aid):
+    for a in actions:
+        if a.get('id') == aid:
+            return a
+        for b in a.get('branches', []):
+            found = find_action(b.get('actions', []), aid)
+            if found:
+                return found
+    return None
+
+
+def intent_violation(action):
+    if not action or action.get('kind') not in ('invoke', 'start'):
+        return None
+    req = (action.get('call') or action).get('request') or {}
+    extra = sorted(set(req) - set(INTENT['properties']))
+    missing = sorted(set(INTENT['required']) - set(req))
+    if not extra and not missing:
+        return None
+    return 'missing ' + ','.join(missing) + ('; extra ' + ','.join(extra) if extra else '')
+
+
 def install_state(evidence, subcase):
     for aid in action_order(subcase):
         a = evidence.get('actions', {}).get(aid)
@@ -62,6 +104,26 @@ def first_problem(evidence, subcase):
     actions = evidence.get('actions', {})
     if evidence.get('harnessError'):
         msg = evidence['harnessError']
+        m = re.search(r'Missing/null observed value at ([^/\s]+)/response/(\S+)', msg)
+        upstream = actions.get(m.group(1)) if m else None
+        r = (upstream or {}).get('response')
+        if isinstance(r, dict) and isinstance(r.get('error'), dict):
+            err = r['error']
+            detail = {'kind': 'UPSTREAM_ACTION_REJECTED', 'actionId': m.group(1), 'missingPointer': '/response/' + m.group(2),
+                      'outcome': r.get('outcome'), 'code': err.get('code'), 'message': err.get('message'),
+                      'detail': 'upstream action rejected ' + str(err.get('code')) + ': ' + str(err.get('message')), 'harnessError': msg}
+            if err.get('message') in ('Unsupported scope key', 'Unsupported inventory scope'):
+                detail['note'] = 'case query scope key not defined by the plan/product query schema'
+                return detail, 'TEST'
+            if err.get('message') == 'Unsupported query field':
+                extra = sorted(set(((find_action(subcase.get('actions', []), m.group(1)) or {}).get('request') or {})) - QUERY_FIELDS)
+                detail['note'] = 'case query fields outside the product query envelope (no contract defines it): ' + ','.join(extra)
+                return detail, 'TEST'
+            violation = intent_violation(find_action(subcase.get('actions', []), m.group(1)))
+            if violation and err.get('code') == 'TYPE_INVALID':
+                detail['note'] = 'case request violates contracts/intent.schema.json: ' + violation
+                return detail, 'TEST'
+            return detail, 'PRODUCT'
         # An exception raised while validating an EXECUTED product response is adapter/harness plumbing until triaged.
         return {'kind': 'HARNESS_ERROR', 'detail': msg}, ('PRODUCT' if 'HTTP 5' in msg else 'ADAPTER')
     for aid in action_order(subcase):
@@ -83,7 +145,19 @@ def first_problem(evidence, subcase):
             obs = json.dumps(detail.get('observed'))
             if obs and len(obs) > 600:
                 detail['observed'] = obs[:600] + '...'
-            return {'kind': 'ASSERTION_FAILED', **detail}, 'PRODUCT'
+            src = x.get('source') or {}
+            pointer = src.get('pointer', '')
+            detail['pointer'] = src.get('actionId', '') + pointer
+            cls = 'PRODUCT'
+            if pointer.startswith('/data/rawRows/'):
+                name = pointer.split('/')[3]
+                if name in APPROXIMATE:
+                    cls = 'ADAPTER'; detail['note'] = 'observation source mapping is approximate'
+                else:
+                    missing = missing_fields(evidence, src)
+                    if missing:
+                        cls = 'ADAPTER'; detail['note'] = 'observer rows lack fields ' + ','.join(missing)
+            return {'kind': 'ASSERTION_FAILED', **detail}, cls
     missing = evidence.get('missingAdapters') or []
     if missing:
         return {'kind': 'MISSING_ADAPTER', 'detail': missing}, 'ADAPTER'
@@ -100,6 +174,8 @@ def main(argv):
         print(__doc__, file=sys.stderr); return 3
     report = json.loads(pathlib.Path(argv[1]).read_text())
     out = pathlib.Path(argv[2])
+    mode_file = pathlib.Path(argv[1]).parent / 'run-mode.txt'
+    run_mode = dict(l.split('=', 1) for l in mode_file.read_text().split() if '=' in l) if mode_file.exists() else {}
     cases = {}
     for f in sorted((ROOT / 'verification/cases').glob('*/case.json')):
         c = json.loads(f.read_text())
@@ -147,7 +223,7 @@ def main(argv):
     inventory = {
         'recordType': 'S5A_ACTUAL_SCENARIO_INVENTORY', 'schemaVersion': '1.0.0',
         'codeCommit': report.get('codeCommit'), 'workingTreeDirty': report.get('workingTreeDirty'),
-        'command': report.get('command'), 'reportTimestamp': report.get('timestamp'),
+        'command': report.get('command'), 'reportTimestamp': report.get('timestamp'), 'runMode': run_mode,
         'harnessStatus': report.get('status'), 'harnessExitCode': report.get('exitCode'),
         'actualExecutedActions': report.get('actualExecutedActions'),
         'classificationNote': 'classification is a triage guess: ADAPTER harness/actual gap, PRODUCT backend differs from plan, TEST case oracle looks wrong. Assertion failures default to PRODUCT until triaged.',

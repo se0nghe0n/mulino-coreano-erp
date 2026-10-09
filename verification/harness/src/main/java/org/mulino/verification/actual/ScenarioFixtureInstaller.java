@@ -31,6 +31,7 @@ final class ScenarioFixtureInstaller {
     private final JsonNode bundle;
     private final ObjectNode fixture;
     private final boolean partial;
+    private final boolean unionGrantDimensions=Boolean.getBoolean("verification.actual.relaxWire");
     private final ObjectNode aliases=Json.object();
     private final Map<String,String> orgOf=new HashMap<>();
     private final Map<String,String> externals=new LinkedHashMap<>();
@@ -152,13 +153,7 @@ final class ScenarioFixtureInstaller {
                 omitted.add("cross-organization delegation "+delegatorAlias+" -> "+alias+" (shadow root installed)");
                 delegatorAlias=shadow;delegator=id(shadow);
             }
-            String grantId=uuid();
-            var g=row("organizationId",org,"ID",grantId,"actorId",actor,"delegatorId",delegator,"validFrom",from,"validUntil",until,"createdAt",asOf,"recordedAt",asOf);
-            if(grant.hasNonNull("revision"))g.put("revision",grant.path("revision").asInt());
-            if(grant.path("scope").hasNonNull("revokedAt"))g.put("revokedAt",time(grant.path("scope").path("revokedAt").asText()));
-            insert("mulino_identity_Grants",g);
             Set<String> actions=new LinkedHashSet<>();for(JsonNode x:grant.path("actions"))actions.add(x.asText());
-            for(String x:actions)insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grantId,"capabilityId",x));
             List<String[]> scopes=new ArrayList<>();
             for(var s=grant.path("scope").fields();s.hasNext();) {
                 var se=s.next();String kind=scopeKind(se.getKey());if(kind==null)continue;
@@ -167,7 +162,20 @@ final class ScenarioFixtureInstaller {
             }
             // Dimension restrictions are installed as-is; an organization row is added only when no dimension is named.
             if(scopes.isEmpty())scopes.add(new String[]{"ORGANIZATION",org});
-            Set<String> seen=new HashSet<>();for(String[] s:scopes)if(seen.add(s[0]+":"+s[1]))insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grantId,"scopeKind",s[0],"scopeId",s[1]));
+            // Default: one grant, its dimensions intersect (product semantics). Probe mode unionGrantDimensions: one grant per
+            // dimension kind, so the authored item/work/target lists act as alternatives (the plan does not decide this).
+            Map<String,List<String[]>> groups=new LinkedHashMap<>();
+            for(String[] sc:scopes)groups.computeIfAbsent(unionGrantDimensions?sc[0]:"ALL",k->new ArrayList<>()).add(sc);
+            if(groups.size()>1)conventions.add("grant of "+alias+" split into "+groups.size()+" single-dimension grants (probe unionGrantDimensions)");
+            for(var group:groups.values()) {
+                String grantId=uuid();
+                var g=row("organizationId",org,"ID",grantId,"actorId",actor,"delegatorId",delegator,"validFrom",from,"validUntil",until,"createdAt",asOf,"recordedAt",asOf);
+                if(grant.hasNonNull("revision"))g.put("revision",grant.path("revision").asInt());
+                if(grant.path("scope").hasNonNull("revokedAt"))g.put("revokedAt",time(grant.path("scope").path("revokedAt").asText()));
+                insert("mulino_identity_Grants",g);
+                for(String x:actions)insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grantId,"capabilityId",x));
+                Set<String> seen=new HashSet<>();for(String[] sc:group)if(seen.add(sc[0]+":"+sc[1]))insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grantId,"scopeKind",sc[0],"scopeId",sc[1]));
+            }
             // A delegator that is not itself a fixture actor is the fixture's root: it receives a self-rooted grant covering what it delegates.
             if(!fixture.path("actors").has(delegatorAlias)&&!delegatorAlias.equals(alias)) {
                 rootActions.computeIfAbsent(delegatorAlias,k->new LinkedHashSet<>()).addAll(actions);

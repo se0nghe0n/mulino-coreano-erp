@@ -11,6 +11,7 @@ import org.mulino.verification.*;
 
 /** Calls the product and captures its unmodified JSON response; never loads an oracle. */
 public final class ActualAcceptanceDriver implements AcceptanceDriver, IndependentDbObserver {
+    private static final Set<String> INTENT_FIELDS=Set.of("intentKind","definitionVersion","capabilityVersion","capabilityId","subjectRefs","slots","conditions","evidenceRefs","sourceRefs","contextRefs","provenance","conversationRequestId","proposalRevision","canonicalIntentHash","commandIdempotencyKey","expectedRevision","approvalId");
     private static final Set<String> QUERIES=Set.of("getObject","getWork","getInventory","getObligations","traceLot","getAssessment","getEvidence","getDefinition","searchObjects","searchWorks","getInbox","searchOperationalIssues");
     private final Path root;
     private final ActualConfiguration configuration;
@@ -49,6 +50,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     }
     /** Explicit suite mode (Main scenarios): fresh organization alias and fixture-start clock per installed fixture. */
     private final boolean suiteIsolation=Boolean.getBoolean("verification.actual.suiteIsolation");
+    private final boolean relaxWire=Boolean.getBoolean("verification.actual.relaxWire");
     private final java.util.concurrent.atomic.AtomicInteger installs=new java.util.concurrent.atomic.AtomicInteger();
     private volatile String externalOrganization;
     private volatile JsonNode externalOrganizations;
@@ -72,7 +74,9 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         return bound;
     }
     @Override public StepResult query(String id,String route,JsonNode actor,String operation,JsonNode request) {
-        if(!route.equals("api")||!QUERIES.contains(operation))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);
+        if(!route.equals("api"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);
+        // Suite isolation: every api query reaches the product; an unknown capability is the product's answer, not an adapter skip.
+        if(!suiteIsolation&&!QUERIES.contains(operation))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);
         return send(id,actor,"queries",operation,request);
     }
     private StepResult send(String id,JsonNode actor,String category,String operation,JsonNode request) {
@@ -81,7 +85,28 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         try {
             var uri=configuration.baseUri().resolve("/api/ontology/"+category+"/"+operation);
             JsonNode wireRequest=request.deepCopy();
-            if(category.equals("queries")&&wireRequest.path("scope").isObject())((ObjectNode)wireRequest.path("scope")).remove("caseId");
+            var translated=Json.array();
+            if(relaxWire&&category.equals("queries")&&wireRequest.has("objectId")&&!wireRequest.has("id")){((ObjectNode)wireRequest).set("id",wireRequest.path("objectId"));((ObjectNode)wireRequest).remove("objectId");translated.add("objectId->id");}
+            if(category.equals("queries")&&wireRequest.path("scope").isObject()) {
+                // Case namespace keys are test metadata (each subcase already has its own organization); includeDescendants
+                // is an observation-scope hint the product query schema does not define. Both are removed on the wire and
+                // the removal is kept in the receipt (Step 2 finding: the plan defines no such query scope keys).
+                var wireScope=(ObjectNode)wireRequest.path("scope");
+                for(String key:ScenarioJdbcObservation.CASE_METADATA)if(wireScope.has(key)&&(key.equals("caseId")||suiteIsolation&&!Set.of("includeDescendants","rawRowsOrder").contains(key))){wireScope.remove(key);translated.add(key);}
+                // Probe mode only (verification.actual.relaxWire): also drop observation-only keys the product rejects, so the
+                // run reaches later steps. Never the default; the inventory records the mode.
+                if(relaxWire){for(String key:List.of("includeDescendants","rawRowsOrder"))if(wireScope.has(key)){wireScope.remove(key);translated.add(key);}
+                    if(operation.equals("getInventory")&&wireScope.has("workId")){wireScope.remove("workId");translated.add("workId");}}
+            }
+            if(relaxWire&&!category.equals("queries")&&wireRequest.isObject()) {
+                // Probe mode only: complete the contracts/intent.schema.json envelope the cases omit. Fields outside the
+                // schema are dropped, valueProvenance becomes provenance, and a missing provenance marks every slot USER.
+                var w=(ObjectNode)wireRequest;
+                for(String key:iterable(w))if(!INTENT_FIELDS.contains(key)&&!key.equals("valueProvenance")){w.remove(key);translated.add(key);}
+                if(!w.has("provenance")&&w.path("valueProvenance").isObject()){w.set("provenance",w.path("valueProvenance"));translated.add("valueProvenance->provenance");}
+                w.remove("valueProvenance");
+                if(!w.has("provenance")&&w.path("slots").isObject()){var prov=Json.object();w.path("slots").fieldNames().forEachRemaining(k->prov.put(k,"USER"));w.set("provenance",prov);translated.add("provenance:USER-default");}
+            }
             String credential=signer.sign(credentialActor(actor));
             var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Authorization","Bearer "+credential).POST(HttpRequest.BodyPublishers.ofString(wireRequest.toString())).build();
             Instant submittedAt=Instant.now();
@@ -90,7 +115,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             JsonNode response=Json.parse(result.body());
             var receipt=Json.object();receipt.put("method","POST").put("path",uri.getPath()).put("httpStatus",result.statusCode()).put("submittedAt",submittedAt.toString()).put("capturedAt",Instant.now().toString());
             receipt.put("credentialSha256",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(credential.getBytes(java.nio.charset.StandardCharsets.UTF_8))));
-            receipt.set("request",request);receipt.set("wireRequest",wireRequest);receipt.set("response",response);
+            receipt.set("request",request);receipt.set("wireRequest",wireRequest);receipt.set("response",response);if(!translated.isEmpty())receipt.set("removedScopeKeys",translated);
             var identity=Json.object();identity.put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
             var transport=Json.object();transport.put("httpStatus",result.statusCode());
             return executed(id,transport,response,provenance(identity,"HTTP",false,null,null),receipt);
@@ -99,7 +124,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     }
     @Override public StepResult observe(String id,JsonNode request) {
         try {
-            var data=observer.capture(request);
+            var data=suiteIsolation?ScenarioJdbcObservation.capture(configuration,root,request,this::replayRevision):observer.capture(request);
             String ref="verification/harness/target/evidence/actual/"+run+"/"+UUID.randomUUID()+".json";
             ((ObjectNode)data.path("snapshot")).put("artifactRef",ref);
             var sources=Json.object();var observedNames=Json.array();if(Set.of("S3","S4").contains(request.path("profile").asText()))data.path("sourceEvidence").fieldNames().forEachRemaining(observedNames::add);else observedNames.addAll((com.fasterxml.jackson.databind.node.ArrayNode)request.path("sources"));for(JsonNode requested:observedNames){String name=requested.asText();var evidence=Json.object();evidence.put("complete",true).put("rowPointer","/rawRows/"+name.replace("~","~0").replace("/","~1")).put("artifactRef",ref);evidence.set("sourceQuery",data.path("sourceEvidence").path(name).hasNonNull("sourceQuery")?data.path("sourceEvidence").path(name).path("sourceQuery"):data.path("sourceQuery"));sources.set(name,evidence);}data.set("sourceEvidence",sources);
@@ -107,6 +132,14 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,null,null,provenance(null,"POSTGRESQL_JDBC",true,data.path("sourceQuery"),data.path("snapshot")),List.of(ref));
         } catch(UnsupportedOperationException unsupported){return StepResult.missing(id,"NOT_IMPLEMENTED: "+unsupported.getMessage());}
         catch(Exception failure){throw new IllegalStateException("Actual JDBC environment failure",failure);}
+    }
+    private static List<String> iterable(ObjectNode node){var out=new ArrayList<String>();node.fieldNames().forEachRemaining(out::add);return out;}
+    /** RESULT_REVISION support: re-issues the issuing api query with the same actor and resolved request. */
+    private String replayRevision(JsonNode source) {
+        var replay=send("observer-replay-"+source.path("actionId").asText(),source.path("actor"),"queries",Json.required(source,"capabilityId"),source.path("request"));
+        if(replay.driverStatus()!=StepResult.DriverStatus.EXECUTED||replay.response()==null||!replay.response().hasNonNull("snapshotRevision"))
+            throw new IllegalStateException("Issuing query replay returned no snapshotRevision (outcome "+(replay.response()==null?"none":replay.response().path("outcome").asText())+")");
+        return replay.response().path("snapshotRevision").asText();
     }
     private StepResult executed(String id,JsonNode data,JsonNode response,ObjectNode provenance,JsonNode receipt) throws java.io.IOException {
         String ref="verification/harness/target/evidence/actual/"+run+"/"+UUID.randomUUID()+".json";

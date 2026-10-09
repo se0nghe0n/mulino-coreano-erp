@@ -51,6 +51,7 @@ cp backend/target/ontology-0.1.0-SNAPSHOT.jar "$fixture/ontology.jar"
 python3 -c 'import hashlib,sys; print(hashlib.sha256(open(sys.argv[1],"rb").read()).hexdigest())' "$fixture/ontology.jar" > "$evidence/executed-jar-sha256.txt"
 git rev-parse HEAD > "$evidence/code-commit.txt"
 git status --porcelain > "$evidence/working-tree-status.txt"
+printf 'partialFixtures=%s\nrelaxWire=%s\n' "${ACTUAL_PARTIAL_FIXTURES:-true}" "${ACTUAL_RELAX_WIRE:-false}" > "$evidence/run-mode.txt"
 image=$(python3 -c 'import json; print(json.load(open("verification/platform/versions.json"))["postgresImage"]["reference"])')
 case "$image" in postgres@sha256:*) ;; *) exit 3 ;; esac
 printf '%s\n' "$image" > "$evidence/postgres-image-reference.txt"
@@ -91,7 +92,7 @@ classpath="$repo/verification/harness/target/classes:$(cat verification/harness/
 argv_json=$(python3 -c 'import json,sys; print(json.dumps(["./verify","scenarios","--actual"]+sys.argv[1:]))' "$@")
 rm -f verification/harness/target/evidence/scenarios.json
 set +e
-java -Dverification.driver=actual -Dverification.agentRunner=scripted -Dverification.actual.suiteIsolation=true "-Dverification.actual.partialFixtures=${ACTUAL_PARTIAL_FIXTURES:-true}" \
+java -Dverification.driver=actual -Dverification.agentRunner=scripted -Dverification.actual.suiteIsolation=true "-Dverification.actual.partialFixtures=${ACTUAL_PARTIAL_FIXTURES:-true}" "-Dverification.actual.relaxWire=${ACTUAL_RELAX_WIRE:-false}" \
   -Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json \
   "-Drepo.root=$repo" '-Dverification.command=./verify scenarios --actual' "-Dverification.argv=$argv_json" \
   -cp "$classpath" org.mulino.verification.Main profile scenarios "$@" > "$evidence/harness-stdout.json" 2> "$evidence/harness-stderr.txt"
