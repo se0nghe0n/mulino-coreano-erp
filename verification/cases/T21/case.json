@@ -40,12 +40,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -108,10 +102,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-approved-lifecycle-draft"
+            "commandIdempotencyKey": "T21-approved-lifecycle-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -127,12 +124,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -148,15 +139,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approved-lifecycle-validate"
+            "commandIdempotencyKey": "T21-approved-lifecycle-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -172,12 +165,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -199,15 +186,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approved-lifecycle-submit"
+            "commandIdempotencyKey": "T21-approved-lifecycle-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -223,12 +213,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -248,15 +232,21 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approved-lifecycle-approve"
+            "commandIdempotencyKey": "T21-approved-lifecycle-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -272,12 +262,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -299,15 +283,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approved-lifecycle-publish"
+            "commandIdempotencyKey": "T21-approved-lifecycle-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -323,12 +310,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -345,15 +326,18 @@
               },
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "publish",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approved-lifecycle-activate"
+            "commandIdempotencyKey": "T21-approved-lifecycle-activate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -366,26 +350,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft",
-                  "pointer": "/response/definitionId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -434,12 +412,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retireDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -450,15 +422,17 @@
               },
               "reason": "신규 업무용 다음 버전으로 전환한다"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "activate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approved-lifecycle-retire"
+            "commandIdempotencyKey": "T21-approved-lifecycle-retire",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "reason": "USER"
+            }
           }
         },
         {
@@ -471,26 +445,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approved-lifecycle"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft",
-                  "pointer": "/response/definitionId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -950,12 +918,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -966,10 +928,13 @@
                 "rename": "arrival-label"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-draft"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -985,12 +950,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1006,15 +965,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-validate"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -1030,12 +991,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1057,15 +1012,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-submit"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -1081,12 +1039,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1103,15 +1055,18 @@
               },
               "decision": "APPROVED"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-self-approve"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-self-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER"
+            }
           }
         },
         {
@@ -1127,12 +1082,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1148,15 +1097,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-unapproved-publish"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-unapproved-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -1172,12 +1123,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1195,15 +1140,19 @@
               "decision": "REJECTED",
               "reason": "회귀 근거를 보완한다"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-reject"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-reject",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "reason": "USER"
+            }
           }
         },
         {
@@ -1219,12 +1168,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1246,15 +1189,18 @@
                 ]
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "reject",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-revised"
+            "commandIdempotencyKey": "T21-approval-required-and-rejected-revision-revised",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "parentDraftRevision": "CONTEXT",
+              "package": "USER"
+            }
           }
         },
         {
@@ -1267,26 +1213,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-approval-required-and-rejected-revision"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft",
-                  "pointer": "/response/definitionId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -1552,12 +1492,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -1620,10 +1554,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-published-content-immutable-draft"
+            "commandIdempotencyKey": "T21-published-content-immutable-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -1639,12 +1576,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1660,15 +1591,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-validate"
+            "commandIdempotencyKey": "T21-published-content-immutable-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -1684,12 +1617,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1711,15 +1638,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-submit"
+            "commandIdempotencyKey": "T21-published-content-immutable-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -1735,12 +1665,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1760,15 +1684,21 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-approve"
+            "commandIdempotencyKey": "T21-published-content-immutable-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -1784,12 +1714,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1811,15 +1735,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-publish"
+            "commandIdempotencyKey": "T21-published-content-immutable-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -1835,12 +1762,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1857,15 +1778,18 @@
               },
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "publish",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-activate"
+            "commandIdempotencyKey": "T21-published-content-immutable-activate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -1878,26 +1802,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft",
-                  "pointer": "/response/definitionId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -1943,12 +1861,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -1968,15 +1880,19 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "activate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-mutate"
+            "commandIdempotencyKey": "T21-published-content-immutable-mutate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "USER",
+              "package": "USER",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -1989,23 +1905,17 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$alias": "DEF1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "DEF1"
+            }
           }
         },
         {
@@ -2021,12 +1931,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -2035,15 +1939,18 @@
               "hash": "347608ca1425f25be3c36fb6a6a4158739d5546d06e7bdddc5cdaabb9af895c3",
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "prior-package",
                 "pointer": "/response/data/revision"
               }
             },
-            "commandIdempotencyKey": "T21-published-content-immutable-rollback-pointer"
+            "commandIdempotencyKey": "T21-published-content-immutable-rollback-pointer",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "USER",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -2056,26 +1963,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-published-content-immutable"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft",
-                  "pointer": "/response/definitionId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -2417,12 +2318,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -2452,10 +2347,15 @@
                 "V1"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-rename"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-rename",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "change": "USER",
+              "compatibilityManifest": "USER",
+              "regressionFixtureRefs": "USER"
+            }
           }
         },
         {
@@ -2471,12 +2371,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -2492,15 +2386,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-rename",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-rename"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-rename",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -2513,27 +2409,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft-rename",
-                  "pointer": "/response/definitionId"
-                }
-              },
-              "includeValidation": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft-rename",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -2577,12 +2466,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -2613,10 +2496,15 @@
                 "V1"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-optional-attribute"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-optional-attribute",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "change": "USER",
+              "compatibilityManifest": "USER",
+              "regressionFixtureRefs": "USER"
+            }
           }
         },
         {
@@ -2632,12 +2520,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -2653,15 +2535,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-optional-attribute",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-optional-attribute"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-optional-attribute",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -2674,27 +2558,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft-optional-attribute",
-                  "pointer": "/response/definitionId"
-                }
-              },
-              "includeValidation": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft-optional-attribute",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -2738,12 +2615,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -2774,10 +2645,15 @@
                 "V1"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-required-slot"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-required-slot",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "change": "USER",
+              "compatibilityManifest": "USER",
+              "regressionFixtureRefs": "USER"
+            }
           }
         },
         {
@@ -2793,12 +2669,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -2814,15 +2684,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-required-slot",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-required-slot"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-required-slot",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -2835,27 +2707,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft-required-slot",
-                  "pointer": "/response/definitionId"
-                }
-              },
-              "includeValidation": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft-required-slot",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -2899,12 +2764,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -2934,10 +2793,15 @@
                 "V1"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-unit"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-unit",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "change": "USER",
+              "compatibilityManifest": "USER",
+              "regressionFixtureRefs": "USER"
+            }
           }
         },
         {
@@ -2953,12 +2817,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -2974,15 +2832,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-unit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-unit"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-unit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -2995,27 +2855,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft-unit",
-                  "pointer": "/response/definitionId"
-                }
-              },
-              "includeValidation": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft-unit",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -3059,12 +2912,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -3094,10 +2941,15 @@
                 "V1"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-endpoint"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-endpoint",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "change": "USER",
+              "compatibilityManifest": "USER",
+              "regressionFixtureRefs": "USER"
+            }
           }
         },
         {
@@ -3113,12 +2965,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -3134,15 +2980,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-endpoint",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-endpoint"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-endpoint",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -3155,27 +3003,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft-endpoint",
-                  "pointer": "/response/definitionId"
-                }
-              },
-              "includeValidation": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft-endpoint",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -3219,12 +3060,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -3258,10 +3093,15 @@
                 "V1"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-relation-meaning"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-draft-relation-meaning",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "change": "USER",
+              "compatibilityManifest": "USER",
+              "regressionFixtureRefs": "USER"
+            }
           }
         },
         {
@@ -3277,12 +3117,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -3298,15 +3132,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-relation-meaning",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-relation-meaning"
+            "commandIdempotencyKey": "T21-six-impact-diff-classes-validate-relation-meaning",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -3319,27 +3155,20 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-six-impact-diff-classes"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$result": {
-                  "actionId": "draft-relation-meaning",
-                  "pointer": "/response/definitionId"
-                }
-              },
-              "includeValidation": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "draft-relation-meaning",
+                "pointer": "/response/definitionId"
+              }
+            }
           }
         },
         {
@@ -4581,12 +4410,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -4597,10 +4420,13 @@
                 "slotType": "UnknownType"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-types"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-types",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -4616,12 +4442,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -4637,15 +4457,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-types",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-types"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-types",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -4661,12 +4483,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -4682,15 +4498,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-types",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-types"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-types",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -4706,12 +4524,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -4725,10 +4537,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-cardinality"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-cardinality",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -4744,12 +4559,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -4765,15 +4574,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-cardinality",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-cardinality"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-cardinality",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -4789,12 +4600,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -4810,15 +4615,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-cardinality",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-cardinality"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-cardinality",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -4834,12 +4641,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -4850,10 +4651,13 @@
                 "requiredStage": "AFTER_EXECUTION_UNKNOWN"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-required-stage"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-required-stage",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -4869,12 +4673,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -4890,15 +4688,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-required-stage",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-required-stage"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-required-stage",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -4914,12 +4714,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -4935,15 +4729,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-required-stage",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-required-stage"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-required-stage",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -4959,12 +4755,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -4978,10 +4768,13 @@
                 ]
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-unit"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-unit",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -4997,12 +4790,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5018,15 +4805,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-unit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-unit"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-unit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5042,12 +4831,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5063,15 +4846,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-unit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-unit"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-unit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5087,12 +4872,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -5108,10 +4887,13 @@
                 "cycleAllowed": false
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-cycle"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-cycle",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -5127,12 +4909,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5148,15 +4924,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-cycle",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-cycle"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-cycle",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5172,12 +4950,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5193,15 +4965,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-cycle",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-cycle"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-cycle",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5217,12 +4991,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -5236,10 +5004,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-goal"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-goal",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -5255,12 +5026,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5276,15 +5041,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-goal",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-goal"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-goal",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5300,12 +5067,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5321,15 +5082,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-goal",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-goal"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-goal",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5345,12 +5108,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -5361,10 +5118,13 @@
                 "organizationId": "synthetic-other-org"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-organization"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-organization",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -5380,12 +5140,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5401,15 +5155,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-organization",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-organization"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-organization",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5425,12 +5181,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5446,15 +5196,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-organization",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-organization"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-organization",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5470,12 +5222,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -5491,10 +5237,13 @@
                 ]
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-regression"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-regression",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -5510,12 +5259,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5531,15 +5274,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-regression",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-regression"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-regression",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5555,12 +5300,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5576,15 +5315,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-regression",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-regression"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-regression",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5600,12 +5341,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -5621,10 +5356,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-validation-constraints-draft-manifest"
+            "commandIdempotencyKey": "T21-validation-constraints-draft-manifest",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -5640,12 +5378,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5661,15 +5393,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-manifest",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-validate-manifest"
+            "commandIdempotencyKey": "T21-validation-constraints-validate-manifest",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5685,12 +5419,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -5706,15 +5434,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-manifest",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-validation-constraints-publish-manifest"
+            "commandIdempotencyKey": "T21-validation-constraints-publish-manifest",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -5727,18 +5457,11 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-validation-constraints"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "includeDrafts": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
@@ -6882,17 +6605,12 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-invalid-executable-payloads"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -6939,12 +6657,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-invalid-executable-payloads"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -6955,10 +6667,13 @@
                 "sql": "SELECT 1"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-sql"
+            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-sql",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -6974,12 +6689,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-invalid-executable-payloads"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -6990,10 +6699,13 @@
                 "script": "return true"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-script"
+            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-script",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -7009,12 +6721,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-invalid-executable-payloads"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -7025,10 +6731,13 @@
                 "newExecutionPrivilege": "SELL_ALL"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-privilege"
+            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-privilege",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -7044,12 +6753,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-invalid-executable-payloads"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -7060,10 +6763,13 @@
                 "operator": "runCode"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-operator"
+            "commandIdempotencyKey": "T21-invalid-executable-payloads-attempt-operator",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -7076,17 +6782,12 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-invalid-executable-payloads"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -7520,12 +7221,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -7588,10 +7283,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-draft"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -7607,12 +7305,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -7628,15 +7320,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-validate"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -7652,12 +7346,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -7679,15 +7367,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-submit"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -7703,12 +7394,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -7728,15 +7413,21 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-approve"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -7752,12 +7443,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -7779,15 +7464,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-publish"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -7803,12 +7491,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -7825,15 +7507,18 @@
               },
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "publish",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-activate"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-activate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -7849,12 +7534,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v2",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -7862,8 +7541,7 @@
               },
               "quantity": {
                 "value": "60",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "destinationId": {
                 "$alias": "W"
@@ -7885,10 +7563,23 @@
                 "$alias": "supervisor"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-new-work"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-new-work",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "evaluationTime": "USER",
+              "eligibilityAction": "USER",
+              "customerId": "CONTEXT",
+              "includeReservations": "USER",
+              "evidencePolicyVersion": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT"
+            }
           }
         },
         {
@@ -7904,12 +7595,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v2",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -7925,15 +7610,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "new-work",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-new-active"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-new-active",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -7949,12 +7636,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "placeHold",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "segmentId": {
@@ -7968,10 +7649,15 @@
               "reason": "synthetic-QC-hold",
               "decisionEvidenceHash": "7f9e4a22a2724081747e6f487d9322b519afe9f88bd0e9de32d8d63c9e0a4830"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-current-hold"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-current-hold",
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER",
+              "reason": "USER",
+              "decisionEvidenceHash": "USER"
+            }
           }
         },
         {
@@ -7984,23 +7670,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -8013,26 +7693,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v2",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "new-work",
-                  "pointer": "/response/workId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "new-work",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -8045,28 +7719,21 @@
           "route": "api",
           "capabilityId": "evaluateEligibility",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "evaluateEligibility",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "action": "SELL",
-              "segmentId": {
-                "$alias": "A40"
-              },
-              "customerId": {
-                "$alias": "C"
-              },
-              "evaluationTime": "2026-10-07T09:00:00Z"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL",
+            "segmentId": {
+              "$alias": "A40"
+            },
+            "customerId": {
+              "$alias": "C"
+            }
           }
         },
         {
@@ -8079,17 +7746,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -8136,12 +7798,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "reserveQuantity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "segmentId": {
@@ -8156,10 +7812,14 @@
               },
               "action": "SELL"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-try-v1-reserve"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-try-v1-reserve",
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "workId": "CONTEXT",
+              "action": "USER"
+            }
           }
         },
         {
@@ -8172,17 +7832,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -8234,12 +7889,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -8265,10 +7914,15 @@
                 "occurredAt": "2026-10-07T09:00:00Z"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-receipt20-evidence"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-receipt20-evidence",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER"
+            }
           }
         },
         {
@@ -8284,12 +7938,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -8324,10 +7972,21 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-receipt20"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-receipt20",
+            "provenance": {
+              "workId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "locationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "occurredAt": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -8340,23 +7999,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -8372,12 +8025,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "correctEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "occurrenceId": {
@@ -8404,15 +8051,23 @@
                 "$alias": "WORK1"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "receipt20",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-correct18"
+            "commandIdempotencyKey": "T21-pinned-meaning-current-policy-correct18",
+            "provenance": {
+              "occurrenceId": "CONTEXT",
+              "supersedesVersion": "USER",
+              "sourceVersion": "USER",
+              "correctedQuantity": "USER",
+              "document": "USER",
+              "correctedContentHash": "USER",
+              "reason": "USER",
+              "workId": "CONTEXT"
+            }
           }
         },
         {
@@ -8425,23 +8080,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -8454,24 +8103,18 @@
           "route": "api",
           "capabilityId": "evaluateEligibility",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "evaluateEligibility",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "action": "SELL",
-              "segmentId": {
-                "$alias": "A40"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL",
+            "segmentId": {
+              "$alias": "A40"
+            }
           }
         },
         {
@@ -9382,17 +9025,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-unsupported-v1-held"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -9440,12 +9078,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "resumeWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-unsupported-v1-held"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -9455,10 +9087,12 @@
                 "verified-source-receipt40"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-unsupported-v1-held-resume"
+            "commandIdempotencyKey": "T21-unsupported-v1-held-resume",
+            "provenance": {
+              "workId": "CONTEXT",
+              "resumeEvidenceRefs": "USER"
+            }
           }
         },
         {
@@ -9471,23 +9105,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-unsupported-v1-held"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -9500,23 +9128,17 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-unsupported-v1-held"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -9563,22 +9185,11 @@
           "route": "api",
           "capabilityId": "getObligations",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObligations",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-unsupported-v1-held"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
-              },
-              "kind": "VERSION_UNSUPPORTED",
-              "current": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
@@ -9587,7 +9198,11 @@
                 "actionId": "after",
                 "pointer": "/response/snapshotRevision"
               }
-            }
+            },
+            "workId": {
+              "$alias": "WORK1"
+            },
+            "kind": "VERSION_UNSUPPORTED"
           }
         }
       ],
@@ -10261,12 +9876,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -10329,10 +9938,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-draft"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -10348,12 +9960,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10369,15 +9975,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-validate"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -10393,12 +10001,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10420,15 +10022,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-submit"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -10444,12 +10049,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10469,15 +10068,21 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-approve"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -10493,12 +10098,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10520,15 +10119,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-publish"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -10544,12 +10146,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10566,15 +10162,18 @@
               },
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "publish",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-activate"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-activate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -10590,12 +10189,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10641,15 +10234,24 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "activate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-migration-review"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-migration-review",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "reviewKind": "USER",
+              "migrationId": "USER",
+              "affectedWorkIds": "CONTEXT",
+              "affectedDataIds": "CONTEXT",
+              "mapping": "USER",
+              "unsupportedValues": "USER",
+              "regressionRunIds": "CONTEXT"
+            }
           }
         },
         {
@@ -10665,12 +10267,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -10708,15 +10304,24 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_MIGRATION"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "migration-review",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-migration-approval"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-migration-approval",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "reviewId": "CONTEXT",
+              "reviewKind": "USER",
+              "decision": "USER",
+              "affectedWorkIds": "CONTEXT",
+              "goalChanges": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -10732,12 +10337,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "migrateWorkDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -10762,10 +10361,16 @@
               },
               "endpoint": "SELL_ELIGIBLE"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-unauthorized-migrate"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-unauthorized-migrate",
+            "provenance": {
+              "workId": "CONTEXT",
+              "targetDefinitionId": "CONTEXT",
+              "migrationId": "USER",
+              "approvalId": "CONTEXT",
+              "quantity": "USER",
+              "endpoint": "USER"
+            }
           }
         },
         {
@@ -10781,12 +10386,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "migrateWorkDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -10812,10 +10411,17 @@
               "endpoint": "SELL_ELIGIBLE",
               "reason": "인간 owner가 승인된 목표 변경을 적용한다"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-explicit-authorized-migration-migrate"
+            "commandIdempotencyKey": "T21-explicit-authorized-migration-migrate",
+            "provenance": {
+              "workId": "CONTEXT",
+              "targetDefinitionId": "CONTEXT",
+              "migrationId": "USER",
+              "approvalId": "CONTEXT",
+              "quantity": "USER",
+              "endpoint": "USER",
+              "reason": "USER"
+            }
           }
         },
         {
@@ -10828,23 +10434,17 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-explicit-authorized-migration"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -11265,12 +10865,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -11333,10 +10927,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-draft"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -11352,12 +10949,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -11373,15 +10964,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-validate"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -11397,12 +10990,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -11424,15 +11011,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-submit"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -11448,12 +11038,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -11473,15 +11057,21 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-approve"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -11497,12 +11087,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -11524,15 +11108,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-publish"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -11548,12 +11135,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -11570,15 +11151,18 @@
               },
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "publish",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-activate"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-activate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -11594,12 +11178,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -11625,10 +11203,15 @@
                 "occurredAt": "2026-10-07T09:00:00Z"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-receipt-evidence"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-receipt-evidence",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER"
+            }
           }
         },
         {
@@ -11644,12 +11227,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -11684,10 +11261,21 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-receipt"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-receipt",
+            "provenance": {
+              "workId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER",
+              "locationId": "CONTEXT",
+              "occurredAt": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -11700,17 +11288,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -11756,23 +11339,17 @@
           "route": "api",
           "capabilityId": "getDefinition",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getDefinition",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "definitionId": {
-                "$alias": "DEF1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "DEF1"
+            }
           }
         },
         {
@@ -11788,12 +11365,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -11802,15 +11373,18 @@
               "hash": "347608ca1425f25be3c36fb6a6a4158739d5546d06e7bdddc5cdaabb9af895c3",
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "prior-package",
                 "pointer": "/response/data/revision"
               }
             },
-            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-rollback-pointer"
+            "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-rollback-pointer",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "USER",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -11823,17 +11397,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T21-active-pointer-rollback-preserves-effects"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }

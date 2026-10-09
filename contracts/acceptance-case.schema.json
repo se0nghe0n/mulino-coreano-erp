@@ -302,6 +302,93 @@
             "EVIDENCE_UNVERIFIED"
           ],
           "description": "Declared receiving-custody negative on a confirmReceipt that carries receivingCustodianId (contracts/fixture-place-kinds.json directReceiptCustody.custodyControl). Harness-side declaration; never sent to the product."
+        },
+        "harness": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": false,
+          "description": "Harness-side declarations of an invoke/query action (contracts/request-contracts.json harnessDeclarations). Adapters read them to drive the call; none is sent as a request field. ./verify prepare (check_request_contracts.py) enforces the request contracts and the intentionalViolation declaration.",
+          "properties": {
+            "testBarrier": {
+              "type": "object",
+              "required": [
+                "transactionId",
+                "participantId",
+                "barrierId",
+                "point"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "transactionId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "participantId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "barrierId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "point": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "environmentId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "authenticationTest": {
+              "type": "object"
+            },
+            "executionContext": {
+              "type": "object"
+            },
+            "mcp": {
+              "type": "object",
+              "minProperties": 1,
+              "additionalProperties": false,
+              "properties": {
+                "transport": {
+                  "type": "object"
+                },
+                "requestState": {},
+                "inputResponses": {
+                  "type": "object"
+                }
+              }
+            },
+            "intentionalViolation": {
+              "type": "object",
+              "required": [
+                "fields",
+                "reason"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "fields": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "reason": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "unpinnedBecause": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          }
         }
       },
       "required": [

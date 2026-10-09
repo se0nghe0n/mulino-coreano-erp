@@ -56,9 +56,9 @@ final class StepTwoRoundEightRegressionTest {
         rejects("is at PORT (kind EXTERNAL_PORT)",problems("T16","provisional-holds",NONE,f->{
             ((ObjectNode)f.path("aliases")).set("PORT",Json.parse("{\"type\":\"Place\",\"name\":\"IT-port\",\"kind\":\"EXTERNAL_PORT\"}"));((ObjectNode)f.path("aliases").path("TRANSIT60")).put("locationAlias","PORT");}));
         for(String sub:List.of("discrepancy-transit2","discrepancy-unobserved2"))
-            rejects("differs from leaf Q100 100 BOX",problems("T14",sub,s->slots(s,"receive98").set("existingSegmentId",Json.parse("{\"value\":{\"$alias\":\"Q100\"},\"provenance\":\"CONTEXT\"}")),NONE));
-        rejects("differs from leaf",problems("T14","discrepancy-transit2",s->((ObjectNode)slots(s,"split98").path("children").path("value").get(0)).put("quantity","97"),NONE));
-        rejects("explicit children entry",problems("T14","discrepancy-transit2",s->slots(s,"receive98").set("existingSegmentId",Json.parse("{\"value\":{\"$result\":{\"actionId\":\"split98\",\"pointer\":\"/response/children/0/id\"}}}")),NONE));
+            rejects("differs from leaf Q100 100 BOX",problems("T14",sub,s->slots(s,"receive98").set("existingSegmentId",Json.parse("{\"$alias\":\"Q100\"}")),NONE));
+        rejects("differs from leaf",problems("T14","discrepancy-transit2",s->((ObjectNode)slots(s,"split98").path("children").get(0)).put("quantity","97"),NONE));
+        rejects("explicit children entry",problems("T14","discrepancy-transit2",s->slots(s,"receive98").set("existingSegmentId",Json.parse("{\"$result\":{\"actionId\":\"split98\",\"pointer\":\"/response/children/0/id\"}}")),NONE));
         rejects("lotId",problems("C2","cumulative-versus-state",s->slots(s,"receive60").set("lotId",Json.parse("{\"$alias\":\"P\"}")),NONE));
         rejects("destination TRANSIT is not a INTERNAL_STORAGE",problems("C2","cumulative-versus-state",s->slots(s,"receive60").set("placeId",Json.parse("{\"$alias\":\"TRANSIT\"}")),NONE));
         rejects("INDISTINGUISHABLE_MIXTURE",problems("C2","cumulative-versus-state",NONE,f->segmentRow(f,"A60").put("identifiability","INDISTINGUISHABLE_MIXTURE")));
@@ -76,10 +76,10 @@ final class StepTwoRoundEightRegressionTest {
         for(String s:List.of("discrepancy-transit2","discrepancy-unobserved2")) {
             ObjectNode sub=sub(caseJson("T14"),s);List<String> ids=new ArrayList<>();for(JsonNode a:sub.path("actions")) ids.add(a.path("id").asText());
             assertTrue(ids.indexOf("split98")<ids.indexOf("receive98"),s);
-            assertEquals("/response/children/RECEIVED98/segmentId",slots(sub,"receive98").at("/existingSegmentId/value/$result/pointer").asText());
+            assertEquals("/response/children/RECEIVED98/segmentId",slots(sub,"receive98").at("/existingSegmentId/$result/pointer").asText());
             for(JsonNode x:sub.path("assertions")) if(List.of("received98","physical-total100","transit2").contains(x.path("id").asText())) assertTrue(x.at("/source/where/active").asBoolean(),x.path("id").asText()+" reads active rows only");
         }
-        assertEquals("/response/children/REMAINDER2/segmentId",slots(sub(caseJson("T14"),"discrepancy-transit2"),"transit2").at("/segmentId/value/$result/pointer").asText());
+        assertEquals("/response/children/REMAINDER2/segmentId",slots(sub(caseJson("T14"),"discrepancy-transit2"),"transit2").at("/segmentId/$result/pointer").asText());
     }
 
     // P3 (a): a declared custody negative names the product's first failing check, pins the outcome and proves zero effect.
@@ -156,7 +156,7 @@ final class StepTwoRoundEightRegressionTest {
         for(JsonNode a:s.path("assertions")) assertions.add(a.path("id").asText());
         for(String db:List.of("return-db","move-db")) {boolean seg=false;for(JsonNode x:action(s,db).at("/observation/sources")) seg|=x.asText().equals("segments");assertTrue(seg,db);}
         assertTrue(actions.indexOf("return-db")<actions.indexOf("split40") && actions.indexOf("split40")<actions.indexOf("move"));
-        assertEquals("/response/children/MOVE20/segmentId",slots(s,"move").at("/segmentId/value/$result/pointer").asText(),"the whole-leaf move takes the split 20 child");
+        assertEquals("/response/children/MOVE20/segmentId",slots(s,"move").at("/segmentId/$result/pointer").asText(),"the whole-leaf move takes the split 20 child");
         for(String id:List.of("dispatch-sale-applied","return-applied","returned-at-W")) assertTrue(assertions.indexOf(id)>=0 && assertions.indexOf(id)<assertions.indexOf("return-no-new-contribution"),id);
         for(String id:List.of("move-applied","relocated-at-W-alt","left-at-W")) assertTrue(assertions.indexOf(id)>assertions.indexOf("return-no-new-contribution") && assertions.indexOf(id)<assertions.indexOf("relocation-no-new-contribution"),id);
         assertEquals(List.of(),new ContractValidator(root).receiptCustodyProblems(only(caseJson("T13"),s)));

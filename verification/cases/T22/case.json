@@ -42,37 +42,36 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "source-key-hash-conflict"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-source-key-hash-conflict-first",
-            "source": {
-              "documentId": {
-                "$alias": "carrier-A"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "carrier-A"
+                },
+                "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
+                "sourceNamespace": "carrier",
+                "externalEventId": "EV60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
-              "sourceNamespace": "carrier",
-              "externalEventId": "EV60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "quantity": "60",
+              "unit": "BOX",
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "quantity": "60",
-            "unit": "BOX",
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "quantity": "USER",
+              "unit": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -90,20 +89,11 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
+              "subjectKind": "ITEM",
+              "subjectId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "source-key-hash-conflict"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "sourceKey": [
@@ -158,37 +148,36 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "source-key-hash-conflict"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-source-key-hash-conflict-replay",
-            "source": {
-              "documentId": {
-                "$alias": "carrier-A"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "carrier-A"
+                },
+                "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
+                "sourceNamespace": "carrier",
+                "externalEventId": "EV60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
-              "sourceNamespace": "carrier",
-              "externalEventId": "EV60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "quantity": "60",
+              "unit": "BOX",
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "quantity": "60",
-            "unit": "BOX",
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "quantity": "USER",
+              "unit": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -205,37 +194,36 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "source-key-hash-conflict"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-source-key-hash-conflict-conflict",
-            "source": {
-              "documentId": {
-                "$alias": "carrier-B"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "carrier-B"
+                },
+                "sha256": "03c92fb9225122f644c832bc6a48795edc24161a5ee2d14c9bfe01e9e88dc151",
+                "sourceNamespace": "carrier",
+                "externalEventId": "EV60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "03c92fb9225122f644c832bc6a48795edc24161a5ee2d14c9bfe01e9e88dc151",
-              "sourceNamespace": "carrier",
-              "externalEventId": "EV60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "quantity": "40",
+              "unit": "BOX",
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "quantity": "40",
-            "unit": "BOX",
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "quantity": "USER",
+              "unit": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -253,20 +241,11 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
+              "subjectKind": "ITEM",
+              "subjectId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "source-key-hash-conflict"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "sourceKey": [
@@ -458,18 +437,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "source-key-hash-conflict"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "EVIDENCE_CONFLICT"
@@ -977,37 +946,36 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-carrier",
-            "source": {
-              "documentId": {
-                "$alias": "carrier60"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "carrier60"
+                },
+                "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
+                "sourceNamespace": "carrier",
+                "externalEventId": "EV60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
-              "sourceNamespace": "carrier",
-              "externalEventId": "EV60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "quantity": "60",
+              "unit": "BOX",
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "quantity": "60",
-            "unit": "BOX",
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "quantity": "USER",
+              "unit": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -1024,29 +992,27 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "matchSourceIdentity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-match-carrier",
-            "activityId": {
-              "$result": {
-                "actionId": "carrier",
-                "pointer": "/response/activityId"
+            "slots": {
+              "activityId": {
+                "$result": {
+                  "actionId": "carrier",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "targetId": {
+                "$alias": "A60"
+              },
+              "basis": {
+                "$alias": "carrier60"
               }
             },
-            "targetId": {
-              "$alias": "A60"
-            },
-            "basis": {
-              "$alias": "carrier60"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "targetId": "CONTEXT",
+              "basis": "CONTEXT"
             }
           }
         },
@@ -1063,35 +1029,34 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkCanonicalOccurrence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-canonical",
-            "activityId": {
-              "$result": {
-                "actionId": "carrier",
-                "pointer": "/response/activityId"
+            "slots": {
+              "activityId": {
+                "$result": {
+                  "actionId": "carrier",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "targetId": {
+                "$alias": "A60"
+              },
+              "identityMatchId": {
+                "$result": {
+                  "actionId": "match-carrier",
+                  "pointer": "/response/id"
+                }
+              },
+              "basis": {
+                "$alias": "carrier60"
               }
             },
-            "targetId": {
-              "$alias": "A60"
-            },
-            "identityMatchId": {
-              "$result": {
-                "actionId": "match-carrier",
-                "pointer": "/response/id"
-              }
-            },
-            "basis": {
-              "$alias": "carrier60"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "targetId": "CONTEXT",
+              "identityMatchId": "CONTEXT",
+              "basis": "CONTEXT"
             }
           }
         },
@@ -1108,31 +1073,27 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-receipt",
-            "occurrenceId": {
-              "$result": {
-                "actionId": "canonical",
-                "pointer": "/response/occurrenceId"
+            "slots": {
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "canonical",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "quantity": "60",
+              "unit": "BOX",
+              "placeId": {
+                "$alias": "W"
               }
             },
-            "segmentId": {
-              "$alias": "A60"
-            },
-            "quantity": "60",
-            "unit": "BOX",
-            "placeId": {
-              "$alias": "W"
+            "subjectRefs": [],
+            "provenance": {
+              "occurrenceId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER",
+              "placeId": "CONTEXT"
             }
           }
         },
@@ -1152,20 +1113,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1213,37 +1167,36 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-warehouse",
-            "source": {
-              "documentId": {
-                "$alias": "warehouse60"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "warehouse60"
+                },
+                "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
+                "sourceNamespace": "warehouse",
+                "externalEventId": "W60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "af90617eaac31571ce35702ee4f49f6c46c13d92158cc2c1f39518a5780c3401",
-              "sourceNamespace": "warehouse",
-              "externalEventId": "W60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "quantity": "60",
+              "unit": "BOX",
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "quantity": "60",
-            "unit": "BOX",
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "quantity": "USER",
+              "unit": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -1263,20 +1216,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1323,29 +1269,27 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "matchSourceIdentity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-match-warehouse",
-            "activityId": {
-              "$result": {
-                "actionId": "warehouse",
-                "pointer": "/response/activityId"
+            "slots": {
+              "activityId": {
+                "$result": {
+                  "actionId": "warehouse",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "targetId": {
+                "$alias": "A60"
+              },
+              "basis": {
+                "$alias": "warehouse60"
               }
             },
-            "targetId": {
-              "$alias": "A60"
-            },
-            "basis": {
-              "$alias": "warehouse60"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "targetId": "CONTEXT",
+              "basis": "CONTEXT"
             }
           }
         },
@@ -1362,38 +1306,37 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkCanonicalOccurrence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-two-sources-one-occurrence-link-warehouse",
-            "activityId": {
-              "$result": {
-                "actionId": "warehouse",
-                "pointer": "/response/activityId"
+            "slots": {
+              "activityId": {
+                "$result": {
+                  "actionId": "warehouse",
+                  "pointer": "/response/activityId"
+                }
+              },
+              "occurrenceId": {
+                "$result": {
+                  "actionId": "canonical",
+                  "pointer": "/response/occurrenceId"
+                }
+              },
+              "identityMatchId": {
+                "$result": {
+                  "actionId": "match-warehouse",
+                  "pointer": "/response/id"
+                }
+              },
+              "basis": {
+                "$alias": "warehouse60"
               }
             },
-            "occurrenceId": {
-              "$result": {
-                "actionId": "canonical",
-                "pointer": "/response/occurrenceId"
-              }
-            },
-            "identityMatchId": {
-              "$result": {
-                "actionId": "match-warehouse",
-                "pointer": "/response/id"
-              }
-            },
-            "basis": {
-              "$alias": "warehouse60"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "occurrenceId": "CONTEXT",
+              "identityMatchId": "CONTEXT",
+              "basis": "CONTEXT"
             }
           }
         },
@@ -1413,20 +1356,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1477,25 +1413,10 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "two-sources-one-occurrence"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
-            "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
             },
-            "quantityMode": "CUMULATIVE_EVENT",
-            "endpoint": "ARRIVED"
+            "asOf": "2026-10-07T00:00:00Z",
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         }
       ],
@@ -1796,20 +1717,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "cross-org-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1876,26 +1790,24 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "matchSourceIdentity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "cross-org-match"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-cross-org-match-invalid",
-            "activityId": {
-              "$alias": "old-event"
+            "slots": {
+              "activityId": {
+                "$alias": "old-event"
+              },
+              "basis": {
+                "reason": "공식 대조 근거 없음"
+              },
+              "targetId": {
+                "$alias": "P-B"
+              }
             },
-            "basis": {
-              "reason": "공식 대조 근거 없음"
-            },
-            "targetId": {
-              "$alias": "P-B"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "basis": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -1915,20 +1827,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "cross-org-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1998,18 +1903,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "cross-org-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -2448,20 +2343,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "overlapping-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -2528,36 +2416,39 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkCanonicalOccurrence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "overlapping-match"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-overlapping-match-invalid",
-            "activityId": {
-              "$alias": "old-event"
+            "slots": {
+              "activityId": {
+                "$alias": "old-event"
+              },
+              "basis": {
+                "$alias": "physical-membership"
+              },
+              "physicalScope": [
+                "B40-physical"
+              ],
+              "occurrenceId": {
+                "$alias": "candidate-occurrence"
+              },
+              "targetId": {
+                "$alias": "B40"
+              },
+              "quantity": "40",
+              "unit": "BOX",
+              "evidenceHash": "b9ed5adeba69b8162018219d12f9b1ffe2fef28cbdf502c525983dfce406d972"
             },
-            "basis": {
-              "$alias": "physical-membership"
-            },
-            "physicalScope": [
-              "B40-physical"
-            ],
-            "occurrenceId": {
-              "$alias": "candidate-occurrence"
-            },
-            "targetId": {
-              "$alias": "B40"
-            },
-            "quantity": "40",
-            "unit": "BOX",
-            "evidenceHash": "b9ed5adeba69b8162018219d12f9b1ffe2fef28cbdf502c525983dfce406d972"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "basis": "CONTEXT",
+              "physicalScope": "USER",
+              "occurrenceId": "CONTEXT",
+              "targetId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER",
+              "evidenceHash": "USER"
+            }
           }
         },
         {
@@ -2576,20 +2467,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "overlapping-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -2659,18 +2543,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "overlapping-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -3155,20 +3029,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "arbitrary-priority"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -3235,26 +3102,25 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "resolveEvidenceConflict",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "arbitrary-priority"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-arbitrary-priority-invalid",
-            "activityId": {
-              "$alias": "old-event"
+            "slots": {
+              "activityId": {
+                "$alias": "old-event"
+              },
+              "basis": {
+                "reason": "공식 대조 근거 없음"
+              },
+              "strategy": "LAST_RECEIVED_WINS",
+              "sourcePriority": "carrier"
             },
-            "basis": {
-              "reason": "공식 대조 근거 없음"
-            },
-            "strategy": "LAST_RECEIVED_WINS",
-            "sourcePriority": "carrier"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "basis": "USER",
+              "strategy": "USER",
+              "sourcePriority": "USER"
+            }
           }
         },
         {
@@ -3273,20 +3139,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "arbitrary-priority"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -3356,18 +3215,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "arbitrary-priority"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -3806,20 +3655,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unauthorized-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -3886,26 +3728,24 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "matchSourceIdentity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unauthorized-match"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-unauthorized-match-invalid",
-            "activityId": {
-              "$alias": "old-event"
+            "slots": {
+              "activityId": {
+                "$alias": "old-event"
+              },
+              "basis": {
+                "reason": "공식 대조 근거 없음"
+              },
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "basis": {
-              "reason": "공식 대조 근거 없음"
-            },
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "activityId": "CONTEXT",
+              "basis": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -3925,20 +3765,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unauthorized-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -4008,18 +3841,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unauthorized-match"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -4458,20 +4281,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "late-old-release"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -4538,36 +4354,34 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "late-old-release"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-late-old-release-late",
-            "source": {
-              "documentId": {
-                "$alias": "old-release"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "old-release"
+                },
+                "sha256": "a8a89339efaba3980d7657dd605a408d77e8dde255e8eb91d1542f3c028c2a1f",
+                "sourceNamespace": "carrier",
+                "externalEventId": "RELEASE",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "a8a89339efaba3980d7657dd605a408d77e8dde255e8eb91d1542f3c028c2a1f",
-              "sourceNamespace": "carrier",
-              "externalEventId": "RELEASE",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "kind": "RESTRICTION_RELEASE",
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "kind": "RESTRICTION_RELEASE",
-            "targetId": {
-              "$alias": "A60"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "kind": "USER",
+              "targetId": "CONTEXT"
             }
           }
         },
@@ -4587,20 +4401,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "late-old-release"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -4670,18 +4477,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "late-old-release"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -4990,20 +4787,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unprofiled-automatic-source"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5070,37 +4860,37 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unprofiled-automatic-source"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-unprofiled-automatic-source-automatic",
-            "source": {
-              "documentId": {
-                "$alias": "unprofiled"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "unprofiled"
+                },
+                "sha256": "c3675b1ecaadbac9bfa5d3b22415750ac6edefdeda25758c351d5b8b4bf0e033",
+                "sourceNamespace": "carrier",
+                "externalEventId": "AUTO60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "c3675b1ecaadbac9bfa5d3b22415750ac6edefdeda25758c351d5b8b4bf0e033",
-              "sourceNamespace": "carrier",
-              "externalEventId": "AUTO60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "ingestionMode": "AUTOMATED",
+              "connectorProfileRevision": "UNCONFIGURED",
+              "quantity": "60",
+              "unit": "BOX"
             },
-            "ingestionMode": "AUTOMATED",
-            "connectorProfileRevision": "UNCONFIGURED",
-            "quantity": "60",
-            "unit": "BOX"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "ingestionMode": "USER",
+              "connectorProfileRevision": "USER",
+              "quantity": "USER",
+              "unit": "USER"
+            }
           }
         },
         {
@@ -5119,20 +4909,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unprofiled-automatic-source"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5228,18 +5011,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "unprofiled-automatic-source"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -5565,38 +5338,37 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "reviewed-source-profile"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-reviewed-source-profile-intake",
-            "source": {
-              "documentId": {
-                "$alias": "profile-report"
+            "slots": {
+              "source": {
+                "documentId": {
+                  "$alias": "profile-report"
+                },
+                "sha256": "c3675b1ecaadbac9bfa5d3b22415750ac6edefdeda25758c351d5b8b4bf0e033",
+                "sourceNamespace": "carrier",
+                "externalEventId": "PROFILE60",
+                "sourceVersion": "v1",
+                "occurredAt": "2026-10-05T00:00:00Z",
+                "originalOccurredAt": "2026-10-05T09:00:00+09:00",
+                "originalOffset": "+09:00",
+                "timezone": "Asia/Seoul",
+                "precision": "SECOND",
+                "recordedAt": "2026-10-07T00:00:00Z"
               },
-              "sha256": "c3675b1ecaadbac9bfa5d3b22415750ac6edefdeda25758c351d5b8b4bf0e033",
-              "sourceNamespace": "carrier",
-              "externalEventId": "PROFILE60",
-              "sourceVersion": "v1",
-              "occurredAt": "2026-10-05T00:00:00Z",
-              "originalOccurredAt": "2026-10-05T09:00:00+09:00",
-              "originalOffset": "+09:00",
-              "timezone": "Asia/Seoul",
-              "precision": "SECOND",
-              "recordedAt": "2026-10-07T00:00:00Z"
+              "targetId": {
+                "$alias": "A60"
+              },
+              "quantity": "60",
+              "unit": "BOX"
             },
-            "targetId": {
-              "$alias": "A60"
-            },
-            "quantity": "60",
-            "unit": "BOX"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "targetId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER"
+            }
           }
         },
         {
@@ -5615,20 +5387,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "reviewed-source-profile"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5696,20 +5461,11 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
+              "subjectKind": "ITEM",
+              "subjectId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "reviewed-source-profile"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "activityId": {
@@ -5802,18 +5558,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "reviewed-source-profile"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "SOURCE_QUARANTINE"
@@ -6222,24 +5968,23 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchPurchaseOrder",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-unknown"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-unknown-send",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "approvedRevision": "1",
+              "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
+              "channel": "purchase-peer"
             },
-            "approvedRevision": 1,
-            "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
-            "channel": "purchase-peer"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "approvedRevision": "USER",
+              "approvedHash": "USER",
+              "channel": "USER"
+            }
           }
         },
         {
@@ -6315,25 +6060,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-unknown"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -6416,22 +6148,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T22",
-              "subcaseId": "external-unknown"
+              "objectType": "CommandRecord"
             },
-            "subjectRefs": [
-              {
-                "type": "CommandRecord",
-                "id": {
-                  "$result": {
-                    "actionId": "send",
-                    "pointer": "/response/commandId"
-                  }
-                }
-              }
-            ],
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$result": {
+                "actionId": "send",
+                "pointer": "/response/commandId"
+              }
+            }
           }
         },
         {
@@ -6447,16 +6173,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-unknown"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "retry-target",
@@ -6483,6 +6199,10 @@
                 }
               },
               "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            },
+            "provenance": {
+              "commandId": "CONTEXT",
+              "reason": "USER"
             }
           }
         },
@@ -6561,20 +6281,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-unknown"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -6627,18 +6340,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-unknown"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "EXTERNAL_RECONCILIATION"
@@ -7114,24 +6817,23 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchPurchaseOrder",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-success-send",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "approvedRevision": "1",
+              "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
+              "channel": "purchase-peer"
             },
-            "approvedRevision": 1,
-            "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
-            "channel": "purchase-peer"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "approvedRevision": "USER",
+              "approvedHash": "USER",
+              "channel": "USER"
+            }
           }
         },
         {
@@ -7207,25 +6909,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -7334,36 +7023,35 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-success-attach-proof",
-            "artifact": {
-              "$result": {
-                "actionId": "remote-proof",
-                "pointer": "/data/receiptArtifact"
+            "slots": {
+              "artifact": {
+                "$result": {
+                  "actionId": "remote-proof",
+                  "pointer": "/data/receiptArtifact"
+                }
+              },
+              "sourceNamespace": "purchase-peer",
+              "externalOperationId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/externalOperationId"
+                }
+              },
+              "evidenceHash": {
+                "$result": {
+                  "actionId": "remote-proof",
+                  "pointer": "/data/receiptHash"
+                }
               }
             },
-            "sourceNamespace": "purchase-peer",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
-              }
-            },
-            "evidenceHash": {
-              "$result": {
-                "actionId": "remote-proof",
-                "pointer": "/data/receiptHash"
-              }
+            "subjectRefs": [],
+            "provenance": {
+              "artifact": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalOperationId": "CONTEXT",
+              "evidenceHash": "CONTEXT"
             }
           }
         },
@@ -7380,31 +7068,30 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordExternalReconciliation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-success-reconcile",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "slots": {
+              "externalOperationId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/externalOperationId"
+                }
+              },
+              "externalResult": "SUCCESS",
+              "remoteResultId": "REMOTE-RESULT-1",
+              "evidenceId": {
+                "$result": {
+                  "actionId": "attach-proof",
+                  "pointer": "/response/evidenceId"
+                }
               }
             },
-            "externalResult": "SUCCESS",
-            "remoteResultId": "REMOTE-RESULT-1",
-            "evidenceId": {
-              "$result": {
-                "actionId": "attach-proof",
-                "pointer": "/response/evidenceId"
-              }
+            "subjectRefs": [],
+            "provenance": {
+              "externalOperationId": "CONTEXT",
+              "externalResult": "USER",
+              "remoteResultId": "USER",
+              "evidenceId": "CONTEXT"
             }
           }
         },
@@ -7422,25 +7109,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -7490,22 +7164,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T22",
-              "subcaseId": "external-success"
+              "objectType": "CommandRecord"
             },
-            "subjectRefs": [
-              {
-                "type": "CommandRecord",
-                "id": {
-                  "$result": {
-                    "actionId": "send",
-                    "pointer": "/response/commandId"
-                  }
-                }
-              }
-            ],
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$result": {
+                "actionId": "send",
+                "pointer": "/response/commandId"
+              }
+            }
           }
         },
         {
@@ -7521,16 +7189,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "retry-target",
@@ -7557,6 +7215,10 @@
                 }
               },
               "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            },
+            "provenance": {
+              "commandId": "CONTEXT",
+              "reason": "USER"
             }
           }
         },
@@ -7635,20 +7297,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-success"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -7984,24 +7639,23 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchPurchaseOrder",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-failure-retry-send",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "approvedRevision": "1",
+              "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
+              "channel": "purchase-peer"
             },
-            "approvedRevision": 1,
-            "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
-            "channel": "purchase-peer"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "approvedRevision": "USER",
+              "approvedHash": "USER",
+              "channel": "USER"
+            }
           }
         },
         {
@@ -8077,25 +7731,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -8204,36 +7845,35 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-failure-retry-attach-proof",
-            "artifact": {
-              "$result": {
-                "actionId": "remote-proof",
-                "pointer": "/data/receiptArtifact"
+            "slots": {
+              "artifact": {
+                "$result": {
+                  "actionId": "remote-proof",
+                  "pointer": "/data/receiptArtifact"
+                }
+              },
+              "sourceNamespace": "purchase-peer",
+              "externalOperationId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/externalOperationId"
+                }
+              },
+              "evidenceHash": {
+                "$result": {
+                  "actionId": "remote-proof",
+                  "pointer": "/data/receiptHash"
+                }
               }
             },
-            "sourceNamespace": "purchase-peer",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
-              }
-            },
-            "evidenceHash": {
-              "$result": {
-                "actionId": "remote-proof",
-                "pointer": "/data/receiptHash"
-              }
+            "subjectRefs": [],
+            "provenance": {
+              "artifact": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalOperationId": "CONTEXT",
+              "evidenceHash": "CONTEXT"
             }
           }
         },
@@ -8250,31 +7890,30 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordExternalReconciliation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-failure-retry-reconcile",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "slots": {
+              "externalOperationId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/externalOperationId"
+                }
+              },
+              "externalResult": "FAILURE",
+              "remoteResultId": "REMOTE-RESULT-1",
+              "evidenceId": {
+                "$result": {
+                  "actionId": "attach-proof",
+                  "pointer": "/response/evidenceId"
+                }
               }
             },
-            "externalResult": "FAILURE",
-            "remoteResultId": "REMOTE-RESULT-1",
-            "evidenceId": {
-              "$result": {
-                "actionId": "attach-proof",
-                "pointer": "/response/evidenceId"
-              }
+            "subjectRefs": [],
+            "provenance": {
+              "externalOperationId": "CONTEXT",
+              "externalResult": "USER",
+              "remoteResultId": "USER",
+              "evidenceId": "CONTEXT"
             }
           }
         },
@@ -8292,25 +7931,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -8360,22 +7986,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
+              "objectType": "CommandRecord"
             },
-            "subjectRefs": [
-              {
-                "type": "CommandRecord",
-                "id": {
-                  "$result": {
-                    "actionId": "send",
-                    "pointer": "/response/commandId"
-                  }
-                }
-              }
-            ],
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$result": {
+                "actionId": "send",
+                "pointer": "/response/commandId"
+              }
+            }
           }
         },
         {
@@ -8391,16 +8011,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "retry-target",
@@ -8427,6 +8037,10 @@
                 }
               },
               "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            },
+            "provenance": {
+              "commandId": "CONTEXT",
+              "reason": "USER"
             }
           }
         },
@@ -8535,20 +8149,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -8993,24 +8600,23 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchPurchaseOrder",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-failure-no-retry-send",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "approvedRevision": "1",
+              "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
+              "channel": "purchase-peer"
             },
-            "approvedRevision": 1,
-            "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
-            "channel": "purchase-peer"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "approvedRevision": "USER",
+              "approvedHash": "USER",
+              "channel": "USER"
+            }
           }
         },
         {
@@ -9086,25 +8692,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -9213,36 +8806,35 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-failure-no-retry-attach-proof",
-            "artifact": {
-              "$result": {
-                "actionId": "remote-proof",
-                "pointer": "/data/receiptArtifact"
+            "slots": {
+              "artifact": {
+                "$result": {
+                  "actionId": "remote-proof",
+                  "pointer": "/data/receiptArtifact"
+                }
+              },
+              "sourceNamespace": "purchase-peer",
+              "externalOperationId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/externalOperationId"
+                }
+              },
+              "evidenceHash": {
+                "$result": {
+                  "actionId": "remote-proof",
+                  "pointer": "/data/receiptHash"
+                }
               }
             },
-            "sourceNamespace": "purchase-peer",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
-              }
-            },
-            "evidenceHash": {
-              "$result": {
-                "actionId": "remote-proof",
-                "pointer": "/data/receiptHash"
-              }
+            "subjectRefs": [],
+            "provenance": {
+              "artifact": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalOperationId": "CONTEXT",
+              "evidenceHash": "CONTEXT"
             }
           }
         },
@@ -9259,31 +8851,30 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordExternalReconciliation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-failure-no-retry-reconcile",
-            "externalOperationId": {
-              "$result": {
-                "actionId": "send",
-                "pointer": "/response/externalOperationId"
+            "slots": {
+              "externalOperationId": {
+                "$result": {
+                  "actionId": "send",
+                  "pointer": "/response/externalOperationId"
+                }
+              },
+              "externalResult": "FAILURE",
+              "remoteResultId": "REMOTE-RESULT-1",
+              "evidenceId": {
+                "$result": {
+                  "actionId": "attach-proof",
+                  "pointer": "/response/evidenceId"
+                }
               }
             },
-            "externalResult": "FAILURE",
-            "remoteResultId": "REMOTE-RESULT-1",
-            "evidenceId": {
-              "$result": {
-                "actionId": "attach-proof",
-                "pointer": "/response/evidenceId"
-              }
+            "subjectRefs": [],
+            "provenance": {
+              "externalOperationId": "CONTEXT",
+              "externalResult": "USER",
+              "remoteResultId": "USER",
+              "evidenceId": "CONTEXT"
             }
           }
         },
@@ -9301,25 +8892,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -9369,22 +8947,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
+              "objectType": "CommandRecord"
             },
-            "subjectRefs": [
-              {
-                "type": "CommandRecord",
-                "id": {
-                  "$result": {
-                    "actionId": "send",
-                    "pointer": "/response/commandId"
-                  }
-                }
-              }
-            ],
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$result": {
+                "actionId": "send",
+                "pointer": "/response/commandId"
+              }
+            }
           }
         },
         {
@@ -9400,16 +8972,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "retry-target",
@@ -9436,6 +8998,10 @@
                 }
               },
               "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            },
+            "provenance": {
+              "commandId": "CONTEXT",
+              "reason": "USER"
             }
           }
         },
@@ -9514,20 +9080,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-failure-no-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -9893,24 +9452,23 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchPurchaseOrder",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-no-lookup"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-no-lookup-send",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "approvedRevision": "1",
+              "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
+              "channel": "purchase-peer"
             },
-            "approvedRevision": 1,
-            "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
-            "channel": "purchase-peer"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "approvedRevision": "USER",
+              "approvedHash": "USER",
+              "channel": "USER"
+            }
           }
         },
         {
@@ -9986,25 +9544,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-no-lookup"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -10087,22 +9632,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T22",
-              "subcaseId": "external-no-lookup"
+              "objectType": "CommandRecord"
             },
-            "subjectRefs": [
-              {
-                "type": "CommandRecord",
-                "id": {
-                  "$result": {
-                    "actionId": "send",
-                    "pointer": "/response/commandId"
-                  }
-                }
-              }
-            ],
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$result": {
+                "actionId": "send",
+                "pointer": "/response/commandId"
+              }
+            }
           }
         },
         {
@@ -10118,16 +9657,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-no-lookup"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "retry-target",
@@ -10154,6 +9683,10 @@
                 }
               },
               "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            },
+            "provenance": {
+              "commandId": "CONTEXT",
+              "reason": "USER"
             }
           }
         },
@@ -10232,20 +9765,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-no-lookup"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -10298,18 +9824,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-no-lookup"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "EXTERNAL_RECONCILIATION"
@@ -10785,24 +10301,23 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchPurchaseOrder",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-local-cancel-send",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "approvedRevision": "1",
+              "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
+              "channel": "purchase-peer"
             },
-            "approvedRevision": 1,
-            "approvedHash": "e353cb557218c3db91386c55ec62e34850f3b1366ed6c539790167d3e594ae7a",
-            "channel": "purchase-peer"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "approvedRevision": "USER",
+              "approvedHash": "USER",
+              "channel": "USER"
+            }
           }
         },
         {
@@ -10878,25 +10393,12 @@
               "organizationId": {
                 "$alias": "ORG-A"
               },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
+              "workId": {
+                "$alias": "O1"
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z",
-            "workId": {
-              "$alias": "O1"
-            }
+            "knownAt": "2026-10-07T00:00:00Z"
           }
         },
         {
@@ -10975,22 +10477,19 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "cancelPurchase",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T22-external-local-cancel-cancel",
-            "workId": {
-              "$alias": "O1"
+            "slots": {
+              "workId": {
+                "$alias": "O1"
+              },
+              "reason": "로컬 취소 요청"
             },
-            "reason": "로컬 취소 요청"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "reason": "USER"
+            }
           }
         },
         {
@@ -11010,22 +10509,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
+              "objectType": "CommandRecord"
             },
-            "subjectRefs": [
-              {
-                "type": "CommandRecord",
-                "id": {
-                  "$result": {
-                    "actionId": "send",
-                    "pointer": "/response/commandId"
-                  }
-                }
-              }
-            ],
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$result": {
+                "actionId": "send",
+                "pointer": "/response/commandId"
+              }
+            }
           }
         },
         {
@@ -11041,16 +10534,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "retry-target",
@@ -11077,6 +10560,10 @@
                 }
               },
               "reason": "외부 대조 상태와 원 canonical 명령·현재 위임을 다시 확인한다"
+            },
+            "provenance": {
+              "commandId": "CONTEXT",
+              "reason": "USER"
             }
           }
         },
@@ -11155,20 +10642,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -11221,18 +10701,8 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T22",
-              "subcaseId": "external-local-cancel"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
             "kind": "EXTERNAL_RECONCILIATION"

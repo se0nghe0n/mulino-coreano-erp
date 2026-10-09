@@ -2,6 +2,11 @@
 import json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
+def _request_contract():
+ import importlib.util
+ spec=importlib.util.spec_from_file_location('request_contract',ROOT/'verification/cases/request_contract.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ return module.Contracts(ROOT)
+REQUEST_CONTRACT=_request_contract()
 TIME='2026-10-07T09:00:00Z';KNOWN='2026-10-07T09:00:01Z';NEXT='2026-10-07T10:00:00Z'
 # MRTR requestState TTL. The fixture records it and both boundary clock instants derive from it,
 # so the contract value lives in one place (T20 fixture baseline.mrtr, mcp-tests/README.md).
@@ -239,7 +244,9 @@ for v in variants:
    if code==-32022:x += [eq('unsupported-version-supported',o,'wire-protocol','wire','/response/body/error/data/supported',['2026-07-28']),eq('unsupported-version-requested',o,'wire-protocol','wire','/response/body/error/data/requested',w['request']['body']['params']['_meta']['io.modelcontextprotocol/protocolVersion'])]
  T20.append(sub('T20','wire-'+v,'raw stateless MCP '+v,o,a,x,['fixture','api','db','wire']))
 o='T20.mcp-stateless-wire'
-w=wire('wire','tools/call',{'name':'createDraft','arguments':typed()},actor='readAgent',transport='stdio');w['request']['headers']={};w['request'].pop('httpMethod',None)
+# step2r round 12: a write tool call without commandIdempotencyKey fails the tool input schema (CommandSchemas.input,
+# -32602) before authorization, so the READ-grant FORBIDDEN this subcase asserts needs the key.
+w=wire('wire','tools/call',{'name':'createDraft','arguments':{**typed(),'commandIdempotencyKey':'T20-stdio-readonly-write-denied'}},actor='readAgent',transport='stdio');w['request']['headers']={};w['request'].pop('httpMethod',None)
 a=[setup(),action('noun','getInventory'),obs('db-before'),w,action('after','getInventory'),obs('db-after','after')]
 x=[eq('stdio-readonly-outcome',o,'wire-protocol','wire','/response/body/result/structuredContent/outcome','REJECTED'),eq('stdio-forbidden',o,'domain-parity','wire','/response/body/result/structuredContent/error/code','FORBIDDEN'),eq('stdio-transport',o,'wire-protocol','wire','/response/transport','stdio'),eq('stdio-is-error',o,'domain-parity','wire','/response/body/result/isError',True,explain=WIRE_DOMAIN_ERROR_EXPLAIN)]+no_effect(o,'domain-parity')
 T20.append(sub('T20','stdio-readonly-write-denied','stdio도 현재 READ grant로 쓰기를 거부한다',o,a,x,['fixture','api','db','wire','stdio']))
@@ -572,8 +579,9 @@ for sc in T20:
 for cid,subs in [('T01',T01),('T20',T20),('T25',T25)]:
  d=ROOT/'verification/cases'/cid
  c={'schemaVersion':'1.0.0','caseId':cid,'title':{'T01':'같은 업무 세계의 역량 질문과 범위','T20':'구조화 intent·실제 wire·host skill 경계','T25':'독립 traceability와 증거 gate'}[cid],'requirementRefs':['D'+cid[1:]],'profiles':['contracts','scenarios']+(['mcp','skills','model'] if cid=='T20' else ['mcp','skills','model','deployment'] if cid=='T25' else []),'subcases':subs}
- (d/'case.json').write_text(json.dumps(c,ensure_ascii=False,indent=2)+'\n')
- (d/'fixture.json').write_text(json.dumps(fixture(cid),ensure_ascii=False,indent=2)+'\n')
+ # step2r round 12: fixture first (the request contract reads its aliases), then the case in contracts/request-contracts.json form.
+ (d/'fixture.json').write_text(json.dumps(REQUEST_CONTRACT.conform_fixture(fixture(cid)),ensure_ascii=False,indent=2)+'\n')
+ (d/'case.json').write_text(json.dumps(REQUEST_CONTRACT.conform_case(c),ensure_ascii=False,indent=2)+'\n')
  lines=['# language: ko',f'@{cid} @D{cid[1:]} @contract-red','기능: '+c['title']]
  for s in subs:
   lines += ['  시나리오: '+s['title'],f'    먼저 사례 파일 "verification/cases/{cid}/case.json"의 "{s["id"]}"를 준비한다']

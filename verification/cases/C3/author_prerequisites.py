@@ -13,6 +13,12 @@ import json
 import re
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[3]
+def _request_contract():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module.Contracts(ROOT)
+REQUEST_CONTRACT = _request_contract()  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
 DIR = ROOT / 'verification/cases/C3'
 NOW = '2026-10-07T09:00:00Z'
 END = '2026-10-08T00:00:00Z'
@@ -67,7 +73,7 @@ def alias(name): return {'$alias': name}
 def typed(value, provenance='CONTEXT'): return {'value':value,'provenance':provenance}
 def ref(action, pointer): return {'$result': {'actionId': action, 'pointer': pointer}}
 def dump(value): return json.dumps(value, ensure_ascii=False, separators=(',', ':'))
-def save(path, value): path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n')
+def save(path, value): path.write_text(json.dumps(REQUEST_CONTRACT.conform_fixture(value) if 'actors' in value else value, ensure_ascii=False, indent=2)+'\n')
 def invoke(sub, id, actor, cap, slots, revision=1, subject=None):
     return {'id':id,'kind':'invoke','actorRef':actor,'route':'api','capabilityId':cap,
             'request':{'intentKind':'COMMAND','definitionVersion':'definition-v1','capabilityId':cap,
@@ -182,7 +188,8 @@ def patch_sub(sub, cap):
         scope={'organizationId':alias('ORG-A'),'itemId':alias('P'),'workIds':[alias('WORK2'),alias('WORK')],'obligationRootId':alias('DUTY'),'includeDescendants':True}
         for a in sub['assertions']:a['scope']=copy.deepcopy(scope)
         for a in sub['actions']:
-            if 'scope' in a.get('request',{}):a['request']['scope']=copy.deepcopy(scope)
+            # step2r round 12: a target read keeps its own object scope (contracts/request-contracts.json objectType).
+            if 'scope' in a.get('request',{}) and a.get('capabilityId')!='getObject':a['request']['scope']=copy.deepcopy(scope)
             if 'observation' in a:a['observation']['scope']=copy.deepcopy(scope)
         for a in [denied,positive]:
             a['request']['scope']=copy.deepcopy(scope)
@@ -389,6 +396,7 @@ def main():
         cap=s['id'].split('-',1)[1]
         if cap in PREREQUISITE_CAPS:patch_sub(s,cap)
         finish_route_sub(s,cap)
+    REQUEST_CONTRACT.conform_case(n)
     self_check(n)
     path.write_text(render_case(n))
     feature=DIR/'scenario.feature';header=feature.read_text().split('\n')[:3]

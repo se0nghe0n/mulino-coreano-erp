@@ -3,6 +3,11 @@
 import json, hashlib, copy
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
+def _request_contract():
+ import importlib.util
+ spec=importlib.util.spec_from_file_location('request_contract',ROOT/'verification/cases/request_contract.py');module=importlib.util.module_from_spec(spec);spec.loader.exec_module(module)
+ return module.Contracts(ROOT)
+REQUEST_CONTRACT=_request_contract()  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
 H='/data/hostObservation/extractor/rawRows/facts/'
 D='/data/rawRows/'
 T='2026-10-07T09:00:00Z'; K='2026-10-07T09:00:01Z'
@@ -31,7 +36,7 @@ class Case:
   path=f'verification/cases/{self.id}/case.json';requirement=['D23'] if self.id=='T23' else ['D23','D24','D26']
   for s in self.subs:
    if any(a.get('route')=='mcp' for a in s.data['actions']) and 'mcp' not in s.data['requiredAdapters']:s.data['requiredAdapters'].append('mcp')
-  write(path,{'schemaVersion':'1.0.0','caseId':self.id,'title':self.title,'requirementRefs':requirement,'profiles':self.profiles,'subcases':[s.data for s in self.subs]})
+  write(path,REQUEST_CONTRACT.conform_case({'schemaVersion':'1.0.0','caseId':self.id,'title':self.title,'requirementRefs':requirement,'profiles':self.profiles,'subcases':[s.data for s in self.subs]}))
   lines=['# language: ko',f'@{self.id} @D23 '+('@D24 @D26 ' if self.id=='V8' else '')+'@contract-red @sit',f'기능: {self.title}']
   for s in self.subs:
    lines.extend(['',f'  시나리오: {s.data["title"]}',f'    먼저 사례 파일 "{path}"의 "{s.id}"를 준비한다'])
@@ -41,7 +46,7 @@ class Case:
 class Sub:
  def __init__(self,c,id,title,oracle,variant):
   self.c=c;self.id=id;self.oracle=oracle;self.env=f'{c.id}-{id}';self.scope={'organizationId':alias('ORG'),'environmentId':self.env}
-  fixture=f'verification/cases/{c.id}/fixtures/{id}.json';write(fixture,make_fixture(self.env,variant))
+  fixture=f'verification/cases/{c.id}/fixtures/{id}.json';write(fixture,REQUEST_CONTRACT.conform_fixture(make_fixture(self.env,variant)))
   self.data={'id':id,'title':title,'fixtureRef':fixture,'requiredAdapters':['fixture','host','api','db']+(['btp'] if id=='btp-auth-binding-tls-wire' else ['client'] if id=='supported-client-separate' else []),'actions':[{'id':'setup','kind':'installFixture','evidenceRefs':['setup:actual-installation-aliases-hash']}], 'assertions':[],'oracleExplanation':title+'.가상 입력은 운영 자료나 실제 실행 증거가 아니다. 실행하지 않은 제품 경로는 NOT_RUN이다.'}
  def action(self,id,kind,**kw):
   a={'id':id,'kind':kind,**kw,'evidenceRefs':[id+':actual-artifact']};self.data['actions'].append(a);return id

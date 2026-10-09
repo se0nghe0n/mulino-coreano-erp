@@ -37,17 +37,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-date-as-place"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -102,12 +97,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordRelation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-date-as-place"
-            },
             "subjectRefs": [],
             "slots": {
               "relation": "locatedAt",
@@ -122,10 +111,13 @@
                 "value": "2026-10-09"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-date-as-place-attempt"
+            "commandIdempotencyKey": "T07-date-as-place-attempt",
+            "provenance": {
+              "relation": "USER",
+              "sourceRef": "CONTEXT",
+              "targetRef": "USER"
+            }
           }
         },
         {
@@ -138,17 +130,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-date-as-place"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -682,17 +669,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-wrong-endpoint"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -747,12 +729,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordRelation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-wrong-endpoint"
-            },
             "subjectRefs": [],
             "slots": {
               "relation": "locatedAt",
@@ -769,10 +745,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-wrong-endpoint-attempt"
+            "commandIdempotencyKey": "T07-wrong-endpoint-attempt",
+            "provenance": {
+              "relation": "USER",
+              "sourceRef": "CONTEXT",
+              "targetRef": "CONTEXT"
+            }
           }
         },
         {
@@ -785,17 +764,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-wrong-endpoint"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -1329,17 +1303,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-cardinality-overflow"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -1394,12 +1363,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordRelation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-cardinality-overflow"
-            },
             "subjectRefs": [],
             "slots": {
               "relation": "locatedAt",
@@ -1425,10 +1388,14 @@
               ],
               "validAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-cardinality-overflow-attempt"
+            "commandIdempotencyKey": "T07-cardinality-overflow-attempt",
+            "provenance": {
+              "relation": "USER",
+              "sourceRef": "CONTEXT",
+              "targetRefs": "CONTEXT",
+              "validAt": "USER"
+            }
           }
         },
         {
@@ -1441,17 +1408,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-cardinality-overflow"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -1985,17 +1947,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unsupported-operator"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -2050,12 +2007,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unsupported-operator"
-            },
             "subjectRefs": [],
             "slots": {
               "predicate": {
@@ -2063,10 +2014,11 @@
                 "sql": "SELECT 1"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-unsupported-operator-attempt"
+            "commandIdempotencyKey": "T07-unsupported-operator-attempt",
+            "provenance": {
+              "predicate": "USER"
+            }
           }
         },
         {
@@ -2079,17 +2031,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unsupported-operator"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -2623,17 +2570,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-extension-eligible"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -2688,12 +2630,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordRelation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-extension-eligible"
-            },
             "subjectRefs": [],
             "slots": {
               "relation": "extensionAttribute",
@@ -2709,10 +2645,14 @@
                 "unit": "BOX"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-extension-eligible-attempt"
+            "commandIdempotencyKey": "T07-extension-eligible-attempt",
+            "provenance": {
+              "relation": "USER",
+              "sourceRef": "CONTEXT",
+              "attribute": "USER",
+              "value": "USER"
+            }
           }
         },
         {
@@ -2725,17 +2665,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-extension-eligible"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -3269,17 +3204,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-extension-role"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -3334,12 +3264,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordRelation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-extension-role"
-            },
             "subjectRefs": [],
             "slots": {
               "relation": "extensionAttribute",
@@ -3354,10 +3278,14 @@
                 "approveDefinition"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-extension-role-attempt"
+            "commandIdempotencyKey": "T07-extension-role-attempt",
+            "provenance": {
+              "relation": "USER",
+              "sourceRef": "CONTEXT",
+              "attribute": "USER",
+              "value": "USER"
+            }
           }
         },
         {
@@ -3370,17 +3298,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-extension-role"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -3914,17 +3837,12 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-relation-without-work"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -3971,12 +3889,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordRelation",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-relation-without-work"
-            },
             "subjectRefs": [],
             "slots": {
               "relation": "locatedAt",
@@ -3996,10 +3908,16 @@
               "validUntil": "2026-10-08T00:00:00Z",
               "basis": "confirmed-warehouse-observation"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-relation-without-work-relation"
+            "commandIdempotencyKey": "T07-relation-without-work-relation",
+            "provenance": {
+              "relation": "USER",
+              "sourceRef": "CONTEXT",
+              "targetRef": "CONTEXT",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "basis": "USER"
+            }
           }
         },
         {
@@ -4012,17 +3930,12 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-relation-without-work"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -4303,12 +4216,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -4333,10 +4240,20 @@
               "predicateInputId": "all-false-unknown",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-false-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-false-unknown",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -4352,12 +4269,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -4373,15 +4284,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-all-false-unknown",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-false-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-false-unknown",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -4394,29 +4307,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-all-false-unknown",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "all-false-unknown",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-all-false-unknown",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -4466,12 +4370,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -4496,10 +4394,20 @@
               "predicateInputId": "all-true",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-true"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-true",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -4515,12 +4423,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -4536,15 +4438,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-all-true",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-true"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-true",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -4557,29 +4461,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-all-true",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "all-true",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-all-true",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -4629,12 +4524,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -4659,10 +4548,20 @@
               "predicateInputId": "all-true-unknown",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-true-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-true-unknown",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -4678,12 +4577,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -4699,15 +4592,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-all-true-unknown",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-true-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-true-unknown",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -4720,29 +4615,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-all-true-unknown",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "all-true-unknown",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-all-true-unknown",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -4792,12 +4678,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -4822,10 +4702,20 @@
               "predicateInputId": "any-true-unknown",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-true-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-true-unknown",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -4841,12 +4731,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -4862,15 +4746,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-any-true-unknown",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-true-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-true-unknown",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -4883,29 +4769,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-any-true-unknown",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "any-true-unknown",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-any-true-unknown",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -4955,12 +4832,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -4985,10 +4856,20 @@
               "predicateInputId": "any-false",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-false"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-false",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5004,12 +4885,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -5025,15 +4900,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-any-false",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-false"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-false",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -5046,29 +4923,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-any-false",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "any-false",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-any-false",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -5118,12 +4986,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -5148,10 +5010,20 @@
               "predicateInputId": "any-false-unknown",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-false-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-false-unknown",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5167,12 +5039,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -5188,15 +5054,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-any-false-unknown",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-false-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-false-unknown",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -5209,29 +5077,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-any-false-unknown",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "any-false-unknown",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-any-false-unknown",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -5281,12 +5140,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -5311,10 +5164,20 @@
               "predicateInputId": "all-false-conflict",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-false-conflict"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-false-conflict",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5330,12 +5193,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -5351,15 +5208,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-all-false-conflict",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-false-conflict"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-false-conflict",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -5372,29 +5231,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-all-false-conflict",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "all-false-conflict",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-all-false-conflict",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -5444,12 +5294,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -5474,10 +5318,20 @@
               "predicateInputId": "any-true-conflict",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-true-conflict"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-true-conflict",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5493,12 +5347,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -5514,15 +5362,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-any-true-conflict",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-true-conflict"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-true-conflict",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -5535,29 +5385,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-any-true-conflict",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "any-true-conflict",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-any-true-conflict",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -5607,12 +5448,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -5637,10 +5472,20 @@
               "predicateInputId": "not-true",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-true"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-true",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5656,12 +5501,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -5677,15 +5516,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-not-true",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-true"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-true",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -5698,29 +5539,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-not-true",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "not-true",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-not-true",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -5770,12 +5602,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -5800,10 +5626,20 @@
               "predicateInputId": "not-false",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-false"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-false",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5819,12 +5655,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -5840,15 +5670,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-not-false",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-false"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-false",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -5861,29 +5693,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-not-false",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "not-false",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-not-false",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -5933,12 +5756,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -5963,10 +5780,20 @@
               "predicateInputId": "not-unknown",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-unknown",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -5982,12 +5809,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -6003,15 +5824,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-not-unknown",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-unknown"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-unknown",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -6024,29 +5847,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-not-unknown",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "not-unknown",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-not-unknown",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -6096,12 +5910,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -6126,10 +5934,20 @@
               "predicateInputId": "not-conflict",
               "evaluatorVersion": "predicate-v1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-conflict"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-conflict",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "predicateInputId": "USER",
+              "evaluatorVersion": "USER"
+            }
           }
         },
         {
@@ -6145,12 +5963,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -6166,15 +5978,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft-not-conflict",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-conflict"
+            "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-conflict",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -6187,29 +6001,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-predicate-truth-and-conflict"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "draft-not-conflict",
-                  "pointer": "/response/workId"
-                }
-              },
-              "predicateInputId": "not-conflict",
-              "definitionVersion": "definition-v1",
-              "evaluatorVersion": "predicate-v1"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "draft-not-conflict",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -8278,17 +8083,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -8334,12 +8134,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -8365,10 +8159,16 @@
               },
               "evidenceRole": "TRANSPORT_CLAIM"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-two-documents-one-receipt-attach-carrier"
+            "commandIdempotencyKey": "T07-two-documents-one-receipt-attach-carrier",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER",
+              "evidenceRole": "USER"
+            }
           }
         },
         {
@@ -8384,12 +8184,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -8415,10 +8209,16 @@
               },
               "evidenceRole": "RECEIPT_CONFIRMATION"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-two-documents-one-receipt-attach-warehouse"
+            "commandIdempotencyKey": "T07-two-documents-one-receipt-attach-warehouse",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER",
+              "evidenceRole": "USER"
+            }
           }
         },
         {
@@ -8434,12 +8234,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkCanonicalOccurrence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
-            },
             "subjectRefs": [],
             "slots": {
               "evidenceId": {
@@ -8470,10 +8264,15 @@
               },
               "identityBasis": "verified-distinguishable-physical-scope"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-two-documents-one-receipt-link-carrier"
+            "commandIdempotencyKey": "T07-two-documents-one-receipt-link-carrier",
+            "provenance": {
+              "evidenceId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "canonicalKind": "USER",
+              "scope": "USER",
+              "identityBasis": "USER"
+            }
           }
         },
         {
@@ -8489,12 +8288,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkCanonicalOccurrence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
-            },
             "subjectRefs": [],
             "slots": {
               "evidenceId": {
@@ -8514,10 +8307,14 @@
               },
               "identityBasis": "same-receipt-physical-scope-location-time-quantity"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-two-documents-one-receipt-link-warehouse"
+            "commandIdempotencyKey": "T07-two-documents-one-receipt-link-warehouse",
+            "provenance": {
+              "evidenceId": "CONTEXT",
+              "occurrenceId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "identityBasis": "USER"
+            }
           }
         },
         {
@@ -8533,12 +8330,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
-            },
             "subjectRefs": [],
             "slots": {
               "occurrenceId": {
@@ -8578,10 +8369,17 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-two-documents-one-receipt-receipt"
+            "commandIdempotencyKey": "T07-two-documents-one-receipt-receipt",
+            "provenance": {
+              "occurrenceId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "locationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -8594,17 +8392,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -8653,12 +8446,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
-            },
             "subjectRefs": [],
             "slots": {
               "occurrenceId": {
@@ -8692,10 +8479,17 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-two-documents-one-receipt-same-receipt"
+            "commandIdempotencyKey": "T07-two-documents-one-receipt-same-receipt",
+            "provenance": {
+              "occurrenceId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "locationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -8708,17 +8502,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-two-documents-one-receipt"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -9207,17 +8996,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-incomplete-upload"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -9263,12 +9047,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-incomplete-upload"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -9289,10 +9067,16 @@
                 "unit": "BOX"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-incomplete-upload-attach"
+            "commandIdempotencyKey": "T07-incomplete-upload-attach",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER"
+            }
           }
         },
         {
@@ -9305,24 +9089,17 @@
           "route": "api",
           "capabilityId": "getEvidence",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getEvidence",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-incomplete-upload"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "sourceNamespace": "synthetic-warehouse",
-              "externalEventId": "incomplete-upload",
-              "sourceVersion": "1",
-              "includeAvailability": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sourceNamespace": "synthetic-warehouse",
+            "externalEventId": "incomplete-upload",
+            "sourceVersion": "1"
           }
         },
         {
@@ -9335,17 +9112,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-incomplete-upload"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -9607,17 +9379,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-hash-mismatch"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -9663,12 +9430,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-hash-mismatch"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -9689,10 +9450,16 @@
                 "unit": "BOX"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-hash-mismatch-attach"
+            "commandIdempotencyKey": "T07-hash-mismatch-attach",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER"
+            }
           }
         },
         {
@@ -9705,24 +9472,17 @@
           "route": "api",
           "capabilityId": "getEvidence",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getEvidence",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-hash-mismatch"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "sourceNamespace": "synthetic-warehouse",
-              "externalEventId": "hash-mismatch",
-              "sourceVersion": "1",
-              "includeAvailability": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sourceNamespace": "synthetic-warehouse",
+            "externalEventId": "hash-mismatch",
+            "sourceVersion": "1"
           }
         },
         {
@@ -9735,17 +9495,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-hash-mismatch"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -10007,17 +9762,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-db-reference-failure"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -10084,12 +9834,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-db-reference-failure"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -10110,10 +9854,16 @@
                 "unit": "BOX"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-db-reference-failure-attach"
+            "commandIdempotencyKey": "T07-db-reference-failure-attach",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER"
+            }
           }
         },
         {
@@ -10126,24 +9876,17 @@
           "route": "api",
           "capabilityId": "getEvidence",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getEvidence",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-db-reference-failure"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "sourceNamespace": "synthetic-warehouse",
-              "externalEventId": "db-reference-failure",
-              "sourceVersion": "1",
-              "includeAvailability": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sourceNamespace": "synthetic-warehouse",
+            "externalEventId": "db-reference-failure",
+            "sourceVersion": "1"
           }
         },
         {
@@ -10156,17 +9899,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-db-reference-failure"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -10530,17 +10268,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-orphan-upload"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -10607,12 +10340,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-orphan-upload"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -10633,10 +10360,16 @@
                 "unit": "BOX"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-orphan-upload-attach"
+            "commandIdempotencyKey": "T07-orphan-upload-attach",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER"
+            }
           }
         },
         {
@@ -10649,24 +10382,17 @@
           "route": "api",
           "capabilityId": "getEvidence",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getEvidence",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-orphan-upload"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "sourceNamespace": "synthetic-warehouse",
-              "externalEventId": "orphan-upload",
-              "sourceVersion": "1",
-              "includeAvailability": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sourceNamespace": "synthetic-warehouse",
+            "externalEventId": "orphan-upload",
+            "sourceVersion": "1"
           }
         },
         {
@@ -10679,17 +10405,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-orphan-upload"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -11053,17 +10774,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unreadable-uri"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -11130,12 +10846,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unreadable-uri"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -11156,10 +10866,16 @@
                 "unit": "BOX"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-unreadable-uri-attach"
+            "commandIdempotencyKey": "T07-unreadable-uri-attach",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER"
+            }
           }
         },
         {
@@ -11172,24 +10888,17 @@
           "route": "api",
           "capabilityId": "getEvidence",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getEvidence",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unreadable-uri"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "sourceNamespace": "synthetic-warehouse",
-              "externalEventId": "unreadable-uri",
-              "sourceVersion": "1",
-              "includeAvailability": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sourceNamespace": "synthetic-warehouse",
+            "externalEventId": "unreadable-uri",
+            "sourceVersion": "1"
           }
         },
         {
@@ -11202,17 +10911,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-unreadable-uri"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -11477,12 +11181,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-immutable-authorized-download"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -11495,10 +11193,14 @@
               "externalEventId": "IMMUTABLE",
               "sourceVersion": "1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-immutable-authorized-download-upload"
+            "commandIdempotencyKey": "T07-immutable-authorized-download-upload",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           }
         },
         {
@@ -11544,17 +11246,12 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-immutable-authorized-download"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -11601,12 +11298,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T07-immutable-authorized-download"
-            },
             "subjectRefs": [],
             "slots": {
               "evidenceId": {
@@ -11623,10 +11314,15 @@
               "externalEventId": "IMMUTABLE",
               "sourceVersion": "1"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T07-immutable-authorized-download-overwrite"
+            "commandIdempotencyKey": "T07-immutable-authorized-download-overwrite",
+            "provenance": {
+              "evidenceId": "CONTEXT",
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           }
         },
         {
@@ -11705,17 +11401,12 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T07-immutable-authorized-download"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }

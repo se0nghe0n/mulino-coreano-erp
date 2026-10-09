@@ -9,13 +9,19 @@ post-restart queue evidence, the derived Korean feature and oracle-bindings.json
 import copy, hashlib, json
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[3]
+def _request_contract():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module.Contracts(ROOT)
+REQUEST_CONTRACT = _request_contract()  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
 DIR=ROOT/'verification/cases/T26'
 CASE=DIR/'case.json'
 AUTONOMOUS=[('due-wait-db-rediscovery','due-wait-autonomous-loop','tick','db'),('lot-expiry-no-event','lot-expiry-autonomous-loop','sweep','sweep-db'),('orphan-intake-recovered','orphan-intake-autonomous-loop','tick','db')]
 NEW_SUBCASES=['safe-retry-forged-original-actor','safe-retry-forged-request-hash','due-wait-autonomous-loop','lot-expiry-autonomous-loop','orphan-intake-autonomous-loop']
 OWNED_ASSERTIONS=('retry-request-','stored-','forged-','autonomous-','queue-empty-after-restart')
 FORGED_HASH='f0'*32
-def dump(path,value):path.write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
+def dump(path,value):path.write_text(json.dumps(REQUEST_CONTRACT.conform_fixture(value) if isinstance(value,dict) and 'actors' in value else value,ensure_ascii=False,indent=2)+'\n')
 def alias(x):return {'$alias':x}
 def ref(a,p):return {'$result':{'actionId':a,'pointer':p}}
 def by_id(items,id):return next(x for x in items if x['id']==id)
@@ -25,7 +31,9 @@ def rescope(node,old,new):
     return json.loads(text)
 def assertion_like(sub,template_id,**kw):
     x=copy.deepcopy(by_id(sub['assertions'],template_id));x.pop('baseline',None);x.pop('unit',None);x.pop('unitSource',None);x.pop('baselineUnitSource',None);x.update(kw);return x
-IDENTITY_FIELDS=('commandId','canonicalRequestHash','originalCommandIdempotencyKey','originalActorId')
+# step2r round 12: the forged hash travels in the contracted intent field canonicalIntentHash (contracts/intent.schema.json);
+# provenance is recomputed by verification/cases/request_contract.py after the slots are rebuilt.
+IDENTITY_FIELDS=('commandId','canonicalRequestHash','canonicalIntentHash','originalCommandIdempotencyKey','originalActorId','provenance')
 def shape_retry(action,extra=None):
     """One management shape for retrySafeCommand (as in C3): the original command identity and a reason.
     Actor, delegation, canonical hash and key are reloaded from the stored command (plan §3.3, §7.2)."""
@@ -63,8 +71,8 @@ def forged_hash(base):
     s=rescope(copy.deepcopy(base),'safe-retry-canonical-current-grant','safe-retry-forged-request-hash')
     s['id']='safe-retry-forged-request-hash';s['title']='호출자가 제시한 다른 canonical hash로 안전 재시도할 수 없다'
     s['fixtureRef']='verification/cases/T26/fixtures/safe-retry-canonical-current-grant.json'
-    s['oracleExplanation']='grant가 유효한 상태에서도 OPERATIONS가 다른 payload의 canonicalRequestHash를 함께 보내면 retry는 거부되고 이동0이다. hash는 저장 command에서만 온다(plan §7.2·§7.3).'
-    shape_retry(by_id(s['actions'],'retry'),{'canonicalRequestHash':FORGED_HASH})
+    s['oracleExplanation']='grant가 유효한 상태에서도 OPERATIONS가 다른 payload의 canonicalIntentHash를 함께 보내면 retry는 거부되고 이동0이다. hash는 저장 command에서만 온다(plan §3.3·§7.2·§7.3).'
+    shape_retry(by_id(s['actions'],'retry'),{'canonicalIntentHash':FORGED_HASH})
     keep=[a for a in s['assertions'] if a['id']=='before-movement-zero']
     s['assertions']=keep+[
         assertion_like(base,'before-movement-zero',id='forged-hash-rejected',op='equals',source={'actionId':'retry','pointer':'/response/outcome'},expected='REJECTED',oracleExplanation='저장 hash와 다른 호출자 hash로는 재시도하지 않는다.'),
@@ -97,7 +105,7 @@ def grant_pick(fixture_ref):
     f['aliases'].setdefault('TRANSIT',copy.deepcopy(TRANSIT_PLACE))
     dump(path,f)
 def transit_dispatch(sub):
-    r=by_id(sub['actions'],'dispatch')['request'];assert 'allocationId' in r,sub['id']
+    r=by_id(sub['actions'],'dispatch')['request'];r=r['slots'] if 'allocationId' in r.get('slots',{}) else r;assert 'allocationId' in r,sub['id']
     r.setdefault('cargoPlaceId',alias('TRANSIT'))
 # Inventory commands carry their basis (InventoryCommands.prepare requires evidenceRef; plan section 4.2 '근거'): the
 # original move of the safe-retry subcases and the split of the restore subcases name a synthetic basis reference.
@@ -111,8 +119,8 @@ def pick_before_guard(sub):
     reserve=by_id(acts,'reserve');r=reserve['request'];dispatch=by_id(acts,'dispatch')
     assert reserve['actorRef']==dispatch['actorRef']=='warehouse',sub['id']
     pick={'id':'pick','kind':'invoke','actorRef':'warehouse','route':'api','capabilityId':'pickQuantity',
-        'request':{'intentKind':'COMMAND','definitionVersion':r['definitionVersion'],'capabilityId':'pickQuantity','scope':copy.deepcopy(r['scope']),'asOf':r['asOf'],'knownAt':r['knownAt'],
-            'allocationId':ref('reserve','/response/allocationId'),'expectedRevision':ref('reserve','/response/revision'),'commandIdempotencyKey':'T26-'+sub['id']+'-pick'},
+        'request':{'intentKind':'COMMAND','definitionVersion':r['definitionVersion'],'capabilityId':'pickQuantity',
+            'expectedRevision':ref('reserve','/response/revision'),'commandIdempotencyKey':'T26-'+sub['id']+'-pick','slots':{'allocationId':ref('reserve','/response/allocationId')},'subjectRefs':[]},
         'evidenceRefs':['pick:actual-artifact']}
     acts.insert(acts.index(reserve)+1,pick)
     dispatch['request']['expectedRevision']=ref('pick','/response/revision')
@@ -260,6 +268,7 @@ def main():
         dump(DIR/f'fixtures/{new_id}.json',autonomous_fixture(subs[base_id]['fixtureRef'],new_id))
         order.append(autonomous(subs[base_id],new_id,trigger_id,db_id))
     c['subcases']=order
+    REQUEST_CONTRACT.conform_case(c)
     self_check(c)
     dump(CASE,c)
     feature=DIR/'scenario.feature';header=feature.read_text().split('\n')[:3]

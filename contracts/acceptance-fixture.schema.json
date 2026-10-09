@@ -133,6 +133,13 @@
               "revision": {
                 "type": "integer",
                 "minimum": 1
+              },
+              "scopeComposition": {
+                "enum": [
+                  "PER_DIMENSION",
+                  "ALL_DIMENSIONS"
+                ],
+                "description": "How the dimension kinds of scope combine (contracts/request-contracts.json grantComposition). PER_DIMENSION: one installed grant per kind, the lists act as alternatives. ALL_DIMENSIONS: one grant whose kinds intersect (the product's all-of match). Required when scope names two or more kinds (./verify prepare, check_request_contracts.py)."
               }
             },
             "required": [

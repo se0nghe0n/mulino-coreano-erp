@@ -37,17 +37,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -94,34 +89,22 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "registerItem",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
-              "name": {
-                "value": "같은 이름 비스킷",
-                "provenance": "USER"
-              },
-              "baseUnit": {
-                "value": "BOX",
-                "provenance": "USER"
-              },
+              "name": "같은 이름 비스킷",
+              "baseUnit": "BOX",
               "specification": {
-                "value": {
-                  "packaging": "sealed-box",
-                  "content": "biscuit"
-                },
-                "provenance": "USER"
+                "packaging": "sealed-box",
+                "content": "biscuit"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-register-a"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-register-a",
+            "provenance": {
+              "name": "USER",
+              "baseUnit": "USER",
+              "specification": "USER"
+            }
           }
         },
         {
@@ -137,12 +120,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkExternalId",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -157,15 +134,21 @@
               "validFrom": "2026-10-01T00:00:00Z",
               "validUntil": "2026-10-31T23:59:59Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "register-a",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-identifier-a"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-identifier-a",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "issuer": "USER",
+              "namespace": "USER",
+              "code": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER"
+            }
           }
         },
         {
@@ -181,12 +164,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -222,10 +199,15 @@
                 "occurredAt": "2026-10-07T09:00:00Z"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-evidence-a"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-evidence-a",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER"
+            }
           }
         },
         {
@@ -241,12 +223,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -264,8 +240,7 @@
               },
               "quantity": {
                 "value": "1",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "locationId": {
                 "$alias": "W"
@@ -283,15 +258,26 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "identifier-a",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-receipt-a"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-receipt-a",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "manufacturerId": "CONTEXT",
+              "lotText": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER",
+              "locationId": "CONTEXT",
+              "occurredAt": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -307,34 +293,22 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "registerItem",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
-              "name": {
-                "value": "같은 이름 비스킷",
-                "provenance": "USER"
-              },
-              "baseUnit": {
-                "value": "BOX",
-                "provenance": "USER"
-              },
+              "name": "같은 이름 비스킷",
+              "baseUnit": "BOX",
               "specification": {
-                "value": {
-                  "packaging": "sealed-box",
-                  "content": "biscuit"
-                },
-                "provenance": "USER"
+                "packaging": "sealed-box",
+                "content": "biscuit"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-register-b"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-register-b",
+            "provenance": {
+              "name": "USER",
+              "baseUnit": "USER",
+              "specification": "USER"
+            }
           }
         },
         {
@@ -350,12 +324,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkExternalId",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -370,15 +338,21 @@
               "validFrom": "2026-10-01T00:00:00Z",
               "validUntil": "2026-10-31T23:59:59Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "register-b",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-identifier-b"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-identifier-b",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "issuer": "USER",
+              "namespace": "USER",
+              "code": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER"
+            }
           }
         },
         {
@@ -394,12 +368,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -435,10 +403,15 @@
                 "occurredAt": "2026-10-07T09:00:00Z"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-evidence-b"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-evidence-b",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER"
+            }
           }
         },
         {
@@ -454,12 +427,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -477,8 +444,7 @@
               },
               "quantity": {
                 "value": "1",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "locationId": {
                 "$alias": "W"
@@ -496,15 +462,26 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "identifier-b",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T02-issuer-and-lot-context-receipt-b"
+            "commandIdempotencyKey": "T02-issuer-and-lot-context-receipt-b",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "manufacturerId": "CONTEXT",
+              "lotText": "USER",
+              "physicalScopeId": "CONTEXT",
+              "quantity": "USER",
+              "locationId": "CONTEXT",
+              "occurredAt": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -517,24 +494,18 @@
           "route": "api",
           "capabilityId": "searchObjects",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "searchObjects",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-issuer-and-lot-context"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "types": [
-                "TradeItem",
-                "ManufacturingLot"
-              ]
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "types": [
+              "TradeItem",
+              "ManufacturingLot"
+            ]
           }
         },
         {
@@ -950,12 +921,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkExternalId",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-overlap"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -968,10 +933,17 @@
               "validUntil": "2026-10-07T09:00:00Z",
               "endInclusive": false
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-period-overlap-first-link"
+            "commandIdempotencyKey": "T02-period-overlap-first-link",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "issuer": "USER",
+              "namespace": "USER",
+              "code": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "endInclusive": "USER"
+            }
           }
         },
         {
@@ -984,17 +956,12 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-overlap"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -1041,12 +1008,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkExternalId",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-overlap"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -1059,10 +1020,17 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "endInclusive": false
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-period-overlap-second-link"
+            "commandIdempotencyKey": "T02-period-overlap-second-link",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "issuer": "USER",
+              "namespace": "USER",
+              "code": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "endInclusive": "USER"
+            }
           }
         },
         {
@@ -1075,26 +1043,19 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-overlap"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "externalIdentifier": {
-                "issuer": "IT-A",
-                "namespace": "A",
-                "code": "SKU1"
-              },
-              "effectiveAt": "2026-10-07T09:00:00Z"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "externalIdentifier": {
+              "issuer": "IT-A",
+              "namespace": "A",
+              "code": "SKU1"
+            }
           }
         },
         {
@@ -1606,12 +1567,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkExternalId",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-boundary-nonoverlap"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -1624,10 +1579,17 @@
               "validUntil": "2026-10-07T09:00:00Z",
               "endInclusive": false
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-period-boundary-nonoverlap-first-link"
+            "commandIdempotencyKey": "T02-period-boundary-nonoverlap-first-link",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "issuer": "USER",
+              "namespace": "USER",
+              "code": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "endInclusive": "USER"
+            }
           }
         },
         {
@@ -1640,17 +1602,12 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-boundary-nonoverlap"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -1697,12 +1654,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "linkExternalId",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-boundary-nonoverlap"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -1715,10 +1666,17 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "endInclusive": false
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T02-period-boundary-nonoverlap-second-link"
+            "commandIdempotencyKey": "T02-period-boundary-nonoverlap-second-link",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "issuer": "USER",
+              "namespace": "USER",
+              "code": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "endInclusive": "USER"
+            }
           }
         },
         {
@@ -1731,26 +1689,19 @@
           "route": "api",
           "capabilityId": "getObject",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObject",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-period-boundary-nonoverlap"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "externalIdentifier": {
-                "issuer": "IT-A",
-                "namespace": "A",
-                "code": "SKU1"
-              },
-              "effectiveAt": "2026-10-07T09:00:00Z"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "externalIdentifier": {
+              "issuer": "IT-A",
+              "namespace": "A",
+              "code": "SKU1"
+            }
           }
         },
         {
@@ -2025,17 +1976,11 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseNamespace": "T02-conversion-no-substitution"
-            },
-            "subjectRefs": [],
-            "slots": {
               "itemId": {
                 "$alias": "P_BUNDLE"
               },
@@ -2087,32 +2032,26 @@
           "route": "api",
           "capabilityId": "convertUnit",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "convertUnit",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseNamespace": "T02-conversion-no-substitution"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "conversionId": {
-                "$alias": "CONVERSION"
-              },
-              "from": {
-                "value": "1",
-                "unit": "BUNDLE"
-              },
-              "toUnit": "EA",
-              "conversionVersion": "conversion-v1",
               "itemId": {
                 "$alias": "P_BUNDLE"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "conversionId": {
+              "$alias": "CONVERSION"
+            },
+            "from": {
+              "value": "1",
+              "unit": "BUNDLE"
+            },
+            "toUnit": "EA",
+            "conversionVersion": "conversion-v1"
           }
         },
         {
@@ -2125,32 +2064,26 @@
           "route": "api",
           "capabilityId": "evaluateEligibility",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "evaluateEligibility",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "T02-conversion-no-substitution"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "action": "FULFIL_ORDER",
-              "candidateItemId": {
-                "$alias": "P_BUNDLE"
-              },
-              "requestedItemId": {
-                "$alias": "P_EA"
-              },
-              "quantity": {
-                "value": "12",
-                "unit": "EA"
-              },
-              "substitutionPermission": "MISSING"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "FULFIL_ORDER",
+            "candidateItemId": {
+              "$alias": "P_BUNDLE"
+            },
+            "requestedItemId": {
+              "$alias": "P_EA"
+            },
+            "quantity": {
+              "value": "12",
+              "unit": "EA"
+            },
+            "substitutionPermission": "MISSING"
           }
         },
         {
@@ -2163,17 +2096,11 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseNamespace": "T02-conversion-no-substitution"
-            },
-            "subjectRefs": [],
-            "slots": {
               "itemId": {
                 "$alias": "P_BUNDLE"
               },

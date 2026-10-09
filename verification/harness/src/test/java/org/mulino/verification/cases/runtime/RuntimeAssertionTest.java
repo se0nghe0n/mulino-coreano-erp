@@ -90,8 +90,8 @@ public final class RuntimeAssertionTest {
                     JsonNode r = a.path("request");
                     assertTrue(r.path("slots").has("commandId"), id);
                     assertEquals(id.equals("safe-retry-forged-original-actor"), r.has("originalActorId"), id);
-                    assertEquals(id.equals("safe-retry-forged-request-hash"), r.has("canonicalRequestHash"), id);
-                    forgedActor |= r.has("originalActorId"); forgedHash |= r.has("canonicalRequestHash");
+                    assertEquals(id.equals("safe-retry-forged-request-hash"), r.has("canonicalIntentHash"), id);
+                    forgedActor |= r.has("originalActorId"); forgedHash |= r.has("canonicalIntentHash");
                 }
                 String op = a.path("control").path("operation").asText();
                 if (id.endsWith("-autonomous-loop") && Set.of("tickScheduler", "sweepDue").contains(op)) {

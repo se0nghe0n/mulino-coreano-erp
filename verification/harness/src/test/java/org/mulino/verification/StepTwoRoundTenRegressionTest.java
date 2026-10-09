@@ -54,9 +54,9 @@ final class StepTwoRoundTenRegressionTest {
         rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T05",T05,s->slots(s,"dispatch").remove("cargoPlaceId"),NONE));
         rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T13",T13,s->slots(s,"dispatch-sale").remove("cargoPlaceId"),NONE));
         rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"C3","api-dispatchQuantity",s->slots(s,"authorized-same-input").remove("cargoPlaceId"),NONE));
-        // T24 and T26 carry the allocation on the request itself; the place goes beside it.
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T24","audit-rollback-and-retry",s->((ObjectNode)action(s,"retry").path("request")).remove("cargoPlaceId"),NONE));
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T26","lot-expiry-no-event",s->((ObjectNode)action(s,"dispatch").path("request")).remove("cargoPlaceId"),NONE));
+        // T24 and T26 carried the allocation on the request itself; since step2r round 12 every business value is a slot.
+        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T24","audit-rollback-and-retry",s->slots(s,"retry").remove("cargoPlaceId"),NONE));
+        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T26","lot-expiry-no-event",s->slots(s,"dispatch").remove("cargoPlaceId"),NONE));
         // An internal storage place, or a TRANSIT place outside the dispatcher's (or its delegator's) place scope, is refused.
         rejects("is not a fixture Place of kind TRANSIT",run(rule,"T05",T05,s->slots(s,"dispatch").set("cargoPlaceId",alias("W2")),NONE));
         rejects("without the transit place TRANSIT",run(rule,"T05",T05,NONE,f->remove(actor(f,"ordinary").path("grant").path("scope").path("placeAliases"),"TRANSIT")));
@@ -113,10 +113,10 @@ final class StepTwoRoundTenRegressionTest {
     // Audit: dispatch and stock commands name their basis; fulfilment and moves touch internal storage only.
     @Test void commandsNameTheirBasisAndUseWarehouseStock() throws Exception {
         clean(ContractValidator::commandBasisProblems);clean(ContractValidator::warehouseCustodyProblems);
-        rejects("moveQuantity is expected to apply but names no basis",run(ContractValidator::commandBasisProblems,"T26","safe-retry-canonical-current-grant",s->((ObjectNode)action(s,"original").path("request")).remove("evidenceRef"),NONE));
-        rejects("splitQuantity is expected to apply but names no basis",run(ContractValidator::commandBasisProblems,"T26","restore-complete",s->((ObjectNode)action(s,"split").path("request")).remove("evidenceRef"),NONE));
+        rejects("moveQuantity is expected to apply but names no basis",run(ContractValidator::commandBasisProblems,"T26","safe-retry-canonical-current-grant",s->slots(s,"original").remove("evidenceRef"),NONE));
+        rejects("splitQuantity is expected to apply but names no basis",run(ContractValidator::commandBasisProblems,"T26","restore-complete",s->slots(s,"split").remove("evidenceRef"),NONE));
         rejects("but the product requires INTERNAL_STORAGE",run(ContractValidator::warehouseCustodyProblems,"T05",T05,NONE,f->((ObjectNode)f.path("aliases").path("CON40")).put("locationAlias","PORT")));
-        rejects("moveQuantity of Q20 goes to W;",run(ContractValidator::warehouseCustodyProblems,"T26","safe-retry-canonical-current-grant",s->((ObjectNode)action(s,"original").path("request")).set("destinationId",alias("W")),NONE));
+        rejects("moveQuantity of Q20 goes to W;",run(ContractValidator::warehouseCustodyProblems,"T26","safe-retry-canonical-current-grant",s->slots(s,"original").set("destinationId",alias("W")),NONE));
     }
 
     // P3 (a)/(b): an unpicked dispatch is a negative only for a pre-pick reason the case shows; a dispatch needs an allocation.
@@ -141,7 +141,7 @@ final class StepTwoRoundTenRegressionTest {
         // without an allocation, or another code, is refused.
         ObjectNode t06=sub(caseJson("T06"),"inconsistent-after-dispatch");
         assertEquals("STALE_REVISION",assertion(t06,"pending-code").path("expected").asText());assertEquals("CONFLICT",assertion(t06,"pending-rejection").path("expected").asText());
-        rejects("names no allocation",run(rule,"T06","inconsistent-after-dispatch",s->((ObjectNode)action(s,"dispatch-pending").path("request")).remove("allocationId"),NONE));
+        rejects("names no allocation",run(rule,"T06","inconsistent-after-dispatch",s->slots(s,"dispatch-pending").remove("allocationId"),NONE));
         rejects("has no picked state",run(rule,"T06","inconsistent-after-dispatch",s->assertion(s,"pending-code").put("expected","INSUFFICIENT_ELIGIBLE_QUANTITY"),NONE));
         rejects("has no picked state",run(rule,"T06","inconsistent-after-dispatch",NONE,f->{((ObjectNode)f.path("aliases").path("old-allocation")).remove("state");((ObjectNode)f.path("baseline")).remove("priorHistory");}));
         // A route-level denial without an allocation (T24 batch/worker attacks pinned FORBIDDEN) stays accepted only on those routes
