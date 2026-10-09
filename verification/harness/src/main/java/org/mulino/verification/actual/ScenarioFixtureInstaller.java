@@ -227,15 +227,14 @@ final class ScenarioFixtureInstaller {
             }
             // Dimension restrictions are installed as-is; an organization row is added only when no dimension is named.
             if(scopes.isEmpty())scopes.add(new String[]{"ORGANIZATION",org});
-            // grant.scopeComposition (Step 2 round 12): PER_DIMENSION -> one grant per dimension kind (same actions,
-            // delegator, validity, revision), so the authored dimension lists are alternatives; absent or ALL_DIMENSIONS ->
-            // one grant whose dimensions intersect (product semantics). Probe unionGrantDimensions splits every grant.
+            // User decision 2026-10-09: a grant naming several dimensions authorizes only when every dimension matches (the
+            // product's all-of rule), so a grant is installed as written whatever its scopeComposition. Only the probe flag
+            // (unionGrantDimensions, ACTUAL_RELAX_WIRE) installs one grant per dimension kind, as a diagnostic.
             String composition=grant.path("scopeComposition").asText("ALL_DIMENSIONS");
             if(!Set.of("PER_DIMENSION","ALL_DIMENSIONS").contains(composition))throw new IllegalArgumentException("Unknown grant scopeComposition "+composition);
-            boolean perDimension=unionGrantDimensions||composition.equals("PER_DIMENSION");
             Map<String,List<String[]>> groups=new LinkedHashMap<>();
-            for(String[] sc:scopes)groups.computeIfAbsent(perDimension?sc[0]:"ALL",k->new ArrayList<>()).add(sc);
-            if(groups.size()>1)conventions.add("grant of "+alias+" installed as "+groups.size()+" single-dimension grants ("+(composition.equals("PER_DIMENSION")?"scopeComposition PER_DIMENSION":"probe unionGrantDimensions")+")");
+            for(String[] sc:scopes)groups.computeIfAbsent(unionGrantDimensions?sc[0]:"ALL",k->new ArrayList<>()).add(sc);
+            if(groups.size()>1)conventions.add("grant of "+alias+" split into "+groups.size()+" single-dimension grants (probe unionGrantDimensions)");
             for(var group:groups.values()) {
                 String grantId=uuid();
                 var g=row("organizationId",org,"ID",grantId,"actorId",actor,"delegatorId",delegator,"validFrom",from,"validUntil",until,"createdAt",asOf,"recordedAt",asOf);
