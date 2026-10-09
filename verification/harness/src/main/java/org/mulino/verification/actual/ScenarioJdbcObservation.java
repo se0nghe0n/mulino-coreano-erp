@@ -129,6 +129,7 @@ final class ScenarioJdbcObservation {
     }
     /** Observation conveniences computed only from the same transaction's rows; never from the product API. */
     private static void derive(Connection c,String table,ArrayNode rows,Map<String,JsonNode> commands) throws SQLException {
+        Map<String,JsonNode> roots=new HashMap<>();
         for(JsonNode n:rows) {
             ObjectNode row=(ObjectNode)n;
             String commandId=row.path("commandId").asText(null);
@@ -141,11 +142,19 @@ final class ScenarioJdbcObservation {
                 case "mulino_commands_CommandRecords" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));row.set("status",row.path("state"));}
                 case "mulino_inventory_SegmentAllocations","mulino_inventory_Restrictions","mulino_inventory_DispositionBases" -> {if(!row.has("status"))row.set("status",row.path("state"));}
                 case "mulino_work_read_Works" -> row.set("state",row.path("status"));
-                case "mulino_work_read_ObligationReferences" -> row.set("current",row.path("valid"));
+                case "mulino_work_read_ObligationReferences" -> {row.set("current",row.path("valid"));row.set("responsibleWorkId",row.path("workId"));row.set("obligationId",row.path("rootId"));
+                    JsonNode root=row.hasNonNull("rootId")?roots.computeIfAbsent(row.path("rootId").asText(),id->root(c,id)):null;
+                    if(root!=null){if(!row.has("sourceKind"))row.set("sourceKind",root.path("sourceKind"));if(!row.has("sourceId"))row.set("sourceId",root.path("sourceId"));}}
+                case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));}
                 case "mulino_runtime_Outbox" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));}
                 default -> {}
             }
         }
+    }
+    private static JsonNode root(Connection c,String id) {
+        try(var s=c.prepareStatement("SELECT sourceKind,sourceId FROM mulino_responsibility_Roots WHERE ID=?")){s.setString(1,id);
+            try(var r=s.executeQuery()){if(!r.next())return null;var o=Json.object();o.put("sourceKind",r.getString(1));o.put("sourceId",r.getString(2));return o;}}
+        catch(SQLException failure){throw new IllegalStateException(failure);}
     }
     private static JsonNode command(Connection c,String id) {
         try(var s=c.prepareStatement("SELECT commandIdempotencyKey,capabilityId,stableRequestOwner FROM mulino_commands_CommandRecords WHERE ID=?")){s.setString(1,id);

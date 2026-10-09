@@ -27,7 +27,8 @@ public class InventoryQueries implements QueryHandler {
     if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId")))throw DomainError.forbidden();
     if(q.scope().containsKey("objectType")&&q.filters().containsKey("type")&&!Objects.equals(q.scope().get("objectType"),q.filters().get("type")))throw DomainError.invalid("Conflicting object types");
     if(Set.of("getObject","searchObjects").contains(q.operation())){if(!Set.of("type","sort").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported object filter");if(q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort")))throw DomainError.invalid("Unsupported object sort");Object type=q.scope().getOrDefault("objectType",q.filters().get("type"));var provider=objects.get(type);if(provider!=null)return provider.query(c,q);}
-    if (!Set.of("type","sort").containsAll(q.filters().keySet())) throw DomainError.invalid("Unsupported inventory filter");
+    // Plan §122 행동별 적격량: getInventory reads eligibility for one action (default SELL) and optionally one customer.
+    if (!(q.operation().equals("getInventory")?Set.of("type","sort","action","customerId"):Set.of("type","sort")).containsAll(q.filters().keySet())) throw DomainError.invalid("Unsupported inventory filter");
     if (q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort"))) throw DomainError.invalid("Unsupported inventory sort");
     if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId"))) throw DomainError.forbidden();
     return switch(q.operation()) {
@@ -91,12 +92,28 @@ public class InventoryQueries implements QueryHandler {
     data.put("eligibleQuantity",null); data.put("reservedQuantity",null); data.put("unreservedEligibleQuantity",null); data.put("cumulativeArrival",null);
     data.put("eligibilityStatus","UNKNOWN"); data.put("segmentIds",rows.stream().map(r -> r.get("ID")).toList()); data.put("segments",rows.stream().map(this::dto).toList());
     var unknowns=new ArrayList<String>();var conflicts=new ArrayList<String>();var evidence=new ArrayList<String>();var implemented=new HashSet<String>();
-    for(var provider:facts){var extra=provider.read(c,q.operation(),item,q.scope(),rows);if(!extra.values().keySet().equals(provider.metrics()))throw new IllegalStateException("Inventory metric contract differs from installed provider");data.putAll(extra.values());implemented.addAll(provider.metrics());unknowns.addAll(extra.unknowns());conflicts.addAll(extra.conflicts());evidence.addAll(extra.evidenceRefs());}
+    var factScope=eligibilityScope(q);
+    for(var provider:facts){var extra=provider.read(c,q.operation(),item,factScope,rows);if(!extra.values().keySet().equals(provider.metrics()))throw new IllegalStateException("Inventory metric contract differs from installed provider");data.putAll(extra.values());implemented.addAll(provider.metrics());unknowns.addAll(extra.unknowns());conflicts.addAll(extra.conflicts());evidence.addAll(extra.evidenceRefs());}
     if(!implemented.contains("eligibleQuantity"))unknowns.add("ELIGIBILITY_NOT_IMPLEMENTED_S1");
     if(!implemented.containsAll(Set.of("reservedQuantity","unreservedEligibleQuantity")))unknowns.add("ALLOCATION_NOT_IMPLEMENTED_S1");
     if(!implemented.contains("cumulativeArrival"))unknowns.add("CUMULATIVE_ARRIVAL_REQUIRES_CONFIRMED_RECEIPT_S3");
-    var scope=new LinkedHashMap<String,Object>(q.scope());scope.put("itemId",item);
+    var scope=new LinkedHashMap<String,Object>(q.scope());scope.put("itemId",item);if(factScope.get("customerId")!=null)scope.put("customerId",factScope.get("customerId"));
     return new QueryResult(data,scope,unknowns,conflicts,evidence,null);
+  }
+  /** Eligibility inputs of getInventory: action filter (an upper-case action token, default SELL) and customer (filter or scope, not conflicting). */
+  private static Map<String,Object> eligibilityScope(QueryRequest q) {
+    var out=new LinkedHashMap<String,Object>(q.scope());
+    Object action=q.filters().getOrDefault("action","SELL");
+    if(!(action instanceof String a)||!a.matches("[A-Z][A-Z_]{0,39}"))throw DomainError.invalid("Invalid eligibility action");
+    out.put("action",action);
+    Object customer=q.filters().get("customerId");
+    if(customer!=null){
+      if(!(customer instanceof String id))throw DomainError.invalid("Typed customer ID required");
+      try{UUID.fromString(id);}catch(IllegalArgumentException invalid){throw DomainError.invalid("UUID customer ID required");}
+      if(out.containsKey("customerId")&&!customer.equals(out.get("customerId")))throw DomainError.invalid("Conflicting customer scope");
+      out.put("customerId",customer);
+    }
+    return out;
   }
   private QueryResult trace(DomainContext c, QueryRequest q) {
     if (q.id()==null) throw DomainError.invalid("Trace ID required");

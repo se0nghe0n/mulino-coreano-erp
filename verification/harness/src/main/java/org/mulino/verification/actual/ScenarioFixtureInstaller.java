@@ -520,6 +520,7 @@ final class ScenarioFixtureInstaller {
             if(customer!=null)ensureCustomer(org,customer);
             if(quantity==null||unit==null||item==null||work==null||customer==null||!installedWork(work)){omitted.add("SalesOrderLine "+l+" (quantity/unit/item/work not resolvable)");continue;}
             if(!a.hasNonNull("quantity"))conventions.add("SalesOrderLine "+l+" quantity/unit/destination from its order "+order);
+            if(destination!=null&&!fixture.path("aliases").path(destination).path("type").asText().equals("Place")){String place=onlyPlaceOfKind(org,"CUSTOMER");conventions.add("SalesOrderLine "+l+" destination "+destination+" is a "+fixture.path("aliases").path(destination).path("type").asText()+", not a Place; "+(place==null?"no CUSTOMER place":"the organization's only CUSTOMER place "+place)+" used");destination=place;}
             if(destination==null)destination=onlyPlaceOfKind(org,"CUSTOMER");
             if(destination==null){omitted.add("SalesOrderLine "+l+" (destination not resolvable)");continue;}
             // OrderLines columns the fixtures never state are NOT NULL in the product schema (price, currency, dueAt, endpoint,
