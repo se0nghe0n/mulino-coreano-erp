@@ -285,7 +285,56 @@
       }
     },
     "operationsWithoutProductHandler": "an operation outside 'operations' has no product handler at ce4970c4; only the shared envelope is checked and any parameter outside it needs a knownOpen entry",
-    "requiresNote": "requires lists the identifiers of which a read names at least one (InventoryQueries object/inventory/trace, WorkReadHandler, DefinitionQueries, PolicyQueries, IdentityQueries getGrant); without them the product answers TYPE_INVALID before any authorization or business rule."
+    "requiresNote": "requires lists the identifiers of which a read names at least one (InventoryQueries object/inventory/trace, WorkReadHandler, DefinitionQueries, PolicyQueries, IdentityQueries getGrant); without them the product answers TYPE_INVALID before any authorization or business rule.",
+    "objectTypes": [
+      "Product",
+      "TradeItem",
+      "ManufacturingLot",
+      "QuantitySegment",
+      "LogisticsUnit",
+      "Place",
+      "Manufacturer",
+      "Invoice",
+      "SalesOrder",
+      "SalesOrderRevision",
+      "SalesOrderLine",
+      "Delivery",
+      "DeliveryObservation",
+      "Customer",
+      "Recall",
+      "RecallScope",
+      "RegulatoryProcedure",
+      "Receipt",
+      "ReceiptObservation",
+      "PurchaseProposal",
+      "PurchaseOrder",
+      "Shipment",
+      "Return"
+    ],
+    "objectTypesNote": "Noun types getObject/searchObjects serve (ApplicationQueries base types plus every ObjectReadProvider.objectTypes at ce4970c4). The type travels as scope.objectType: a top-level type lifts into filters, which provider handlers such as RegulatoryQueries refuse.",
+    "dedicatedReads": {
+      "Work": {
+        "operation": "getWork",
+        "identifier": "id"
+      },
+      "PolicyVersion": {
+        "operation": "getPolicy",
+        "identifier": "id"
+      },
+      "DefinitionPackage": {
+        "operation": "getDefinition",
+        "identifier": "id"
+      },
+      "Grant": {
+        "operation": "getGrant",
+        "identifier": "id"
+      },
+      "ReconciliationCase": {
+        "operation": "getReconciliation",
+        "identifier": "id"
+      }
+    },
+    "dedicatedReadsNote": "A getObject of a non-noun target reads it through the plan's own read (plan section 3.4: Work through getWork, definitions through getDefinition; product PolicyQueries, IdentityQueries getGrant, EvidenceQueries getReconciliation)."
   },
   "harnessDeclarations": {
     "description": "Values a case needs that are not product request content move to the action's 'harness' object (contracts/acceptance-case.schema.json); adapters read them and never send them as request fields.",
@@ -513,6 +562,29 @@
       },
       "reason": "T21 lists the organization's definitions (drafts included) after validation; getDefinition reads one pinned definition id.",
       "closeWhen": "the query contract names a definition listing"
+    },
+    {
+      "id": "PG-TARGET-REVISION-READ",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getObject",
+          "searchObjects"
+        ],
+        "objectTypes": [
+          "Allocation",
+          "Obligation",
+          "ReturnAuthorization",
+          "Handover",
+          "Restriction",
+          "DispositionBasis",
+          "Dispatch",
+          "CommandRecord"
+        ]
+      },
+      "reason": "C3 and V4 read each command target before the command to take its revision for expectedRevision (plan sections 4.2 and 7.3). These kinds have no product read: getObject serves only noun types and no dedicated read returns them.",
+      "closeWhen": "a read returns the current revision of every command target kind"
     },
     {
       "id": "PG-QUERY-CAPABILITY-ABSENT",

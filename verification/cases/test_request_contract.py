@@ -142,7 +142,7 @@ class Conformance(unittest.TestCase):
             world = RC.World(tmp, 'f.json')
             for action in (read, inventory):
                 C.conform_action(action, 'X01', 's', world)
-        self.assertEqual({'id': A('A20'), 'scope': {'organizationId': A('ORG')}, 'type': 'QuantitySegment'}, read['request'])
+        self.assertEqual({'id': A('A20'), 'scope': {'organizationId': A('ORG'), 'objectType': 'QuantitySegment'}}, read['request'])
         self.assertEqual({'scope': {'organizationId': A('ORG'), 'itemId': A('P')}}, inventory['request'])
         self.assertEqual({'environmentId': 'env'}, inventory['harness'])
         self.assertEqual([], C.case_problems(case([read, inventory]))[0])
@@ -173,6 +173,20 @@ class QueryContract(unittest.TestCase):
         problems, known = self.check(query({'scope': {'organizationId': A('ORG')}}))
         self.assertEqual([], problems)
         self.assertTrue(any('PG-ORGANIZATION-SNAPSHOT' in k for k in known), known)
+
+    def test_non_noun_targets_use_their_own_read_or_a_recorded_gap(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            Path(tmp, 'f.json').write_text(json.dumps({'aliases': {'WORK': {'type': 'Work'}, 'ALLOC': {'type': 'Allocation'}}}))
+            world = RC.World(tmp, 'f.json')
+            work, alloc = query({'objectId': A('WORK')}, cap='getObject'), query({'objectId': A('ALLOC')}, cap='getObject', aid='alloc')
+            for action in (work, alloc):
+                C.conform_action(action, 'X01', 's', world)
+        self.assertEqual(('getWork', {'id': A('WORK')}), (work['capabilityId'], work['request']))
+        problems, known = C.case_problems(case([work, alloc]))
+        self.assertEqual([], problems)
+        self.assertTrue(any('PG-TARGET-REVISION-READ' in k for k in known), known)
+        problems, _ = C.case_problems(case([query({'id': A('X'), 'scope': {'objectType': 'MadeUp'}}, cap='getObject')]))
+        self.assertTrue(any('MadeUp is not a noun type' in p for p in problems), problems)
 
     def test_conformance_derives_identifiers_from_the_case(self):
         work = invoke(command(capabilityId='createWork'), cap='createWork', aid='work')

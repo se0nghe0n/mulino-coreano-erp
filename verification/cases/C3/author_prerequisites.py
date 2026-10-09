@@ -188,7 +188,8 @@ def patch_sub(sub, cap):
         scope={'organizationId':alias('ORG-A'),'itemId':alias('P'),'workIds':[alias('WORK2'),alias('WORK')],'obligationRootId':alias('DUTY'),'includeDescendants':True}
         for a in sub['assertions']:a['scope']=copy.deepcopy(scope)
         for a in sub['actions']:
-            if 'scope' in a.get('request',{}):a['request']['scope']=copy.deepcopy(scope)
+            # step2r round 12: a target read keeps its own object scope (contracts/request-contracts.json objectType).
+            if 'scope' in a.get('request',{}) and a.get('capabilityId')!='getObject':a['request']['scope']=copy.deepcopy(scope)
             if 'observation' in a:a['observation']['scope']=copy.deepcopy(scope)
         for a in [denied,positive]:
             a['request']['scope']=copy.deepcopy(scope)

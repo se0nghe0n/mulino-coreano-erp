@@ -443,7 +443,15 @@ class Contracts:
         if op == 'getObject' and 'type' not in request and 'objectType' not in scope:
             kind = world.alias_type(request.get('id'))
             if kind and kind != 'TradeItem':
-                request['type'] = kind
+                scope['objectType'] = kind
+        if op in ('getObject', 'searchObjects') and 'type' in request:
+            if 'objectType' in scope and scope['objectType'] != request['type']:
+                raise ValueError(f"{action.get('id')}: type differs from scope.objectType")
+            scope['objectType'] = request.pop('type')  # a top-level type lifts into filters, which provider handlers refuse
+        dedicated = self.query['dedicatedReads'].get(scope.get('objectType')) if op == 'getObject' else None
+        if dedicated:
+            scope.pop('objectType')
+            action['capabilityId'] = op = dedicated['operation']  # a non-noun target has its own read (plan section 3.4)
         self.place_by_operation(request, scope, op)
         if op == 'getObject' and 'id' not in request and 'itemId' in scope:
             request['id'] = scope['itemId']  # the object a getObject without id reads is the item its scope names
@@ -659,6 +667,9 @@ class Contracts:
                 filters[key] = request[key]
         if spec is not None:
             violations += [('filter', k) for k in filters if k not in spec['filters']]
+        for kind_value in (scope.get('objectType'), filters.get('type') if op in ('getObject', 'searchObjects') else None):
+            if isinstance(kind_value, str) and kind_value not in self.query['objectTypes']:
+                violations.append(('objectType', kind_value))
         required = (spec or {}).get('requires')
         if required and not any(present(request, path) for path in required):
             violations.append(('requires', '|'.join(required)))
@@ -666,7 +677,8 @@ class Contracts:
         for kind, key in violations:
             gap = self.query_gap(op, kind, key)
             text = {'field': f'/{key}: not a query envelope field', 'scope': f'/scope/{key}: not a {op} scope key',
-                    'filter': f'/{key}: not a {op} filter', 'requires': f': {op} needs one of {key}'}[kind]
+                    'filter': f'/{key}: not a {op} filter', 'requires': f': {op} needs one of {key}',
+                    'objectType': f'/scope/objectType: {key} is not a noun type the product serves'}[kind]
             (known if gap else problems).append(f'{text}' + (f' KNOWN_OPEN {gap}' if gap else ' (contracts/request-contracts.json queryEnvelope)'))
         for key in ('asOf', 'knownAt'):
             if key in request and not (isinstance(request[key], str) and re.match(r'^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$', request[key])):
@@ -682,6 +694,10 @@ class Contracts:
                 continue
             if kind == 'requires':
                 if match.get('missingIdentifier'):
+                    return gap['id']
+                continue
+            if kind == 'objectType':
+                if key in match.get('objectTypes', []):
                     return gap['id']
                 continue
             if match.get('anyParameter') or key in match.get({'field': 'fields', 'scope': 'scopeKeys', 'filter': 'filters'}[kind], []):
