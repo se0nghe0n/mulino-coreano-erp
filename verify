@@ -90,6 +90,11 @@ if mode in {'actual-s1','actual-s2','actual-s3','actual-s4'}:
     if len(extras)>1:
         print(mode+' accepts at most one fresh evidence directory',file=sys.stderr);finish(3)
     finish(command(['sh',ROOT/('verification/actual/'+mode.removeprefix('actual-')+'/run.sh')]+extras))
+if mode=='scenarios' and actual:
+    # The actual scenarios suite runs a freshly packaged backend against a disposable PostgreSQL container.
+    # run.sh owns those resources; explicit case.json paths select a subset (never a closed gate).
+    if command([ROOT/'mvnw','-B','-ntp','-q','-f',ROOT/'backend/pom.xml','-DskipTests','package']): finish(3)
+    finish(command(['sh',ROOT/'verification/actual/scenarios/run.sh','--']+extras))
 args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare'} else ['profile',mode]+extras
 argv=['./verify']+sys.argv[1:]
 finish(command(['java',f'-Dverification.driver={"actual" if actual else "unimplemented"}',f'-Dverification.agentRunner={runner[0] if runner else "scripted"}',f'-Drepo.root={ROOT}',f'-Dverification.command={shlex.join(["./verify",mode]+extras)}',f'-Dverification.argv={json.dumps(argv)}','-cp',classpath,'org.mulino.verification.Main']+args))

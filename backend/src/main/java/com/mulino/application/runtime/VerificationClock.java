@@ -19,4 +19,10 @@ public class VerificationClock extends Clock {
  @Override public Clock withZone(ZoneId zone){if(!ZoneOffset.UTC.equals(zone))throw new IllegalArgumentException("Verification clock is UTC");return this;}
  @Override public Instant instant(){return now.get();}
  public Instant advance(Instant next){return now.updateAndGet(previous->{if(next.isBefore(previous))throw new IllegalArgumentException("Clock cannot go backwards");return next;});}
+ /**
+  * Scenario isolation boundary only: a suite installs one fresh synthetic organization per subcase and starts that
+  * subcase at its own fixture asOf, which may precede the previous subcase's last instant. Within a subcase the
+  * clock still only moves forward through advance().
+  */
+ public Instant resetForFixture(Instant start){now.set(start);return start;}
 }

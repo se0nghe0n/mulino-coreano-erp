@@ -1,0 +1,27 @@
+{
+  "synthetic": true,
+  "isolatedLoopbackOnly": true,
+  "deployedIssuer": "https://mulino-native.invalid",
+  "deployedAudience": "isolated-ontology",
+  "issuerMappings": {
+    "https://fixture.invalid/issuer": "https://mulino-native.invalid",
+    "https://fixture.invalid/identity": "https://mulino-native.invalid",
+    "synthetic-test-issuer": "https://mulino-native.invalid",
+    "synthetic-issuer": "https://mulino-native.invalid",
+    "synthetic-local-issuer": "https://mulino-native.invalid",
+    "synthetic-platform-issuer": "https://mulino-native.invalid",
+    "synthetic-fixture-issuer": "https://mulino-native.invalid",
+    "fixture-issuer": "https://mulino-native.invalid",
+    "https://mulino-native.invalid": "https://mulino-native.invalid"
+  },
+  "audienceMappings": {
+    "mulino-acceptance": "isolated-ontology",
+    "isolated-ontology": "isolated-ontology",
+    "isolated-ontology-test": "isolated-ontology",
+    "ontology-fixture": "isolated-ontology",
+    "isolated-test-product": "isolated-ontology"
+  },
+  "untrustedIssuers": ["https://untrusted.invalid/issuer"],
+  "untrustedAudiences": ["wrong-audience"],
+  "_note": "Untrusted issuer/audience values are authored negative identities. They are kept verbatim: the credential is signed with the authored iss/aud, so the backend must reject it. No mapping broadens grant scope or time."
+}

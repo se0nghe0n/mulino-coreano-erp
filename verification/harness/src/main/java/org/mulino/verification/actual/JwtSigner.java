@@ -23,7 +23,9 @@ public final class JwtSigner {
     public String sign(JsonNode actor) {
         try {
             Instant now=Instant.now(); var claims=Json.object();
-            claims.put("iss",configuration.issuer()).put("aud",configuration.audience()).put("sub",Json.required(actor,"subject"));
+            // A declared untrusted authored identity keeps its own iss/aud so the backend must reject it.
+            boolean untrusted=actor.path(ActualFixtureBindings.UNTRUSTED).asBoolean(false);
+            claims.put("iss",untrusted?Json.required(actor,"issuer"):configuration.issuer()).put("aud",untrusted?Json.required(actor,"audience"):configuration.audience()).put("sub",Json.required(actor,"subject"));
             claims.put("jti",java.util.UUID.randomUUID().toString());
             claims.put("organizationId",Json.required(actor,"organizationAlias"));
             // This claim satisfies the S0 decoder shape; current server identity ignores it for ownership.

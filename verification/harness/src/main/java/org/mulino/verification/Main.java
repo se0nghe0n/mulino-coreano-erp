@@ -61,8 +61,17 @@ public final class Main {
                 selected++;
                 CaseRunner runner=new CaseRunner(validator,driver,agentRunner,path,Json.required(sub,"id"));
                 started++;
-                String status=runner.run(mode.equals("red")); anyFail|=status.equals("FAIL");anyNotRun|=status.equals("NOT_RUN");
-                cases.add(runner.evidence(status,System.getProperty("verification.command","Java acceptance harness")));
+                String status;String harnessError=null;
+                if(actual) {
+                    // Actual suite: one subcase's adapter/environment error is that subcase's FAIL, never an abort of the
+                    // remaining subcases and never a silent skip. Actions after the failing one stay unexecuted.
+                    try { status=runner.run(false); }
+                    catch(Exception|AssertionError e) { status="FAIL";harnessError=e.getClass().getSimpleName()+": "+rootMessage(e); }
+                } else status=runner.run(mode.equals("red"));
+                anyFail|=status.equals("FAIL");anyNotRun|=status.equals("NOT_RUN");
+                ObjectNode subEvidence=runner.evidence(status,System.getProperty("verification.command","Java acceptance harness"));
+                if(harnessError!=null) subEvidence.put("harnessError",harnessError);
+                cases.add(subEvidence);
                 completed++;
             }
         }
@@ -219,6 +228,11 @@ public final class Main {
         ObjectNode gate=Json.object().put("profile","recovery").put("gate","SCHEDULER_CYCLE_RECORD").put("status","NOT_RUN_GATED").put("reason",SCHEDULER_CYCLE_GATE);
         gate.set("subcases",Json.MAPPER.valueToTree(subcases));gate.set("assertions",Json.MAPPER.valueToTree(assertions));gate.set("observations",Json.MAPPER.valueToTree(observations));
         return gate;
+    }
+    private static String rootMessage(Throwable e) {
+        StringBuilder b=new StringBuilder(String.valueOf(e.getMessage()));
+        for(Throwable c=e.getCause();c!=null&&c!=e;c=c.getCause()) {b.append(" <- ").append(c.getClass().getSimpleName()).append(": ").append(c.getMessage());if(c.getCause()==c)break;}
+        String s=b.toString();return s.length()>1500?s.substring(0,1500):s;
     }
     private static void collectActions(JsonNode actions,List<JsonNode> out) {for(JsonNode a:actions) {out.add(a);for(JsonNode b:a.path("branches")) collectActions(b.path("actions"),out);}}
     private static List<Path> discoverCases(Path root) throws IOException {

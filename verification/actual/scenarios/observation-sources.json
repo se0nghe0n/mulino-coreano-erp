@@ -1,0 +1,342 @@
+{
+  "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
+  "schemaVersion": "1.0.0",
+  "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED.",
+  "sources": {
+    "segments": [
+      "mulino_inventory_QuantitySegments"
+    ],
+    "movements": [
+      "mulino_inventory_QuantityMovements"
+    ],
+    "allocations": [
+      "mulino_inventory_SegmentAllocations"
+    ],
+    "newAllocations": [
+      "mulino_inventory_SegmentAllocations"
+    ],
+    "approvals": [
+      "mulino_commands_Approvals",
+      "mulino_trade_purchase_Approvals",
+      "mulino_trade_recall_Approvals",
+      "mulino_governance_PolicyApprovals"
+    ],
+    "works": [
+      "mulino_work_read_Works"
+    ],
+    "goals": [
+      "mulino_work_read_GoalReferences"
+    ],
+    "goalVersions": [
+      "mulino_work_read_GoalReferences"
+    ],
+    "obligations": [
+      "mulino_work_read_ObligationReferences"
+    ],
+    "assignments": [
+      "mulino_work_read_ObligationReferences"
+    ],
+    "assessments": [
+      "mulino_work_read_AssessmentReferences"
+    ],
+    "assessmentInputs": [
+      "mulino_evaluation_InputSnapshots"
+    ],
+    "outbox": [
+      "mulino_runtime_Outbox"
+    ],
+    "businessOutbox": [
+      "mulino_runtime_Outbox"
+    ],
+    "externalDeliveries": [
+      "mulino_runtime_Outbox"
+    ],
+    "commands": [
+      "mulino_commands_CommandRecords"
+    ],
+    "command_records": [
+      "mulino_commands_CommandRecords"
+    ],
+    "commandResults": [
+      "mulino_commands_CommandRecords"
+    ],
+    "idempotency": [
+      "mulino_commands_CommandRecords"
+    ],
+    "audit": [
+      "mulino_commands_CommandAudits"
+    ],
+    "claims": [
+      "mulino_evidence_Claims"
+    ],
+    "events": [
+      "mulino_evidence_Events"
+    ],
+    "evidenceLinks": [
+      "mulino_evidence_EvidenceLinks"
+    ],
+    "documents": [
+      "mulino_evidence_DocumentVersions"
+    ],
+    "evidence": [
+      "mulino_evidence_DocumentVersions"
+    ],
+    "evidence_revisions": [
+      "mulino_evidence_DocumentVersions"
+    ],
+    "inbox": [
+      "mulino_evidence_InboxRecords"
+    ],
+    "intakes": [
+      "mulino_evidence_InboxRecords"
+    ],
+    "intake": [
+      "mulino_evidence_InboxRecords"
+    ],
+    "reconciliations": [
+      "mulino_evidence_Reconciliations",
+      "mulino_runtime_ExternalReconciliations"
+    ],
+    "source_profiles": [
+      "mulino_evidence_SourceProfiles"
+    ],
+    "canonicalOccurrences": [
+      "mulino_evidence_CanonicalOccurrences"
+    ],
+    "canonical_links": [
+      "mulino_evidence_EvidenceLinks"
+    ],
+    "observationCoverage": [
+      "mulino_evidence_CompletionCoverages"
+    ],
+    "grants": [
+      "mulino_identity_Grants"
+    ],
+    "capabilityAssignments": [
+      "mulino_identity_CapabilityAssignments"
+    ],
+    "managementAuthorities": [
+      "mulino_identity_ManagementAuthorities"
+    ],
+    "boundaries": [
+      "mulino_governance_PolicyBoundaries",
+      "mulino_identity_AuthorityInvalidations"
+    ],
+    "fenceCommits": [
+      "mulino_identity_AuthorityFences",
+      "mulino_governance_PolicyFences"
+    ],
+    "definitions": [
+      "mulino_definitions_DefinitionVersions"
+    ],
+    "definitionRevisions": [
+      "mulino_definitions_DefinitionVersions"
+    ],
+    "compatibilityManifests": [
+      "mulino_definitions_CapabilityContracts"
+    ],
+    "contracts": [
+      "mulino_definitions_CapabilityContracts"
+    ],
+    "policies": [
+      "mulino_governance_PolicyVersions"
+    ],
+    "activePolicies": [
+      "mulino_governance_ActivePolicies"
+    ],
+    "policyDrafts": [
+      "mulino_governance_PolicyDrafts"
+    ],
+    "policyApprovals": [
+      "mulino_governance_PolicyApprovals"
+    ],
+    "relations": [
+      "mulino_inventory_ObjectRelations"
+    ],
+    "constraints": [
+      "mulino_inventory_Restrictions",
+      "mulino_inventory_DispositionBases"
+    ],
+    "restrictions": [
+      "mulino_inventory_Restrictions"
+    ],
+    "dispositionBases": [
+      "mulino_inventory_DispositionBases"
+    ],
+    "genealogy": [
+      "mulino_inventory_GenealogyEdges"
+    ],
+    "logisticsMemberships": [
+      "mulino_inventory_LogisticsMemberships"
+    ],
+    "stocktakes": [
+      "mulino_inventory_Stocktakes"
+    ],
+    "unitConversions": [
+      "mulino_inventory_UnitConversions"
+    ],
+    "externalIdentifiers": [
+      "mulino_inventory_ExternalIdentifiers"
+    ],
+    "items": [
+      "mulino_inventory_TradeItems"
+    ],
+    "lots": [
+      "mulino_inventory_ManufacturingLots"
+    ],
+    "decisions": [
+      "mulino_quality_Decisions"
+    ],
+    "qcDecisions": [
+      "mulino_quality_Decisions"
+    ],
+    "handovers": [
+      "mulino_responsibility_Handovers"
+    ],
+    "dutyTransitions": [
+      "mulino_responsibility_Handovers"
+    ],
+    "workLinks": [
+      "mulino_work_WorkLinks"
+    ],
+    "contributions": [
+      "mulino_work_WorkContributions"
+    ],
+    "executionAttempts": [
+      "mulino_runtime_ExecutionAttempts"
+    ],
+    "attempts": [
+      "mulino_runtime_ExecutionAttempts"
+    ],
+    "recoveries": [
+      "mulino_trade_recall_Actions"
+    ],
+    "recoveryObligations": [
+      "mulino_runtime_RecoverySchedules"
+    ],
+    "validityBoundaries": [
+      "mulino_runtime_RecoverySchedules"
+    ],
+    "orders": [
+      "mulino_trade_sales_Orders",
+      "mulino_trade_purchase_Orders"
+    ],
+    "purchaseOrders": [
+      "mulino_trade_purchase_Orders"
+    ],
+    "proposals": [
+      "mulino_trade_purchase_Proposals"
+    ],
+    "purchaseRevisions": [
+      "mulino_trade_purchase_ProposalRevisions"
+    ],
+    "supplierCommitments": [
+      "mulino_trade_purchase_SupplierReplies"
+    ],
+    "receiptContributions": [
+      "mulino_trade_purchase_ReceiptCredits"
+    ],
+    "cancellationRequests": [
+      "mulino_trade_purchase_Cancellations"
+    ],
+    "deliveries": [
+      "mulino_trade_sales_Deliveries"
+    ],
+    "returns": [
+      "mulino_trade_returns_Receipts"
+    ],
+    "dispositions": [
+      "mulino_trade_returns_Dispositions"
+    ],
+    "receipts": [
+      "mulino_trade_receipt_Receipts"
+    ],
+    "shipments": [
+      "mulino_trade_shipment_Shipments"
+    ],
+    "legs": [
+      "mulino_trade_shipment_ShipmentLegs"
+    ],
+    "cargoAllocations": [
+      "mulino_trade_shipment_CargoAllocations"
+    ],
+    "custodyHandovers": [
+      "mulino_trade_shipment_CustodyHandovers"
+    ],
+    "recallScopes": [
+      "mulino_trade_recall_Scopes"
+    ],
+    "recallClosures": [
+      "mulino_trade_recall_Closures"
+    ],
+    "investigations": [
+      "mulino_trade_recall_Investigations"
+    ],
+    "notices": [
+      "mulino_trade_recall_Actions"
+    ],
+    "invoices": [
+      "mulino_trade_settlement_Invoices"
+    ],
+    "charges": [
+      "mulino_trade_settlement_Charges"
+    ],
+    "paymentReferences": [
+      "mulino_trade_settlement_PaymentReferences"
+    ],
+    "settlementAdjustments": [
+      "mulino_trade_settlement_Adjustments"
+    ],
+    "adjustmentProposals": [
+      "mulino_trade_settlement_Adjustments"
+    ],
+    "purchaseMatches": [
+      "mulino_trade_settlement_Matches"
+    ],
+    "saleMatches": [
+      "mulino_trade_settlement_Matches"
+    ],
+    "procedures": [
+      "mulino_trade_regulatory_Procedures"
+    ],
+    "regulatoryDecisions": [
+      "mulino_trade_regulatory_DecisionVersions"
+    ],
+    "labels": [
+      "mulino_trade_regulatory_LabelVerifications"
+    ]
+  },
+  "approximate": [
+    "adjustmentProposals",
+    "attempts",
+    "boundaries",
+    "businessOutbox",
+    "cancellationRequests",
+    "canonical_links",
+    "commandResults",
+    "compatibilityManifests",
+    "constraints",
+    "contracts",
+    "definitionRevisions",
+    "dutyTransitions",
+    "evidence",
+    "evidence_revisions",
+    "externalDeliveries",
+    "fenceCommits",
+    "idempotency",
+    "intake",
+    "intakes",
+    "newAllocations",
+    "notices",
+    "observationCoverage",
+    "orders",
+    "qcDecisions",
+    "receiptContributions",
+    "recoveries",
+    "recoveryObligations",
+    "saleMatches",
+    "supplierCommitments",
+    "validityBoundaries"
+  ],
+  "approximateNote": "Sources whose table choice is a guess; an assertion failure on them is classified ADAPTER until the mapping is confirmed."
+}
