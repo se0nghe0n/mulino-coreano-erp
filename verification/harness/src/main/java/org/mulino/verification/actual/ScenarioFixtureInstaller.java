@@ -21,7 +21,15 @@ import org.mulino.verification.Json;
  */
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
-        "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion");
+        "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation");
+    /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
+    static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation");
+    /**
+     * Grant scope keys with no installable product dimension: mulino_identity_GrantScopes.scopeKind is CHECKed to
+     * ORGANIZATION, TARGET, WORK, ITEM, PLACE, SOURCE. The grant is installed without them (broader than authored), so the
+     * fact stays in omittedFacts (fixture incomplete) and is listed in notRepresentedFacts as a Step 2/product finding.
+     */
+    static final Set<String> UNREPRESENTED_SCOPE=Set.of("workKinds","derivedSegmentsWithinSamePhysicalRoot","settlementModes","basisKinds","customerAliases","supplierAliases");
     /** Baseline keys that are descriptive only (no product row is implied). */
     static final Set<String> DESCRIPTIVE_BASELINE=Set.of("setupIsExecutionCoverage","identitySources","traceabilitySeed","policy","fixtureClassification","installationMode",
         "rolesAreDescriptiveNotImplicitAuthority","sentinelIsSyntheticNotCredential","approvalNote","operationUnderTest","syntheticPolicyBasis");
@@ -37,6 +45,11 @@ final class ScenarioFixtureInstaller {
     private final Map<String,String> externals=new LinkedHashMap<>();
     private final List<String> omitted=new ArrayList<>();
     private final List<String> conventions=new ArrayList<>();
+    /** Authored facts the product has no row or authorization dimension for: reported (Step 2/product findings), not an installer gap. */
+    private final List<String> notRepresented=new ArrayList<>();
+    private OffsetDateTime knownAt;
+    private final Path blobRoot=System.getProperty("verification.actual.blobRoot")==null?null:Path.of(System.getProperty("verification.actual.blobRoot"));
+    private final List<Path> writtenBlobs=new ArrayList<>();
     private OffsetDateTime asOf;
     private String defaultOrgAlias;
     private Connection c;
@@ -65,7 +78,8 @@ final class ScenarioFixtureInstaller {
     }
     private ObjectNode run() throws Exception {
         if(!fixture.path("synthetic").asBoolean(false))throw new IllegalArgumentException("Only synthetic fixtures allowed");
-        asOf=time(Json.required(fixture.path("clock"),"asOf"));
+        asOf=time(Json.required(fixture.path("clock"),"asOf"));knownAt=fixture.path("clock").hasNonNull("knownAt")?time(fixture.path("clock").path("knownAt").asText()):asOf;
+        normalizeAliases();
         fixture.path("aliases").fieldNames().forEachRemaining(a->aliases.put(a,UUID.randomUUID().toString()));
         // Authored root delegators that are not aliases still need an actor id.
         for(JsonNode actor:fixture.path("actors")) {String d=actor.path("grant").path("delegatorAlias").asText(null);if(d!=null&&!aliases.has(d))aliases.put(d,UUID.randomUUID().toString());}
@@ -76,16 +90,16 @@ final class ScenarioFixtureInstaller {
             c=connection;c.setAutoCommit(false);
             try {
                 for(String org:externals.keySet()) insert("mulino_identity_Organizations",row("ID",aliases.path(org).asText(),"externalAlias",externals.get(org),"createdAt",asOf,"recordedAt",asOf));
-                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();evidence();grants();
+                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();sourceProfiles();evidence();sales();allocations();grants();
                 if(!partial&&!omitted.isEmpty())throw new UnsupportedOperationException("scenario fixture facts not installable: "+String.join("; ",omitted.subList(0,Math.min(12,omitted.size()))));
                 c.commit();
-            } catch(Exception failure){c.rollback();throw failure;}
+            } catch(Exception failure){c.rollback();for(Path b:writtenBlobs)java.nio.file.Files.deleteIfExists(b);throw failure;}
         }
         var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));
         if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));
         result.put("organizationExternalAlias",externals.get(defaultOrgAlias));result.set("organizationExternalAliases",Json.MAPPER.valueToTree(externals));
-        result.put("installer","scenario-fixture-installer-v1").put("recordedAtRule","every installed row recordedAt=createdAt=fixture clock asOf (starting clock)");
-        result.put("fixtureComplete",omitted.isEmpty());result.set("omittedFacts",Json.MAPPER.valueToTree(omitted));result.set("installerConventions",Json.MAPPER.valueToTree(conventions));
+        result.put("installer","scenario-fixture-installer-v2").put("recordedAtRule","every installed row recordedAt=createdAt=fixture clock asOf (starting clock); evidence declared recordedAt later than the fixture knownAt is recorded at that declared instant (late-known)");
+        result.put("fixtureComplete",omitted.isEmpty());result.set("omittedFacts",Json.MAPPER.valueToTree(omitted));result.set("notRepresentedFacts",Json.MAPPER.valueToTree(notRepresented));result.set("installerConventions",Json.MAPPER.valueToTree(conventions));
         result.put("committed",true).put("businessExecutionClaimed",false);return result;
     }
 
@@ -108,14 +122,63 @@ final class ScenarioFixtureInstaller {
         fixture.path("baseline").fields().forEachRemaining(e->{
             String k=e.getKey();JsonNode v=e.getValue();
             if(DESCRIPTIVE_BASELINE.contains(k)||v.isNull()||v.isBoolean()&&!v.asBoolean()||v.isContainerNode()&&v.isEmpty())return;
-            if(Set.of("segments","works","work").contains(k))return;
+            if(CONSUMED_BASELINE.contains(k))return;
             omitted.add("baseline."+k);
         });
-        if(!fixture.path("responsibilities").isEmpty())omitted.add("responsibilities ("+fixture.path("responsibilities").size()+")");
-        if(!fixture.path("evidence").isEmpty())omitted.add("evidence events/claims/verifications (documents installed with availability UNKNOWN only)");
+        responsibilitySurvey();
+        if(!fixture.path("evidence").isEmpty())notRepresented.add("evidence events/claims/verified chains: an authored evidence entry states hash, namespace and times only (no event kind, claim or canonical scope); the chain is built by the case's own evidence commands");
         for(var it=fixture.path("actors").fields();it.hasNext();) {var e=it.next();
-            for(var s=e.getValue().path("grant").path("scope").fieldNames();s.hasNext();){String k=s.next();if(!GRANT_METADATA.contains(k)&&scopeKind(k)==null)omitted.add("grantScope "+k+" ("+e.getKey()+")");}
+            for(var s=e.getValue().path("grant").path("scope").fieldNames();s.hasNext();){String k=s.next();if(GRANT_METADATA.contains(k)||scopeKind(k)!=null)continue;
+                if(UNREPRESENTED_SCOPE.contains(k)){String note="grantScope "+k+" (no product grant scope kind; grant installed without it)";if(!notRepresented.contains(note))notRepresented.add(note);}omitted.add("grantScope "+k+" ("+e.getKey()+")");}
         }
+    }
+
+    /**
+     * Baseline lists that restate alias attributes are merged into the alias entries (authored alias keys win):
+     * items (baseUnit, fractionDigits -> decimalPlaces), places (kind), lots (itemAlias, expiry -> expiresAt), documents
+     * (path, mediaType, sha256), priorEntities (per-alias state, quantity, revision, ...), baseline.salesOrder and
+     * baseline.allocations / baseline.allocation (an unaliased allocation binds to the fixture's only Allocation alias).
+     */
+    private void normalizeAliases() {
+        ObjectNode all=(ObjectNode)fixture.path("aliases");JsonNode b=fixture.path("baseline");
+        for(String key:List.of("items","places","lots","documents"))for(JsonNode e:b.path(key))if(e.hasNonNull("alias")&&all.has(e.path("alias").asText()))merge((ObjectNode)all.path(e.path("alias").asText()),e);
+        for(JsonNode e:b.path("items"))if(e.has("fractionDigits")&&all.path(e.path("alias").asText()) instanceof ObjectNode a&&!a.has("decimalPlaces"))a.set("decimalPlaces",e.path("fractionDigits"));
+        for(JsonNode e:b.path("lots"))if(e.has("expiry")&&all.path(e.path("alias").asText()) instanceof ObjectNode a&&!a.has("expiresAt"))a.set("expiresAt",e.path("expiry"));
+        for(var it=b.path("priorEntities").fields();it.hasNext();){var e=it.next();if(all.path(e.getKey()) instanceof ObjectNode a&&e.getValue().isObject())merge(a,e.getValue());}
+        JsonNode so=b.path("salesOrder");
+        if(so.isObject()&&so.hasNonNull("alias")) {
+            if(!all.has(so.path("alias").asText()))all.set(so.path("alias").asText(),Json.object().put("type","SalesOrder"));
+            merge((ObjectNode)all.path(so.path("alias").asText()),so);
+            if(so.hasNonNull("lineAlias")){String line=so.path("lineAlias").asText();if(!all.has(line))all.set(line,Json.object().put("type","SalesOrderLine"));var l=(ObjectNode)all.path(line);merge(l,so);l.put("salesOrderAlias",so.path("alias").asText());l.remove("lineAlias");l.put("type","SalesOrderLine");}
+        }
+        for(JsonNode e:b.path("allocations"))if(e.hasNonNull("alias")){if(!all.has(e.path("alias").asText()))all.set(e.path("alias").asText(),Json.object().put("type","Allocation"));merge((ObjectNode)all.path(e.path("alias").asText()),e);}
+        JsonNode one=b.path("allocation");
+        if(one.isObject()&&!one.isEmpty()) {
+            List<String> allocs=new ArrayList<>();all.fields().forEachRemaining(e->{if(e.getValue().path("type").asText().equals("Allocation"))allocs.add(e.getKey());});
+            String target=one.hasNonNull("alias")?one.path("alias").asText():allocs.size()==1?allocs.get(0):null;
+            if(target==null){target="baseline-allocation";all.set(target,Json.object().put("type","Allocation"));conventions.add("baseline.allocation installed under synthetic alias "+target);}
+            if(!all.has(target))all.set(target,Json.object().put("type","Allocation"));
+            var a=(ObjectNode)all.path(target);merge(a,one);
+            if(!a.has("segmentAlias")&&one.hasNonNull("scopeAlias"))a.set("segmentAlias",one.path("scopeAlias"));
+            if(!a.has("workAlias")&&one.hasNonNull("responsibleWorkAlias"))a.set("workAlias",one.path("responsibleWorkAlias"));
+            if(!a.has("state")&&one.hasNonNull("status"))a.set("state",one.path("status"));
+        }
+        // An alias added above needs an installation id.
+        all.fieldNames().forEachRemaining(a->{if(!aliases.has(a))aliases.put(a,UUID.randomUUID().toString());});
+    }
+    private static void merge(ObjectNode into,JsonNode from){from.fields().forEachRemaining(f->{if(!f.getKey().equals("alias")&&!into.has(f.getKey()))into.set(f.getKey(),f.getValue());});}
+    private int revision(JsonNode entry){return entry.hasNonNull("revision")?entry.path("revision").asInt():fixture.path("baseline").path("entityRevisions").path("initial").asInt(1);}
+    /**
+     * Fixture responsibilities name the owner/supervisor of a scope. For a Work scope they are the installed Work's
+     * owner/supervisor (works() reads them). nextAction/nextCheckAt and scopes without a Work have no product row unless
+     * an obligation kind is authored, so they are reported as not represented.
+     */
+    private void responsibilitySurvey() {
+        Set<String> works=new HashSet<>();for(String k:List.of("works","work")){JsonNode v=fixture.path("baseline").path(k);if(v.isArray())v.forEach(w->works.add(w.path("alias").asText()));else if(v.isObject())works.add(v.path("alias").asText());}
+        int unrepresented=0;
+        for(JsonNode r:fixture.path("responsibilities")){String w=r.path("scope").path("workAlias").asText(null);if(w!=null&&works.contains(w))continue;unrepresented++;}
+        if(!fixture.path("responsibilities").isEmpty())notRepresented.add("responsibility nextAction/nextCheckAt (no Work-level product column; owner/supervisor of an installed Work scope are installed on the Work)");
+        if(unrepresented>0)notRepresented.add("responsibilities without an installed Work scope ("+unrepresented+"): no product row without an obligation kind");
     }
 
     // ---- identity --------------------------------------------------------------------------------------------------
@@ -197,7 +260,7 @@ final class ScenarioFixtureInstaller {
             case "itemAliases","items","itemAlias" -> "ITEM";
             case "workAliases","works" -> "WORK";
             case "placeAliases","places" -> "PLACE";
-            case "segmentAliases","segments","lotAliases","customerAliases","supplierAliases","documentAliases","targetAliases","physicalRootAliases" -> "TARGET";
+            case "segmentAliases","segments","lotAliases","documentAliases","targetAliases","physicalRootAliases","definitionPackages","evidenceIds" -> "TARGET";
             case "sourceNamespaces" -> "SOURCE";
             default -> null;
         };
@@ -254,6 +317,7 @@ final class ScenarioFixtureInstaller {
                 var content=Json.object();content.put("description","scenario installer synthetic "+e.getKey());
                 insert(v[0],row("organizationId",org,"ID",v[1],"productId",product,"version","1","contentHash",FixtureInstaller.contentHash(content),"description",content.toString(),"createdAt",asOf,"recordedAt",asOf));
             }
+            itemUnits.put(e.getKey(),unit);
             insert("mulino_inventory_TradeItems",row("organizationId",org,"ID",id(e.getKey()),"productId",product,"name",name,"baseUnit",unit,"decimalPlaces",a.path("decimalPlaces").asInt(0),"specificationVersionId",spec,"packagingVersionId",pack,"createdAt",asOf,"recordedAt",asOf));
         }
     }
@@ -286,6 +350,7 @@ final class ScenarioFixtureInstaller {
                     conventions.add("lot "+e.getKey()+" manufacturer "+m+" ("+fixture.path("aliases").path(m).path("type").asText()+") installed as a Manufacturer row with the same id");}
             }
             else {manufacturer=uuid();insert("mulino_inventory_Manufacturers",row("organizationId",org,"ID",manufacturer,"name","synthetic manufacturer of "+e.getKey(),"createdAt",asOf,"recordedAt",asOf));conventions.add("lot "+e.getKey()+" manufacturer synthesized");}
+            installedLots.add(e.getKey());
             insert("mulino_inventory_ManufacturingLots",row("organizationId",org,"ID",id(e.getKey()),"manufacturerId",manufacturer,"itemId",id(item),"originalLot",a.path("originalLot").asText(e.getKey()),"expiresAt",a.hasNonNull("expiresAt")?time(a.path("expiresAt").asText()):null,"createdAt",asOf,"recordedAt",asOf));
         }
     }
@@ -312,11 +377,14 @@ final class ScenarioFixtureInstaller {
             if(item==null&&lot!=null)item=fixture.path("aliases").path(lot).path("itemAlias").asText(null);
             if(item==null&&lot!=null)item=inferLotItem(lot);
             if(item==null||place==null||!s.hasNonNull("quantity")||!s.hasNonNull("unit")||s.has("parentAlias")){omitted.add("segment "+alias+" (item/place/quantity/unit/parent not mappable)");continue;}
+            if(!s.path("unit").asText().equals(itemUnits.get(item))){omitted.add("segment "+alias+" unit "+s.path("unit").asText()+" differs from item "+item+" base unit (product FK forbids)");continue;}
+            if(lot!=null&&!installedLots.contains(lot)){omitted.add("segment "+alias+" lot "+lot+" not installed");continue;}
             OffsetDateTime from=s.hasNonNull("validFrom")?time(s.path("validFrom").asText()):asOf;
             for(String role:List.of("ownerAlias","custodianAlias")) if(s.hasNonNull(role)) partyActor(orgOf.get(alias),s.path(role).asText());
-            insert("mulino_inventory_QuantitySegments",row("organizationId",orgOf.get(alias),"ID",id(alias),"itemId",id(item),"lotId",lot==null?null:id(lot),"identificationStatus",lot==null?"UNKNOWN":"CONFIRMED","quantity",new BigDecimal(s.path("quantity").asText()),"unit",s.path("unit").asText(),
+            insert("mulino_inventory_QuantitySegments",row("organizationId",orgOf.get(alias),"ID",id(alias),"revision",revision(s),"itemId",id(item),"lotId",lot==null?null:id(lot),"identificationStatus",lot==null?"UNKNOWN":"CONFIRMED","quantity",new BigDecimal(s.path("quantity").asText()),"unit",s.path("unit").asText(),
                 "placeId",id(place),"controlScope",s.path("physicalScope").asText(alias),"validFrom",from,"mixtureStatus","IDENTIFIED","createdAt",asOf,"recordedAt",asOf,
                 "ownerId",s.hasNonNull("ownerAlias")?id(s.path("ownerAlias").asText()):null,"custodianId",s.hasNonNull("custodianAlias")?id(s.path("custodianAlias").asText()):null,"evidenceRef","authored-input:"+Json.required(bundle,"fixtureHash")));
+            installedSegments.add(alias);
             insert("mulino_inventory_QuantityMovements",row("organizationId",orgOf.get(alias),"ID",uuid(),"revision",1,"targetId",id(alias),"quantity",new BigDecimal(s.path("quantity").asText()),"unit",s.path("unit").asText(),"kind","INITIAL_BALANCE","occurredAt",from,"evidenceRef","authored-input:"+Json.required(bundle,"fixtureHash"),"createdAt",asOf,"recordedAt",asOf));
         }
     }
@@ -369,7 +437,7 @@ final class ScenarioFixtureInstaller {
             wait.put("overdueAction",authored.path("overdueAction").asText(w.path("overdueAction").asText("supervisor review")));
             row.put("waitJson",wait.toString());
         }
-        insert("mulino_work_read_Works",row);
+        insert("mulino_work_read_Works",row);installedWorks.add(alias);
         JsonNode goal=w.path("goal");
         if(goal.isObject()&&!goal.isEmpty()) {
             var slots=Json.object();
@@ -405,25 +473,189 @@ final class ScenarioFixtureInstaller {
         try(var s=c.prepareStatement("SELECT ID FROM mulino_definitions_DefinitionVersions WHERE organizationId=? AND version=? AND state='PUBLISHED'")){s.setString(1,org);s.setString(2,version);try(var r=s.executeQuery()){return r.next()?r.getString(1):null;}}
     }
 
-    // ---- evidence documents ----------------------------------------------------------------------------------------
-    private void evidence() throws SQLException {
-        Map<String,String> profiles=new HashMap<>();
-        String supervisor=aliases.has("supervisor")?"supervisor":null;
-        for(JsonNode e:fixture.path("evidence")) {
-            String alias=e.path("alias").asText(null);if(alias==null||!aliases.has(alias)){omitted.add("evidence entry without alias");continue;}
-            String org=orgOf.get(alias),namespace=e.path("sourceNamespace").asText("synthetic");
-            String recorder=supervisor!=null?id(supervisor):firstActor(org);
-            if(recorder==null){omitted.add("evidence "+alias+" without recorder actor");continue;}
-            String profile=profiles.get(org+":"+namespace);
-            if(profile==null){profile=uuid();profiles.put(org+":"+namespace,profile);
-                insert("mulino_evidence_SourceProfiles",row("organizationId",org,"ID",profile,"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",recorder,"namespace",namespace,"policyVersion","fixture-v1","intakeOwnerId",recorder,"supervisorId",recorder,"nextAction","authored fixture source review","nextCheckAt",asOf.plusDays(1)));}
-            String item=firstOfType(org,"TradeItem");
-            if(item==null){omitted.add("evidence "+alias+" without item subject");continue;}
-            String sha=e.path("sha256").asText();if(!sha.matches("[0-9a-f]{64}")){omitted.add("evidence "+alias+" sha256 not hex");continue;}
-            insert("mulino_evidence_DocumentVersions",row("organizationId",org,"ID",id(alias),"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",recorder,"subjectKind","ITEM","subjectId",item,"itemId",item,"sha256",sha,"byteLength",0L,"mediaType","application/octet-stream",
-                "sourceNamespace",namespace,"sourceProfileId",profile,"sourceReference",e.path("externalEventId").asText(null),"availability","UNKNOWN","provenance","{\"source\":\"scenario-installer-authored-hash-only\"}"));
+    // ---- sales orders and allocations --------------------------------------------------------------------------------
+    private final Map<String,ObjectNode> lines=new LinkedHashMap<>();
+    /**
+     * SalesOrder -> Orders + OrderRevisions(revisionNumber 1); SalesOrderLine -> OrderLines on that revision (Step 2
+     * round 11 request). A line without quantity takes quantity/unit/destination from its order; item = itemAlias, else the
+     * organization's only TradeItem; customer = customerAlias, else the order's, else the organization's only Customer;
+     * Work = workAlias/salesWorkAlias, else the order's, else baseline.work. The Work must be installed.
+     */
+    private void sales() throws Exception {
+        Map<String,String> orderWork=new HashMap<>(),orderCustomer=new HashMap<>(),orderRevision=new HashMap<>();
+        List<String> orders=aliasesOfType("SalesOrder"),saleLines=aliasesOfType("SalesOrderLine");
+        String baselineWork=fixture.path("baseline").path("work").path("alias").asText(null);
+        for(String o:orders) {
+            JsonNode a=fixture.path("aliases").path(o);String org=orgOf.get(o);
+            String work=firstAlias(a,"workAlias","salesWorkAlias");
+            if(work==null)for(String l:saleLines){JsonNode la=fixture.path("aliases").path(l);if(o.equals(la.path("salesOrderAlias").asText(o.equals(onlyInOrg("SalesOrder",org))?o:null))){work=firstAlias(la,"workAlias","salesWorkAlias");if(work!=null)break;}}
+            if(work==null&&baselineWork!=null&&aliases.has(baselineWork))work=baselineWork;
+            String customer=firstAlias(a,"customerAlias");if(customer==null)customer=onlyInOrg("Customer",org);
+            if(customer!=null)ensureCustomer(org,customer);
+            if(work==null||!installedWork(work)||customer==null){if(referencedByLine(o,saleLines))omitted.add("SalesOrder "+o+" (work/customer not resolvable)");else conventions.add("SalesOrder alias "+o+" has no line or work; not installed");continue;}
+            insert("mulino_trade_sales_Orders",row("organizationId",org,"ID",id(o),"revision",1,"currentRevision",1,"workId",id(work),"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+            String rev=uuid();insert("mulino_trade_sales_OrderRevisions",row("organizationId",org,"ID",rev,"revision",1,"orderId",id(o),"workId",id(work),"customerId",id(customer),"revisionNumber",1,"reason","authored fixture sales order","createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+            orderWork.put(o,work);orderCustomer.put(o,customer);orderRevision.put(o,rev);
+        }
+        for(String l:saleLines) {
+            JsonNode a=fixture.path("aliases").path(l);String org=orgOf.get(l);
+            String order=firstAlias(a,"salesOrderAlias","orderAlias");if(order==null)order=onlyInOrg("SalesOrder",org);
+            if(order==null||!orderRevision.containsKey(order)){
+                // A line without an installed order: an order of its own (same work/customer).
+                String work=firstAlias(a,"workAlias","salesWorkAlias");if(work==null&&baselineWork!=null&&aliases.has(baselineWork))work=baselineWork;
+                String customer=firstAlias(a,"customerAlias");if(customer==null)customer=onlyInOrg("Customer",org);
+                if(work==null||!installedWork(work)||customer==null||!a.hasNonNull("quantity")){omitted.add("SalesOrderLine "+l+" (order/work/customer/quantity not resolvable)");continue;}
+                ensureCustomer(org,customer);
+                order="order-of-"+l;aliases.put(order,uuid());orgOf.put(order,org);
+                insert("mulino_trade_sales_Orders",row("organizationId",org,"ID",id(order),"revision",1,"currentRevision",1,"workId",id(work),"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+                String rev=uuid();insert("mulino_trade_sales_OrderRevisions",row("organizationId",org,"ID",rev,"revision",1,"orderId",id(order),"workId",id(work),"customerId",id(customer),"revisionNumber",1,"reason","authored fixture sales line","createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+                orderWork.put(order,work);orderCustomer.put(order,customer);orderRevision.put(order,rev);conventions.add("SalesOrderLine "+l+" installed with its own synthetic order");
+            }
+            JsonNode o=fixture.path("aliases").path(order);
+            String quantity=a.path("quantity").asText(o.path("quantity").asText(null)),unit=a.path("unit").asText(o.path("unit").asText(null));
+            String destination=firstAlias(a,"destinationAlias");if(destination==null)destination=firstAlias(o,"destinationAlias");
+            String item=firstAlias(a,"itemAlias");if(item==null)item=firstAlias(o,"itemAlias");if(item==null)item=onlyInOrg("TradeItem",org);
+            String work=firstAlias(a,"workAlias","salesWorkAlias");if(work==null)work=orderWork.get(order);
+            String customer=firstAlias(a,"customerAlias");if(customer==null)customer=orderCustomer.get(order);
+            if(customer!=null)ensureCustomer(org,customer);
+            if(quantity==null||unit==null||item==null||work==null||customer==null||!installedWork(work)){omitted.add("SalesOrderLine "+l+" (quantity/unit/item/work not resolvable)");continue;}
+            if(!a.hasNonNull("quantity"))conventions.add("SalesOrderLine "+l+" quantity/unit/destination from its order "+order);
+            if(destination==null)destination=onlyPlaceOfKind(org,"CUSTOMER");
+            if(destination==null){omitted.add("SalesOrderLine "+l+" (destination not resolvable)");continue;}
+            // OrderLines columns the fixtures never state are NOT NULL in the product schema (price, currency, dueAt, endpoint,
+            // terms). They get explicit synthetic placeholders recorded as an installer convention; no case asserts them.
+            JsonNode money=a.path("monetaryReference");
+            String due=a.path("dueAt").asText(o.path("dueAt").asText(null));
+            var r=row("organizationId",org,"ID",id(l),"revision",1,"orderId",id(order),"revisionId",orderRevision.get(order),"workId",id(work),"customerId",id(customer),"itemId",id(item),"quantity",new BigDecimal(quantity),"unit",unit,
+                "destinationId",id(destination),"price",new BigDecimal(money.path("price").asText(money.path("amount").asText("0"))),"currency",money.path("currency").asText("XXX"),"dueAt",due!=null?time(due):asOf.plusDays(30),
+                "deliveryEndpoint",a.path("endpoint").asText(o.path("endpoint").asText("DELIVERED")),"qualityTerms","fixture-unspecified","packageTerms","fixture-unspecified","createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf);
+            if(!syntheticLineTerms){syntheticLineTerms=true;conventions.add("SalesOrderLine terms not authored (price 0 / currency XXX unless monetaryReference, dueAt asOf+30d unless authored, endpoint DELIVERED unless authored, quality/package terms 'fixture-unspecified') installed as synthetic placeholders");}
+            insert("mulino_trade_sales_OrderLines",r);
+            var installed=Json.object();installed.put("work",work).put("customer",customer).put("unit",unit);lines.put(l,installed);
         }
     }
+    /**
+     * Allocation aliases with authored facts -> SegmentAllocations: segment, quantity/unit, state (default EXECUTABLE),
+     * startQuantity as declared (absent = no coordinate), revision (alias, else entityRevisions.initial, else 1), the
+     * sales line (orderLineAlias, else the only line of its workAlias, else the organization's only line), action SELL,
+     * pickedAt as declared (must not be after asOf). pickedByAlias has no product column (the product records only pickedAt).
+     */
+    private void allocations() throws Exception {
+        for(String alias:aliasesOfType("Allocation")) {
+            JsonNode a=fixture.path("aliases").path(alias);String org=orgOf.get(alias);
+            if(!a.hasNonNull("segmentAlias")&&!a.hasNonNull("quantity")){conventions.add("Allocation alias "+alias+" has no authored facts; not installed");continue;}
+            String segment=firstAlias(a,"segmentAlias","scopeAlias");
+            String line=firstAlias(a,"orderLineAlias","salesLineAlias");
+            if(line==null){List<String> c=new ArrayList<>();for(var e:lines.entrySet())if(a.hasNonNull("workAlias")&&a.path("workAlias").asText().equals(e.getValue().path("work").asText())&&orgOf.get(e.getKey()).equals(org))c.add(e.getKey());if(c.size()==1)line=c.get(0);}
+            if(line==null){List<String> c=new ArrayList<>();for(String l:lines.keySet())if(orgOf.get(l).equals(org))c.add(l);if(c.size()==1)line=c.get(0);}
+            if(segment==null||line==null||!lines.containsKey(line)||!a.hasNonNull("quantity")){omitted.add("Allocation "+alias+" (segment/sales line/quantity not resolvable)");continue;}
+            JsonNode l=lines.get(line);
+            String state=a.path("state").asText(a.path("status").asText("EXECUTABLE"));
+            if(state.equals("NOT_CREATED")){conventions.add("Allocation "+alias+" declared NOT_CREATED; not installed");continue;}
+            if(!Set.of("EXECUTABLE","SUSPENDED","REPLACED","CONSUMED","RELEASED").contains(state)){omitted.add("Allocation "+alias+" state "+state+" outside the product allocation states");continue;}
+            if(!installedSegments.contains(segment)){omitted.add("Allocation "+alias+" segment "+segment+" not installed");continue;}
+            OffsetDateTime picked=a.hasNonNull("pickedAt")?time(a.path("pickedAt").asText()):null;
+            if(picked!=null&&picked.isAfter(asOf)){omitted.add("Allocation "+alias+" pickedAt after the starting clock");continue;}
+            var r=row("organizationId",org,"ID",id(alias),"revision",revision(a),"rootId",id(segment),"segmentId",id(segment),"orderLineId",id(line),"quantity",new BigDecimal(a.path("quantity").asText()),"unit",a.path("unit").asText(l.path("unit").asText()),
+                "state",state,"action","SELL","customerId",id(l.path("customer").asText()),"workId",id(a.hasNonNull("workAlias")&&aliases.has(a.path("workAlias").asText())?a.path("workAlias").asText():l.path("work").asText()),
+                "startQuantity",a.hasNonNull("startQuantity")?new BigDecimal(a.path("startQuantity").asText()):null,"pickedAt",picked,"commandId",uuid(),"createdAt",asOf,"recordedAt",asOf);
+            insert("mulino_inventory_SegmentAllocations",r);
+            if(!syntheticAllocationCommand){syntheticAllocationCommand=true;conventions.add("fixture allocations carry a synthetic commandId (NOT NULL column; no CommandRecord row exists for an authored allocation)");}
+            if(a.hasNonNull("pickedByAlias"))notRepresented.add("Allocation "+alias+" pickedByAlias (the product records pickedAt only)");
+        }
+    }
+    private boolean syntheticLineTerms,syntheticAllocationCommand;
+    private final Set<String> installedSegments=new HashSet<>(),installedLots=new HashSet<>();
+    private final Map<String,String> itemUnits=new HashMap<>();
+    /** A sales customer alias that is not a Customer (e.g. an Organization or Place standing for the buyer) gets a Customer row with the same id. */
+    private void ensureCustomer(String org,String alias) throws SQLException {
+        if(fixture.path("aliases").path(alias).path("type").asText().equals("Customer")||!ensured.add(org+":C:"+id(alias)))return;
+        insert("mulino_trade_sales_Customers",row("organizationId",org,"ID",id(alias),"name",fixture.path("aliases").path(alias).path("name").asText(alias),"revision",1,"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+        conventions.add("sales customer "+alias+" ("+fixture.path("aliases").path(alias).path("type").asText()+") installed as a Customer row with the same id");
+    }
+    private String onlyPlaceOfKind(String org,String kind){String found=null;for(String a:aliasesOfType("Place"))if(org.equals(orgOf.get(a))&&kind.equals(fixture.path("aliases").path(a).path("kind").asText())){if(found!=null)return null;found=a;}return found;}
+    private List<String> aliasesOfType(String type){List<String> out=new ArrayList<>();fixture.path("aliases").fields().forEachRemaining(e->{if(e.getValue().path("type").asText().equals(type))out.add(e.getKey());});return out;}
+    private String onlyInOrg(String type,String org){String found=null;for(String a:aliasesOfType(type))if(org.equals(orgOf.get(a))){if(found!=null)return null;found=a;}return found;}
+    private boolean referencedByLine(String order,List<String> saleLines){for(String l:saleLines)if(order.equals(fixture.path("aliases").path(l).path("salesOrderAlias").asText(null)))return true;return !saleLines.isEmpty();}
+    private final Set<String> installedWorks=new HashSet<>();
+    private boolean installedWork(String alias){return installedWorks.contains(alias);}
+
+    // ---- evidence documents ----------------------------------------------------------------------------------------
+    private final Map<String,String> profiles=new HashMap<>();
+    /** baseline.sourceProfiles: one SourceProfile per namespace; intake owner = reconciliationOwnerAlias, else recordActorAlias. */
+    private void sourceProfiles() throws SQLException {
+        for(JsonNode p:fixture.path("baseline").path("sourceProfiles")) {
+            String namespace=p.path("namespace").asText(null);if(namespace==null){omitted.add("sourceProfile without namespace");continue;}
+            String owner=firstAlias(p,"reconciliationOwnerAlias","intakeOwnerAlias","recordActorAlias");
+            String supervisor=firstAlias(fixture.path("baseline"),"supervisorAlias");if(supervisor==null&&aliases.has("supervisor"))supervisor="supervisor";if(supervisor==null)supervisor=owner;
+            if(owner==null){omitted.add("sourceProfile "+namespace+" without resolvable owner");continue;}
+            String org=org(owner);profile(org,namespace,id(owner),id(supervisor),p.path("policyVersion").asText("fixture-v1"));
+        }
+    }
+    private String profile(String org,String namespace,String owner,String supervisor,String policy) throws SQLException {
+        String key=org+":"+namespace,id=profiles.get(key);if(id!=null)return id;id=uuid();profiles.put(key,id);
+        insert("mulino_evidence_SourceProfiles",row("organizationId",org,"ID",id,"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",owner,"namespace",namespace,"policyVersion",policy,"intakeOwnerId",owner,"supervisorId",supervisor,
+            "nextAction",fixture.path("baseline").path("nextAction").asText("authored fixture source review"),"nextCheckAt",fixture.path("baseline").hasNonNull("nextCheckAt")?time(fixture.path("baseline").path("nextCheckAt").asText()):asOf.plusDays(1)));
+        return id;
+    }
+    /**
+     * Evidence documents. An authored evidence entry is installed as its DocumentVersion. When the alias carries canonical
+     * fixtureContent (or baseline.documents names a repository file), the original bytes are written to the backend blob
+     * store and the document is AVAILABLE: fixtureContent aliases (keys ending in Alias naming a fixture alias) are resolved
+     * to installed IDs under the same key without the Alias suffix plus "Id" (receivingCustodianAlias -> receivingCustodianId),
+     * so the stored sha256 is the hash of the resolved canonical bytes, not the authored hash. Recording time: declared
+     * recordedAt at or before the fixture knownAt -> the starting clock (asOf); later -> the declared instant (late-known).
+     */
+    private void evidence() throws Exception {
+        String supervisor=aliases.has("supervisor")?"supervisor":null;
+        Map<String,JsonNode> entries=new LinkedHashMap<>();
+        for(JsonNode e:fixture.path("evidence")){String alias=e.path("alias").asText(null);if(alias==null||!aliases.has(alias)){omitted.add("evidence entry without alias");continue;}entries.put(alias,e);}
+        for(var it=fixture.path("aliases").fields();it.hasNext();){var e=it.next();if(e.getValue().path("type").asText().equals("DocumentVersion")&&!entries.containsKey(e.getKey())&&(e.getValue().has("fixtureContent")||e.getValue().has("path")))entries.put(e.getKey(),Json.object());}
+        for(var entry:entries.entrySet()) {
+            String alias=entry.getKey();JsonNode e=entry.getValue();JsonNode a=fixture.path("aliases").path(alias);
+            String org=orgOf.get(alias),namespace=e.path("sourceNamespace").asText(a.path("fixtureContent").path("sourceNamespace").asText("synthetic"));
+            String recorder=supervisor!=null&&org.equals(org(supervisor))?id(supervisor):firstActor(org);
+            if(recorder==null){omitted.add("evidence "+alias+" without recorder actor");continue;}
+            String profile=profile(org,namespace,recorder,recorder,"fixture-v1");
+            String item=a.path("fixtureContent").hasNonNull("itemAlias")&&aliases.has(a.path("fixtureContent").path("itemAlias").asText())?id(a.path("fixtureContent").path("itemAlias").asText()):firstOfType(org,"TradeItem");
+            if(item==null){omitted.add("evidence "+alias+" without item subject");continue;}
+            OffsetDateTime recorded=asOf;
+            if(e.hasNonNull("recordedAt")){OffsetDateTime declared=time(e.path("recordedAt").asText());if(declared.isAfter(knownAt))recorded=declared;}
+            byte[] bytes=null;String media="application/octet-stream";
+            if(a.path("fixtureContent").isObject()){bytes=CANONICAL.writeValueAsBytes(Json.MAPPER.treeToValue(resolved((ObjectNode)a.path("fixtureContent").deepCopy()),Object.class));media="application/json";}
+            else if(a.hasNonNull("path")){Path file=root.resolve(a.path("path").asText()).normalize();if(!file.startsWith(root.normalize())){omitted.add("evidence "+alias+" path escapes repository");continue;}bytes=java.nio.file.Files.readAllBytes(file);media=a.path("mediaType").asText(media);
+                String authored=e.path("sha256").asText(a.path("sha256").asText(""));if(!authored.isEmpty()&&!authored.equals(sha(bytes))){omitted.add("evidence "+alias+" file hash differs from authored sha256");continue;}}
+            String sha=bytes!=null?sha(bytes):e.path("sha256").asText();
+            if(!sha.matches("[0-9a-f]{64}")){omitted.add("evidence "+alias+" sha256 not hex");continue;}
+            String blob=null;
+            if(bytes!=null) {
+                if(blobRoot==null){omitted.add("evidence "+alias+" original bytes (no isolated blob root configured)");}
+                else{blob=uuid();Path objects=blobRoot.toAbsolutePath().normalize().resolve("objects");if(!java.nio.file.Files.isDirectory(objects))throw new IllegalStateException("Backend blob object store missing");
+                    Path file=objects.resolve(blob);java.nio.file.Files.write(file,bytes,java.nio.file.StandardOpenOption.CREATE_NEW);writtenBlobs.add(file);
+                    java.nio.file.Files.setPosixFilePermissions(file,java.nio.file.attribute.PosixFilePermissions.fromString("r--------"));}
+            }
+            var doc=row("organizationId",org,"ID",id(alias),"revision",1,"createdAt",recorded,"recordedAt",recorded,"recordedBy",recorder,"subjectKind","ITEM","subjectId",item,"itemId",item,"sha256",sha,"byteLength",bytes==null?0L:(long)bytes.length,"mediaType",media,
+                "sourceNamespace",namespace,"sourceProfileId",profile,"sourceReference",e.path("externalEventId").asText(a.path("fixtureContent").path("externalEventId").asText(null)),"availability",blob!=null?"AVAILABLE":"UNKNOWN",
+                "provenance",blob!=null?"{\"source\":\"scenario-installer-resolved-canonical-content\"}":"{\"source\":\"scenario-installer-authored-hash-only\"}");
+            if(blob!=null)doc.put("blobId",blob);
+            insert("mulino_evidence_DocumentVersions",doc);
+            if(recorded!=asOf)conventions.add("evidence "+alias+" recorded at its declared late-known instant "+recorded);
+        }
+    }
+    /** fixtureContent alias fields resolved to installed IDs (field fooAlias naming an alias adds fooId). */
+    private JsonNode resolved(ObjectNode content) {
+        for(String key:new ArrayList<>(iterable(content))) {
+            JsonNode v=content.path(key);
+            if(key.endsWith("Alias")&&v.isTextual()&&aliases.has(v.asText()))content.put(key.substring(0,key.length()-5)+"Id",id(v.asText()));
+            else if(v.isObject())resolved((ObjectNode)v);
+        }
+        return content;
+    }
+    private static final com.fasterxml.jackson.databind.ObjectMapper CANONICAL=new com.fasterxml.jackson.databind.ObjectMapper().configure(com.fasterxml.jackson.databind.SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
+    private static String sha(byte[] bytes) throws Exception {return HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));}
+    private static List<String> iterable(ObjectNode n){var out=new ArrayList<String>();n.fieldNames().forEachRemaining(out::add);return out;}
+    private String firstAlias(JsonNode node,String... keys){for(String k:keys){String v=node.path(k).asText(null);if(v!=null&&aliases.has(v))return v;}return null;}
+
     private String firstActor(String org) {for(var it=fixture.path("aliases").fields();it.hasNext();){var e=it.next();if(e.getValue().path("type").asText().equals("Human")&&org.equals(orgOf.get(e.getKey())))return id(e.getKey());}return null;}
     private String firstOfType(String org,String type) {for(var it=fixture.path("aliases").fields();it.hasNext();){var e=it.next();if(e.getValue().path("type").asText().equals(type)&&org.equals(orgOf.get(e.getKey())))return id(e.getKey());}return null;}
 

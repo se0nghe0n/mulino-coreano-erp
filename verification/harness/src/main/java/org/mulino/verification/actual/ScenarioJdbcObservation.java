@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
 import org.mulino.verification.Json;
 
 /**
@@ -18,9 +17,9 @@ import org.mulino.verification.Json;
  * column (Works: workId restricts ID). includeDescendants=true widens the work restriction to the organization/item
  * scope (a superset that contains descendant works). Case namespace keys (caseId, subcaseId, ...) are test metadata.
  *
- * RESULT_REVISION: the observer replays the issuing API query (same actor, same resolved request) and reports the
- * product's revision. This is a stability check of the projection between the query and the observation, NOT an
- * independent recomputation from rows; revisionQuery says so. An issuing action that is not an api query is refused.
+ * RESULT_REVISION: the observer recomputes an organization row digest in its own snapshot and reports the product
+ * revision only when it equals the digest bound around the issuing query (ScenarioRevisionBinding). The product API is
+ * never re-issued. An issuing action that is not an api/mcp query is refused.
  */
 final class ScenarioJdbcObservation {
     static final Set<String> CASE_METADATA=Set.of("caseId","subcaseId","scenarioId","caseNamespace","caseKey","environmentId","includeDescendants","rawRowsOrder");
@@ -43,7 +42,7 @@ final class ScenarioJdbcObservation {
         return csnNames.getOrDefault(table.toLowerCase(Locale.ROOT),Map.of());
     }
 
-    static ObjectNode capture(ActualConfiguration config,Path root,JsonNode request,Function<JsonNode,String> replay) throws Exception {
+    static ObjectNode capture(ActualConfiguration config,Path root,JsonNode request) throws Exception {
         if(request.path("sources").isEmpty())throw new IllegalArgumentException("Raw sources required");
         String ref=request.path("snapshotRef").asText(null);
         String readMode=ref==null?"CURRENT_COMMITTED":ref;
@@ -57,20 +56,27 @@ final class ScenarioJdbcObservation {
         for(var it=scope.fieldNames();it.hasNext();){String k=it.next();if(!CASE_METADATA.contains(k)&&!Set.of("organizationId","organizationIds","itemId","itemIds","workId","workIds","lotId","lotIds").contains(k))throw new UnsupportedOperationException("observer scope key "+k+" not implemented");}
         boolean descendants=scope.path("includeDescendants").asBoolean(false);
         if(descendants)works=List.of();
-        String revision=null;ObjectNode revisionQuery=null;
+        String revision=null;ObjectNode revisionQuery=null;ScenarioRevisionBinding.Binding binding=null;JsonNode source=null;
         if(readMode.equals("RESULT_REVISION")) {
-            JsonNode source=request.path("snapshotSource");
-            if(!source.path("kind").asText().equals("query")||!source.path("route").asText().equals("api"))throw new UnsupportedOperationException("RESULT_REVISION from "+source.path("kind").asText()+"/"+source.path("route").asText()+" cannot be replayed safely");
-            revision=replay.apply(source);
-            revisionQuery=Json.object();revisionQuery.put("statementId","product-api-query-replay-v1")
-                .put("sql","REPLAY POST /api/ontology/queries/"+source.path("capabilityId").asText()+" with the issuing actor and resolved request; product projection, not an independent row recomputation");
-            var p=Json.object();p.put("capabilityId",source.path("capabilityId").asText()).put("actionId",source.path("actionId").asText()).put("independent",false);revisionQuery.set("parameters",p);revisionQuery.put("mappingVersion","1.0.0");
+            source=request.path("snapshotSource");
+            if(!source.path("kind").asText().equals("query")||!Set.of("api","mcp").contains(source.path("route").asText()))throw new UnsupportedOperationException("RESULT_REVISION from "+source.path("kind").asText()+"/"+source.path("route").asText()+" has no independent row binding");
+            binding=ScenarioRevisionBinding.binding(source.path("actionId").asText());
         }
         OffsetDateTime knownAt=OffsetDateTime.parse(Json.required(request,"knownAt"));
         var raw=Json.object();var evidence=Json.object();String mvcc;
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             mvcc=ObserverSnapshot.token(c);
+            if(readMode.equals("RESULT_REVISION")) {
+                // Independent: the digest is computed from this transaction's rows; the product API is not called.
+                String digest=ScenarioRevisionBinding.digest(c);
+                revision=binding!=null&&binding.digest().equals(digest)?binding.revision():"row-digest:"+digest;
+                revisionQuery=Json.object();revisionQuery.put("statementId","s5b-organization-row-digest-v1")
+                    .put("sql","md5 over every row (row::text, ordered) of every organization-scoped mulino_* table except mulino_runtime_*, in the observer's REPEATABLE READ snapshot; compared with the digest bound around the issuing query (before = after)");
+                var p=Json.object();p.put("capabilityId",source.path("capabilityId").asText()).put("actionId",source.path("actionId").asText()).put("observedDigest",digest)
+                    .put("boundDigest",binding==null?null:binding.digest()).put("digestMatched",binding!=null&&binding.digest().equals(digest)).put("organizations",String.join(",",ScenarioRevisionBinding.organizations())).put("productApiCalled",false);
+                revisionQuery.set("parameters",p);revisionQuery.put("mappingVersion","2.0.0");
+            }
             Map<String,ArrayNode> cache=new HashMap<>();Map<String,JsonNode> commandCache=new HashMap<>();
             for(JsonNode requested:request.path("sources")) {
                 String name=requested.asText();JsonNode tables=sources.path(name);var rows=Json.array();var queries=Json.array();
