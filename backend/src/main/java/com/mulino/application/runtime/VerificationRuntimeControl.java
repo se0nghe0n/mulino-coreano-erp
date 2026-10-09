@@ -13,7 +13,8 @@ import org.springframework.web.bind.annotation.*;
 public class VerificationRuntimeControl {
  private final VerificationClock clock;
  private final VerificationBarriers barriers;
- public VerificationRuntimeControl(VerificationClock clock,VerificationBarriers barriers){this.clock=clock;this.barriers=barriers;}
+ private final VerificationFaults faults;
+ public VerificationRuntimeControl(VerificationClock clock,VerificationBarriers barriers,VerificationFaults faults){this.clock=clock;this.barriers=barriers;this.faults=faults;}
  @PostMapping("/clock") public Map<String,Object> advance(@RequestBody Map<String,Object> body,HttpServletRequest request){
   return Map.of("instant",clock.advance(instant(body,request)).toString(),"profile","verification","authorityClock",true);
  }
@@ -37,6 +38,16 @@ public class VerificationRuntimeControl {
    default->throw new IllegalArgumentException("Unsupported barrier operation");
   });
   view.put("operation",operation);view.put("profile","verification");view.put("observedAt",Instant.now().toString());return view;
+ }
+ /** Fault points the pipeline reports; a host adapter refuses any other authored point instead of arming it. */
+ @GetMapping("/fault/points") public Map<String,Object> faultPoints(HttpServletRequest request){
+  loopback(request);return Map.of("points",new java.util.TreeSet<>(VerificationFaults.POINTS),"profile","verification");
+ }
+ /** arm/inject/install a fault for one organization at one pipeline point, or disarm/remove it by id. */
+ @PostMapping("/fault") public org.springframework.http.ResponseEntity<Map<String,Object>> fault(@RequestBody Map<String,Object> body,HttpServletRequest request){
+  loopback(request);
+  try{var view=new java.util.LinkedHashMap<String,Object>(faults.control(body));view.put("operation",body.get("operation"));view.put("profile","verification");view.put("observedAt",Instant.now().toString());return org.springframework.http.ResponseEntity.ok(view);}
+  catch(VerificationFaults.UnsupportedPoint unsupported){return org.springframework.http.ResponseEntity.status(422).body(Map.of("supported",false,"point",unsupported.getMessage(),"points",new java.util.TreeSet<>(VerificationFaults.POINTS)));}
  }
  private static void loopback(HttpServletRequest request){
   if(!java.util.Set.of("127.0.0.1","0:0:0:0:0:0:0:1","::1").contains(request.getRemoteAddr()))throw new org.springframework.security.access.AccessDeniedException("Verification controls require loopback");

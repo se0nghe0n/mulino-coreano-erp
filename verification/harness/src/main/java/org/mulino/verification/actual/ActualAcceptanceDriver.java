@@ -290,6 +290,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Host control interrupted",interrupted);}
             catch(java.io.IOException failure){throw new IllegalStateException("Host control environment failure",failure);}
         }
+        if(suiteIsolation&&request.path("type").asText().equals("fault")&&Set.of("arm","inject","install","disarm","remove").contains(request.path("operation").asText()))return faultControl(id,request);
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
             return StepResult.missing(id,"NOT_IMPLEMENTED: actual "+request.path("type").asText()+"/"+request.path("operation").asText()+" host control absent");
         if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
@@ -336,6 +337,48 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_BARRIER",false,null,null),receipt);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual barrier interrupted",failure);}
         catch(Exception failure){throw new IllegalStateException("Actual barrier environment/response failure",failure);}
+    }
+    /**
+     * Fault control on the verification-profile fault registry: arm/inject/install a fault for the subcase organization
+     * at a pipeline point, or disarm/remove it by id. The authored parameter names map one to one (commandKey or
+     * commandIdempotencyKey, occurrences/times/once, fault/failure); nothing else is sent. A point the product pipeline
+     * does not report stays NOT_IMPLEMENTED with its name instead of being armed and never firing.
+     */
+    private StepResult faultControl(String id,JsonNode request) {
+        if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
+        JsonNode p=request.path("parameters");String operation=request.path("operation").asText();
+        var body=Json.object();body.put("operation",operation);
+        if(Set.of("disarm","remove").contains(operation)){
+            if(!p.hasNonNull("faultId"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual fault/"+operation+" without faultId");
+            body.put("faultId",p.path("faultId").asText());
+        } else {
+            String organization=p.path("scope").path("organizationId").asText(null);
+            if(organization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: actual fault/"+operation+" without scope organization");
+            body.put("organizationId",organization).put("point",Json.required(p,"point"));
+            if(p.hasNonNull("faultId"))body.put("faultId",p.path("faultId").asText());
+            if(p.hasNonNull("capabilityId"))body.put("capabilityId",p.path("capabilityId").asText());
+            String key=p.hasNonNull("commandKey")?p.path("commandKey").asText():p.hasNonNull("commandIdempotencyKey")?p.path("commandIdempotencyKey").asText():null;
+            if(key!=null)body.put("commandKey",key);
+            if(p.has("occurrences"))body.put("occurrences",p.path("occurrences").asInt());else if(p.has("times"))body.put("occurrences",p.path("times").asInt());else if(p.path("once").asBoolean(false))body.put("occurrences",1);
+            String kind=p.hasNonNull("fault")?p.path("fault").asText():p.hasNonNull("failure")?p.path("failure").asText():null;
+            if(kind!=null)body.put("fault",kind);
+            for(var it=p.fieldNames();it.hasNext();){String k=it.next();if(!Set.of("scope","point","faultId","capabilityId","commandKey","commandIdempotencyKey","occurrences","times","once","fault","failure").contains(k))return StepResult.missing(id,"NOT_IMPLEMENTED: actual fault parameter "+k+" (point "+p.path("point").asText()+")");}
+        }
+        try {
+            var uri=configuration.baseUri().resolve("/__verification/runtime/fault");
+            var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(10)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(controlActor)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
+            var result=http.send(call,HttpResponse.BodyHandlers.ofString());
+            if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification fault profile not installed");
+            var response=Json.parse(result.body());
+            if(result.statusCode()==422)return StepResult.missing(id,"NOT_IMPLEMENTED: product pipeline reports no fault point "+response.path("point").asText());
+            if(result.statusCode()!=200)throw new IllegalStateException("Fault control HTTP "+result.statusCode());
+            var data=Json.object();data.put("acknowledged",true).put("controlType","fault").put("operation",operation).put("acknowledgedAt",Instant.now().toString());
+            for(String k:List.of("faultId","point","state"))data.set(k,response.path(k));
+            data.set("serverObservation",response);
+            var receipt=Json.object();receipt.put("httpStatus",result.statusCode()).put("path",uri.getPath());receipt.set("requestedControl",request);receipt.set("wireRequest",body);receipt.set("serverResponse",response);
+            return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_FAULT",false,null,null),receipt);
+        }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual fault control interrupted",failure);}
+        catch(Exception failure){throw new IllegalStateException("Actual fault control environment/response failure",failure);}
     }
     static ObjectNode clockAcknowledgment(int httpStatus,String requestedInstant,JsonNode serverResponse) {
         if(httpStatus!=200||!serverResponse.path("authorityClock").asBoolean()||!"verification".equals(serverResponse.path("profile").asText())||!Instant.parse(requestedInstant).equals(Instant.parse(serverResponse.path("instant").asText())))throw new IllegalStateException("Verification clock control did not prove applied authority clock");

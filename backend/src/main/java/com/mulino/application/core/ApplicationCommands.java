@@ -10,11 +10,13 @@ import org.springframework.security.access.AccessDeniedException;
 public class ApplicationCommands {
   private final Map<String,CommandHandler> handlers=new TreeMap<>();
   private final CommandDefinitionResolver definitions;private final ReadAuthorizer auth;private final CommandRepository repository;private final ExecutionClock clock;
-  private final ObjectProvider<CommandGuard> guard;private final ObjectProvider<CommandLeasePort> leases;private final ObjectProvider<CommandBarrier> barriers;
+  private final ObjectProvider<CommandGuard> guard;private final ObjectProvider<CommandLeasePort> leases;private final ObjectProvider<CommandBarrier> barriers;private final ObjectProvider<CommandFaults> faults;
+  /** Organization of the command the current thread last applied; read only by the after-commit fault point. */
+  private final ThreadLocal<String> appliedOrganization=new ThreadLocal<>();
   private final TransactionTemplate transaction;private final TransactionTemplate denial;
   public ApplicationCommands(List<CommandHandler> handlers,ReadAuthorizer auth,CommandRepository repository,
-      ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,ObjectProvider<CommandBarrier> barriers,PlatformTransactionManager manager){
-    this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;this.barriers=barriers;
+      ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,ObjectProvider<CommandBarrier> barriers,ObjectProvider<CommandFaults> faults,PlatformTransactionManager manager){
+    this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;this.barriers=barriers;this.faults=faults;
     for(CommandHandler h:handlers)for(String cap:h.capabilities())if(this.handlers.put(cap,h)!=null)throw new IllegalStateException("Duplicate command capability "+cap);
     transaction=new TransactionTemplate(manager);transaction.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
     denial=new TransactionTemplate(manager);denial.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -56,7 +58,7 @@ public class ApplicationCommands {
     try{intent=typed(input,true);}catch(DomainError failure){return failure.response();}
     String hash=CommandRequests.hash(intent);
     if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return rejectWhenClosed(intent,hash,new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed"),serverExecutionClaim,claimed,afterChangeSet);
-    for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));}
+    for(int attempt=0;attempt<3;attempt++)try{appliedOrganization.remove();Map<String,Object> committed=transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));if(afterChangeSet==null&&appliedOrganization.get()!=null)fault(appliedOrganization.get(),(String)intent.get("capabilityId"),(String)intent.get("commandIdempotencyKey"),"AFTER_DB_COMMIT_BEFORE_RESPONSE");return committed;}
     catch(DomainError failure){return rejectWhenClosed(intent,hash,failure,serverExecutionClaim,claimed,afterChangeSet);}
     catch(AccessDeniedException failure){return rejectWhenClosed(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed,afterChangeSet);}
     // A caller-owned changeset cannot be retried here: its transaction already holds this attempt's work.
@@ -100,7 +102,9 @@ public class ApplicationCommands {
     if(!h.mutatesAuthorization(cap))auth.authorizeScopes(c,cap,prep.scopes());current.verifyCommit(c,cap,hash,prep,intent,h.mutatesAuthorization(cap));if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
     current.consume(c,prep,intent,id);
     result.put("commandId",id);result.put("canonicalIntentHash",hash);result.put("proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1);
-    result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
+    result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));
+    fault(c.organizationId(),cap,key,"command.beforeCommit","AFTER_IN_PROGRESS_BEFORE_EFFECT_COMMIT","AUDIT_INSERT");appliedOrganization.set(c.organizationId());
+    repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
   }
   private void verifyClaim(Map<String,Object> intent,Map<String,Object> claim,Map<String,List<String>> scopes){
     if(!Objects.equals(claim.get("capabilityId"),intent.get("capabilityId"))||!Objects.equals(claim.get("commandId"),intent.get("commandIdempotencyKey")))throw DomainError.forbidden();
@@ -122,6 +126,7 @@ public class ApplicationCommands {
       if(old.isPresent()){repository.audit(c,(String)old.get().get("ID"),intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"replayAttempt",true));return result;}String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"definitionVersion",intent.get("definitionVersion"),"capabilityVersion",intent.get("capabilityVersion")));return result;});
   }
   private void barrier(String... points){CommandBarrier b=barriers.getIfAvailable();if(b!=null)b.reach(points);}
+  private void fault(String organizationId,String capability,String key,String... points){CommandFaults f=faults.getIfAvailable();if(f!=null)f.check(organizationId,capability,key,points);}
   private void blocking(String... points){CommandBarrier b=barriers.getIfAvailable();if(b!=null)b.blocking(points);}
   private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }
