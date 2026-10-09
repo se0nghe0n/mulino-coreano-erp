@@ -186,6 +186,27 @@ class S1ReadIntegrationTest {
     if(mcp){builder.header("Accept","application/json, text/event-stream").header("MCP-Protocol-Version","2026-07-28").header("Mcp-Method",String.valueOf(body.get("method")));if(((Map<?,?>)body.get("params")).get("name")!=null)builder.header("Mcp-Name",String.valueOf(((Map<?,?>)body.get("params")).get("name")));}
     return HttpClient.newHttpClient().send(builder.POST(HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body))).build(),HttpResponse.BodyHandlers.ofString());
   }
+  /** Plan section 3.4: an OData command or $batch failure carries the structured command envelope, never a bare HTTP 400. */
+  @Test @SuppressWarnings("unchecked") void odataCommandAndBatchFailuresKeepTheCommandEnvelope()throws Exception{
+    var command=row("intentKind","COMMAND","definitionVersion","integration-v1","capabilityId","moveQuantity","subjectRefs",List.of(Map.of("type","QuantitySegment","id",segment)),"slots",Map.of("segmentId",segment,"destinationId",place,"occurredAt",AS_OF.toString(),"evidenceRef","doc"),"provenance",Map.of(),"expectedRevision",0,"commandIdempotencyKey",id());
+    var unauthorized=http("/odata/v4/ontology/command",Map.of("requestJson",json.writeValueAsString(command)),true,false);
+    assertEquals(200,unauthorized.statusCode(),unauthorized.body());
+    var envelope=json.readValue(String.valueOf(json.readValue(unauthorized.body(),Map.class).get("value")),Map.class);
+    assertTrue(CommandOutcomes.NOT_APPLIED.contains(envelope.get("outcome")),String.valueOf(envelope));assertNotNull(((Map<?,?>)envelope.get("error")).get("code"));
+    // The denial audit is committed after the rolled-back changeset closed, not lost with it.
+    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_commands_CommandRecords WHERE organizationId=? AND commandIdempotencyKey=?",Integer.class,org,command.get("commandIdempotencyKey")));
+    var malformed=http("/odata/v4/ontology/command",Map.of("requestJson","{not json"),true,false);
+    assertEquals(200,malformed.statusCode(),malformed.body());
+    var invalid=json.readValue(String.valueOf(json.readValue(malformed.body(),Map.class).get("value")),Map.class);
+    assertEquals("REJECTED",invalid.get("outcome"));assertEquals("TYPE_INVALID",((Map<?,?>)invalid.get("error")).get("code"));
+    String batch="batch_t",change="changeset_t";
+    String body="--"+batch+"\r\nContent-Type: multipart/mixed; boundary="+change+"\r\n\r\n--"+change+"\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\nContent-ID: 1\r\n\r\nPOST command HTTP/1.1\r\nContent-Type: application/json\r\nAccept: application/json\r\n\r\n"+json.writeValueAsString(Map.of("requestJson",json.writeValueAsString(command)))+"\r\n--"+change+"--\r\n--"+batch+"--\r\n";
+    var batched=HttpClient.newHttpClient().send(HttpRequest.newBuilder(URI.create("http://localhost:"+port+"/odata/v4/ontology/$batch")).header("Content-Type","multipart/mixed; boundary="+batch).header("Accept","multipart/mixed").header("Authorization","Bearer "+token()).POST(HttpRequest.BodyPublishers.ofString(body)).build(),HttpResponse.BodyHandlers.ofString());
+    assertEquals(200,batched.statusCode(),batched.body());
+    assertTrue(batched.body().contains("HTTP/1.1 200"),batched.body());
+    assertTrue(batched.body().contains("\\\"outcome\\\":\\\"HELD\\\"")||batched.body().contains("\\\"outcome\\\":\\\"REJECTED\\\""),batched.body());
+    assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=?",Integer.class,org));
+  }
   @Test @SuppressWarnings("unchecked") void signedRestOdataAndMcpShareTheActualDomainRead()throws Exception{
     var request=request("getObject",item,null);var noun=http("/api/ontology/queries/getObject",request,true,false);assertEquals(200,noun.statusCode(),noun.body());Map<String,Object> result=json.readValue(noun.body(),Map.class);
     var workRequest=request("getWork",work,(String)result.get("snapshotRevision"));var verb=http("/api/ontology/queries/getWork",workRequest,true,false);assertEquals(200,verb.statusCode(),verb.body());Map<String,Object> workResponse=json.readValue(verb.body(),Map.class);assertEquals(result.get("snapshotRevision"),workResponse.get("snapshotRevision"));

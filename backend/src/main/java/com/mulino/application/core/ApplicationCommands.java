@@ -36,20 +36,31 @@ public class ApplicationCommands {
   }
   public Map<String,Object> execute(Map<String,Object> input){return execute(input,Map.of());}
   /** Internal runtime entrypoint; executionClaim is server-issued and never accepted by public adapters. */
-  public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){return executeInternal(input,serverExecutionClaim,false);}
+  public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){return executeInternal(input,serverExecutionClaim,false,null);}
+  /**
+   * Adapter entrypoint for a caller-owned changeset (CAP OData action or atomic $batch changeset): the command runs in the
+   * caller's transaction, so the changeset commits or rolls back as one. A rejected command still holds its command-key
+   * fence in that open transaction, so its denial audit is handed to the caller to run after the changeset closed, in its
+   * own transaction, instead of waiting on the caller's lock until lock timeout.
+   */
+  public Map<String,Object> executeInChangeSet(Map<String,Object> input,java.util.function.Consumer<Runnable> afterChangeSet){
+    if(afterChangeSet==null)throw new IllegalArgumentException("Changeset completion hook required");
+    return executeInternal(input,Map.of(),false,afterChangeSet);
+  }
   /** Internal worker entrypoint; identity is resolved from the fenced persistent claim, never payload. */
   public Map<String,Object> executeClaimed(Map<String,Object> input,Map<String,Object> serverExecutionClaim){
-    if(serverExecutionClaim.isEmpty())throw DomainError.forbidden();return executeInternal(input,serverExecutionClaim,true);
+    if(serverExecutionClaim.isEmpty())throw DomainError.forbidden();return executeInternal(input,serverExecutionClaim,true,null);
   }
-  private Map<String,Object> executeInternal(Map<String,Object> input,Map<String,Object> serverExecutionClaim,boolean claimed){
+  private Map<String,Object> executeInternal(Map<String,Object> input,Map<String,Object> serverExecutionClaim,boolean claimed,java.util.function.Consumer<Runnable> afterChangeSet){
     Map<String,Object> intent;
     try{intent=typed(input,true);}catch(DomainError failure){return failure.response();}
     String hash=CommandRequests.hash(intent);
-    if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return reject(intent,hash,new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed"),serverExecutionClaim,claimed);
+    if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return rejectWhenClosed(intent,hash,new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed"),serverExecutionClaim,claimed,afterChangeSet);
     for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));}
-    catch(DomainError failure){return reject(intent,hash,failure,serverExecutionClaim,claimed);}
-    catch(AccessDeniedException failure){return reject(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed);}
-    catch(RuntimeException failure){if(transientFailure(failure)&&attempt<2)continue;throw failure;}
+    catch(DomainError failure){return rejectWhenClosed(intent,hash,failure,serverExecutionClaim,claimed,afterChangeSet);}
+    catch(AccessDeniedException failure){return rejectWhenClosed(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed,afterChangeSet);}
+    // A caller-owned changeset cannot be retried here: its transaction already holds this attempt's work.
+    catch(RuntimeException failure){if(afterChangeSet==null&&transientFailure(failure)&&attempt<2)continue;throw failure;}
     throw new IllegalStateException("Unreachable retry state");
   }
   private Map<String,Object> typed(Map<String,Object> input,boolean executing){Map<String,Object> intent=new LinkedHashMap<>(CommandRequests.parse(input,executing));CommandHandler h=handlers.get(intent.get("capabilityId"));if(h!=null)intent.putIfAbsent("capabilityVersion",h.semanticVersion());else intent.putIfAbsent("capabilityVersion","UNKNOWN");return Map.copyOf(intent);}
@@ -98,6 +109,10 @@ public class ApplicationCommands {
       CommandRequests.uuid(intakeId);return; // Runtime verifies the persisted immutable intake owner/template/hash fence.
     }
     if(!(claim.get("workId") instanceof String workId)||!scopes.getOrDefault("WORK",List.of()).contains(workId))throw DomainError.forbidden();
+  }
+  private Map<String,Object> rejectWhenClosed(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed,java.util.function.Consumer<Runnable> afterChangeSet){
+    if(afterChangeSet==null)return reject(intent,hash,failure,claim,claimed);
+    afterChangeSet.accept(()->reject(intent,hash,failure,claim,claimed));return failure.response();
   }
   /** Expected denial audit is committed separately only after the effect transaction rolled back. */
   private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed){
