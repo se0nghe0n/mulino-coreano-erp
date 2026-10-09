@@ -79,10 +79,12 @@ public final class FixtureInstaller {
                 for(var it=fixture.path("actors").fields();it.hasNext();) {var entry=it.next();JsonNode a=entry.getValue();String actor=aliases.path(entry.getKey()).asText();
                     if(actor.isBlank())throw new IllegalArgumentException("Actor alias absent");
                     if(!orgAlias.equals(Json.required(a,"organizationAlias")))throw new UnsupportedOperationException("Actor organization differs");
-                    if(!configuration.issuer().equals(Json.required(a,"issuer"))||!configuration.audience().equals(Json.required(a,"audience")))throw new IllegalArgumentException("Fixture identity issuer/audience differs from backend");
+                    boolean untrusted=a.path(ActualFixtureBindings.UNTRUSTED).asBoolean(false);
+                    if(!untrusted&&(!configuration.issuer().equals(Json.required(a,"issuer"))||!configuration.audience().equals(Json.required(a,"audience"))))throw new IllegalArgumentException("Fixture identity issuer/audience differs from backend");
                     var grant=a.path("grant");String delegator=ref(aliases,grant,"delegatorAlias"),grantId=UUID.randomUUID().toString();
                     var from=time(Json.required(grant,"validFrom"));var until=time(Json.required(grant,"validUntil"));
-                    seedTemporal(c,fixture,"INSERT INTO mulino_identity_ExternalIdentities(organizationId,ID,actorId,issuer,subject,organizationAlias) VALUES(?,?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,configuration.issuer(),Json.required(a,"subject"),externalAlias);
+                    // An untrusted authored identity is bound to its own issuer; the backend never resolves it through the deployed issuer.
+                    seedTemporal(c,fixture,"INSERT INTO mulino_identity_ExternalIdentities(organizationId,ID,actorId,issuer,subject,organizationAlias) VALUES(?,?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,untrusted?Json.required(a,"issuer"):configuration.issuer(),Json.required(a,"subject"),externalAlias);
                     seedTemporal(c,fixture,"INSERT INTO mulino_identity_Memberships(organizationId,ID,actorId,validFrom,validUntil) VALUES(?,?,?,?,?)",org,UUID.randomUUID().toString(),actor,from,until);
                     seedTemporal(c,fixture,"INSERT INTO mulino_identity_Grants(organizationId,ID,actorId,delegatorId,validFrom,validUntil) VALUES(?,?,?,?,?,?)",org,grantId,actor,delegator,from,until);
                     // Only an explicit organization scope is supported; never broaden item/work-restricted grants.
