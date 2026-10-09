@@ -13,6 +13,8 @@ Run: python3 -m unittest discover -s verification/mcp-tests -p 'test_*.py' -v
 import shutil, subprocess, sys, tempfile, unittest
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
+# step2r round 12: every generator writes its requests through the shared request contract module.
+REQUEST_CONTRACT = ['verification/cases/request_contract.py', 'contracts/intent.schema.json', 'contracts/request-contracts.json']
 
 def copy(rel, dest):
     target = dest / rel
@@ -32,15 +34,15 @@ class GeneratorsReproduceCommittedFiles(unittest.TestCase):
     def test_channel_cases(self):
         outputs = [f'verification/cases/{c}/{f}' for c in ['T01', 'T20', 'T25'] for f in ['case.json', 'fixture.json', 'scenario.feature']]
         self.run_generator('verification/mcp-tests/author_cases.py', ['verification/requirements/mandatory-oracles.json', 'contracts/acceptance-capabilities.json',
-                                                                    'contracts/mcp/s0-protocol.md'] + outputs, outputs)
+                                                                    'contracts/mcp/s0-protocol.md'] + REQUEST_CONTRACT + outputs, outputs)
 
     def test_c3_post_processor_is_a_fixed_point(self):
         self.run_generator('verification/cases/C3/author_prerequisites.py', ['verification/cases/C3', 'contracts/acceptance-capabilities.json',
-                                                                             'verification/requirements/mandatory-oracles.json'],
+                                                                             'verification/requirements/mandatory-oracles.json'] + REQUEST_CONTRACT,
                            [f'verification/cases/C3/{f}' for f in ['case.json', 'scenario.feature', 'observation-bindings.json', 'fixture-closeRecall.json', 'fixture-emergencyReassign.json', 'fixture-dispatchPurchaseOrder.json', 'recipient-acceptance.json']])
 
     def test_t26_post_processor_is_a_fixed_point(self):
-        self.run_generator('verification/cases/T26/author_review_fixes.py', ['verification/cases/T26'],
+        self.run_generator('verification/cases/T26/author_review_fixes.py', ['verification/cases/T26', 'contracts/acceptance-capabilities.json'] + REQUEST_CONTRACT,
                            [f'verification/cases/T26/{f}' for f in ['case.json', 'scenario.feature', 'oracle-bindings.json', 'fixtures/safe-retry-forged-original-actor.json',
                             'fixtures/due-wait-autonomous-loop.json', 'fixtures/lot-expiry-autonomous-loop.json', 'fixtures/orphan-intake-autonomous-loop.json']])
 

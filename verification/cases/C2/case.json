@@ -53,8 +53,7 @@
               "workType": "PURCHASE_ARRIVAL",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "destinationId": {
                 "$alias": "W"
@@ -91,7 +90,25 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "workType": "USER",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "period": "USER",
+              "eventKinds": "USER",
+              "distinctContributionScope": "USER",
+              "evidencePolicyVersion": "USER",
+              "evaluationTime": "USER",
+              "placeId": "CONTEXT",
+              "eligibilityAction": "USER",
+              "includeReservations": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT"
+            }
           }
         },
         {
@@ -119,8 +136,7 @@
               "workType": "PURCHASE_ARRIVAL",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "destinationId": {
                 "$alias": "W"
@@ -157,7 +173,25 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "workType": "USER",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "period": "USER",
+              "eventKinds": "USER",
+              "distinctContributionScope": "USER",
+              "evidencePolicyVersion": "USER",
+              "evaluationTime": "USER",
+              "placeId": "CONTEXT",
+              "eligibilityAction": "USER",
+              "includeReservations": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT"
+            }
           }
         },
         {
@@ -207,7 +241,16 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "segmentId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "canonicalOccurrenceKey": "USER",
+              "purchaseOrderId": "CONTEXT"
+            }
           }
         },
         {
@@ -251,7 +294,14 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "customerId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER"
+            }
           }
         },
         {
@@ -299,7 +349,12 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "segmentId": "CONTEXT",
+              "orderId": "CONTEXT"
+            }
           }
         },
         {
@@ -342,7 +397,10 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "allocationId": "CONTEXT"
+            }
           }
         },
         {
@@ -419,7 +477,14 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT"
+            }
           }
         },
         {
@@ -492,7 +557,16 @@
               {
                 "$alias": "DOC"
               }
-            ]
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "segmentId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "canonicalOccurrenceKey": "USER",
+              "purchaseOrderId": "CONTEXT"
+            }
           }
         },
         {
@@ -531,10 +605,6 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "C2",
-              "itemId": {
-                "$alias": "P"
               }
             },
             "asOf": "2026-10-07T02:00:00Z",
@@ -544,8 +614,7 @@
                 "actionId": "cumulative",
                 "pointer": "/response/workId"
               }
-            },
-            "evaluationTime": "2026-10-07T02:00:00Z"
+            }
           }
         },
         {
@@ -561,10 +630,6 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "C2",
-              "itemId": {
-                "$alias": "P"
               }
             },
             "asOf": "2026-10-07T02:00:00Z",
@@ -574,8 +639,7 @@
                 "actionId": "state",
                 "pointer": "/response/workId"
               }
-            },
-            "evaluationTime": "2026-10-07T02:00:00Z"
+            }
           }
         },
         {
@@ -592,7 +656,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "C2",
               "itemId": {
                 "$alias": "P"
               }

@@ -5,6 +5,12 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
+def _request_contract():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module.Contracts(ROOT)
+REQUEST_CONTRACT = _request_contract()  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
 NOW = '2026-10-07T00:00:00Z'
 LATER = '2026-10-07T01:00:00Z'
 EVENT = '2026-10-05T00:00:00Z'
@@ -48,7 +54,7 @@ class Case:
     def finish(self):
         folder=ROOT/'verification/cases'/self.cid
         data={'schemaVersion':'1.0.0','caseId':self.cid,'title':self.title,'requirementRefs':['D'+self.cid[1:]],'profiles':['contracts','scenarios','recovery'],'subcases':[s.data for s in self.subs]}
-        write(folder/'case.json',data)
+        write(folder/'case.json',REQUEST_CONTRACT.conform_case(data))
         lines=['# language: ko',f'@{self.cid} @D{self.cid[1:]} @sit @uat @contract-red',f'기능: {self.title}']
         for sub in self.subs:
             lines += ['',f'  시나리오: {sub.title}',f'    먼저 사례 파일 "verification/cases/{self.cid}/case.json"의 "{sub.sid}"를 준비한다']
@@ -121,7 +127,7 @@ class Sub:
         self.raw(kind+'-human-owner','assignments',['HUMAN'],obs,'exactSet',field='ownerType',where=where)
         self.query('api-duty-'+kind,'getObligations',actor='intake',request={'kind':kind})
         self.ass(kind+'-api-responsibility','api-duty-'+kind,'/response/data/items',[[alias(owner),action,NEXT]],obs,'relationSet',field=['ownerId','nextAction','nextCheckAt'],where=where)
-    def finish(self): write(ROOT/self.data['fixtureRef'],self.fixture)
+    def finish(self): write(ROOT/self.data['fixtureRef'],REQUEST_CONTRACT.conform_fixture(self.fixture))
 
 def build_t06():
     c=Case('T06','과거에 알던 사실과 현재 정정·시간·미확인 상태를 구별한다')
@@ -173,7 +179,10 @@ def build_t06():
         s.invoke('record','recordActivity',request={'kind':'RECEIPT_OBSERVATION','quantity':'100','unit':'BOX','targetId':alias('Q100'),'source':p})
         s.invoke('match','matchSourceIdentity','reconciler',{'activityId':result('record','/response/activityId'),'targetId':alias('Q100'),'basis':alias('at-deadline')})
         s.invoke('link','linkCanonicalOccurrence','reconciler',{'activityId':result('record','/response/activityId'),'scope':s.scope,'targetId':alias('Q100'),'identityMatchId':result('match','/response/id'),'basis':alias('at-deadline')})
-        s.invoke('confirm','confirmReceipt',request={'occurrenceId':result('link','/response/occurrenceId'),'segmentId':alias('Q100'),'quantity':'100','unit':'BOX','placeId':alias('W')})
+        # step2r round 12: a direct receipt into W (no segmentId): Q100 already sits at W, and a receipt naming an existing leaf is a
+        # transit receipt the product accepts only from a TRANSIT place (contracts/fixture-place-kinds.json transitReceipt). The
+        # top-level request fields hid the leaf from that prepare rule until they moved into slots.
+        s.invoke('confirm','confirmReceipt',request={'occurrenceId':result('link','/response/occurrenceId'),'quantity':'100','unit':'BOX','placeId':alias('W')})
         s.query('assessment','getAssessment',request={'workId':alias('O1')});s.db('db-after','assessment',['events','assessments'])
         s.ass('deadline-status','assessment','/response/data/result',status,'time-preserved')
         s.raw('deadline-meaning','assessments',[[status,incl,'2026-10-05T15:00:00Z','Asia/Seoul']],'time-preserved','relationSet',field=['result','deadlineInclusive','dueAt','timezone'])
@@ -186,7 +195,7 @@ def build_t06():
     s.invoke('record','recordActivity',request={'kind':'RECEIPT_OBSERVATION','quantity':'100','unit':'BOX','targetId':alias('Q100'),'source':p})
     s.invoke('match','matchSourceIdentity','reconciler',{'activityId':result('record','/response/activityId'),'targetId':alias('Q100'),'basis':alias('date-only')})
     s.invoke('link','linkCanonicalOccurrence','reconciler',{'activityId':result('record','/response/activityId'),'targetId':alias('Q100'),'identityMatchId':result('match','/response/id'),'basis':alias('date-only')})
-    s.invoke('confirm','confirmReceipt',request={'occurrenceId':result('link','/response/occurrenceId'),'segmentId':alias('Q100'),'quantity':'100','unit':'BOX','placeId':alias('W'),'occurredRange':p['occurredRange'],'precision':'DATE'})
+    s.invoke('confirm','confirmReceipt',request={'occurrenceId':result('link','/response/occurrenceId'),'quantity':'100','unit':'BOX','placeId':alias('W'),'occurredRange':p['occurredRange'],'precision':'DATE'})  # direct receipt (round 12)
     s.query('evidence','getEvidence',request={'activityId':result('record','/response/activityId')});s.query('assessment','getAssessment',request={'workId':alias('O1')});s.db('db-after','assessment',['events','assessments','movements'])
     s.ass('date-range','evidence','/response/data/occurredRange',p['occurredRange'],'time-preserved')
     s.ass('date-precision','evidence','/response/data/precision','DATE','time-preserved')
@@ -245,7 +254,7 @@ def build_t22():
     s.invoke('carrier','recordActivity',request={'source':p,'quantity':'60','unit':'BOX','targetId':alias('A60')})
     s.invoke('match-carrier','matchSourceIdentity','reconciler',{'activityId':result('carrier','/response/activityId'),'targetId':alias('A60'),'basis':alias('carrier60')})
     s.invoke('canonical','linkCanonicalOccurrence','reconciler',{'activityId':result('carrier','/response/activityId'),'targetId':alias('A60'),'identityMatchId':result('match-carrier','/response/id'),'basis':alias('carrier60')})
-    s.invoke('receipt','confirmReceipt',request={'occurrenceId':result('canonical','/response/occurrenceId'),'segmentId':alias('A60'),'quantity':'60','unit':'BOX','placeId':alias('W')})
+    s.invoke('receipt','confirmReceipt',request={'occurrenceId':result('canonical','/response/occurrenceId'),'quantity':'60','unit':'BOX','placeId':alias('W')})  # direct receipt into W (round 12)
     s.before(['movements','canonical_links','segments']);s.invoke('warehouse','recordActivity',request={'source':q,'quantity':'60','unit':'BOX','targetId':alias('A60')})
     s.query('unverified');s.db('db-unverified','unverified',['movements','segments'])
     s.invoke('match-warehouse','matchSourceIdentity','reconciler',{'activityId':result('warehouse','/response/activityId'),'targetId':alias('A60'),'basis':alias('warehouse60')})

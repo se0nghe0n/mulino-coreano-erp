@@ -133,16 +133,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "waiting-full-restart"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workKind": "check",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -151,28 +141,39 @@
                 }
               }
             ],
-            "goal": {
-              "quantity": "20",
-              "unit": "BOX",
-              "quantityMode": "STATE_AT",
-              "endpoint": "VERIFIED",
-              "destinationId": {
-                "$alias": "W"
+            "commandIdempotencyKey": "V5-waiting-full-restart-create",
+            "slots": {
+              "workKind": "check",
+              "goal": {
+                "quantity": "20",
+                "unit": "BOX",
+                "quantityMode": "STATE_AT",
+                "endpoint": "VERIFIED",
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T09:00:10Z",
+                "deadlineInclusive": true,
+                "timezone": "Asia/Seoul",
+                "evidencePolicyVersion": "synthetic-evidence-v1"
               },
-              "dueAt": "2026-10-07T09:00:10Z",
-              "deadlineInclusive": true,
-              "timezone": "Asia/Seoul",
-              "evidencePolicyVersion": "synthetic-evidence-v1"
+              "ownerId": {
+                "$alias": "owner"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "조사·재인가·안전 재시도",
+              "nextCheckAt": "2026-10-07T09:01:00Z"
             },
-            "ownerId": {
-              "$alias": "owner"
-            },
-            "supervisorId": {
-              "$alias": "supervisor"
-            },
-            "nextAction": "조사·재인가·안전 재시도",
-            "nextCheckAt": "2026-10-07T09:01:00Z",
-            "commandIdempotencyKey": "V5-waiting-full-restart-create"
+            "provenance": {
+              "workKind": "USER",
+              "goal": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
+            }
           },
           "evidenceRefs": [
             "create:actual-artifact"
@@ -188,28 +189,25 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "waiting-full-restart"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V5-waiting-full-restart-create-activate"
+            "commandIdempotencyKey": "V5-waiting-full-restart-create-activate",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "create-activate:actual-artifact"
@@ -225,42 +223,45 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "waitWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "waiting-full-restart"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create-activate",
                 "pointer": "/response/revision"
               }
             },
-            "reason": "AWAITING_VERIFIED_EVIDENCE",
-            "targetId": {
-              "$alias": "Q20"
+            "commandIdempotencyKey": "V5-waiting-full-restart-wait",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              },
+              "reason": "AWAITING_VERIFIED_EVIDENCE",
+              "targetId": {
+                "$alias": "Q20"
+              },
+              "resumePredicate": {
+                "kind": "evidenceAvailable",
+                "eventId": "EV-READY",
+                "expectedRevision": 1
+              },
+              "verifierId": {
+                "$alias": "owner"
+              },
+              "nextCheckAt": "2026-10-07T09:00:10Z",
+              "overdueAction": "ESCALATE_EXISTING_DUTY"
             },
-            "resumePredicate": {
-              "kind": "evidenceAvailable",
-              "eventId": "EV-READY",
-              "expectedRevision": 1
-            },
-            "verifierId": {
-              "$alias": "owner"
-            },
-            "nextCheckAt": "2026-10-07T09:00:10Z",
-            "overdueAction": "ESCALATE_EXISTING_DUTY",
-            "commandIdempotencyKey": "V5-waiting-full-restart-wait"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "reason": "USER",
+              "targetId": "CONTEXT",
+              "resumePredicate": "USER",
+              "verifierId": "CONTEXT",
+              "nextCheckAt": "USER",
+              "overdueAction": "USER"
+            }
           },
           "evidenceRefs": [
             "wait:actual-artifact"
@@ -352,15 +353,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "waiting-full-restart"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:00Z",
@@ -697,15 +694,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "waiting-full-restart"
+              }
             },
             "asOf": "2026-10-07T09:00:10Z",
             "knownAt": "2026-10-07T09:00:10Z",
@@ -1627,16 +1620,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "two-workers-expired-fence"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workKind": "check",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -1645,28 +1628,39 @@
                 }
               }
             ],
-            "goal": {
-              "quantity": "20",
-              "unit": "BOX",
-              "quantityMode": "STATE_AT",
-              "endpoint": "VERIFIED",
-              "destinationId": {
-                "$alias": "W"
+            "commandIdempotencyKey": "V5-two-workers-expired-fence-create",
+            "slots": {
+              "workKind": "check",
+              "goal": {
+                "quantity": "20",
+                "unit": "BOX",
+                "quantityMode": "STATE_AT",
+                "endpoint": "VERIFIED",
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T09:00:10Z",
+                "deadlineInclusive": true,
+                "timezone": "Asia/Seoul",
+                "evidencePolicyVersion": "synthetic-evidence-v1"
               },
-              "dueAt": "2026-10-07T09:00:10Z",
-              "deadlineInclusive": true,
-              "timezone": "Asia/Seoul",
-              "evidencePolicyVersion": "synthetic-evidence-v1"
+              "ownerId": {
+                "$alias": "owner"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "조사·재인가·안전 재시도",
+              "nextCheckAt": "2026-10-07T09:01:00Z"
             },
-            "ownerId": {
-              "$alias": "owner"
-            },
-            "supervisorId": {
-              "$alias": "supervisor"
-            },
-            "nextAction": "조사·재인가·안전 재시도",
-            "nextCheckAt": "2026-10-07T09:01:00Z",
-            "commandIdempotencyKey": "V5-two-workers-expired-fence-create"
+            "provenance": {
+              "workKind": "USER",
+              "goal": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
+            }
           },
           "evidenceRefs": [
             "create:actual-artifact"
@@ -1682,28 +1676,25 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "two-workers-expired-fence"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V5-two-workers-expired-fence-create-activate"
+            "commandIdempotencyKey": "V5-two-workers-expired-fence-create-activate",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "create-activate:actual-artifact"
@@ -1719,42 +1710,45 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "waitWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "two-workers-expired-fence"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create-activate",
                 "pointer": "/response/revision"
               }
             },
-            "reason": "AWAITING_VERIFIED_EVIDENCE",
-            "targetId": {
-              "$alias": "Q20"
+            "commandIdempotencyKey": "V5-two-workers-expired-fence-wait",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              },
+              "reason": "AWAITING_VERIFIED_EVIDENCE",
+              "targetId": {
+                "$alias": "Q20"
+              },
+              "resumePredicate": {
+                "kind": "evidenceAvailable",
+                "eventId": "EV-READY",
+                "expectedRevision": 1
+              },
+              "verifierId": {
+                "$alias": "owner"
+              },
+              "nextCheckAt": "2026-10-07T09:00:10Z",
+              "overdueAction": "ESCALATE_EXISTING_DUTY"
             },
-            "resumePredicate": {
-              "kind": "evidenceAvailable",
-              "eventId": "EV-READY",
-              "expectedRevision": 1
-            },
-            "verifierId": {
-              "$alias": "owner"
-            },
-            "nextCheckAt": "2026-10-07T09:00:10Z",
-            "overdueAction": "ESCALATE_EXISTING_DUTY",
-            "commandIdempotencyKey": "V5-two-workers-expired-fence-wait"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "reason": "USER",
+              "targetId": "CONTEXT",
+              "resumePredicate": "USER",
+              "verifierId": "CONTEXT",
+              "nextCheckAt": "USER",
+              "overdueAction": "USER"
+            }
           },
           "evidenceRefs": [
             "wait:actual-artifact"
@@ -1896,15 +1890,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "two-workers-expired-fence"
+              }
             },
             "asOf": "2026-10-07T09:00:10Z",
             "knownAt": "2026-10-07T09:00:10Z",
@@ -2114,15 +2104,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "two-workers-expired-fence"
+              }
             },
             "asOf": "2026-10-07T09:00:20Z",
             "knownAt": "2026-10-07T09:00:20Z",
@@ -2321,15 +2307,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "two-workers-expired-fence"
+              }
             },
             "asOf": "2026-10-07T09:00:20Z",
             "knownAt": "2026-10-07T09:00:20Z",
@@ -3541,16 +3523,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "repeated-crash-no-duplicate"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workKind": "check",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -3559,28 +3531,39 @@
                 }
               }
             ],
-            "goal": {
-              "quantity": "20",
-              "unit": "BOX",
-              "quantityMode": "STATE_AT",
-              "endpoint": "VERIFIED",
-              "destinationId": {
-                "$alias": "W"
+            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create",
+            "slots": {
+              "workKind": "check",
+              "goal": {
+                "quantity": "20",
+                "unit": "BOX",
+                "quantityMode": "STATE_AT",
+                "endpoint": "VERIFIED",
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T09:00:10Z",
+                "deadlineInclusive": true,
+                "timezone": "Asia/Seoul",
+                "evidencePolicyVersion": "synthetic-evidence-v1"
               },
-              "dueAt": "2026-10-07T09:00:10Z",
-              "deadlineInclusive": true,
-              "timezone": "Asia/Seoul",
-              "evidencePolicyVersion": "synthetic-evidence-v1"
+              "ownerId": {
+                "$alias": "owner"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "조사·재인가·안전 재시도",
+              "nextCheckAt": "2026-10-07T09:01:00Z"
             },
-            "ownerId": {
-              "$alias": "owner"
-            },
-            "supervisorId": {
-              "$alias": "supervisor"
-            },
-            "nextAction": "조사·재인가·안전 재시도",
-            "nextCheckAt": "2026-10-07T09:01:00Z",
-            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create"
+            "provenance": {
+              "workKind": "USER",
+              "goal": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
+            }
           },
           "evidenceRefs": [
             "create:actual-artifact"
@@ -3596,28 +3579,25 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "repeated-crash-no-duplicate"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create-activate"
+            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create-activate",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "create-activate:actual-artifact"
@@ -3633,42 +3613,45 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "waitWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "repeated-crash-no-duplicate"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create-activate",
                 "pointer": "/response/revision"
               }
             },
-            "reason": "AWAITING_VERIFIED_EVIDENCE",
-            "targetId": {
-              "$alias": "Q20"
+            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-wait",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              },
+              "reason": "AWAITING_VERIFIED_EVIDENCE",
+              "targetId": {
+                "$alias": "Q20"
+              },
+              "resumePredicate": {
+                "kind": "evidenceAvailable",
+                "eventId": "EV-READY",
+                "expectedRevision": 1
+              },
+              "verifierId": {
+                "$alias": "owner"
+              },
+              "nextCheckAt": "2026-10-07T09:00:10Z",
+              "overdueAction": "ESCALATE_EXISTING_DUTY"
             },
-            "resumePredicate": {
-              "kind": "evidenceAvailable",
-              "eventId": "EV-READY",
-              "expectedRevision": 1
-            },
-            "verifierId": {
-              "$alias": "owner"
-            },
-            "nextCheckAt": "2026-10-07T09:00:10Z",
-            "overdueAction": "ESCALATE_EXISTING_DUTY",
-            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-wait"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "reason": "USER",
+              "targetId": "CONTEXT",
+              "resumePredicate": "USER",
+              "verifierId": "CONTEXT",
+              "nextCheckAt": "USER",
+              "overdueAction": "USER"
+            }
           },
           "evidenceRefs": [
             "wait:actual-artifact"
@@ -4178,15 +4161,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "repeated-crash-no-duplicate"
+              }
             },
             "asOf": "2026-10-07T09:00:22Z",
             "knownAt": "2026-10-07T09:00:22Z",
@@ -5181,16 +5160,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "bounded-retry-exhausted-owner"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workKind": "check",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -5199,28 +5168,39 @@
                 }
               }
             ],
-            "goal": {
-              "quantity": "20",
-              "unit": "BOX",
-              "quantityMode": "STATE_AT",
-              "endpoint": "VERIFIED",
-              "destinationId": {
-                "$alias": "W"
+            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create",
+            "slots": {
+              "workKind": "check",
+              "goal": {
+                "quantity": "20",
+                "unit": "BOX",
+                "quantityMode": "STATE_AT",
+                "endpoint": "VERIFIED",
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T09:00:10Z",
+                "deadlineInclusive": true,
+                "timezone": "Asia/Seoul",
+                "evidencePolicyVersion": "synthetic-evidence-v1"
               },
-              "dueAt": "2026-10-07T09:00:10Z",
-              "deadlineInclusive": true,
-              "timezone": "Asia/Seoul",
-              "evidencePolicyVersion": "synthetic-evidence-v1"
+              "ownerId": {
+                "$alias": "owner"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "조사·재인가·안전 재시도",
+              "nextCheckAt": "2026-10-07T09:01:00Z"
             },
-            "ownerId": {
-              "$alias": "owner"
-            },
-            "supervisorId": {
-              "$alias": "supervisor"
-            },
-            "nextAction": "조사·재인가·안전 재시도",
-            "nextCheckAt": "2026-10-07T09:01:00Z",
-            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create"
+            "provenance": {
+              "workKind": "USER",
+              "goal": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
+            }
           },
           "evidenceRefs": [
             "create:actual-artifact"
@@ -5236,28 +5216,25 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "bounded-retry-exhausted-owner"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create-activate"
+            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create-activate",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "create-activate:actual-artifact"
@@ -5273,42 +5250,45 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "waitWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "bounded-retry-exhausted-owner"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/workId"
-              }
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "create-activate",
                 "pointer": "/response/revision"
               }
             },
-            "reason": "AWAITING_VERIFIED_EVIDENCE",
-            "targetId": {
-              "$alias": "Q20"
+            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-wait",
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "create",
+                  "pointer": "/response/workId"
+                }
+              },
+              "reason": "AWAITING_VERIFIED_EVIDENCE",
+              "targetId": {
+                "$alias": "Q20"
+              },
+              "resumePredicate": {
+                "kind": "evidenceAvailable",
+                "eventId": "EV-READY",
+                "expectedRevision": 1
+              },
+              "verifierId": {
+                "$alias": "owner"
+              },
+              "nextCheckAt": "2026-10-07T09:00:10Z",
+              "overdueAction": "ESCALATE_EXISTING_DUTY"
             },
-            "resumePredicate": {
-              "kind": "evidenceAvailable",
-              "eventId": "EV-READY",
-              "expectedRevision": 1
-            },
-            "verifierId": {
-              "$alias": "owner"
-            },
-            "nextCheckAt": "2026-10-07T09:00:10Z",
-            "overdueAction": "ESCALATE_EXISTING_DUTY",
-            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-wait"
+            "subjectRefs": [],
+            "provenance": {
+              "workId": "CONTEXT",
+              "reason": "USER",
+              "targetId": "CONTEXT",
+              "resumePredicate": "USER",
+              "verifierId": "CONTEXT",
+              "nextCheckAt": "USER",
+              "overdueAction": "USER"
+            }
           },
           "evidenceRefs": [
             "wait:actual-artifact"
@@ -5607,15 +5587,11 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "V5",
-              "subcaseId": "bounded-retry-exhausted-owner"
+              }
             },
             "asOf": "2026-10-07T09:00:16Z",
             "knownAt": "2026-10-07T09:00:16Z",

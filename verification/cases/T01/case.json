@@ -919,12 +919,6 @@
                 "$alias": "L"
               }
             },
-            "workId": {
-              "$alias": "O1"
-            },
-            "lotId": {
-              "$alias": "L"
-            },
             "action": "SELL",
             "customerId": {
               "$alias": "C"
@@ -1405,12 +1399,6 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "lotId": {
-                "$alias": "L"
               }
             },
             "workId": {
@@ -3102,12 +3090,6 @@
                 "$alias": "L"
               }
             },
-            "workId": {
-              "$alias": "O1"
-            },
-            "lotId": {
-              "$alias": "L"
-            },
             "action": "SELL",
             "customerId": {
               "$alias": "C"
@@ -3678,7 +3660,6 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "requestedEffect": "manufacture",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -3687,7 +3668,14 @@
                 }
               }
             ],
-            "conversationRequestId": "excluded-manufacture"
+            "conversationRequestId": "excluded-manufacture",
+            "slots": {
+              "requestedEffect": "manufacture"
+            },
+            "capabilityId": "structureIntent",
+            "provenance": {
+              "requestedEffect": "USER"
+            }
           },
           "evidenceRefs": [
             "unsupported:actual-response",
@@ -4307,7 +4295,6 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "requestedEffect": "BOM",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -4316,7 +4303,14 @@
                 }
               }
             ],
-            "conversationRequestId": "excluded-BOM"
+            "conversationRequestId": "excluded-BOM",
+            "slots": {
+              "requestedEffect": "BOM"
+            },
+            "capabilityId": "structureIntent",
+            "provenance": {
+              "requestedEffect": "USER"
+            }
           },
           "evidenceRefs": [
             "unsupported:actual-response",
@@ -4936,7 +4930,6 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "requestedEffect": "B2C",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -4945,7 +4938,14 @@
                 }
               }
             ],
-            "conversationRequestId": "excluded-B2C"
+            "conversationRequestId": "excluded-B2C",
+            "slots": {
+              "requestedEffect": "B2C"
+            },
+            "capabilityId": "structureIntent",
+            "provenance": {
+              "requestedEffect": "USER"
+            }
           },
           "evidenceRefs": [
             "unsupported:actual-response",
@@ -5565,7 +5565,6 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "requestedEffect": "generalLedger",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -5574,7 +5573,14 @@
                 }
               }
             ],
-            "conversationRequestId": "excluded-generalLedger"
+            "conversationRequestId": "excluded-generalLedger",
+            "slots": {
+              "requestedEffect": "generalLedger"
+            },
+            "capabilityId": "structureIntent",
+            "provenance": {
+              "requestedEffect": "USER"
+            }
           },
           "evidenceRefs": [
             "unsupported:actual-response",
@@ -6194,7 +6200,6 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "requestedEffect": "taxSubmit",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -6203,7 +6208,14 @@
                 }
               }
             ],
-            "conversationRequestId": "excluded-taxSubmit"
+            "conversationRequestId": "excluded-taxSubmit",
+            "slots": {
+              "requestedEffect": "taxSubmit"
+            },
+            "capabilityId": "structureIntent",
+            "provenance": {
+              "requestedEffect": "USER"
+            }
           },
           "evidenceRefs": [
             "unsupported:actual-response",
@@ -6823,7 +6835,6 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "requestedEffect": "bankTransfer",
             "subjectRefs": [
               {
                 "type": "TradeItem",
@@ -6832,7 +6843,14 @@
                 }
               }
             ],
-            "conversationRequestId": "excluded-bankTransfer"
+            "conversationRequestId": "excluded-bankTransfer",
+            "slots": {
+              "requestedEffect": "bankTransfer"
+            },
+            "capabilityId": "structureIntent",
+            "provenance": {
+              "requestedEffect": "USER"
+            }
           },
           "evidenceRefs": [
             "unsupported:actual-response",

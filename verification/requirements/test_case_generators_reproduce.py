@@ -1,4 +1,4 @@
-"""Committed V4, T06/T22/T24 and T23/V8 files must equal their generators' output (temp copy; never a runtime PASS).
+"""Committed V4, T06/T22/T24, T23/V8 and round 12 files must equal their generators' output (temp copy; never a runtime PASS).
 
 verification/mcp-tests/test_generators_reproduce.py covers T01/T20/T25, C3 and T26. The generators
 below were outside every gate, so a hand edit of their outputs or a generator change that was not
@@ -47,6 +47,11 @@ class CaseGeneratorsReproduce(unittest.TestCase):
     def test_t06_contracts(self):
         self.reproduce('verification/cases/T06/author_contracts.py', [],
                        ['verification/cases', 'verification/requirements/mandatory-oracles.json', 'contracts'])
+
+    def test_round12_request_contract_author(self):
+        # Post-processor over the hand-maintained cases and fixtures: proves the fixed point (idempotence).
+        self.reproduce('docs/execution/step2r-round12/author_round12.py', [],
+                       ['verification/cases', 'contracts', 'docs/execution/step2r-round12/author_round12.py'])
 
     def test_platform_cases(self):
         self.reproduce('verification/platform-tests/build_cases.py', [],

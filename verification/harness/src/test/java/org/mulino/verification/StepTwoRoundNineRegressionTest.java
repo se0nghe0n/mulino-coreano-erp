@@ -188,7 +188,7 @@ final class StepTwoRoundNineRegressionTest {
         assertEquals(List.of(),custody("E1","full-flow-quantities",NONE,f->nameCustodian(f,"delivery-proof","qc")));
         // T13 now names its original as the verification basis; without it the receipts are unevidenced.
         rejects("no receipt original it cites",custody("T13",T13,x->slots(x,"receipt60").remove("evidenceId"),NONE));
-        for(String r:List.of("receipt60","receipt40","receipt5")) assertEquals("warehouse-receipt",slots(sub(caseJson("T13"),T13),r).at("/evidenceId/value/$alias").asText(),r);
+        for(String r:List.of("receipt60","receipt40","receipt5")) assertEquals("warehouse-receipt",slots(sub(caseJson("T13"),T13),r).at("/evidenceId/$alias").asText(),r);
         // A duplicate source of the same canonicalOccurrenceKey adds a verified chain: its basis naming qc conflicts with warehouse-60.
         rejects("name different receiving custodians",custody("E1","full-flow-quantities",x->{ObjectNode dup=action(x,"receipt60").deepCopy();dup.put("id","receipt60-other-source");
             ((ObjectNode)dup.path("request").path("slots")).set("evidenceId",Json.parse("{\"$alias\":\"delivery-proof\"}"));

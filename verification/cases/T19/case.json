@@ -46,57 +46,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "COMMERCIAL",
-                "provenance": "USER"
-              },
+              "invoiceKind": "COMMERCIAL",
               "originalAmount": {
                 "value": "105",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1.05",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1.05",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -122,33 +116,31 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "kind": {
-                "value": "FREIGHT_REFERENCE",
-                "provenance": "USER"
-              },
+              "kind": "FREIGHT_REFERENCE",
               "amount": {
                 "value": "0",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "custody",
-                "provenance": "USER"
-              }
+              "evidence": "custody"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-charge",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "kind": "USER",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "charge:actual-adapter-artifact"
@@ -174,40 +166,38 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "receiptOccurrenceKey": {
-                "value": "ACTUAL-R100",
-                "provenance": "USER"
-              },
+              "receiptOccurrenceKey": "ACTUAL-R100",
               "matchQuantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "orderedAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-match",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "purchaseLineId": "CONTEXT",
+              "receiptOccurrenceKey": "USER",
+              "matchQuantity": "USER",
+              "orderedAmount": "USER"
+            }
           },
           "evidenceRefs": [
             "match:actual-adapter-artifact"
@@ -232,51 +222,45 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "DOMESTIC_TAX",
-                "provenance": "USER"
-              },
-              "scopeKind": {
-                "value": "SALE",
-                "provenance": "USER"
-              },
+              "invoiceKind": "DOMESTIC_TAX",
+              "scopeKind": "SALE",
               "saleLineId": {
-                "value": {
-                  "$alias": "SALE-LINE"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SALE-LINE"
               },
               "deliveryId": {
-                "value": {
-                  "$alias": "OLD-DELIVERY"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "OLD-DELIVERY"
               },
               "quantity": {
                 "value": "30",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "originalAmount": {
                 "value": "30",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "unitPrice": {
                 "value": "1",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              }
+              "evidence": "invoice"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-sale-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "scopeKind": "USER",
+              "saleLineId": "CONTEXT",
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "originalAmount": "USER",
+              "unitPrice": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "sale-invoice:actual-adapter-artifact"
@@ -302,32 +286,30 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "sale-invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "sale-invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
               "saleLineId": {
-                "value": {
-                  "$alias": "SALE-LINE"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SALE-LINE"
               },
               "deliveryId": {
-                "value": {
-                  "$alias": "OLD-DELIVERY"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "OLD-DELIVERY"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-sale-match",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "saleLineId": "CONTEXT",
+              "deliveryId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "sale-match:actual-adapter-artifact"
@@ -353,37 +335,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "PROPOSE",
-                "provenance": "USER"
-              },
+              "mode": "PROPOSE",
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "reason": {
-                "value": "원 차이 확인 제안",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "reason": "원 차이 확인 제안",
+              "evidence": "adjustment"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-adjustment-proposal",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "amount": "USER",
+              "reason": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "adjustment-proposal:actual-adapter-artifact"
@@ -399,11 +377,6 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "T19",
-              "subcaseId": "invoice-match-difference",
-              "itemId": {
-                "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
@@ -943,42 +916,40 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "COMMERCIAL",
-                "provenance": "USER"
-              },
+              "invoiceKind": "COMMERCIAL",
               "originalAmount": {
                 "value": "105",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "105",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "105",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1",
+                  "currency": "EUR"
+                }
               },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              }
+              "evidence": "invoice"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-quantity-difference-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -1004,30 +975,28 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "receiptOccurrenceKey": {
-                "value": "ACTUAL-R100",
-                "provenance": "USER"
-              }
+              "receiptOccurrenceKey": "ACTUAL-R100"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-quantity-difference-match",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "purchaseLineId": "CONTEXT",
+              "receiptOccurrenceKey": "USER"
+            }
           },
           "evidenceRefs": [
             "match:actual-adapter-artifact"
@@ -1043,11 +1012,6 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseId": "T19",
-              "subcaseId": "invoice-quantity-difference",
-              "itemId": {
-                "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
@@ -1467,57 +1431,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "COMMERCIAL",
-                "provenance": "USER"
-              },
+              "invoiceKind": "COMMERCIAL",
               "originalAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -1534,15 +1492,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-commercial",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -1607,38 +1563,32 @@
             ],
             "slots": {
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "basisKind": {
-                "value": "QC",
-                "provenance": "USER"
-              },
-              "action": {
-                "value": "PAYMENT_REFERENCE",
-                "provenance": "USER"
-              },
-              "decision": {
-                "value": "PASS",
-                "provenance": "USER"
-              },
+              "basisKind": "QC",
+              "action": "PAYMENT_REFERENCE",
+              "decision": "PASS",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "evidence": {
-                "value": "qc-result",
-                "provenance": "USER"
-              }
+              "evidence": "qc-result"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-qc-result",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseLineId": "CONTEXT",
+              "basisKind": "USER",
+              "action": "USER",
+              "decision": "USER",
+              "quantity": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "qc-result:actual-adapter-artifact"
@@ -1664,37 +1614,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "externalPaymentReference": {
-                "value": "SYNTHETIC-BANK-REFERENCE-ONLY",
-                "provenance": "USER"
-              },
+              "externalPaymentReference": "SYNTHETIC-BANK-REFERENCE-ONLY",
               "amount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "observedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "payment-reference",
-                "provenance": "USER"
-              }
+              "observedAt": "2026-10-07T09:00:00Z",
+              "evidence": "payment-reference"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-payment-ref",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "externalPaymentReference": "USER",
+              "amount": "USER",
+              "observedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "payment-ref:actual-adapter-artifact"
@@ -1719,36 +1665,28 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "FX",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "fx-v2",
-                "provenance": "USER"
-              },
-              "pair": {
-                "value": "EUR/KRW",
-                "provenance": "USER"
-              },
-              "rate": {
-                "value": "1600",
-                "provenance": "USER"
-              },
-              "source": {
-                "value": "synthetic-fx",
-                "provenance": "USER"
-              },
-              "effectiveAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              }
+              "kind": "FX",
+              "policyVersion": "fx-v2",
+              "pair": "EUR/KRW",
+              "rate": "1600",
+              "source": "synthetic-fx",
+              "effectiveAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-fx-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "pair": "USER",
+              "rate": "USER",
+              "source": "USER",
+              "effectiveAt": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-draft:actual-adapter-artifact"
@@ -1774,27 +1712,18 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               },
               "policyHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyHash"
+                }
               },
-              "regressionEvidence": {
-                "value": "synthetic-FX-policy-change",
-                "provenance": "USER"
-              }
+              "regressionEvidence": "synthetic-FX-policy-change"
             },
             "expectedRevision": {
               "$result": {
@@ -1804,8 +1733,15 @@
             },
             "commandIdempotencyKey": "T19-fx-commercial-fx-policy-approved",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT",
+              "policyHash": "CONTEXT",
+              "regressionEvidence": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-approved:actual-adapter-artifact"
@@ -1831,13 +1767,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -1848,8 +1781,13 @@
             },
             "commandIdempotencyKey": "T19-fx-commercial-fx-policy-active",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "fx-policy-active:actual-adapter-artifact"
@@ -1866,15 +1804,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-commercial",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -2512,57 +2448,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "DOMESTIC_TAX",
-                "provenance": "USER"
-              },
+              "invoiceKind": "DOMESTIC_TAX",
               "originalAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -2579,15 +2509,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-domestic_tax",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -2652,38 +2580,32 @@
             ],
             "slots": {
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "basisKind": {
-                "value": "QC",
-                "provenance": "USER"
-              },
-              "action": {
-                "value": "PAYMENT_REFERENCE",
-                "provenance": "USER"
-              },
-              "decision": {
-                "value": "PASS",
-                "provenance": "USER"
-              },
+              "basisKind": "QC",
+              "action": "PAYMENT_REFERENCE",
+              "decision": "PASS",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "evidence": {
-                "value": "qc-result",
-                "provenance": "USER"
-              }
+              "evidence": "qc-result"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-qc-result",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseLineId": "CONTEXT",
+              "basisKind": "USER",
+              "action": "USER",
+              "decision": "USER",
+              "quantity": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "qc-result:actual-adapter-artifact"
@@ -2709,37 +2631,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "externalPaymentReference": {
-                "value": "SYNTHETIC-BANK-REFERENCE-ONLY",
-                "provenance": "USER"
-              },
+              "externalPaymentReference": "SYNTHETIC-BANK-REFERENCE-ONLY",
               "amount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "observedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "payment-reference",
-                "provenance": "USER"
-              }
+              "observedAt": "2026-10-07T09:00:00Z",
+              "evidence": "payment-reference"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-payment-ref",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "externalPaymentReference": "USER",
+              "amount": "USER",
+              "observedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "payment-ref:actual-adapter-artifact"
@@ -2764,36 +2682,28 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "FX",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "fx-v2",
-                "provenance": "USER"
-              },
-              "pair": {
-                "value": "EUR/KRW",
-                "provenance": "USER"
-              },
-              "rate": {
-                "value": "1600",
-                "provenance": "USER"
-              },
-              "source": {
-                "value": "synthetic-fx",
-                "provenance": "USER"
-              },
-              "effectiveAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              }
+              "kind": "FX",
+              "policyVersion": "fx-v2",
+              "pair": "EUR/KRW",
+              "rate": "1600",
+              "source": "synthetic-fx",
+              "effectiveAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-fx-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "pair": "USER",
+              "rate": "USER",
+              "source": "USER",
+              "effectiveAt": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-draft:actual-adapter-artifact"
@@ -2819,27 +2729,18 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               },
               "policyHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyHash"
+                }
               },
-              "regressionEvidence": {
-                "value": "synthetic-FX-policy-change",
-                "provenance": "USER"
-              }
+              "regressionEvidence": "synthetic-FX-policy-change"
             },
             "expectedRevision": {
               "$result": {
@@ -2849,8 +2750,15 @@
             },
             "commandIdempotencyKey": "T19-fx-domestic_tax-fx-policy-approved",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT",
+              "policyHash": "CONTEXT",
+              "regressionEvidence": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-approved:actual-adapter-artifact"
@@ -2876,13 +2784,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -2893,8 +2798,13 @@
             },
             "commandIdempotencyKey": "T19-fx-domestic_tax-fx-policy-active",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "fx-policy-active:actual-adapter-artifact"
@@ -2911,15 +2821,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-domestic_tax",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -3517,57 +3425,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "CORRECTION",
-                "provenance": "USER"
-              },
+              "invoiceKind": "CORRECTION",
               "originalAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -3584,15 +3486,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-correction",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -3657,38 +3557,32 @@
             ],
             "slots": {
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "basisKind": {
-                "value": "QC",
-                "provenance": "USER"
-              },
-              "action": {
-                "value": "PAYMENT_REFERENCE",
-                "provenance": "USER"
-              },
-              "decision": {
-                "value": "PASS",
-                "provenance": "USER"
-              },
+              "basisKind": "QC",
+              "action": "PAYMENT_REFERENCE",
+              "decision": "PASS",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "evidence": {
-                "value": "qc-result",
-                "provenance": "USER"
-              }
+              "evidence": "qc-result"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-qc-result",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseLineId": "CONTEXT",
+              "basisKind": "USER",
+              "action": "USER",
+              "decision": "USER",
+              "quantity": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "qc-result:actual-adapter-artifact"
@@ -3714,37 +3608,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "externalPaymentReference": {
-                "value": "SYNTHETIC-BANK-REFERENCE-ONLY",
-                "provenance": "USER"
-              },
+              "externalPaymentReference": "SYNTHETIC-BANK-REFERENCE-ONLY",
               "amount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "observedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "payment-reference",
-                "provenance": "USER"
-              }
+              "observedAt": "2026-10-07T09:00:00Z",
+              "evidence": "payment-reference"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-payment-ref",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "externalPaymentReference": "USER",
+              "amount": "USER",
+              "observedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "payment-ref:actual-adapter-artifact"
@@ -3769,36 +3659,28 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "FX",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "fx-v2",
-                "provenance": "USER"
-              },
-              "pair": {
-                "value": "EUR/KRW",
-                "provenance": "USER"
-              },
-              "rate": {
-                "value": "1600",
-                "provenance": "USER"
-              },
-              "source": {
-                "value": "synthetic-fx",
-                "provenance": "USER"
-              },
-              "effectiveAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              }
+              "kind": "FX",
+              "policyVersion": "fx-v2",
+              "pair": "EUR/KRW",
+              "rate": "1600",
+              "source": "synthetic-fx",
+              "effectiveAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-fx-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "pair": "USER",
+              "rate": "USER",
+              "source": "USER",
+              "effectiveAt": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-draft:actual-adapter-artifact"
@@ -3824,27 +3706,18 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               },
               "policyHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyHash"
+                }
               },
-              "regressionEvidence": {
-                "value": "synthetic-FX-policy-change",
-                "provenance": "USER"
-              }
+              "regressionEvidence": "synthetic-FX-policy-change"
             },
             "expectedRevision": {
               "$result": {
@@ -3854,8 +3727,15 @@
             },
             "commandIdempotencyKey": "T19-fx-correction-fx-policy-approved",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT",
+              "policyHash": "CONTEXT",
+              "regressionEvidence": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-approved:actual-adapter-artifact"
@@ -3881,13 +3761,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -3898,8 +3775,13 @@
             },
             "commandIdempotencyKey": "T19-fx-correction-fx-policy-active",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "fx-policy-active:actual-adapter-artifact"
@@ -3916,15 +3798,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-correction",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -4522,57 +4402,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "CREDIT_NOTE",
-                "provenance": "USER"
-              },
+              "invoiceKind": "CREDIT_NOTE",
               "originalAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -4589,15 +4463,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-credit_note",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -4662,38 +4534,32 @@
             ],
             "slots": {
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "basisKind": {
-                "value": "QC",
-                "provenance": "USER"
-              },
-              "action": {
-                "value": "PAYMENT_REFERENCE",
-                "provenance": "USER"
-              },
-              "decision": {
-                "value": "PASS",
-                "provenance": "USER"
-              },
+              "basisKind": "QC",
+              "action": "PAYMENT_REFERENCE",
+              "decision": "PASS",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "evidence": {
-                "value": "qc-result",
-                "provenance": "USER"
-              }
+              "evidence": "qc-result"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-qc-result",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseLineId": "CONTEXT",
+              "basisKind": "USER",
+              "action": "USER",
+              "decision": "USER",
+              "quantity": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "qc-result:actual-adapter-artifact"
@@ -4719,37 +4585,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "externalPaymentReference": {
-                "value": "SYNTHETIC-BANK-REFERENCE-ONLY",
-                "provenance": "USER"
-              },
+              "externalPaymentReference": "SYNTHETIC-BANK-REFERENCE-ONLY",
               "amount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "observedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "payment-reference",
-                "provenance": "USER"
-              }
+              "observedAt": "2026-10-07T09:00:00Z",
+              "evidence": "payment-reference"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-payment-ref",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "externalPaymentReference": "USER",
+              "amount": "USER",
+              "observedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "payment-ref:actual-adapter-artifact"
@@ -4774,36 +4636,28 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "FX",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "fx-v2",
-                "provenance": "USER"
-              },
-              "pair": {
-                "value": "EUR/KRW",
-                "provenance": "USER"
-              },
-              "rate": {
-                "value": "1600",
-                "provenance": "USER"
-              },
-              "source": {
-                "value": "synthetic-fx",
-                "provenance": "USER"
-              },
-              "effectiveAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              }
+              "kind": "FX",
+              "policyVersion": "fx-v2",
+              "pair": "EUR/KRW",
+              "rate": "1600",
+              "source": "synthetic-fx",
+              "effectiveAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-fx-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "pair": "USER",
+              "rate": "USER",
+              "source": "USER",
+              "effectiveAt": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-draft:actual-adapter-artifact"
@@ -4829,27 +4683,18 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               },
               "policyHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyHash"
+                }
               },
-              "regressionEvidence": {
-                "value": "synthetic-FX-policy-change",
-                "provenance": "USER"
-              }
+              "regressionEvidence": "synthetic-FX-policy-change"
             },
             "expectedRevision": {
               "$result": {
@@ -4859,8 +4704,15 @@
             },
             "commandIdempotencyKey": "T19-fx-credit_note-fx-policy-approved",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT",
+              "policyHash": "CONTEXT",
+              "regressionEvidence": "USER"
+            }
           },
           "evidenceRefs": [
             "fx-policy-approved:actual-adapter-artifact"
@@ -4886,13 +4738,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "fx-policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "fx-policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -4903,8 +4752,13 @@
             },
             "commandIdempotencyKey": "T19-fx-credit_note-fx-policy-active",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "fx-policy-active:actual-adapter-artifact"
@@ -4921,15 +4775,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "fx-credit_note",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -5527,57 +5379,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "COMMERCIAL",
-                "provenance": "USER"
-              },
+              "invoiceKind": "COMMERCIAL",
               "originalAmount": {
                 "value": "105",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1.05",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1.05",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-valid-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -5603,35 +5449,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "receiptOccurrenceKey": {
-                "value": "ACTUAL-R100",
-                "provenance": "USER"
-              },
+              "receiptOccurrenceKey": "ACTUAL-R100",
               "orderedAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-valid-match",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "purchaseLineId": "CONTEXT",
+              "receiptOccurrenceKey": "USER",
+              "orderedAmount": "USER"
+            }
           },
           "evidenceRefs": [
             "match:actual-adapter-artifact"
@@ -5657,33 +5501,31 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "PROPOSE",
-                "provenance": "USER"
-              },
+              "mode": "PROPOSE",
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "evidence": "adjustment"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-valid-proposal",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-adapter-artifact"
@@ -5700,15 +5542,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-valid",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -5773,45 +5613,29 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "CONFIRM",
-                "provenance": "USER"
-              },
+              "mode": "CONFIRM",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "evidence": "adjustment"
             },
             "expectedRevision": {
               "$result": {
@@ -5821,8 +5645,18 @@
             },
             "commandIdempotencyKey": "T19-settlement-valid-ordinary-confirm",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "ordinary-confirm:actual-adapter-artifact"
@@ -5839,15 +5673,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-valid",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -5911,49 +5743,30 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "CONFIRM",
-                "provenance": "USER"
-              },
+              "mode": "CONFIRM",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "evidence": "adjustment"
             },
             "expectedRevision": {
               "$result": {
@@ -5963,8 +5776,19 @@
             },
             "commandIdempotencyKey": "T19-settlement-valid-manager-confirm",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "amount": "USER",
+              "decidedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "manager-confirm:actual-adapter-artifact"
@@ -5981,15 +5805,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-valid",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -6817,57 +6639,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "COMMERCIAL",
-                "provenance": "USER"
-              },
+              "invoiceKind": "COMMERCIAL",
               "originalAmount": {
                 "value": "105",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1.05",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1.05",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-unauthorized-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -6893,35 +6709,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "receiptOccurrenceKey": {
-                "value": "ACTUAL-R100",
-                "provenance": "USER"
-              },
+              "receiptOccurrenceKey": "ACTUAL-R100",
               "orderedAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-unauthorized-match",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "purchaseLineId": "CONTEXT",
+              "receiptOccurrenceKey": "USER",
+              "orderedAmount": "USER"
+            }
           },
           "evidenceRefs": [
             "match:actual-adapter-artifact"
@@ -6947,33 +6761,31 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "PROPOSE",
-                "provenance": "USER"
-              },
+              "mode": "PROPOSE",
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "evidence": "adjustment"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-unauthorized-proposal",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-adapter-artifact"
@@ -6990,15 +6802,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-unauthorized",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -7063,45 +6873,29 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "CONFIRM",
-                "provenance": "USER"
-              },
+              "mode": "CONFIRM",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "evidence": "adjustment"
             },
             "expectedRevision": {
               "$result": {
@@ -7111,8 +6905,18 @@
             },
             "commandIdempotencyKey": "T19-settlement-unauthorized-ordinary-confirm",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "ordinary-confirm:actual-adapter-artifact"
@@ -7129,15 +6933,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-unauthorized",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -7201,49 +7003,30 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "CONFIRM",
-                "provenance": "USER"
-              },
+              "mode": "CONFIRM",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "evidence": "adjustment"
             },
             "expectedRevision": {
               "$result": {
@@ -7253,8 +7036,19 @@
             },
             "commandIdempotencyKey": "T19-settlement-unauthorized-manager-confirm",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "amount": "USER",
+              "decidedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "manager-confirm:actual-adapter-artifact"
@@ -7271,15 +7065,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-unauthorized",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -7964,57 +7756,51 @@
               }
             ],
             "slots": {
-              "invoiceKind": {
-                "value": "COMMERCIAL",
-                "provenance": "USER"
-              },
+              "invoiceKind": "COMMERCIAL",
               "originalAmount": {
                 "value": "105",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "line": {
-                "value": {
-                  "purchaseLineId": {
-                    "$alias": "PO-A"
-                  },
-                  "receiptOccurrenceKey": "ACTUAL-R100",
-                  "quantity": {
-                    "value": "100",
-                    "unit": "BOX"
-                  },
-                  "unitPrice": {
-                    "value": "1.05",
-                    "currency": "EUR"
-                  }
+                "purchaseLineId": {
+                  "$alias": "PO-A"
                 },
-                "provenance": "USER"
+                "receiptOccurrenceKey": "ACTUAL-R100",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "unitPrice": {
+                  "value": "1.05",
+                  "currency": "EUR"
+                }
               },
-              "scopeKind": {
-                "value": "PURCHASE",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "invoice",
-                "provenance": "USER"
-              },
+              "scopeKind": "PURCHASE",
+              "evidence": "invoice",
               "fxSnapshot": {
-                "value": {
-                  "pair": "EUR/KRW",
-                  "rate": "1500",
-                  "date": "2026-10-07",
-                  "source": "synthetic-fx",
-                  "policyVersion": "fx-v1",
-                  "rounding": "HALF_UP_SCALE_0"
-                },
-                "provenance": "USER"
+                "pair": "EUR/KRW",
+                "rate": "1500",
+                "date": "2026-10-07",
+                "source": "synthetic-fx",
+                "policyVersion": "fx-v1",
+                "rounding": "HALF_UP_SCALE_0"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-stale-invoice",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceKind": "USER",
+              "originalAmount": "USER",
+              "line": "USER",
+              "scopeKind": "USER",
+              "evidence": "USER",
+              "fxSnapshot": "USER"
+            }
           },
           "evidenceRefs": [
             "invoice:actual-adapter-artifact"
@@ -8040,35 +7826,33 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
               "purchaseLineId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
-              "receiptOccurrenceKey": {
-                "value": "ACTUAL-R100",
-                "provenance": "USER"
-              },
+              "receiptOccurrenceKey": "ACTUAL-R100",
               "orderedAmount": {
                 "value": "100",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-stale-match",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "purchaseLineId": "CONTEXT",
+              "receiptOccurrenceKey": "USER",
+              "orderedAmount": "USER"
+            }
           },
           "evidenceRefs": [
             "match:actual-adapter-artifact"
@@ -8094,33 +7878,31 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "PROPOSE",
-                "provenance": "USER"
-              },
+              "mode": "PROPOSE",
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "evidence": "adjustment"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-stale-proposal",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-adapter-artifact"
@@ -8137,15 +7919,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-stale",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -8210,45 +7990,29 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "CONFIRM",
-                "provenance": "USER"
-              },
+              "mode": "CONFIRM",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "evidence": "adjustment"
             },
             "expectedRevision": {
               "$result": {
@@ -8258,8 +8022,18 @@
             },
             "commandIdempotencyKey": "T19-settlement-stale-ordinary-confirm",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "amount": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "ordinary-confirm:actual-adapter-artifact"
@@ -8276,15 +8050,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-stale",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"
@@ -8348,40 +8120,24 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "REVISE_PROPOSAL",
-                "provenance": "USER"
-              },
+              "mode": "REVISE_PROPOSAL",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "reason": {
-                "value": "추가 근거 version",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "custody",
-                "provenance": "USER"
-              }
+              "reason": "추가 근거 version",
+              "evidence": "custody"
             },
             "expectedRevision": {
               "$result": {
@@ -8391,8 +8147,18 @@
             },
             "commandIdempotencyKey": "T19-settlement-stale-proposal-revision",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "amount": "USER",
+              "reason": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "proposal-revision:actual-adapter-artifact"
@@ -8418,49 +8184,30 @@
             ],
             "slots": {
               "invoiceId": {
-                "value": {
-                  "$result": {
-                    "actionId": "invoice",
-                    "pointer": "/response/invoiceId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "invoice",
+                  "pointer": "/response/invoiceId"
+                }
               },
-              "mode": {
-                "value": "CONFIRM",
-                "provenance": "USER"
-              },
+              "mode": "CONFIRM",
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "amount": {
                 "value": "5",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "adjustment",
-                "provenance": "USER"
-              }
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "evidence": "adjustment"
             },
             "expectedRevision": {
               "$result": {
@@ -8470,8 +8217,19 @@
             },
             "commandIdempotencyKey": "T19-settlement-stale-manager-confirm",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "invoiceId": "CONTEXT",
+              "mode": "USER",
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "amount": "USER",
+              "decidedAt": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "manager-confirm:actual-adapter-artifact"
@@ -8488,15 +8246,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T19",
-              "subcaseId": "settlement-stale",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "invoice",
                 "pointer": "/response/invoiceId"

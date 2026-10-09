@@ -149,7 +149,15 @@
               "evidenceRef": "receipt-evidence"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-fresh-install-manifest-cqn-receipt"
+            "commandIdempotencyKey": "V8-fresh-install-manifest-cqn-receipt",
+            "provenance": {
+              "quantity": "USER",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "sourceEventId": "USER",
+              "evidenceRef": "USER"
+            }
           },
           "evidenceRefs": [
             "receipt:actual-artifact"
@@ -166,7 +174,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-fresh-install-manifest-cqn",
               "itemId": {
                 "$alias": "P"
               },
@@ -183,6 +190,9 @@
               }
             }
           },
+          "harness": {
+            "environmentId": "V8-fresh-install-manifest-cqn"
+          },
           "evidenceRefs": [
             "read-cqn:actual-artifact"
           ]
@@ -198,7 +208,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-fresh-install-manifest-cqn",
               "itemId": {
                 "$alias": "P"
               },
@@ -214,6 +223,9 @@
                 "pointer": "/response/snapshotRevision"
               }
             }
+          },
+          "harness": {
+            "environmentId": "V8-fresh-install-manifest-cqn"
           },
           "evidenceRefs": [
             "read-mcp:actual-artifact"
@@ -1081,7 +1093,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-fresh-constraints-auth",
               "itemId": {
                 "$alias": "P"
               },
@@ -1090,10 +1101,10 @@
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
-            "targetOrganizationId": {
-              "$alias": "ORG"
-            }
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-fresh-constraints-auth"
           },
           "evidenceRefs": [
             "unauthorized-endpoint:actual-artifact"
@@ -1713,7 +1724,11 @@
               "faultPoint": "AUDIT"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-audit"
+            "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-audit",
+            "provenance": {
+              "quantity": "USER",
+              "faultPoint": "USER"
+            }
           },
           "evidenceRefs": [
             "split-audit:actual-artifact"
@@ -1745,7 +1760,11 @@
               "faultPoint": "OUTBOX"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-outbox"
+            "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-outbox",
+            "provenance": {
+              "quantity": "USER",
+              "faultPoint": "USER"
+            }
           },
           "evidenceRefs": [
             "split-outbox:actual-artifact"
@@ -1777,7 +1796,11 @@
               "faultPoint": "IDEMPOTENCY"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-idempotency"
+            "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-idempotency",
+            "provenance": {
+              "quantity": "USER",
+              "faultPoint": "USER"
+            }
           },
           "evidenceRefs": [
             "split-idempotency:actual-artifact"
@@ -2473,10 +2496,18 @@
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-real-lock-two-transactions-reserve40",
-              "testTransactionId": "tx-reserve40",
-              "testParticipantId": "reserve40",
-              "testBarrierId": "scope-lock",
-              "testBarrierPoint": "AFTER_SCOPE_LOCK"
+              "provenance": {
+                "quantity": "USER",
+                "orderLineId": "CONTEXT"
+              }
+            },
+            "harness": {
+              "testBarrier": {
+                "transactionId": "tx-reserve40",
+                "participantId": "reserve40",
+                "barrierId": "scope-lock",
+                "point": "AFTER_SCOPE_LOCK"
+              }
             },
             "evidenceRefs": [
               "reserve40:actual-transaction"
@@ -2542,10 +2573,18 @@
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-real-lock-two-transactions-reserve30",
-              "testTransactionId": "tx-reserve30",
-              "testParticipantId": "reserve30",
-              "testBarrierId": "scope-lock",
-              "testBarrierPoint": "BEFORE_SCOPE_LOCK"
+              "provenance": {
+                "quantity": "USER",
+                "orderLineId": "CONTEXT"
+              }
+            },
+            "harness": {
+              "testBarrier": {
+                "transactionId": "tx-reserve30",
+                "participantId": "reserve30",
+                "barrierId": "scope-lock",
+                "point": "BEFORE_SCOPE_LOCK"
+              }
             },
             "evidenceRefs": [
               "reserve30:actual-transaction"
@@ -3648,14 +3687,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-ontology-v1-v2-preserves"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-ontology-v1-v2-preserves"
           },
           "evidenceRefs": [
             "assessment-before:actual-artifact"
@@ -3734,14 +3775,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-ontology-v1-v2-preserves"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-ontology-v1-v2-preserves"
           },
           "evidenceRefs": [
             "assessment-after:actual-artifact"
@@ -3758,7 +3801,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-ontology-v1-v2-preserves",
               "itemId": {
                 "$alias": "P"
               },
@@ -3768,6 +3810,9 @@
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-ontology-v1-v2-preserves"
           },
           "evidenceRefs": [
             "inventory-after:actual-artifact"
@@ -3783,14 +3828,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-ontology-v1-v2-preserves"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-ontology-v1-v2-preserves"
           },
           "evidenceRefs": [
             "duties-after:actual-artifact"
@@ -3806,14 +3853,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-ontology-v1-v2-preserves"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-ontology-v1-v2-preserves"
           },
           "evidenceRefs": [
             "mcp-after:actual-artifact"
@@ -5283,14 +5332,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-none"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-restore-none"
           },
           "evidenceRefs": [
             "assessment-before:actual-artifact"
@@ -5509,14 +5560,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-none-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-restore-none-restored"
           },
           "evidenceRefs": [
             "assessment-after:actual-artifact"
@@ -5532,14 +5585,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-none-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "evidenceId": {
+            "id": {
               "$alias": "HOLD-DOC"
             }
+          },
+          "harness": {
+            "environmentId": "V8-restore-none-restored"
           },
           "evidenceRefs": [
             "evidence-after:actual-artifact"
@@ -5555,14 +5610,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-none-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-restore-none-restored"
           },
           "evidenceRefs": [
             "mcp-after-restore:actual-artifact"
@@ -7208,14 +7265,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-blob"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-restore-blob"
           },
           "evidenceRefs": [
             "assessment-before:actual-artifact"
@@ -7462,11 +7521,13 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-blob-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-restore-blob-restored"
           },
           "evidenceRefs": [
             "partial-access:actual-artifact"
@@ -7482,11 +7543,13 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-blob-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-restore-blob-restored"
           },
           "evidenceRefs": [
             "partial-mcp-access:actual-artifact"
@@ -8054,14 +8117,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-evaluator"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "workId": {
               "$alias": "O1"
             }
+          },
+          "harness": {
+            "environmentId": "V8-restore-evaluator"
           },
           "evidenceRefs": [
             "assessment-before:actual-artifact"
@@ -8308,11 +8373,13 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-evaluator-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-restore-evaluator-restored"
           },
           "evidenceRefs": [
             "partial-access:actual-artifact"
@@ -8328,11 +8395,13 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "environmentId": "V8-restore-evaluator-restored"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-restore-evaluator-restored"
           },
           "evidenceRefs": [
             "partial-mcp-access:actual-artifact"
@@ -9751,7 +9820,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-unavailable-environment-gates",
               "itemId": {
                 "$alias": "P"
               },
@@ -9761,6 +9829,9 @@
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-unavailable-environment-gates"
           },
           "evidenceRefs": [
             "local-witness:actual-artifact"
@@ -9777,7 +9848,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-unavailable-environment-gates",
               "itemId": {
                 "$alias": "P"
               },
@@ -9793,6 +9863,9 @@
                 "pointer": "/response/snapshotRevision"
               }
             }
+          },
+          "harness": {
+            "environmentId": "V8-unavailable-environment-gates"
           },
           "evidenceRefs": [
             "local-mcp-witness:actual-artifact"
@@ -10341,7 +10414,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "environmentId": "V8-upgrade-revalidate-transactions",
               "itemId": {
                 "$alias": "P"
               },
@@ -10350,10 +10422,10 @@
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
-            "targetOrganizationId": {
-              "$alias": "ORG"
-            }
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "harness": {
+            "environmentId": "V8-upgrade-revalidate-transactions"
           },
           "evidenceRefs": [
             "unauthorized:actual-artifact"
@@ -10463,7 +10535,11 @@
               "faultPoint": "AUDIT"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-audit"
+            "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-audit",
+            "provenance": {
+              "quantity": "USER",
+              "faultPoint": "USER"
+            }
           },
           "evidenceRefs": [
             "rollback-split-audit:actual-artifact"
@@ -10495,7 +10571,11 @@
               "faultPoint": "OUTBOX"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-outbox"
+            "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-outbox",
+            "provenance": {
+              "quantity": "USER",
+              "faultPoint": "USER"
+            }
           },
           "evidenceRefs": [
             "rollback-split-outbox:actual-artifact"
@@ -10527,7 +10607,11 @@
               "faultPoint": "IDEMPOTENCY"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-idempotency"
+            "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-idempotency",
+            "provenance": {
+              "quantity": "USER",
+              "faultPoint": "USER"
+            }
           },
           "evidenceRefs": [
             "rollback-split-idempotency:actual-artifact"
@@ -10669,10 +10753,18 @@
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-reserve40",
-              "testTransactionId": "tx-reserve40",
-              "testParticipantId": "reserve40",
-              "testBarrierId": "scope-lock",
-              "testBarrierPoint": "AFTER_SCOPE_LOCK"
+              "provenance": {
+                "quantity": "USER",
+                "orderLineId": "CONTEXT"
+              }
+            },
+            "harness": {
+              "testBarrier": {
+                "transactionId": "tx-reserve40",
+                "participantId": "reserve40",
+                "barrierId": "scope-lock",
+                "point": "AFTER_SCOPE_LOCK"
+              }
             },
             "evidenceRefs": [
               "lock-reserve40:actual-transaction"
@@ -10738,10 +10830,18 @@
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-reserve30",
-              "testTransactionId": "tx-reserve30",
-              "testParticipantId": "reserve30",
-              "testBarrierId": "scope-lock",
-              "testBarrierPoint": "BEFORE_SCOPE_LOCK"
+              "provenance": {
+                "quantity": "USER",
+                "orderLineId": "CONTEXT"
+              }
+            },
+            "harness": {
+              "testBarrier": {
+                "transactionId": "tx-reserve30",
+                "participantId": "reserve30",
+                "barrierId": "scope-lock",
+                "point": "BEFORE_SCOPE_LOCK"
+              }
             },
             "evidenceRefs": [
               "lock-reserve30:actual-transaction"

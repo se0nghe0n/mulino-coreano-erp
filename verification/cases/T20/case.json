@@ -123,34 +123,34 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -980,32 +980,32 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
                 "value": "2026-10-09",
-                "type": "Date",
-                "provenance": "USER"
+                "type": "Date"
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -1565,34 +1565,34 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "금요일",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "금요일",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -2175,43 +2175,40 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "name": "비스킷"
-              }
-            ],
+            "subjectRefs": [],
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
-              }
+                "id": {
+                  "$alias": "W"
+                }
+              },
+              "itemName": "비스킷"
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER",
+              "itemName": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -2805,27 +2802,27 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              }
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT"
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -3419,34 +3416,34 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -4242,34 +4239,34 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -5065,34 +5062,34 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "structured:actual-response",
@@ -5888,27 +5885,27 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              }
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT"
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT"
+            }
           },
           "evidenceRefs": [
             "draft:actual-response",
@@ -5936,39 +5933,33 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation",
-            "requestState": {
-              "$result": {
-                "actionId": "draft",
-                "pointer": "/response/requestState"
-              }
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
             }
           },
           "evidenceRefs": [
@@ -6026,70 +6017,54 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "price": {
                 "value": "2",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "supplierId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "USER"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "ownerId": {
-                "value": {
-                  "$alias": "writer"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "writer"
               },
               "supervisorId": {
-                "value": {
-                  "$alias": "supervisor"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "supervisor"
               },
               "workId": {
-                "value": {
-                  "$alias": "O1"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "O1"
               },
               "goalVersionId": {
-                "value": {
-                  "$result": {
-                    "actionId": "purchase-work",
-                    "pointer": "/response/data/goal/id"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "purchase-work",
+                  "pointer": "/response/data/goal/id"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T20-effect-proposal-1"
+            "commandIdempotencyKey": "T20-effect-proposal-1",
+            "provenance": {
+              "quantity": "USER",
+              "price": "USER",
+              "supplierId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-response",
@@ -6116,43 +6091,22 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "decision": {
-                "value": "APPROVE",
-                "provenance": "USER"
-              },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "validUntil": {
-                "value": "2026-10-08T09:00:00Z",
-                "provenance": "USER"
-              },
-              "consumptionPolicy": {
-                "value": "SINGLE_ORDER_REVISION",
-                "provenance": "USER"
-              },
-              "conditions": {
-                "value": [],
-                "provenance": "USER"
-              }
+              "decision": "APPROVE",
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-08T09:00:00Z",
+              "consumptionPolicy": "SINGLE_ORDER_REVISION",
+              "conditions": []
             },
             "conditions": [],
             "evidenceRefs": [],
@@ -6162,7 +6116,16 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-manager-decision-1"
+            "commandIdempotencyKey": "T20-manager-decision-1",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "decision": "USER",
+              "decidedAt": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER",
+              "conditions": "USER"
+            }
           },
           "evidenceRefs": [
             "approval:actual-response",
@@ -6189,27 +6152,20 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
               "quantity": {
                 "value": "120",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               }
             },
             "conditions": [],
@@ -6220,7 +6176,12 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-effect-revision-2"
+            "commandIdempotencyKey": "T20-effect-revision-2",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "revise:actual-response",
@@ -6247,39 +6208,24 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "revise",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "revise",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "revise",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "revise",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "channel": {
-                "value": "SYNTHETIC_SUPPLIER",
-                "provenance": "USER"
-              },
-              "externalOperationId": {
-                "value": "T20-dispatch-2-external",
-                "provenance": "USER"
-              },
+              "channel": "SYNTHETIC_SUPPLIER",
+              "externalOperationId": "T20-dispatch-2-external",
               "approvalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "approval",
-                    "pointer": "/response/approvalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "approval",
+                  "pointer": "/response/approvalId"
+                }
               }
             },
             "conditions": [],
@@ -6290,7 +6236,14 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-dispatch-2"
+            "commandIdempotencyKey": "T20-dispatch-2",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "channel": "USER",
+              "externalOperationId": "USER",
+              "approvalId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "stale-approval:actual-response",
@@ -23203,34 +23156,35 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "commandIdempotencyKey": "T20-stdio-readonly-write-denied",
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -24538,27 +24492,27 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              }
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT"
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation"
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT"
+            }
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -24602,27 +24556,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -25470,70 +25424,54 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "price": {
                 "value": "2",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "supplierId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "USER"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "ownerId": {
-                "value": {
-                  "$alias": "writer"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "writer"
               },
               "supervisorId": {
-                "value": {
-                  "$alias": "supervisor"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "supervisor"
               },
               "workId": {
-                "value": {
-                  "$alias": "O1"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "O1"
               },
               "goalVersionId": {
-                "value": {
-                  "$result": {
-                    "actionId": "purchase-work",
-                    "pointer": "/response/data/goal/id"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "purchase-work",
+                  "pointer": "/response/data/goal/id"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T20-proposal-WAITING_APPROVAL"
+            "commandIdempotencyKey": "T20-proposal-WAITING_APPROVAL",
+            "provenance": {
+              "quantity": "USER",
+              "price": "USER",
+              "supplierId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-response",
@@ -25632,31 +25570,19 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "channel": {
-                "value": "SYNTHETIC_SUPPLIER",
-                "provenance": "USER"
-              },
-              "externalOperationId": {
-                "value": "T20-WAITING_APPROVAL-external",
-                "provenance": "USER"
-              }
+              "channel": "SYNTHETIC_SUPPLIER",
+              "externalOperationId": "T20-WAITING_APPROVAL-external"
             },
             "conditions": [],
             "evidenceRefs": [],
@@ -25666,7 +25592,13 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-WAITING_APPROVAL"
+            "commandIdempotencyKey": "T20-WAITING_APPROVAL",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "channel": "USER",
+              "externalOperationId": "USER"
+            }
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -25709,31 +25641,19 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "channel": {
-                      "value": "SYNTHETIC_SUPPLIER",
-                      "provenance": "USER"
-                    },
-                    "externalOperationId": {
-                      "value": "T20-WAITING_APPROVAL-external",
-                      "provenance": "USER"
-                    }
+                    "channel": "SYNTHETIC_SUPPLIER",
+                    "externalOperationId": "T20-WAITING_APPROVAL-external"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
@@ -25743,7 +25663,13 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-WAITING_APPROVAL"
+                  "commandIdempotencyKey": "T20-WAITING_APPROVAL",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "channel": "USER",
+                    "externalOperationId": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -26562,35 +26488,35 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation",
-            "commandIdempotencyKey": "T20-shared-effect"
+            "commandIdempotencyKey": "T20-shared-effect",
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "first:actual-response",
@@ -26634,35 +26560,35 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation",
-                  "commandIdempotencyKey": "T20-shared-effect"
+                  "commandIdempotencyKey": "T20-shared-effect",
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -26779,35 +26705,35 @@
             "slots": {
               "quantity": {
                 "value": "40",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "CONTEXT"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "APPROVED_DEFAULT"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "destination": {
-                "value": {
-                  "$alias": "W"
-                },
                 "type": "Place",
-                "provenance": "USER"
+                "id": {
+                  "$alias": "W"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "conversationRequestId": "T20-input",
-            "originalTextRef": "user-input",
-            "contextRef": "scoped-conversation",
-            "commandIdempotencyKey": "T20-shared-effect"
+            "commandIdempotencyKey": "T20-shared-effect",
+            "sourceRefs": [
+              "user-input"
+            ],
+            "contextRefs": [
+              "scoped-conversation"
+            ],
+            "provenance": {
+              "quantity": "USER",
+              "dueAt": "USER",
+              "endpoint": "CONTEXT",
+              "quantityMode": "APPROVED_DEFAULT",
+              "destination": "USER"
+            }
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -26851,35 +26777,35 @@
                   "slots": {
                     "quantity": {
                       "value": "40",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation",
-                  "commandIdempotencyKey": "T20-shared-effect"
+                  "commandIdempotencyKey": "T20-shared-effect",
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -27852,23 +27778,32 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "segmentId": {
-              "$alias": "B40"
-            },
-            "salesOrderLineId": {
-              "$alias": "SL1"
-            },
-            "quantity": {
-              "value": "20",
-              "unit": "BOX"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "noun",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T20-held-reservation"
+            "commandIdempotencyKey": "T20-held-reservation",
+            "slots": {
+              "segmentId": {
+                "$alias": "B40"
+              },
+              "salesOrderLineId": {
+                "$alias": "SL1"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              }
+            },
+            "subjectRefs": [],
+            "capabilityId": "reserveQuantity",
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "salesOrderLineId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -27900,23 +27835,32 @@
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "segmentId": {
-                    "$alias": "B40"
-                  },
-                  "salesOrderLineId": {
-                    "$alias": "SL1"
-                  },
-                  "quantity": {
-                    "value": "20",
-                    "unit": "BOX"
-                  },
                   "expectedRevision": {
                     "$result": {
                       "actionId": "noun",
                       "pointer": "/response/revision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-held-reservation"
+                  "commandIdempotencyKey": "T20-held-reservation",
+                  "slots": {
+                    "segmentId": {
+                      "$alias": "B40"
+                    },
+                    "salesOrderLineId": {
+                      "$alias": "SL1"
+                    },
+                    "quantity": {
+                      "value": "20",
+                      "unit": "BOX"
+                    }
+                  },
+                  "subjectRefs": [],
+                  "capabilityId": "reserveQuantity",
+                  "provenance": {
+                    "segmentId": "CONTEXT",
+                    "salesOrderLineId": "CONTEXT",
+                    "quantity": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -28897,23 +28841,32 @@
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
-            "segmentId": {
-              "$alias": "B40"
-            },
-            "salesOrderLineId": {
-              "$alias": "SL1"
-            },
-            "quantity": {
-              "value": "20",
-              "unit": "BOX"
-            },
             "expectedRevision": {
               "$result": {
                 "actionId": "noun",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "T20-held-reservation"
+            "commandIdempotencyKey": "T20-held-reservation",
+            "slots": {
+              "segmentId": {
+                "$alias": "B40"
+              },
+              "salesOrderLineId": {
+                "$alias": "SL1"
+              },
+              "quantity": {
+                "value": "20",
+                "unit": "BOX"
+              }
+            },
+            "subjectRefs": [],
+            "capabilityId": "reserveQuantity",
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "salesOrderLineId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -28945,23 +28898,32 @@
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "segmentId": {
-                    "$alias": "B40"
-                  },
-                  "salesOrderLineId": {
-                    "$alias": "SL1"
-                  },
-                  "quantity": {
-                    "value": "20",
-                    "unit": "BOX"
-                  },
                   "expectedRevision": {
                     "$result": {
                       "actionId": "noun",
                       "pointer": "/response/revision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-held-reservation"
+                  "commandIdempotencyKey": "T20-held-reservation",
+                  "slots": {
+                    "segmentId": {
+                      "$alias": "B40"
+                    },
+                    "salesOrderLineId": {
+                      "$alias": "SL1"
+                    },
+                    "quantity": {
+                      "value": "20",
+                      "unit": "BOX"
+                    }
+                  },
+                  "subjectRefs": [],
+                  "capabilityId": "reserveQuantity",
+                  "provenance": {
+                    "segmentId": "CONTEXT",
+                    "salesOrderLineId": "CONTEXT",
+                    "quantity": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -29911,70 +29873,54 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "price": {
                 "value": "2",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "supplierId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "USER"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "ownerId": {
-                "value": {
-                  "$alias": "writer"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "writer"
               },
               "supervisorId": {
-                "value": {
-                  "$alias": "supervisor"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "supervisor"
               },
               "workId": {
-                "value": {
-                  "$alias": "O1"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "O1"
               },
               "goalVersionId": {
-                "value": {
-                  "$result": {
-                    "actionId": "purchase-work",
-                    "pointer": "/response/data/goal/id"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "purchase-work",
+                  "pointer": "/response/data/goal/id"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T20-proposal-ACCEPTED_PENDING_EXTERNAL"
+            "commandIdempotencyKey": "T20-proposal-ACCEPTED_PENDING_EXTERNAL",
+            "provenance": {
+              "quantity": "USER",
+              "price": "USER",
+              "supplierId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-response",
@@ -30001,43 +29947,22 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "decision": {
-                "value": "APPROVE",
-                "provenance": "USER"
-              },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "validUntil": {
-                "value": "2026-10-08T09:00:00Z",
-                "provenance": "USER"
-              },
-              "consumptionPolicy": {
-                "value": "SINGLE_ORDER_REVISION",
-                "provenance": "USER"
-              },
-              "conditions": {
-                "value": [],
-                "provenance": "USER"
-              }
+              "decision": "APPROVE",
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-08T09:00:00Z",
+              "consumptionPolicy": "SINGLE_ORDER_REVISION",
+              "conditions": []
             },
             "conditions": [],
             "evidenceRefs": [],
@@ -30047,7 +29972,16 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-manager-ACCEPTED_PENDING_EXTERNAL"
+            "commandIdempotencyKey": "T20-manager-ACCEPTED_PENDING_EXTERNAL",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "decision": "USER",
+              "decidedAt": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER",
+              "conditions": "USER"
+            }
           },
           "evidenceRefs": [
             "approval:actual-response",
@@ -30162,39 +30096,24 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "channel": {
-                "value": "SYNTHETIC_SUPPLIER",
-                "provenance": "USER"
-              },
-              "externalOperationId": {
-                "value": "T20-ACCEPTED_PENDING_EXTERNAL-external",
-                "provenance": "USER"
-              },
+              "channel": "SYNTHETIC_SUPPLIER",
+              "externalOperationId": "T20-ACCEPTED_PENDING_EXTERNAL-external",
               "approvalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "approval",
-                    "pointer": "/response/approvalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "approval",
+                  "pointer": "/response/approvalId"
+                }
               }
             },
             "conditions": [],
@@ -30205,7 +30124,14 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL"
+            "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "channel": "USER",
+              "externalOperationId": "USER",
+              "approvalId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "api-result:actual-response",
@@ -30248,39 +30174,24 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "channel": {
-                      "value": "SYNTHETIC_SUPPLIER",
-                      "provenance": "USER"
-                    },
-                    "externalOperationId": {
-                      "value": "T20-ACCEPTED_PENDING_EXTERNAL-external",
-                      "provenance": "USER"
-                    },
+                    "channel": "SYNTHETIC_SUPPLIER",
+                    "externalOperationId": "T20-ACCEPTED_PENDING_EXTERNAL-external",
                     "approvalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "approval",
-                          "pointer": "/response/approvalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "approval",
+                        "pointer": "/response/approvalId"
+                      }
                     }
                   },
                   "conditions": [],
@@ -30291,7 +30202,14 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL"
+                  "commandIdempotencyKey": "T20-ACCEPTED_PENDING_EXTERNAL",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "channel": "USER",
+                    "externalOperationId": "USER",
+                    "approvalId": "CONTEXT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -30945,27 +30863,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -31026,34 +30944,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -32202,27 +32120,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -32283,34 +32201,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$transform": {
@@ -33430,27 +33348,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -33527,34 +33445,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -34667,27 +34585,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -34764,34 +34682,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -35940,27 +35858,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -36021,34 +35939,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -36130,27 +36048,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-other-principal-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -36211,34 +36129,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-other-principal-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -37919,27 +37837,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -39096,27 +39014,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -39177,34 +39095,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -40317,27 +40235,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -40398,34 +40316,34 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    },
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT",
                     "destination": {
-                      "value": {
-                        "$alias": "W"
-                      },
                       "type": "Place",
-                      "provenance": "USER"
+                      "id": {
+                        "$alias": "W"
+                      }
                     }
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT",
+                    "destination": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -41474,70 +41392,54 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "price": {
                 "value": "2",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "supplierId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "USER"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "ownerId": {
-                "value": {
-                  "$alias": "writer"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "writer"
               },
               "supervisorId": {
-                "value": {
-                  "$alias": "supervisor"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "supervisor"
               },
               "workId": {
-                "value": {
-                  "$alias": "O1"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "O1"
               },
               "goalVersionId": {
-                "value": {
-                  "$result": {
-                    "actionId": "purchase-work",
-                    "pointer": "/response/data/goal/id"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "purchase-work",
+                  "pointer": "/response/data/goal/id"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T20-state-as-approval-proposal"
+            "commandIdempotencyKey": "T20-state-as-approval-proposal",
+            "provenance": {
+              "quantity": "USER",
+              "price": "USER",
+              "supplierId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-response",
@@ -41654,27 +41556,18 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "externalOperationId": {
-                      "value": "T20-state-as-approval-dispatch-external",
-                      "provenance": "USER"
-                    }
+                    "externalOperationId": "T20-state-as-approval-dispatch-external"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
@@ -41684,7 +41577,12 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-state-as-approval-dispatch"
+                  "commandIdempotencyKey": "T20-state-as-approval-dispatch",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "externalOperationId": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -41744,31 +41642,19 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "channel": {
-                      "value": "SYNTHETIC_SUPPLIER",
-                      "provenance": "USER"
-                    },
-                    "externalOperationId": {
-                      "value": "T20-state-as-approval-dispatch-external",
-                      "provenance": "USER"
-                    }
+                    "channel": "SYNTHETIC_SUPPLIER",
+                    "externalOperationId": "T20-state-as-approval-dispatch-external"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
@@ -41778,7 +41664,13 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-state-as-approval-dispatch"
+                  "commandIdempotencyKey": "T20-state-as-approval-dispatch",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "channel": "USER",
+                    "externalOperationId": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -41915,43 +41807,22 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "decision": {
-                "value": "APPROVE",
-                "provenance": "USER"
-              },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "validUntil": {
-                "value": "2026-10-08T09:00:00Z",
-                "provenance": "USER"
-              },
-              "consumptionPolicy": {
-                "value": "SINGLE_ORDER_REVISION",
-                "provenance": "USER"
-              },
-              "conditions": {
-                "value": [],
-                "provenance": "USER"
-              }
+              "decision": "APPROVE",
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-08T09:00:00Z",
+              "consumptionPolicy": "SINGLE_ORDER_REVISION",
+              "conditions": []
             },
             "conditions": [],
             "evidenceRefs": [],
@@ -41961,7 +41832,16 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-state-as-approval-manager"
+            "commandIdempotencyKey": "T20-state-as-approval-manager",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "decision": "USER",
+              "decidedAt": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER",
+              "conditions": "USER"
+            }
           },
           "evidenceRefs": [
             "approval:actual-response",
@@ -42004,39 +41884,24 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "channel": {
-                      "value": "SYNTHETIC_SUPPLIER",
-                      "provenance": "USER"
-                    },
-                    "externalOperationId": {
-                      "value": "T20-state-as-approval-dispatch-external",
-                      "provenance": "USER"
-                    },
+                    "channel": "SYNTHETIC_SUPPLIER",
+                    "externalOperationId": "T20-state-as-approval-dispatch-external",
                     "approvalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "approval",
-                          "pointer": "/response/approvalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "approval",
+                        "pointer": "/response/approvalId"
+                      }
                     }
                   },
                   "conditions": [],
@@ -42047,7 +41912,14 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-state-as-approval-approved-dispatch"
+                  "commandIdempotencyKey": "T20-state-as-approval-approved-dispatch",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "channel": "USER",
+                    "externalOperationId": "USER",
+                    "approvalId": "CONTEXT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -43926,70 +43798,54 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "price": {
                 "value": "2",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "supplierId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "USER"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "ownerId": {
-                "value": {
-                  "$alias": "writer"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "writer"
               },
               "supervisorId": {
-                "value": {
-                  "$alias": "supervisor"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "supervisor"
               },
               "workId": {
-                "value": {
-                  "$alias": "O1"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "O1"
               },
               "goalVersionId": {
-                "value": {
-                  "$result": {
-                    "actionId": "purchase-work",
-                    "pointer": "/response/data/goal/id"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "purchase-work",
+                  "pointer": "/response/data/goal/id"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T20-accept-as-approval-proposal"
+            "commandIdempotencyKey": "T20-accept-as-approval-proposal",
+            "provenance": {
+              "quantity": "USER",
+              "price": "USER",
+              "supplierId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-response",
@@ -44106,27 +43962,18 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "externalOperationId": {
-                      "value": "T20-accept-as-approval-dispatch-external",
-                      "provenance": "USER"
-                    }
+                    "externalOperationId": "T20-accept-as-approval-dispatch-external"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
@@ -44136,7 +43983,12 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-accept-as-approval-dispatch"
+                  "commandIdempotencyKey": "T20-accept-as-approval-dispatch",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "externalOperationId": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -44196,31 +44048,19 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "channel": {
-                      "value": "SYNTHETIC_SUPPLIER",
-                      "provenance": "USER"
-                    },
-                    "externalOperationId": {
-                      "value": "T20-accept-as-approval-dispatch-external",
-                      "provenance": "USER"
-                    }
+                    "channel": "SYNTHETIC_SUPPLIER",
+                    "externalOperationId": "T20-accept-as-approval-dispatch-external"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
@@ -44230,7 +44070,13 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-accept-as-approval-dispatch"
+                  "commandIdempotencyKey": "T20-accept-as-approval-dispatch",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "channel": "USER",
+                    "externalOperationId": "USER"
+                  }
                 },
                 "requestState": {
                   "$result": {
@@ -44368,43 +44214,22 @@
             ],
             "slots": {
               "proposalId": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
               },
               "proposalHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "proposal",
-                    "pointer": "/response/proposalHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
               },
-              "decision": {
-                "value": "APPROVE",
-                "provenance": "USER"
-              },
-              "decidedAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "validUntil": {
-                "value": "2026-10-08T09:00:00Z",
-                "provenance": "USER"
-              },
-              "consumptionPolicy": {
-                "value": "SINGLE_ORDER_REVISION",
-                "provenance": "USER"
-              },
-              "conditions": {
-                "value": [],
-                "provenance": "USER"
-              }
+              "decision": "APPROVE",
+              "decidedAt": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-08T09:00:00Z",
+              "consumptionPolicy": "SINGLE_ORDER_REVISION",
+              "conditions": []
             },
             "conditions": [],
             "evidenceRefs": [],
@@ -44414,7 +44239,16 @@
                 "pointer": "/response/proposalRevision"
               }
             },
-            "commandIdempotencyKey": "T20-accept-as-approval-manager"
+            "commandIdempotencyKey": "T20-accept-as-approval-manager",
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "decision": "USER",
+              "decidedAt": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER",
+              "conditions": "USER"
+            }
           },
           "evidenceRefs": [
             "approval:actual-response",
@@ -44457,39 +44291,24 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "channel": {
-                      "value": "SYNTHETIC_SUPPLIER",
-                      "provenance": "USER"
-                    },
-                    "externalOperationId": {
-                      "value": "T20-accept-as-approval-dispatch-external",
-                      "provenance": "USER"
-                    },
+                    "channel": "SYNTHETIC_SUPPLIER",
+                    "externalOperationId": "T20-accept-as-approval-dispatch-external",
                     "approvalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "approval",
-                          "pointer": "/response/approvalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "approval",
+                        "pointer": "/response/approvalId"
+                      }
                     }
                   },
                   "conditions": [],
@@ -44500,7 +44319,14 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-accept-as-approval-approved-dispatch"
+                  "commandIdempotencyKey": "T20-accept-as-approval-approved-dispatch",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "channel": "USER",
+                    "externalOperationId": "USER",
+                    "approvalId": "CONTEXT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -46439,27 +46265,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -46516,27 +46342,27 @@
                   "slots": {
                     "quantity": {
                       "value": "100",
-                      "unit": "BOX",
-                      "provenance": "USER"
+                      "unit": "BOX"
                     },
-                    "dueAt": {
-                      "value": "2026-10-09T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "endpoint": {
-                      "value": "ARRIVED",
-                      "provenance": "CONTEXT"
-                    },
-                    "quantityMode": {
-                      "value": "CUMULATIVE_EVENT",
-                      "provenance": "APPROVED_DEFAULT"
-                    }
+                    "dueAt": "2026-10-09T09:00:00Z",
+                    "endpoint": "ARRIVED",
+                    "quantityMode": "CUMULATIVE_EVENT"
                   },
                   "conditions": [],
                   "evidenceRefs": [],
                   "conversationRequestId": "T20-input",
-                  "originalTextRef": "user-input",
-                  "contextRef": "scoped-conversation"
+                  "sourceRefs": [
+                    "user-input"
+                  ],
+                  "contextRefs": [
+                    "scoped-conversation"
+                  ],
+                  "provenance": {
+                    "quantity": "USER",
+                    "dueAt": "USER",
+                    "endpoint": "CONTEXT",
+                    "quantityMode": "APPROVED_DEFAULT"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -47592,70 +47418,54 @@
             "slots": {
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "price": {
                 "value": "2",
-                "currency": "EUR",
-                "provenance": "USER"
+                "currency": "EUR"
               },
               "supplierId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "dueAt": {
-                "value": "2026-10-09T09:00:00Z",
-                "provenance": "USER"
-              },
-              "endpoint": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
-              "quantityMode": {
-                "value": "CUMULATIVE_EVENT",
-                "provenance": "USER"
-              },
+              "dueAt": "2026-10-09T09:00:00Z",
+              "endpoint": "ARRIVED",
+              "quantityMode": "CUMULATIVE_EVENT",
               "ownerId": {
-                "value": {
-                  "$alias": "writer"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "writer"
               },
               "supervisorId": {
-                "value": {
-                  "$alias": "supervisor"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "supervisor"
               },
               "workId": {
-                "value": {
-                  "$alias": "O1"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "O1"
               },
               "goalVersionId": {
-                "value": {
-                  "$result": {
-                    "actionId": "purchase-work",
-                    "pointer": "/response/data/goal/id"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "purchase-work",
+                  "pointer": "/response/data/goal/id"
+                }
               }
             },
             "conditions": [],
             "evidenceRefs": [],
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T20-mrtr-proposal"
+            "commandIdempotencyKey": "T20-mrtr-proposal",
+            "provenance": {
+              "quantity": "USER",
+              "price": "USER",
+              "supplierId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-response",
@@ -47770,39 +47580,21 @@
                   ],
                   "slots": {
                     "proposalId": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalId"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalId"
+                      }
                     },
                     "proposalHash": {
-                      "value": {
-                        "$result": {
-                          "actionId": "proposal",
-                          "pointer": "/response/proposalHash"
-                        }
-                      },
-                      "provenance": "CONTEXT"
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalHash"
+                      }
                     },
-                    "decidedAt": {
-                      "value": "2026-10-07T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "validUntil": {
-                      "value": "2026-10-08T09:00:00Z",
-                      "provenance": "USER"
-                    },
-                    "consumptionPolicy": {
-                      "value": "SINGLE_ORDER_REVISION",
-                      "provenance": "USER"
-                    },
-                    "conditions": {
-                      "value": [],
-                      "provenance": "USER"
-                    }
+                    "decidedAt": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-08T09:00:00Z",
+                    "consumptionPolicy": "SINGLE_ORDER_REVISION",
+                    "conditions": []
                   },
                   "conditions": [],
                   "evidenceRefs": [],
@@ -47812,7 +47604,15 @@
                       "pointer": "/response/proposalRevision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-mrtr-approval-issued"
+                  "commandIdempotencyKey": "T20-mrtr-approval-issued",
+                  "provenance": {
+                    "proposalId": "CONTEXT",
+                    "proposalHash": "CONTEXT",
+                    "decidedAt": "USER",
+                    "validUntil": "USER",
+                    "consumptionPolicy": "USER",
+                    "conditions": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",
@@ -47875,43 +47675,22 @@
                     ],
                     "slots": {
                       "proposalId": {
-                        "value": {
-                          "$result": {
-                            "actionId": "proposal",
-                            "pointer": "/response/proposalId"
-                          }
-                        },
-                        "provenance": "CONTEXT"
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
                       },
                       "proposalHash": {
-                        "value": {
-                          "$result": {
-                            "actionId": "proposal",
-                            "pointer": "/response/proposalHash"
-                          }
-                        },
-                        "provenance": "CONTEXT"
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
                       },
-                      "decision": {
-                        "value": "APPROVE",
-                        "provenance": "USER"
-                      },
-                      "decidedAt": {
-                        "value": "2026-10-07T09:00:00Z",
-                        "provenance": "USER"
-                      },
-                      "validUntil": {
-                        "value": "2026-10-08T09:00:00Z",
-                        "provenance": "USER"
-                      },
-                      "consumptionPolicy": {
-                        "value": "SINGLE_ORDER_REVISION",
-                        "provenance": "USER"
-                      },
-                      "conditions": {
-                        "value": [],
-                        "provenance": "USER"
-                      }
+                      "decision": "APPROVE",
+                      "decidedAt": "2026-10-07T09:00:00Z",
+                      "validUntil": "2026-10-08T09:00:00Z",
+                      "consumptionPolicy": "SINGLE_ORDER_REVISION",
+                      "conditions": []
                     },
                     "conditions": [],
                     "evidenceRefs": [],
@@ -47921,7 +47700,16 @@
                         "pointer": "/response/proposalRevision"
                       }
                     },
-                    "commandIdempotencyKey": "T20-approval-left"
+                    "commandIdempotencyKey": "T20-approval-left",
+                    "provenance": {
+                      "proposalId": "CONTEXT",
+                      "proposalHash": "CONTEXT",
+                      "decision": "USER",
+                      "decidedAt": "USER",
+                      "validUntil": "USER",
+                      "consumptionPolicy": "USER",
+                      "conditions": "USER"
+                    }
                   },
                   "requestState": {
                     "$result": {
@@ -48017,43 +47805,22 @@
                     ],
                     "slots": {
                       "proposalId": {
-                        "value": {
-                          "$result": {
-                            "actionId": "proposal",
-                            "pointer": "/response/proposalId"
-                          }
-                        },
-                        "provenance": "CONTEXT"
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalId"
+                        }
                       },
                       "proposalHash": {
-                        "value": {
-                          "$result": {
-                            "actionId": "proposal",
-                            "pointer": "/response/proposalHash"
-                          }
-                        },
-                        "provenance": "CONTEXT"
+                        "$result": {
+                          "actionId": "proposal",
+                          "pointer": "/response/proposalHash"
+                        }
                       },
-                      "decision": {
-                        "value": "APPROVE",
-                        "provenance": "USER"
-                      },
-                      "decidedAt": {
-                        "value": "2026-10-07T09:00:00Z",
-                        "provenance": "USER"
-                      },
-                      "validUntil": {
-                        "value": "2026-10-08T09:00:00Z",
-                        "provenance": "USER"
-                      },
-                      "consumptionPolicy": {
-                        "value": "SINGLE_ORDER_REVISION",
-                        "provenance": "USER"
-                      },
-                      "conditions": {
-                        "value": [],
-                        "provenance": "USER"
-                      }
+                      "decision": "APPROVE",
+                      "decidedAt": "2026-10-07T09:00:00Z",
+                      "validUntil": "2026-10-08T09:00:00Z",
+                      "consumptionPolicy": "SINGLE_ORDER_REVISION",
+                      "conditions": []
                     },
                     "conditions": [],
                     "evidenceRefs": [],
@@ -48063,7 +47830,16 @@
                         "pointer": "/response/proposalRevision"
                       }
                     },
-                    "commandIdempotencyKey": "T20-approval-right"
+                    "commandIdempotencyKey": "T20-approval-right",
+                    "provenance": {
+                      "proposalId": "CONTEXT",
+                      "proposalHash": "CONTEXT",
+                      "decision": "USER",
+                      "decidedAt": "USER",
+                      "validUntil": "USER",
+                      "consumptionPolicy": "USER",
+                      "conditions": "USER"
+                    }
                   },
                   "requestState": {
                     "$result": {
@@ -59286,23 +59062,32 @@
                 "arguments": {
                   "intentKind": "COMMAND",
                   "definitionVersion": "definition-v1",
-                  "segmentId": {
-                    "$alias": "B40"
-                  },
-                  "salesOrderLineId": {
-                    "$alias": "SL1"
-                  },
-                  "quantity": {
-                    "value": "20",
-                    "unit": "BOX"
-                  },
                   "expectedRevision": {
                     "$result": {
                       "actionId": "noun",
                       "pointer": "/response/revision"
                     }
                   },
-                  "commandIdempotencyKey": "T20-allowed-tools-scripted-write"
+                  "commandIdempotencyKey": "T20-allowed-tools-scripted-write",
+                  "slots": {
+                    "segmentId": {
+                      "$alias": "B40"
+                    },
+                    "salesOrderLineId": {
+                      "$alias": "SL1"
+                    },
+                    "quantity": {
+                      "value": "20",
+                      "unit": "BOX"
+                    }
+                  },
+                  "subjectRefs": [],
+                  "capabilityId": "reserveQuantity",
+                  "provenance": {
+                    "segmentId": "CONTEXT",
+                    "salesOrderLineId": "CONTEXT",
+                    "quantity": "USER"
+                  }
                 },
                 "_meta": {
                   "io.modelcontextprotocol/protocolVersion": "2026-07-28",

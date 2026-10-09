@@ -11,7 +11,8 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 CASES = ['E1', 'E2', 'C4', 'V2', 'V3']
 CANONICAL_ERROR = '/response/error/code'
-TEST_ARMING = ('testTransactionId', 'testParticipantId', 'testBarrierId', 'testBarrierPoint')
+# step2r round 12: barrier arming is a harness declaration (action.harness.testBarrier), never a request field.
+TEST_ARMING = ('transactionId', 'participantId', 'barrierId', 'point')
 RACE_SUBCASES = {('V2', 'split-commits-first'), ('V2', 'reserve-commits-first'),
                  ('V3', 'hold-first'), ('V3', 'dispatch-first')}
 problems = []
@@ -110,7 +111,7 @@ for cid in CASES:
         # 7. race subcases carry independent lock-wait and re-validation evidence
         if (cid, sub['id']) in RACE_SUBCASES:
             starts = [a for a in sub['actions'] if a.get('kind') == 'start']
-            if len(starts) != 2 or any(any(k not in a['call']['request'] for k in TEST_ARMING) for a in starts):
+            if len(starts) != 2 or any(any(k not in (a['call'].get('harness') or {}).get('testBarrier', {}) for k in TEST_ARMING) for a in starts):
                 fail(where, 'race needs two armed starts (contender and winner)')
             probe = actions.get('contender-waits', {}).get('observation', {})
             if not probe.get('scope', {}).get('lockProbe', {}).get('readOnly'):

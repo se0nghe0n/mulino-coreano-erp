@@ -60,15 +60,15 @@ final class BusinessReviewAssertionTest {
             assertEquals("dispatchPurchaseOrder",negative.path("capabilityId").asText());
             assertEquals("COMMAND",negative.path("intentKind").asText());
             assertTrue(negative.has("slots"),"The shared business envelope is required");
-            assertFalse(negative.path("slots").has("approvalId"));assertEquals("SYNTHETIC_SUPPLIER",negative.at("/slots/channel/value").asText());
+            assertFalse(negative.path("slots").has("approvalId"));assertEquals("SYNTHETIC_SUPPLIER",negative.at("/slots/channel").asText());
             for(String f:List.of("proposalId","proposalHash")) {
-                assertEquals("proposal",negative.at("/slots/"+f+"/value/$result/actionId").asText());
+                assertEquals("proposal",negative.at("/slots/"+f+"/$result/actionId").asText());
                 assertEquals(negative.at("/slots/"+f),action(s,"approved-dispatch").at("/request/body/params/arguments/slots/"+f));
             }
             assertEquals("/response/proposalRevision",negative.at("/expectedRevision/$result/pointer").asText());
             ObjectNode approved=action(s,"approved-dispatch").at("/request/body/params/arguments").deepCopy();
-            assertEquals("approval",approved.at("/slots/approvalId/value/$result/actionId").asText());
-            ((ObjectNode)approved.path("slots")).remove("approvalId");approved.set("commandIdempotencyKey",negative.path("commandIdempotencyKey"));
+            assertEquals("approval",approved.at("/slots/approvalId/$result/actionId").asText());
+            ((ObjectNode)approved.path("slots")).remove("approvalId");((ObjectNode)approved.path("provenance")).remove("approvalId");approved.set("commandIdempotencyKey",negative.path("commandIdempotencyKey"));
             assertEquals(negative,approved,"Only manager approval and a fresh effect key differ");
             assertEquals("manager",action(s,"approval").path("actorRef").asText());
             assertFalse(action(s,"issued").at("/request/body/params/arguments/slots").has("channel"));
@@ -85,15 +85,15 @@ final class BusinessReviewAssertionTest {
             assertEquals("/response/proposalRevision",api.at("/expectedRevision/$result/pointer").asText());
             if(sid.contains("accepted")) {
                 JsonNode approval=action(s,"approval").path("request");
-                assertEquals("APPROVE",approval.at("/slots/decision/value").asText());
-                assertEquals("SINGLE_ORDER_REVISION",approval.at("/slots/consumptionPolicy/value").asText());
+                assertEquals("APPROVE",approval.at("/slots/decision").asText());
+                assertEquals("SINGLE_ORDER_REVISION",approval.at("/slots/consumptionPolicy").asText());
             }
         }
         JsonNode concurrent=sub("T20","mrtr-concurrent-approval-consumption");
         assertFalse(action(concurrent,"approval-issued").at("/request/body/params/arguments/slots").has("decision"));
         for(String side:List.of("left","right")) {
             JsonNode call=action(concurrent,"start-"+side).path("call");
-            assertEquals("APPROVE",call.at("/request/body/params/arguments/slots/decision/value").asText());
+            assertEquals("APPROVE",call.at("/request/body/params/arguments/slots/decision").asText());
             assertEquals("/response/proposalRevision",call.at("/request/body/params/arguments/expectedRevision/$result/pointer").asText());
         }
     }

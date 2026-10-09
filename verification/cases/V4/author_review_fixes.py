@@ -25,6 +25,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[3]
 DIR = ROOT / 'verification/cases/V4'
+def _request_contract():
+    import importlib.util
+    spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
+    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+    return module.Contracts(ROOT)
+REQUEST_CONTRACT = _request_contract()  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
 
 
 def _load(name, path):
@@ -376,7 +382,7 @@ def self_check(case):
 
 
 def build():
-    case = json.loads((DIR / 'case.json').read_text())
+    case = REQUEST_CONTRACT.conform_case(json.loads((DIR / 'case.json').read_text()))  # derived requests copy conformed ones
     case['subcases'] = [s for s in case['subcases'] if s['id'] != SURFACE]
     template = next(s for s in case['subcases'] if s['id'] == 'mcp-inventory')
     for s in case['subcases']:
@@ -386,6 +392,7 @@ def build():
         if s['id'] == MIXED:
             mixed_batch_mcp(s)
     case['subcases'].append(surface_subcase(template))
+    REQUEST_CONTRACT.conform_case(case)
     self_check(case)
     return case
 

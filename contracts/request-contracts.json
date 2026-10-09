@@ -1,0 +1,468 @@
+{
+  "$id": "urn:mulino:request-contracts:1",
+  "version": "1.0.0",
+  "description": "Request-side contracts every case invoke/query action must meet before it reaches the product (step2r round 12, run-driven: docs/execution/s5a-adapter/run-61bd0f8a.json showed every api command and most queries rejected for envelope shape). verification/cases/request_contract.py applies and checks them; ./verify prepare runs verification/cases/check_request_contracts.py (PreparationAssetChecks 'request-contracts'), so a violation fails preparation and a recorded product gap prints KNOWN_OPEN. Product code is read, never changed.",
+  "productRefs": {
+    "commandEnvelope": "contracts/intent.schema.json (product-published; backend CommandRequests.ALLOWED and CommandSchemas.input are the same field set and add commandIdempotencyKey as required when executing)",
+    "queryEnvelope": "backend QueryRequests.FIELDS, ApplicationQueries scope keys, per-handler scope/filter guards (InventoryQueries, WorkReadHandler, EvidenceQueries, RuntimeQueries, DefinitionQueries, PolicyQueries, IdentityQueries) at ce4970c4; MCP read tools expose the same fields without operation (OntologyMcp.tool)",
+    "grantScopes": "backend IdentityAuthorization.permittedScopes: one grant matches only when every dimension kind it names matches the target (all-of), any grant of the actor may match; installer key mapping ScenarioFixtureInstaller.scopeKind"
+  },
+  "commandRoutes": {
+    "intentBody": [
+      "api",
+      "mcp",
+      "worker",
+      "management"
+    ],
+    "intentWithAddressing": {
+      "nested": "navigation",
+      "projection": "projection",
+      "direct": "primitiveName"
+    },
+    "batch": {
+      "envelope": [
+        "atomic",
+        "changesetId",
+        "operations"
+      ],
+      "operationsField": "operations"
+    },
+    "blob": {
+      "envelope": [
+        "operation",
+        "documentId",
+        "businessAction",
+        "contentHash"
+      ],
+      "intentField": "businessAction"
+    },
+    "notChecked": {
+      "db": "raw database privilege probe, not a product request (T04 raw-db)",
+      "wire": "own contract: ContractValidator.wireTransportProblems and contracts/mcp/s0-protocol.md"
+    },
+    "provenanceRule": "provenance names every slot exactly once. A value whose provenance the case states (formerly embedded in the slot value or a per-slot valueProvenance map) keeps it. Otherwise a value the requester picked from the fixture world or an earlier response ($alias, $result, $transform, typed {type,id} or a list of only those) is CONTEXT, and a literal the requester typed in the request (text, decimal, boolean, quantity, aggregate) is USER. APPROVED_DEFAULT is never inferred; only a case statement sets it. A blanket valueProvenance string is not a per-slot statement and is ignored."
+  },
+  "queryEnvelope": {
+    "routes": [
+      "api",
+      "mcp"
+    ],
+    "notChecked": {
+      "blob": "evidence download surface, no product query endpoint (adapter NOT_IMPLEMENTED)",
+      "direct": "bypass probe",
+      "nested": "bypass probe"
+    },
+    "fields": [
+      "operation",
+      "id",
+      "scope",
+      "filters",
+      "limit",
+      "cursor",
+      "definitionVersion",
+      "asOf",
+      "knownAt",
+      "snapshotRef",
+      "workId",
+      "itemId",
+      "lotId",
+      "action",
+      "customerId",
+      "type",
+      "sort",
+      "name",
+      "status"
+    ],
+    "mcpFields": [
+      "id",
+      "scope",
+      "filters",
+      "limit",
+      "cursor",
+      "definitionVersion",
+      "asOf",
+      "knownAt",
+      "snapshotRef",
+      "workId",
+      "itemId",
+      "lotId",
+      "action",
+      "customerId",
+      "type",
+      "sort",
+      "name",
+      "status"
+    ],
+    "liftedToFilters": [
+      "workId",
+      "itemId",
+      "lotId",
+      "action",
+      "customerId",
+      "type",
+      "sort",
+      "name",
+      "status"
+    ],
+    "scopeKeys": [
+      "organizationId",
+      "itemId",
+      "lotId",
+      "workId",
+      "placeId",
+      "customerId",
+      "objectType"
+    ],
+    "operations": {
+      "getObject": {
+        "filters": [
+          "type",
+          "sort"
+        ]
+      },
+      "searchObjects": {
+        "filters": [
+          "type",
+          "sort"
+        ]
+      },
+      "getInventory": {
+        "scope": [
+          "organizationId",
+          "itemId",
+          "placeId",
+          "lotId",
+          "objectType",
+          "customerId"
+        ],
+        "filters": [
+          "type",
+          "sort"
+        ]
+      },
+      "traceLot": {
+        "filters": [
+          "type",
+          "sort"
+        ]
+      },
+      "getTrace": {
+        "filters": [
+          "type",
+          "sort"
+        ]
+      },
+      "getWork": {
+        "filters": [
+          "itemId",
+          "lotId",
+          "workId",
+          "status",
+          "sort",
+          "action",
+          "customerId"
+        ]
+      },
+      "searchWorks": {
+        "filters": [
+          "itemId",
+          "lotId",
+          "workId",
+          "status",
+          "sort",
+          "action",
+          "customerId"
+        ]
+      },
+      "getObligations": {
+        "filters": [
+          "itemId",
+          "lotId",
+          "workId",
+          "status",
+          "sort",
+          "action",
+          "customerId"
+        ]
+      },
+      "getAssessment": {
+        "filters": [
+          "itemId",
+          "lotId",
+          "workId",
+          "status",
+          "sort",
+          "action",
+          "customerId"
+        ]
+      },
+      "getEvidence": {
+        "scope": [
+          "organizationId",
+          "kind",
+          "subjectKind",
+          "subjectId"
+        ],
+        "filters": [
+          "includeSuperseded",
+          "verifiedOnly"
+        ]
+      },
+      "getInbox": {
+        "scope": [
+          "organizationId",
+          "kind",
+          "subjectKind",
+          "subjectId"
+        ],
+        "filters": [
+          "includeSuperseded",
+          "verifiedOnly"
+        ]
+      },
+      "getReconciliation": {
+        "scope": [
+          "organizationId"
+        ],
+        "filters": [
+          "includeSuperseded",
+          "verifiedOnly"
+        ]
+      },
+      "searchOperationalIssues": {
+        "scope": [
+          "organizationId",
+          "workId"
+        ],
+        "filters": []
+      },
+      "getDefinition": {
+        "filters": []
+      },
+      "getPolicy": {
+        "filters": []
+      },
+      "getAccessContext": {
+        "filters": []
+      },
+      "getGrant": {
+        "filters": []
+      }
+    },
+    "operationsWithoutProductHandler": "an operation outside 'operations' has no product handler at ce4970c4; only the shared envelope is checked and any parameter outside it needs a knownOpen entry"
+  },
+  "harnessDeclarations": {
+    "description": "Values a case needs that are not product request content move to the action's 'harness' object (contracts/acceptance-case.schema.json); adapters read them and never send them as request fields.",
+    "testBarrier": "testTransactionId/testParticipantId/testBarrierId/testBarrierPoint of a racing call (the same values as its barrier control parameters)",
+    "environmentId": "the runtime environment a call or read targets (restore and archive cases)",
+    "authenticationTest": "credential variant the adapter signs (T08 issuer/subject/audience)",
+    "executionContext": "worker-route runtime task context (V7); the product binds it from the scheduled task, never from the payload",
+    "mcp": "MCP protocol fields outside tool arguments: transport rpcId, MRTR requestState and inputResponses (V6)",
+    "intentionalViolation": "a field the case sends on purpose to prove the product rejects it; prepare requires the declared fields to equal the actual violations and a pinned rejection on the action"
+  },
+  "grantComposition": {
+    "field": "scopeComposition",
+    "values": {
+      "PER_DIMENSION": "install one grant per product dimension kind (same actions, delegator, validity, revision); the authored lists act as alternatives",
+      "ALL_DIMENSIONS": "install one grant whose dimension kinds intersect (product all-of semantics)"
+    },
+    "dimensionKinds": {
+      "itemAliases": "ITEM",
+      "items": "ITEM",
+      "itemAlias": "ITEM",
+      "workAliases": "WORK",
+      "works": "WORK",
+      "placeAliases": "PLACE",
+      "places": "PLACE",
+      "segmentAliases": "TARGET",
+      "segments": "TARGET",
+      "lotAliases": "TARGET",
+      "customerAliases": "TARGET",
+      "supplierAliases": "TARGET",
+      "documentAliases": "TARGET",
+      "targetAliases": "TARGET",
+      "physicalRootAliases": "TARGET",
+      "sourceNamespaces": "SOURCE"
+    },
+    "rule": "A grant naming two or more dimension kinds declares scopeComposition. Step 2 round 12 sets PER_DIMENSION on every such fixture grant: the cases read and act across items, works and segments the grant lists, which the product's all-of match of one grant refuses (run-61bd0f8a: 111 subcases FORBIDDEN). The plan (section 7.1) does not say whether the lists of one grant are alternatives; the installer must split a PER_DIMENSION grant (probe mode unionGrantDimensions does exactly this today)."
+  },
+  "knownOpen": [
+    {
+      "id": "PG-INTENT-ARRAY-SLOT",
+      "owner": "Step 3",
+      "kind": "command",
+      "match": {
+        "arraySlot": true
+      },
+      "reason": "contracts/intent.schema.json $defs.value has no array branch, yet the product handlers read list slots (InventoryCommands splitQuantity quantities and mergeQuantity segmentIds) and the plan's split/merge/multi-evidence commands need them. Cases keep their list slots; the product contract must publish an array value or an aggregate shape.",
+      "closeWhen": "intent.schema.json allows the list representation the handlers read"
+    },
+    {
+      "id": "PG-INVENTORY-ACTION-ELIGIBILITY",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getInventory",
+          "traceLot"
+        ],
+        "filters": [
+          "action",
+          "customerId"
+        ]
+      },
+      "reason": "plan section 4.2 (line 122) defines action-specific eligible quantity; QueryRequests accepts top-level action/customerId but InventoryQueries rejects them as filters (Unsupported inventory filter).",
+      "closeWhen": "getInventory answers eligibleQuantity for an action and customer"
+    },
+    {
+      "id": "PG-OBLIGATION-SELECTOR",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getObligations"
+        ],
+        "fields": [
+          "kind",
+          "obligationId"
+        ],
+        "filters": [
+          "kind"
+        ],
+        "scopeKeys": [
+          "allocationId",
+          "kind"
+        ]
+      },
+      "reason": "cases read one obligation by id, the obligations of one kind or those of one allocation; getObligations takes only a work id and work filters.",
+      "closeWhen": "the query contract names an obligation id/kind selector"
+    },
+    {
+      "id": "PG-SOURCE-KEY-SELECTOR",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getInbox",
+          "getEvidence"
+        ],
+        "fields": [
+          "sourceNamespace",
+          "externalEventId",
+          "sourceVersion",
+          "sourceKey",
+          "occurrenceId",
+          "activityId"
+        ]
+      },
+      "reason": "plan section 4.3 keys an inbox record by sourceNamespace+externalEventId+sourceVersion and links evidence to activities/occurrences; EvidenceQueries selects only by kind and a typed subject.",
+      "closeWhen": "getInbox/getEvidence accept the source key, occurrence or activity selector"
+    },
+    {
+      "id": "PG-ACCESS-CONTEXT-OTHER-ACTOR",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getAccessContext"
+        ],
+        "fields": [
+          "actorId"
+        ]
+      },
+      "reason": "an identity administrator reads another actor's access context (T08); getAccessContext answers only the caller.",
+      "closeWhen": "the plan/product decide whether an administrator may read another actor's context"
+    },
+    {
+      "id": "PG-TRACE-AFFECTED-SUBSET",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "traceLot"
+        ],
+        "fields": [
+          "affectedSourceId"
+        ]
+      },
+      "reason": "plan section 4.2 traces a late-known defective subset of a mixed LOT; traceLot has no selector for the affected source.",
+      "closeWhen": "traceLot or getTrace names the affected source"
+    },
+    {
+      "id": "PG-WORK-BY-COMMAND",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getWork"
+        ],
+        "fields": [
+          "commandId"
+        ]
+      },
+      "reason": "T26 reads the Work a retried command touched by the command id; getWork takes only a work id.",
+      "closeWhen": "the query contract names a command selector or the case reads the work id from the command result"
+    },
+    {
+      "id": "PG-ASSESSMENT-INVOICE",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getAssessment"
+        ],
+        "fields": [
+          "invoiceId"
+        ]
+      },
+      "reason": "T19 reads the invoice-match assessment by invoice; getAssessment takes a work id only.",
+      "closeWhen": "the query contract names an invoice assessment selector"
+    },
+    {
+      "id": "PG-SEARCH-MULTI-TYPE",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "searchObjects"
+        ],
+        "fields": [
+          "types"
+        ]
+      },
+      "reason": "T02 searches two noun types at once; searchObjects takes one type.",
+      "closeWhen": "searchObjects accepts several types or the case issues one search per type"
+    },
+    {
+      "id": "PG-EXTERNAL-ID-LOOKUP",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getObject",
+          "searchObjects"
+        ],
+        "fields": [
+          "externalIdentifier"
+        ]
+      },
+      "reason": "plan section 4.1 keeps ExternalIdentifier (issuer/namespace/validity) beside the internal id; T02 resolves an object by its issuer-scoped external identifier, which the object query has no selector for.",
+      "closeWhen": "the object query names an external identifier selector"
+    },
+    {
+      "id": "PG-QUERY-CAPABILITY-ABSENT",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "evaluateEligibility",
+          "convertUnit",
+          "getCommandResult"
+        ],
+        "anyParameter": true
+      },
+      "reason": "contracts/acceptance-capabilities.json registers these plan queries; the product has no handler, so their parameters have no product contract.",
+      "closeWhen": "the product publishes the query and its parameters"
+    }
+  ]
+}

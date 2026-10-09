@@ -66,18 +66,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -125,18 +121,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -185,18 +175,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -254,18 +236,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -333,18 +310,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -400,18 +376,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER",
+              "physicalScopeId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "return-authorize:api-response",
@@ -481,18 +451,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "returnAuthorizationId": "CONTEXT",
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "sourceEvidenceId": "CONTEXT",
+              "externalEventId": "USER",
+              "sourceNamespace": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "return:api-response",
@@ -512,29 +481,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-duplicate:api-response"
@@ -643,18 +596,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "returnAuthorizationId": "CONTEXT",
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "sourceEvidenceId": "CONTEXT",
+              "externalEventId": "USER",
+              "sourceNamespace": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "duplicate-return:api-response",
@@ -674,29 +626,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "returned:api-response"
@@ -784,18 +720,11 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "return-new-receipt"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "returnId": "CONTEXT",
+              "decision": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "return-disposition:api-response",
@@ -1528,18 +1457,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -1587,18 +1512,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -1647,18 +1566,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -1716,18 +1627,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -1795,18 +1701,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -1852,18 +1757,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "identityStatus": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "return-authorize:api-response",
@@ -1919,18 +1818,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "returnAuthorizationId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "identityStatus": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "return:api-response",
@@ -1950,29 +1844,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "unidentified-return-provisional"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "provisional:api-response"
@@ -2521,18 +2399,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -2580,18 +2454,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -2640,18 +2508,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -2709,18 +2569,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -2788,18 +2643,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -2844,18 +2698,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "classification": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "investigate:api-response",
@@ -2908,18 +2756,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "investigationId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "recall-proposal:api-response",
@@ -2978,18 +2820,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "scopeHash": "CONTEXT",
+              "scopeVersion": "CONTEXT",
+              "decision": "USER",
+              "validUntil": "USER"
+            }
           },
           "evidenceRefs": [
             "recall-approve:api-response",
@@ -3010,28 +2847,12 @@
               "itemId": {
                 "$alias": "P"
               },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "subjectRefs": [
-              {
-                "type": "ManufacturerLot",
-                "id": {
-                  "$alias": "L"
-                }
+              "lotId": {
+                "$alias": "L"
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "knownAt": "2026-10-07T09:00:01Z"
           },
           "evidenceRefs": [
             "trace:api-response"
@@ -3083,29 +2904,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-unauthorized:api-response"
@@ -3198,18 +3003,11 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "scopeHash": "CONTEXT",
+              "decision": "USER"
+            }
           },
           "evidenceRefs": [
             "unauthorized:api-response",
@@ -3229,29 +3027,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "after-unauthorized:api-response"
@@ -3356,18 +3138,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "recallId": "CONTEXT",
+              "approvalId": "CONTEXT",
+              "scopeVersion": "CONTEXT",
+              "submissionEvidenceId": "CONTEXT",
+              "receiptEvidenceId": "CONTEXT",
+              "submittedAt": "USER"
+            }
           },
           "evidenceRefs": [
             "notice:api-response",
@@ -3422,18 +3200,11 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "investigationId": "CONTEXT",
+              "quantity": "USER",
+              "previousProposalId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "changed-scope:api-response",
@@ -3502,18 +3273,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "recallId": "CONTEXT",
+              "proposalId": "CONTEXT",
+              "scopeVersion": "CONTEXT",
+              "approvalId": "CONTEXT",
+              "scopeHash": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "old-approval-new-notice:api-response",
@@ -3533,29 +3299,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "trace-and-recall-decisions"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "recall:api-response"
@@ -4259,18 +4009,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -4318,18 +4064,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -4378,18 +4118,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -4447,18 +4179,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -4526,18 +4253,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -4582,18 +4308,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "classification": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "investigate:api-response",
@@ -4646,18 +4366,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "investigationId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "recall-proposal:api-response",
@@ -4716,18 +4430,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "scopeHash": "CONTEXT",
+              "scopeVersion": "CONTEXT",
+              "decision": "USER",
+              "validUntil": "USER"
+            }
           },
           "evidenceRefs": [
             "recall-approve:api-response",
@@ -4800,18 +4509,15 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "recallId": "CONTEXT",
+              "scopeVersion": "CONTEXT",
+              "quantity": "USER",
+              "deliveryId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "recover25:api-response",
@@ -4873,18 +4579,16 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "recallId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER",
+              "decisionKind": "USER",
+              "reason": "USER",
+              "evidenceId": "CONTEXT",
+              "validUntil": "USER"
+            }
           },
           "evidenceRefs": [
             "recall-dispose-clearance:api-response",
@@ -4939,18 +4643,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER",
+              "reason": "USER",
+              "evidenceId": "CONTEXT",
+              "validUntil": "USER"
+            }
           },
           "evidenceRefs": [
             "dispose-decision:api-response",
@@ -5026,18 +4726,15 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "recoveryId": "CONTEXT",
+              "quantity": "USER",
+              "dispositionBasisId": "CONTEXT",
+              "recallApprovalId": "CONTEXT",
+              "recallDispositionDecisionId": "CONTEXT",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "dispose25:api-response",
@@ -5057,29 +4754,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-close:api-response"
@@ -5171,18 +4852,11 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "recallId": "CONTEXT",
+              "claimedProcessedQuantity": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "false-close:api-response",
@@ -5202,29 +4876,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T18",
-              "scenarioId": "recall-closure-accounting"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "after-close:api-response"

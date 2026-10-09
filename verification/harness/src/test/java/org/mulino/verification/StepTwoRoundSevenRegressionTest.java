@@ -84,7 +84,7 @@ final class StepTwoRoundSevenRegressionTest {
             for(String r:List.of("receipt60","receipt40")) assertEquals("receiver",slots(s,r).at("/receivingCustodianId/$alias").asText());
         }
         ObjectNode t13=sub(caseJson("T13"),"partial-excess-return-relocation");
-        for(String r:List.of("receipt60","receipt40","receipt5")) assertEquals("warehouse",slots(t13,r).at("/receivingCustodianId/value/$alias").asText());
+        for(String r:List.of("receipt60","receipt40","receipt5")) assertEquals("warehouse",slots(t13,r).at("/receivingCustodianId/$alias").asText());
     }
 
     // P3 (a): C1 unrecognized-place-kind differs from custody-not-sale only by the place kind.
