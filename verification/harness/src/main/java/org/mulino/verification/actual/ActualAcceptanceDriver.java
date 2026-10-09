@@ -28,10 +28,10 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return Set.of("api","mcp","wire","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","clock","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
-        if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;}
+        if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;}
         try {var bound=ActualFixtureBindings.bind(root,bundle,configuration);
             // Suite isolation: each installed fixture is a fresh synthetic organization with its own external alias,
             // because one disposable database serves every subcase. The authored alias key stays the contract.
@@ -46,6 +46,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             } else data=fixtures.install(bound);
             // The control identity is the first installed actor the backend can authenticate (never a declared untrusted identity).
             for(JsonNode candidate:bound.path("fixture").path("actors")){if(candidate.path(ActualFixtureBindings.UNTRUSTED).asBoolean(false))continue;var control=(ObjectNode)candidate.deepCopy();String mapped=data.path("organizationExternalAliases").path(control.path("organizationAlias").asText()).asText(data.path("organizationExternalAlias").asText(null));if(mapped!=null)control.put("organizationAlias",mapped);controlActor=control;break;}
+            if(suiteIsolation)idTypes=data.path("idTypes");
             if(suiteIsolation){installedActors=data.path("installedActors").isObject()?data.path("installedActors"):bound.path("fixture").path("actors");fixtureStart(bound.path("fixture"));}
             return executed(id,data,null,provenance(null,"JDBC_FIXTURE_INSTALL",false,null,null),data);}
         catch(UnsupportedOperationException unsupported){return StepResult.missing(id,"NOT_IMPLEMENTED: "+unsupported.getMessage());}
@@ -92,6 +93,9 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             JsonNode wireRequest=request.deepCopy();
             var translated=Json.array();
             if(relaxWire&&category.equals("queries")&&wireRequest.has("objectId")&&!wireRequest.has("id")){((ObjectNode)wireRequest).set("id",wireRequest.path("objectId"));((ObjectNode)wireRequest).remove("objectId");translated.add("objectId->id");}
+            // Probe only: an untyped getObject reads TradeItem in the product; name the installed alias type instead.
+            if(relaxWire&&operation.equals("getObject")&&wireRequest.hasNonNull("id")&&!wireRequest.path("scope").has("objectType")&&!wireRequest.path("filters").has("type")&&idTypes!=null&&idTypes.hasNonNull(wireRequest.path("id").asText())){
+                String type=idTypes.path(wireRequest.path("id").asText()).asText();if(!type.equals("TradeItem")){if(!wireRequest.path("scope").isObject())((ObjectNode)wireRequest).putObject("scope");((ObjectNode)wireRequest.path("scope")).put("objectType",type);translated.add("scope.objectType="+type+" (probe)");}}
             if(category.equals("queries")&&wireRequest.path("scope").isObject()) {
                 // Case namespace keys are test metadata (each subcase already has its own organization); includeDescendants
                 // is an observation-scope hint the product query schema does not define. Both are removed on the wire and
@@ -167,8 +171,15 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         p.set("sourceQuery",query==null?Json.MAPPER.nullNode():query);p.set("snapshot",snapshot==null?Json.MAPPER.nullNode():snapshot);return p;
     }
     @Override public StepResult invoke(String id,String route,JsonNode actor,String capability,JsonNode request) {
-        if(!route.equals("api")&&!(suiteIsolation&&route.equals("mcp")))return StepResult.missing(id,"NOT_IMPLEMENTED: actual command route "+route);
-        return send(id,actor,request.path("intentKind").asText().equals("RECORD")?"records":"commands",capability,request,route);
+        if(suiteIsolation&&Set.of("nested","projection").contains(route))
+            return StepResult.missing(id,"NOT_IMPLEMENTED: no product surface for route "+route+": OntologyService exposes only the query/command/validateCommand actions, no entity set or navigation to write through");
+        if(suiteIsolation&&route.equals("direct"))return odataCommand(id,actor,capability,request);
+        if(suiteIsolation&&route.equals("batch"))return odataBatch(id,actor,request);
+        // Management commands (retrySafeCommand, emergencyRepair, ...) are product commands guarded by management authority;
+        // the product has no separate management transport, so the route is the command API with the operator's identity.
+        String transport=suiteIsolation&&route.equals("management")?"api":route;
+        if(!transport.equals("api")&&!(suiteIsolation&&transport.equals("mcp")))return StepResult.missing(id,"NOT_IMPLEMENTED: actual command route "+route);
+        return send(id,actor,request.path("intentKind").asText().equals("RECORD")?"records":"commands",capability,request,transport);
     }
     @Override public StepResult control(String id,JsonNode request) {
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
@@ -194,6 +205,60 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         if(httpStatus!=200||!serverResponse.path("authorityClock").asBoolean()||!"verification".equals(serverResponse.path("profile").asText())||!Instant.parse(requestedInstant).equals(Instant.parse(serverResponse.path("instant").asText())))throw new IllegalStateException("Verification clock control did not prove applied authority clock");
         var data=Json.object();data.put("acknowledged",true).put("controlType","clock").put("operation","advanceTo").put("acknowledgedAt",Instant.now().toString());data.set("instant",serverResponse.path("instant"));data.set("serverObservation",serverResponse);return data;
     }
+    /** route=direct: the product's exposed generic write action, CAP OData OntologyService.command(requestJson) at /odata/v4/ontology/command. */
+    private StepResult odataCommand(String id,JsonNode actor,String capability,JsonNode request) {
+        if(externalOrganization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: no fixture organization installed for this subcase");
+        try {
+            var translated=Json.array();JsonNode wire=request.deepCopy();if(wire instanceof ObjectNode command)ScenarioWireMapping.command(capability,command,translated);
+            var body=Json.object();body.put("requestJson",wire.toString());
+            var uri=configuration.baseUri().resolve(ODATA+"/command");String credential=signer.sign(credentialActor(actor));
+            var result=http.send(HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Accept","application/json").header("Authorization","Bearer "+credential).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build(),HttpResponse.BodyHandlers.ofString());
+            if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: actual HTTP endpoint "+uri.getPath());
+            JsonNode raw=parseOrText(result.body());JsonNode response=raw.path("value").isTextual()?parseOrText(raw.path("value").asText()):raw;
+            var receipt=Json.object();receipt.put("method","POST").put("path",uri.getPath()).put("route","direct").put("httpStatus",result.statusCode());receipt.set("request",request);receipt.set("wireRequest",body);receipt.set("rawResponse",raw);receipt.set("response",response);if(!translated.isEmpty())receipt.set("adapterTranslations",translated);
+            var identity=Json.object().put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
+            return executed(id,Json.object().put("httpStatus",result.statusCode()).put("route","direct"),response,provenance(identity,"HTTP_ODATA_ACTION",false,null,null),receipt);
+        } catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Actual OData interrupted",interrupted);}
+        catch(Exception failure){throw new IllegalStateException("Actual OData environment/response failure",failure);}
+    }
+    /**
+     * route=batch: OData v4 multipart $batch of OntologyService.command calls; atomic=true puts every operation in one
+     * changeset. The step response is an adapter aggregate: outcome APPLIED only when every operation applied, else the
+     * first non-applied operation's outcome and error; every operation envelope is kept under operations[].
+     */
+    private StepResult odataBatch(String id,JsonNode actor,JsonNode request) {
+        if(externalOrganization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: no fixture organization installed for this subcase");
+        try {
+            String batch="batch_"+UUID.randomUUID(),change="changeset_"+UUID.randomUUID();boolean atomic=request.path("atomic").asBoolean(false);
+            var translated=Json.array();var sb=new StringBuilder();int n=0;
+            if(atomic)sb.append("--").append(batch).append("\r\nContent-Type: multipart/mixed; boundary=").append(change).append("\r\n\r\n");
+            for(JsonNode op:request.path("operations")) {
+                JsonNode wire=op.deepCopy();if(wire instanceof ObjectNode command)ScenarioWireMapping.command(op.path("capabilityId").asText(),command,translated);
+                var body=Json.object();body.put("requestJson",wire.toString());
+                sb.append("--").append(atomic?change:batch).append("\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\nContent-ID: ").append(++n).append("\r\n\r\n")
+                  .append("POST command HTTP/1.1\r\nContent-Type: application/json\r\nAccept: application/json\r\n\r\n").append(body).append("\r\n");
+            }
+            if(atomic)sb.append("--").append(change).append("--\r\n");
+            sb.append("--").append(batch).append("--\r\n");
+            var uri=configuration.baseUri().resolve(ODATA+"/$batch");String credential=signer.sign(credentialActor(actor));
+            var result=http.send(HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(60)).header("Content-Type","multipart/mixed; boundary="+batch).header("Accept","multipart/mixed").header("Authorization","Bearer "+credential).POST(HttpRequest.BodyPublishers.ofString(sb.toString())).build(),HttpResponse.BodyHandlers.ofString());
+            if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: actual HTTP endpoint "+uri.getPath());
+            var operations=Json.array();
+            var m=java.util.regex.Pattern.compile("HTTP/1\\.1 (\\d{3})[^\\n]*\\n(?:[^\\n]+\\n)*?\\r?\\n(\\{.*?\\})\\r?\\n(?=--)",java.util.regex.Pattern.DOTALL).matcher(result.body());
+            while(m.find()){JsonNode raw=parseOrText(m.group(2));var entry=Json.object();entry.put("httpStatus",Integer.parseInt(m.group(1)));entry.set("response",raw.path("value").isTextual()?parseOrText(raw.path("value").asText()):raw);operations.add(entry);}
+            var response=Json.object();JsonNode first=null;for(JsonNode op:operations)if(!"APPLIED".equals(op.path("response").path("outcome").asText())){first=op.path("response");break;}
+            if(operations.isEmpty()){response.put("outcome","UNPARSED_BATCH_RESPONSE");}
+            else if(first==null)response.put("outcome","APPLIED");else{response.set("outcome",first.path("outcome").isMissingNode()?Json.MAPPER.getNodeFactory().textNode("NO_ENVELOPE"):first.path("outcome"));if(first.has("error"))response.set("error",first.path("error"));}
+            response.set("operations",operations);
+            var receipt=Json.object();receipt.put("method","POST").put("path",uri.getPath()).put("route","batch").put("httpStatus",result.statusCode()).put("aggregate","outcome APPLIED only when every operation applied; else the first non-applied operation's outcome/error");
+            receipt.set("request",request);receipt.put("wireBody",sb.toString());receipt.put("rawResponse",result.body());receipt.set("response",response);if(!translated.isEmpty())receipt.set("adapterTranslations",translated);
+            var identity=Json.object().put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
+            return executed(id,Json.object().put("httpStatus",result.statusCode()).put("route","batch").put("operationCount",operations.size()),response,provenance(identity,"HTTP_ODATA_BATCH",false,null,null),receipt);
+        } catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Actual OData batch interrupted",interrupted);}
+        catch(Exception failure){throw new IllegalStateException("Actual OData batch environment/response failure",failure);}
+    }
+    static final String ODATA="/odata/v4/ontology";
+    private static JsonNode parseOrText(String body){try{return Json.parse(body);}catch(Exception notJson){return Json.MAPPER.getNodeFactory().textNode(body);}}
     /**
      * Raw protocol transport (route=wire): the authored method, headers and body are sent unchanged to the product MCP
      * channel (/mcp/ontology), or to the authored path for HTTP/* operations. The only addition is the bearer credential of
@@ -230,7 +295,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         catch(Exception failure){throw new IllegalStateException("Actual raw wire environment/response failure",failure);}
     }
     private static JsonNode redacted(JsonNode raw){var copy=raw.deepCopy();if(copy.path("headers") instanceof ObjectNode h)for(String k:List.of("Authorization","authorization","Cookie","cookie"))if(h.has(k))h.put(k,"REDACTED");return copy;}
-    private volatile JsonNode installedActors;
+    private volatile JsonNode installedActors,idTypes;
     @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request) {
         if(!route.equals("api"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual async route "+route);
         String handle=UUID.randomUUID().toString();

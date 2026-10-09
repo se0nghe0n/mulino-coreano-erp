@@ -19,6 +19,8 @@ ADAPTER_PATTERNS = [
 ]
 PRODUCT_PATTERNS = [r'actual HTTP endpoint', r'verification clock profile not installed']
 CLIENT_PATTERNS = [r'actual client/model runner']
+# The case drives a write path the product does not expose (plan §126 checks exposed paths only): a case question.
+TEST_PATTERNS = [r'no product surface for route']
 
 
 def action_order(subcase):
@@ -33,6 +35,8 @@ def action_order(subcase):
 
 
 def classify_reason(reason):
+    if any(re.search(p, reason) for p in TEST_PATTERNS):
+        return 'TEST'
     if any(re.search(p, reason) for p in CLIENT_PATTERNS):
         return 'ADAPTER'
     if any(re.search(p, reason) for p in PRODUCT_PATTERNS):
@@ -87,8 +91,8 @@ def install_state(evidence, subcase):
         a = evidence.get('actions', {}).get(aid)
         if a and a.get('actionKind', None) is None and isinstance(a.get('data'), dict) and 'aliasMap' in a.get('data', {}):
             d = a['data']
-            return d.get('fixtureComplete', True), d.get('omittedFacts', [])
-    return None, []
+            return d.get('fixtureComplete', True), d.get('omittedFacts', []), d.get('notRepresentedFacts', [])
+    return None, [], []
 
 
 def first_rejection(evidence, subcase):
@@ -189,7 +193,7 @@ def main(argv):
         sub = next(s for s in cases[cid]['subcases'] if s['id'] == sid)
         status = {'PASS': 'PASS', 'FAIL': 'FAIL'}.get(e['status'], 'NOT_IMPLEMENTED')
         problem, cls = (None, None) if status == 'PASS' else first_problem(e, sub)
-        complete, omitted = install_state(e, sub)
+        complete, omitted, unrepresented = install_state(e, sub)
         rejection = first_rejection(e, sub)
         if problem is not None and rejection is not None:
             problem['firstProductRejection'] = rejection
@@ -199,7 +203,7 @@ def main(argv):
             problem['note'] = 'fixture installed partially; product verdict pending complete fixture'
         executed = sum(1 for a in e.get('actions', {}).values() if a.get('driverStatus') == 'EXECUTED')
         row = {'caseId': cid, 'subcaseId': sid, 'status': status, 'executedActions': executed,
-               'declaredActions': len(action_order(sub)), 'fixtureComplete': complete, 'omittedFixtureFacts': omitted,
+               'declaredActions': len(action_order(sub)), 'fixtureComplete': complete, 'omittedFixtureFacts': omitted, 'notRepresentedFixtureFacts': unrepresented,
                'firstProblem': problem, 'classification': cls}
         subcases.append(row)
         totals[status] += 1
@@ -221,7 +225,7 @@ def main(argv):
         per_case[r['caseId']][r['status']] += 1
     top = sorted(groups.items(), key=lambda kv: -len(kv[1]))
     inventory = {
-        'recordType': 'S5A_ACTUAL_SCENARIO_INVENTORY', 'schemaVersion': '1.0.0',
+        'recordType': 'S5_ACTUAL_SCENARIO_INVENTORY', 'schemaVersion': '1.1.0',
         'codeCommit': report.get('codeCommit'), 'workingTreeDirty': report.get('workingTreeDirty'),
         'command': report.get('command'), 'reportTimestamp': report.get('timestamp'), 'runMode': run_mode,
         'harnessStatus': report.get('status'), 'harnessExitCode': report.get('exitCode'),

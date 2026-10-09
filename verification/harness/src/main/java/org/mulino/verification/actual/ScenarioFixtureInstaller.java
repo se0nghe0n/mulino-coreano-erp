@@ -99,7 +99,7 @@ final class ScenarioFixtureInstaller {
         if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));
         result.put("organizationExternalAlias",externals.get(defaultOrgAlias));result.set("organizationExternalAliases",Json.MAPPER.valueToTree(externals));
         result.put("installer","scenario-fixture-installer-v2").put("recordedAtRule","every installed row recordedAt=createdAt=fixture clock asOf (starting clock); evidence declared recordedAt later than the fixture knownAt is recorded at that declared instant (late-known)");
-        result.put("fixtureComplete",omitted.isEmpty());result.set("omittedFacts",Json.MAPPER.valueToTree(omitted));result.set("notRepresentedFacts",Json.MAPPER.valueToTree(notRepresented));result.set("installerConventions",Json.MAPPER.valueToTree(conventions));
+        result.put("fixtureComplete",omitted.isEmpty());result.set("omittedFacts",Json.MAPPER.valueToTree(omitted));result.set("notRepresentedFacts",Json.MAPPER.valueToTree(notRepresented));var types=Json.object();fixture.path("aliases").fields().forEachRemaining(e->{if(aliases.has(e.getKey()))types.put(aliases.path(e.getKey()).asText(),e.getValue().path("type").asText());});result.set("idTypes",types);result.set("installerConventions",Json.MAPPER.valueToTree(conventions));
         result.put("committed",true).put("businessExecutionClaimed",false);return result;
     }
 
