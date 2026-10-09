@@ -68,7 +68,24 @@ adversarial review를 수행한다. 이미 닫은 Step 1·2도 이 두 reviewer�
 대상 baseline·diff·요구·실행 증거와 반례를 확인하고 지적을 통합·수정한다.
 관련 checks가 통과해야 Step를 닫는다. review 완료가 runtime PASS를
 뜻하지 않는다. 모델이나 effort를 사용할 수 없으면 실제 제한을 보고하고
-임의로 대체하지 않는다.
+임의로 대체하지 않는다. Fable을 쓸 수 없을 때는 사용자가 허용한 대로
+GPT-6-Astra `low`(T3 `delegate_task`)로 대체하고 그 사실을 기록한다.
+
+2026-10-09 사용자가 review 시점을 바꿨다. Step 2 closure가 정적
+review 8회 동안 매번 새 P1·P2를 찾으며 수렴하지 않았고, 지적 대부분이
+제품에 한 번 실행하면 드러나는 동작 불일치였기 때문이다. 이 결정이
+위 "매 사용자 Step마다" 규칙보다 우선한다.
+
+1. 정적 adversarial review를 중단한다. Step 2 round 11은 closure 8의
+   P1 두 건(시계와 fixture 기록 시각, 예약 이중 계상)만 닫고, 나머지
+   지적은 backlog로 넘긴다.
+2. Step 3가 test adapter와 fixture installer를 먼저 만들어 41 case를
+   `./verify scenarios --actual`로 실제 제품에 실행할 수 있게 한다.
+3. S5·S6를 구현하면서 시스템 Step마다 시나리오를 실행한다. 실패는
+   원인에 따라 test는 Step 2 모델로, 제품은 Step 3 모델로 고친다.
+   중간 gate는 실행 결과와 결합 checks로 판정한다.
+4. S6까지 구현하고 시나리오를 실행한 뒤 위 두 reviewer가 실행 증거와
+   함께 전체를 한 번 adversarial review한다.
 
 Task branch `feat/ontology-implementation`은 통합 milestone마다 fork
 remote에 push한다. force push와 main 직접 push는 하지 않는다.
