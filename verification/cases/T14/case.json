@@ -47,42 +47,42 @@
             ],
             "slots": {
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "Q100"
               },
-              "children": {
-                "value": [
-                  {
-                    "alias": "A40",
-                    "quantity": "40",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "B10",
-                    "quantity": "10",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "A20",
-                    "quantity": "20",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "B30",
-                    "quantity": "30",
-                    "unit": "BOX"
-                  }
-                ],
-                "provenance": "USER"
-              }
+              "children": [
+                {
+                  "alias": "A40",
+                  "quantity": "40",
+                  "unit": "BOX"
+                },
+                {
+                  "alias": "B10",
+                  "quantity": "10",
+                  "unit": "BOX"
+                },
+                {
+                  "alias": "A20",
+                  "quantity": "20",
+                  "unit": "BOX"
+                },
+                {
+                  "alias": "B30",
+                  "quantity": "30",
+                  "unit": "BOX"
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-split",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "children": "USER"
+            }
           },
           "evidenceRefs": [
             "split:actual-adapter-artifact"
@@ -108,87 +108,83 @@
             ],
             "slots": {
               "originId": {
-                "value": {
-                  "$alias": "IT-origin"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "IT-origin"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
+                "$alias": "W"
+              },
+              "cargo": [
+                {
+                  "purchaseLineId": {
+                    "$alias": "PO-A"
+                  },
+                  "segmentId": {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/A40/segmentId"
+                    }
+                  },
+                  "quantity": {
+                    "value": "40",
+                    "unit": "BOX"
+                  }
                 },
-                "provenance": "CONTEXT"
-              },
-              "cargo": {
-                "value": [
-                  {
-                    "purchaseLineId": {
-                      "$alias": "PO-A"
-                    },
-                    "segmentId": {
-                      "$result": {
-                        "actionId": "split",
-                        "pointer": "/response/children/A40/segmentId"
-                      }
-                    },
-                    "quantity": {
-                      "value": "40",
-                      "unit": "BOX"
+                {
+                  "purchaseLineId": {
+                    "$alias": "PO-B"
+                  },
+                  "segmentId": {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/B10/segmentId"
                     }
                   },
-                  {
-                    "purchaseLineId": {
-                      "$alias": "PO-B"
-                    },
-                    "segmentId": {
-                      "$result": {
-                        "actionId": "split",
-                        "pointer": "/response/children/B10/segmentId"
-                      }
-                    },
-                    "quantity": {
-                      "value": "10",
-                      "unit": "BOX"
-                    }
+                  "quantity": {
+                    "value": "10",
+                    "unit": "BOX"
                   }
-                ],
-                "provenance": "USER"
-              },
-              "legs": {
-                "value": [
-                  {
-                    "originId": {
-                      "$alias": "IT-origin"
-                    },
-                    "destinationId": {
-                      "$alias": "IT-port"
-                    }
+                }
+              ],
+              "legs": [
+                {
+                  "originId": {
+                    "$alias": "IT-origin"
                   },
-                  {
-                    "originId": {
-                      "$alias": "IT-port"
-                    },
-                    "destinationId": {
-                      "$alias": "KR-port"
-                    }
-                  },
-                  {
-                    "originId": {
-                      "$alias": "KR-port"
-                    },
-                    "destinationId": {
-                      "$alias": "W"
-                    }
+                  "destinationId": {
+                    "$alias": "IT-port"
                   }
-                ],
-                "provenance": "USER"
-              }
+                },
+                {
+                  "originId": {
+                    "$alias": "IT-port"
+                  },
+                  "destinationId": {
+                    "$alias": "KR-port"
+                  }
+                },
+                {
+                  "originId": {
+                    "$alias": "KR-port"
+                  },
+                  "destinationId": {
+                    "$alias": "W"
+                  }
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargo": "USER",
+              "legs": "USER"
+            }
           },
           "evidenceRefs": [
             "S1:actual-adapter-artifact"
@@ -214,87 +210,83 @@
             ],
             "slots": {
               "originId": {
-                "value": {
-                  "$alias": "IT-origin"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "IT-origin"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
+                "$alias": "W"
+              },
+              "cargo": [
+                {
+                  "purchaseLineId": {
+                    "$alias": "PO-A"
+                  },
+                  "segmentId": {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/A20/segmentId"
+                    }
+                  },
+                  "quantity": {
+                    "value": "20",
+                    "unit": "BOX"
+                  }
                 },
-                "provenance": "CONTEXT"
-              },
-              "cargo": {
-                "value": [
-                  {
-                    "purchaseLineId": {
-                      "$alias": "PO-A"
-                    },
-                    "segmentId": {
-                      "$result": {
-                        "actionId": "split",
-                        "pointer": "/response/children/A20/segmentId"
-                      }
-                    },
-                    "quantity": {
-                      "value": "20",
-                      "unit": "BOX"
+                {
+                  "purchaseLineId": {
+                    "$alias": "PO-B"
+                  },
+                  "segmentId": {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/B30/segmentId"
                     }
                   },
-                  {
-                    "purchaseLineId": {
-                      "$alias": "PO-B"
-                    },
-                    "segmentId": {
-                      "$result": {
-                        "actionId": "split",
-                        "pointer": "/response/children/B30/segmentId"
-                      }
-                    },
-                    "quantity": {
-                      "value": "30",
-                      "unit": "BOX"
-                    }
+                  "quantity": {
+                    "value": "30",
+                    "unit": "BOX"
                   }
-                ],
-                "provenance": "USER"
-              },
-              "legs": {
-                "value": [
-                  {
-                    "originId": {
-                      "$alias": "IT-origin"
-                    },
-                    "destinationId": {
-                      "$alias": "IT-port"
-                    }
+                }
+              ],
+              "legs": [
+                {
+                  "originId": {
+                    "$alias": "IT-origin"
                   },
-                  {
-                    "originId": {
-                      "$alias": "IT-port"
-                    },
-                    "destinationId": {
-                      "$alias": "KR-port"
-                    }
-                  },
-                  {
-                    "originId": {
-                      "$alias": "KR-port"
-                    },
-                    "destinationId": {
-                      "$alias": "W"
-                    }
+                  "destinationId": {
+                    "$alias": "IT-port"
                   }
-                ],
-                "provenance": "USER"
-              }
+                },
+                {
+                  "originId": {
+                    "$alias": "IT-port"
+                  },
+                  "destinationId": {
+                    "$alias": "KR-port"
+                  }
+                },
+                {
+                  "originId": {
+                    "$alias": "KR-port"
+                  },
+                  "destinationId": {
+                    "$alias": "W"
+                  }
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargo": "USER",
+              "legs": "USER"
+            }
           },
           "evidenceRefs": [
             "S2:actual-adapter-artifact"
@@ -311,14 +303,15 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "many-to-many",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-double:actual-adapter-artifact"
@@ -375,43 +368,41 @@
             ],
             "slots": {
               "originId": {
-                "value": {
-                  "$alias": "IT-origin"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "IT-origin"
               },
               "destinationId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "cargo": {
-                "value": [
-                  {
-                    "purchaseLineId": {
-                      "$alias": "PO-B"
-                    },
-                    "segmentId": {
-                      "$result": {
-                        "actionId": "split",
-                        "pointer": "/response/children/A40/segmentId"
-                      }
-                    },
-                    "quantity": {
-                      "value": "40",
-                      "unit": "BOX"
+              "cargo": [
+                {
+                  "purchaseLineId": {
+                    "$alias": "PO-B"
+                  },
+                  "segmentId": {
+                    "$result": {
+                      "actionId": "split",
+                      "pointer": "/response/children/A40/segmentId"
                     }
+                  },
+                  "quantity": {
+                    "value": "40",
+                    "unit": "BOX"
                   }
-                ],
-                "provenance": "USER"
-              }
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-double",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargo": "USER"
+            }
           },
           "evidenceRefs": [
             "double:actual-adapter-artifact"
@@ -428,14 +419,15 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "many-to-many",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "after-double:actual-adapter-artifact"
@@ -493,46 +485,36 @@
             ],
             "slots": {
               "shipmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "S1",
-                    "pointer": "/response/shipmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
               },
-              "legIndex": {
-                "value": 1,
-                "provenance": "USER"
-              },
-              "eventKind": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
+              "legIndex": "1",
+              "eventKind": "ARRIVED",
               "placeId": {
-                "value": {
-                  "$alias": "KR-port"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "KR-port"
               },
-              "occurredAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "eventClass": {
-                "value": "ACTUAL",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "supplier-ship",
-                "provenance": "USER"
-              }
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "eventClass": "ACTUAL",
+              "evidence": "supplier-ship"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-port",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "shipmentId": "CONTEXT",
+              "legIndex": "USER",
+              "eventKind": "USER",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "eventClass": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "S1-port:actual-adapter-artifact"
@@ -558,46 +540,36 @@
             ],
             "slots": {
               "shipmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "S2",
-                    "pointer": "/response/shipmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
               },
-              "legIndex": {
-                "value": 1,
-                "provenance": "USER"
-              },
-              "eventKind": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
+              "legIndex": "1",
+              "eventKind": "ARRIVED",
               "placeId": {
-                "value": {
-                  "$alias": "KR-port"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "KR-port"
               },
-              "occurredAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "eventClass": {
-                "value": "ACTUAL",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "supplier-ship",
-                "provenance": "USER"
-              }
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "eventClass": "ACTUAL",
+              "evidence": "supplier-ship"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-port",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "shipmentId": "CONTEXT",
+              "legIndex": "USER",
+              "eventKind": "USER",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "eventClass": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "S2-port:actual-adapter-artifact"
@@ -614,8 +586,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "many-to-many",
               "itemId": {
                 "$alias": "P"
               }
@@ -680,50 +650,40 @@
             ],
             "slots": {
               "shipmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "S1",
-                    "pointer": "/response/shipmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
               },
               "fromCustodianId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "toCustodianId": {
-                "value": {
-                  "$alias": "warehouse"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "warehouse"
               },
               "placeId": {
-                "value": {
-                  "$alias": "KR-port"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "KR-port"
               },
-              "occurredAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "ownerTransfer": {
-                "value": false,
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "custody",
-                "provenance": "USER"
-              }
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "ownerTransfer": false,
+              "evidence": "custody"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-handover",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "shipmentId": "CONTEXT",
+              "fromCustodianId": "CONTEXT",
+              "toCustodianId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "ownerTransfer": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "S1-handover:actual-adapter-artifact"
@@ -749,46 +709,36 @@
             ],
             "slots": {
               "shipmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "S1",
-                    "pointer": "/response/shipmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "S1",
+                  "pointer": "/response/shipmentId"
+                }
               },
-              "legIndex": {
-                "value": 2,
-                "provenance": "USER"
-              },
-              "eventKind": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
+              "legIndex": "2",
+              "eventKind": "ARRIVED",
               "placeId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "occurredAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "eventClass": {
-                "value": "ACTUAL",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "warehouse-receipt",
-                "provenance": "USER"
-              }
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "eventClass": "ACTUAL",
+              "evidence": "warehouse-receipt"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-W",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "shipmentId": "CONTEXT",
+              "legIndex": "USER",
+              "eventKind": "USER",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "eventClass": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "S1-W:actual-adapter-artifact"
@@ -814,50 +764,40 @@
             ],
             "slots": {
               "shipmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "S2",
-                    "pointer": "/response/shipmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
               },
               "fromCustodianId": {
-                "value": {
-                  "$alias": "SUP"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "SUP"
               },
               "toCustodianId": {
-                "value": {
-                  "$alias": "warehouse"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "warehouse"
               },
               "placeId": {
-                "value": {
-                  "$alias": "KR-port"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "KR-port"
               },
-              "occurredAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "ownerTransfer": {
-                "value": false,
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "custody",
-                "provenance": "USER"
-              }
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "ownerTransfer": false,
+              "evidence": "custody"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-handover",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "shipmentId": "CONTEXT",
+              "fromCustodianId": "CONTEXT",
+              "toCustodianId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "ownerTransfer": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "S2-handover:actual-adapter-artifact"
@@ -883,46 +823,36 @@
             ],
             "slots": {
               "shipmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "S2",
-                    "pointer": "/response/shipmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "S2",
+                  "pointer": "/response/shipmentId"
+                }
               },
-              "legIndex": {
-                "value": 2,
-                "provenance": "USER"
-              },
-              "eventKind": {
-                "value": "ARRIVED",
-                "provenance": "USER"
-              },
+              "legIndex": "2",
+              "eventKind": "ARRIVED",
               "placeId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "occurredAt": {
-                "value": "2026-10-07T09:00:00Z",
-                "provenance": "USER"
-              },
-              "eventClass": {
-                "value": "ACTUAL",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "warehouse-receipt",
-                "provenance": "USER"
-              }
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "eventClass": "ACTUAL",
+              "evidence": "warehouse-receipt"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-W",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "shipmentId": "CONTEXT",
+              "legIndex": "USER",
+              "eventKind": "USER",
+              "placeId": "CONTEXT",
+              "occurredAt": "USER",
+              "eventClass": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "S2-W:actual-adapter-artifact"
@@ -939,8 +869,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "many-to-many",
               "itemId": {
                 "$alias": "P"
               }
@@ -1731,8 +1659,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "discrepancy-transit2",
               "itemId": {
                 "$alias": "P"
               }
@@ -1795,42 +1721,36 @@
             ],
             "slots": {
               "purchaseId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "Q100"
               },
-              "eventKind": {
-                "value": "SHIPPED_CLAIM",
-                "provenance": "USER"
-              },
+              "eventKind": "SHIPPED_CLAIM",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "CONTEXT"
+                "unit": "BOX"
               },
               "placeId": {
-                "value": {
-                  "$alias": "IT-origin"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "IT-origin"
               },
-              "evidence": {
-                "value": "supplier-ship",
-                "provenance": "USER"
-              }
+              "evidence": "supplier-ship"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-shipped",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "eventKind": "USER",
+              "quantity": "CONTEXT",
+              "placeId": "CONTEXT",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "shipped:actual-adapter-artifact"
@@ -1856,36 +1776,34 @@
             ],
             "slots": {
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
+                "$alias": "Q100"
+              },
+              "children": [
+                {
+                  "alias": "RECEIVED98",
+                  "quantity": "98",
+                  "unit": "BOX"
                 },
-                "provenance": "CONTEXT"
-              },
-              "children": {
-                "value": [
-                  {
-                    "alias": "RECEIVED98",
-                    "quantity": "98",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "REMAINDER2",
-                    "quantity": "2",
-                    "unit": "BOX"
-                  }
-                ],
-                "provenance": "USER"
-              },
-              "reason": {
-                "value": "부분 수령 전 수령 범위 분리",
-                "provenance": "USER"
-              }
+                {
+                  "alias": "REMAINDER2",
+                  "quantity": "2",
+                  "unit": "BOX"
+                }
+              ],
+              "reason": "부분 수령 전 수령 범위 분리"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-split98",
             "evidenceRefs": [
-              "warehouse-receipt"
-            ]
+              {
+                "$alias": "warehouse-receipt"
+              }
+            ],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "children": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "split98:actual-adapter-artifact"
@@ -1911,61 +1829,49 @@
             ],
             "slots": {
               "purchaseId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
               "existingSegmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split98",
-                    "pointer": "/response/children/RECEIVED98/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/RECEIVED98/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "98",
-                "unit": "BOX",
-                "provenance": "CONTEXT"
+                "unit": "BOX"
               },
               "placeId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "physicalScope": {
-                "value": "Q100-received98",
-                "provenance": "USER"
-              },
-              "sourceEventId": {
-                "value": "RECEIVE98",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "warehouse-receipt",
-                "provenance": "USER"
-              }
+              "physicalScope": "Q100-received98",
+              "sourceEventId": "RECEIVE98",
+              "evidence": "warehouse-receipt"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-receive98",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseId": "CONTEXT",
+              "existingSegmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "CONTEXT",
+              "placeId": "CONTEXT",
+              "physicalScope": "USER",
+              "sourceEventId": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "receive98:actual-adapter-artifact"
@@ -1991,45 +1897,39 @@
             ],
             "slots": {
               "purchaseId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
               "segmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split98",
-                    "pointer": "/response/children/REMAINDER2/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/REMAINDER2/segmentId"
+                }
               },
-              "eventKind": {
-                "value": "IN_TRANSIT_CONFIRMED",
-                "provenance": "USER"
-              },
+              "eventKind": "IN_TRANSIT_CONFIRMED",
               "quantity": {
                 "value": "2",
-                "unit": "BOX",
-                "provenance": "CONTEXT"
+                "unit": "BOX"
               },
               "placeId": {
-                "value": {
-                  "$alias": "TRANSIT"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "TRANSIT"
               },
-              "evidence": {
-                "value": "custody",
-                "provenance": "USER"
-              }
+              "evidence": "custody"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-transit2",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "eventKind": "USER",
+              "quantity": "CONTEXT",
+              "placeId": "CONTEXT",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "transit2:actual-adapter-artifact"
@@ -2046,8 +1946,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "discrepancy-transit2",
               "itemId": {
                 "$alias": "P"
               }
@@ -2756,8 +2654,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "discrepancy-unobserved2",
               "itemId": {
                 "$alias": "P"
               }
@@ -2820,42 +2716,36 @@
             ],
             "slots": {
               "purchaseId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "Q100"
               },
-              "eventKind": {
-                "value": "SHIPPED_CLAIM",
-                "provenance": "USER"
-              },
+              "eventKind": "SHIPPED_CLAIM",
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "CONTEXT"
+                "unit": "BOX"
               },
               "placeId": {
-                "value": {
-                  "$alias": "IT-origin"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "IT-origin"
               },
-              "evidence": {
-                "value": "supplier-ship",
-                "provenance": "USER"
-              }
+              "evidence": "supplier-ship"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-shipped",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "eventKind": "USER",
+              "quantity": "CONTEXT",
+              "placeId": "CONTEXT",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "shipped:actual-adapter-artifact"
@@ -2881,36 +2771,34 @@
             ],
             "slots": {
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
+                "$alias": "Q100"
+              },
+              "children": [
+                {
+                  "alias": "RECEIVED98",
+                  "quantity": "98",
+                  "unit": "BOX"
                 },
-                "provenance": "CONTEXT"
-              },
-              "children": {
-                "value": [
-                  {
-                    "alias": "RECEIVED98",
-                    "quantity": "98",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "REMAINDER2",
-                    "quantity": "2",
-                    "unit": "BOX"
-                  }
-                ],
-                "provenance": "USER"
-              },
-              "reason": {
-                "value": "부분 수령 전 수령 범위 분리",
-                "provenance": "USER"
-              }
+                {
+                  "alias": "REMAINDER2",
+                  "quantity": "2",
+                  "unit": "BOX"
+                }
+              ],
+              "reason": "부분 수령 전 수령 범위 분리"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-split98",
             "evidenceRefs": [
-              "warehouse-receipt"
-            ]
+              {
+                "$alias": "warehouse-receipt"
+              }
+            ],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "children": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "split98:actual-adapter-artifact"
@@ -2936,61 +2824,49 @@
             ],
             "slots": {
               "purchaseId": {
-                "value": {
-                  "$alias": "PO-A"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "PO-A"
               },
               "existingSegmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split98",
-                    "pointer": "/response/children/RECEIVED98/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split98",
+                  "pointer": "/response/children/RECEIVED98/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "98",
-                "unit": "BOX",
-                "provenance": "CONTEXT"
+                "unit": "BOX"
               },
               "placeId": {
-                "value": {
-                  "$alias": "W"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "W"
               },
-              "physicalScope": {
-                "value": "Q100-received98",
-                "provenance": "USER"
-              },
-              "sourceEventId": {
-                "value": "RECEIVE98",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "warehouse-receipt",
-                "provenance": "USER"
-              }
+              "physicalScope": "Q100-received98",
+              "sourceEventId": "RECEIVE98",
+              "evidence": "warehouse-receipt"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-receive98",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "purchaseId": "CONTEXT",
+              "existingSegmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "CONTEXT",
+              "placeId": "CONTEXT",
+              "physicalScope": "USER",
+              "sourceEventId": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "receive98:actual-adapter-artifact"
@@ -3007,8 +2883,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "discrepancy-unobserved2",
               "itemId": {
                 "$alias": "P"
               }
@@ -3726,39 +3600,31 @@
             ],
             "slots": {
               "parentWorkId": {
-                "value": {
-                  "$alias": "OLD-WORK"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "OLD-WORK"
               },
               "segmentId": {
-                "value": {
-                  "$alias": "B40"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "B40"
               },
-              "kind": {
-                "value": "TEMPERATURE_ABNORMAL",
-                "provenance": "USER"
-              },
-              "value": {
-                "value": "35",
-                "provenance": "USER"
-              },
-              "unit": {
-                "value": "CELSIUS",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "temperature",
-                "provenance": "USER"
-              }
+              "kind": "TEMPERATURE_ABNORMAL",
+              "value": "35",
+              "unit": "CELSIUS",
+              "evidence": "temperature"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-orphan-temperature-temperature",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "parentWorkId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "kind": "USER",
+              "value": "USER",
+              "unit": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "temperature:actual-adapter-artifact"
@@ -3784,40 +3650,34 @@
             ],
             "slots": {
               "sourceActivityId": {
-                "value": {
-                  "$result": {
-                    "actionId": "temperature",
-                    "pointer": "/response/activityId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "temperature",
+                  "pointer": "/response/activityId"
+                }
               },
               "parentWorkId": {
-                "value": {
-                  "$alias": "OLD-WORK"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "OLD-WORK"
               },
               "ownerId": {
-                "value": {
-                  "$alias": "intake"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "intake"
               },
-              "nextAction": {
-                "value": "원천 물량과 근거를 대조한다",
-                "provenance": "USER"
-              },
-              "nextCheckAt": {
-                "value": "2026-10-07T10:00:00Z",
-                "provenance": "USER"
-              }
+              "nextAction": "원천 물량과 근거를 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-orphan-temperature-followup",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "sourceActivityId": "CONTEXT",
+              "parentWorkId": "CONTEXT",
+              "ownerId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
+            }
           },
           "evidenceRefs": [
             "followup:actual-adapter-artifact"
@@ -3834,9 +3694,8 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "orphan-temperature",
-              "itemId": {
+              "subjectKind": "ITEM",
+              "subjectId": {
                 "$alias": "P"
               }
             },
@@ -3970,9 +3829,8 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T14",
-              "subcaseId": "orphan-temperature",
-              "itemId": {
+              "subjectKind": "ITEM",
+              "subjectId": {
                 "$alias": "P"
               }
             },

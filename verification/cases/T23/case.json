@@ -9388,7 +9388,14 @@
               }
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T23-failure-after-open-forward-proposal"
+            "commandIdempotencyKey": "T23-failure-after-open-forward-proposal",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "price": "USER"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-artifact"
@@ -9412,7 +9419,20 @@
                 }
               }
             ],
-            "slots": {},
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "proposalHash": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              }
+            },
             "expectedRevision": {
               "$result": {
                 "actionId": "proposal",
@@ -9420,17 +9440,9 @@
               }
             },
             "commandIdempotencyKey": "T23-failure-after-open-forward-approve",
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
-              }
-            },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -9477,28 +9489,34 @@
                 }
               }
             ],
-            "slots": {},
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "proposalHash": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "externalOperationId": "T23-failure-after-open-forward-external-po"
+            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T23-failure-after-open-forward-send-order",
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
-              }
-            },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
-            },
             "approvalId": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/approvalId"
               }
             },
-            "externalOperationId": "T23-failure-after-open-forward-external-po"
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "externalOperationId": "USER"
+            }
           },
           "evidenceRefs": [
             "send-order:actual-artifact"
@@ -9632,14 +9650,20 @@
                 }
               }
             ],
-            "slots": {},
+            "slots": {
+              "externalOperationId": "T23-failure-after-open-forward-external-po",
+              "confirmedOutcome": "SUCCESS"
+            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T23-failure-after-open-forward-external-reconcile",
-            "externalOperationId": "T23-failure-after-open-forward-external-po",
-            "evidenceRefs": [
+            "evidenceRefs": [],
+            "sourceRefs": [
               "synthetic-confirmed-external-po"
             ],
-            "confirmedOutcome": "SUCCESS"
+            "provenance": {
+              "externalOperationId": "USER",
+              "confirmedOutcome": "USER"
+            }
           },
           "evidenceRefs": [
             "external-reconcile:actual-artifact"
@@ -10808,7 +10832,14 @@
               }
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T23-failure-after-open-approved-snapshot-proposal"
+            "commandIdempotencyKey": "T23-failure-after-open-approved-snapshot-proposal",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "price": "USER"
+            }
           },
           "evidenceRefs": [
             "proposal:actual-artifact"
@@ -10832,7 +10863,20 @@
                 }
               }
             ],
-            "slots": {},
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "proposalHash": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              }
+            },
             "expectedRevision": {
               "$result": {
                 "actionId": "proposal",
@@ -10840,17 +10884,9 @@
               }
             },
             "commandIdempotencyKey": "T23-failure-after-open-approved-snapshot-approve",
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
-              }
-            },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10897,28 +10933,34 @@
                 }
               }
             ],
-            "slots": {},
+            "slots": {
+              "proposalId": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalId"
+                }
+              },
+              "proposalHash": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalHash"
+                }
+              },
+              "externalOperationId": "T23-failure-after-open-approved-snapshot-external-po"
+            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T23-failure-after-open-approved-snapshot-send-order",
-            "proposalId": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalId"
-              }
-            },
-            "proposalHash": {
-              "$result": {
-                "actionId": "proposal",
-                "pointer": "/response/proposalHash"
-              }
-            },
             "approvalId": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/approvalId"
               }
             },
-            "externalOperationId": "T23-failure-after-open-approved-snapshot-external-po"
+            "provenance": {
+              "proposalId": "CONTEXT",
+              "proposalHash": "CONTEXT",
+              "externalOperationId": "USER"
+            }
           },
           "evidenceRefs": [
             "send-order:actual-artifact"
@@ -11052,14 +11094,20 @@
                 }
               }
             ],
-            "slots": {},
+            "slots": {
+              "externalOperationId": "T23-failure-after-open-approved-snapshot-external-po",
+              "confirmedOutcome": "SUCCESS"
+            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T23-failure-after-open-approved-snapshot-external-reconcile",
-            "externalOperationId": "T23-failure-after-open-approved-snapshot-external-po",
-            "evidenceRefs": [
+            "evidenceRefs": [],
+            "sourceRefs": [
               "synthetic-confirmed-external-po"
             ],
-            "confirmedOutcome": "SUCCESS"
+            "provenance": {
+              "externalOperationId": "USER",
+              "confirmedOutcome": "USER"
+            }
           },
           "evidenceRefs": [
             "external-reconcile:actual-artifact"

@@ -68,18 +68,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -127,18 +123,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -187,18 +177,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -256,18 +238,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -335,18 +312,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -363,35 +339,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "subjectRefs": [
-              {
-                "type": "Work",
-                "id": {
-                  "$result": {
-                    "actionId": "order",
-                    "pointer": "/response/workId"
-                  }
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "workId": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            }
           },
           "evidenceRefs": [
             "return-history-assessment:api-response"
@@ -410,29 +367,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-return:api-response"
@@ -527,18 +468,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER",
+              "physicalScopeId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "return-authorize:api-response",
@@ -608,18 +543,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "returnAuthorizationId": "CONTEXT",
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "sourceEvidenceId": "CONTEXT",
+              "externalEventId": "USER",
+              "sourceNamespace": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "return:api-response",
@@ -639,29 +573,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-duplicate:api-response"
@@ -770,18 +688,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "returnAuthorizationId": "CONTEXT",
+              "deliveryId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "sourceEvidenceId": "CONTEXT",
+              "externalEventId": "USER",
+              "sourceNamespace": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "duplicate-return:api-response",
@@ -801,29 +718,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "returned:api-response"
@@ -839,39 +740,20 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "return-not-correction"
-            },
-            "subjectRefs": [
-              {
-                "type": "Work",
-                "id": {
-                  "$result": {
-                    "actionId": "order",
-                    "pointer": "/response/workId"
-                  }
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ],
             "snapshotRef": {
               "$result": {
                 "actionId": "returned",
                 "pointer": "/response/snapshotRevision"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
               }
             }
           },
@@ -1612,18 +1494,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -1671,18 +1549,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -1731,18 +1603,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -1800,18 +1664,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -1879,18 +1738,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -1907,35 +1765,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "subjectRefs": [
-              {
-                "type": "Work",
-                "id": {
-                  "$result": {
-                    "actionId": "order",
-                    "pointer": "/response/workId"
-                  }
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "workId": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            }
           },
           "evidenceRefs": [
             "old-assessment:api-response"
@@ -1954,29 +1793,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "historical:api-response"
@@ -2077,18 +1900,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "originalOccurrenceId": "CONTEXT",
+              "originalEvidenceId": "CONTEXT",
+              "correctedQuantity": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "reason": "USER",
+              "supersedesOccurrenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "correct98:api-response",
@@ -2108,29 +1927,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "corrected:api-response"
@@ -2186,39 +1989,20 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "subjectRefs": [
-              {
-                "type": "Work",
-                "id": {
-                  "$result": {
-                    "actionId": "order",
-                    "pointer": "/response/workId"
-                  }
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ],
             "snapshotRef": {
               "$result": {
                 "actionId": "corrected",
                 "pointer": "/response/snapshotRevision"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
               }
             }
           },
@@ -2239,29 +2023,10 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "corrected-delivery-98"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ],
             "snapshotRef": {
               "$result": {
                 "actionId": "corrected",
@@ -3051,18 +2816,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -3110,18 +2871,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -3170,18 +2925,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -3239,18 +2986,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -3318,18 +3060,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -3346,35 +3087,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "subjectRefs": [
-              {
-                "type": "Work",
-                "id": {
-                  "$result": {
-                    "actionId": "order",
-                    "pointer": "/response/workId"
-                  }
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "workId": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            }
           },
           "evidenceRefs": [
             "old-assessment:api-response"
@@ -3393,29 +3115,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "historical:api-response"
@@ -3519,18 +3225,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "originalOccurrenceId": "CONTEXT",
+              "originalEvidenceId": "CONTEXT",
+              "correctedQuantity": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "reason": "USER",
+              "supersedesOccurrenceId": "CONTEXT",
+              "sourceVersion": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER"
+            }
           },
           "evidenceRefs": [
             "correct98:api-response",
@@ -3550,29 +3255,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "corrected:api-response"
@@ -3631,33 +3320,12 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ],
-            "filter": {
-              "kind": "DELIVERY_DEFICIT",
-              "status": "OPEN"
-            }
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
           },
           "evidenceRefs": [
             "duty:api-response"
@@ -3709,18 +3377,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "obligationId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "resolution:api-response",
@@ -3740,29 +3402,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-reprocess:api-response"
@@ -3861,18 +3507,16 @@
                 "$alias": "correction-98-v2"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "originalOccurrenceId": "CONTEXT",
+              "supersedesOccurrenceId": "CONTEXT",
+              "correctedQuantity": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "reason": "USER",
+              "sourceVersion": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER"
+            }
           },
           "evidenceRefs": [
             "reconfirm98:api-response",
@@ -3892,29 +3536,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-resolved"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "after-reprocess:api-response"
@@ -4714,18 +4342,14 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "customerId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "packagingVersion": "USER",
+              "dueAt": "USER"
+            }
           },
           "evidenceRefs": [
             "order:api-response",
@@ -4773,18 +4397,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "orderLineId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER"
+            }
           },
           "evidenceRefs": [
             "reserve:api-response",
@@ -4833,18 +4451,10 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "pick:api-response",
@@ -4902,18 +4512,13 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "allocationId": "CONTEXT",
+              "originId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "dispatch:api-response",
@@ -4981,18 +4586,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "quantity": "USER",
+              "occurredAt": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER"
+            }
           },
           "evidenceRefs": [
             "delivery:api-response",
@@ -5009,35 +4613,16 @@
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "subjectRefs": [
-              {
-                "type": "Work",
-                "id": {
-                  "$result": {
-                    "actionId": "order",
-                    "pointer": "/response/workId"
-                  }
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "workId": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            }
           },
           "evidenceRefs": [
             "old-assessment:api-response"
@@ -5056,29 +4641,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "historical:api-response"
@@ -5182,18 +4751,17 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "originalOccurrenceId": "CONTEXT",
+              "originalEvidenceId": "CONTEXT",
+              "correctedQuantity": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "reason": "USER",
+              "supersedesOccurrenceId": "CONTEXT",
+              "sourceVersion": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER"
+            }
           },
           "evidenceRefs": [
             "correct98:api-response",
@@ -5213,29 +4781,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "corrected:api-response"
@@ -5294,33 +4846,12 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ],
-            "filter": {
-              "kind": "DELIVERY_DEFICIT",
-              "status": "OPEN"
-            }
+            "kind": "DELIVERY_CORRECTED_DEFICIT",
+            "status": "OPEN"
           },
           "evidenceRefs": [
             "duty:api-response"
@@ -5372,18 +4903,12 @@
                 "$alias": "delivery-proof"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "obligationId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "resolution:api-response",
@@ -5403,29 +4928,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-reprocess:api-response"
@@ -5524,18 +5033,16 @@
                 "$alias": "correction-98-v2"
               }
             ],
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "provenance": {
+              "originalOccurrenceId": "CONTEXT",
+              "supersedesOccurrenceId": "CONTEXT",
+              "correctedQuantity": "USER",
+              "sourceEvidenceId": "CONTEXT",
+              "reason": "USER",
+              "sourceVersion": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER"
+            }
           },
           "evidenceRefs": [
             "reconfirm98:api-response",
@@ -5555,29 +5062,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "C4",
-              "scenarioId": "resolved-no-resurrection-waived"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "include": [
-              "inventory",
-              "trade",
-              "evidence",
-              "assessments",
-              "obligations",
-              "audit",
-              "outbox"
-            ]
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "after-reprocess:api-response"

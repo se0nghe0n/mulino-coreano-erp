@@ -42,12 +42,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDefinitionDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "parentDefinitionId": {
@@ -110,10 +104,13 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-draft"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-draft",
+            "provenance": {
+              "parentDefinitionId": "CONTEXT",
+              "version": "USER",
+              "package": "USER"
+            }
           }
         },
         {
@@ -129,12 +126,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "validateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -150,15 +141,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "draft",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-validate"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-validate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT"
+            }
           }
         },
         {
@@ -174,12 +167,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "submitDefinitionReview",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -201,15 +188,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "validate",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-submit"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-submit",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "validationId": "CONTEXT"
+            }
           }
         },
         {
@@ -225,12 +215,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "approveDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -250,15 +234,21 @@
               "validUntil": "2026-10-31T23:59:59Z",
               "consumptionPolicy": "ONE_PACKAGE_PUBLISH"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "submit",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-approve"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-approve",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "decision": "USER",
+              "validFrom": "USER",
+              "validUntil": "USER",
+              "consumptionPolicy": "USER"
+            }
           }
         },
         {
@@ -274,12 +264,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "publishDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -301,15 +285,18 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "approve",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-publish"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-publish",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "approvalId": "CONTEXT"
+            }
           }
         },
         {
@@ -325,12 +312,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "activateDefinition",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "definitionId": {
@@ -347,15 +328,18 @@
               },
               "effectiveAt": "2026-10-07T09:00:00Z"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "publish",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-activate"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-activate",
+            "provenance": {
+              "definitionId": "CONTEXT",
+              "hash": "CONTEXT",
+              "effectiveAt": "USER"
+            }
           }
         },
         {
@@ -371,12 +355,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v2",
             "capabilityId": "createDraft",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "itemId": {
@@ -384,8 +362,7 @@
               },
               "quantity": {
                 "value": "60",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "destinationId": {
                 "$alias": "W"
@@ -407,10 +384,23 @@
                 "$alias": "supervisor"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-work"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-work",
+            "provenance": {
+              "itemId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "dueAt": "USER",
+              "endpoint": "USER",
+              "quantityMode": "USER",
+              "evaluationTime": "USER",
+              "eligibilityAction": "USER",
+              "customerId": "CONTEXT",
+              "includeReservations": "USER",
+              "evidencePolicyVersion": "USER",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT"
+            }
           }
         },
         {
@@ -426,12 +416,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v2",
             "capabilityId": "activateWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -447,15 +431,17 @@
                 }
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "new-work",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-active"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-active",
+            "provenance": {
+              "workId": "CONTEXT",
+              "goalVersionId": "CONTEXT"
+            }
           }
         },
         {
@@ -471,12 +457,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "placeHold",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "segmentId": {
@@ -490,10 +470,15 @@
               "reason": "synthetic-QC-hold",
               "decisionEvidenceHash": "7f9e4a22a2724081747e6f487d9322b519afe9f88bd0e9de32d8d63c9e0a4830"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-current-hold"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-current-hold",
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "action": "USER",
+              "reason": "USER",
+              "decisionEvidenceHash": "USER"
+            }
           }
         },
         {
@@ -506,23 +491,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -535,26 +514,20 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v2",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "new-work",
-                  "pointer": "/response/workId"
-                }
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$result": {
+                "actionId": "new-work",
+                "pointer": "/response/workId"
+              }
+            }
           }
         },
         {
@@ -567,28 +540,21 @@
           "route": "api",
           "capabilityId": "evaluateEligibility",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "evaluateEligibility",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "action": "SELL",
-              "segmentId": {
-                "$alias": "A40"
-              },
-              "customerId": {
-                "$alias": "C"
-              },
-              "evaluationTime": "2026-10-07T09:00:00Z"
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL",
+            "segmentId": {
+              "$alias": "A40"
+            },
+            "customerId": {
+              "$alias": "C"
+            }
           }
         },
         {
@@ -601,17 +567,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -658,12 +619,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "reserveQuantity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "segmentId": {
@@ -678,10 +633,14 @@
               },
               "action": "SELL"
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-try-v1-reserve"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-try-v1-reserve",
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "workId": "CONTEXT",
+              "action": "USER"
+            }
           }
         },
         {
@@ -694,17 +653,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -756,12 +710,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "attachEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "document": {
@@ -787,10 +735,15 @@
                 "occurredAt": "2026-10-07T09:00:00Z"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-receipt20-evidence"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-receipt20-evidence",
+            "provenance": {
+              "document": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "claim": "USER"
+            }
           }
         },
         {
@@ -806,12 +759,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "confirmReceipt",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -846,10 +793,21 @@
                 }
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-receipt20"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-receipt20",
+            "provenance": {
+              "workId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "locationId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "occurredAt": "USER",
+              "sourceNamespace": "USER",
+              "externalEventId": "USER",
+              "sourceVersion": "USER",
+              "evidenceIds": "CONTEXT"
+            }
           }
         },
         {
@@ -862,23 +820,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -894,12 +846,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "correctEvidence",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
             "subjectRefs": [],
             "slots": {
               "occurrenceId": {
@@ -926,15 +872,23 @@
                 "$alias": "WORK1"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": {
               "$result": {
                 "actionId": "receipt20",
                 "pointer": "/response/revision"
               }
             },
-            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-correct18"
+            "commandIdempotencyKey": "V1-pinned-meaning-current-policy-correct18",
+            "provenance": {
+              "occurrenceId": "CONTEXT",
+              "supersedesVersion": "USER",
+              "sourceVersion": "USER",
+              "correctedQuantity": "USER",
+              "document": "USER",
+              "correctedContentHash": "USER",
+              "reason": "USER",
+              "workId": "CONTEXT"
+            }
           }
         },
         {
@@ -947,23 +901,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -976,24 +924,18 @@
           "route": "api",
           "capabilityId": "evaluateEligibility",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "evaluateEligibility",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-pinned-meaning-current-policy"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "action": "SELL",
-              "segmentId": {
-                "$alias": "A40"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "action": "SELL",
+            "segmentId": {
+              "$alias": "A40"
+            }
           }
         },
         {
@@ -1954,17 +1896,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-unsupported-v1-held"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -2012,12 +1949,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "resumeWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-unsupported-v1-held"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -2027,10 +1958,12 @@
                 "verified-source-receipt40"
               ]
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-unsupported-v1-held-resume"
+            "commandIdempotencyKey": "V1-unsupported-v1-held-resume",
+            "provenance": {
+              "workId": "CONTEXT",
+              "resumeEvidenceRefs": "USER"
+            }
           }
         },
         {
@@ -2043,23 +1976,17 @@
           "route": "api",
           "capabilityId": "getAssessment",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getAssessment",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-unsupported-v1-held"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -2072,23 +1999,17 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-unsupported-v1-held"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {
@@ -2135,22 +2056,11 @@
           "route": "api",
           "capabilityId": "getObligations",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getObligations",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-unsupported-v1-held"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
-              },
-              "kind": "VERSION_UNSUPPORTED",
-              "current": true
+              }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
@@ -2159,7 +2069,11 @@
                 "actionId": "after",
                 "pointer": "/response/snapshotRevision"
               }
-            }
+            },
+            "workId": {
+              "$alias": "WORK1"
+            },
+            "kind": "VERSION_UNSUPPORTED"
           }
         }
       ],
@@ -2870,17 +2784,12 @@
           "route": "api",
           "capabilityId": "getInventory",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getInventory",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-skill-hash-no-runtime-proof"
+              }
             },
-            "subjectRefs": [],
-            "slots": {},
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z"
           }
@@ -2928,12 +2837,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "resumeWork",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              },
-              "caseNamespace": "V1-skill-hash-no-runtime-proof"
-            },
             "subjectRefs": [],
             "slots": {
               "workId": {
@@ -2946,10 +2849,12 @@
                 "claimsSupportedDefinition": "definition-v1"
               }
             },
-            "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z",
             "expectedRevision": 1,
-            "commandIdempotencyKey": "V1-skill-hash-no-runtime-proof-claimed-skill"
+            "commandIdempotencyKey": "V1-skill-hash-no-runtime-proof-claimed-skill",
+            "provenance": {
+              "workId": "CONTEXT",
+              "clientMetadata": "USER"
+            }
           }
         },
         {
@@ -2962,23 +2867,17 @@
           "route": "api",
           "capabilityId": "getWork",
           "request": {
-            "intentKind": "QUERY",
             "definitionVersion": "definition-v1",
-            "capabilityId": "getWork",
             "scope": {
               "organizationId": {
                 "$alias": "ORG"
-              },
-              "caseNamespace": "V1-skill-hash-no-runtime-proof"
-            },
-            "subjectRefs": [],
-            "slots": {
-              "workId": {
-                "$alias": "WORK1"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "workId": {
+              "$alias": "WORK1"
+            }
           }
         },
         {

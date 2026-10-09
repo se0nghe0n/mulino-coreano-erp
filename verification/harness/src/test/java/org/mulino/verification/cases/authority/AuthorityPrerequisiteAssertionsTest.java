@@ -69,9 +69,9 @@ public class AuthorityPrerequisiteAssertionsTest {
             JsonNode sub=scenario(route,"dispatchPurchaseOrder"),approve=action(sub,"precondition-approval"),attempt=action(sub,"attempt");
             assertEquals("manager",approve.path("actorRef").asText());assertEquals("approvePurchase",approve.path("capabilityId").asText());
             assertTrue(index(sub,"precondition-proposal")<index(sub,"precondition-approval"));assertTrue(index(sub,"precondition-approval")<index(sub,"before"));
-            assertEquals("APPROVE",approve.at("/request/slots/decision/value").asText());assertFalse(attempt.at("/request/slots").has("decision"));
-            assertEquals("precondition-approval",attempt.at("/request/slots/approvalId/value/$result/actionId").asText());
-            assertEquals("PROPOSAL",action(sub,"target-before").at("/request/objectId/$alias").asText());
+            assertEquals("APPROVE",approve.at("/request/slots/decision").asText());assertFalse(attempt.at("/request/slots").has("decision"));
+            assertEquals("precondition-approval",attempt.at("/request/slots/approvalId/$result/actionId").asText());
+            assertEquals("PROPOSAL",action(sub,"target-before").at("/request/id/$alias").asText());
             assertEquals("TradeItem",attempt.at("/request/subjectRefs/0/type").asText());
         }
     }

@@ -68,8 +68,9 @@ adversarial review를 수행한다. 이미 닫은 Step 1·2도 이 두 reviewer�
 대상 baseline·diff·요구·실행 증거와 반례를 확인하고 지적을 통합·수정한다.
 관련 checks가 통과해야 Step를 닫는다. review 완료가 runtime PASS를
 뜻하지 않는다. 모델이나 effort를 사용할 수 없으면 실제 제한을 보고하고
-임의로 대체하지 않는다. Fable을 쓸 수 없을 때는 사용자가 허용한 대로
-GPT-6-Astra `low`(T3 `delegate_task`)로 대체하고 그 사실을 기록한다.
+임의로 대체하지 않는다. Fable을 쓸 수 없을 때는 GPT-6.1 Sol `low`(T3
+`delegate_task`, provider `codex_2`)로 대체하고 그 사실을 기록한다.
+2026-10-09 사용자가 GPT-6-Astra 대체를 중단하고 Sol로 바꾸게 했다.
 
 2026-10-09 사용자가 review 시점을 바꿨다. Step 2 closure가 정적
 review 8회 동안 매번 새 P1·P2를 찾으며 수렴하지 않았고, 지적 대부분이

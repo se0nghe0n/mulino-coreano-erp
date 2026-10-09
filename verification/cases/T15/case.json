@@ -47,32 +47,32 @@
             ],
             "slots": {
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "Q100"
               },
-              "children": {
-                "value": [
-                  {
-                    "alias": "ALLOW30",
-                    "quantity": "30",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "UNKNOWN70",
-                    "quantity": "70",
-                    "unit": "BOX"
-                  }
-                ],
-                "provenance": "USER"
-              }
+              "children": [
+                {
+                  "alias": "ALLOW30",
+                  "quantity": "30",
+                  "unit": "BOX"
+                },
+                {
+                  "alias": "UNKNOWN70",
+                  "quantity": "70",
+                  "unit": "BOX"
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-split",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "children": "USER"
+            }
           },
           "evidenceRefs": [
             "split:actual-adapter-artifact"
@@ -98,53 +98,47 @@
             ],
             "slots": {
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
-              "segmentIds": {
-                "value": [
-                  {
-                    "$result": {
-                      "actionId": "split",
-                      "pointer": "/response/children/ALLOW30/segmentId"
-                    }
-                  },
-                  {
-                    "$result": {
-                      "actionId": "split",
-                      "pointer": "/response/children/UNKNOWN70/segmentId"
-                    }
+              "segmentIds": [
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/ALLOW30/segmentId"
                   }
-                ],
-                "provenance": "USER"
-              },
+                },
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/UNKNOWN70/segmentId"
+                  }
+                }
+              ],
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "policyVersion": {
-                "value": "SYNTHETIC-policy-v1",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "need",
-                "provenance": "USER"
-              }
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "evidence": "need"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-procedure",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "segmentIds": "USER",
+              "quantity": "USER",
+              "policyVersion": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "procedure:actual-adapter-artifact"
@@ -170,37 +164,33 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "procedure",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "procedure",
+                  "pointer": "/response/objectId"
+                }
               },
               "documentHash": {
-                "value": {
-                  "$result": {
-                    "actionId": "procedure",
-                    "pointer": "/response/evidenceHash"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "procedure",
+                  "pointer": "/response/evidenceHash"
+                }
               },
-              "externalReceiptEvidence": {
-                "value": "agency-receipt",
-                "provenance": "USER"
-              },
-              "externalReceiptId": {
-                "value": "AGENCY-ACK30",
-                "provenance": "USER"
-              }
+              "externalReceiptEvidence": "agency-receipt",
+              "externalReceiptId": "AGENCY-ACK30"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-submitted",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "documentHash": "CONTEXT",
+              "externalReceiptEvidence": "USER",
+              "externalReceiptId": "USER"
+            }
           },
           "evidenceRefs": [
             "submitted:actual-adapter-artifact"
@@ -226,58 +216,48 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "procedure",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "procedure",
+                  "pointer": "/response/objectId"
+                }
               },
               "segmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split",
-                    "pointer": "/response/children/ALLOW30/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split",
+                  "pointer": "/response/children/ALLOW30/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "30",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "decision": {
-                "value": "ALLOW",
-                "provenance": "USER"
-              },
-              "decisionVersion": {
-                "value": "agency-v1",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "agency-decision",
-                "provenance": "USER"
-              }
+              "decision": "ALLOW",
+              "decisionVersion": "agency-v1",
+              "evidence": "agency-decision"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-allow30",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "decision": "USER",
+              "decisionVersion": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "allow30:actual-adapter-artifact"
@@ -294,21 +274,16 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "agency30-qc100",
               "itemId": {
                 "$alias": "P"
+              },
+              "placeId": {
+                "$alias": "W"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "action": "SELL",
-            "itemId": {
-              "$alias": "P"
-            },
-            "placeId": {
-              "$alias": "W"
-            }
+            "action": "SELL"
           },
           "evidenceRefs": [
             "before-qc:actual-adapter-artifact"
@@ -364,50 +339,44 @@
               }
             ],
             "slots": {
-              "segmentIds": {
-                "value": [
-                  {
-                    "$result": {
-                      "actionId": "split",
-                      "pointer": "/response/children/ALLOW30/segmentId"
-                    }
-                  },
-                  {
-                    "$result": {
-                      "actionId": "split",
-                      "pointer": "/response/children/UNKNOWN70/segmentId"
-                    }
+              "segmentIds": [
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/ALLOW30/segmentId"
                   }
-                ],
-                "provenance": "USER"
-              },
+                },
+                {
+                  "$result": {
+                    "actionId": "split",
+                    "pointer": "/response/children/UNKNOWN70/segmentId"
+                  }
+                }
+              ],
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "basisKind": {
-                "value": "QC",
-                "provenance": "USER"
-              },
-              "action": {
-                "value": "SELL",
-                "provenance": "USER"
-              },
-              "decision": {
-                "value": "PASS",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "qc-result",
-                "provenance": "USER"
-              }
+              "basisKind": "QC",
+              "action": "SELL",
+              "decision": "PASS",
+              "evidence": "qc-result"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-qc100",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "segmentIds": "USER",
+              "quantity": "USER",
+              "basisKind": "USER",
+              "action": "USER",
+              "decision": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "qc100:actual-adapter-artifact"
@@ -424,21 +393,16 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "agency30-qc100",
               "itemId": {
                 "$alias": "P"
+              },
+              "placeId": {
+                "$alias": "W"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "action": "SELL",
-            "itemId": {
-              "$alias": "P"
-            },
-            "placeId": {
-              "$alias": "W"
-            }
+            "action": "SELL"
           },
           "evidenceRefs": [
             "eligibility:actual-adapter-artifact"
@@ -885,32 +849,32 @@
             ],
             "slots": {
               "segmentId": {
-                "value": {
-                  "$alias": "Q100"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "Q100"
               },
-              "children": {
-                "value": [
-                  {
-                    "alias": "PART30",
-                    "quantity": "30",
-                    "unit": "BOX"
-                  },
-                  {
-                    "alias": "REST70",
-                    "quantity": "70",
-                    "unit": "BOX"
-                  }
-                ],
-                "provenance": "USER"
-              }
+              "children": [
+                {
+                  "alias": "PART30",
+                  "quantity": "30",
+                  "unit": "BOX"
+                },
+                {
+                  "alias": "REST70",
+                  "quantity": "70",
+                  "unit": "BOX"
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-split-life",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "children": "USER"
+            }
           },
           "evidenceRefs": [
             "split-life:actual-adapter-artifact"
@@ -927,14 +891,15 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "procedure-lifecycle",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
-            "knownAt": "2026-10-07T09:00:01Z"
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "P"
+            }
           },
           "evidenceRefs": [
             "before-local:actual-adapter-artifact"
@@ -991,61 +956,51 @@
             ],
             "slots": {
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
-              "segmentIds": {
-                "value": [
-                  {
-                    "$result": {
-                      "actionId": "split-life",
-                      "pointer": "/response/children/PART30/segmentId"
-                    }
-                  },
-                  {
-                    "$result": {
-                      "actionId": "split-life",
-                      "pointer": "/response/children/REST70/segmentId"
-                    }
+              "segmentIds": [
+                {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/PART30/segmentId"
                   }
-                ],
-                "provenance": "USER"
-              },
+                },
+                {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/REST70/segmentId"
+                  }
+                }
+              ],
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "procedureVersion": {
-                "value": "procedure-v1",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "SYNTHETIC-policy-v1",
-                "provenance": "USER"
-              },
-              "documentKind": {
-                "value": "IMPORT_DECLARATION",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "need",
-                "provenance": "USER"
-              }
+              "procedureVersion": "procedure-v1",
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "documentKind": "IMPORT_DECLARATION",
+              "evidence": "need"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-prepare",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "segmentIds": "USER",
+              "quantity": "USER",
+              "procedureVersion": "USER",
+              "policyVersion": "USER",
+              "documentKind": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "prepare:actual-adapter-artifact"
@@ -1062,15 +1017,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "procedure-lifecycle",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "prepare",
                 "pointer": "/response/objectId"
@@ -1133,28 +1086,26 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "submissionStatus": {
-                "value": "UNCONFIRMED",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "need",
-                "provenance": "USER"
-              }
+              "submissionStatus": "UNCONFIRMED",
+              "evidence": "need"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-unknown-submit",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "submissionStatus": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "unknown-submit:actual-adapter-artifact"
@@ -1171,15 +1122,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "procedure-lifecycle",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "prepare",
                 "pointer": "/response/objectId"
@@ -1241,22 +1190,13 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "externalReceiptId": {
-                "value": "EXT-AGENCY-1",
-                "provenance": "USER"
-              },
-              "externalReceiptEvidence": {
-                "value": "agency-receipt",
-                "provenance": "USER"
-              }
+              "externalReceiptId": "EXT-AGENCY-1",
+              "externalReceiptEvidence": "agency-receipt"
             },
             "expectedRevision": {
               "$result": {
@@ -1266,8 +1206,15 @@
             },
             "commandIdempotencyKey": "T15-procedure-lifecycle-received-submit",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "externalReceiptId": "USER",
+              "externalReceiptEvidence": "USER"
+            }
           },
           "evidenceRefs": [
             "received-submit:actual-adapter-artifact"
@@ -1284,15 +1231,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "procedure-lifecycle",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "prepare",
                 "pointer": "/response/objectId"
@@ -1354,56 +1299,31 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "procedureVersion": {
-                "value": "procedure-v1",
-                "provenance": "USER"
-              },
+              "procedureVersion": "procedure-v1",
               "segmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split-life",
-                    "pointer": "/response/children/PART30/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split-life",
+                  "pointer": "/response/children/PART30/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "30",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "decision": {
-                "value": "ALLOW",
-                "provenance": "USER"
-              },
-              "decisionVersion": {
-                "value": "partial-v1",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "agency-decision",
-                "provenance": "USER"
-              }
+              "decision": "ALLOW",
+              "decisionVersion": "partial-v1",
+              "evidence": "agency-decision"
             },
             "expectedRevision": {
               "$result": {
@@ -1413,8 +1333,21 @@
             },
             "commandIdempotencyKey": "T15-procedure-lifecycle-partial",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "procedureVersion": "USER",
+              "segmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "decision": "USER",
+              "decisionVersion": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "partial:actual-adapter-artifact"
@@ -1440,56 +1373,31 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "procedureVersion": {
-                "value": "procedure-v1",
-                "provenance": "USER"
-              },
+              "procedureVersion": "procedure-v1",
               "segmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split-life",
-                    "pointer": "/response/children/REST70/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split-life",
+                  "pointer": "/response/children/REST70/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "70",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "decision": {
-                "value": "SUPPLEMENT_REQUIRED",
-                "provenance": "USER"
-              },
-              "decisionVersion": {
-                "value": "supplement-v1",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "agency-decision",
-                "provenance": "USER"
-              }
+              "decision": "SUPPLEMENT_REQUIRED",
+              "decisionVersion": "supplement-v1",
+              "evidence": "agency-decision"
             },
             "expectedRevision": {
               "$result": {
@@ -1499,8 +1407,21 @@
             },
             "commandIdempotencyKey": "T15-procedure-lifecycle-supplement",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "procedureVersion": "USER",
+              "segmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "decision": "USER",
+              "decisionVersion": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "supplement:actual-adapter-artifact"
@@ -1526,56 +1447,31 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "procedureVersion": {
-                "value": "procedure-v1",
-                "provenance": "USER"
-              },
+              "procedureVersion": "procedure-v1",
               "segmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split-life",
-                    "pointer": "/response/children/REST70/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split-life",
+                  "pointer": "/response/children/REST70/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "70",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "decision": {
-                "value": "REJECTED",
-                "provenance": "USER"
-              },
-              "decisionVersion": {
-                "value": "reject-v1",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "agency-decision",
-                "provenance": "USER"
-              }
+              "decision": "REJECTED",
+              "decisionVersion": "reject-v1",
+              "evidence": "agency-decision"
             },
             "expectedRevision": {
               "$result": {
@@ -1585,8 +1481,21 @@
             },
             "commandIdempotencyKey": "T15-procedure-lifecycle-reject",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "procedureVersion": "USER",
+              "segmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "decision": "USER",
+              "decisionVersion": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "reject:actual-adapter-artifact"
@@ -1612,67 +1521,55 @@
             ],
             "slots": {
               "previousProcedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
               "originalProcedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "procedureVersion": {
-                "value": "procedure-v2",
-                "provenance": "USER"
-              },
+              "procedureVersion": "procedure-v2",
               "segmentId": {
-                "value": {
-                  "$result": {
-                    "actionId": "split-life",
-                    "pointer": "/response/children/REST70/segmentId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "split-life",
+                  "pointer": "/response/children/REST70/segmentId"
+                }
               },
               "itemId": {
-                "value": {
-                  "$alias": "P"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "P"
               },
               "lotId": {
-                "value": {
-                  "$alias": "L"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "L"
               },
               "quantity": {
                 "value": "70",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "reason": {
-                "value": "보완 후 재제출",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "need",
-                "provenance": "USER"
-              }
+              "reason": "보완 후 재제출",
+              "evidence": "need"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-resubmit-prepare",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "previousProcedureId": "CONTEXT",
+              "originalProcedureId": "CONTEXT",
+              "procedureVersion": "USER",
+              "segmentId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "quantity": "USER",
+              "reason": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "resubmit-prepare:actual-adapter-artifact"
@@ -1698,28 +1595,26 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
-                  "$result": {
-                    "actionId": "resubmit-prepare",
-                    "pointer": "/response/objectId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "resubmit-prepare",
+                  "pointer": "/response/objectId"
+                }
               },
-              "externalReceiptId": {
-                "value": "EXT-AGENCY-2",
-                "provenance": "USER"
-              },
-              "externalReceiptEvidence": {
-                "value": "agency-receipt",
-                "provenance": "USER"
-              }
+              "externalReceiptId": "EXT-AGENCY-2",
+              "externalReceiptEvidence": "agency-receipt"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-resubmit",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "externalReceiptId": "USER",
+              "externalReceiptEvidence": "USER"
+            }
           },
           "evidenceRefs": [
             "resubmit:actual-adapter-artifact"
@@ -1745,50 +1640,46 @@
             ],
             "slots": {
               "procedureId": {
-                "value": {
+                "$result": {
+                  "actionId": "prepare",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "segmentIds": [
+                {
                   "$result": {
-                    "actionId": "prepare",
-                    "pointer": "/response/objectId"
+                    "actionId": "split-life",
+                    "pointer": "/response/children/PART30/segmentId"
                   }
                 },
-                "provenance": "CONTEXT"
-              },
-              "segmentIds": {
-                "value": [
-                  {
-                    "$result": {
-                      "actionId": "split-life",
-                      "pointer": "/response/children/PART30/segmentId"
-                    }
-                  },
-                  {
-                    "$result": {
-                      "actionId": "split-life",
-                      "pointer": "/response/children/REST70/segmentId"
-                    }
+                {
+                  "$result": {
+                    "actionId": "split-life",
+                    "pointer": "/response/children/REST70/segmentId"
                   }
-                ],
-                "provenance": "USER"
-              },
+                }
+              ],
               "quantity": {
                 "value": "100",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
-              "labelVersion": {
-                "value": "label-v1",
-                "provenance": "USER"
-              },
-              "evidence": {
-                "value": "label",
-                "provenance": "USER"
-              }
+              "labelVersion": "label-v1",
+              "evidence": "label"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-label",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "procedureId": "CONTEXT",
+              "segmentIds": "USER",
+              "quantity": "USER",
+              "labelVersion": "USER",
+              "evidence": "USER"
+            }
           },
           "evidenceRefs": [
             "label:actual-adapter-artifact"
@@ -1805,15 +1696,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "procedure-lifecycle",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "objectId": {
+            "id": {
               "$result": {
                 "actionId": "prepare",
                 "pointer": "/response/objectId"
@@ -2429,38 +2318,28 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "REGULATORY",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "unverified-v1",
-                "provenance": "USER"
-              },
-              "officialSource": {
-                "value": null,
-                "provenance": "USER"
-              },
-              "applicableDate": {
-                "value": "2026-10-07",
-                "provenance": "USER"
-              },
+              "kind": "REGULATORY",
+              "policyVersion": "unverified-v1",
+              "applicableDate": "2026-10-07",
               "reviewerId": {
-                "value": {
-                  "$alias": "config"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "config"
               },
-              "synthetic": {
-                "value": true,
-                "provenance": "USER"
-              }
+              "synthetic": true
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-missing-officialSource-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "applicableDate": "USER",
+              "reviewerId": "CONTEXT",
+              "synthetic": "USER"
+            }
           },
           "evidenceRefs": [
             "policy-draft:actual-adapter-artifact"
@@ -2477,15 +2356,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "missing-officialSource",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "policyId": {
+            "id": {
               "$result": {
                 "actionId": "policy-draft",
                 "pointer": "/response/policyId"
@@ -2546,13 +2423,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -2563,8 +2437,13 @@
             },
             "commandIdempotencyKey": "T15-missing-officialSource-activate",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "activate:actual-adapter-artifact"
@@ -2581,8 +2460,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "missing-officialSource",
               "itemId": {
                 "$alias": "P"
               }
@@ -2999,38 +2876,28 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "REGULATORY",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "unverified-v1",
-                "provenance": "USER"
-              },
-              "officialSource": {
-                "value": "SYNTHETIC-NOT-OFFICIAL",
-                "provenance": "USER"
-              },
-              "applicableDate": {
-                "value": null,
-                "provenance": "USER"
-              },
+              "kind": "REGULATORY",
+              "policyVersion": "unverified-v1",
+              "officialSource": "SYNTHETIC-NOT-OFFICIAL",
               "reviewerId": {
-                "value": {
-                  "$alias": "config"
-                },
-                "provenance": "CONTEXT"
+                "$alias": "config"
               },
-              "synthetic": {
-                "value": true,
-                "provenance": "USER"
-              }
+              "synthetic": true
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-missing-applicableDate-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "officialSource": "USER",
+              "reviewerId": "CONTEXT",
+              "synthetic": "USER"
+            }
           },
           "evidenceRefs": [
             "policy-draft:actual-adapter-artifact"
@@ -3047,15 +2914,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "missing-applicableDate",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "policyId": {
+            "id": {
               "$result": {
                 "actionId": "policy-draft",
                 "pointer": "/response/policyId"
@@ -3116,13 +2981,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -3133,8 +2995,13 @@
             },
             "commandIdempotencyKey": "T15-missing-applicableDate-activate",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "activate:actual-adapter-artifact"
@@ -3151,8 +3018,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "missing-applicableDate",
               "itemId": {
                 "$alias": "P"
               }
@@ -3569,36 +3434,26 @@
               }
             ],
             "slots": {
-              "kind": {
-                "value": "REGULATORY",
-                "provenance": "USER"
-              },
-              "policyVersion": {
-                "value": "unverified-v1",
-                "provenance": "USER"
-              },
-              "officialSource": {
-                "value": "SYNTHETIC-NOT-OFFICIAL",
-                "provenance": "USER"
-              },
-              "applicableDate": {
-                "value": "2026-10-07",
-                "provenance": "USER"
-              },
-              "reviewerId": {
-                "value": null,
-                "provenance": "USER"
-              },
-              "synthetic": {
-                "value": true,
-                "provenance": "USER"
-              }
+              "kind": "REGULATORY",
+              "policyVersion": "unverified-v1",
+              "officialSource": "SYNTHETIC-NOT-OFFICIAL",
+              "applicableDate": "2026-10-07",
+              "synthetic": true
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-missing-reviewer-policy-draft",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "kind": "USER",
+              "policyVersion": "USER",
+              "officialSource": "USER",
+              "applicableDate": "USER",
+              "synthetic": "USER"
+            }
           },
           "evidenceRefs": [
             "policy-draft:actual-adapter-artifact"
@@ -3615,15 +3470,13 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "missing-reviewer",
               "itemId": {
                 "$alias": "P"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
-            "policyId": {
+            "id": {
               "$result": {
                 "actionId": "policy-draft",
                 "pointer": "/response/policyId"
@@ -3684,13 +3537,10 @@
             ],
             "slots": {
               "policyId": {
-                "value": {
-                  "$result": {
-                    "actionId": "policy-draft",
-                    "pointer": "/response/policyId"
-                  }
-                },
-                "provenance": "CONTEXT"
+                "$result": {
+                  "actionId": "policy-draft",
+                  "pointer": "/response/policyId"
+                }
               }
             },
             "expectedRevision": {
@@ -3701,8 +3551,13 @@
             },
             "commandIdempotencyKey": "T15-missing-reviewer-activate",
             "evidenceRefs": [
-              "need"
-            ]
+              {
+                "$alias": "need"
+              }
+            ],
+            "provenance": {
+              "policyId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "activate:actual-adapter-artifact"
@@ -3719,8 +3574,6 @@
               "organizationId": {
                 "$alias": "ORG"
               },
-              "caseId": "T15",
-              "subcaseId": "missing-reviewer",
               "itemId": {
                 "$alias": "P"
               }

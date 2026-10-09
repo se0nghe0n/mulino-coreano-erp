@@ -41,8 +41,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-provisional-holds"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -116,9 +115,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "receiveProvisional",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -130,8 +126,7 @@
             "slots": {
               "quantity": {
                 "value": "60",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "observedPlaceId": {
                 "$alias": "W"
@@ -149,7 +144,13 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "observedPlaceId": "CONTEXT",
+              "identification": "USER",
+              "originalTransitSegmentId": "CONTEXT",
+              "canonicalOccurrenceKey": "USER"
+            }
           },
           "evidenceRefs": [
             "provisional:actual-adapter-artifact"
@@ -168,8 +169,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-provisional-holds"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -243,9 +243,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "confirmReceipt",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -263,8 +260,7 @@
               },
               "quantity": {
                 "value": "60",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "destinationId": {
                 "$alias": "W"
@@ -294,7 +290,15 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "intakeId": "CONTEXT",
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "canonicalOccurrenceKey": "USER",
+              "existingTransitSegmentId": "CONTEXT",
+              "verifiedEvidenceIds": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "confirm:actual-adapter-artifact"
@@ -313,8 +317,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-provisional-holds"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -388,9 +391,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "placeHold",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -405,8 +405,7 @@
             "slots": {
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "kind": "QC",
               "action": "SELL",
@@ -424,7 +423,12 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "kind": "USER",
+              "action": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "qc-hold:actual-adapter-artifact"
@@ -440,9 +444,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "placeHold",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -457,8 +458,7 @@
             "slots": {
               "quantity": {
                 "value": "60",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "kind": "RECALL",
               "action": "SELL",
@@ -476,7 +476,12 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "kind": "USER",
+              "action": "USER",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "recall-hold:actual-adapter-artifact"
@@ -495,8 +500,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-provisional-holds"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -570,9 +574,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "ontology-v1",
             "capabilityId": "recordActivity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -588,8 +589,7 @@
               "kind": "QC_HOLD_PROPOSAL",
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "evidenceId": {
                 "$alias": "qc-proof"
@@ -607,7 +607,11 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "kind": "USER",
+              "quantity": "USER",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "ordinary-hold-proposal:actual-adapter-artifact"
@@ -623,9 +627,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "placeHold",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -642,8 +643,7 @@
               "action": "SELL",
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -658,7 +658,11 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "kind": "USER",
+              "action": "USER",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "ordinary-hold:actual-adapter-artifact"
@@ -674,9 +678,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "releaseHold",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -697,8 +698,7 @@
               },
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -713,7 +713,10 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "restrictionId": "CONTEXT",
+              "quantity": "USER"
+            }
           },
           "evidenceRefs": [
             "ordinary-release:actual-adapter-artifact"
@@ -732,8 +735,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-provisional-holds"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -807,9 +809,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "releaseHold",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -830,8 +829,7 @@
               },
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "decisionEvidenceId": {
                 "$alias": "qc-proof"
@@ -849,7 +847,11 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "restrictionId": "CONTEXT",
+              "quantity": "USER",
+              "decisionEvidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "qc-release:actual-adapter-artifact"
@@ -868,8 +870,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-provisional-holds"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -1821,12 +1822,6 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-stocktake-adjust-move",
-              "rawRowsOrder": {
-                "movements": [
-                  "ledgerSequence"
-                ]
               }
             },
             "action": "SELL",
@@ -1906,9 +1901,6 @@
             "intentKind": "RECORD",
             "definitionVersion": "ontology-v1",
             "capabilityId": "recordStocktake",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -1920,8 +1912,7 @@
             "slots": {
               "observedQuantity": {
                 "value": "98",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "locationId": {
                 "$alias": "W"
@@ -1937,7 +1928,11 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "observedQuantity": "USER",
+              "locationId": "CONTEXT",
+              "evidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "stocktake:actual-adapter-artifact"
@@ -1956,12 +1951,6 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-stocktake-adjust-move",
-              "rawRowsOrder": {
-                "movements": [
-                  "ledgerSequence"
-                ]
               }
             },
             "action": "SELL",
@@ -2041,9 +2030,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "adjustQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -2055,8 +2041,7 @@
             "slots": {
               "decrease": {
                 "value": "2",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "stocktakeId": {
                 "$result": {
@@ -2078,7 +2063,11 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "decrease": "USER",
+              "stocktakeId": "CONTEXT",
+              "reason": "USER"
+            }
           },
           "evidenceRefs": [
             "ordinary-adjust:actual-adapter-artifact"
@@ -2097,12 +2086,6 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-stocktake-adjust-move",
-              "rawRowsOrder": {
-                "movements": [
-                  "ledgerSequence"
-                ]
               }
             },
             "action": "SELL",
@@ -2182,9 +2165,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "adjustQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -2196,8 +2176,7 @@
             "slots": {
               "decrease": {
                 "value": "2",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "stocktakeId": {
                 "$result": {
@@ -2222,7 +2201,12 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "decrease": "USER",
+              "stocktakeId": "CONTEXT",
+              "reason": "USER",
+              "decisionEvidenceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "adjust:actual-adapter-artifact"
@@ -2241,12 +2225,6 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-stocktake-adjust-move",
-              "rawRowsOrder": {
-                "movements": [
-                  "ledgerSequence"
-                ]
               }
             },
             "action": "SELL",
@@ -2326,9 +2304,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "splitQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -2341,19 +2316,16 @@
               "children": [
                 {
                   "value": "20",
-                  "unit": "BOX",
-                  "provenance": "USER"
+                  "unit": "BOX"
                 },
                 {
                   "value": "78",
-                  "unit": "BOX",
-                  "provenance": "USER"
+                  "unit": "BOX"
                 }
               ],
               "loss": {
                 "value": "0",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -2368,7 +2340,10 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "children": "USER",
+              "loss": "USER"
+            }
           },
           "evidenceRefs": [
             "split:actual-adapter-artifact"
@@ -2384,9 +2359,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "moveQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -2401,8 +2373,7 @@
             "slots": {
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "destinationId": {
                 "$alias": "W2"
@@ -2423,7 +2394,11 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "destinationId": "CONTEXT",
+              "custodianId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "move:actual-adapter-artifact"
@@ -2442,12 +2417,6 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-stocktake-adjust-move",
-              "rawRowsOrder": {
-                "movements": [
-                  "ledgerSequence"
-                ]
               }
             },
             "action": "SELL",
@@ -3350,8 +3319,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-sweeper"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -3425,9 +3393,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "reserveQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -3439,8 +3404,7 @@
             "slots": {
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "orderLineId": {
                 "$alias": "ORDER"
@@ -3453,7 +3417,10 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "orderLineId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "reserve:actual-adapter-artifact"
@@ -3469,9 +3436,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "pickQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -3500,7 +3464,9 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "allocationId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "pick:actual-adapter-artifact"
@@ -3519,8 +3485,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-sweeper"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -3680,9 +3645,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "dispatchQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -3694,8 +3656,7 @@
             "slots": {
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "allocationId": {
                 "$result": {
@@ -3722,7 +3683,12 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "allocationId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-adapter-artifact"
@@ -3741,8 +3707,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-sweeper"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -4546,8 +4511,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-delayed-sweep"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -4621,9 +4585,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "reserveQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -4635,8 +4596,7 @@
             "slots": {
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "orderLineId": {
                 "$alias": "ORDER"
@@ -4649,7 +4609,10 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "orderLineId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "reserve:actual-adapter-artifact"
@@ -4665,9 +4628,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "pickQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -4696,7 +4656,9 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "allocationId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "pick:actual-adapter-artifact"
@@ -4715,8 +4677,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-delayed-sweep"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -4839,9 +4800,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "ontology-v1",
             "capabilityId": "dispatchQuantity",
-            "organizationId": {
-              "$alias": "ORG"
-            },
             "subjectRefs": [
               {
                 "type": "QuantitySegment",
@@ -4853,8 +4811,7 @@
             "slots": {
               "quantity": {
                 "value": "20",
-                "unit": "BOX",
-                "provenance": "USER"
+                "unit": "BOX"
               },
               "allocationId": {
                 "$result": {
@@ -4881,7 +4838,12 @@
                 "$alias": "operation-proof"
               }
             ],
-            "valueProvenance": "USER"
+            "provenance": {
+              "quantity": "USER",
+              "allocationId": "CONTEXT",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT"
+            }
           },
           "evidenceRefs": [
             "dispatch:actual-adapter-artifact"
@@ -4900,8 +4862,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-delayed-sweep"
+              }
             },
             "action": "SELL",
             "customerId": {
@@ -5063,8 +5024,7 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseKey": "T16-expiry-delayed-sweep"
+              }
             },
             "action": "SELL",
             "customerId": {

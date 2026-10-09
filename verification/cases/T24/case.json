@@ -44,20 +44,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-search"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -129,21 +122,11 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-search"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
-            "objectId": {
+            "id": {
               "$alias": "P"
             }
           }
@@ -160,31 +143,16 @@
           "request": {
             "scope": {
               "organizationId": {
-                "$alias": "ORG-A"
+                "$alias": "ORG-B"
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-search"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
-            "organizationId": {
-              "$alias": "ORG-B"
-            },
-            "filter": {
-              "id": {
-                "$alias": "B-secret"
-              }
+            "id": {
+              "$alias": "B-secret"
             }
           }
         },
@@ -204,20 +172,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-search"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -618,20 +579,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-blob"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -703,21 +657,11 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-blob"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
-            "objectId": {
+            "id": {
               "$alias": "P"
             }
           }
@@ -774,20 +718,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-blob"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1251,25 +1188,25 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "placeHold",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-batch"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-deny-batch-permitted-first",
-            "segmentId": {
-              "$alias": "A60"
+            "slots": {
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "quantity": "10",
+              "unit": "BOX",
+              "reason": "가상 QC 사유",
+              "action": "SELL"
             },
-            "quantity": "10",
-            "unit": "BOX",
-            "reason": "가상 QC 사유",
-            "action": "SELL"
+            "subjectRefs": [],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER",
+              "reason": "USER",
+              "action": "USER"
+            }
           }
         },
         {
@@ -1288,20 +1225,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-batch"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -1373,21 +1303,11 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-batch"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
-            "objectId": {
+            "id": {
               "$alias": "P"
             }
           }
@@ -1402,38 +1322,56 @@
           "route": "batch",
           "capabilityId": "dispatchQuantity",
           "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "definition-v1",
-            "capabilityId": "dispatchQuantity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-batch"
-            },
-            "expectedRevision": 1,
-            "commandIdempotencyKey": "T24-deny-batch-attack",
             "atomic": true,
-            "commands": [
+            "changesetId": "T24-deny-batch-attack",
+            "operations": [
               {
+                "intentKind": "COMMAND",
+                "definitionVersion": "definition-v1",
                 "capabilityId": "placeHold",
-                "subjectId": {
-                  "$alias": "A60"
+                "subjectRefs": [
+                  {
+                    "type": "QuantitySegment",
+                    "id": {
+                      "$alias": "A60"
+                    }
+                  }
+                ],
+                "slots": {
+                  "quantity": {
+                    "value": "20",
+                    "unit": "BOX"
+                  }
                 },
-                "quantity": "20",
-                "unit": "BOX"
+                "expectedRevision": 1,
+                "commandIdempotencyKey": "T24-deny-batch-attack-1",
+                "provenance": {
+                  "quantity": "USER"
+                }
               },
               {
+                "intentKind": "COMMAND",
+                "definitionVersion": "definition-v1",
                 "capabilityId": "dispatchQuantity",
-                "subjectId": {
-                  "$alias": "B60"
+                "subjectRefs": [
+                  {
+                    "type": "QuantitySegment",
+                    "id": {
+                      "$alias": "B60"
+                    }
+                  }
+                ],
+                "slots": {
+                  "quantity": {
+                    "value": "20",
+                    "unit": "BOX"
+                  }
                 },
-                "quantity": "20",
-                "unit": "BOX"
+                "expectedRevision": 1,
+                "commandIdempotencyKey": "T24-deny-batch-attack-2",
+                "provenance": {
+                  "quantity": "USER"
+                }
               }
             ]
           }
@@ -1454,20 +1392,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-batch"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -2007,20 +1938,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-worker"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -2092,21 +2016,11 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-worker"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
-            "objectId": {
+            "id": {
               "$alias": "P"
             }
           }
@@ -2124,16 +2038,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchQuantity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-worker"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-deny-worker-attack",
             "originalActorId": {
@@ -2142,11 +2046,28 @@
             "originalDelegatorId": {
               "$alias": "supervisor"
             },
-            "segmentId": {
-              "$alias": "A60"
+            "slots": {
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "quantity": "20",
+              "unit": "BOX"
             },
-            "quantity": "20",
-            "unit": "BOX"
+            "subjectRefs": [],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER"
+            }
+          },
+          "harness": {
+            "intentionalViolation": {
+              "fields": [
+                "originalActorId",
+                "originalDelegatorId"
+              ],
+              "reason": "the worker payload forges the original requester; the runtime task context, never the payload, carries it (plan section 7.1)"
+            }
           }
         },
         {
@@ -2165,20 +2086,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-worker"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -2655,20 +2569,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-admin"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -2740,21 +2647,11 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-admin"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
             "knownAt": "2026-10-07T00:00:00Z",
-            "objectId": {
+            "id": {
               "$alias": "P"
             }
           }
@@ -2772,25 +2669,19 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "assignCapability",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-admin"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-deny-admin-attack",
-            "organizationId": {
-              "$alias": "ORG-B"
+            "slots": {
+              "subjectId": {
+                "$alias": "B-human"
+              },
+              "capability": "dispatchQuantity"
             },
-            "subjectId": {
-              "$alias": "B-human"
-            },
-            "capability": "dispatchQuantity"
+            "subjectRefs": [],
+            "provenance": {
+              "subjectId": "CONTEXT",
+              "capability": "USER"
+            }
           }
         },
         {
@@ -2809,20 +2700,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "deny-admin"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -3445,20 +3329,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "audit-rollback-and-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -3552,40 +3429,42 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchQuantity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "audit-rollback-and-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-audit-effect",
-            "segmentId": {
-              "$alias": "A60"
-            },
-            "allocationId": {
-              "$alias": "old-allocation"
-            },
-            "workId": {
-              "$alias": "S1"
-            },
-            "quantity": "20",
-            "unit": "BOX",
-            "destinationId": {
-              "$alias": "C"
-            },
-            "cargoPlaceId": {
-              "$alias": "TRANSIT"
-            },
             "evidenceRefs": [
               {
                 "$alias": "dispatch-basis"
               }
-            ]
+            ],
+            "slots": {
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "allocationId": {
+                "$alias": "old-allocation"
+              },
+              "workId": {
+                "$alias": "S1"
+              },
+              "quantity": "20",
+              "unit": "BOX",
+              "destinationId": {
+                "$alias": "C"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              }
+            },
+            "subjectRefs": [],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "workId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT"
+            }
           }
         },
         {
@@ -3604,20 +3483,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "audit-rollback-and-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -3708,40 +3580,42 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "dispatchQuantity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "audit-rollback-and-retry"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-audit-effect",
-            "segmentId": {
-              "$alias": "A60"
-            },
-            "allocationId": {
-              "$alias": "old-allocation"
-            },
-            "workId": {
-              "$alias": "S1"
-            },
-            "quantity": "20",
-            "unit": "BOX",
-            "destinationId": {
-              "$alias": "C"
-            },
-            "cargoPlaceId": {
-              "$alias": "TRANSIT"
-            },
             "evidenceRefs": [
               {
                 "$alias": "dispatch-basis"
               }
-            ]
+            ],
+            "slots": {
+              "segmentId": {
+                "$alias": "A60"
+              },
+              "allocationId": {
+                "$alias": "old-allocation"
+              },
+              "workId": {
+                "$alias": "S1"
+              },
+              "quantity": "20",
+              "unit": "BOX",
+              "destinationId": {
+                "$alias": "C"
+              },
+              "cargoPlaceId": {
+                "$alias": "TRANSIT"
+              }
+            },
+            "subjectRefs": [],
+            "provenance": {
+              "segmentId": "CONTEXT",
+              "allocationId": "CONTEXT",
+              "workId": "CONTEXT",
+              "quantity": "USER",
+              "unit": "USER",
+              "destinationId": "CONTEXT",
+              "cargoPlaceId": "CONTEXT"
+            }
           }
         },
         {
@@ -3760,20 +3634,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "audit-rollback-and-retry"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -4550,20 +4417,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "legal-hold"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -4681,20 +4541,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "legal-hold"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5148,20 +5001,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "active-reference"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5279,20 +5125,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "active-reference"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5746,20 +5585,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "R6-unconfirmed"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -5877,20 +5709,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "R6-unconfirmed"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -6344,20 +6169,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "authorized-delete"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -6475,20 +6293,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "authorized-delete"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -6840,20 +6651,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "restore-deleted"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -7002,20 +6806,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "restore-deleted"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -7608,20 +7405,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "sentinel-artifact-scan"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -7688,29 +7478,36 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG-A"
-              },
-              "itemId": {
-                "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "sentinel-artifact-scan"
-            },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-sentinel-artifact-scan-request-with-sentinel",
             "syntheticAuthenticationMetadata": {
               "token": "SYNTHETIC-DO-NOT-LOG"
             },
-            "source": {
-              "namespace": "untrusted",
-              "rawPrivateValue": "SYNTHETIC-DO-NOT-LOG"
+            "forceValidationError": "TYPE_INVALID",
+            "slots": {
+              "source": {
+                "namespace": "untrusted",
+                "rawPrivateValue": "SYNTHETIC-DO-NOT-LOG"
+              },
+              "targetId": {
+                "$alias": "A60"
+              }
             },
-            "targetId": {
-              "$alias": "A60"
-            },
-            "forceValidationError": "TYPE_INVALID"
+            "subjectRefs": [],
+            "provenance": {
+              "source": "USER",
+              "targetId": "CONTEXT"
+            }
+          },
+          "harness": {
+            "intentionalViolation": {
+              "fields": [
+                "forceValidationError",
+                "syntheticAuthenticationMetadata"
+              ],
+              "reason": "a rejected request must carry the synthetic secret so the artifact scan can prove it is never logged",
+              "unpinnedBecause": "the subcase asserts the six artifact surfaces, not the response of this request"
+            }
           }
         },
         {
@@ -7729,20 +7526,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "sentinel-artifact-scan"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {
@@ -7900,20 +7690,13 @@
               },
               "itemId": {
                 "$alias": "P"
-              },
-              "caseId": "T24",
-              "subcaseId": "sentinel-artifact-scan"
-            },
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
               }
-            ],
+            },
             "asOf": "2026-10-07T00:00:00Z",
-            "knownAt": "2026-10-07T00:00:00Z"
+            "knownAt": "2026-10-07T00:00:00Z",
+            "id": {
+              "$alias": "P"
+            }
           }
         },
         {

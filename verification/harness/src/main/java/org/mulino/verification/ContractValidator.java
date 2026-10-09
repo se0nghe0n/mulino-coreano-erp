@@ -793,6 +793,8 @@ public final class ContractValidator {
     private static boolean namesBasis(JsonNode node,Set<String> fields) {
         if(node.isObject()) {
             for(var it=node.fields();it.hasNext();) {var e=it.next();
+                // step2r round 12: the intent provenance map is keyed by slot names; a provenance entry is not a named basis.
+                if(e.getKey().equals("provenance") && e.getValue().isObject()) continue;
                 if(fields.contains(e.getKey()) && !(e.getValue().isArray() && e.getValue().isEmpty()) && !e.getValue().isNull() && !(e.getValue().isTextual() && e.getValue().asText().isBlank())) return true;
                 if(namesBasis(e.getValue(),fields)) return true;}
         } else if(node.isArray()) for(JsonNode v:node) if(namesBasis(v,fields)) return true;
