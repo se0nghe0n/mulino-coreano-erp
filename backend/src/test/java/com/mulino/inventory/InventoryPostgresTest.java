@@ -59,6 +59,18 @@ class InventoryPostgresTest {
  }
  void edge(String edge,String source,String target,String quantity){jdbc.update("INSERT INTO mulino_inventory_GenealogyEdges(organizationId,id,sourceId,targetId,quantity,unit,kind,uncertain,occurredAt,createdAt,recordedAt) VALUES (?,?,?,?,?::numeric,'EA','SPLIT',false,'2026-02-01','2026-02-01','2026-02-01')",org,edge,source,target,quantity);}
  QueryRequest query(String operation,String id,Map<String,Object> scope){return new QueryRequest(operation,id,scope,Map.of(),50,null,"v1",at,at,null);}
+ /** PG-ORGANIZATION-SNAPSHOT: without an item, getInventory returns every readable item block and hides the rest. */
+ @Test @SuppressWarnings("unchecked") void organizationSnapshotListsReadableItemsOnly(){runtime.requestContext().run(ctx->{
+  var queries=new InventoryQueries(repository,authorizer);
+  var result=queries.query(context(),query("getInventory",null,Map.of("organizationId",org)));
+  Map<String,Object> data=(Map<String,Object>)result.data();
+  assertEquals(List.of(item),data.get("itemIds"));
+  Map<String,Object> block=((List<Map<String,Object>>)data.get("items")).getFirst();
+  assertEquals("100",block.get("heldQuantity"));assertEquals(Set.of(left,right),new HashSet<>((List<String>)block.get("segmentIds")));
+  assertFalse(result.scope().containsKey("itemId"));
+  when(authorizer.permittedScopes(any(),anyString(),anyMap())).thenReturn(false);
+  assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->queries.query(context(),query("getInventory",null,Map.of("organizationId",org)))).code());
+  return null;});}
  @Test void cqnActiveLeavesIndependentSqlSumAndLineage(){runtime.requestContext().run(ctx->{
   var queries=new InventoryQueries(repository,authorizer);
   Map<String,Object> data=(Map<String,Object>)queries.query(context(),query("getInventory",item,Map.of())).data();
