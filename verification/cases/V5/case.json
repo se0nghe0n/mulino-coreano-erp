@@ -143,7 +143,6 @@
             ],
             "commandIdempotencyKey": "V5-waiting-full-restart-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -164,15 +163,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -237,30 +237,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -1630,7 +1627,6 @@
             ],
             "commandIdempotencyKey": "V5-two-workers-expired-fence-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -1651,15 +1647,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -1724,30 +1721,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -3533,7 +3527,6 @@
             ],
             "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -3554,15 +3547,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -3627,30 +3621,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -5170,7 +5161,6 @@
             ],
             "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -5191,15 +5181,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -5264,30 +5255,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [

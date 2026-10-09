@@ -50,16 +50,17 @@
               "customerId": {
                 "$alias": "C"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
               "deliveryEndpoint": "CUSTOMER_ACCEPTED",
-              "packagingVersion": "sealed-box-v1",
-              "dueAt": "2026-10-07T10:00:00Z"
+              "dueAt": "2026-10-07T10:00:00Z",
+              "packageTerms": "sealed-box-v1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-return-not-correction-order",
@@ -71,10 +72,12 @@
             "provenance": {
               "customerId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "packagingVersion": "USER",
-              "dueAt": "USER"
+              "dueAt": "USER",
+              "packageTerms": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -101,20 +104,18 @@
               }
             ],
             "slots": {
-              "orderLineId": {
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": "100",
+              "unit": "BOX",
+              "action": "SELL",
+              "salesLineId": {
                 "$result": {
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              },
-              "segmentId": {
-                "$alias": "A"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
-              "action": "SELL"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-return-not-correction-reserve",
@@ -124,10 +125,11 @@
               }
             ],
             "provenance": {
-              "orderLineId": "CONTEXT",
               "segmentId": "CONTEXT",
               "quantity": "USER",
-              "action": "USER"
+              "unit": "USER",
+              "action": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -218,13 +220,17 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
-                "$alias": "TRANSIT"
-              },
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
-              }
+              },
+              "transitPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "delivery-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -242,8 +248,10 @@
               "allocationId": "CONTEXT",
               "originId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -288,17 +296,18 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "occurredAt": "2026-10-07T09:00:00Z",
               "sourceEvidenceId": {
                 "$alias": "delivery-proof"
               },
               "sourceNamespace": "SYNTHETIC-CUSTOMER",
               "externalEventId": "return-not-correction-actual-delivery",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -317,11 +326,13 @@
               "cargoScopeId": "CONTEXT",
               "allocationId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "occurredAt": "USER",
               "sourceEvidenceId": "CONTEXT",
               "sourceNamespace": "USER",
               "externalEventId": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -444,10 +455,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantity": "20",
+              "unit": "BOX",
               "reason": "DAMAGED_RETURN",
               "physicalScopeId": {
                 "$result": {
@@ -471,6 +480,7 @@
             "provenance": {
               "deliveryId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "reason": "USER",
               "physicalScopeId": "CONTEXT"
             }
@@ -511,10 +521,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantity": "20",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "W"
               },
@@ -547,6 +555,7 @@
               "returnAuthorizationId": "CONTEXT",
               "deliveryId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
               "physicalScopeId": "CONTEXT",
               "sourceEvidenceId": "CONTEXT",
@@ -656,10 +665,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantity": "20",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "W"
               },
@@ -692,6 +699,7 @@
               "returnAuthorizationId": "CONTEXT",
               "deliveryId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
               "physicalScopeId": "CONTEXT",
               "sourceEvidenceId": "CONTEXT",
@@ -1476,16 +1484,17 @@
               "customerId": {
                 "$alias": "C"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
               "deliveryEndpoint": "CUSTOMER_ACCEPTED",
-              "packagingVersion": "sealed-box-v1",
-              "dueAt": "2026-10-07T10:00:00Z"
+              "dueAt": "2026-10-07T10:00:00Z",
+              "packageTerms": "sealed-box-v1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-corrected-delivery-98-order",
@@ -1497,10 +1506,12 @@
             "provenance": {
               "customerId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "packagingVersion": "USER",
-              "dueAt": "USER"
+              "dueAt": "USER",
+              "packageTerms": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1527,20 +1538,18 @@
               }
             ],
             "slots": {
-              "orderLineId": {
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": "100",
+              "unit": "BOX",
+              "action": "SELL",
+              "salesLineId": {
                 "$result": {
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              },
-              "segmentId": {
-                "$alias": "A"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
-              "action": "SELL"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-corrected-delivery-98-reserve",
@@ -1550,10 +1559,11 @@
               }
             ],
             "provenance": {
-              "orderLineId": "CONTEXT",
               "segmentId": "CONTEXT",
               "quantity": "USER",
-              "action": "USER"
+              "unit": "USER",
+              "action": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1644,13 +1654,17 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
-                "$alias": "TRANSIT"
-              },
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
-              }
+              },
+              "transitPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "delivery-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -1668,8 +1682,10 @@
               "allocationId": "CONTEXT",
               "originId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1714,17 +1730,18 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "occurredAt": "2026-10-07T09:00:00Z",
               "sourceEvidenceId": {
                 "$alias": "delivery-proof"
               },
               "sourceNamespace": "SYNTHETIC-CUSTOMER",
               "externalEventId": "corrected-delivery-98-actual-delivery",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -1743,11 +1760,13 @@
               "cargoScopeId": "CONTEXT",
               "allocationId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "occurredAt": "USER",
               "sourceEvidenceId": "CONTEXT",
               "sourceNamespace": "USER",
               "externalEventId": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2798,16 +2817,17 @@
               "customerId": {
                 "$alias": "C"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
               "deliveryEndpoint": "CUSTOMER_ACCEPTED",
-              "packagingVersion": "sealed-box-v1",
-              "dueAt": "2026-10-07T10:00:00Z"
+              "dueAt": "2026-10-07T10:00:00Z",
+              "packageTerms": "sealed-box-v1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-order",
@@ -2819,10 +2839,12 @@
             "provenance": {
               "customerId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "packagingVersion": "USER",
-              "dueAt": "USER"
+              "dueAt": "USER",
+              "packageTerms": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2849,20 +2871,18 @@
               }
             ],
             "slots": {
-              "orderLineId": {
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": "100",
+              "unit": "BOX",
+              "action": "SELL",
+              "salesLineId": {
                 "$result": {
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              },
-              "segmentId": {
-                "$alias": "A"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
-              "action": "SELL"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-reserve",
@@ -2872,10 +2892,11 @@
               }
             ],
             "provenance": {
-              "orderLineId": "CONTEXT",
               "segmentId": "CONTEXT",
               "quantity": "USER",
-              "action": "USER"
+              "unit": "USER",
+              "action": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2966,13 +2987,17 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
-                "$alias": "TRANSIT"
-              },
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
-              }
+              },
+              "transitPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "delivery-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -2990,8 +3015,10 @@
               "allocationId": "CONTEXT",
               "originId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3036,17 +3063,18 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "occurredAt": "2026-10-07T09:00:00Z",
               "sourceEvidenceId": {
                 "$alias": "delivery-proof"
               },
               "sourceNamespace": "SYNTHETIC-CUSTOMER",
               "externalEventId": "resolved-no-resurrection-resolved-actual-delivery",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -3065,11 +3093,13 @@
               "cargoScopeId": "CONTEXT",
               "allocationId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "occurredAt": "USER",
               "sourceEvidenceId": "CONTEXT",
               "sourceNamespace": "USER",
               "externalEventId": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4324,16 +4354,17 @@
               "customerId": {
                 "$alias": "C"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
               "deliveryEndpoint": "CUSTOMER_ACCEPTED",
-              "packagingVersion": "sealed-box-v1",
-              "dueAt": "2026-10-07T10:00:00Z"
+              "dueAt": "2026-10-07T10:00:00Z",
+              "packageTerms": "sealed-box-v1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-order",
@@ -4345,10 +4376,12 @@
             "provenance": {
               "customerId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "packagingVersion": "USER",
-              "dueAt": "USER"
+              "dueAt": "USER",
+              "packageTerms": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4375,20 +4408,18 @@
               }
             ],
             "slots": {
-              "orderLineId": {
+              "segmentId": {
+                "$alias": "A"
+              },
+              "quantity": "100",
+              "unit": "BOX",
+              "action": "SELL",
+              "salesLineId": {
                 "$result": {
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              },
-              "segmentId": {
-                "$alias": "A"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
-              "action": "SELL"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-reserve",
@@ -4398,10 +4429,11 @@
               }
             ],
             "provenance": {
-              "orderLineId": "CONTEXT",
               "segmentId": "CONTEXT",
               "quantity": "USER",
-              "action": "USER"
+              "unit": "USER",
+              "action": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4492,13 +4524,17 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
-                "$alias": "TRANSIT"
-              },
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
-              }
+              },
+              "transitPlaceId": {
+                "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "delivery-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -4516,8 +4552,10 @@
               "allocationId": "CONTEXT",
               "originId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4562,17 +4600,18 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "occurredAt": "2026-10-07T09:00:00Z",
               "sourceEvidenceId": {
                 "$alias": "delivery-proof"
               },
               "sourceNamespace": "SYNTHETIC-CUSTOMER",
               "externalEventId": "resolved-no-resurrection-waived-actual-delivery",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -4591,11 +4630,13 @@
               "cargoScopeId": "CONTEXT",
               "allocationId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "occurredAt": "USER",
               "sourceEvidenceId": "CONTEXT",
               "sourceNamespace": "USER",
               "externalEventId": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [

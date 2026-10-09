@@ -106,7 +106,7 @@ def grant_pick(fixture_ref):
     dump(path,f)
 def transit_dispatch(sub):
     r=by_id(sub['actions'],'dispatch')['request'];r=r['slots'] if 'allocationId' in r.get('slots',{}) else r;assert 'allocationId' in r,sub['id']
-    r.setdefault('cargoPlaceId',alias('TRANSIT'))
+    if 'transitPlaceId' not in r:r.setdefault('cargoPlaceId',alias('TRANSIT'))  # round 13: conform_intent renames it to transitPlaceId
 # Inventory commands carry their basis (InventoryCommands.prepare requires evidenceRef; plan section 4.2 '근거'): the
 # original move of the safe-retry subcases and the split of the restore subcases name a synthetic basis reference.
 BASIS_ACTIONS={'safe-retry-canonical-current-grant':'original','safe-retry-revoked-blocked':'original','restore-complete':'split',

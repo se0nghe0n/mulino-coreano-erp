@@ -124,12 +124,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "0.5",
-                "unit": "EA"
-              },
-              "orderLineId": {
+              "quantity": "0.5",
+              "unit": "EA",
+              "salesLineId": {
                 "$alias": "ORDER"
+              },
+              "segmentId": {
+                "$alias": "Q100"
               }
             },
             "expectedRevision": 1,
@@ -141,7 +142,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1664,12 +1667,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "100000000000000000000000000",
-                "unit": "BOX"
-              },
-              "orderLineId": {
+              "quantity": "100000000000000000000000000",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "ORDER"
+              },
+              "segmentId": {
+                "$alias": "Q100"
               }
             },
             "expectedRevision": 1,
@@ -1681,7 +1685,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2430,13 +2436,14 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "kind": "QC",
               "action": "SELL",
-              "reason": "파손 검사"
+              "reason": "파손 검사",
+              "segmentId": {
+                "$alias": "B10"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T04-hold-dispose-hold",
@@ -2447,9 +2454,11 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "kind": "USER",
               "action": "USER",
-              "reason": "USER"
+              "reason": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2552,13 +2561,18 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "reason": "파손",
               "decisionEvidenceId": {
                 "$alias": "management-proof"
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "B10"
               }
             },
             "expectedRevision": {
@@ -2575,8 +2589,12 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "reason": "USER",
-              "decisionEvidenceId": "CONTEXT"
+              "decisionEvidenceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2679,10 +2697,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "reason": "파손 폐기",
               "managementDecision": {
                 "actorId": {
@@ -2698,6 +2714,13 @@
                   "actionId": "hold",
                   "pointer": "/response/restrictionId"
                 }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "B10"
               }
             },
             "expectedRevision": {
@@ -2714,9 +2737,13 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "reason": "USER",
               "managementDecision": "USER",
-              "qcDecisionId": "CONTEXT"
+              "qcDecisionId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3708,9 +3735,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T04-rollback-afterMovementBeforeAllocation-dispatch",
@@ -3723,7 +3754,9 @@
               "allocationId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4394,9 +4427,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T04-rollback-afterAllocationBeforeAudit-dispatch",
@@ -4409,7 +4446,9 @@
               "allocationId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5080,9 +5119,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T04-rollback-afterAuditBeforeOutbox-dispatch",
@@ -5095,7 +5138,9 @@
               "allocationId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5766,9 +5811,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T04-rollback-afterOutboxBeforeCommittedResult-dispatch",
@@ -5781,7 +5830,9 @@
               "allocationId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6423,9 +6474,14 @@
             ],
             "slots": {
               "primitive": "QuantityMovement.UPDATE",
-              "quantity": {
-                "value": "59",
-                "unit": "BOX"
+              "quantity": "59",
+              "unit": "BOX",
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
               }
             },
             "expectedRevision": 1,
@@ -6437,7 +6493,11 @@
             ],
             "provenance": {
               "primitive": "USER",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6508,12 +6568,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "1",
-                "unit": "BOX"
-              },
-              "orderLineId": {
+              "quantity": "1",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "ORDER"
+              },
+              "segmentId": {
+                "$alias": "A60"
               }
             },
             "expectedRevision": 0,
@@ -6525,7 +6586,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6647,6 +6710,13 @@
               "loss": {
                 "value": "0",
                 "unit": "BOX"
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
               }
             },
             "expectedRevision": 1,
@@ -6658,7 +6728,10 @@
             ],
             "provenance": {
               "children": "USER",
-              "loss": "USER"
+              "loss": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [

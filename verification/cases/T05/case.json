@@ -152,10 +152,8 @@
               "custodianId": {
                 "$alias": "warehouse"
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "confirmedLocationId": {
                 "$alias": "W"
               }
@@ -170,6 +168,7 @@
             "provenance": {
               "custodianId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "confirmedLocationId": "CONTEXT"
             }
           },
@@ -196,12 +195,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "kind": "QC",
-              "action": "SELL"
+              "action": "SELL",
+              "segmentId": {
+                "$alias": "CUS60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T05-custody-not-sale-hold-customer",
@@ -212,8 +212,10 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "kind": "USER",
-              "action": "USER"
+              "action": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -294,12 +296,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
-              "orderLineId": {
+              "quantity": "60",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "ORDER"
+              },
+              "segmentId": {
+                "$alias": "CUS60"
               }
             },
             "expectedRevision": {
@@ -316,7 +319,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1780,10 +1785,8 @@
             "slots": {
               "kind": "DISPOSITION_PROPOSAL",
               "action": "SELL",
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
-              },
+              "quantity": "40",
+              "unit": "BOX",
               "validFrom": "2026-10-07T09:00:00Z",
               "validUntil": "2026-10-31T23:59:59Z",
               "documentId": {
@@ -1802,6 +1805,7 @@
               "kind": "USER",
               "action": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "validFrom": "USER",
               "validUntil": "USER",
               "documentId": "CONTEXT",
@@ -1844,9 +1848,10 @@
                 }
               },
               "action": "SELL",
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
+              "quantity": "40",
+              "unit": "BOX",
+              "segmentId": {
+                "$alias": "CON40"
               }
             },
             "expectedRevision": 1,
@@ -1866,7 +1871,9 @@
               "proposalId": "CONTEXT",
               "proposalHash": "CONTEXT",
               "action": "USER",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1982,14 +1989,15 @@
                 }
               },
               "action": "SELL",
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
-              },
+              "quantity": "40",
+              "unit": "BOX",
               "validFrom": "2026-10-07T09:00:00Z",
               "validUntil": "2026-10-31T23:59:59Z",
               "evidenceId": {
                 "$alias": "baseline-permission"
+              },
+              "segmentId": {
+                "$alias": "CON40"
               }
             },
             "expectedRevision": {
@@ -2015,9 +2023,11 @@
               "proposalHash": "CONTEXT",
               "action": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "validFrom": "USER",
               "validUntil": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2120,12 +2130,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
-              "orderLineId": {
+              "quantity": "10",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "ORDER"
+              },
+              "segmentId": {
+                "$alias": "CON40"
               }
             },
             "expectedRevision": {
@@ -2142,7 +2153,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2304,9 +2317,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -2324,7 +2341,9 @@
               "quantity": "USER",
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2430,12 +2449,16 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
+              "quantity": "30",
+              "unit": "BOX",
               "action": "SELL",
-              "kind": "QC"
+              "kind": "QC",
+              "segmentId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/remainingSegmentId"
+                }
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T05-manager-disposition-independent-qc",
@@ -2446,8 +2469,10 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "action": "USER",
-              "kind": "USER"
+              "kind": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2476,12 +2501,16 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
+              "quantity": "30",
+              "unit": "BOX",
               "action": "SELL",
-              "kind": "RECALL"
+              "kind": "RECALL",
+              "segmentId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/remainingSegmentId"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -2497,8 +2526,10 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "action": "USER",
-              "kind": "USER"
+              "kind": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [

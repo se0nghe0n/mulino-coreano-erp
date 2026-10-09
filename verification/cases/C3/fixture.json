@@ -1417,18 +1417,6 @@
       "type": "PurchaseOrder",
       "organizationAlias": "ORG-A"
     },
-    "PO2": {
-      "type": "PurchaseOrder",
-      "organizationAlias": "ORG-A"
-    },
-    "PO-LINE": {
-      "type": "PurchaseOrderLine",
-      "organizationAlias": "ORG-A"
-    },
-    "PO2-LINE": {
-      "type": "PurchaseOrderLine",
-      "organizationAlias": "ORG-A"
-    },
     "SALE": {
       "type": "SalesOrder",
       "organizationAlias": "ORG-A"
@@ -1527,10 +1515,6 @@
     },
     "REGULATORY": {
       "type": "RegulatoryProcedure",
-      "organizationAlias": "ORG-A"
-    },
-    "INBOX": {
-      "type": "InboxRecord",
       "organizationAlias": "ORG-A"
     },
     "RECONCILIATION": {
@@ -1708,13 +1692,6 @@
         "state": "ACCEPTED",
         "destinationAlias": "W"
       },
-      "PO2": {
-        "revision": 1,
-        "quantity": "100",
-        "unit": "BOX",
-        "state": "ACCEPTED",
-        "destinationAlias": "W"
-      },
       "SALE": {
         "revision": 1,
         "quantity": "20",
@@ -1785,6 +1762,50 @@
         "state": "IN_REVIEW",
         "revision": 1,
         "hash": "421bf77e57b1afab10a6c229c232cd1ab613295ad0d2c8416bb7fc84c74ed7e3"
+      },
+      "DISPATCH": {
+        "revision": 1,
+        "state": "DISPATCHED",
+        "allocationAlias": "ALLOCATION",
+        "segmentAlias": "A20",
+        "quantity": "20",
+        "unit": "BOX"
+      },
+      "CARGO": {
+        "revision": 1,
+        "shipmentAlias": "SHIPMENT",
+        "itemAlias": "P",
+        "quantity": "20",
+        "unit": "BOX"
+      },
+      "HOLD": {
+        "revision": 1,
+        "status": "ACTIVE",
+        "scopeSegmentAlias": "A20",
+        "action": "SELL",
+        "category": "QC",
+        "decisionOwnerAlias": "qc"
+      },
+      "EXTERNAL-OP": {
+        "revision": 1,
+        "state": "PENDING",
+        "operation": "dispatchPurchaseOrder",
+        "proposalAlias": "PROPOSAL"
+      },
+      "OCCURRENCE": {
+        "revision": 1,
+        "kind": "PHYSICAL_RECEIPT",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "placeAlias": "W",
+        "quantity": "20",
+        "unit": "BOX"
+      },
+      "LEASE": {
+        "revision": 1,
+        "state": "ACTIVE",
+        "workAlias": "WORK",
+        "holderAlias": "reader"
       }
     },
     "policies": {

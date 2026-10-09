@@ -302,6 +302,7 @@ class World:
 class Contracts:
     def __init__(self, root=ROOT):
         self.root = Path(root)
+        self._clock = self._case = None
         self.intent = load_json(self.root, 'contracts/intent.schema.json')
         self.data = load_json(self.root, 'contracts/request-contracts.json')
         self.intent_fields = list(self.intent['properties'])
@@ -320,9 +321,14 @@ class Contracts:
         for sub in case.get('subcases', []):
             world = World(self.root, sub.get('fixtureRef'), cache)
             prior = []
+            self._clock, self._case = world.clock, case.get('caseId')
             for action in iter_actions(sub.get('actions', [])):
+                if action.get('kind') == 'control' and (action.get('control') or {}).get('type') == 'clock':
+                    params = action['control'].get('parameters') or {}
+                    self._clock = next((params[k] for k in ('instant', 'asOf', 'knownAt') if isinstance(params.get(k), str)), self._clock)
                 self.conform_action(action, case.get('caseId'), sub.get('id'), world, prior)
                 prior.append(action)
+        self._clock = self._case = None
         return case
 
     def conform_action(self, action, case_id, sub_id, world, prior=()):
@@ -442,11 +448,139 @@ class Contracts:
                 continue
             slots[name] = value
             provenance[name] = provenance.get(name) or stated.get(name) or said or default_provenance(value)
+        self.conform_slots(body, slots, provenance, action, intentional)
         body['provenance'] = {name: provenance[name] for name in slots}
         if intentional:
             harness['intentionalViolation'] = {k: v for k, v in (('fields', sorted(intentional)), ('reason', override['reason']),
                                                                 ('unpinnedBecause', override.get('unpinnedBecause'))) if v}
         merge_harness(action, harness)
+
+    # -- command slots (step2r round 13) --
+    SLOT_SOURCES = {
+        'segmentId': ('segmentId', 'sourceSegmentId', '@QuantitySegment'), 'segmentIds': ('segmentIds', 'sourceSegmentIds'),
+        'salesLineId': ('salesLineId', 'orderLineId'), 'transitPlaceId': ('transitPlaceId', 'cargoPlaceId'),
+        'workId': ('workId', '@Work'), 'itemId': ('itemId', '@TradeItem'), 'allocationId': ('allocationId', '@Allocation'),
+        'handoverId': ('handoverId', '@Handover'), 'restrictionId': ('restrictionId', '@Restriction'),
+        'dispositionBasisId': ('dispositionBasisId', '@DispositionBasis'), 'assignmentId': ('assignmentId', '@Obligation'),
+        'proposalId': ('proposalId', '@PurchaseProposal'), 'purchaseId': ('purchaseId', '@PurchaseOrder'),
+        'shipmentId': ('shipmentId', '@Shipment'), 'procedureId': ('procedureId', '@RegulatoryProcedure'),
+        'invoiceId': ('invoiceId', '@Invoice'), 'id': ('id', '@PolicyVersion', '@Grant', '@CapabilityAssignment'),
+        'deliveryEndpoint': ('deliveryEndpoint', 'endpoint'), 'packageTerms': ('packageTerms', 'packagingVersion'),
+        'workType': ('workType', 'workKind'), 'evidenceRef': ('evidenceRef', '@evidenceRefs'), 'occurredAt': ('occurredAt', '@clock'),
+    }
+
+    def slot_source(self, source, body, slots):
+        """(value, provenance or None) of one slot source: a slot, a typed subject, the request evidenceRefs or the clock."""
+        if source == '@evidenceRefs':
+            refs = body.get('evidenceRefs') or []
+            return (copy.deepcopy(refs[0]), 'CONTEXT') if refs else (None, None)
+        if source == '@clock':
+            return (self._clock, 'CONTEXT') if getattr(self, '_clock', None) else (None, None)
+        if source.startswith('@'):
+            found = [r.get('id') for r in body.get('subjectRefs') or [] if isinstance(r, dict) and r.get('type') == source[1:]]
+            return (copy.deepcopy(found[0]), 'CONTEXT') if len(found) == 1 else (None, None)
+        return (slots[source], None) if source in slots else (None, None)
+
+    def conform_slots(self, body, slots, provenance, action, intentional):
+        """Write command slots in the declaring contract's vocabulary (contracts/request-contracts.json commandSlots)."""
+        spec = self.data['commandSlots']
+        capability = body.get('capabilityId') or action.get('capabilityId')
+        declared = spec['capabilities'].get(capability)
+        if declared is None or any(f.startswith('slots/') for f in intentional):
+            return
+        for rule in spec['renames']:
+            if capability in rule['capabilities'] and rule['from'] in slots and rule['to'] not in slots:
+                slots[rule['to']] = slots.pop(rule['from'])
+                provenance[rule['to']] = provenance.pop(rule['from'], None) or default_provenance(slots[rule['to']])
+        wait = spec['waitContract']
+        if capability in wait['capabilities'] and wait['slot'] not in slots and any(v in slots for v in wait['fields'].values()):
+            value, said = {}, set()
+            for field, source in wait['fields'].items():
+                if source in slots:
+                    value[field] = slots.pop(source)
+                    said.add(provenance.pop(source, None) or default_provenance(value[field]))
+            slots[wait['slot']] = value
+            provenance[wait['slot']] = 'USER' if 'USER' in said else 'CONTEXT'
+        def fill(name, sources):
+            for source in sources:
+                value, said = self.slot_source(source, body, slots)
+                if value is not None:
+                    return value, said or provenance.get(source) or default_provenance(value)
+            return None, None
+        for rule in (spec['basisSlot'], spec['occurrenceSlot']):
+            if capability in rule['capabilities'] and rule['slot'] not in slots:
+                value, said = fill(rule['slot'], self.SLOT_SOURCES[rule['slot']])
+                if value is not None:
+                    slots[rule['slot']], provenance[rule['slot']] = value, said
+        if self._case in spec['declaredOnlyCases']['cases']:
+            projected, kept = {}, {}
+            overrides = spec['sourceOverrides'].get(capability, {})
+            for name in declared['allowed']:
+                value, said = fill(name, overrides.get(name) or self.SLOT_SOURCES.get(name, (name,)))
+                start = spec['startCoordinate']
+                if value is None and name == start['slot'] and capability in start['capabilities']:
+                    value, said = start['value'], 'CONTEXT'
+                if value is not None:
+                    projected[name], kept[name] = value, said
+            for name in (spec['planSlots'].get(capability) or {}).get('slots', []):
+                if name in slots:
+                    projected[name], kept[name] = slots[name], provenance.get(name) or default_provenance(slots[name])
+            slots.clear()
+            slots.update(projected)
+            for name in list(provenance):
+                provenance.pop(name)
+            provenance.update(kept)
+        else:
+            for name in declared['allowed']:
+                sources = [s for s in self.SLOT_SOURCES.get(name, ()) if s.startswith('@') and s not in ('@clock', '@evidenceRefs')]
+                if name not in slots and sources:
+                    value, said = fill(name, sources)
+                    if value is not None:
+                        slots[name], provenance[name] = value, said
+        for qname in spec['quantityWithUnit']['slots']:
+            if capability in spec['quantityWithUnit']['capabilities'] and isinstance(slots.get(qname), dict) \
+                    and set(slots[qname]) == {'value', 'unit'} and slots.get('unit') in (None, slots[qname]['unit']):
+                quantity, said = slots[qname], provenance.get(qname) or 'USER'
+                items = []
+                for name, value in slots.items():
+                    if name == qname:
+                        items += [(qname, quantity['value']), ('unit', quantity['unit'])]
+                    elif name != 'unit':
+                        items.append((name, value))
+                slots.clear()
+                slots.update(items)  # the unit follows its quantity, so a second pass writes the same order
+                provenance[qname], provenance['unit'] = said, provenance.get('unit') or said
+        if self._case in spec['declaredOnlyCases']['cases']:
+            order = {name: i for i, name in enumerate(declared['allowed'])}
+            ordered = sorted(slots.items(), key=lambda kv: order.get(kv[0], len(order)))
+            slots.clear()
+            slots.update(ordered)
+
+    def slot_problems(self, body, action, case_id):
+        """KNOWN_OPEN lines for slots a capability does not declare or requires (Step 2 vocabulary backlog), FAIL for the
+        declared-only cases."""
+        spec = self.data['commandSlots']
+        capability = body.get('capabilityId') or action.get('capabilityId')
+        declared = spec['capabilities'].get(capability)
+        slots = body.get('slots') if isinstance(body.get('slots'), dict) else {}
+        intentional = set(((action.get('harness') or {}).get('intentionalViolation') or {}).get('fields') or [])
+        if declared is None or {f for f in intentional if f.startswith('slots/')}:
+            return [], []
+        problems, known = [], []
+        strict = case_id in spec['declaredOnlyCases']['cases']
+        plan = spec['planSlots'].get(capability) or {}
+        for name in sorted(set(slots) & set(plan.get('slots', []))):
+            known.append(f'/slots/{name}: the plan requires {name} for {capability} but the handler declares no slot ({plan["contractRef"]}) KNOWN_OPEN {plan["gap"]}')
+        for name in sorted(set(slots) - set(declared['allowed']) - set(plan.get('slots', []))):
+            text = f'/slots/{name}: {capability} declares no slot {name} ({declared["ref"]})'
+            (problems.append(text + ' (contracts/request-contracts.json commandSlots)') if strict else known.append(text + ' KNOWN_OPEN S2-SLOT-VOCABULARY'))
+        for name in sorted(set(declared['required']) - set(slots)):
+            known.append(f'/slots/{name}: {capability} requires {name} ({declared["ref"]}) KNOWN_OPEN S2-SLOT-REQUIRED')
+        wait = spec['waitContract']
+        if capability in wait['capabilities'] and isinstance(slots.get(wait['slot']), dict):
+            for field in sorted(set(wait['fields']) - set(slots[wait['slot']])):
+                known.append(f'/slots/{wait["slot"]}/{field}: {capability} requires the complete wait contract ({wait["contractRef"]}) KNOWN_OPEN S2-SLOT-REQUIRED')
+        return problems, known
 
     # -- queries --
     def conform_query(self, request, action, world, prior=()):
@@ -680,6 +814,7 @@ class Contracts:
     def case_problems(self, case):
         """(problems, knownOpen) of every invoke/query request of a case."""
         problems, known = [], []
+        self._case = case.get('caseId')
         for sub in case.get('subcases', []):
             for action in iter_actions(sub.get('actions', [])):
                 where = f"{case.get('caseId')}/{sub.get('id')}/{action.get('id')}"
@@ -695,6 +830,7 @@ class Contracts:
                 known += [f'{where}{x}' for x in k]
                 if action.get('harness', {}).get('intentionalViolation') and action.get('kind') != 'invoke':
                     problems.append(f'{where}: intentionalViolation is declared on a non-command action')
+        self._case = None
         return problems, known
 
     def command_problems(self, action, sub):
@@ -726,6 +862,9 @@ class Contracts:
         violations = {}
         for prefix, body, skip in bodies:
             p, k, v = self.intent_problems(body, action, skip)
+            problems += [prefix + x for x in p]
+            known += [prefix + x for x in k]
+            p, k = self.slot_problems(body, action, getattr(self, '_case', None))
             problems += [prefix + x for x in p]
             known += [prefix + x for x in k]
             for key, messages in v.items():

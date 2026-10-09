@@ -157,9 +157,10 @@ exit code를 출력하며 `verification/harness/target/wrapper-commands.json`에
   - **실행 전제(round 10)**: 적용을 기대하는 명령마다 제품 검사 사슬을 순서대로
     맞춘다(`contracts/execution-preconditions.json`,
     `docs/execution/step2r-round10/precondition-audit.md`).
-    `dispatchTransitProblems`는 배분을 지명한 모든 출고에 `cargoPlaceId`의
-    fixture TRANSIT 장소를, FORBIDDEN 반례가 아니면 출고 actor·위임자의 grant
-    장소 scope에 그 장소를 요구한다(fixture-place-kinds.json dispatchTransit).
+    `dispatchTransitProblems`는 배분을 지명한 모든 출고에 `transitPlaceId`의
+    (round 13 전에는 `cargoPlaceId`) fixture TRANSIT 장소를, FORBIDDEN 반례가
+    아니면 grant가 장소를 나열할 때 출고 actor·위임자의 장소 scope에 그 장소를
+    요구한다(fixture-place-kinds.json dispatchTransit).
     `occurrenceTimeProblems`는 제품 시계(fixture clock asOf에서 시작해 clock
     control의 instant·asOf·knownAt으로만 움직임)로 발생 시각(명시
     occurredAt, 없으면 요청 asOf, 없으면 시계)이 시계보다 뒤가 아니고, 출고가

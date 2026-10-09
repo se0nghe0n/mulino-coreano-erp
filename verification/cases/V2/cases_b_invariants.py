@@ -80,7 +80,8 @@ for cid in CASES:
                 fail(where, f'{action["id"]} arms a barrier inside business slots')
             # 4. dispatch probes in E1/E2/C4 are well-formed siblings of the accepted dispatch
             if cap == 'dispatchQuantity' and cid in ('E1', 'E2', 'C4'):
-                for slot in ('allocationId', 'cargoPlaceId', 'originId', 'destinationId', 'quantity'):
+                # step2r round 13: the transit place is the product slot transitPlaceId (commandSlots renames).
+                for slot in ('allocationId', 'transitPlaceId', 'originId', 'destinationId', 'quantity'):
                     if slot not in slots:
                         fail(where, f'{action["id"]} dispatch lacks {slot}')
                 for plural in ('allocationIds', 'segmentIds'):
@@ -148,8 +149,10 @@ for sid in ('split-commits-first', 'reserve-commits-first'):
     for action in flat_actions(sub):
         if action.get('capabilityId') == 'reserveQuantity':
             slots = action['request']['slots']
-            line = slots['orderLineId'].get('$alias')
-            want = float(slots['quantity']['value'])
+            # step2r round 13: salesLineId and a decimal quantity beside its unit (commandSlots renames, quantityWithUnit).
+            line = (slots.get('salesLineId') or slots.get('orderLineId')).get('$alias')
+            quantity = slots['quantity']
+            want = float(quantity['value'] if isinstance(quantity, dict) else quantity)
             if action['id'] != 'retired-parent' and held.get(line, 0) + want > float(lines[line]['quantity']):
                 problems.append(f'V2/{sid}: {action["id"]} over-reserves {line}')
 
@@ -177,7 +180,7 @@ need = {'contender-reported-equals-recorded', 'contender-conflict-is-stale-revis
 VOCABULARY_OUTCOMES = [o['outcome'] for o in load('contracts/domain-vocabulary.json')['outcomes']]
 need |= {'contender-outcome-not-' + o.lower().replace('_', '-') for o in VOCABULARY_OUTCOMES if o not in ('APPLIED', 'CONFLICT')}
 probe = next(a for a in sub['actions'] if a['id'] == 'retired-parent')
-if probe['request']['slots'].get('orderLineId') != {'$alias': 'ORDER3'}:
+if probe['request']['slots'].get('salesLineId', probe['request']['slots'].get('orderLineId')) != {'$alias': 'ORDER3'}:
     problems.append('V2/reserve-commits-first: retired-parent probe must target ORDER3 (outstanding 10), not a fully covered line')
 missing = need - {x['id'] for x in sub['assertions']}
 if missing:

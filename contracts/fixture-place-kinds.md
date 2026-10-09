@@ -204,15 +204,16 @@ Place.kind TRANSIT('Transit place required'), 그 장소의 PLACE 인가
 (FORBIDDEN)를 차례로 본다. round 9가 pick을 채우자 T05·C3·V7·V3·T24·T04·T13의
 적용·실행 시점 기대가 이 검사에서 막혔고, C2·T09·T11·T16·T26의 출고도
 장소를 지명하지 않았다(Step 2 closure review 7, P1). 기계 규칙은 [fixture-place-kinds.json](fixture-place-kinds.json)의
-`dispatchTransit`(1.4.0)이고 `ContractValidator.dispatchTransitProblems`가
+`dispatchTransit`(1.5.0)이고 `ContractValidator.dispatchTransitProblems`가
 강제한다.
 
 - 배분을 지명한 모든 출고(`slots.allocationId` 또는 요청 최상위
-  `allocationId`)는 같은 객체에 `cargoPlaceId`로 fixture TRANSIT 장소를
-  지명한다. corpus slot은 C4·E1·E2·T17·T18이 쓰던 `cargoPlaceId`이고 Step 3
-  adapter가 제품 slot `transitPlaceId`로 옮긴다. adapter는 장소를 고르지
-  않는다. 반례도 양성 출고의 잘 갖춘 사본이어서 장소 누락이 거부 이유가
-  되지 않는다.
+  `allocationId`)는 같은 객체에 `transitPlaceId`로 fixture TRANSIT 장소를
+  지명한다. round 12까지 corpus slot은 C4·E1·E2·T17·T18이 쓰던
+  `cargoPlaceId`였고 adapter가 옮기기로 했다. round 12 이후 기본 adapter는
+  요청을 다시 쓰지 않으므로 round 13에서 case가 제품 slot을 직접 쓴다
+  (`contracts/request-contracts.json` commandSlots renames). 반례도 양성
+  출고의 잘 갖춘 사본이어서 장소 누락이 거부 이유가 되지 않는다.
 - FORBIDDEN으로 고정한 반례가 아니면, 출고 actor와 fixture actor인 위임자의
   grant가 장소를 나열할 때 그 TRANSIT 장소를 담는다.
 - TRANSIT 장소가 없던 fixture에는 `TRANSIT`(이름 '출고 운송 구간')을 더하고

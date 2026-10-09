@@ -144,7 +144,14 @@
                   },
                   "childIndex": 0
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "Q100"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-split-merge-split",
@@ -156,7 +163,10 @@
             "provenance": {
               "children": "USER",
               "loss": "USER",
-              "allocationTransfer": "USER"
+              "allocationTransfer": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -275,7 +285,11 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "compatibleControlRequired": true
+              "compatibleControlRequired": true,
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -291,7 +305,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "compatibleControlRequired": "USER"
+              "compatibleControlRequired": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1873,7 +1889,11 @@
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-pallet-two-lots-cross-lot-merge",
@@ -1883,7 +1903,9 @@
               }
             ],
             "provenance": {
-              "quantity": "USER"
+              "quantity": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2611,6 +2633,13 @@
               "loss": {
                 "value": "0",
                 "unit": "BOX"
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "Q100"
               }
             },
             "expectedRevision": 1,
@@ -2622,7 +2651,10 @@
             ],
             "provenance": {
               "children": "USER",
-              "loss": "USER"
+              "loss": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2750,6 +2782,16 @@
                 "targetId": {
                   "$alias": "Q100"
                 }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$result": {
+                  "actionId": "legitimate-split",
+                  "pointer": "/response/children/0/segmentId"
+                }
               }
             },
             "expectedRevision": {
@@ -2766,7 +2808,10 @@
             ],
             "provenance": {
               "children": "USER",
-              "candidateGenealogyEdge": "USER"
+              "candidateGenealogyEdge": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3413,6 +3458,13 @@
               "loss": {
                 "value": "0",
                 "unit": "BOX"
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "Q100"
               }
             },
             "expectedRevision": 1,
@@ -3424,7 +3476,10 @@
             ],
             "provenance": {
               "children": "USER",
-              "loss": "USER"
+              "loss": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3532,7 +3587,14 @@
                   "value": "100",
                   "unit": "BOX"
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "Q100"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -3547,7 +3609,10 @@
               }
             ],
             "provenance": {
-              "children": "USER"
+              "children": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4159,7 +4224,11 @@
               "quantity": {
                 "value": "110",
                 "unit": "BOX"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-reject-mergeDifferentPlace-invalid",
@@ -4169,7 +4238,9 @@
               }
             ],
             "provenance": {
-              "quantity": "USER"
+              "quantity": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4781,7 +4852,11 @@
               "quantity": {
                 "value": "110",
                 "unit": "BOX"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-reject-mergeDifferentControl-invalid",
@@ -4791,7 +4866,9 @@
               }
             ],
             "provenance": {
-              "quantity": "USER"
+              "quantity": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5403,7 +5480,11 @@
               "quantity": {
                 "value": "110",
                 "unit": "BOX"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-reject-mergeIncompatibleUnit-invalid",
@@ -5413,7 +5494,9 @@
               }
             ],
             "provenance": {
-              "quantity": "USER"
+              "quantity": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6019,13 +6102,14 @@
               "affectedSourceId": {
                 "$alias": "X40"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "action": "SELL",
               "kind": "QC",
-              "identificationPolicy": "whole-indistinguishable-mixture"
+              "identificationPolicy": "whole-indistinguishable-mixture",
+              "segmentId": {
+                "$alias": "M100"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-indistinguishable-mixture-hold",
@@ -6037,9 +6121,11 @@
             "provenance": {
               "affectedSourceId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "action": "USER",
               "kind": "USER",
-              "identificationPolicy": "USER"
+              "identificationPolicy": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [

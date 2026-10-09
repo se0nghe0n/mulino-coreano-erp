@@ -115,8 +115,9 @@ class Conformance(unittest.TestCase):
         C.conform_action(action, 'X01', 's', RC.World(ROOT, None))
         body = action['request']
         self.assertNotIn('scope', body)
-        self.assertEqual({'quantity': 'USER', 'dueAt': 'CONTEXT', 'orderLineId': 'CONTEXT', 'digits': 'USER', 'segmentId': 'CONTEXT', 'reason': 'USER'}, body['provenance'])
-        self.assertEqual({'value': '20', 'unit': 'BOX'}, body['slots']['quantity'])
+        # step2r round 13: the reserve line is the declared salesLineId, the quantity a decimal string beside its unit slot.
+        self.assertEqual({'quantity': 'USER', 'unit': 'USER', 'dueAt': 'CONTEXT', 'salesLineId': 'CONTEXT', 'digits': 'USER', 'segmentId': 'CONTEXT', 'reason': 'USER'}, body['provenance'])
+        self.assertEqual(('20', 'BOX'), (body['slots']['quantity'], body['slots']['unit']))
         self.assertEqual('0', body['slots']['digits'])
         self.assertNotIn('missing', body['slots'])
         self.assertEqual([], body['subjectRefs'])
@@ -125,6 +126,36 @@ class Conformance(unittest.TestCase):
         again = copy.deepcopy(action)
         C.conform_action(again, 'X01', 's', RC.World(ROOT, None))
         self.assertEqual(action, again, 'conformance is idempotent')
+
+    def test_declared_only_cases_send_the_capability_slots(self):
+        shared = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'moveQuantity',
+                  'subjectRefs': [{'type': 'QuantitySegment', 'id': A('A20')}], 'evidenceRefs': [A('DOC')],
+                  'slots': {'quantity': {'value': '20', 'unit': 'BOX'}, 'destinationId': A('W2'), 'orderLineId': A('LINE'),
+                            'sourceSegmentId': A('A20'), 'reason': 'r'}, 'expectedRevision': 1, 'commandIdempotencyKey': 'k'}
+        sub = {'id': 's', 'actions': [invoke(shared)], 'assertions': []}
+        C.conform_case({'caseId': 'C3', 'subcases': [sub]})
+        body = sub['actions'][0]['request']
+        self.assertEqual({'segmentId': A('A20'), 'destinationId': A('W2'), 'evidenceRef': A('DOC')}, body['slots'])
+        self.assertEqual({'segmentId': 'CONTEXT', 'destinationId': 'CONTEXT', 'evidenceRef': 'CONTEXT'}, body['provenance'])
+        stray = copy.deepcopy(sub)
+        stray['actions'][0]['request']['slots']['reason'] = 'r'
+        stray['actions'][0]['request']['provenance']['reason'] = 'USER'
+        problems, known = C.case_problems({'caseId': 'C3', 'subcases': [stray]})
+        self.assertTrue(any('moveQuantity declares no slot reason' in p for p in problems), problems)
+        self.assertTrue(any('requires occurredAt' in k and 'S2-SLOT-REQUIRED' in k for k in known), known)
+        problems, known = C.case_problems({'caseId': 'T99', 'subcases': [stray]})
+        self.assertEqual([], [p for p in problems if 'declares no slot' in p])
+        self.assertTrue(any('S2-SLOT-VOCABULARY' in k for k in known), known)
+
+    def test_wait_slots_form_the_wait_contract(self):
+        flat = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'waitWork', 'subjectRefs': [],
+                'slots': {'workId': A('W'), 'reason': 'r', 'targetId': A('PO'), 'resumePredicate': {'kind': 'x'}, 'verifierId': A('V'),
+                          'nextCheckAt': '2026-10-08T00:00:00Z', 'overdueAction': 'o'}, 'expectedRevision': 1, 'commandIdempotencyKey': 'k'}
+        sub = {'id': 's', 'actions': [invoke(flat, cap='waitWork')], 'assertions': []}
+        C.conform_case({'caseId': 'T99', 'subcases': [sub]})
+        slots = sub['actions'][0]['request']['slots']
+        self.assertEqual({'workId', 'wait'}, set(slots))
+        self.assertEqual({'reason', 'target', 'resumePredicate', 'verifier', 'nextCheckAt', 'overdueAction'}, set(slots['wait']))
 
     def test_foreign_organization_needs_a_decision(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -284,7 +315,7 @@ class RepositoryIsCurrent(unittest.TestCase):
         problems, lines, cases, _ = module.review(ROOT)
         self.assertEqual([], problems)
         self.assertEqual(41, cases)
-        self.assertTrue(all(line.startswith('KNOWN_OPEN PG-') for line in lines))
+        self.assertTrue(all(line.startswith(('KNOWN_OPEN PG-', 'KNOWN_OPEN S2-')) for line in lines))
 
 
 if __name__ == '__main__':

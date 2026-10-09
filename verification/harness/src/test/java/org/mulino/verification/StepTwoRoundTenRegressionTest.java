@@ -60,21 +60,21 @@ final class StepTwoRoundTenRegressionTest {
     @Test void dispatchNamesATransitPlaceInsideTheDispatchersPlaceScope() throws Exception {
         Rule rule=ContractValidator::dispatchTransitProblems;clean(rule);
         // The closure review 7 shapes: T05 and T13 dispatch with no transit place, C3 with a fixture that has none.
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T05",T05,s->slots(s,"dispatch").remove("cargoPlaceId"),NONE));
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T13",T13,s->slots(s,"dispatch-sale").remove("cargoPlaceId"),NONE));
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"C3","api-dispatchQuantity",s->slots(s,"authorized-same-input").remove("cargoPlaceId"),NONE));
+        rejects("names an allocation but no TRANSIT place in transitPlaceId",run(rule,"T05",T05,s->slots(s,"dispatch").remove("transitPlaceId"),NONE));
+        rejects("names an allocation but no TRANSIT place in transitPlaceId",run(rule,"T13",T13,s->slots(s,"dispatch-sale").remove("transitPlaceId"),NONE));
+        rejects("names an allocation but no TRANSIT place in transitPlaceId",run(rule,"C3","api-dispatchQuantity",s->slots(s,"authorized-same-input").remove("transitPlaceId"),NONE));
         // T24 and T26 carried the allocation on the request itself; since step2r round 12 every business value is a slot.
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T24","audit-rollback-and-retry",s->slots(s,"retry").remove("cargoPlaceId"),NONE));
-        rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T26","lot-expiry-no-event",s->slots(s,"dispatch").remove("cargoPlaceId"),NONE));
+        rejects("names an allocation but no TRANSIT place in transitPlaceId",run(rule,"T24","audit-rollback-and-retry",s->slots(s,"retry").remove("transitPlaceId"),NONE));
+        rejects("names an allocation but no TRANSIT place in transitPlaceId",run(rule,"T26","lot-expiry-no-event",s->slots(s,"dispatch").remove("transitPlaceId"),NONE));
         // An internal storage place, or a TRANSIT place outside the dispatcher's (or its delegator's) place scope, is refused.
-        rejects("is not a fixture Place of kind TRANSIT",run(rule,"T05",T05,s->slots(s,"dispatch").set("cargoPlaceId",alias("W2")),NONE));
+        rejects("is not a fixture Place of kind TRANSIT",run(rule,"T05",T05,s->slots(s,"dispatch").set("transitPlaceId",alias("W2")),NONE));
         rejects("without the transit place TRANSIT",run(rule,"T05",T05,NONE,f->placesWithout(f,"ordinary","TRANSIT")));
         rejects("the grant of delegator lists places",run(rule,"C3","api-dispatchQuantity",NONE,f->placesWithout(f,"delegator","TRANSIT")));
         // A negative pinned FORBIDDEN is decided before the PLACE authorization: the reader of C3 needs no transit scope.
         assertEquals(List.of(),run(rule,"C3","api-dispatchQuantity",NONE,f->placesWithout(f,"reader","TRANSIT")));
-        // Every positive and negative dispatch of the corpus names the place now; the contract slot is the corpus slot.
+        // Every positive and negative dispatch of the corpus names the place; since step2r round 13 the case writes the product slot.
         JsonNode contract=Json.read(root.resolve("contracts/fixture-place-kinds.json")).path("dispatchTransit");
-        assertEquals("cargoPlaceId",contract.path("slot").asText());assertEquals("transitPlaceId",contract.path("productSlot").asText());assertEquals("1.4.0",Json.read(root.resolve("contracts/fixture-place-kinds.json")).path("version").asText());
+        assertEquals("transitPlaceId",contract.path("slot").asText());assertEquals("transitPlaceId",contract.path("productSlot").asText());assertEquals("1.5.0",Json.read(root.resolve("contracts/fixture-place-kinds.json")).path("version").asText());
     }
 
     // P2: dispatch occurrence is at or after its authorized pick on the product clock; deliveries follow their dispatch.

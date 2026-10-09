@@ -60,7 +60,11 @@
                   "quantity": "70",
                   "unit": "BOX"
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-split",
@@ -71,7 +75,9 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER"
+              "children": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -233,10 +239,8 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
+              "quantity": "30",
+              "unit": "BOX",
               "decision": "ALLOW",
               "decisionVersion": "agency-v1",
               "evidence": "agency-decision"
@@ -254,6 +258,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -353,10 +358,8 @@
                   }
                 }
               ],
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "basisKind": "QC",
               "action": "SELL",
               "decision": "PASS",
@@ -372,6 +375,7 @@
             "provenance": {
               "segmentIds": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "basisKind": "USER",
               "action": "USER",
               "decision": "USER",
@@ -862,7 +866,11 @@
                   "quantity": "70",
                   "unit": "BOX"
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-split-life",
@@ -873,7 +881,9 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER"
+              "children": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1317,10 +1327,8 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
+              "quantity": "30",
+              "unit": "BOX",
               "decision": "ALLOW",
               "decisionVersion": "partial-v1",
               "evidence": "agency-decision"
@@ -1344,6 +1352,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -1391,10 +1400,8 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "70",
-                "unit": "BOX"
-              },
+              "quantity": "70",
+              "unit": "BOX",
               "decision": "SUPPLEMENT_REQUIRED",
               "decisionVersion": "supplement-v1",
               "evidence": "agency-decision"
@@ -1418,6 +1425,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -1465,10 +1473,8 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "70",
-                "unit": "BOX"
-              },
+              "quantity": "70",
+              "unit": "BOX",
               "decision": "REJECTED",
               "decisionVersion": "reject-v1",
               "evidence": "agency-decision"
@@ -1492,6 +1498,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"

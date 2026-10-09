@@ -1721,13 +1721,19 @@
                 "value": "20",
                 "unit": "BOX"
               },
-              "faultPoint": "AUDIT"
+              "faultPoint": "AUDIT",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-audit",
             "provenance": {
               "quantity": "USER",
-              "faultPoint": "USER"
+              "faultPoint": "USER",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1757,13 +1763,19 @@
                 "value": "20",
                 "unit": "BOX"
               },
-              "faultPoint": "OUTBOX"
+              "faultPoint": "OUTBOX",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-outbox",
             "provenance": {
               "quantity": "USER",
-              "faultPoint": "USER"
+              "faultPoint": "USER",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1793,13 +1805,19 @@
                 "value": "20",
                 "unit": "BOX"
               },
-              "faultPoint": "IDEMPOTENCY"
+              "faultPoint": "IDEMPOTENCY",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V8-transaction-rollback-all-effects-split-idempotency",
             "provenance": {
               "quantity": "USER",
-              "faultPoint": "USER"
+              "faultPoint": "USER",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2486,19 +2504,22 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "40",
-                  "unit": "BOX"
-                },
-                "orderLineId": {
+                "quantity": "40",
+                "unit": "BOX",
+                "salesLineId": {
                   "$alias": "SO-LINE"
+                },
+                "segmentId": {
+                  "$alias": "A60"
                 }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-real-lock-two-transactions-reserve40",
               "provenance": {
                 "quantity": "USER",
-                "orderLineId": "CONTEXT"
+                "unit": "USER",
+                "salesLineId": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -2563,19 +2584,22 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "30",
-                  "unit": "BOX"
-                },
-                "orderLineId": {
+                "quantity": "30",
+                "unit": "BOX",
+                "salesLineId": {
                   "$alias": "SO-LINE"
+                },
+                "segmentId": {
+                  "$alias": "A60"
                 }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-real-lock-two-transactions-reserve30",
               "provenance": {
                 "quantity": "USER",
-                "orderLineId": "CONTEXT"
+                "unit": "USER",
+                "salesLineId": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -10532,13 +10556,19 @@
                 "value": "20",
                 "unit": "BOX"
               },
-              "faultPoint": "AUDIT"
+              "faultPoint": "AUDIT",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-audit",
             "provenance": {
               "quantity": "USER",
-              "faultPoint": "USER"
+              "faultPoint": "USER",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10568,13 +10598,19 @@
                 "value": "20",
                 "unit": "BOX"
               },
-              "faultPoint": "OUTBOX"
+              "faultPoint": "OUTBOX",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-outbox",
             "provenance": {
               "quantity": "USER",
-              "faultPoint": "USER"
+              "faultPoint": "USER",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10604,13 +10640,19 @@
                 "value": "20",
                 "unit": "BOX"
               },
-              "faultPoint": "IDEMPOTENCY"
+              "faultPoint": "IDEMPOTENCY",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-split-idempotency",
             "provenance": {
               "quantity": "USER",
-              "faultPoint": "USER"
+              "faultPoint": "USER",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10743,19 +10785,22 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "40",
-                  "unit": "BOX"
-                },
-                "orderLineId": {
+                "quantity": "40",
+                "unit": "BOX",
+                "salesLineId": {
                   "$alias": "SO-LINE"
+                },
+                "segmentId": {
+                  "$alias": "A60"
                 }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-reserve40",
               "provenance": {
                 "quantity": "USER",
-                "orderLineId": "CONTEXT"
+                "unit": "USER",
+                "salesLineId": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -10820,19 +10865,22 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "30",
-                  "unit": "BOX"
-                },
-                "orderLineId": {
+                "quantity": "30",
+                "unit": "BOX",
+                "salesLineId": {
                   "$alias": "SO-LINE"
+                },
+                "segmentId": {
+                  "$alias": "A60"
                 }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V8-upgrade-revalidate-transactions-reserve30",
               "provenance": {
                 "quantity": "USER",
-                "orderLineId": "CONTEXT"
+                "unit": "USER",
+                "salesLineId": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {

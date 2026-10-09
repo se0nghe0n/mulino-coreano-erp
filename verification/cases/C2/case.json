@@ -275,10 +275,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "customerId": {
                 "$alias": "CUSTOMER"
               },
@@ -286,7 +284,10 @@
                 "$alias": "CUSTOMER"
               },
               "dueAt": "2026-10-06T09:00:00Z",
-              "endpoint": "CUSTOMER_ACCEPTED"
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C2-cumulative-versus-state-sale60",
@@ -297,10 +298,12 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "customerId": "CONTEXT",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
-              "endpoint": "USER"
+              "deliveryEndpoint": "USER",
+              "itemId": "CONTEXT"
             }
           }
         },
@@ -326,10 +329,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "segmentId": {
                 "$result": {
                   "actionId": "receive60",
@@ -352,6 +353,7 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "segmentId": "CONTEXT",
               "orderId": "CONTEXT"
             }
@@ -462,8 +464,11 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "DOC"
               }
             },
             "expectedRevision": {
@@ -483,7 +488,8 @@
               "quantity": "USER",
               "occurredAt": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT"
             }
           }
         },

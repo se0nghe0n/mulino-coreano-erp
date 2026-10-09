@@ -6191,19 +6191,21 @@
               "workId": {
                 "$alias": "SOURCE"
               },
-              "reason": "수령 근거 대기",
-              "targetId": {
-                "$alias": "Q"
-              },
-              "resumePredicate": {
-                "operator": "exists",
-                "verifiedOccurrenceKind": "CONFIRMED_RECEIPT"
-              },
-              "verifierId": {
-                "$alias": "A"
-              },
-              "nextCheckAt": "2026-10-07T01:00:00Z",
-              "overdueAction": "ESCALATE_SUPERVISOR"
+              "wait": {
+                "reason": "수령 근거 대기",
+                "target": {
+                  "$alias": "Q"
+                },
+                "resumePredicate": {
+                  "operator": "exists",
+                  "verifiedOccurrenceKind": "CONFIRMED_RECEIPT"
+                },
+                "verifier": {
+                  "$alias": "A"
+                },
+                "nextCheckAt": "2026-10-07T01:00:00Z",
+                "overdueAction": "ESCALATE_SUPERVISOR"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-wait-timeout-wait",
@@ -6214,12 +6216,7 @@
             ],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           }
         },
@@ -8061,19 +8058,21 @@
               "workId": {
                 "$alias": "SOURCE"
               },
-              "reason": "근거 대기",
-              "targetId": {
-                "$alias": "Q"
-              },
-              "resumePredicate": {
-                "operator": "exists",
-                "verifiedOccurrenceKind": "CONFIRMED_RECEIPT"
-              },
-              "verifierId": {
-                "$alias": "A"
-              },
-              "nextCheckAt": "2026-10-08T09:00:00Z",
-              "overdueAction": "ESCALATE_SUPERVISOR"
+              "wait": {
+                "reason": "근거 대기",
+                "target": {
+                  "$alias": "Q"
+                },
+                "resumePredicate": {
+                  "operator": "exists",
+                  "verifiedOccurrenceKind": "CONFIRMED_RECEIPT"
+                },
+                "verifier": {
+                  "$alias": "A"
+                },
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "overdueAction": "ESCALATE_SUPERVISOR"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-stale-revision-wait",
@@ -8084,12 +8083,7 @@
             ],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           }
         },
@@ -8635,17 +8629,18 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "customerId": {
                 "$alias": "CUSTOMER"
               },
               "dueAt": "2026-10-07T02:00:00Z",
-              "endpoint": "CUSTOMER_ACCEPTED",
               "workId": {
                 "$alias": "SOURCE"
+              },
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -8657,10 +8652,12 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "customerId": "CONTEXT",
               "dueAt": "USER",
-              "endpoint": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "deliveryEndpoint": "USER",
+              "itemId": "CONTEXT"
             }
           }
         },
@@ -8695,10 +8692,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              }
+              "quantity": "100",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-cancel-after-shipment-reserve",
@@ -8710,7 +8705,8 @@
             "provenance": {
               "segmentId": "CONTEXT",
               "orderId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },
@@ -8796,8 +8792,11 @@
                 "$alias": "CUSTOMER"
               },
               "occurredAt": "2026-10-07T02:00:00Z",
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "DOC"
               }
             },
             "expectedRevision": {
@@ -8817,7 +8816,8 @@
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "occurredAt": "USER",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT"
             }
           }
         },

@@ -21,6 +21,12 @@ grants were all-of:
   unit, cardinality, supported effect, then applicable policy; section 3.4 lists TYPE_INVALID for such an
   envelope. The product's TYPE_INVALID before authorization follows that order, so the code oracle becomes
   TYPE_INVALID; the zero-effect, no-foreign-data and REJECTED oracles stay.
+- C3 fixtures (item 4 of the round): transaction aliases the installer cannot install (no installer type) and that
+  no C3 or V4 action, assertion or other fixture fact names are removed with their prior facts (PO2, PO-LINE,
+  PO2-LINE, INBOX). The used ones that stated no fact receive the relational facts their neighbours already
+  imply (DISPATCH of ALLOCATION/A20, CARGO of SHIPMENT, HOLD on A20, EXTERNAL-OP of PROPOSAL, OCCURRENCE of the
+  receipt event, LEASE of WORK) so a Step 3 installer type has its inputs; installing them remains a Step 3
+  finding.
 Idempotent: a second run changes nothing (verification/requirements/test_case_generators_reproduce.py).
 Run: python3 -I docs/execution/step2r-round13/author_round13.py [--check]
 """
@@ -87,11 +93,70 @@ def edit_t08(changed, check):
             path.write_text(new)
 
 
+# Installer alias types (ScenarioFixtureInstaller.SUPPORTED_TYPES); other C3 aliases are transaction state the
+# installer cannot write yet.
+INSTALLABLE = {'Organization', 'Human', 'Agent', 'TradeItem', 'Product', 'Manufacturer', 'ManufacturerLot', 'ManufacturingLot',
+               'Place', 'Customer', 'Supplier', 'QuantitySegment', 'Work', 'DocumentVersion', 'DefinitionVersion',
+               'PolicyVersion', 'SalesOrder', 'SalesOrderLine', 'Allocation'}
+C3_FACTS = {
+    'DISPATCH': {'revision': 1, 'state': 'DISPATCHED', 'allocationAlias': 'ALLOCATION', 'segmentAlias': 'A20', 'quantity': '20', 'unit': 'BOX'},
+    'CARGO': {'revision': 1, 'shipmentAlias': 'SHIPMENT', 'itemAlias': 'P', 'quantity': '20', 'unit': 'BOX'},
+    'HOLD': {'revision': 1, 'status': 'ACTIVE', 'scopeSegmentAlias': 'A20', 'action': 'SELL', 'category': 'QC', 'decisionOwnerAlias': 'qc'},
+    'EXTERNAL-OP': {'revision': 1, 'state': 'PENDING', 'operation': 'dispatchPurchaseOrder', 'proposalAlias': 'PROPOSAL'},
+    'OCCURRENCE': {'revision': 1, 'kind': 'PHYSICAL_RECEIPT', 'itemAlias': 'P', 'lotAlias': 'L', 'placeAlias': 'W', 'quantity': '20', 'unit': 'BOX'},
+    'LEASE': {'revision': 1, 'state': 'ACTIVE', 'workAlias': 'WORK', 'holderAlias': 'reader'},
+}
+
+
+def strings(node):
+    if isinstance(node, dict):
+        for value in node.values():
+            yield from strings(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from strings(value)
+    elif isinstance(node, str):
+        yield node
+
+
+def case_aliases():
+    names = set()
+    for case in ('C3', 'V4'):
+        names |= R12.RC.aliases_in(json.loads((ROOT / f'verification/cases/{case}/case.json').read_text()))
+    return names
+
+
+def edit_c3_aliases(changed, check):
+    used_by_cases = case_aliases()
+    for path in sorted((ROOT / 'verification/cases/C3').glob('fixture*.json')):
+        data, fmt, text = R12.load(path)
+        aliases, prior = data.get('aliases') or {}, (data.get('baseline') or {}).get('priorEntities') or {}
+        inside = set()
+        for key, value in data.items():
+            if key != 'aliases':
+                for s in strings(value if key != 'baseline' else {k: v for k, v in value.items() if k != 'priorEntities'}):
+                    inside.add(s)
+        for name, facts in prior.items():
+            inside |= {s for s in strings(facts)}
+        for name in [n for n, a in aliases.items() if a.get('type') not in INSTALLABLE and n not in used_by_cases and n not in inside]:
+            aliases.pop(name)
+            prior.pop(name, None)
+        for name, facts in C3_FACTS.items():
+            if name in aliases and name not in prior:
+                prior[name] = dict(facts)
+        new = R12.render(data, fmt)
+        if new != text:
+            changed.append(str(path.relative_to(ROOT)))
+            if not check:
+                path.write_text(new)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
     edit_fixtures(changed, check)
     edit_t08(changed, check)
+    edit_c3_aliases(changed, check)
     if check and changed:
         sys.exit('round 13 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 13: {len(changed)} file(s) changed')

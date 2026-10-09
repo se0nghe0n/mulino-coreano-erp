@@ -138,9 +138,13 @@
                 "destinationId": {
                   "$alias": "CUSTOMER"
                 },
-                "cargoPlaceId": {
+                "transitPlaceId": {
                   "$alias": "TRANSIT"
-                }
+                },
+                "evidenceRef": {
+                  "$alias": "operation-proof"
+                },
+                "occurredAt": "2026-10-07T09:00:00Z"
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V3-hold-first-contender-call",
@@ -153,7 +157,9 @@
                 "allocationId": "CONTEXT",
                 "quantity": "USER",
                 "destinationId": "CONTEXT",
-                "cargoPlaceId": "CONTEXT"
+                "transitPlaceId": "CONTEXT",
+                "evidenceRef": "CONTEXT",
+                "occurredAt": "CONTEXT"
               }
             },
             "harness": {
@@ -219,12 +225,13 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "20",
-                  "unit": "BOX"
-                },
+                "quantity": "20",
+                "unit": "BOX",
                 "kind": "QC",
-                "action": "SELL"
+                "action": "SELL",
+                "segmentId": {
+                  "$alias": "A20"
+                }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V3-hold-first-winner",
@@ -235,8 +242,10 @@
               ],
               "provenance": {
                 "quantity": "USER",
+                "unit": "USER",
                 "kind": "USER",
-                "action": "USER"
+                "action": "USER",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -1722,12 +1731,13 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "20",
-                  "unit": "BOX"
-                },
+                "quantity": "20",
+                "unit": "BOX",
                 "kind": "QC",
-                "action": "SELL"
+                "action": "SELL",
+                "segmentId": {
+                  "$alias": "A20"
+                }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V3-dispatch-first-contender-call",
@@ -1738,8 +1748,10 @@
               ],
               "provenance": {
                 "quantity": "USER",
+                "unit": "USER",
                 "kind": "USER",
-                "action": "USER"
+                "action": "USER",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -1815,9 +1827,13 @@
                 "destinationId": {
                   "$alias": "CUSTOMER"
                 },
-                "cargoPlaceId": {
+                "transitPlaceId": {
                   "$alias": "TRANSIT"
-                }
+                },
+                "evidenceRef": {
+                  "$alias": "operation-proof"
+                },
+                "occurredAt": "2026-10-07T09:00:00Z"
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V3-dispatch-first-winner",
@@ -1830,7 +1846,9 @@
                 "quantity": "USER",
                 "allocationId": "CONTEXT",
                 "destinationId": "CONTEXT",
-                "cargoPlaceId": "CONTEXT"
+                "transitPlaceId": "CONTEXT",
+                "evidenceRef": "CONTEXT",
+                "occurredAt": "CONTEXT"
               }
             },
             "harness": {
@@ -2107,12 +2125,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantity": "20",
+              "unit": "BOX",
               "kind": "QC",
-              "action": "SELL"
+              "action": "SELL",
+              "segmentId": {
+                "$alias": "A20"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -2128,8 +2147,10 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "kind": "USER",
-              "action": "USER"
+              "action": "USER",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3332,10 +3353,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantity": "20",
+              "unit": "BOX",
               "kind": "QC",
               "action": "SELL",
               "sourceNamespace": "synthetic-qc",
@@ -3343,6 +3362,9 @@
               "sourceVersion": "2",
               "supersedesRestrictionId": {
                 "$alias": "OLD_HOLD"
+              },
+              "segmentId": {
+                "$alias": "A20"
               }
             },
             "expectedRevision": 1,
@@ -3354,12 +3376,14 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "kind": "USER",
               "action": "USER",
               "sourceNamespace": "USER",
               "externalEventId": "USER",
               "sourceVersion": "USER",
-              "supersedesRestrictionId": "CONTEXT"
+              "supersedesRestrictionId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3470,10 +3494,8 @@
               "externalEventId": "QC-A20-RELEASE",
               "sourceVersion": "1",
               "occurredAt": "2026-10-07T08:00:00Z",
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              }
+              "quantity": "20",
+              "unit": "BOX"
             },
             "expectedRevision": {
               "$result": {
@@ -3494,7 +3516,8 @@
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "occurredAt": "USER",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           },
           "evidenceRefs": [
@@ -3639,9 +3662,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "operation-proof"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -3659,7 +3686,9 @@
               "quantity": "USER",
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [

@@ -93,7 +93,7 @@ public class AuthorityPrerequisiteAssertionsTest {
                 assertTrue(index(sub,previous)<index(sub,next),previous+" must precede "+next);previous=next;
             }
             assertEquals("admin",action(sub,"precondition-approval").path("actorRef").asText());assertEquals("admin",action(sub,"authorized-same-input").path("actorRef").asText());
-            assertEquals("DISPOSED",action(sub,"precondition-disposal").at("/request/slots/outcome").asText());
+            assertEquals("DISPOSED",action(sub,"precondition-disposal").at("/request/slots/kind").asText());  // round 13: the recordRecovery slot kind (RecallCommands.java:26)
             assertEquals("precondition-disposal",action(sub,"attempt").at("/request/slots/partitionHash/$result/actionId").asText());
             assertFalse(action(sub,"attempt").at("/request/slots").has("decision"),"closeRecall must not reuse approveRecall's payload");
         }

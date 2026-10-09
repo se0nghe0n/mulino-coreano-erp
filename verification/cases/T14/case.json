@@ -70,7 +70,11 @@
                   "quantity": "30",
                   "unit": "BOX"
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-split",
@@ -81,7 +85,9 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER"
+              "children": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1727,10 +1733,8 @@
                 "$alias": "Q100"
               },
               "eventKind": "SHIPPED_CLAIM",
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "IT-origin"
               },
@@ -1748,6 +1752,7 @@
               "segmentId": "CONTEXT",
               "eventKind": "USER",
               "quantity": "CONTEXT",
+              "unit": "CONTEXT",
               "placeId": "CONTEXT",
               "evidence": "USER"
             }
@@ -1790,7 +1795,11 @@
                   "unit": "BOX"
                 }
               ],
-              "reason": "부분 수령 전 수령 범위 분리"
+              "reason": "부분 수령 전 수령 범위 분리",
+              "evidenceRef": {
+                "$alias": "warehouse-receipt"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-split98",
@@ -1802,7 +1811,9 @@
             "provenance": {
               "segmentId": "CONTEXT",
               "children": "USER",
-              "reason": "USER"
+              "reason": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1906,10 +1917,8 @@
                 }
               },
               "eventKind": "IN_TRANSIT_CONFIRMED",
-              "quantity": {
-                "value": "2",
-                "unit": "BOX"
-              },
+              "quantity": "2",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "TRANSIT"
               },
@@ -1927,6 +1936,7 @@
               "segmentId": "CONTEXT",
               "eventKind": "USER",
               "quantity": "CONTEXT",
+              "unit": "CONTEXT",
               "placeId": "CONTEXT",
               "evidence": "USER"
             }
@@ -2722,10 +2732,8 @@
                 "$alias": "Q100"
               },
               "eventKind": "SHIPPED_CLAIM",
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "IT-origin"
               },
@@ -2743,6 +2751,7 @@
               "segmentId": "CONTEXT",
               "eventKind": "USER",
               "quantity": "CONTEXT",
+              "unit": "CONTEXT",
               "placeId": "CONTEXT",
               "evidence": "USER"
             }
@@ -2785,7 +2794,11 @@
                   "unit": "BOX"
                 }
               ],
-              "reason": "부분 수령 전 수령 범위 분리"
+              "reason": "부분 수령 전 수령 범위 분리",
+              "evidenceRef": {
+                "$alias": "warehouse-receipt"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-split98",
@@ -2797,7 +2810,9 @@
             "provenance": {
               "segmentId": "CONTEXT",
               "children": "USER",
-              "reason": "USER"
+              "reason": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [

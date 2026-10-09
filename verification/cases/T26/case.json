@@ -143,7 +143,6 @@
             ],
             "commandIdempotencyKey": "T26-due-wait-db-rediscovery-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -164,15 +163,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -237,30 +237,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -4211,7 +4208,6 @@
             ],
             "commandIdempotencyKey": "T26-operational-nine-categories-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -4232,15 +4228,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -4305,30 +4302,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -4351,18 +4345,18 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
-              "unit": "BOX"
+              "unit": "BOX",
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6209,7 +6203,8 @@
               },
               "quantity": "20",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-safe-retry-canonical-current-grant-original-basis"
+              "evidenceRef": "synthetic-T26-safe-retry-canonical-current-grant-original-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
@@ -6217,7 +6212,8 @@
               "destinationId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6908,7 +6904,8 @@
               },
               "quantity": "20",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-safe-retry-revoked-blocked-original-basis"
+              "evidenceRef": "synthetic-T26-safe-retry-revoked-blocked-original-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
@@ -6916,7 +6913,8 @@
               "destinationId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -7976,7 +7974,8 @@
               },
               "quantity": "20",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-safe-retry-forged-original-actor-original-basis"
+              "evidenceRef": "synthetic-T26-safe-retry-forged-original-actor-original-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
@@ -7984,7 +7983,8 @@
               "destinationId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -9046,7 +9046,8 @@
               },
               "quantity": "20",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-safe-retry-forged-request-hash-original-basis"
+              "evidenceRef": "synthetic-T26-safe-retry-forged-request-hash-original-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
@@ -9054,7 +9055,8 @@
               "destinationId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10673,7 +10675,6 @@
             ],
             "commandIdempotencyKey": "T26-lot-expiry-no-event-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -10694,15 +10695,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -10759,9 +10761,6 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
               "unit": "BOX",
               "workId": {
@@ -10769,15 +10768,18 @@
                   "actionId": "create",
                   "pointer": "/response/workId"
                 }
+              },
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
               }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -11241,15 +11243,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -14110,18 +14114,18 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
-              "unit": "BOX"
+              "unit": "BOX",
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -14319,15 +14323,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -15537,7 +15543,6 @@
             ],
             "commandIdempotencyKey": "T26-disposition-expiry-no-event-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -15558,15 +15563,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -15623,9 +15629,6 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
               "unit": "BOX",
               "workId": {
@@ -15633,15 +15636,18 @@
                   "actionId": "create",
                   "pointer": "/response/workId"
                 }
+              },
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
               }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -16105,15 +16111,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -18974,18 +18982,18 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
-              "unit": "BOX"
+              "unit": "BOX",
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -19183,15 +19191,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -20401,7 +20411,6 @@
             ],
             "commandIdempotencyKey": "T26-grant-expiry-no-event-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -20422,15 +20431,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -20487,9 +20497,6 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
               "unit": "BOX",
               "workId": {
@@ -20497,15 +20504,18 @@
                   "actionId": "create",
                   "pointer": "/response/workId"
                 }
+              },
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
               }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -20969,15 +20979,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -23838,18 +23850,18 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
-              "unit": "BOX"
+              "unit": "BOX",
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -24047,15 +24059,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -25265,7 +25279,6 @@
             ],
             "commandIdempotencyKey": "T26-policy-expiry-no-event-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -25286,15 +25299,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -25351,9 +25365,6 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
               "unit": "BOX",
               "workId": {
@@ -25361,15 +25372,18 @@
                   "actionId": "create",
                   "pointer": "/response/workId"
                 }
+              },
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
               }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -25833,15 +25847,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -28702,18 +28718,18 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
-              "unit": "BOX"
+              "unit": "BOX",
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -28911,15 +28927,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -30129,7 +30147,6 @@
             ],
             "commandIdempotencyKey": "T26-planned-transition-reindexes-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -30150,15 +30167,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -30223,30 +30241,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -30809,7 +30824,6 @@
             ],
             "commandIdempotencyKey": "T26-emergency-repair-dryrun-apply-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -30830,15 +30844,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -32559,7 +32574,6 @@
             ],
             "commandIdempotencyKey": "T26-restore-complete-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -32580,15 +32594,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -32653,30 +32668,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -32701,14 +32713,16 @@
               },
               "quantity": "8",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-restore-complete-split-basis"
+              "evidenceRef": "synthetic-T26-restore-complete-split-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -33915,7 +33929,6 @@
             ],
             "commandIdempotencyKey": "T26-restore-missing-blob-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -33936,15 +33949,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -34009,30 +34023,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -34057,14 +34068,16 @@
               },
               "quantity": "8",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-restore-missing-blob-split-basis"
+              "evidenceRef": "synthetic-T26-restore-missing-blob-split-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -35301,7 +35314,6 @@
             ],
             "commandIdempotencyKey": "T26-restore-missing-v1-evaluator-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -35322,15 +35334,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -35395,30 +35408,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -35443,14 +35453,16 @@
               },
               "quantity": "8",
               "unit": "BOX",
-              "evidenceRef": "synthetic-T26-restore-missing-v1-evaluator-split-basis"
+              "evidenceRef": "synthetic-T26-restore-missing-v1-evaluator-split-basis",
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "evidenceRef": "USER"
+              "evidenceRef": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -36667,7 +36679,6 @@
             ],
             "commandIdempotencyKey": "T26-due-wait-autonomous-loop-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -36688,15 +36699,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -36761,30 +36773,27 @@
                   "pointer": "/response/workId"
                 }
               },
-              "reason": "AWAITING_VERIFIED_EVIDENCE",
-              "targetId": {
-                "$alias": "Q20"
-              },
-              "resumePredicate": {
-                "kind": "evidenceAvailable",
-                "eventId": "EV-READY",
-                "expectedRevision": 1
-              },
-              "verifierId": {
-                "$alias": "owner"
-              },
-              "nextCheckAt": "2026-10-07T09:00:10Z",
-              "overdueAction": "ESCALATE_EXISTING_DUTY"
+              "wait": {
+                "reason": "AWAITING_VERIFIED_EVIDENCE",
+                "target": {
+                  "$alias": "Q20"
+                },
+                "resumePredicate": {
+                  "kind": "evidenceAvailable",
+                  "eventId": "EV-READY",
+                  "expectedRevision": 1
+                },
+                "verifier": {
+                  "$alias": "owner"
+                },
+                "nextCheckAt": "2026-10-07T09:00:10Z",
+                "overdueAction": "ESCALATE_EXISTING_DUTY"
+              }
             },
             "subjectRefs": [],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "targetId": "CONTEXT",
-              "resumePredicate": "USER",
-              "verifierId": "CONTEXT",
-              "nextCheckAt": "USER",
-              "overdueAction": "USER"
+              "wait": "USER"
             }
           },
           "evidenceRefs": [
@@ -38076,7 +38085,6 @@
             ],
             "commandIdempotencyKey": "T26-lot-expiry-autonomous-loop-create",
             "slots": {
-              "workKind": "check",
               "goal": {
                 "quantity": "20",
                 "unit": "BOX",
@@ -38097,15 +38105,16 @@
                 "$alias": "supervisor"
               },
               "nextAction": "조사·재인가·안전 재시도",
-              "nextCheckAt": "2026-10-07T09:01:00Z"
+              "nextCheckAt": "2026-10-07T09:01:00Z",
+              "workType": "check"
             },
             "provenance": {
-              "workKind": "USER",
               "goal": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -38162,9 +38171,6 @@
               "segmentId": {
                 "$alias": "Q20"
               },
-              "orderLineId": {
-                "$alias": "BASE_ORDER_LINE"
-              },
               "quantity": "20",
               "unit": "BOX",
               "workId": {
@@ -38172,15 +38178,18 @@
                   "actionId": "create",
                   "pointer": "/response/workId"
                 }
+              },
+              "salesLineId": {
+                "$alias": "BASE_ORDER_LINE"
               }
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -38673,15 +38682,17 @@
               "destinationId": {
                 "$alias": "C_PLACE"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "occurredAt": "2026-10-07T09:00:20Z"
             },
             "subjectRefs": [],
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
