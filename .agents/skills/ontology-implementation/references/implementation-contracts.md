@@ -38,7 +38,12 @@ numeric(38,12)다. 허용 정밀도를 넘으면 거부한다. 기준 단위 소
    관계 타입을 확인한다. 구매 초안에서 수령 단계의 LOT를 미리 강제하지
    않는다. 해석 초안의 conversationRequestId와 최종 effect key를 분리한다.
 2. 인증 문맥에서 organization/actor/delegator를 만든다. 조직 접근∩역할∩
-   현재 grant∩행동별 승인∩물량별 허용을 적용한다. payload·문서·role 이름·
+   현재 grant∩행동별 승인∩물량별 허용을 적용한다. 한 grant의 여러
+   scope 차원은 모두 일치해야 한다(all-of). 차원이 대상에 없으면
+   거부한다. 위임자도 같은 capability·대상에 현재 권한을 가진다
+   ([실행 전제](../../../../contracts/execution-preconditions.md),
+   [AGENTS.md](../../../../AGENTS.md)의 2026-10-09 결정).
+   payload·문서·role 이름·
    queue system user는 권한을 만들지 않는다. 승인 필요 행동만 지정
    MANAGER/QC/ADMIN/CONFIG_APPROVER 결정으로 연결한다.
 3. proposalRevision/canonical intent hash·승인 대상 revision을 검증한다.
@@ -90,11 +95,13 @@ V4 절을 따른다.
 요청은 [저장소 harness](../../ontology-scenario-testing/references/repository-harness.md)를 따른다.
 
 query/복구 관찰을 연결할 때 API revision의 `RESULT_REVISION`과 task
-terminal의 `RUNTIME_TASK_SNAPSHOT`을 구별한다. 전자는 원행 재계산,
+terminal의 `RUNTIME_TASK_SNAPSHOT`을 구별한다. 전자는 독립 원행 대조,
 후자는 task identity·await 결과·snapshot artifact bytes로 검증한다.
-실제 observer의 두 mode와 verifyCoverage host 출력은 Step 3 actual
-소유이며 아직 `NOT_RUN`이다. PREPARATION 제품 validator의 checkout
-대조를 실제 host 구현 완료로 보고하지 않는다.
+두 mode의 실행 근거는
+[S5b adapter](../../../../docs/execution/s5b-adapter/README.md)를 따른다.
+RESULT_REVISION의 원행 digest 대조는 projection 정확성을 증명하지
+않는다. RUNTIME_TASK_SNAPSHOT·verifyCoverage host의 미구현 범위를
+PREPARATION validator 성공으로 대신하지 않는다.
 
 **조회 두 진입점.** `getObject`·`searchObjects`·`getWork`·`searchWorks`·
 `getInventory`·`getObligations`·`traceLot`·`getEvidence`·`getAssessment`·
@@ -126,23 +133,44 @@ LogisticsUnit 안에 함께 둘 수 있지만 단일 LOT segment로 합치지 �
 QC/규제/고객 조건/처분 근거의 허용 scope 교집합이다. UNKNOWN은 confirmed
 eligible이 아니다. 장소·보관자 판정도 이 교집합에 포함한다.
 [fixture 장소 종류](../../../../contracts/fixture-place-kinds.md)의
-기계 원본은 같은 이름의 JSON이다. INTERNAL_STORAGE는 같은 조직의
-HUMAN/AGENT custodian이 확인돼야 내부 보관으로 판정한다.
-TRANSIT·CUSTOMER·SUPPLIER·EXTERNAL_PORT는 외부로 적격 확정0이다.
-제품의 그 밖 어휘 밖 kind(`EXTERNAL_*` 제외)는 UNKNOWN·적격0이며
-confirmed eligible에 넣지 않는다. 보유 사실은 보존하고 UNKNOWN을
-DENIED/확정0으로 바꾸지 않는다. fixture는 다섯 kind만 쓰며 명시
-`kindControl=UNRECOGNIZED_PLACE_KIND` 반례 외 미지 kind·누락 kind와
-내부 보관자 누락을 prepare가 거부한다. FixtureInstaller·native fixture와
-첫 수령 custodian slot의 남은 요청은 저장소 harness의 fixture 절을 따른다.
+기계 원본은 [fixture-place-kinds.json](../../../../contracts/fixture-place-kinds.json)이다.
+QualityEligibility의 보관 판단은 CONFIRMED(같은 조직 HUMAN/AGENT
+보관자의 INTERNAL_STORAGE), UNCONFIRMED(종류·내부 보관자 미확인),
+OUTSIDE(TRANSIT·CUSTOMER·SUPPLIER·EXTERNAL_PORT)를 구별한다.
+UNCONFIRMED는 UNKNOWN·적격0이고 OUTSIDE만 DENIED·확정0이다.
+어휘 밖 kind(`EXTERNAL_*` 제외)는 UNRECOGNIZED로 UNKNOWN·적격0과
+PLACE_KIND_UNRECOGNIZED를 남긴다. 보유 사실과 confirmed eligible을
+구별한다. fixture의 kind/보관자 선언과 수령 반례는 저장소 harness의
+fixture 절을 따른다.
+
+직접 confirmReceipt는 INTERNAL_STORAGE에 수령한다. 후속 예약·pick·
+출고·이동에 쓰는 실물은 receivingCustodianId를 명시하고, 같은 조직의
+내부 actor·현재 수령 권한·canonical occurrence의 검증 basis 원본이
+그 보관자를 확인해야 한다. 호출자나 evidenceRefs 증인에서 추론하지
+않는다. 운송 수령은 동일 item·LOT·단위·정확한 수량의 식별된 TRANSIT
+leaf 하나만 소비하고 INTERNAL_STORAGE로 받으며 owner/custodian을
+이어받는다. 일부 수령은 먼저 split하고 receivingCustodianId로
+덮어쓰지 않는다(위 계약의 directReceiptCustody·transitReceipt).
 
 신규 실행 배분은 적격 실물 이하이며 suspended 배분은
-실행 불가여도 기존 의무로 조회된다. QC/정정으로 줄어든 가능량은 과거
+실행 불가여도 기존 의무로 조회된다. reserve·replace의 구간은 같은
+segment의 EXECUTABLE·SUSPENDED 배분과 겹치지 않고 segment 및 판매
+line 잔여를 넘지 않는다. 좌표 없는 배분은 전체 segment와 겹친다.
+line 사용량에는 CONSUMED도 센다. fixture와 앞선 실행 배분 모두를
+해제·교체·출고 반영 뒤 대조한다
+([reserveCapacity](../../../../contracts/execution-preconditions.json)).
+QC/정정으로 줄어든 가능량은 과거
 예약 삭제가 아닌 부족 의무/대체 배분이다. replace는 원배분 비활성과
 대체배분 생성이 원자적이며 과거 예약 자동 부활이 없다.
 
-피킹/출고는 현재 적격성을 commit 경계에서 재검증한다. 출고는 배분을
-CONSUMED로 만들고 창고 물량을 운송 위치로 옮긴다. 현재 SELL 부적격은
+피킹/출고는 현재 적격성을 commit 경계에서 재검증한다. 출고는 같은
+배분의 pick 뒤에 실행하고 pick 응답 revision을 잇는다. 출고 발생은
+pickedAt보다 앞서거나 제품 시계보다 뒤일 수 없다. 출고는 PLACE grant
+scope 안의 TRANSIT 장소를 명시하고 배분을 CONSUMED로 만들어 그곳으로
+옮긴다. adapter가 pick·장소를 만들어 주지 않는다
+([dispatchTransit](../../../../contracts/fixture-place-kinds.json),
+[occurrence](../../../../contracts/execution-preconditions.json)).
+현재 SELL 부적격은
 이미 발생한 인도 사실을 지우는 조건이 아니다. 해당 사실은 아래 RECORD
 대조를 거치며 정상 목표 이행 인정 여부는 별도로 평가한다.
 
@@ -175,37 +203,36 @@ RECORD는 권한 있는 주체·원천·scope와 claim 원문을 접수한다. c
 
 ## S4 정산 복원·면제와 정정 영향 — D12/D19
 
-[S4 closure 3](../../../../docs/execution/s4k-closure/README.md)의
-`3addaefe` 구현 규칙을 보존한다. 수령/인도 기여를 복원해 Match가
-CURRENT이지만 SATISFIED가 아니고 열린 차이 root가 있으면 열린
-assignment를 다시 발행한다(`ResponsibilityService.reissueOpen`).
-owner·work·root는 유지하고 revision을 올리며 복원 nextAction·nextCheck와
-`CONTRIBUTION_RESTORED:<canonical>` basis를 기록한다. 같은 basis 재처리는
-revision을 다시 올리지 않는다. 정정 전 assignment revision에 묶인
-면제 결정은 실행 시 STALE_REVISION으로 거부하고, 현재 revision으로
-새 결정한 면제만 실행한다. 복원과 면제 실행 순서로 책임이 사라지면 안 된다.
+[S4l 수정](../../../../docs/execution/s4l-closure/README.md)과
+[final closure](../../../../docs/execution/s4-closure-final/README.md)를 따른다.
 
-열린 root가 없을 때 CURRENT 잔여를 이미 유효하게 면제한 root가 덮으면
-새 root/follow-up을 열지 않는다. Match 자신의 root는 불변
-`originalDifference`, CURRENT 복원 root는 scope residual의
-`settlementDifference`를 비교한다. 금액이 다르거나 확인할 수 없으면
-새 책임을 여는 기존 fail-closed 규칙을 따른다. 새 CHANGED 정정의 의무와
-이미 면제한 같은 잔여의 자동 부활을 구별한다.
+- 정정으로 인정 수령/인도 기여가 바뀌면 해당 Match의
+  SETTLEMENT_DIFFERENCE root에 인간 owner·nextAction·nextCheck를 남긴다.
+  CURRENT 복원 뒤에도 미충족이면 기존 OPEN assignment를
+  ResponsibilityService.reissueOpen으로 재발행한다. root·owner·work를
+  유지하고 revision·복원 basis를 갱신한다. 같은 basis 재처리는 revision을
+  다시 올리지 않는다. 같은 수량·단위 정정이고 열린 root가 모두 Match
+  자신의 root 또는 CURRENT 기여 root면 재발행하지 않는다.
+  복원 전 revision의 미실행 면제 결정은 STALE_REVISION이다.
+- relink된 정정 chain에 OPEN UNVERIFIED root가 있으면
+  CONTRIBUTION_RELINKED basis로 이어받고 중복 root를 열지 않는다.
+  명시 invalidatesId의 PHYSICAL_DELIVERY도 정산 책임을 남긴다.
+- CURRENT 기여의 면제 실행 시 서버가 WAIVED assignment basis 끝에
+  `[SETTLEMENT_COVERED CURRENT amt]`를 기록한다. 복원 잔여와 이 금액이
+  decimal로 같을 때만 같은 잔여의 자동 부활을 막는다. root 생성 당시
+  originalDifference나 scope 금액으로 대신하지 않는다. suffix 없음·
+  CHANGED/UNVERIFIED·금액 불일치는 새 책임을 여는 fail-closed다.
+- IMPORTED Work는 **무효화만 건너뛴다**. revision·pendingInvalidation은
+  불변이고 evidenceLinked의 무효화도 제외하지만 apply의 영향 집합과
+  정정 의무를 버리지 않는다. 가능한 상태에는 owner 있는 의무를 열고
+  CLOSED는 COMMAND follow-up에 연결한다. 의무를 둘 수 없는 상태의
+  NEEDS_INPUT/IMPORTED_WORK rollback은 final closure의 R5-3 backlog다.
 
-`AssessmentCorrectionImpact`의 `evidenceLinked`·`apply` 영향 집합은
-IMPORTED Work를 제외한다. 가져온 행은 revision·pendingInvalidation을
-바꾸지 않고 knownAt 조회에 보존한다. 직접 대상으로 정정해도 IMPORTED
-Work에 무효화 표시나 FOLLOWUP_REVIEW를 만들지 않는다. 해당 참조 업무의
-후속 책임 위치는 work/responsibility owner의 S5 backlog다.
-
-PHYSICAL_DELIVERY 증거의 명시 invalidatesId는 UNVERIFIED Match에 owner
-있는 SETTLEMENT_DIFFERENCE를 연다. 일반 supersession 뒤 relink하지 않은
-SALE 인도는 Match UNVERIFIED와 owner 있는 FOLLOWUP_REVIEW로 남으며,
-단일 정산 root를 잇는 계약은 settlement owner의 S5 backlog다.
-이 두 DEFERRED 항목을 구현 완료로 안내하지 않는다. closure 기록의
-backend 513 tests와 native S1–S4 PASS는 이전 한정 증거이며 coverage
-manifest PASS가 아니다. 결합 `./verify scenarios --actual` 인수는
-그 기록에서 NOT_RUN이고 이번 skill 변경으로 해소되지 않는다.
+CURRENT 이외 상태의 면제 coverage(R5-1), basis 500자 suffix 공간(R5-2),
+relink 없는 SALE supersession과 invalidatesId≠supersedesId 재도출은
+final closure backlog로 남긴다. ManagementCoverage도 all-of로 바꿔야
+한다([AGENTS.md](../../../../AGENTS.md)의 최신 결정). 한정 native/backend
+PASS를 전체 scenarios/coverage 인수로 바꾸지 않는다.
 
 ## 목표·의무·인계 — D09/D10/D11/D12/D26
 
