@@ -317,6 +317,15 @@
     "externalEffects": [
       "mulino_runtime_Outbox",
       "mulino_runtime_ExternalReconciliations"
+    ],
+    "transactions": [
+      "@transactions"
+    ],
+    "dbPrivileges": [
+      "@dbPrivileges"
+    ],
+    "conditionResults": [
+      "@conditionResults"
     ]
   },
   "approximate": [
@@ -329,7 +338,10 @@
     "activities",
     "retryAttempts",
     "definitionPackages",
-    "externalEffects"
+    "externalEffects",
+    "transactions",
+    "dbPrivileges",
+    "conditionResults"
   ],
   "approximateNote": "Sources whose table choice is still a guess (s5b review); an assertion failure on them is classified ADAPTER until the mapping is confirmed. confirmed lists the s5b review of the former s5a guesses.",
   "confirmed": {
@@ -366,5 +378,10 @@
     "mulino_inventory_SegmentAllocations": "status=state",
     "mulino_work_read_Works": "state=status",
     "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row"
+  },
+  "virtual": {
+    "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",
+    "@dbPrivileges": "information_schema.role_table_grants of mulino_* tables",
+    "@conditionResults": "elements of AssessmentReferences.conditionsJson"
   }
 }

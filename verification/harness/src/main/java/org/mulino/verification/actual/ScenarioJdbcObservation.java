@@ -83,6 +83,8 @@ final class ScenarioJdbcObservation {
                 for(JsonNode t:tables) {
                     String table=t.asText();String key=table;
                     ArrayNode tableRows=cache.get(key);
+                    if(table.startsWith("@")){var statement=Json.object();if(tableRows==null){tableRows=virtual(c,table,orgs,statement);cache.put(key,tableRows);}else statement.put("sql","(same statement as an earlier source in this observation)");
+                        statement.put("table",table);queries.add(statement);for(JsonNode row:tableRows){ObjectNode copy=(ObjectNode)row.deepCopy();if(tables.size()>1)copy.put("_table",table);rows.add(copy);}continue;}
                     var columns=columns(c,table);var statement=Json.object();
                     if(tableRows==null) {
                         List<Object> params=new ArrayList<>();StringBuilder sql=new StringBuilder("SELECT * FROM "+table+" r WHERE ");
@@ -118,6 +120,50 @@ final class ScenarioJdbcObservation {
         var snapshot=ObserverSnapshot.snapshot(mvcc,readMode,request);if(revisionQuery!=null)snapshot.set("revisionQuery",revisionQuery);
         result.set("snapshot",snapshot);
         return result;
+    }
+    /**
+     * Virtual sources read from the same snapshot, never from the product API:
+     * @transactions  one row per PostgreSQL transaction (xmin) that last wrote an organization CommandRecords row
+     *                (id = that xid, capabilityId, commandIds); a later update of the record moves it (approximate).
+     * @dbPrivileges  information_schema.role_table_grants of every mulino_* table (roleId = grantee, table = CDS entity
+     *                name without the trailing plural s, entity = full CDS entity name, privilege).
+     * @conditionResults  each element of AssessmentReferences.conditionsJson, with assessmentId, workId and the
+     *                assessment's evaluatorVersion added when the element does not state them.
+     */
+    private static ArrayNode virtual(Connection c,String source,List<String> orgs,ObjectNode statement) throws SQLException {
+        var out=Json.array();String in=String.join(",",Collections.nCopies(orgs.size(),"?"));
+        switch(source) {
+            case "@transactions" -> {
+                String sql="SELECT xmin::text AS xid,capabilityId,ID FROM mulino_commands_CommandRecords WHERE organizationId IN ("+in+") ORDER BY xmin::text,ID";
+                Map<String,ObjectNode> byXid=new LinkedHashMap<>();
+                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){var row=byXid.computeIfAbsent(r.getString(1),x->{var o=Json.object();o.put("id",x).put("transactionId",x);o.putArray("commandIds");return o;});
+                    if(!row.has("capabilityId"))row.put("capabilityId",r.getString(2));else if(!row.path("capabilityId").asText().equals(r.getString(2)))row.put("capabilityId","MIXED");((ArrayNode)row.path("commandIds")).add(r.getString(3));}}}
+                byXid.values().forEach(out::add);statement.put("sql",sql);
+            }
+            case "@dbPrivileges" -> {
+                String sql="SELECT grantee,table_name,privilege_type FROM information_schema.role_table_grants WHERE table_schema=current_schema() AND table_name LIKE 'mulino\\_%' ORDER BY table_name,grantee,privilege_type";
+                try(var st=c.prepareStatement(sql);var r=st.executeQuery()){while(r.next()){String t=r.getString(2);String entity=t.substring(t.lastIndexOf('_')+1);
+                    var row=Json.object();row.put("roleId",r.getString(1));row.put("tableName",t);row.put("privilege",r.getString(3));out.add(row);row.put("entityTable",entity);}}
+                // CDS element case is lost in PostgreSQL identifiers; map back through the CSN names.
+                for(JsonNode n:out){ObjectNode row=(ObjectNode)n;String cds=cdsEntity(row.path("tableName").asText());if(cds!=null){row.put("entity",cds);row.put("table",cds.endsWith("s")?cds.substring(0,cds.length()-1):cds);}}
+                statement.put("sql",sql);
+            }
+            case "@conditionResults" -> {
+                String sql="SELECT ID,workId,evaluatorVersion,conditionsJson FROM mulino_work_read_AssessmentReferences WHERE organizationId IN ("+in+") ORDER BY ID";
+                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){JsonNode conditions;try{conditions=Json.parse(r.getString(4));}catch(Exception invalid){continue;}
+                    if(conditions.isObject()&&conditions.has("conditions"))conditions=conditions.path("conditions");
+                    for(JsonNode cond:conditions)if(cond.isObject()){var row=(ObjectNode)cond.deepCopy();if(!row.has("assessmentId"))row.put("assessmentId",r.getString(1));if(!row.has("workId"))row.put("workId",r.getString(2));if(!row.has("evaluatorVersion"))row.put("evaluatorVersion",r.getString(3));out.add(row);}}}}
+                statement.put("sql",sql);
+            }
+            default -> throw new UnsupportedOperationException("virtual observation source "+source+" not implemented");
+        }
+        statement.set("boundValues",Json.MAPPER.valueToTree(orgs));
+        return out;
+    }
+    private static volatile Map<String,String> cdsEntities;
+    private static String cdsEntity(String table) {
+        if(cdsEntities==null){var out=new HashMap<String,String>();try{JsonNode csn=Json.read(Path.of(System.getProperty("repo.root",".")).resolve("backend/src/main/resources/edmx/csn.json"));csn.path("definitions").fieldNames().forEachRemaining(k->{if(k.startsWith("mulino."))out.put(k.replace('.','_').toLowerCase(Locale.ROOT),k.substring(k.lastIndexOf('.')+1));});}catch(Exception missing){}cdsEntities=out;}
+        return cdsEntities.get(table.toLowerCase(Locale.ROOT));
     }
     private static final Map<String,Set<String>> COLUMNS=new java.util.concurrent.ConcurrentHashMap<>();
     private static Set<String> columns(Connection c,String table) throws SQLException {
