@@ -19,9 +19,12 @@ check_request_contracts.py, which ./verify prepare runs). A request a case sends
 keeps its fields and declares them in action.harness.intentionalViolation. A needed selector the product
 contract lacks stays in the request and is reported against a knownOpen product gap instead of a new key.
 """
+import base64
 import copy
+import hashlib
 import json
 import re
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -194,6 +197,7 @@ class World:
     def __init__(self, root, ref, cache=None):
         self.aliases, self.actors, self.evidence = {}, {}, set()
         self.segments, self.works, self.lots, self.allocations, self.clock, self.actor_source = {}, {}, {}, {}, None, {}
+        self.documents, self.prior, self.clock_settings = {}, {}, {}
         if ref:
             self._merge(Path(root), ref, set(), cache if cache is not None else {})
 
@@ -233,6 +237,13 @@ class World:
         clock = (data.get('clock') or {}).get('asOf')
         if isinstance(clock, str):
             self.clock = clock
+        self.clock_settings.update({k: v for k, v in (data.get('clock') or {}).items() if isinstance(v, str)})
+        for row in baseline.get('documents') or []:
+            if isinstance(row, dict) and isinstance(row.get('alias'), str):
+                self.documents[row['alias']] = row
+        for name, row in (baseline.get('priorEntities') or {}).items():
+            if isinstance(row, dict):
+                self.prior.setdefault(name, {}).update(row)
         evidence = data.get('evidence')
         for row in evidence if isinstance(evidence, list) else []:
             if isinstance(row, dict) and isinstance(row.get('alias'), str):
@@ -302,7 +313,7 @@ class World:
 class Contracts:
     def __init__(self, root=ROOT):
         self.root = Path(root)
-        self._clock = self._case = None
+        self._clock = self._case = self._world = None
         self.intent = load_json(self.root, 'contracts/intent.schema.json')
         self.data = load_json(self.root, 'contracts/request-contracts.json')
         self.intent_fields = list(self.intent['properties'])
@@ -321,14 +332,14 @@ class Contracts:
         for sub in case.get('subcases', []):
             world = World(self.root, sub.get('fixtureRef'), cache)
             prior = []
-            self._clock, self._case = world.clock, case.get('caseId')
+            self._clock, self._case, self._world = world.clock, case.get('caseId'), world
             for action in iter_actions(sub.get('actions', [])):
                 if action.get('kind') == 'control' and (action.get('control') or {}).get('type') == 'clock':
                     params = action['control'].get('parameters') or {}
                     self._clock = next((params[k] for k in ('instant', 'asOf', 'knownAt') if isinstance(params.get(k), str)), self._clock)
                 self.conform_action(action, case.get('caseId'), sub.get('id'), world, prior)
                 prior.append(action)
-        self._clock = self._case = None
+        self._clock = self._case = self._world = None
         return case
 
     def conform_action(self, action, case_id, sub_id, world, prior=()):
@@ -530,6 +541,7 @@ class Contracts:
             for name in list(provenance):
                 provenance.pop(name)
             provenance.update(kept)
+            self.fill_required(body, slots, provenance, action, capability, declared)
         else:
             for name in declared['allowed']:
                 sources = [s for s in self.SLOT_SOURCES.get(name, ()) if s.startswith('@') and s not in ('@clock', '@evidenceRefs')]
@@ -555,6 +567,89 @@ class Contracts:
             ordered = sorted(slots.items(), key=lambda kv: order.get(kv[0], len(order)))
             slots.clear()
             slots.update(ordered)
+
+    def fill_required(self, body, slots, provenance, action, capability, declared):
+        """Required slots a shared-slot case did not state, from commandSlots.requiredFill (step2r round 13)."""
+        spec = self.data['commandSlots']
+        retype = spec['subjectFromWorkItem']
+        world = getattr(self, '_world', None)
+        if capability in retype['capabilities'] and world is not None:
+            refs = body.get('subjectRefs') or []
+            works = [r for r in refs if isinstance(r, dict) and r.get('type') == 'Work' and isinstance(r.get('id'), dict) and '$alias' in r['id']]
+            if len(works) == 1 and not any(isinstance(r, dict) and r.get('type') == 'TradeItem' for r in refs):
+                item = world.work_item(works[0]['id']['$alias'])
+                if item:
+                    body['subjectRefs'] = [{'type': 'TradeItem', 'id': {'$alias': item}} if r is works[0] else r for r in refs]
+        for name, sources in (spec['requiredFill']['capabilities'].get(capability) or {}).items():
+            if name in slots or name not in declared['required']:
+                continue
+            for source in sources:
+                value, said = self.fill_source(source, body, slots, action, world)
+                if value is not None:
+                    slots[name], provenance[name] = value, said
+                    break
+
+    def fill_source(self, source, body, slots, action, world):
+        if not source.startswith('@'):
+            return (copy.deepcopy(slots[source]), provenance_of(slots[source])) if source in slots else (None, None)
+        kind, _, arg = source[1:].partition(':')
+        refs = [r for r in body.get('subjectRefs') or [] if isinstance(r, dict)]
+        evidence = body.get('evidenceRefs') or []
+        if kind == 'literal':
+            return json.loads(arg), 'USER'
+        if kind == 'sha256':
+            return hashlib.sha256(arg.encode()).hexdigest(), 'USER'
+        if kind == 'evidenceRefs':
+            return (copy.deepcopy(evidence[0]), 'CONTEXT') if evidence else (None, None)
+        if kind.startswith('clock'):
+            if not self._clock:
+                return None, None
+            at = datetime.fromisoformat(self._clock.replace('Z', '+00:00'))
+            if kind.startswith('clock+'):
+                at += parse_duration(kind[len('clock+'):])
+            return at.astimezone(timezone.utc).strftime('%Y-%m-%dT%H:%M:%SZ'), 'CONTEXT'
+        if world is None:
+            return None, None
+        if kind == 'alias':
+            return ({'$alias': arg}, 'CONTEXT') if world.known_alias(arg) else (None, None)
+        if kind == 'fact':
+            name, _, field = arg.partition('.')
+            value = (world.prior.get(name) or {}).get(field)
+            return (value, 'CONTEXT') if value is not None else (None, None)
+        if kind == 'fixture':
+            value = world.clock_settings.get(arg)
+            return (value, 'CONTEXT') if value is not None else (None, None)
+        if kind == 'document':
+            first = evidence[0] if evidence else None
+            row = world.documents.get(first.get('$alias')) if isinstance(first, dict) else None
+            if not row or not isinstance(row.get('path'), str) or not (self.root / row['path']).is_file():
+                return None, None
+            content = (self.root / row['path']).read_bytes()
+            value = {'path': row['path'], 'mediaType': row.get('mediaType'), 'sha256': hashlib.sha256(content).hexdigest(),
+                     'base64': base64.b64encode(content).decode()}.get(arg)
+            return (value, 'CONTEXT') if value is not None else (None, None)
+        if kind == 'evidenceSubject':
+            typed = [r for r in refs if r.get('type') in SUBJECT_KINDS]
+            return ({'kind': SUBJECT_KINDS[typed[0]['type']], 'id': copy.deepcopy(typed[0]['id'])}, 'CONTEXT') if len(typed) == 1 else (None, None)
+        if kind == 'subjectItem':
+            segs = [r['id']['$alias'] for r in refs if r.get('type') == 'QuantitySegment' and isinstance(r.get('id'), dict) and '$alias' in r['id']]
+            item = world.segment_item(segs[0]) if len(segs) == 1 else None
+            return ({'$alias': item}, 'CONTEXT') if item else (None, None)
+        if kind in ('actorItem', 'actorItemScopes'):
+            actor = world.actors.get(action.get('actorRef')) or {}
+            items = ((actor.get('grant') or {}).get('scope') or {}).get('itemAliases') or world.org_items(actor.get('organizationAlias'))
+            if not items:
+                return None, None
+            if kind == 'actorItem':
+                return {'$alias': items[0]}, 'CONTEXT'
+            return [{'scopeKind': 'ITEM', 'scopeId': {'$alias': i}} for i in items], 'CONTEXT'
+        if kind == 'quantityUnit':
+            quantity = slots.get('quantity')
+            return (quantity['unit'], 'USER') if isinstance(quantity, dict) and isinstance(quantity.get('unit'), str) else (None, None)
+        if kind[:1].isupper():
+            found = [r.get('id') for r in refs if r.get('type') == kind]
+            return (copy.deepcopy(found[0]), 'CONTEXT') if len(found) == 1 else (None, None)
+        raise ValueError(f'unknown requiredFill source {source}')
 
     def slot_problems(self, body, action, case_id):
         """KNOWN_OPEN lines for slots a capability does not declare or requires (Step 2 vocabulary backlog), FAIL for the
@@ -1381,6 +1476,18 @@ def normalize_slot(value):
             return {'type': rest['type'], 'id': rest['value']}, said
         return rest, said
     return value, None
+
+
+def provenance_of(value):
+    return default_provenance(value)
+
+
+def parse_duration(text):
+    match = re.fullmatch(r'P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?', text)
+    if not match or not any(match.groups()):
+        raise ValueError(f'unsupported duration {text}')
+    days, hours, minutes = (int(g or 0) for g in match.groups())
+    return timedelta(days=days, hours=hours, minutes=minutes)
 
 
 def default_provenance(value):

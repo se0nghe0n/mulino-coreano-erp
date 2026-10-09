@@ -147,6 +147,31 @@ class Conformance(unittest.TestCase):
         self.assertEqual([], [p for p in problems if 'declares no slot' in p])
         self.assertTrue(any('S2-SLOT-VOCABULARY' in k for k in known), known)
 
+    def test_declared_only_cases_complete_required_slots_for_the_authorization_probe(self):
+        # round 13 run-7b6c69b4: a probe missing required slots is TYPE_INVALID before authorization (plan section 3.3).
+        hold = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'placeHold',
+                'subjectRefs': [{'type': 'QuantitySegment', 'id': A('A20')}], 'evidenceRefs': [A('DOC')],
+                'slots': {'segmentId': A('A20'), 'action': 'SELL', 'reason': 'r', 'validFrom': '2026-10-07T09:00:00Z',
+                          'validUntil': '2026-10-08T00:00:00Z', 'quantity': '20', 'unit': 'BOX'},
+                'expectedRevision': 1, 'commandIdempotencyKey': 'k'}
+        draft = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'createDraft',
+                 'subjectRefs': [{'type': 'Work', 'id': A('WORK')}], 'slots': {'ownerId': A('warehouse'), 'supervisorId': A('supervisor')},
+                 'expectedRevision': 1, 'commandIdempotencyKey': 'k2'}
+        sub = {'id': 'api-placeHold', 'fixtureRef': 'verification/cases/C3/fixture-placeHold.json',
+               'actions': [invoke(hold, cap='placeHold'), invoke(draft, cap='createDraft', aid='draft')], 'assertions': []}
+        C.conform_case({'caseId': 'C3', 'subcases': [sub]})
+        slots = sub['actions'][0]['request']['slots']
+        self.assertEqual(('QC', A('DOC'), '0', A('WORK'), '2026-10-07T10:00:00Z'),
+                         (slots['category'], slots['evidenceId'], slots['startQuantity'], slots['workId'], slots['nextCheckAt']))
+        self.assertEqual('USER', sub['actions'][0]['request']['provenance']['category'])
+        self.assertEqual('CONTEXT', sub['actions'][0]['request']['provenance']['nextCheckAt'])
+        self.assertEqual([{'type': 'TradeItem', 'id': A('P')}], sub['actions'][1]['request']['subjectRefs'])
+        again = copy.deepcopy(sub)
+        C.conform_case({'caseId': 'C3', 'subcases': [again]})
+        self.assertEqual(sub, again, 'filling is idempotent')
+        problems, known = C.case_problems({'caseId': 'C3', 'subcases': [sub]})
+        self.assertFalse(any('placeHold requires' in k for k in known), known)
+
     def test_wait_slots_form_the_wait_contract(self):
         flat = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'waitWork', 'subjectRefs': [],
                 'slots': {'workId': A('W'), 'reason': 'r', 'targetId': A('PO'), 'resumePredicate': {'kind': 'x'}, 'verifierId': A('V'),

@@ -1037,29 +1037,14 @@
       "attachEvidence": {
         "allowed": [
           "subject",
-          "kind",
           "sourceNamespace",
-          "externalEventId",
-          "sourceVersion",
-          "effectiveFrom",
-          "effectiveUntil",
-          "timeZone",
-          "timePrecision",
-          "valueState",
-          "payload",
-          "supersedesId",
-          "invalidatesId",
-          "documentId",
-          "assertion",
-          "quantity",
-          "unit",
-          "evidenceType",
           "sourceReference",
           "mediaType",
           "expectedHash",
           "provenance",
+          "supersedesId",
           "contentBase64",
-          "eventId"
+          "evidenceType"
         ],
         "required": [
           "subject",
@@ -1070,7 +1055,7 @@
           "provenance",
           "contentBase64"
         ],
-        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-14"
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-13,16-23 (per evidence type: attachEvidence is DOCUMENT, recordActivity is EVENT; slots outside the type set are rejected as Unsupported evidence slot)"
       },
       "authorizeReturn": {
         "allowed": [
@@ -1896,13 +1881,7 @@
           "assertion",
           "quantity",
           "unit",
-          "evidenceType",
-          "sourceReference",
-          "mediaType",
-          "expectedHash",
-          "provenance",
-          "contentBase64",
-          "eventId"
+          "evidenceType"
         ],
         "required": [
           "subject",
@@ -1916,7 +1895,7 @@
           "valueState",
           "payload"
         ],
-        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-14"
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-13,16-23 (per evidence type: attachEvidence is DOCUMENT, recordActivity is EVENT; slots outside the type set are rejected as Unsupported evidence slot)"
       },
       "recordCharge": {
         "allowed": [
@@ -2756,6 +2735,370 @@
         "gap": "PG-PLAN-SLOT",
         "contractRef": "plan section 5.3: the target work owner accepts in the same transaction; C3 cites the verified recipient decision RECIPIENT-ACCEPTANCE, which the product handler has no slot for (ResponsibilityService.java:37)"
       }
+    },
+    "requiredFill": {
+      "description": "Required slots the shared-slot cases (declaredOnlyCases) did not state (step2r round 13, run-7b6c69b4: 35 negative authorization probes answered TYPE_INVALID before the authorization they test). Plan section 3.3 validates required slots, type, unit and cardinality before the applicable policy, so a probe that must reach the authorization check sends a type-valid complete request. Each missing required slot takes the first available source: a slot of the same request, a typed subject (@Type), a fixture alias that exists (@alias:NAME), a fixture prior fact (@fact:ALIAS.field), the fixture document named by the first request evidenceRefs entry (@document:path|mediaType|sha256|base64), the typed evidence subject of the one subjectRef (@evidenceSubject), the item of the QuantitySegment subject (@subjectItem), the requesting actor's granted item (@actorItem, @actorItemScopes), the unit of the quantity slot (@quantityUnit), the fixture clock settings (@fixture:timezone|precision), the product clock at the action (@clock, @clock+ISO-8601 duration), the first request evidenceRefs entry (@evidenceRefs), a SHA-256 of a fixed text (@sha256:text) or a literal (@literal:json). Values the requester sets are USER, values taken from the fixture or the clock are CONTEXT. Slots that need an entity the fixture does not install (stocktake, receipt, canonical occurrence, cargo, leg, investigation, outbox) stay KNOWN_OPEN S2-SLOT-REQUIRED until the installer writes those aliases.",
+      "contractRef": "the handler references of commandSlots.capabilities; QualityCommands.java:31 (category QC|CUSTOMER|COMMERCIAL|RECALL), ItemCommands.java:30 (SHA-256 hex), EvidenceCommandInputs.java:16-23 (typed subject {kind,id}, ValueState), IdentityCommands.java:52-54,73 (scopes [{scopeKind,scopeId}]), SalesCommands.java:16-18, RuntimeCommands decision",
+      "capabilities": {
+        "registerItem": {
+          "specificationHash": [
+            "@sha256:fixture specification version 1"
+          ],
+          "packagingHash": [
+            "@sha256:fixture packaging version 1"
+          ]
+        },
+        "attachEvidence": {
+          "subject": [
+            "@evidenceSubject"
+          ],
+          "sourceReference": [
+            "@document:path"
+          ],
+          "mediaType": [
+            "@document:mediaType"
+          ],
+          "expectedHash": [
+            "@document:sha256"
+          ],
+          "provenance": [
+            "@literal:\"fixture source document\""
+          ],
+          "contentBase64": [
+            "@document:base64"
+          ]
+        },
+        "recordActivity": {
+          "subject": [
+            "@evidenceSubject"
+          ],
+          "kind": [
+            "@literal:\"OBSERVATION\""
+          ],
+          "effectiveFrom": [
+            "occurredAt",
+            "@clock"
+          ],
+          "timeZone": [
+            "@fixture:timezone"
+          ],
+          "timePrecision": [
+            "@fixture:precision"
+          ],
+          "valueState": [
+            "@literal:\"KNOWN\""
+          ],
+          "payload": [
+            "@literal:\"{}\""
+          ]
+        },
+        "placeHold": {
+          "category": [
+            "@literal:\"QC\""
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "recordDispositionBasis": {
+          "category": [
+            "@literal:\"QC\""
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "releaseHold": {
+          "evidenceId": [
+            "@evidenceRefs"
+          ]
+        },
+        "revokeDispositionBasis": {
+          "evidenceId": [
+            "@evidenceRefs"
+          ]
+        },
+        "createGrant": {
+          "scopes": [
+            "@actorItemScopes"
+          ]
+        },
+        "assignCapability": {
+          "scopeKind": [
+            "@literal:\"ITEM\""
+          ],
+          "scopeId": [
+            "@actorItem"
+          ]
+        },
+        "createSalesOrder": {
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "price": [
+            "@literal:\"2.50\""
+          ],
+          "currency": [
+            "@literal:\"EUR\""
+          ],
+          "qualityTerms": [
+            "@literal:\"STANDARD\""
+          ],
+          "packageTerms": [
+            "@literal:\"STANDARD\""
+          ]
+        },
+        "reviseSalesOrder": {
+          "orderId": [
+            "@SalesOrder",
+            "@alias:SALE"
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "price": [
+            "@literal:\"2.50\""
+          ],
+          "currency": [
+            "@literal:\"EUR\""
+          ],
+          "qualityTerms": [
+            "@literal:\"STANDARD\""
+          ],
+          "packageTerms": [
+            "@literal:\"STANDARD\""
+          ],
+          "reason": [
+            "@literal:\"fixture 주문 조건 변경\""
+          ]
+        },
+        "approvePurchase": {
+          "proposalHash": [
+            "@fact:PROPOSAL.canonicalHash"
+          ],
+          "validUntil": [
+            "@clock+P1D"
+          ]
+        },
+        "authorizeReturn": {
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "validUntil": [
+            "@clock+P1D"
+          ]
+        },
+        "decideReturnDisposition": {
+          "returnId": [
+            "@alias:RETURN"
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "receiveReturn": {
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "openInvestigation": {
+          "itemId": [
+            "@subjectItem"
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "basisEvidenceId": [
+            "@evidenceRefs"
+          ],
+          "nextAction": [
+            "@literal:\"조사 범위와 근거를 확인한다\""
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "proposeHandover": {
+          "expiresAt": [
+            "@clock+P1D"
+          ]
+        },
+        "proposePurchase": {
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "unit": [
+            "@quantityUnit"
+          ],
+          "endpoint": [
+            "@literal:\"ARRIVED\""
+          ],
+          "quantityMode": [
+            "@literal:\"CUMULATIVE_EVENT\""
+          ]
+        },
+        "transferObligation": {
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "expiresAt": [
+            "@clock+P1D"
+          ],
+          "nextAction": [
+            "@literal:\"인계받은 의무를 확인한다\""
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "createPolicyDraft": {
+          "version": [
+            "@literal:\"2\""
+          ],
+          "content": [
+            "@literal:\"{\\\"rule\\\":\\\"fixture\\\"}\""
+          ],
+          "source": [
+            "@literal:\"fixture policy source\""
+          ],
+          "regressionEvidence": [
+            "@literal:\"verification/cases/C3/case.json\""
+          ],
+          "effectiveFrom": [
+            "@clock"
+          ],
+          "fixtureOnly": [
+            "@literal:true"
+          ]
+        },
+        "retirePolicy": {
+          "terminationBasis": [
+            "@literal:\"fixture 정책 종료 근거\""
+          ]
+        },
+        "recordExternalReconciliation": {
+          "decision": [
+            "@literal:\"UNRESOLVED\""
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordSettlementAdjustment": {
+          "mode": [
+            "@literal:\"PROPOSE\""
+          ],
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordInvoice": {
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordCharge": {
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordSupplierReply": {
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordPaymentReference": {
+          "observedAt": [
+            "@clock"
+          ],
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "prepareRegulatoryProcedure": {
+          "documentVersionId": [
+            "@evidenceRefs"
+          ]
+        },
+        "adjustQuantity": {
+          "direction": [
+            "@literal:\"DECREASE\""
+          ]
+        },
+        "recordRegulatoryDecision": {
+          "action": [
+            "@literal:\"SELL\""
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "validFrom": [
+            "@clock"
+          ]
+        },
+        "verifyLabel": {
+          "validFrom": [
+            "@clock"
+          ]
+        },
+        "recordRecallNotice": {
+          "rootSegmentId": [
+            "@QuantitySegment",
+            "@alias:A20"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ]
+        },
+        "recordRecovery": {
+          "rootSegmentId": [
+            "@QuantitySegment",
+            "@alias:A20"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ]
+        }
+      }
+    },
+    "subjectFromWorkItem": {
+      "capabilities": [
+        "createWork",
+        "createDraft"
+      ],
+      "contractRef": "WorkLifecycle.java:92-93 publicDraft: the Work item is the one TradeItem subject (NEEDS_INPUT ITEM_MISSING without it); a shared-slot case that names the Work it drafts names its item instead",
+      "scope": "declaredOnlyCases"
     }
   },
   "knownOpen": [
