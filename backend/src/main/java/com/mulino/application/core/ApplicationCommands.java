@@ -10,11 +10,11 @@ import org.springframework.security.access.AccessDeniedException;
 public class ApplicationCommands {
   private final Map<String,CommandHandler> handlers=new TreeMap<>();
   private final CommandDefinitionResolver definitions;private final ReadAuthorizer auth;private final CommandRepository repository;private final ExecutionClock clock;
-  private final ObjectProvider<CommandGuard> guard;private final ObjectProvider<CommandLeasePort> leases;
+  private final ObjectProvider<CommandGuard> guard;private final ObjectProvider<CommandLeasePort> leases;private final ObjectProvider<CommandBarrier> barriers;
   private final TransactionTemplate transaction;private final TransactionTemplate denial;
   public ApplicationCommands(List<CommandHandler> handlers,ReadAuthorizer auth,CommandRepository repository,
-      ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,PlatformTransactionManager manager){
-    this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;
+      ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,ObjectProvider<CommandBarrier> barriers,PlatformTransactionManager manager){
+    this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;this.barriers=barriers;
     for(CommandHandler h:handlers)for(String cap:h.capabilities())if(this.handlers.put(cap,h)!=null)throw new IllegalStateException("Duplicate command capability "+cap);
     transaction=new TransactionTemplate(manager);transaction.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
     denial=new TransactionTemplate(manager);denial.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -56,6 +56,7 @@ public class ApplicationCommands {
   private CommandHandler handler(Map<String,Object> intent){CommandHandler h=handlers.get(intent.get("capabilityId"));if(h==null||!h.semanticVersion().equals(intent.get("capabilityVersion"))||!h.intentKinds().contains(intent.get("intentKind")))throw DomainError.unsupported();return h;}
   private Map<String,Object> apply(Map<String,Object> intent,String hash,Map<String,Object> claim,boolean claimed){
     DomainContext c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");
+    barrier("AFTER_AUTH_BEFORE_IDEMPOTENCY_FENCE");
     // The key fence and saved scope precede prerequisites which a successful action may consume.
     repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));
     Optional<Map<String,Object>> old=repository.find(c,cap,key);
@@ -67,12 +68,16 @@ public class ApplicationCommands {
       return repository.result(old.get());
     }
     CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);List<SubjectBinding> initialSubjects=definitions.verifySubjects(c,intent,h,initial);
+    barrier("AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK","BEFORE_SCOPE_LOCK","AFTER_INITIAL_READ_BEFORE_SCOPE_FENCE","AFTER_ELIGIBILITY_READ_BEFORE_SCOPE_FENCE","AFTER_AUTH_READ_BEFORE_SCOPE_FENCE");
+    blocking("WAITING_FOR_GRANT_SCOPE_FENCE","WAITING_FOR_SCOPE_FENCE");
     repository.fence(c,initial.fenceKeys());
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
+    barrier("AFTER_SCOPE_LOCK");
     CommandPreparation prep=h.prepare(c,intent);if(!initial.authorityActors().equals(prep.authorityActors())||!initial.effectClass().equals(prep.effectClass())||!Objects.equals(initial.approvalAction(),prep.approvalAction())||!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
     List<SubjectBinding> subjects=definitions.verifySubjects(c,intent,h,prep);if(!initialSubjects.equals(subjects))throw new DomainError("CONFLICT","STALE_REVISION","Command subject changed");
     auth.authorizeScopes(c,cap,prep.scopes());
     if(!claim.isEmpty()){verifyClaim(intent,claim,prep.scopes());CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
+    barrier("AFTER_AUTH_SCOPE_FENCE_ACQUIRED_BEFORE_EFFECT_COMMIT");
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
@@ -101,5 +106,7 @@ public class ApplicationCommands {
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
       if(old.isPresent()){repository.audit(c,(String)old.get().get("ID"),intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"replayAttempt",true));return result;}String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"definitionVersion",intent.get("definitionVersion"),"capabilityVersion",intent.get("capabilityVersion")));return result;});
   }
+  private void barrier(String... points){CommandBarrier b=barriers.getIfAvailable();if(b!=null)b.reach(points);}
+  private void blocking(String... points){CommandBarrier b=barriers.getIfAvailable();if(b!=null)b.blocking(points);}
   private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }

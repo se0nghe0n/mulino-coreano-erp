@@ -20,6 +20,8 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).followRedirects(HttpClient.Redirect.NEVER).build();
     private final String run=UUID.randomUUID().toString();
     private final Map<String,CompletableFuture<StepResult>> pending=new ConcurrentHashMap<>();
+    /** Barrier races hold several submitted calls open at once; the common pool may have a single worker. */
+    private final ExecutorService asyncCalls=Executors.newCachedThreadPool(r->{var t=new Thread(r,"actual-async-call");t.setDaemon(true);return t;});
     private volatile JsonNode controlActor;
     private final FixtureInstaller fixtures;
     private final JdbcObservation observer;
@@ -28,7 +30,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","clock","fixture","db"):Set.of("api","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","clock","barrier","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
         if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;}
@@ -77,6 +79,64 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         if(suiteIsolation&&externalOrganizations!=null&&externalOrganizations.hasNonNull(actor.path("organizationAlias").asText()))((ObjectNode)bound).put("organizationAlias",externalOrganizations.path(actor.path("organizationAlias").asText()).asText());
         return bound;
     }
+    /** The resolved action.harness of the call this thread is sending; never part of the product request body. */
+    private final ThreadLocal<JsonNode> harness=new ThreadLocal<>();
+    @Override public StepResult query(String id,String route,JsonNode actor,String operation,JsonNode request,JsonNode declared) {
+        StepResult refused=refuseHarness(id,route,declared);if(refused!=null)return refused;
+        return withHarness(declared,()->query(id,route,actor,operation,request));
+    }
+    @Override public StepResult invoke(String id,String route,JsonNode actor,String capability,JsonNode request,JsonNode declared) {
+        StepResult refused=refuseHarness(id,route,declared);if(refused!=null)return refused;
+        return withHarness(declared,()->invoke(id,route,actor,capability,request));
+    }
+    private StepResult withHarness(JsonNode declared,java.util.function.Supplier<StepResult> call){
+        JsonNode previous=harness.get();harness.set(declared==null?Json.object():declared);
+        try{return call.get();}finally{if(previous==null)harness.remove();else harness.set(previous);}
+    }
+    private volatile Set<String> barrierPoints;
+    /**
+     * Harness blocks the product cannot honour are refused before anything is sent, so an action never runs in a
+     * different environment, without its barrier or with a different credential than the case declared:
+     * environmentId names an isolated environment (fresh install, restore) no host control of this adapter
+     * provisions; a testBarrier point the product pipeline does not report is never reached; an authenticationTest
+     * variant other than one replaced iss/sub/aud claim is not a credential this adapter can sign.
+     */
+    private StepResult refuseHarness(String id,String route,JsonNode declared) {
+        if(declared==null||!declared.isObject()||declared.isEmpty())return null;
+        if(declared.hasNonNull("environmentId"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual environment "+declared.path("environmentId").asText()+" not provisioned (no isolated fresh-install/restore host control)");
+        JsonNode auth=declared.path("authenticationTest");
+        if(auth.isObject()&&!Set.of("issuer","subject","audience").contains(auth.path("variant").asText()))return StepResult.missing(id,"NOT_IMPLEMENTED: actual credential variant "+auth.path("variant").asText());
+        JsonNode barrier=declared.path("testBarrier");
+        if(barrier.isObject()){
+            if(!suiteIsolation)return StepResult.missing(id,"NOT_IMPLEMENTED: actual test barrier outside the verification suite");
+            String point=barrier.path("point").asText();
+            try{if(!barrierPoints().contains(point))return StepResult.missing(id,"NOT_IMPLEMENTED: product pipeline reports no barrier point "+point);}
+            catch(Exception failure){throw new IllegalStateException("Barrier point discovery failed",failure);}
+        }
+        return null;
+    }
+    private Set<String> barrierPoints() throws Exception {
+        if(barrierPoints!=null)return barrierPoints;
+        if(controlActor==null)return Set.of();
+        var call=HttpRequest.newBuilder(configuration.baseUri().resolve("/__verification/runtime/barrier/points")).timeout(Duration.ofSeconds(10)).header("Authorization","Bearer "+signer.sign(controlActor)).GET().build();
+        var result=http.send(call,HttpResponse.BodyHandlers.ofString());
+        if(result.statusCode()!=200)return Set.of();
+        var points=new TreeSet<String>();Json.parse(result.body()).path("points").forEach(p->points.add(p.asText()));
+        return barrierPoints=Set.copyOf(points);
+    }
+    /** The authored barrier participant as the loopback header the verification profile reads; null when undeclared. */
+    private String barrierHeader(){
+        JsonNode b=harness.get()==null?null:harness.get().path("testBarrier");
+        if(b==null||!b.isObject())return null;
+        var h=Json.object();for(String k:List.of("barrierId","participantId","transactionId","point"))h.put(k,Json.required(b,k));return h.toString();
+    }
+    private String credential(JsonNode actor) throws Exception {
+        JsonNode auth=harness.get()==null?Json.MAPPER.missingNode():harness.get().path("authenticationTest");
+        JsonNode bound=credentialActor(actor);
+        if(!auth.isObject())return signer.sign(bound);
+        String claim=switch(auth.path("variant").asText()){case "issuer"->"iss";case "subject"->"sub";case "audience"->"aud";default->throw new IllegalArgumentException("Unsupported credential variant");};
+        return signer.sign(bound,claim,Json.required(auth,"invalidValue"));
+    }
     @Override public StepResult query(String id,String route,JsonNode actor,String operation,JsonNode request) {
         if(!route.equals("api")&&!(suiteIsolation&&route.equals("mcp")))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);
         // Suite isolation: every api/mcp query reaches the product; an unknown capability is the product's answer, not an adapter skip.
@@ -117,17 +177,27 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
                 w.remove("valueProvenance");
                 if(!w.has("provenance")&&w.path("slots").isObject()){var prov=Json.object();w.path("slots").fieldNames().forEachRemaining(k->prov.put(k,"USER"));w.set("provenance",prov);translated.add("provenance:USER-default");}
             }
-            String credential=signer.sign(credentialActor(actor));
+            String credential=credential(actor);
             String digestBefore=category.equals("queries")&&suiteIsolation?ScenarioRevisionBinding.digest(configuration):null;
             String body=wireRequest.toString();ObjectNode rpc=null;
-            var builder=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Authorization","Bearer "+credential);
+            var builder=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(60)).header("Content-Type","application/json").header("Authorization","Bearer "+credential);
+            JsonNode mcpContext=harness.get()==null?Json.MAPPER.missingNode():harness.get().path("mcp");
             if(route.equals("mcp")) {
                 uri=configuration.baseUri().resolve("/mcp/ontology");
-                rpc=Json.object();rpc.put("jsonrpc","2.0").put("id",id).put("method","tools/call");var params=rpc.putObject("params");params.put("name",operation);params.set("arguments",wireRequest);
+                // action.harness.mcp: the authored JSON-RPC id, and MRTR requestState/inputResponses as tools/call params
+                // (protocol fields, never tool arguments).
+                String rpcId=mcpContext.path("transport").path("rpcId").asText(id);
+                rpc=Json.object();rpc.put("jsonrpc","2.0").put("id",rpcId).put("method","tools/call");var params=rpc.putObject("params");params.put("name",operation);params.set("arguments",wireRequest);
+                for(String field:List.of("requestState","inputResponses"))if(mcpContext.has(field))params.set(field,mcpContext.path(field));
                 var meta=params.putObject("_meta");meta.put("io.modelcontextprotocol/protocolVersion",MCP_VERSION);meta.putObject("io.modelcontextprotocol/clientInfo").put("name","mulino-actual-adapter").put("version","2.1.0");meta.putObject("io.modelcontextprotocol/clientCapabilities");
                 body=rpc.toString();
-                builder=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Accept","application/json, text/event-stream").header("Mcp-Method","tools/call").header("MCP-Protocol-Version",MCP_VERSION).header("Mcp-Name",operation).header("Authorization","Bearer "+credential);
+                builder=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(60)).header("Content-Type","application/json").header("Accept","application/json, text/event-stream").header("Mcp-Method","tools/call").header("MCP-Protocol-Version",MCP_VERSION).header("Mcp-Name",operation).header("Authorization","Bearer "+credential);
             }
+            // Harness consumption is recorded apart from adapterTranslations: the request body is not rewritten.
+            var harnessApplied=Json.array();
+            String barrier=barrierHeader();if(barrier!=null){builder.header("X-Mulino-Test-Barrier",barrier);harnessApplied.add("testBarrier->X-Mulino-Test-Barrier header");}
+            if(harness.get()!=null&&harness.get().path("authenticationTest").isObject())harnessApplied.add("authenticationTest: credential claim "+harness.get().path("authenticationTest").path("variant").asText()+" replaced by the authored invalid value");
+            if(route.equals("mcp")&&mcpContext.isObject())harnessApplied.add("mcp: JSON-RPC id and MRTR params from the case");
             var call=builder.POST(HttpRequest.BodyPublishers.ofString(body)).build();
             Instant submittedAt=Instant.now();
             var result=http.send(call,HttpResponse.BodyHandlers.ofString());
@@ -141,7 +211,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var receipt=Json.object();receipt.put("method","POST").put("path",uri.getPath()).put("route",route).put("httpStatus",result.statusCode()).put("submittedAt",submittedAt.toString()).put("capturedAt",Instant.now().toString());
             if(rpc!=null){receipt.set("rpcRequest",rpc);receipt.set("rpcResponse",rpcResponse);}
             receipt.put("credentialSha256",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(credential.getBytes(java.nio.charset.StandardCharsets.UTF_8))));
-            receipt.set("request",request);receipt.set("wireRequest",wireRequest);receipt.set("response",response);if(!translated.isEmpty())receipt.set("adapterTranslations",translated);
+            receipt.set("request",request);receipt.set("wireRequest",wireRequest);receipt.set("response",response);if(!translated.isEmpty())receipt.set("adapterTranslations",translated);if(!harnessApplied.isEmpty())receipt.set("harnessApplied",harnessApplied);
             var identity=Json.object();identity.put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
             var transport=Json.object();transport.put("httpStatus",result.statusCode()).put("route",route);
             return executed(id,transport,response,provenance(identity,"HTTP",false,null,null),receipt);
@@ -182,6 +252,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         return send(id,actor,request.path("intentKind").asText().equals("RECORD")?"records":"commands",capability,request,transport);
     }
     @Override public StepResult control(String id,JsonNode request) {
+        if(suiteIsolation&&request.path("type").asText().equals("barrier")&&Set.of("waitReached","resume").contains(request.path("operation").asText()))return barrierControl(id,request);
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
             return StepResult.missing(id,"NOT_IMPLEMENTED: actual "+request.path("type").asText()+"/"+request.path("operation").asText()+" host control absent");
         if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
@@ -200,6 +271,34 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_CLOCK",false,null,null),receipt);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual clock interrupted",failure);}
         catch(Exception failure){throw new IllegalStateException("Actual clock environment/response failure",failure);}
+    }
+    /**
+     * Barrier control: waitReached and resume on the verification-profile barrier registry. The ACK carries the state the
+     * product observed for that participant (REACHED, BLOCKED, RESUMED, or NOT_SEEN/TIMED_OUT), never the requested one;
+     * the harness compares it with the authored state.
+     */
+    private StepResult barrierControl(String id,JsonNode request) {
+        if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
+        JsonNode p=request.path("parameters");
+        try {
+            var body=Json.object();body.put("operation",request.path("operation").asText()).put("barrierId",Json.required(p,"barrierId")).put("participantId",Json.required(p,"participantId"));
+            if(request.path("operation").asText().equals("waitReached"))body.put("timeoutSeconds",p.path("timeoutSeconds").asInt(30));
+            var uri=configuration.baseUri().resolve("/__verification/runtime/barrier");
+            var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(70)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(controlActor)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
+            var result=http.send(call,HttpResponse.BodyHandlers.ofString());
+            if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification barrier profile not installed");
+            var response=Json.parse(result.body());
+            if(result.statusCode()!=200)throw new IllegalStateException("Barrier control HTTP "+result.statusCode());
+            var data=Json.object();data.put("controlType","barrier").put("operation",request.path("operation").asText()).put("acknowledgedAt",Instant.now().toString());
+            for(String k:List.of("barrierId","participantId"))data.set(k,response.path(k));
+            // transactionId and point come from the product registry entry, which the request header declared.
+            data.set("transactionId",response.hasNonNull("transactionId")?response.path("transactionId"):Json.MAPPER.nullNode());
+            data.set("point",response.hasNonNull("point")?response.path("point"):Json.MAPPER.nullNode());
+            data.set("state",response.path("state"));data.set("serverObservation",response);
+            var receipt=Json.object();receipt.put("httpStatus",result.statusCode()).put("path",uri.getPath());receipt.set("requestedControl",request);receipt.set("wireRequest",body);receipt.set("serverResponse",response);
+            return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_BARRIER",false,null,null),receipt);
+        }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual barrier interrupted",failure);}
+        catch(Exception failure){throw new IllegalStateException("Actual barrier environment/response failure",failure);}
     }
     static ObjectNode clockAcknowledgment(int httpStatus,String requestedInstant,JsonNode serverResponse) {
         if(httpStatus!=200||!serverResponse.path("authorityClock").asBoolean()||!"verification".equals(serverResponse.path("profile").asText())||!Instant.parse(requestedInstant).equals(Instant.parse(serverResponse.path("instant").asText())))throw new IllegalStateException("Verification clock control did not prove applied authority clock");
@@ -296,10 +395,12 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     }
     private static JsonNode redacted(JsonNode raw){var copy=raw.deepCopy();if(copy.path("headers") instanceof ObjectNode h)for(String k:List.of("Authorization","authorization","Cookie","cookie"))if(h.has(k))h.put(k,"REDACTED");return copy;}
     private volatile JsonNode installedActors,idTypes;
-    @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request) {
+    @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request) {return start(id,route,actor,capability,request,Json.object());}
+    @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request,JsonNode declared) {
         if(!route.equals("api"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual async route "+route);
+        StepResult refused=refuseHarness(id,route,declared);if(refused!=null)return refused;
         String handle=UUID.randomUUID().toString();
-        pending.put(handle,CompletableFuture.supplyAsync(()->invoke(id,route,actor,capability,request)));
+        pending.put(handle,CompletableFuture.supplyAsync(()->invoke(id,route,actor,capability,request,declared),asyncCalls));
         var ack=Json.object();ack.put("invocationHandle",handle).put("submittedAt",Instant.now().toString());
         try {return executed(id,ack,null,provenance(null,"HTTP_ASYNC_SUBMISSION",false,null,null),ack);}
         catch(java.io.IOException failure){throw new IllegalStateException("Cannot persist asynchronous submission",failure);}
