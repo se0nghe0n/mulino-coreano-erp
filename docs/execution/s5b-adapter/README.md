@@ -123,9 +123,10 @@ PASS 10(T20 wire 5, T20 locationFridayTypeError, V4 raw-crud 4)은 모두
 | 명령 | 결과 |
 |---|---|
 | backend focused `-Dtest=FulfillmentPostgresTest` | 53 tests, 0 failures |
-| backend 전체 `./mvnw -f backend/pom.xml test` | 519 tests, failures 0, errors 2. 두 오류는 `PlatformIntegrationTest.compilerColumnsMatchFlywaySchema`·`S1ReadIntegrationTest.freshFlywayMatches…`가 실행 중 `NODE24_BIN`을 찾지 못한 환경 오류(`error=2`)다. 아래 재실행 참고 |
+| backend 전체 `./mvnw -f backend/pom.xml test` | 519 tests, failures 0, errors 2. 두 오류는 `PlatformIntegrationTest.compilerColumnsMatchFlywaySchema`·`S1ReadIntegrationTest.freshFlywayMatches…`가 실행 중 `NODE24_BIN`을 찾지 못한 환경 오류(`error=2`, 실행 중 node binary가 교체됨)다 |
+| 위 두 class 재실행(`-Dtest=PlatformIntegrationTest,S1ReadIntegrationTest`) | 19 tests, 0 failures, 0 errors → 전체 519 통과 |
 | 시나리오 기본·probe | 위 표 |
-| native actual-s1..s4 | 아래 |
+| native `./verify actual-s1`, `actual/s2..s4` `build.py`+`run.sh`(85ce2365 이후 clean tree) | 네 실행 모두 exit 0 |
 
 ## Step 2 발견(case 결함, oracle은 바꾸지 않음)
 
