@@ -29,17 +29,20 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     @Override public Set<String> availableAdapters() {return Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
-        if(suiteIsolation){externalOrganization=null;controlActor=null;}
+        if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;}
         try {var bound=ActualFixtureBindings.bind(root,bundle,configuration);
-            String authoredOrganization=suiteIsolation?organizationAlias(bound.path("fixture")):null;
             // Suite isolation: each installed fixture is a fresh synthetic organization with its own external alias,
             // because one disposable database serves every subcase. The authored alias key stays the contract.
-            if(authoredOrganization!=null&&!bound.has("organizationExternalAlias"))((ObjectNode)bound).put("organizationExternalAlias",authoredOrganization+"-"+run.substring(0,8)+"-"+installs.incrementAndGet());
-            var data=fixtures.install(bound);
-            if(authoredOrganization!=null)externalOrganization=data.path("organizationExternalAlias").asText();
+            ObjectNode data;
+            if(suiteIsolation) {
+                ((ObjectNode)bound).put("organizationAliasSuffix",run.substring(0,8)+"-"+installs.incrementAndGet());
+                data=ScenarioFixtureInstaller.install(configuration,root,bound,Boolean.getBoolean("verification.actual.partialFixtures"));
+                externalOrganization=data.path("organizationExternalAlias").asText();
+                externalOrganizations=data.path("organizationExternalAliases");
+            } else data=fixtures.install(bound);
             // The control identity is the first installed actor the backend can authenticate (never a declared untrusted identity).
-            for(JsonNode candidate:bound.path("fixture").path("actors")){if(candidate.path(ActualFixtureBindings.UNTRUSTED).asBoolean(false))continue;var control=(ObjectNode)candidate.deepCopy();if(data.hasNonNull("organizationExternalAlias"))control.put("organizationAlias",data.path("organizationExternalAlias").asText());controlActor=control;break;}
-            if(authoredOrganization!=null)fixtureStart(bound.path("fixture"));
+            for(JsonNode candidate:bound.path("fixture").path("actors")){if(candidate.path(ActualFixtureBindings.UNTRUSTED).asBoolean(false))continue;var control=(ObjectNode)candidate.deepCopy();String mapped=data.path("organizationExternalAliases").path(control.path("organizationAlias").asText()).asText(data.path("organizationExternalAlias").asText(null));if(mapped!=null)control.put("organizationAlias",mapped);controlActor=control;break;}
+            if(suiteIsolation)fixtureStart(bound.path("fixture"));
             return executed(id,data,null,provenance(null,"JDBC_FIXTURE_INSTALL",false,null,null),data);}
         catch(UnsupportedOperationException unsupported){return StepResult.missing(id,"NOT_IMPLEMENTED: "+unsupported.getMessage());}
         catch(Exception failure){throw new IllegalStateException("Actual fixture transaction failed: "+SqlFailureSummary.safe(failure),failure);}
@@ -48,11 +51,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private final boolean suiteIsolation=Boolean.getBoolean("verification.actual.suiteIsolation");
     private final java.util.concurrent.atomic.AtomicInteger installs=new java.util.concurrent.atomic.AtomicInteger();
     private volatile String externalOrganization;
-    private static String organizationAlias(JsonNode fixture) {
-        String found=null;
-        for(var it=fixture.path("aliases").fields();it.hasNext();){var e=it.next();if(e.getValue().path("type").asText().equals("Organization")){if(found!=null)return null;found=e.getKey();}}
-        return found;
-    }
+    private volatile JsonNode externalOrganizations;
     /** Contract: the product clock starts at the fixture clock asOf; installed rows are recorded at or before it. */
     private void fixtureStart(JsonNode fixture) throws Exception {
         String start=Json.required(fixture.path("clock"),"asOf");
@@ -68,7 +67,8 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     /** Credential identity: binding manifest applied, organization claim set to this suite installation's external alias. */
     private JsonNode credentialActor(JsonNode actor) throws Exception {
         JsonNode bound=ActualFixtureBindings.credentialActor(root,configuration,actor);
-        if(suiteIsolation&&externalOrganization!=null)((ObjectNode)bound).put("organizationAlias",externalOrganization);
+        // Each authored organization alias maps to this installation's external alias; an unknown alias stays authored (the backend must reject it).
+        if(suiteIsolation&&externalOrganizations!=null&&externalOrganizations.hasNonNull(actor.path("organizationAlias").asText()))((ObjectNode)bound).put("organizationAlias",externalOrganizations.path(actor.path("organizationAlias").asText()).asText());
         return bound;
     }
     @Override public StepResult query(String id,String route,JsonNode actor,String operation,JsonNode request) {

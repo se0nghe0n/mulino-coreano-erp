@@ -89,8 +89,9 @@ ACTUAL_BUILD_COMMIT=$(git rev-parse HEAD)
 export ACTUAL_BUILD_COMMIT
 classpath="$repo/verification/harness/target/classes:$(cat verification/harness/target/classpath.txt)"
 argv_json=$(python3 -c 'import json,sys; print(json.dumps(["./verify","scenarios","--actual"]+sys.argv[1:]))' "$@")
+rm -f verification/harness/target/evidence/scenarios.json
 set +e
-java -Dverification.driver=actual -Dverification.agentRunner=scripted -Dverification.actual.suiteIsolation=true \
+java -Dverification.driver=actual -Dverification.agentRunner=scripted -Dverification.actual.suiteIsolation=true "-Dverification.actual.partialFixtures=${ACTUAL_PARTIAL_FIXTURES:-true}" \
   -Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json \
   "-Drepo.root=$repo" '-Dverification.command=./verify scenarios --actual' "-Dverification.argv=$argv_json" \
   -cp "$classpath" org.mulino.verification.Main profile scenarios "$@" > "$evidence/harness-stdout.json" 2> "$evidence/harness-stderr.txt"

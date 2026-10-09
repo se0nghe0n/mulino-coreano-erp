@@ -66,7 +66,7 @@ public final class Main {
                     // Actual suite: one subcase's adapter/environment error is that subcase's FAIL, never an abort of the
                     // remaining subcases and never a silent skip. Actions after the failing one stay unexecuted.
                     try { status=runner.run(false); }
-                    catch(Exception e) { status="FAIL";harnessError=e.getClass().getSimpleName()+": "+rootMessage(e); }
+                    catch(Exception|AssertionError e) { status="FAIL";harnessError=e.getClass().getSimpleName()+": "+rootMessage(e); }
                 } else status=runner.run(mode.equals("red"));
                 anyFail|=status.equals("FAIL");anyNotRun|=status.equals("NOT_RUN");
                 ObjectNode subEvidence=runner.evidence(status,System.getProperty("verification.command","Java acceptance harness"));

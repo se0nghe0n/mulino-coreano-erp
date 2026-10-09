@@ -40,6 +40,24 @@ def classify_reason(reason):
     return 'ADAPTER'
 
 
+def install_state(evidence, subcase):
+    for aid in action_order(subcase):
+        a = evidence.get('actions', {}).get(aid)
+        if a and a.get('actionKind', None) is None and isinstance(a.get('data'), dict) and 'aliasMap' in a.get('data', {}):
+            d = a['data']
+            return d.get('fixtureComplete', True), d.get('omittedFacts', [])
+    return None, []
+
+
+def first_rejection(evidence, subcase):
+    for aid in action_order(subcase):
+        a = evidence.get('actions', {}).get(aid) or {}
+        r = a.get('response')
+        if isinstance(r, dict) and r.get('outcome') in ('REJECTED', 'HELD', 'CONFLICT', 'NEEDS_INPUT') and isinstance(r.get('error'), dict):
+            return {'actionId': aid, 'outcome': r.get('outcome'), 'code': r['error'].get('code'), 'message': r['error'].get('message')}
+    return None
+
+
 def first_problem(evidence, subcase):
     actions = evidence.get('actions', {})
     if evidence.get('harnessError'):
@@ -95,11 +113,22 @@ def main(argv):
         sub = next(s for s in cases[cid]['subcases'] if s['id'] == sid)
         status = {'PASS': 'PASS', 'FAIL': 'FAIL'}.get(e['status'], 'NOT_IMPLEMENTED')
         problem, cls = (None, None) if status == 'PASS' else first_problem(e, sub)
+        complete, omitted = install_state(e, sub)
+        rejection = first_rejection(e, sub)
+        if problem is not None and rejection is not None:
+            problem['firstProductRejection'] = rejection
+        # A failure on a partially installed world is first an installer gap, until the omitted facts are installed.
+        if status == 'FAIL' and complete is False and cls == 'PRODUCT':
+            cls = 'ADAPTER'
+            problem['note'] = 'fixture installed partially; product verdict pending complete fixture'
         executed = sum(1 for a in e.get('actions', {}).values() if a.get('driverStatus') == 'EXECUTED')
         row = {'caseId': cid, 'subcaseId': sid, 'status': status, 'executedActions': executed,
-               'declaredActions': len(action_order(sub)), 'firstProblem': problem, 'classification': cls}
+               'declaredActions': len(action_order(sub)), 'fixtureComplete': complete, 'omittedFixtureFacts': omitted,
+               'firstProblem': problem, 'classification': cls}
         subcases.append(row)
         totals[status] += 1
+        if status == 'PASS' and complete is False:
+            totals['PASS_WITH_PARTIAL_FIXTURE'] += 1
         if cls:
             by_class[status + '/' + cls] += 1
             key = (problem or {}).get('detail') or (problem or {}).get('reason') or (problem or {}).get('kind')
