@@ -555,7 +555,8 @@
       "quantity": "40",
       "unit": "BOX",
       "state": "EXECUTABLE",
-      "revision": 1
+      "revision": 1,
+      "startQuantity": "0"
     },
     "PROMISE": {
       "type": "ObligationRoot"
@@ -663,7 +664,8 @@
         "state": "EXECUTABLE",
         "revision": 1,
         "commandKey": "synthetic-baseline-V2-reserve-commits-first",
-        "rootAlias": "ALLOC"
+        "rootAlias": "ALLOC",
+        "startQuantity": "0"
       }
     ],
     "setupIsExecutionCoverage": false,
@@ -725,7 +727,7 @@
         "stableRootAlias": "PROMISE3"
       }
     ],
-    "newDemandNote": "ORDER(40)는 기존 ALLOC40으로 이미 모두 덮였다. 경합하는 신규 예약20은 별도 주문 ORDER2(20)·업무 S2·약속 PROMISE2를 대상으로 해 초과 예약 없이 실물60을 채운다. ORDER3(10)·업무 S3·약속 PROMISE3은 배분 없는 미충족 주문량10이다. retired-parent 예약 시도가 주문량 부족이 아니라 retired 부모 때문에만 거부되도록 둔다."
+    "newDemandNote": "ORDER(40)는 기존 ALLOC40으로 이미 모두 덮였다. 경합하는 신규 예약20은 별도 주문 ORDER2(20)·업무 S2·약속 PROMISE2를 대상으로 해 초과 예약 없이 실물60을 채운다. ORDER3(10)·업무 S3·약속 PROMISE3은 배분 없는 미충족 주문량10이다. retired-parent 예약 시도가 주문량 부족이 아니라 retired 부모 때문에만 거부되도록 둔다. ALLOC40은 A60의 [0,40) 좌표를 가지고 신규 예약20은 startQuantity 40으로 [40,60)을 지명한다. 좌표 없는 배분은 제품이 구간 전체와 겹친다고 보므로(FulfillmentCommands) 같은 실물을 두 번 예약하지 않는다."
   },
   "evidence": [
     {

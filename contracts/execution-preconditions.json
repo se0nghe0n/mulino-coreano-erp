@@ -1,19 +1,38 @@
 {
   "$id": "urn:mulino:execution-preconditions:1",
-  "version": "1.0.0",
-  "description": "Fixture- and request-side preconditions of the product check chain for actions a case expects to apply (step2r round 10, Step 2 closure review 7 and docs/execution/step2r-round10/precondition-audit.md). The product checks are read from the backend, never changed. ./verify prepare enforces them: ContractValidator.occurrenceTimeProblems (business clock, dispatch after its pick, delivery after its dispatch), grantAuthorityProblems (grant capability scope, delegator coverage, acting authority and grant place scope), commandBasisProblems (basis reference of dispatch and stock commands) and warehouseCustodyProblems (fixture stock reserved, picked, dispatched or moved at internal storage). contracts/fixture-place-kinds.json holds the place rules (dispatchTransit, transitReceipt, directReceiptCustody).",
+  "version": "1.1.0",
+  "description": "Fixture- and request-side preconditions of the product check chain for actions a case expects to apply (step2r round 10, Step 2 closure review 7 and docs/execution/step2r-round10/precondition-audit.md). The product checks are read from the backend, never changed. ./verify prepare enforces them: ContractValidator.occurrenceTimeProblems (business clock, dispatch after its pick, delivery after its dispatch), grantAuthorityProblems (grant capability scope, delegator coverage, acting authority and grant place scope), commandBasisProblems (basis reference of dispatch and stock commands) and warehouseCustodyProblems (fixture stock reserved, picked, dispatched or moved at internal storage). Step 2 round 11 (closure review 8 P1) adds clock.installation (fixtureRecordTimeProblems: no command before the installation, late-known evidence read only after its recording; fixture pickedAt no later than asOf) and reserveCapacity (reserveCapacityProblems: no double booking of a segment interval or a sales line). contracts/fixture-place-kinds.json holds the place rules (dispatchTransit, transitReceipt, directReceiptCustody).",
   "productRefs": [
     "backend/src/main/java/com/mulino/application/core/ApplicationCommands.java (apply: definition, handler prepare, fences, re-prepare, authorizeScopes, expectedRevision, CommandGuard.verify, execute, authorizeScopes again, verifyCommit)",
     "backend/src/main/java/com/mulino/application/identity/IdentityAuthorization.java (permittedScopes: active membership; CapabilityAssignment of the capability; an active Grant with a GrantAction of the capability; every listed scope dimension matches the targets; a delegated grant requires the delegator to be permitted for the same capability and targets)",
     "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java (reserve/replace/release/pick/dispatch order; dispatch: requireWarehouse, pickedAt, DISPATCH, transitPlaceId, PLACE authorization, requireContinuousAuthority: occurrence not after now and not before pickedAt, SELL and DISPATCH continuous from the occurrence to now, evidenceRef)",
     "backend/src/main/java/com/mulino/domain/inventory/FulfillmentStockPrimitives.java (pick records pickedAt = the product clock and increments the allocation revision; observeDelivery rejects a delivery before the dispatch occurrence or after now)",
     "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java (split/merge/move/stocktake/adjust/dispose: occurredAt not after now, evidenceRef required, source leaf not retired and valid at the occurrence, moveQuantity between distinct INTERNAL_STORAGE places of an internal custodian, destination PLACE authorization)",
-    "backend/src/main/java/com/mulino/application/core/ExecutionClock.java (one injected product clock; every DomainContext of a command has asOf = knownAt = that clock)"
+    "backend/src/main/java/com/mulino/application/core/ExecutionClock.java (one injected product clock; every DomainContext of a command has asOf = knownAt = that clock)",
+    "backend/src/main/java/com/mulino/domain/inventory/InventoryRepository.java (rows/object read only rows with recordedAt <= the context knownAt; object throws FORBIDDEN for a row recorded later)",
+    "backend/src/main/java/com/mulino/application/trade/TradeEvidence.java (visible: canonical occurrences and verifications count only when recorded at or before the context knownAt)"
   ],
   "clock": {
-    "meaning": "The acceptance runtime runs the product on one controlled clock. It starts at the fixture clock asOf (the business instant of the installed facts; a fixture whose knownAt is later reads history at asOf with that knownAt) and moves only by clock controls. A clock control sets the clock to its parameters instant, else asOf, else knownAt. A runtime action's product instant (pickedAt, recordedAt) is the clock at that action.",
+    "meaning": "The acceptance runtime runs the product on one controlled clock. It starts at the fixture clock asOf, the installation instant: installed facts are recorded no later than it (installation below), and the fixture knownAt is only the default knowledge instant of a query that names none. It moves only by clock controls. A clock control sets the clock to its parameters instant, else asOf, else knownAt. A runtime action's product instant (pickedAt, recordedAt) is the clock at that action.",
     "controlType": "clock",
-    "instantParameters": ["instant", "asOf", "knownAt"]
+    "instantParameters": ["instant", "asOf", "knownAt"],
+    "installation": {
+      "meaning": "Step 2 closure review 8 NF1. The product reads only rows recorded at or before the command's knownAt, which is the clock (InventoryRepository, TradeEvidence). The installer therefore records every fixture row (createdAt and recordedAt) no later than the starting clock, the fixture clock asOf. The fixture clock knownAt is only the default knowledge instant of a query that names none; it is not a recording instant. A fixture evidence entry declared with recordedAt at or before the fixture knownAt is installation knowledge and is recorded at the starting clock (it must not occur after asOf). An evidence entry declared with recordedAt later than the fixture knownAt is a late-known fact: the installer records it at that declared instant, and an action that names it and is expected to apply runs at a clock at or after it. A fixture pickedAt is at or before asOf. Clock controls never move the clock before the installation for a COMMAND or RECORD.",
+      "recordedAtNotAfter": "asOf",
+      "defaultQueryKnowledge": "knownAt",
+      "lateKnownEvidence": "evidence.recordedAt > clock.knownAt",
+      "rules": [
+        "Every COMMAND or RECORD invoke runs at a product clock at or after the fixture asOf.",
+        "A fixture evidence entry whose recordedAt is at or before the fixture knownAt occurs at or before asOf; one recorded later is not recorded before it occurs.",
+        "An action expected to apply that names late-known evidence runs at a clock at or after that evidence's recordedAt.",
+        "A fixture allocation pickedAt is at or before asOf."
+      ],
+      "knownOpen": [
+        {"caseId": "C2", "subcaseId": "cumulative-versus-state", "evidenceAlias": "DOC", "finding": "Step 2 closure review 8 NF8 backlog: DOC recorded 10-07T04:00 after the round 10 clock shift; docs/execution/step2r-round11/README.md"},
+        {"caseId": "T09", "subcaseId": "cumulative-versus-state", "evidenceAlias": "DOC", "finding": "Step 2 closure review 8 NF8 backlog: DOC recorded 10-07T04:00 after the round 10 clock shift; docs/execution/step2r-round11/README.md"},
+        {"caseId": "T09", "subcaseId": "exists-versus-end-throughout", "evidenceAlias": "DOC", "finding": "Step 2 closure review 8 NF8 backlog: DOC recorded 10-07T04:00 after the round 10 clock shift; docs/execution/step2r-round11/README.md"}
+      ]
+    }
   },
   "occurrence": {
     "meaning": "An action's business occurrence instant is its explicit occurredAt (slots or request), else the request asOf, else the clock at the action. The adapter derives it this way and never chooses another instant.",
@@ -49,6 +68,14 @@
     "terminalStates": ["CONSUMED", "RELEASED", "REPLACED"],
     "revokingCapabilities": ["revokeGrant", "revokeCapability"],
     "unnamedAllocation": "A dispatch that names no allocation is accepted only as a route-level denial: it pins /response/error/code FORBIDDEN and runs on the batch or worker route, or names a subject of another organization."
+  },
+  "reserveCapacity": {
+    "meaning": "Step 2 closure review 8 NF2. FulfillmentCommands.prepare rejects a reservation (or replacement) whose interval [startQuantity, startQuantity + quantity) of the segment overlaps an EXECUTABLE or SUSPENDED allocation of the same segment (INSUFFICIENT_ELIGIBLE_QUANTITY 'Physical interval already reserved'; an allocation without startQuantity overlaps every interval), exceeds the segment (TYPE_INVALID), or exceeds the sales line remainder: allocations on the line plus the new quantity above the ordered quantity minus dispatched (SALES_LINE_QUANTITY_EXCEEDED). A reserve or replace a subcase expects to apply is checked against the fixture allocations and the earlier runtime allocations of the subcase, after earlier releases, replacements and dispatches. The request startQuantity defaults to 0 (adapter). A fixture allocation without startQuantity is treated as covering its whole segment; a fixture that expects another reservation on the same segment declares both coordinates.",
+    "capabilities": ["reserveQuantity", "replaceAllocation"],
+    "activeStates": ["EXECUTABLE", "SUSPENDED"],
+    "lineUsageStates": ["EXECUTABLE", "SUSPENDED", "CONSUMED"],
+    "lineSlots": ["orderLineId", "salesLineId", "saleLineId", "salesOrderLineId", "orderId"],
+    "lineSources": "A fixture allocation's line is its orderLineAlias, else the only SalesOrderLine alias of its workAlias. A line's ordered quantity is the line alias or priorEntities quantity, the only SalesOrder priorEntity when the fixture has exactly one line and one order, or the createSalesOrder quantity for a runtime line; a line whose quantity is not declared is not checked."
   },
   "openInstallerConventions": [
     "Grant scope vocabulary (itemAliases, segmentAliases with derivedSegmentsWithinSamePhysicalRoot, workAliases, createdWorkNamespace, workKinds, sourceNamespaces, places): FixtureInstaller installs only an organization-wide scope today ('Dimension-restricted grant fixture mapping pending'). The WORK dimension of a runtime-created sales or purchase work has no fixture alias; the mapping is Step 3's.",
