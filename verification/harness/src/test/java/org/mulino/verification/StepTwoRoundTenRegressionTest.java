@@ -36,6 +36,15 @@ final class StepTwoRoundTenRegressionTest {
     private static JsonNode alias(String a) {return Json.parse("{\"$alias\":\""+a+"\"}");}
     private static ObjectNode actor(ObjectNode f,String a) {return (ObjectNode)f.path("actors").path(a);}
     private static void remove(JsonNode array,String value) {if(!array.isArray()) return;ArrayNode a=(ArrayNode)array;for(int i=a.size()-1;i>=0;i--) if(a.get(i).asText().equals(value)) a.remove(i);}
+    /**
+     * Step 2 round 13: fixture grants are one all-of grant and list no places (the reads they make present none), so the
+     * place-scope rules are exercised with a grant that lists every fixture place except one.
+     */
+    private static void placesWithout(ObjectNode f,String actor,String without) {
+        ArrayNode places=Json.array();
+        f.path("aliases").fields().forEachRemaining(e->{if(e.getValue().path("type").asText().equals("Place") && !e.getKey().equals(without)) places.add(e.getKey());});
+        ((ObjectNode)actor(f,actor).path("grant").path("scope")).set("placeAliases",places);
+    }
     private void rejects(String key,List<String> problems) {assertTrue(problems.stream().anyMatch(p->p.contains(key)),key+": "+problems);}
     private List<String> run(Rule rule,String caseId,String subId,Consumer<ObjectNode> changeSub,Consumer<ObjectNode> changeFixture) throws Exception {
         JsonNode c=caseJson(caseId);ObjectNode s=sub(c,subId).deepCopy();changeSub.accept(s);
@@ -59,10 +68,10 @@ final class StepTwoRoundTenRegressionTest {
         rejects("names an allocation but no TRANSIT place in cargoPlaceId",run(rule,"T26","lot-expiry-no-event",s->slots(s,"dispatch").remove("cargoPlaceId"),NONE));
         // An internal storage place, or a TRANSIT place outside the dispatcher's (or its delegator's) place scope, is refused.
         rejects("is not a fixture Place of kind TRANSIT",run(rule,"T05",T05,s->slots(s,"dispatch").set("cargoPlaceId",alias("W2")),NONE));
-        rejects("without the transit place TRANSIT",run(rule,"T05",T05,NONE,f->remove(actor(f,"ordinary").path("grant").path("scope").path("placeAliases"),"TRANSIT")));
-        rejects("the grant of delegator lists places",run(rule,"C3","api-dispatchQuantity",NONE,f->remove(actor(f,"delegator").path("grant").path("scope").path("placeAliases"),"TRANSIT")));
+        rejects("without the transit place TRANSIT",run(rule,"T05",T05,NONE,f->placesWithout(f,"ordinary","TRANSIT")));
+        rejects("the grant of delegator lists places",run(rule,"C3","api-dispatchQuantity",NONE,f->placesWithout(f,"delegator","TRANSIT")));
         // A negative pinned FORBIDDEN is decided before the PLACE authorization: the reader of C3 needs no transit scope.
-        assertEquals(List.of(),run(rule,"C3","api-dispatchQuantity",NONE,f->remove(actor(f,"reader").path("grant").path("scope").path("placeAliases"),"TRANSIT")));
+        assertEquals(List.of(),run(rule,"C3","api-dispatchQuantity",NONE,f->placesWithout(f,"reader","TRANSIT")));
         // Every positive and negative dispatch of the corpus names the place now; the contract slot is the corpus slot.
         JsonNode contract=Json.read(root.resolve("contracts/fixture-place-kinds.json")).path("dispatchTransit");
         assertEquals("cargoPlaceId",contract.path("slot").asText());assertEquals("transitPlaceId",contract.path("productSlot").asText());assertEquals("1.4.0",Json.read(root.resolve("contracts/fixture-place-kinds.json")).path("version").asText());
@@ -104,8 +113,8 @@ final class StepTwoRoundTenRegressionTest {
         // The acting actor without the capability, with an expired grant, or outside the places it touches.
         rejects("pickQuantity is expected to apply but warehouse does not hold it",run(rule,"T05",T05,NONE,f->remove(actor(f,"warehouse").path("grant").path("actions"),"pickQuantity")));
         rejects("is not valid at the product clock",run(rule,"T26","grant-expiry-no-event",NONE,f->((ObjectNode)actor(f,"warehouse").path("grant")).put("validUntil","2026-10-07T09:00:00Z")));
-        rejects("without W, which the product authorizes for it",run(rule,"T05",T05,NONE,f->remove(actor(f,"ordinary").path("grant").path("scope").path("placeAliases"),"W")));
-        rejects("without W-alt, which the product authorizes for it",run(rule,"T13",T13,NONE,f->{for(JsonNode a:f.path("actors")) for(String k:List.of("placeAliases","places")) remove(a.path("grant").path("scope").path(k),"W-alt");}));
+        rejects("without W, which the product authorizes for it",run(rule,"T05",T05,NONE,f->placesWithout(f,"ordinary","W")));
+        rejects("without W-alt, which the product authorizes for it",run(rule,"T13",T13,NONE,f->{for(var it=f.path("actors").fieldNames();it.hasNext();) placesWithout(f,it.next(),"W-alt");}));
         // A negative that pins its refusal is not an action expected to apply (T20 readAgent reserve pinned FORBIDDEN).
         assertEquals(List.of(),run(rule,"T20","domain-forbidden",NONE,NONE));
     }

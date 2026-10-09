@@ -201,20 +201,79 @@ class QueryContract(unittest.TestCase):
         self.assertTrue(any('/asOf: UTC instant required' in p for p in problems))
 
 
-class GrantComposition(unittest.TestCase):
-    def fixture(self, scope, **grant):
-        return {'actors': {'reader': {'grant': {'delegatorAlias': 'd', 'actions': [], 'scope': scope, 'validFrom': 'a', 'validUntil': 'b', 'revision': 1, **grant}}}}
+class GrantAuthorization(unittest.TestCase):
+    """Step 2 round 13: one all-of grant per actor, proven against the subcase's reads and commands."""
+    def world(self, scope, actions, roles=None, **fixture):
+        actor = {'organizationAlias': 'ORG', 'roleCapabilities': roles or actions,
+                 'grant': {'delegatorAlias': 'root', 'actions': actions, 'scope': scope, 'validFrom': '2026-10-01T00:00:00Z',
+                           'validUntil': '2026-10-31T00:00:00Z', 'revision': 1}}
+        f = {'fixtureId': 'unit', 'clock': {'asOf': '2026-10-07T09:00:00Z'}, 'actors': {'reader': actor},
+             'aliases': {'ORG': {'type': 'Organization'}, 'P': {'type': 'TradeItem', 'organizationAlias': 'ORG'},
+                         'Q': {'type': 'TradeItem', 'organizationAlias': 'ORG'},
+                         'S': {'type': 'QuantitySegment', 'organizationAlias': 'ORG', 'itemAlias': 'P', 'locationAlias': 'W'},
+                         'W': {'type': 'Place', 'organizationAlias': 'ORG', 'kind': 'INTERNAL_STORAGE'},
+                         'WORK': {'type': 'Work', 'organizationAlias': 'ORG'},
+                         'X': {'type': 'TradeItem', 'organizationAlias': 'ORG-B'}},
+             'baseline': {'work': {'alias': 'WORK', 'ownerAlias': 'reader'}}, **fixture}
+        return f
 
-    def test_multi_dimension_grant_declares_composition(self):
-        two = self.fixture({'itemAliases': ['P'], 'workAliases': ['W']})
-        self.assertTrue(C.fixture_problems('f', two))
-        C.conform_fixture(two)
-        self.assertEqual('PER_DIMENSION', two['actors']['reader']['grant']['scopeComposition'])
-        self.assertEqual([], C.fixture_problems('f', two))
+    def problems(self, fixture, actions, assertions=()):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'fixture.json'
+            path.write_text(json.dumps(fixture))
+            sub = {'id': 's', 'fixtureRef': str(path), 'actions': actions, 'assertions': list(assertions)}
+            return C.grant_problems({'caseId': 'X', 'subcases': [sub]})
 
-    def test_single_dimension_and_empty_lists_need_none(self):
-        self.assertEqual([], C.fixture_problems('f', self.fixture({'itemAliases': ['P'], 'segmentAliases': [], 'caseId': 'X'})))
-        self.assertTrue(C.fixture_problems('f', self.fixture({'itemAliases': ['P']}, scopeComposition='ANY')))
+    def read(self, scope=None, aid='read', cap='getInventory', **request):
+        return query({'scope': scope or {'organizationId': A('ORG'), 'itemId': A('P')}, **request}, cap=cap, aid=aid)
+
+    def test_a_dimension_the_read_does_not_present_refuses_it(self):
+        f = self.world({'itemAliases': ['P'], 'workAliases': ['WORK']}, ['getInventory'])
+        self.assertTrue(any('names WORK' in p for p in self.problems(f, [self.read()])))
+        C.conform_fixture(f)
+        self.assertEqual({'itemAliases': ['P']}, f['actors']['reader']['grant']['scope'])
+        self.assertEqual([], self.problems(f, [self.read()]))
+
+    def test_item_restriction_is_kept_and_checked_by_value(self):
+        f = self.world({'itemAliases': ['P']}, ['getInventory'])
+        problems = self.problems(f, [self.read({'organizationId': A('ORG'), 'itemId': A('Q')})])
+        self.assertTrue(any("ITEM ['Q'] outside the grant" in p for p in problems), problems)
+
+    def test_a_pinned_forbidden_that_the_grant_covers_is_reported(self):
+        f = self.world({'itemAliases': ['P']}, ['getInventory'])
+        pin = {'id': 'code', 'op': 'equals', 'source': {'actionId': 'read', 'pointer': '/response/error/code'}, 'expected': 'FORBIDDEN'}
+        self.assertTrue(any('pinned FORBIDDEN' in p for p in self.problems(f, [self.read()], [pin])))
+        other = self.read({'organizationId': A('ORG'), 'itemId': A('Q')})
+        self.assertEqual([], self.problems(f, [other], [pin]))
+        foreign = self.read({'organizationId': A('ORG'), 'itemId': A('X')})
+        self.assertEqual([], self.problems(self.world({}, ['getInventory']), [foreign], [pin]))
+
+    def test_capability_outside_the_grant_or_revoked_grant_is_uncovered(self):
+        f = self.world({}, ['getInventory'], roles=['getInventory', 'getWork'])
+        problems = self.problems(f, [self.read(cap='getWork', workId=A('WORK'))])
+        self.assertTrue(any('not in its roleCapabilities and grant actions' in p for p in problems), problems)
+        f = self.world({'revokedAt': '2026-10-07T08:00:00Z'}, ['getInventory'])
+        self.assertTrue(any('revoked' in p for p in self.problems(f, [self.read()])))
+
+    def test_item_restriction_drops_when_a_called_capability_presents_no_item(self):
+        f = self.world({'itemAliases': ['P']}, ['getInventory', 'getDefinition'])
+        self.assertEqual({'itemAliases'}, C.kept_scope_keys('unit', 'reader', f['actors']['reader']['grant']) & {'itemAliases'})
+        self.assertTrue(any('names ITEM but TARGET_ID' in p for p in self.problems(f, [self.read(cap='getDefinition', id=A('P'))])))
+
+    def test_retired_composition_and_unrepresented_keys_fail_the_fixture(self):
+        f = self.world({'itemAliases': ['P'], 'customerAliases': ['C']}, ['getInventory'])
+        f['actors']['reader']['grant']['scopeComposition'] = 'PER_DIMENSION'
+        problems = C.fixture_problems('f', f)
+        self.assertTrue(any('scopeComposition is retired' in p for p in problems))
+        self.assertTrue(any('customerAliases has no product grant scope kind' in p for p in problems))
+        C.conform_fixture(f)
+        self.assertEqual([], C.fixture_problems('f', f))
+
+    def test_work_item_survives_the_dropped_work_dimension(self):
+        f = self.world({'itemAliases': ['P'], 'workAliases': ['WORK']}, ['getInventory'])
+        f['aliases']['Q2'] = {'type': 'TradeItem', 'organizationAlias': 'ORG'}
+        C.conform_fixture(f)
+        self.assertEqual('P', f['baseline']['work']['itemAlias'])
 
 
 class RepositoryIsCurrent(unittest.TestCase):

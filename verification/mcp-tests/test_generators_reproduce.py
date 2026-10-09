@@ -37,7 +37,8 @@ class GeneratorsReproduceCommittedFiles(unittest.TestCase):
                                                                     'contracts/mcp/s0-protocol.md'] + REQUEST_CONTRACT + outputs, outputs)
 
     def test_c3_post_processor_is_a_fixed_point(self):
-        self.run_generator('verification/cases/C3/author_prerequisites.py', ['verification/cases/C3', 'contracts/acceptance-capabilities.json',
+        # step2r round 13: V4 subcases install C3 fixtures, so the grant rule reads every case (request_contract.grant_usage).
+        self.run_generator('verification/cases/C3/author_prerequisites.py', ['verification/cases', 'contracts/acceptance-capabilities.json',
                                                                              'verification/requirements/mandatory-oracles.json'] + REQUEST_CONTRACT,
                            [f'verification/cases/C3/{f}' for f in ['case.json', 'scenario.feature', 'observation-bindings.json', 'fixture-closeRecall.json', 'fixture-emergencyReassign.json', 'fixture-dispatchPurchaseOrder.json', 'recipient-acceptance.json']])
 

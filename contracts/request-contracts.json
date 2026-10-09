@@ -1,7 +1,7 @@
 {
   "$id": "urn:mulino:request-contracts:1",
-  "version": "1.0.0",
-  "description": "Request-side contracts every case invoke/query action must meet before it reaches the product (step2r round 12, run-driven: docs/execution/s5a-adapter/run-61bd0f8a.json showed every api command and most queries rejected for envelope shape). verification/cases/request_contract.py applies and checks them; ./verify prepare runs verification/cases/check_request_contracts.py (PreparationAssetChecks 'request-contracts'), so a violation fails preparation and a recorded product gap prints KNOWN_OPEN. Product code is read, never changed.",
+  "version": "1.1.0",
+  "description": "Request-side contracts every case invoke/query action must meet before it reaches the product (step2r round 12, run-driven: docs/execution/s5a-adapter/run-61bd0f8a.json showed every api command and most queries rejected for envelope shape). verification/cases/request_contract.py applies and checks them; ./verify prepare runs verification/cases/check_request_contracts.py (PreparationAssetChecks 'request-contracts'), so a violation fails preparation and a recorded product gap prints KNOWN_OPEN. Step 2 round 13 replaces grantComposition with grantAuthorization: one all-of grant per actor, checked statically against every authorized read and command and every pinned FORBIDDEN. Product code is read, never changed.",
   "productRefs": {
     "commandEnvelope": "contracts/intent.schema.json (product-published; backend CommandRequests.ALLOWED and CommandSchemas.input are the same field set and add commandIdempotencyKey as required when executing)",
     "queryEnvelope": "backend QueryRequests.FIELDS, ApplicationQueries scope keys, per-handler scope/filter guards (InventoryQueries, WorkReadHandler, EvidenceQueries, RuntimeQueries, DefinitionQueries, PolicyQueries, IdentityQueries) at ce4970c4; MCP read tools expose the same fields without operation (OntologyMcp.tool)",
@@ -345,12 +345,13 @@
     "mcp": "MCP protocol fields outside tool arguments: transport rpcId, MRTR requestState and inputResponses (V6)",
     "intentionalViolation": "a field the case sends on purpose to prove the product rejects it; prepare requires the declared fields to equal the actual violations and a pinned rejection on the action"
   },
-  "grantComposition": {
-    "field": "scopeComposition",
-    "values": {
-      "PER_DIMENSION": "install one grant per product dimension kind (same actions, delegator, validity, revision); the authored lists act as alternatives",
-      "ALL_DIMENSIONS": "install one grant whose dimension kinds intersect (product all-of semantics)"
-    },
+  "grantAuthorization": {
+    "rule": "User decision 2026-10-09 (AGENTS.md): a grant naming several dimension kinds authorizes only when every kind matches the targets the product presents (all-of, IdentityAuthorization.permittedScopes); identifiers within one kind are alternatives, and the policy guard requires every presented identifier of a command (PolicyCommandGuard.everyScope). The fixture schema and the Step 3 installer hold one grant per actor, so a fixture grant keeps only the dimension kinds that every capability the cases call with that actor presents (directly or through it as a fixture delegator): ITEM when all those capabilities carry the item (familiesWithoutItem name those that do not), none otherwise (an organization-wide grant). WORK, PLACE, TARGET and SOURCE restrictions of a multi-purpose grant would refuse its own reads (an inventory or item row presents no WORK; a Work presents no PLACE), so conform_fixture drops them unless an override keeps them for a negative oracle. Keys with no product grant scope kind are dropped too: the installer could not install them. check_request_contracts.py then proves statically, per subcase, that every read or command the case expects to be authorized is covered and that every action pinned to FORBIDDEN stays uncovered.",
+    "productRefs": [
+      "backend/src/main/java/com/mulino/application/identity/IdentityAuthorization.java (permittedScopes: membership, CapabilityAssignment, Grant with GrantAction, every non-ORGANIZATION grant scope kind present in targets with a matching id, delegator permitted for the same targets)",
+      "backend/src/main/java/com/mulino/application/policy/PolicyCommandGuard.java (everyScope: every single-id combination of the command scopes must pass)",
+      "verification/harness/src/main/java/org/mulino/verification/actual/ScenarioFixtureInstaller.java (grants: one grant per actor, scope kinds ITEM/WORK/PLACE/TARGET/SOURCE; workItem infers a Work item from grant scopes when the work entry names none)"
+    ],
     "dimensionKinds": {
       "itemAliases": "ITEM",
       "items": "ITEM",
@@ -362,14 +363,422 @@
       "segmentAliases": "TARGET",
       "segments": "TARGET",
       "lotAliases": "TARGET",
-      "customerAliases": "TARGET",
-      "supplierAliases": "TARGET",
       "documentAliases": "TARGET",
       "targetAliases": "TARGET",
       "physicalRootAliases": "TARGET",
       "sourceNamespaces": "SOURCE"
     },
-    "rule": "A grant naming two or more dimension kinds declares scopeComposition. Step 2 round 12 sets PER_DIMENSION on every such fixture grant: the cases read and act across items, works and segments the grant lists, which the product's all-of match of one grant refuses (run-61bd0f8a: 111 subcases FORBIDDEN). The plan (section 7.1) does not say whether the lists of one grant are alternatives; the installer must split a PER_DIMENSION grant (probe mode unionGrantDimensions does exactly this today)."
+    "unrepresentedScopeKeys": [
+      "customerAliases",
+      "supplierAliases",
+      "workKinds",
+      "derivedSegmentsWithinSamePhysicalRoot",
+      "settlementModes",
+      "basisKinds",
+      "managementOrganizationAliases"
+    ],
+    "unrepresentedNote": "mulino_identity_GrantScopes.scopeKind is CHECKed to ORGANIZATION, TARGET, WORK, ITEM, PLACE, SOURCE; the installer drops these keys and reports the fixture incomplete. The grant is installed without them, so conform_fixture removes them instead of letting a fixture claim a restriction the product never enforces.",
+    "metadataScopeKeys": [
+      "organizationAlias",
+      "caseId",
+      "subcaseId",
+      "caseNamespace",
+      "createdWorkNamespace",
+      "environmentId",
+      "capabilityIds",
+      "revokedAt"
+    ],
+    "families": {
+      "NULL": {
+        "meaning": "authorize(context, capability, null): any active grant with the capability passes (ApplicationQueries.java:55 for getAccessContext, IdentityQueries.java:15)",
+        "presents": null
+      },
+      "ITEM_ROW": {
+        "meaning": "TradeItem row {TARGET:item, ITEM:item}",
+        "presents": [
+          {
+            "TARGET": "item",
+            "ITEM": "item"
+          }
+        ]
+      },
+      "INVENTORY": {
+        "meaning": "every visible fixture segment of the item {TARGET:segment, ITEM:item, PLACE:segment place}; when none is visible the item row {TARGET:item, ITEM:item} must pass (InventoryQueries.java:87-88)",
+        "presents": "inventory"
+      },
+      "OBJECT": {
+        "meaning": "the requested row by noun type: TradeItem/ManufacturingLot {TARGET, ITEM}, QuantitySegment {TARGET, ITEM, PLACE}, Place {TARGET, PLACE}, Work {TARGET, WORK, ITEM}, PurchaseOrder/PurchaseProposal {ITEM, WORK}, Customer/Supplier {TARGET}; other provider nouns are not modelled (InventoryQueries.java:146-157, PurchaseQueries.java:20, SalesQueries.java:22)",
+        "presents": "object"
+      },
+      "WORK_ROW": {
+        "meaning": "the Work row {TARGET:work, WORK:work, ITEM:work item} (WorkReadHandler.java:65, WorkLifecycle.java:34)",
+        "presents": [
+          {
+            "TARGET": "work",
+            "WORK": "work",
+            "ITEM": "workItem"
+          }
+        ]
+      },
+      "CREATE_WORK": {
+        "meaning": "{ITEM:item} only (WorkLifecycle.java:30)",
+        "presents": [
+          {
+            "ITEM": "item"
+          }
+        ]
+      },
+      "WORK_ONLY": {
+        "meaning": "{WORK:work} only, no ITEM (ResponsibilityCommands.java:46, RuntimeCommands.java:20, RuntimeFixtureCommands.java:21)",
+        "presents": [
+          {
+            "WORK": "work"
+          }
+        ]
+      },
+      "ORGANIZATION": {
+        "meaning": "{ORGANIZATION:org} only: a grant naming any dimension fails (ItemCommands.java:33, PolicyCommands.java:20)",
+        "presents": [
+          {
+            "ORGANIZATION": "organization"
+          }
+        ]
+      },
+      "STOCK": {
+        "meaning": "each source leaf {TARGET:segment, ITEM:item, PLACE:segment place}, a move also {PLACE:destination}; the policy guard requires every value (InventoryCommands.java:45,64,82-84)",
+        "presents": [
+          {
+            "TARGET": "segment",
+            "ITEM": "item",
+            "PLACE": "segmentPlace+destination"
+          }
+        ]
+      },
+      "FULFILLMENT": {
+        "meaning": "{TARGET:segment, ITEM:item, PLACE:segment place (+transit place of a dispatch), WORK:sales line work} (FulfillmentCommands.java:28,31,38)",
+        "presents": [
+          {
+            "TARGET": "segment",
+            "ITEM": "item",
+            "PLACE": "segmentPlace+transit",
+            "WORK": "?"
+          }
+        ]
+      },
+      "QUALITY": {
+        "meaning": "{TARGET:segment, ITEM, PLACE, WORK} (QualityCommands.java:42-44)",
+        "presents": [
+          {
+            "TARGET": "segment",
+            "ITEM": "item",
+            "PLACE": "segmentPlace",
+            "WORK": "?"
+          }
+        ]
+      },
+      "ITEM_TRADE": {
+        "meaning": "trade and evidence scopes that always carry the item of the row (purchase {ITEM, WORK, PLACE, SUPPLIER}, sales/receipt/delivery/return/recall {TARGET, ITEM, PLACE, WORK}, settlement {ITEM, WORK, PLACE, SUPPLIER|CUSTOMER}, shipment {ITEM, TARGET, PLACE, WORK}, regulatory {ITEM, TARGET, WORK, SOURCE}, evidence rows {TARGET, ITEM?, PLACE?, WORK?, SOURCE}); only the ITEM value is modelled",
+        "presents": [
+          {
+            "ITEM": "item",
+            "TARGET": "?",
+            "PLACE": "?",
+            "WORK": "?",
+            "SOURCE": "?"
+          }
+        ]
+      },
+      "ITEM_TARGET": {
+        "meaning": "{ITEM:item, TARGET:item} (ItemCommands.java:40)",
+        "presents": [
+          {
+            "ITEM": "item",
+            "TARGET": "item"
+          }
+        ]
+      },
+      "WORK_ITEM": {
+        "meaning": "{WORK:work, ITEM:work item} (AssessmentService.java:23)",
+        "presents": [
+          {
+            "WORK": "work",
+            "ITEM": "workItem"
+          }
+        ]
+      },
+      "TARGET_ID": {
+        "meaning": "{TARGET:requested id} (DefinitionQueries.java:17, PolicyQueries.java:12)",
+        "presents": [
+          {
+            "TARGET": "id"
+          }
+        ]
+      },
+      "SOURCE_ONLY": {
+        "meaning": "{SOURCE:source profile} only (PurchaseCommands.java:59, RuntimeQueries.java:26)",
+        "presents": [
+          {
+            "SOURCE": "?"
+          }
+        ]
+      },
+      "IDENTITY": {
+        "meaning": "the requested or stored grant/assignment scopes (IdentityCommands.java:19-22, IdentityControlGuard.java:17-66, IdentityQueries.java:20-26); not modelled, never assumed to carry ITEM",
+        "presents": "unknown"
+      },
+      "WORK_SEARCH": {
+        "meaning": "searchOperationalIssues rows {WORK} or {SOURCE} (RuntimeQueries.java:21-26)",
+        "presents": [
+          {
+            "WORK": "?"
+          }
+        ]
+      },
+      "NO_HANDLER": {
+        "meaning": "no product handler is installed (contracts/request-contracts.json queryEnvelope operationsWithoutProductHandler, missing CommandHandler): the product answers VERSION_UNSUPPORTED before any authorization, so the grant decides nothing",
+        "presents": "unknown"
+      },
+      "GRANT_READ": {
+        "meaning": "the read grant's own GrantScopes plus TARGET:grant (IdentityQueries.java:20-26); a holder reading a grant of its own item scope presents that item. Values are not modelled",
+        "presents": [
+          {
+            "ITEM": "?",
+            "TARGET": "?",
+            "WORK": "?",
+            "PLACE": "?",
+            "SOURCE": "?"
+          }
+        ]
+      }
+    },
+    "familiesWithoutItem": [
+      "ORGANIZATION",
+      "WORK_ONLY",
+      "TARGET_ID",
+      "SOURCE_ONLY",
+      "IDENTITY",
+      "WORK_SEARCH"
+    ],
+    "capabilityFamilies": {
+      "acceptHandover": "WORK_ONLY",
+      "activateDefinition": "NO_HANDLER",
+      "activatePolicy": "ORGANIZATION",
+      "activateWork": "WORK_ROW",
+      "adjustQuantity": "STOCK",
+      "approveDefinition": "NO_HANDLER",
+      "approvePolicy": "ORGANIZATION",
+      "approvePurchase": "ITEM_TRADE",
+      "approveRecall": "ITEM_TRADE",
+      "assessGoal": "WORK_ITEM",
+      "assignCapability": "IDENTITY",
+      "attachEvidence": "ITEM_TRADE",
+      "authorizeReturn": "ITEM_TRADE",
+      "cancelDraft": "WORK_ROW",
+      "cancelPurchase": "ITEM_TRADE",
+      "closeRecall": "ITEM_TRADE",
+      "closeWork": "WORK_ROW",
+      "confirmReceipt": "ITEM_TRADE",
+      "convertUnit": "NO_HANDLER",
+      "correctEvidence": "ITEM_TRADE",
+      "createDefinitionDraft": "NO_HANDLER",
+      "createDraft": "CREATE_WORK",
+      "createFollowup": "WORK_ROW",
+      "createGrant": "IDENTITY",
+      "createObligation": "WORK_ONLY",
+      "createPolicyDraft": "ORGANIZATION",
+      "createSalesOrder": "ITEM_TRADE",
+      "createShipment": "ITEM_TRADE",
+      "createWork": "CREATE_WORK",
+      "createWorkLink": "WORK_ROW",
+      "decideQualityDutyWaiver": "WORK_ONLY",
+      "decideQuantityDutyWaiver": "WORK_ONLY",
+      "decideRecallDutyWaiver": "WORK_ONLY",
+      "decideReturnDisposition": "ITEM_TRADE",
+      "dispatchPurchaseOrder": "ITEM_TRADE",
+      "dispatchQuantity": "FULFILLMENT",
+      "disposeQuantity": "STOCK",
+      "emergencyReassign": "WORK_ONLY",
+      "emergencyRepair": "NO_HANDLER",
+      "evaluateEligibility": "NO_HANDLER",
+      "expireHandover": "WORK_ONLY",
+      "fixtureExternalEffect": "WORK_ONLY",
+      "getAccessContext": "NULL",
+      "getAssessment": "WORK_ROW",
+      "getCommandResult": "NO_HANDLER",
+      "getDefinition": "TARGET_ID",
+      "getDeliveries": "ITEM_TRADE",
+      "getDelivery": "ITEM_TRADE",
+      "getEvidence": "ITEM_TRADE",
+      "getGrant": "GRANT_READ",
+      "getInbox": "ITEM_TRADE",
+      "getInventory": "INVENTORY",
+      "getObject": "OBJECT",
+      "getObligations": "WORK_ROW",
+      "getPolicy": "TARGET_ID",
+      "getPurchase": "ITEM_TRADE",
+      "getRecall": "ITEM_TRADE",
+      "getRecalls": "ITEM_TRADE",
+      "getReceipt": "ITEM_TRADE",
+      "getReceipts": "ITEM_TRADE",
+      "getReconciliation": "ITEM_TRADE",
+      "getRegulatoryProcedure": "ITEM_TRADE",
+      "getReturn": "ITEM_TRADE",
+      "getReturns": "ITEM_TRADE",
+      "getSalesOrder": "ITEM_TRADE",
+      "getSalesOrders": "ITEM_TRADE",
+      "getSettlement": "ITEM_TRADE",
+      "getShipment": "ITEM_TRADE",
+      "getTrace": "NO_HANDLER",
+      "getWork": "WORK_ROW",
+      "linkCanonicalOccurrence": "ITEM_TRADE",
+      "linkExternalId": "ITEM_TARGET",
+      "matchInvoice": "ITEM_TRADE",
+      "matchSourceIdentity": "ITEM_TRADE",
+      "mergeQuantity": "STOCK",
+      "migrateWorkDefinition": "NO_HANDLER",
+      "moveQuantity": "STOCK",
+      "openInvestigation": "ITEM_TRADE",
+      "openObligation": "WORK_ONLY",
+      "pickQuantity": "FULFILLMENT",
+      "placeHold": "QUALITY",
+      "prepareRegulatoryProcedure": "ITEM_TRADE",
+      "proposeHandover": "WORK_ONLY",
+      "proposePurchase": "ITEM_TRADE",
+      "proposeRecall": "ITEM_TRADE",
+      "publishDefinition": "NO_HANDLER",
+      "receiveProvisional": "ITEM_TRADE",
+      "receiveReturn": "ITEM_TRADE",
+      "recordActivity": "ITEM_TRADE",
+      "recordCharge": "ITEM_TRADE",
+      "recordDelivery": "ITEM_TRADE",
+      "recordDispositionBasis": "QUALITY",
+      "recordExternalReconciliation": "WORK_ONLY",
+      "recordHandover": "ITEM_TRADE",
+      "recordInvoice": "ITEM_TRADE",
+      "recordLegEvent": "ITEM_TRADE",
+      "recordObservedMovement": "ITEM_TRADE",
+      "recordPaymentReference": "ITEM_TRADE",
+      "recordRecallNotice": "ITEM_TRADE",
+      "recordRecovery": "ITEM_TRADE",
+      "recordRegulatoryDecision": "ITEM_TRADE",
+      "recordRelation": "NO_HANDLER",
+      "recordSettlementAdjustment": "ITEM_TRADE",
+      "recordStocktake": "STOCK",
+      "recordSubmission": "ITEM_TRADE",
+      "recordSupplierReply": "SOURCE_ONLY",
+      "registerItem": "ORGANIZATION",
+      "rejectHandover": "WORK_ONLY",
+      "releaseAllocation": "FULFILLMENT",
+      "releaseHold": "QUALITY",
+      "replaceAllocation": "FULFILLMENT",
+      "reserveQuantity": "FULFILLMENT",
+      "resolveEvidenceConflict": "ITEM_TRADE",
+      "resolveObligation": "WORK_ONLY",
+      "resumeWork": "WORK_ROW",
+      "retireDefinition": "NO_HANDLER",
+      "retirePolicy": "ORGANIZATION",
+      "retrySafeCommand": "NO_HANDLER",
+      "reviseGoal": "WORK_ROW",
+      "revisePurchase": "ITEM_TRADE",
+      "reviseSalesOrder": "ITEM_TRADE",
+      "revokeCapability": "IDENTITY",
+      "revokeDispositionBasis": "QUALITY",
+      "revokeGrant": "IDENTITY",
+      "searchObjects": "OBJECT",
+      "searchOperationalIssues": "WORK_SEARCH",
+      "searchShipments": "ITEM_TRADE",
+      "searchWorks": "WORK_ROW",
+      "splitQuantity": "STOCK",
+      "structureIntent": "NO_HANDLER",
+      "submitDefinitionReview": "NO_HANDLER",
+      "traceLot": "OBJECT",
+      "traceRecall": "ITEM_TRADE",
+      "transferObligation": "WORK_ONLY",
+      "validateDefinition": "NO_HANDLER",
+      "verifyLabel": "ITEM_TRADE",
+      "waitWork": "WORK_ROW",
+      "waiveObligation": "WORK_ONLY"
+    },
+    "defaultFamily": "NULL",
+    "overrides": [],
+    "overridesNote": "(fixtureId, actor) entries whose grant keeps named scope keys after conform_fixture, each with the negative oracle that needs the restriction. Empty unless a check shows a pinned FORBIDDEN that only a dimension restriction refuses.",
+    "decisionAuthority": {
+      "capabilities": [
+        "activatePolicy",
+        "adjustQuantity",
+        "approvePolicy",
+        "approvePurchase",
+        "approveRecall",
+        "assignCapability",
+        "authorizeReturn",
+        "closeRecall",
+        "createGrant",
+        "decideQualityDutyWaiver",
+        "decideQuantityDutyWaiver",
+        "decideRecallDutyWaiver",
+        "decideReturnDisposition",
+        "dispatchPurchaseOrder",
+        "disposeQuantity",
+        "emergencyReassign",
+        "placeHold",
+        "proposeRecall",
+        "receiveReturn",
+        "recordDispositionBasis",
+        "recordRecallNotice",
+        "recordRecovery",
+        "recordSettlementAdjustment",
+        "releaseHold",
+        "revokeCapability",
+        "revokeDispositionBasis",
+        "revokeGrant",
+        "waiveObligation"
+      ],
+      "meaning": "Plan section 7.1 gives these actions a decision authority beyond the grant (MANAGER, QC, ADMIN, CONFIG_APPROVER, a guarded approval or ManagementAuthorities/ManagementCoverage of a HUMAN, backend PurchaseCommands.manager, RecallCommands.admin, ReturnCommands.manager, SettlementCommands.manager, ResponsibilityCommands.designated, IdentityControlGuard). A FORBIDDEN pinned on them is decided by that authority, so a grant that covers the call does not contradict it; the static check reports it as not judged instead of as a broken negative."
+    },
+    "nonGrantForbidden": [
+      {
+        "caseId": "V6",
+        "subcaseId": "rejected-new-key",
+        "actionId": "bad",
+        "basis": "ORACLE_REVIEW",
+        "note": "The request repeats the committed receipt with a new key and names nothing the actor lacks (same item, place, work, capability); no grant, identity or decision basis makes it FORBIDDEN. Open Step 2 finding: the rejected change of V6.key-conflicts-owner-and-distinct-order rejectedChangeNewKey must be authored. The oracle is kept."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "destination-id-swap",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "renamed-action",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "raw-primitive",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "return-bypass",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "disposal-bypass",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      }
+    ]
   },
   "knownOpen": [
     {

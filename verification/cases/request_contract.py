@@ -9,7 +9,9 @@ contracts/request-contracts.json:
   with a provenance entry for every slot;
 - queries: only the fields, scope keys and filters of the product query envelope (QueryRequests and the
   per-handler guards transcribed in the contract file);
-- grants: a fixture grant naming two or more product dimension kinds declares scopeComposition.
+- grants (step2r round 13): one all-of grant per actor (user decision 2026-10-09). A grant keeps only the dimension
+  kinds every capability the cases call with that actor presents; grant_problems proves per subcase that every
+  read or command expected to be authorized is covered and every action pinned FORBIDDEN is not.
 
 conform_case/conform_fixture rewrite authored requests into those contracts (used by every case generator and
 docs/execution/step2r-round12/author_round12.py); case_problems/fixture_problems check them (used by
@@ -191,6 +193,7 @@ class World:
     """Merged aliases and actors of a subcase fixture (baseRefs first, the fixture itself last)."""
     def __init__(self, root, ref, cache=None):
         self.aliases, self.actors, self.evidence = {}, {}, set()
+        self.segments, self.works, self.lots, self.allocations, self.clock, self.actor_source = {}, {}, {}, {}, None, {}
         if ref:
             self._merge(Path(root), ref, set(), cache if cache is not None else {})
 
@@ -205,6 +208,31 @@ class World:
             self._merge(root, base, visiting, cache)
         self.aliases.update(data.get('aliases') or {})
         self.actors.update(data.get('actors') or {})
+        for name in data.get('actors') or {}:
+            self.actor_source[name] = data.get('fixtureId')
+        baseline = data.get('baseline') or {}
+        for row in baseline.get('segments') or []:
+            if isinstance(row, dict) and isinstance(row.get('alias'), str):
+                self.segments[row['alias']] = row
+        for key in ('works', 'work'):
+            rows = baseline.get(key)
+            for row in rows if isinstance(rows, list) else [rows] if isinstance(rows, dict) else []:
+                if isinstance(row, dict) and isinstance(row.get('alias'), str):
+                    self.works[row['alias']] = row
+        for row in baseline.get('lots') or []:
+            if isinstance(row, dict) and isinstance(row.get('alias'), str):
+                self.lots[row['alias']] = row
+        for key in ('allocations', 'allocation'):
+            rows = baseline.get(key)
+            for row in rows if isinstance(rows, list) else [rows] if isinstance(rows, dict) else []:
+                if isinstance(row, dict) and isinstance(row.get('alias'), str):
+                    self.allocations[row['alias']] = row
+        for name, row in (baseline.get('priorEntities') or {}).items():
+            if isinstance(row, dict) and (self.aliases.get(name) or {}).get('type') == 'Allocation':
+                self.allocations.setdefault(name, {}).update(row)
+        clock = (data.get('clock') or {}).get('asOf')
+        if isinstance(clock, str):
+            self.clock = clock
         evidence = data.get('evidence')
         for row in evidence if isinstance(evidence, list) else []:
             if isinstance(row, dict) and isinstance(row.get('alias'), str):
@@ -222,6 +250,53 @@ class World:
     def org_items(self, org):
         return sorted(a for a, v in self.aliases.items() if v.get('type') == 'TradeItem' and v.get('organizationAlias') == org)
 
+    # -- facts the product authorizes against (step2r round 13) --
+    def org_of(self, name):
+        return (self.aliases.get(name) or {}).get('organizationAlias')
+
+    def segment_item(self, name):
+        for row in (self.aliases.get(name) or {}, self.segments.get(name) or {}):
+            if isinstance(row.get('itemAlias'), str):
+                return row['itemAlias']
+        for row in (self.aliases.get(name) or {}, self.segments.get(name) or {}):
+            if isinstance(row.get('lotAlias'), str):
+                return self.lot_item(row['lotAlias'])
+        return None
+
+    def segment_place(self, name):
+        for row in (self.aliases.get(name) or {}, self.segments.get(name) or {}):
+            for key in ('locationAlias', 'placeAlias'):
+                if isinstance(row.get(key), str):
+                    return row[key]
+        return None
+
+    def lot_item(self, name):
+        for row in (self.aliases.get(name) or {}, self.lots.get(name) or {}):
+            if isinstance(row.get('itemAlias'), str):
+                return row['itemAlias']
+        return None
+
+    def work_item(self, name):
+        """The installer's Work item: the work entry's itemAlias, else the one item of the grants naming the work, else
+        the organization's only TradeItem (ScenarioFixtureInstaller.workItem)."""
+        row = self.works.get(name) or {}
+        if isinstance(row.get('itemAlias'), str):
+            return row['itemAlias']
+        org = self.org_of(name)
+        items = []
+        for actor in self.actors.values():
+            scope = (actor.get('grant') or {}).get('scope') or {}
+            if name in (scope.get('workAliases') or []):
+                items += [i for i in scope.get('itemAliases') or [] if self.org_of(i) == org and i not in items]
+        if len(items) == 1:
+            return items[0]
+        only = self.org_items(org)
+        return only[0] if len(only) == 1 else None
+
+    def item_segments(self, item):
+        names = set(self.segments) | {a for a, v in self.aliases.items() if v.get('type') == 'QuantitySegment'}
+        return sorted(n for n in names if self.segment_item(n) == item and (self.segments.get(n) or {}).get('active', True) is not False)
+
 
 # ---- conformance -----------------------------------------------------------------------------------------------------
 class Contracts:
@@ -234,7 +309,8 @@ class Contracts:
         self.intent_routes = set(routes['intentBody'])
         self.addressing = routes['intentWithAddressing']
         self.query = self.data['queryEnvelope']
-        self.dimensions = self.data['grantComposition']['dimensionKinds']
+        self.grants = self.data['grantAuthorization']
+        self.dimensions = self.grants['dimensionKinds']
         self.known = self.data['knownOpen']
         self.kinds = {c['id']: c['kind'] for c in load_json(self.root, 'contracts/acceptance-capabilities.json')['capabilities']}
 
@@ -523,17 +599,81 @@ class Contracts:
                 kinds.add(self.dimensions[key])
         return kinds
 
+    def family(self, capability):
+        return self.grants['capabilityFamilies'].get(capability, self.grants['defaultFamily'])
+
+    def grant_override(self, fixture_id, actor):
+        for row in self.grants['overrides']:
+            if row['fixtureId'] == fixture_id and row['actor'] == actor:
+                return row
+        return None
+
+    def grant_usage(self):
+        """(fixtureId, actor) -> capabilities the committed cases call with that fixture actor, or through it as a fixture
+        delegator, outside actions pinned FORBIDDEN (computed from verification/cases/*/case.json, cached)."""
+        if getattr(self, '_usage', None) is None:
+            usage, cache = {}, {}
+            for path in sorted((self.root / 'verification/cases').glob('*/case.json')):
+                case = json.loads(path.read_text())
+                for sub in case.get('subcases', []):
+                    world = World(self.root, sub.get('fixtureRef'), cache)
+                    actions = list(iter_actions(sub.get('actions', [])))
+                    pins = pinned_codes(sub, actions)
+                    for action in actions:
+                        if action.get('kind') not in ('invoke', 'query') or not action.get('actorRef') or pins.get(action.get('id')) == 'FORBIDDEN':
+                            continue
+                        for capability, _ in self.authorized_calls(action):
+                            who, seen = action['actorRef'], set()
+                            while who in world.actors and who not in seen:
+                                seen.add(who)
+                                usage.setdefault((world.actor_source.get(who), who), set()).add(capability)
+                                who = (world.actors[who].get('grant') or {}).get('delegatorAlias')
+            self._usage = usage
+        return self._usage
+
+    def kept_scope_keys(self, fixture_id, actor, grant):
+        """Scope keys conform_fixture keeps: metadata, the ITEM keys unless a capability the cases call with this actor (or
+        through it as delegator) presents no item, and the keys an override names (contracts/request-contracts.json
+        grantAuthorization)."""
+        without = set(self.grants['familiesWithoutItem'])
+        used = self.grant_usage().get((fixture_id, actor), set()) & set(grant.get('actions') or [])
+        item = not any(self.family(cap) in without for cap in used)
+        override = self.grant_override(fixture_id, actor)
+        keep = set(self.grants['metadataScopeKeys']) | set((override or {}).get('keep') or [])
+        if item and not (override and override.get('dropItem')):
+            keep |= {k for k, kind in self.dimensions.items() if kind == 'ITEM'}
+        return keep
+
     def conform_fixture(self, fixture):
-        for actor in (fixture.get('actors') or {}).values():
+        """Step 2 round 13: one all-of grant per actor (user decision 2026-10-09). Before a Work loses the grant that named
+        it, its baseline entry gets the item the installer inferred from that grant (ScenarioFixtureInstaller.workItem)."""
+        actors = fixture.get('actors') or {}
+        baseline = fixture.get('baseline') or {}
+        world = World(self.root, None)
+        world.aliases, world.actors = fixture.get('aliases') or {}, actors
+        for key in ('works', 'work'):
+            rows = baseline.get(key)
+            for row in rows if isinstance(rows, list) else [rows] if isinstance(rows, dict) else []:
+                if isinstance(row, dict) and isinstance(row.get('alias'), str) and 'itemAlias' not in row:
+                    item = world.work_item(row['alias'])
+                    if item:
+                        rebuilt = {}
+                        for k, v in row.items():
+                            rebuilt[k] = v
+                            if k == 'alias':
+                                rebuilt['itemAlias'] = item
+                        row.clear()
+                        row.update(rebuilt)
+        for name, actor in actors.items():
             grant = actor.get('grant')
-            if isinstance(grant, dict) and len(self.grant_kinds(grant)) >= 2 and 'scopeComposition' not in grant:
-                rebuilt = {}
-                for key, value in grant.items():
-                    rebuilt[key] = value
-                    if key == 'scope':
-                        rebuilt['scopeComposition'] = 'PER_DIMENSION'
-                grant.clear()
-                grant.update(rebuilt)
+            if not isinstance(grant, dict):
+                continue
+            grant.pop('scopeComposition', None)
+            scope = grant.get('scope')
+            if isinstance(scope, dict):
+                keep = self.kept_scope_keys(fixture.get('fixtureId'), name, grant)
+                for key in [k for k in scope if k not in keep]:
+                    scope.pop(key)
         return fixture
 
     # -- checks --
@@ -710,13 +850,365 @@ class Contracts:
         problems = []
         for name, actor in (fixture.get('actors') or {}).items():
             grant = actor.get('grant') or {}
-            kinds = self.grant_kinds(grant)
-            composition = grant.get('scopeComposition')
-            if composition is not None and composition not in self.data['grantComposition']['values']:
-                problems.append(f'{rel} actor {name}: unknown scopeComposition {composition}')
-            if len(kinds) >= 2 and composition is None:
-                problems.append(f'{rel} actor {name}: grant names {sorted(kinds)} without scopeComposition (contracts/request-contracts.json grantComposition)')
+            if 'scopeComposition' in grant:
+                problems.append(f'{rel} actor {name}: scopeComposition is retired; a grant is one all-of grant (contracts/request-contracts.json grantAuthorization)')
+            keep = self.kept_scope_keys(fixture.get('fixtureId'), name, grant)
+            for key in grant.get('scope') or {}:
+                if key not in keep:
+                    kind = self.dimensions.get(key)
+                    why = 'has no product grant scope kind' if key in self.grants['unrepresentedScopeKeys'] else \
+                        f'is a {kind} restriction that a capability of this grant does not present' if kind else 'is not a grant scope key'
+                    problems.append(f'{rel} actor {name}: grant scope {key} {why}; the all-of grant would refuse its own reads (contracts/request-contracts.json grantAuthorization)')
         return problems
+
+    # -- grant coverage (step2r round 13) --
+    def grant_problems(self, case, cache=None):
+        """Static all-of check of every authenticated read and command (contracts/request-contracts.json grantAuthorization):
+        an action the subcase expects to be authorized must be covered by its actor's grant, and an action pinned to
+        FORBIDDEN must stay uncovered. Unresolvable targets (runtime results, unmodelled families), decisions that another
+        authority makes and declared nonGrantForbidden actions are not judged."""
+        cache = {} if cache is None else cache
+        declared = {(r['caseId'], r['subcaseId'], r['actionId']) for r in self.grants['nonGrantForbidden']}
+        problems = []
+        for sub in case.get('subcases', []):
+            world = World(self.root, sub.get('fixtureRef'), cache)
+            actions = list(iter_actions(sub.get('actions', [])))
+            pins = pinned_codes(sub, actions)
+            started = {a['call'].get('id') for a in actions if isinstance(a.get('call'), dict)}
+            controls = [i for i, a in enumerate(actions) if a.get('kind') == 'invoke' and a.get('capabilityId') in IDENTITY_CONTROL
+                        and pins.get(a.get('id')) is None]
+            clock = world.clock
+            for i, action in enumerate(actions):
+                if action.get('kind') == 'control' and (action.get('control') or {}).get('type') == 'clock':
+                    params = action['control'].get('parameters') or {}
+                    clock = next((params[k] for k in ('instant', 'asOf', 'knownAt') if isinstance(params.get(k), str)), clock)
+                if action.get('kind') not in ('invoke', 'query') or not action.get('actorRef'):
+                    continue
+                key = (case.get('caseId'), sub.get('id'), action.get('id'))
+                # a grant changed at run time before this call (or before the await of a started call) is not judged
+                if any(c < i for c in controls) or action.get('id') in started and any(c > i for c in controls):
+                    continue
+                code = pins.get(action.get('id'))
+                wire = action.get('route') == 'wire'
+                if code != 'FORBIDDEN' and (wire or code is not None or not expects_effect(sub, actions, i, action)):
+                    continue
+                if code == 'FORBIDDEN' and key in declared:
+                    continue
+                calls = self.authorized_calls(action)
+                verdicts = [self.covered(world, action['actorRef'], cap, request, action, clock) + (cap,) for cap, request in calls]
+                where = f"{case.get('caseId')}/{sub.get('id')}/{action.get('id')}"
+                if code == 'FORBIDDEN':
+                    if any(v is False for v, _, _ in verdicts) or not verdicts:
+                        continue
+                    decided = [cap for v, _, cap in verdicts if v is True and cap in self.grants['decisionAuthority']['capabilities']]
+                    if all(v is True for v, _, _ in verdicts) and not decided:
+                        why = '; '.join(f'{cap}: {w}' for _, w, cap in verdicts)
+                        problems.append(f'{where}: pinned FORBIDDEN but the grant of {action["actorRef"]} covers it ({why}); the negative authorization oracle would not hold (contracts/request-contracts.json grantAuthorization)')
+                else:
+                    for v, w, cap in verdicts:
+                        if v is False and not w.startswith('the request names'):
+                            problems.append(f'{where}: {cap} is expected to be authorized but the grant of {action["actorRef"]} does not cover it ({w}) under the all-of rule (contracts/request-contracts.json grantAuthorization)')
+        return problems
+
+    def authorized_calls(self, action):
+        request = action.get('request') if isinstance(action.get('request'), dict) else {}
+        if action.get('route') == 'wire':
+            return [(proxy['capabilityId'], args) for args, proxy in self.tool_calls(action)]
+        if action.get('route') == 'batch':
+            return [(op.get('capabilityId'), op) for op in request.get('operations') or [] if isinstance(op, dict)]
+        if action.get('route') == 'blob' and isinstance(request.get('businessAction'), dict):
+            return [(action.get('capabilityId'), request['businessAction'])]
+        return [(action.get('capabilityId'), request)]
+
+    def covered(self, world, actor_name, capability, request, action, clock, seen=()):
+        """(True|False|None, reason) for the actor and its fixture delegators."""
+        actor = world.actors.get(actor_name)
+        if actor is None or actor_name in seen:
+            return None, f'{actor_name} is no fixture actor'
+        if self.family(capability) == 'NO_HANDLER':
+            return None, f'{capability} has no product handler; VERSION_UNSUPPORTED precedes authorization'
+        if (action.get('harness') or {}).get('authenticationTest') and not seen:
+            return False, 'the credential is a declared authentication variant'
+        grant = actor.get('grant') or {}
+        if capability not in (actor.get('roleCapabilities') or []) or capability not in (grant.get('actions') or []):
+            return False, f'{capability} is not in its roleCapabilities and grant actions'
+        ids = (grant.get('scope') or {}).get('capabilityIds')
+        if isinstance(ids, list) and capability not in ids:
+            return False, f'{capability} is not in its grant scope capabilityIds'
+        if clock and not (str(grant.get('validFrom', '')) <= clock < str(grant.get('validUntil', '~'))):
+            return False, f'the grant is not valid at the product clock {clock}'
+        revoked = (grant.get('scope') or {}).get('revokedAt')
+        if clock and isinstance(revoked, str) and revoked <= clock:
+            return False, f'the grant was revoked at {revoked}'
+        org = actor.get('organizationAlias')
+        scope_org = (request.get('scope') or {}).get('organizationId') if isinstance(request.get('scope'), dict) else None
+        if isinstance(scope_org, dict) and scope_org.get('$alias') and scope_org['$alias'] != org:
+            return False, f'the request names organization {scope_org["$alias"]}'
+        foreign = sorted(a for a in aliases_in(request) if world.org_of(a) not in (None, org) and (world.aliases.get(a) or {}).get('type') != 'Organization')
+        if foreign:
+            return False, f'the request names {foreign} of another organization'
+        presented = self.presentations(world, capability, request, action)
+        result, why = self.match_grant(world, org, grant, presented, self.family(capability))
+        if result is False:
+            return False, why
+        delegator = grant.get('delegatorAlias')
+        if delegator and delegator != actor_name and delegator in world.actors and world.actors[delegator].get('organizationAlias') == org:
+            parent, pwhy = self.covered(world, delegator, capability, request, action, clock, seen + (actor_name,))
+            if parent is False:
+                return False, f'its delegator {delegator}: {pwhy}'
+            if parent is None:
+                result = None if result else result
+        return result, why
+
+    def match_grant(self, world, org, grant, presented, family):
+        dims = {}
+        for key, value in (grant.get('scope') or {}).items():
+            kind = self.dimensions.get(key)
+            if kind and value not in (None, [], ''):
+                dims.setdefault(kind, set()).update(value if isinstance(value, list) else [value])
+        if presented is None:
+            return True, 'any grant with the capability passes'
+        if presented == 'unknown':
+            return None, f'{family} targets are not modelled'
+        verdicts = []
+        for p in presented:
+            if any(world.org_of(v) not in (None, org) for values, _ in p.values() for v in values):
+                verdicts.append((False, 'the target belongs to another organization'))
+                continue
+            if 'ORGANIZATION' in p:
+                verdicts.append((not dims, 'the product presents only the organization' + ('' if not dims else f'; the grant names {sorted(dims)}')))
+                continue
+            verdict, why = True, f'grant kinds {sorted(dims) or "none"} match {sorted(p)}'
+            for kind, allowed in dims.items():
+                if kind not in p:
+                    verdict, why = False, f'the grant names {kind} but {family} presents only {sorted(p)}'
+                    break
+                values, unknown = p[kind]
+                if unknown or not values:
+                    verdict, why = (None if verdict else verdict), f'{kind} value unresolved'
+                    continue
+                if not values <= allowed:
+                    verdict, why = False, f'{kind} {sorted(values - allowed)} outside the grant {sorted(allowed)}'
+                    break
+            verdicts.append((verdict, why))
+        for wanted in (True, None, False):
+            for verdict, why in verdicts:
+                if verdict is wanted:
+                    return verdict, why
+        return None, 'no presentation'
+
+    def presentations(self, world, capability, request, action):
+        """Alternative target maps {kind: (alias values, unresolved)} the product presents for this call."""
+        family = self.family(capability)
+        spec = self.grants['families'][family]['presents']
+        if spec is None or spec == 'unknown':
+            return spec
+        refs = TargetRefs(world, request, capability)
+        if spec == 'inventory':
+            item = refs.first('item')
+            if item is None:
+                return 'unknown'
+            rows = [{'TARGET': ({s}, False), 'ITEM': ({item}, False), 'PLACE': refs.place_of(s)} for s in world.item_segments(item)
+                    if refs.segment_matches(s)]
+            return rows + [{'TARGET': ({item}, False), 'ITEM': ({item}, False)}]
+        if spec == 'object':
+            return refs.object_presentation()
+        out = []
+        for template in spec:
+            out.append({kind: refs.values(source) for kind, source in template.items()})
+        return out
+
+IDENTITY_CONTROL = ('createGrant', 'revokeGrant', 'assignCapability', 'revokeCapability')
+
+
+def pinned_codes(sub, actions):
+    """/response/error/code pinned per action id, an await's pin applying to its start call."""
+    codes = {}
+    for assertion in sub.get('assertions', []):
+        source = assertion.get('source') or {}
+        pointer = str(source.get('pointer', ''))
+        if assertion.get('op') == 'equals' and isinstance(assertion.get('expected'), str) and (
+                pointer == '/response/error/code' or pointer.startswith('/response/body') and pointer.endswith('/error/code')):
+            codes[source.get('actionId')] = assertion['expected']
+        if source.get('pointer') == '/response/outcome' and assertion.get('op') == 'equals' and assertion.get('expected') not in ('APPLIED', None):
+            codes.setdefault(source.get('actionId'), 'OUTCOME:' + str(assertion.get('expected')))
+    starts = {a['call'].get('id'): a.get('id') for a in actions if isinstance(a.get('call'), dict)}
+    for action in actions:
+        if action.get('kind') == 'await':
+            for call, holder in starts.items():
+                if holder == action.get('awaitActionId') and action.get('id') in codes:
+                    codes.setdefault(call, codes[action['id']])
+    return codes
+
+
+def expects_effect(sub, actions, at, action):
+    """A query without a pinned rejection is read by the case; a command applies when its result is read or pinned APPLIED
+    (ContractValidator.expectedToApply)."""
+    if action.get('kind') == 'query':
+        return True
+    aid = action.get('id')
+    for assertion in sub.get('assertions', []):
+        source = assertion.get('source') or {}
+        pointer = str(source.get('pointer', ''))
+        if source.get('actionId') == aid:
+            if pointer == '/response/outcome':
+                if assertion.get('op') == 'equals' and assertion.get('expected') == 'APPLIED':
+                    return True
+            elif pointer.startswith('/response/') and not pointer.startswith('/response/error') and assertion.get('op') not in ('absent', 'notEquals'):
+                return True
+        if aid in result_ids(assertion):
+            return True
+    return any(aid in result_ids(later.get('request')) for later in actions[at + 1:])
+
+
+def aliases_in(node):
+    out = set()
+    if isinstance(node, dict):
+        if isinstance(node.get('$alias'), str) and len(node) == 1:
+            out.add(node['$alias'])
+        for value in node.values():
+            out |= aliases_in(value)
+    elif isinstance(node, list):
+        for value in node:
+            out |= aliases_in(value)
+    return out
+
+
+def result_ids(node):
+    out = set()
+    if isinstance(node, dict):
+        ref = node.get('$result')
+        if isinstance(ref, dict) and isinstance(ref.get('actionId'), str):
+            out.add(ref['actionId'])
+        for value in node.values():
+            out |= result_ids(value)
+    elif isinstance(node, list):
+        for value in node:
+            out |= result_ids(value)
+    return out
+
+
+class TargetRefs:
+    """Alias values a request names, classified by the fixture type of each alias (runtime results stay unresolved)."""
+    SLOT_KINDS = {'itemId': 'item', 'workId': 'work', 'targetWorkId': 'work', 'segmentId': 'segment', 'sourceSegmentId': 'segment',
+                  'segmentIds': 'segment', 'destinationId': 'destination', 'placeId': 'place', 'transitPlaceId': 'transit',
+                  'cargoPlaceId': 'transit', 'lotId': 'lot', 'allocationId': 'allocation'}
+    TYPE_KINDS = {'TradeItem': 'item', 'Work': 'work', 'QuantitySegment': 'segment', 'Place': 'place', 'ManufacturingLot': 'lot',
+                  'ManufacturerLot': 'lot', 'Allocation': 'allocation'}
+
+    def __init__(self, world, request, capability):
+        self.world, self.capability = world, capability
+        self.named = {k: set() for k in ('item', 'work', 'segment', 'destination', 'place', 'transit', 'lot', 'allocation', 'id')}
+        self.unresolved = set()
+        scope = request.get('scope') if isinstance(request.get('scope'), dict) else {}
+        slots = request.get('slots') if isinstance(request.get('slots'), dict) else {}
+        for key, value in list(scope.items()) + [(k, request[k]) for k in ('id', 'workId', 'itemId', 'lotId', 'placeId') + QUERY_ID_KEYS if k in request]:
+            kind = {'itemId': 'item', 'workId': 'work', 'lotId': 'lot', 'placeId': 'place', 'id': 'id', **{k: 'id' for k in QUERY_ID_KEYS}}.get(key)
+            if kind:
+                self.add(kind, value)
+        for key, value in slots.items():
+            if key in self.SLOT_KINDS:
+                self.add(self.SLOT_KINDS[key], value)
+        for ref in request.get('subjectRefs') or []:
+            if isinstance(ref, dict) and ref.get('type') in self.TYPE_KINDS:
+                self.add(self.TYPE_KINDS[ref['type']], ref.get('id'))
+        for name in list(self.named['id']):
+            kind = self.TYPE_KINDS.get((world.aliases.get(name) or {}).get('type'))
+            if kind:
+                self.named[kind].add(name)
+        for name in list(self.named['allocation']):
+            row = world.allocations.get(name) or world.aliases.get(name) or {}
+            if isinstance(row.get('segmentAlias'), str):
+                self.named['segment'].add(row['segmentAlias'])
+            else:
+                self.unresolved.add('segment')
+
+    def add(self, kind, value):
+        if isinstance(value, list):
+            for v in value:
+                self.add(kind, v)
+            return
+        if isinstance(value, dict) and set(value) == {'type', 'id'}:
+            value = value['id']
+        if isinstance(value, dict) and isinstance(value.get('value'), (dict, str)) and '$alias' not in value:
+            value = value['value']
+        if isinstance(value, dict) and isinstance(value.get('$alias'), str):
+            self.named[kind].add(value['$alias'])
+        elif value is not None:
+            self.unresolved.add(kind)
+
+    def first(self, kind):
+        values = self.values(kind)[0]
+        return sorted(values)[0] if len(values) == 1 else None
+
+    def place_of(self, segment):
+        place = self.world.segment_place(segment)
+        return ({place}, False) if place else (set(), True)
+
+    def segment_matches(self, segment):
+        places, lots = self.named['place'], self.named['lot']
+        if places and self.world.segment_place(segment) not in places:
+            return False
+        if lots:
+            lot = (self.world.aliases.get(segment) or {}).get('lotAlias') or (self.world.segments.get(segment) or {}).get('lotAlias')
+            return lot in lots
+        return True
+
+    def values(self, source):
+        """(alias set, unresolved) for a family source: item, workItem, work, segment, segmentPlace(+destination|+transit), id, ?."""
+        w = self.world
+        if source == '?':
+            return set(), True
+        if source == 'organization':
+            return set(), False
+        parts = source.split('+')
+        out, unknown = set(), False
+        for part in parts:
+            if part == 'item':
+                items = set(self.named['item'])
+                items |= {w.segment_item(s) for s in self.named['segment']}
+                items |= {w.lot_item(l) for l in self.named['lot']}
+                items |= {w.work_item(x) for x in self.named['work']}
+                unknown |= None in items or not (items - {None}) and bool(self.unresolved & {'item', 'segment', 'lot', 'work', 'id'})
+                out |= items - {None}
+                if not out:
+                    unknown = True
+            elif part == 'workItem':
+                items = {w.work_item(x) for x in self.named['work']}
+                unknown |= None in items or 'work' in self.unresolved or not items
+                out |= items - {None}
+            elif part in ('work', 'segment', 'destination', 'transit', 'place', 'lot', 'id'):
+                out |= self.named[part]
+                unknown |= part in self.unresolved or not self.named[part]
+            elif part == 'segmentPlace':
+                places = {w.segment_place(s) for s in self.named['segment']}
+                unknown |= None in places or 'segment' in self.unresolved or not places
+                out |= places - {None}
+        return out, unknown
+
+    def object_presentation(self):
+        w = self.world
+        ids = self.named['id'] or self.named['item']
+        if len(ids) != 1 or self.unresolved & {'id'}:
+            return 'unknown'
+        name = next(iter(ids))
+        kind = (w.aliases.get(name) or {}).get('type')
+        one = ({name}, False)
+        def known(value):
+            return ({value}, False) if value else (set(), True)
+        if kind == 'TradeItem':
+            return [{'TARGET': one, 'ITEM': one}]
+        if kind in ('ManufacturingLot', 'ManufacturerLot'):
+            return [{'TARGET': one, 'ITEM': known(w.lot_item(name))}]
+        if kind == 'QuantitySegment':
+            return [{'TARGET': one, 'ITEM': known(w.segment_item(name)), 'PLACE': known(w.segment_place(name))}]
+        if kind == 'Place':
+            return [{'TARGET': one, 'PLACE': one}]
+        if kind == 'Work':
+            return [{'TARGET': one, 'WORK': one, 'ITEM': known(w.work_item(name))}]
+        if kind in ('Customer', 'Supplier'):
+            return [{'TARGET': one}]
+        return 'unknown'
 
 
 _ABSENT = object()
