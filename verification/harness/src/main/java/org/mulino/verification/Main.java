@@ -116,7 +116,7 @@ public final class Main {
         PreparationValidator preparation=new PreparationValidator(validator.root());
         Map<String,Path> casePaths=new LinkedHashMap<>();
         Map<String,JsonNode> cases=new LinkedHashMap<>();Set<String> covered=new HashSet<>();int subcases=0,assertions=0;
-        List<String> problems=new ArrayList<>();
+        List<String> problems=new ArrayList<>(),recordTimeKnownOpen=new ArrayList<>();
         for(Path path:paths) {
             JsonNode c=validator.caseFile(path);String id=Json.required(c,"caseId");
             if(cases.put(id,c)!=null) problems.add("Duplicate caseId "+id);
@@ -141,6 +141,9 @@ public final class Main {
             problems.addAll(validator.grantAuthorityProblems(c));
             problems.addAll(validator.commandBasisProblems(c));
             problems.addAll(validator.warehouseCustodyProblems(c));
+            problems.addAll(validator.fixtureRecordTimeProblems(c));
+            problems.addAll(validator.reserveCapacityProblems(c));
+            recordTimeKnownOpen.addAll(validator.fixtureRecordTimeKnownOpen(c));
         }
         for(String id:expected) if(!cases.containsKey(id)) problems.add("Missing required case "+id);
         for(int i=1;i<=26;i++) if(!covered.contains(String.format("D%02d",i))) problems.add("Missing requirement assertion "+String.format("D%02d",i));
@@ -159,6 +162,8 @@ public final class Main {
         report.put("gateComplete",false).put("runtimeStatus","NOT_RUN").put("runtimeComplete",false).put("preparedCases",cases.size()).put("preparedSubcases",subcases).put("preparedAssertions",assertions);
         report.set("preparationProblems",Json.MAPPER.valueToTree(problems));report.set("artifactKindAttributionGaps",Json.MAPPER.valueToTree(attributionGaps));report.set("caseAssetChecks",assetChecks);
         ArrayNode knownOpen=Json.array();for(JsonNode check:assetChecks) for(JsonNode line:check.path("knownOpen")) knownOpen.add(Json.object().put("check",check.path("name").asText()).put("gap",line.asText()));
+        // step2r round 11: late-known evidence uses that contracts/execution-preconditions.json clock.installation.knownOpen keeps as backlog.
+        for(String line:recordTimeKnownOpen) knownOpen.add(Json.object().put("check","fixture-record-time").put("gap",line));
         report.set("knownOpenGaps",knownOpen);report.set("runtimeGates",runtimeGates(validator.root(),cases));report.put("artifactCoverageStatus","NOT_RUN");report.put("semanticOracleEquivalence","REQUIRES_CASE_REVIEW");
         Json.write(validator.root().resolve("verification/harness/target/evidence/"+mode+".json"),report);System.out.println(report.toPrettyString());return problems.isEmpty()?0:1;
     }
