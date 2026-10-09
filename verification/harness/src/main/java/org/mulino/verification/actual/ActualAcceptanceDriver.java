@@ -24,13 +24,14 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private final ExecutorService asyncCalls=Executors.newCachedThreadPool(r->{var t=new Thread(r,"actual-async-call");t.setDaemon(true);return t;});
     private volatile JsonNode controlActor;
     private final FixtureInstaller fixtures;
+    private final HostProcessControls hostControls;
     private final JdbcObservation observer;
     public ActualAcceptanceDriver(Path root,ActualConfiguration configuration) {
         this.root=root;this.configuration=configuration;signer=new JwtSigner(configuration);
-        fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);
+        fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);hostControls=new HostProcessControls(root,run);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","clock","barrier","fixture","db"):Set.of("api","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","clock","barrier","host","coverage","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
         if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;}
@@ -253,6 +254,11 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     }
     @Override public StepResult control(String id,JsonNode request) {
         if(suiteIsolation&&request.path("type").asText().equals("barrier")&&Set.of("waitReached","resume").contains(request.path("operation").asText()))return barrierControl(id,request);
+        if(suiteIsolation&&request.path("type").asText().equals("process")&&HostProcessControls.OPERATIONS.contains(request.path("operation").asText())) {
+            try{return hostControls.control(id,request,()->provenance(null,"ACTUAL_HOST_PROCESS",true,null,null));}
+            catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Host control interrupted",interrupted);}
+            catch(java.io.IOException failure){throw new IllegalStateException("Host control environment failure",failure);}
+        }
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
             return StepResult.missing(id,"NOT_IMPLEMENTED: actual "+request.path("type").asText()+"/"+request.path("operation").asText()+" host control absent");
         if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
@@ -289,7 +295,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification barrier profile not installed");
             var response=Json.parse(result.body());
             if(result.statusCode()!=200)throw new IllegalStateException("Barrier control HTTP "+result.statusCode());
-            var data=Json.object();data.put("controlType","barrier").put("operation",request.path("operation").asText()).put("acknowledgedAt",Instant.now().toString());
+            var data=Json.object();data.put("acknowledged",true).put("controlType","barrier").put("operation",request.path("operation").asText()).put("acknowledgedAt",Instant.now().toString());
             for(String k:List.of("barrierId","participantId"))data.set(k,response.path(k));
             // transactionId and point come from the product registry entry, which the request header declared.
             data.set("transactionId",response.hasNonNull("transactionId")?response.path("transactionId"):Json.MAPPER.nullNode());
