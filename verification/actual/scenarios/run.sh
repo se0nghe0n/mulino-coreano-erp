@@ -93,7 +93,7 @@ argv_json=$(python3 -c 'import json,sys; print(json.dumps(["./verify","scenarios
 rm -f verification/harness/target/evidence/scenarios.json
 set +e
 java -Dverification.driver=actual -Dverification.agentRunner=scripted -Dverification.actual.suiteIsolation=true "-Dverification.actual.partialFixtures=${ACTUAL_PARTIAL_FIXTURES:-true}" "-Dverification.actual.relaxWire=${ACTUAL_RELAX_WIRE:-false}" \
-  -Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json \
+  -Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json "-Dverification.actual.blobRoot=$fixture/blobs" \
   "-Drepo.root=$repo" '-Dverification.command=./verify scenarios --actual' "-Dverification.argv=$argv_json" \
   -cp "$classpath" org.mulino.verification.Main profile scenarios "$@" > "$evidence/harness-stdout.json" 2> "$evidence/harness-stderr.txt"
 code=$?

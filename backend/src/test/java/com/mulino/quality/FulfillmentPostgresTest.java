@@ -395,6 +395,23 @@ class FulfillmentPostgresTest {
   var noun=(Map<?,?>)read("getObject",item,map("organizationId",org,"itemId",item),now,now).get("data");assertEquals("70",noun.get("eligibleQuantity"));assertEquals("70",noun.get("unreservedEligibleQuantity"));
   var customerSite=(Map<?,?>)read("getInventory",null,map("organizationId",org,"itemId",item,"placeId",destination),now,now).get("data");assertEquals("20",customerSite.get("heldQuantity"));assertEquals("0",customerSite.get("eligibleQuantity"));assertEquals("DENIED",customerSite.get("eligibilityStatus"));}
 
+ // s5b (plan §122 행동별 적격량): getInventory reads eligibility for the requested action and customer. Before this change the
+ // action/customerId filters were rejected and the SELL range was the only one readable; an action the current eligibility
+ // policy does not define stays UNKNOWN instead of borrowing the SELL answer.
+ @Test void inventoryEligibilityFollowsTheRequestedActionAndCustomer(){allow("100");
+  var scope=map("organizationId",org,"itemId",item);
+  var sell=readFiltered(scope,map("action","SELL","customerId",customer));var sellData=(Map<?,?>)sell.get("data");
+  assertEquals("100",sellData.get("eligibleQuantity"));assertEquals(customer,((Map<?,?>)sell.get("scope")).get("customerId"));
+  assertEquals(sellData.get("eligibleQuantity"),((Map<?,?>)read("getInventory",null,scope,now,now).get("data")).get("eligibleQuantity"));
+  var dispatchBefore=(Map<?,?>)readFiltered(scope,map("action","DISPATCH")).get("data");
+  assertNotEquals("100",dispatchBefore.get("eligibleQuantity"));
+  allowDispatch();
+  var dispatch=(Map<?,?>)readFiltered(scope,map("action","DISPATCH","customerId",customer)).get("data");assertEquals("100",dispatch.get("eligibleQuantity"));
+  var undefined=(Map<?,?>)readFiltered(scope,map("action","RETURN")).get("data");assertNull(undefined.get("eligibleQuantity"));assertEquals("UNKNOWN",undefined.get("eligibilityStatus"));
+  assertEquals("TYPE_INVALID",assertThrows(DomainError.class,()->readFiltered(map("organizationId",org,"itemId",item,"customerId",customer),map("customerId",id()))).code());
+  assertEquals("TYPE_INVALID",assertThrows(DomainError.class,()->readFiltered(scope,map("action","sell"))).code());}
+ Map<String,Object> readFiltered(Map<String,Object> scope,Map<String,Object> filters){var body=map("scope",scope,"asOf",now.toString(),"knownAt",now.toString(),"filters",filters);return runtime.requestContext().run(ctx->{return queries.query(QueryRequests.parse("getInventory",body));});}
+
  // s4i closure P3 (plan §5.3 책임 이전, §7.1): a partial transfer of 30 of 100 splits the exact leaf into source [0,70) and target
  // [70,100) only when the target owner accepts; a rejected or expired transfer keeps the original assignment OPEN and whole.
  @Autowired com.mulino.application.responsibility.ResponsibilityService responsibilities;

@@ -70,7 +70,9 @@ public class ApplicationQueries {
       Map<String,Object> world=work.world(context,worldScope);
       if(handlers.containsKey("getInventory")){
         var inventoryScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId"))if(scope.containsKey(key))inventoryScope.put(key,scope.get(key));
-        QueryRequest inventory=new QueryRequest("getInventory",null,inventoryScope,Map.of(),200,null,request.definitionVersion(),asOf,knownAt,null);
+        // The world projection of getInventory itself keeps the request's eligibility action (plan §122 행동별 적격량).
+        var eligibilityFilters=new LinkedHashMap<String,Object>();if(request.operation().equals("getInventory")&&request.filters().containsKey("action"))eligibilityFilters.put("action",request.filters().get("action"));
+        QueryRequest inventory=new QueryRequest("getInventory",null,inventoryScope,eligibilityFilters,200,null,request.definitionVersion(),asOf,knownAt,null);
         auth.authorize(context,"getInventory",null);
         QueryResult inventoryResult=handlers.get("getInventory").query(context,inventory);
         if(inventoryResult.data() instanceof Map<?,?> inventoryData)world.putAll((Map<String,Object>)inventoryData);

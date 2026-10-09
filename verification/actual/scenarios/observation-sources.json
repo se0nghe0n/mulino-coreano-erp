@@ -1,6 +1,6 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.0.0",
+  "schemaVersion": "1.1.0",
   "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED.",
   "sources": {
     "segments": [
@@ -304,39 +304,84 @@
     ],
     "labels": [
       "mulino_trade_regulatory_LabelVerifications"
+    ],
+    "activities": [
+      "mulino_evidence_Events"
+    ],
+    "retryAttempts": [
+      "mulino_runtime_ExecutionAttempts"
+    ],
+    "definitionPackages": [
+      "mulino_definitions_DefinitionVersions"
+    ],
+    "externalEffects": [
+      "mulino_runtime_Outbox",
+      "mulino_runtime_ExternalReconciliations"
+    ],
+    "transactions": [
+      "@transactions"
+    ],
+    "dbPrivileges": [
+      "@dbPrivileges"
+    ],
+    "conditionResults": [
+      "@conditionResults"
     ]
   },
   "approximate": [
-    "adjustmentProposals",
-    "attempts",
     "boundaries",
-    "businessOutbox",
-    "cancellationRequests",
-    "canonical_links",
-    "commandResults",
     "compatibilityManifests",
-    "constraints",
-    "contracts",
-    "definitionRevisions",
-    "dutyTransitions",
-    "evidence",
-    "evidence_revisions",
     "externalDeliveries",
     "fenceCommits",
-    "idempotency",
-    "intake",
-    "intakes",
-    "newAllocations",
-    "notices",
-    "observationCoverage",
-    "orders",
-    "qcDecisions",
-    "receiptContributions",
-    "recoveries",
     "recoveryObligations",
-    "saleMatches",
-    "supplierCommitments",
-    "validityBoundaries"
+    "validityBoundaries",
+    "activities",
+    "retryAttempts",
+    "definitionPackages",
+    "externalEffects",
+    "transactions",
+    "dbPrivileges",
+    "conditionResults"
   ],
-  "approximateNote": "Sources whose table choice is a guess; an assertion failure on them is classified ADAPTER until the mapping is confirmed."
+  "approximateNote": "Sources whose table choice is still a guess (s5b review); an assertion failure on them is classified ADAPTER until the mapping is confirmed. confirmed lists the s5b review of the former s5a guesses.",
+  "confirmed": {
+    "commandResults": "CommandRecords carries state and resultJson of each command",
+    "idempotency": "CommandRecords is keyed by stableRequestOwner+capabilityId+commandIdempotencyKey",
+    "evidence": "DocumentVersions are the immutable evidence originals (supersedesId chain)",
+    "evidence_revisions": "DocumentVersions revisions/supersedesId are the evidence revisions",
+    "intake": "InboxRecords is the source intake ledger (state, intakeOwnerId, nextCheckAt)",
+    "intakes": "InboxRecords is the source intake ledger",
+    "newAllocations": "SegmentAllocations; assertions select the new rows by commandIdempotencyKey/where",
+    "canonical_links": "EvidenceLinks links document/event/claim to canonicalOccurrenceId",
+    "observationCoverage": "CompletionCoverages is the observation coverage record",
+    "receiptContributions": "ReceiptCredits holds contributedQuantity/excessQuantity per receipt and PO line",
+    "supplierCommitments": "SupplierReplies holds the supplier ACCEPT/REJECT/CHANGE commitment",
+    "saleMatches": "settlement Matches",
+    "adjustmentProposals": "settlement Adjustments carry mode (PROPOSE/CONFIRM), status and proposalId",
+    "cancellationRequests": "purchase Cancellations (externalAcceptance UNKNOWN until reconciled)",
+    "qcDecisions": "quality Decisions (operation, restriction/disposition basis, evidence)",
+    "orders": "sales Orders and purchase Orders (rows carry _table)",
+    "definitionRevisions": "DefinitionVersions (version, state, contentHash)",
+    "contracts": "CapabilityContracts of a definition version",
+    "businessOutbox": "runtime Outbox is the only business outbox",
+    "attempts": "runtime ExecutionAttempts",
+    "constraints": "Restrictions and DispositionBases are the eligibility constraints (rows carry _table)",
+    "notices": "recall Actions rows; kind distinguishes notices",
+    "recoveries": "recall Actions rows; kind distinguishes recoveries",
+    "dutyTransitions": "responsibility Handovers (OWNER/TRANSFER, status)"
+  },
+  "derived": {
+    "mulino_inventory_QuantitySegments": "active (retiredAt null), locationId=placeId, physicalScope=controlScope",
+    "mulino_inventory_QuantityMovements": "segmentId=targetId, else sourceId (the segment the movement lands on)",
+    "mulino_work_read_ObligationReferences": "current=valid, responsibleWorkId=workId, obligationId=rootId, sourceKind/sourceId from responsibility Roots",
+    "mulino_commands_CommandRecords": "status=state, stableRequestOwnerId=stableRequestOwner",
+    "mulino_inventory_SegmentAllocations": "status=state",
+    "mulino_work_read_Works": "state=status",
+    "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row"
+  },
+  "virtual": {
+    "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",
+    "@dbPrivileges": "information_schema.role_table_grants of mulino_* tables",
+    "@conditionResults": "elements of AssessmentReferences.conditionsJson"
+  }
 }

@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.function.Function;
 import org.mulino.verification.Json;
 
 /**
@@ -18,9 +17,9 @@ import org.mulino.verification.Json;
  * column (Works: workId restricts ID). includeDescendants=true widens the work restriction to the organization/item
  * scope (a superset that contains descendant works). Case namespace keys (caseId, subcaseId, ...) are test metadata.
  *
- * RESULT_REVISION: the observer replays the issuing API query (same actor, same resolved request) and reports the
- * product's revision. This is a stability check of the projection between the query and the observation, NOT an
- * independent recomputation from rows; revisionQuery says so. An issuing action that is not an api query is refused.
+ * RESULT_REVISION: the observer recomputes an organization row digest in its own snapshot and reports the product
+ * revision only when it equals the digest bound around the issuing query (ScenarioRevisionBinding). The product API is
+ * never re-issued. An issuing action that is not an api/mcp query is refused.
  */
 final class ScenarioJdbcObservation {
     static final Set<String> CASE_METADATA=Set.of("caseId","subcaseId","scenarioId","caseNamespace","caseKey","environmentId","includeDescendants","rawRowsOrder");
@@ -43,7 +42,7 @@ final class ScenarioJdbcObservation {
         return csnNames.getOrDefault(table.toLowerCase(Locale.ROOT),Map.of());
     }
 
-    static ObjectNode capture(ActualConfiguration config,Path root,JsonNode request,Function<JsonNode,String> replay) throws Exception {
+    static ObjectNode capture(ActualConfiguration config,Path root,JsonNode request) throws Exception {
         if(request.path("sources").isEmpty())throw new IllegalArgumentException("Raw sources required");
         String ref=request.path("snapshotRef").asText(null);
         String readMode=ref==null?"CURRENT_COMMITTED":ref;
@@ -57,26 +56,35 @@ final class ScenarioJdbcObservation {
         for(var it=scope.fieldNames();it.hasNext();){String k=it.next();if(!CASE_METADATA.contains(k)&&!Set.of("organizationId","organizationIds","itemId","itemIds","workId","workIds","lotId","lotIds").contains(k))throw new UnsupportedOperationException("observer scope key "+k+" not implemented");}
         boolean descendants=scope.path("includeDescendants").asBoolean(false);
         if(descendants)works=List.of();
-        String revision=null;ObjectNode revisionQuery=null;
+        String revision=null;ObjectNode revisionQuery=null;ScenarioRevisionBinding.Binding binding=null;JsonNode source=null;
         if(readMode.equals("RESULT_REVISION")) {
-            JsonNode source=request.path("snapshotSource");
-            if(!source.path("kind").asText().equals("query")||!source.path("route").asText().equals("api"))throw new UnsupportedOperationException("RESULT_REVISION from "+source.path("kind").asText()+"/"+source.path("route").asText()+" cannot be replayed safely");
-            revision=replay.apply(source);
-            revisionQuery=Json.object();revisionQuery.put("statementId","product-api-query-replay-v1")
-                .put("sql","REPLAY POST /api/ontology/queries/"+source.path("capabilityId").asText()+" with the issuing actor and resolved request; product projection, not an independent row recomputation");
-            var p=Json.object();p.put("capabilityId",source.path("capabilityId").asText()).put("actionId",source.path("actionId").asText()).put("independent",false);revisionQuery.set("parameters",p);revisionQuery.put("mappingVersion","1.0.0");
+            source=request.path("snapshotSource");
+            if(!source.path("kind").asText().equals("query")||!Set.of("api","mcp").contains(source.path("route").asText()))throw new UnsupportedOperationException("RESULT_REVISION from "+source.path("kind").asText()+"/"+source.path("route").asText()+" has no independent row binding");
+            binding=ScenarioRevisionBinding.binding(source.path("actionId").asText());
         }
         OffsetDateTime knownAt=OffsetDateTime.parse(Json.required(request,"knownAt"));
         var raw=Json.object();var evidence=Json.object();String mvcc;
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             mvcc=ObserverSnapshot.token(c);
+            if(readMode.equals("RESULT_REVISION")) {
+                // Independent: the digest is computed from this transaction's rows; the product API is not called.
+                String digest=ScenarioRevisionBinding.digest(c);
+                revision=binding!=null&&binding.digest().equals(digest)?binding.revision():"row-digest:"+digest;
+                revisionQuery=Json.object();revisionQuery.put("statementId","s5b-organization-row-digest-v1")
+                    .put("sql","md5 over every row (row::text, ordered) of every organization-scoped mulino_* table except mulino_runtime_*, in the observer's REPEATABLE READ snapshot; compared with the digest bound around the issuing query (before = after)");
+                var p=Json.object();p.put("capabilityId",source.path("capabilityId").asText()).put("actionId",source.path("actionId").asText()).put("observedDigest",digest)
+                    .put("boundDigest",binding==null?null:binding.digest()).put("digestMatched",binding!=null&&binding.digest().equals(digest)).put("organizations",String.join(",",ScenarioRevisionBinding.organizations())).put("productApiCalled",false);
+                revisionQuery.set("parameters",p);revisionQuery.put("mappingVersion","2.0.0");
+            }
             Map<String,ArrayNode> cache=new HashMap<>();Map<String,JsonNode> commandCache=new HashMap<>();
             for(JsonNode requested:request.path("sources")) {
                 String name=requested.asText();JsonNode tables=sources.path(name);var rows=Json.array();var queries=Json.array();
                 for(JsonNode t:tables) {
                     String table=t.asText();String key=table;
                     ArrayNode tableRows=cache.get(key);
+                    if(table.startsWith("@")){var statement=Json.object();if(tableRows==null){tableRows=virtual(c,table,orgs,statement);cache.put(key,tableRows);}else statement.put("sql","(same statement as an earlier source in this observation)");
+                        statement.put("table",table);queries.add(statement);for(JsonNode row:tableRows){ObjectNode copy=(ObjectNode)row.deepCopy();if(tables.size()>1)copy.put("_table",table);rows.add(copy);}continue;}
                     var columns=columns(c,table);var statement=Json.object();
                     if(tableRows==null) {
                         List<Object> params=new ArrayList<>();StringBuilder sql=new StringBuilder("SELECT * FROM "+table+" r WHERE ");
@@ -113,6 +121,50 @@ final class ScenarioJdbcObservation {
         result.set("snapshot",snapshot);
         return result;
     }
+    /**
+     * Virtual sources read from the same snapshot, never from the product API:
+     * @transactions  one row per PostgreSQL transaction (xmin) that last wrote an organization CommandRecords row
+     *                (id = that xid, capabilityId, commandIds); a later update of the record moves it (approximate).
+     * @dbPrivileges  information_schema.role_table_grants of every mulino_* table (roleId = grantee, table = CDS entity
+     *                name without the trailing plural s, entity = full CDS entity name, privilege).
+     * @conditionResults  each element of AssessmentReferences.conditionsJson, with assessmentId, workId and the
+     *                assessment's evaluatorVersion added when the element does not state them.
+     */
+    private static ArrayNode virtual(Connection c,String source,List<String> orgs,ObjectNode statement) throws SQLException {
+        var out=Json.array();String in=String.join(",",Collections.nCopies(orgs.size(),"?"));
+        switch(source) {
+            case "@transactions" -> {
+                String sql="SELECT xmin::text AS xid,capabilityId,ID FROM mulino_commands_CommandRecords WHERE organizationId IN ("+in+") ORDER BY xmin::text,ID";
+                Map<String,ObjectNode> byXid=new LinkedHashMap<>();
+                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){var row=byXid.computeIfAbsent(r.getString(1),x->{var o=Json.object();o.put("id",x).put("transactionId",x);o.putArray("commandIds");return o;});
+                    if(!row.has("capabilityId"))row.put("capabilityId",r.getString(2));else if(!row.path("capabilityId").asText().equals(r.getString(2)))row.put("capabilityId","MIXED");((ArrayNode)row.path("commandIds")).add(r.getString(3));}}}
+                byXid.values().forEach(out::add);statement.put("sql",sql);
+            }
+            case "@dbPrivileges" -> {
+                String sql="SELECT grantee,table_name,privilege_type FROM information_schema.role_table_grants WHERE table_schema=current_schema() AND table_name LIKE 'mulino\\_%' ORDER BY table_name,grantee,privilege_type";
+                try(var st=c.prepareStatement(sql);var r=st.executeQuery()){while(r.next()){String t=r.getString(2);String entity=t.substring(t.lastIndexOf('_')+1);
+                    var row=Json.object();row.put("roleId",r.getString(1));row.put("tableName",t);row.put("privilege",r.getString(3));out.add(row);row.put("entityTable",entity);}}
+                // CDS element case is lost in PostgreSQL identifiers; map back through the CSN names.
+                for(JsonNode n:out){ObjectNode row=(ObjectNode)n;String cds=cdsEntity(row.path("tableName").asText());if(cds!=null){row.put("entity",cds);row.put("table",cds.endsWith("s")?cds.substring(0,cds.length()-1):cds);}}
+                statement.put("sql",sql);
+            }
+            case "@conditionResults" -> {
+                String sql="SELECT ID,workId,evaluatorVersion,conditionsJson FROM mulino_work_read_AssessmentReferences WHERE organizationId IN ("+in+") ORDER BY ID";
+                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){JsonNode conditions;try{conditions=Json.parse(r.getString(4));}catch(Exception invalid){continue;}
+                    if(conditions.isObject()&&conditions.has("conditions"))conditions=conditions.path("conditions");
+                    for(JsonNode cond:conditions)if(cond.isObject()){var row=(ObjectNode)cond.deepCopy();if(!row.has("assessmentId"))row.put("assessmentId",r.getString(1));if(!row.has("workId"))row.put("workId",r.getString(2));if(!row.has("evaluatorVersion"))row.put("evaluatorVersion",r.getString(3));out.add(row);}}}}
+                statement.put("sql",sql);
+            }
+            default -> throw new UnsupportedOperationException("virtual observation source "+source+" not implemented");
+        }
+        statement.set("boundValues",Json.MAPPER.valueToTree(orgs));
+        return out;
+    }
+    private static volatile Map<String,String> cdsEntities;
+    private static String cdsEntity(String table) {
+        if(cdsEntities==null){var out=new HashMap<String,String>();try{JsonNode csn=Json.read(Path.of(System.getProperty("repo.root",".")).resolve("backend/src/main/resources/edmx/csn.json"));csn.path("definitions").fieldNames().forEachRemaining(k->{if(k.startsWith("mulino."))out.put(k.replace('.','_').toLowerCase(Locale.ROOT),k.substring(k.lastIndexOf('.')+1));});}catch(Exception missing){}cdsEntities=out;}
+        return cdsEntities.get(table.toLowerCase(Locale.ROOT));
+    }
     private static final Map<String,Set<String>> COLUMNS=new java.util.concurrent.ConcurrentHashMap<>();
     private static Set<String> columns(Connection c,String table) throws SQLException {
         Set<String> cached=COLUMNS.get(table);if(cached!=null)return cached;
@@ -123,6 +175,7 @@ final class ScenarioJdbcObservation {
     }
     /** Observation conveniences computed only from the same transaction's rows; never from the product API. */
     private static void derive(Connection c,String table,ArrayNode rows,Map<String,JsonNode> commands) throws SQLException {
+        Map<String,JsonNode> roots=new HashMap<>();
         for(JsonNode n:rows) {
             ObjectNode row=(ObjectNode)n;
             String commandId=row.path("commandId").asText(null);
@@ -135,11 +188,19 @@ final class ScenarioJdbcObservation {
                 case "mulino_commands_CommandRecords" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));row.set("status",row.path("state"));}
                 case "mulino_inventory_SegmentAllocations","mulino_inventory_Restrictions","mulino_inventory_DispositionBases" -> {if(!row.has("status"))row.set("status",row.path("state"));}
                 case "mulino_work_read_Works" -> row.set("state",row.path("status"));
-                case "mulino_work_read_ObligationReferences" -> row.set("current",row.path("valid"));
+                case "mulino_work_read_ObligationReferences" -> {row.set("current",row.path("valid"));row.set("responsibleWorkId",row.path("workId"));row.set("obligationId",row.path("rootId"));
+                    JsonNode root=row.hasNonNull("rootId")?roots.computeIfAbsent(row.path("rootId").asText(),id->root(c,id)):null;
+                    if(root!=null){if(!row.has("sourceKind"))row.set("sourceKind",root.path("sourceKind"));if(!row.has("sourceId"))row.set("sourceId",root.path("sourceId"));}}
+                case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));}
                 case "mulino_runtime_Outbox" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));}
                 default -> {}
             }
         }
+    }
+    private static JsonNode root(Connection c,String id) {
+        try(var s=c.prepareStatement("SELECT sourceKind,sourceId FROM mulino_responsibility_Roots WHERE ID=?")){s.setString(1,id);
+            try(var r=s.executeQuery()){if(!r.next())return null;var o=Json.object();o.put("sourceKind",r.getString(1));o.put("sourceId",r.getString(2));return o;}}
+        catch(SQLException failure){throw new IllegalStateException(failure);}
     }
     private static JsonNode command(Connection c,String id) {
         try(var s=c.prepareStatement("SELECT commandIdempotencyKey,capabilityId,stableRequestOwner FROM mulino_commands_CommandRecords WHERE ID=?")){s.setString(1,id);
