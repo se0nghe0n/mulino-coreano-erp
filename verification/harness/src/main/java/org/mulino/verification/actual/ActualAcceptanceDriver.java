@@ -107,7 +107,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
                 if(relaxWire){for(String key:List.of("includeDescendants","rawRowsOrder"))if(wireScope.has(key)){wireScope.remove(key);translated.add(key);}
                     if(operation.equals("getInventory")&&wireScope.has("workId")){wireScope.remove("workId");translated.add("workId");}}
             }
-            if(suiteIsolation&&!category.equals("queries")&&wireRequest instanceof ObjectNode command)ScenarioWireMapping.command(operation,command,translated);
+            if(relaxWire&&!category.equals("queries")&&wireRequest instanceof ObjectNode command)ScenarioWireMapping.command(operation,command,translated);
             if(relaxWire&&!category.equals("queries")&&wireRequest.isObject()) {
                 // Probe mode only: complete the contracts/intent.schema.json envelope the cases omit. Fields outside the
                 // schema are dropped, valueProvenance becomes provenance, and a missing provenance marks every slot USER.
@@ -209,7 +209,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private StepResult odataCommand(String id,JsonNode actor,String capability,JsonNode request) {
         if(externalOrganization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: no fixture organization installed for this subcase");
         try {
-            var translated=Json.array();JsonNode wire=request.deepCopy();if(wire instanceof ObjectNode command)ScenarioWireMapping.command(capability,command,translated);
+            var translated=Json.array();JsonNode wire=request.deepCopy();if(relaxWire&&wire instanceof ObjectNode command)ScenarioWireMapping.command(capability,command,translated);
             var body=Json.object();body.put("requestJson",wire.toString());
             var uri=configuration.baseUri().resolve(ODATA+"/command");String credential=signer.sign(credentialActor(actor));
             var result=http.send(HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Content-Type","application/json").header("Accept","application/json").header("Authorization","Bearer "+credential).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build(),HttpResponse.BodyHandlers.ofString());
@@ -233,7 +233,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var translated=Json.array();var sb=new StringBuilder();int n=0;
             if(atomic)sb.append("--").append(batch).append("\r\nContent-Type: multipart/mixed; boundary=").append(change).append("\r\n\r\n");
             for(JsonNode op:request.path("operations")) {
-                JsonNode wire=op.deepCopy();if(wire instanceof ObjectNode command)ScenarioWireMapping.command(op.path("capabilityId").asText(),command,translated);
+                JsonNode wire=op.deepCopy();if(relaxWire&&wire instanceof ObjectNode command)ScenarioWireMapping.command(op.path("capabilityId").asText(),command,translated);
                 var body=Json.object();body.put("requestJson",wire.toString());
                 sb.append("--").append(atomic?change:batch).append("\r\nContent-Type: application/http\r\nContent-Transfer-Encoding: binary\r\nContent-ID: ").append(++n).append("\r\n\r\n")
                   .append("POST command HTTP/1.1\r\nContent-Type: application/json\r\nAccept: application/json\r\n\r\n").append(body).append("\r\n");

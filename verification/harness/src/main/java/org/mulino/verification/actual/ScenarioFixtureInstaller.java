@@ -81,6 +81,8 @@ final class ScenarioFixtureInstaller {
         asOf=time(Json.required(fixture.path("clock"),"asOf"));knownAt=fixture.path("clock").hasNonNull("knownAt")?time(fixture.path("clock").path("knownAt").asText()):asOf;
         normalizeAliases();
         fixture.path("aliases").fieldNames().forEachRemaining(a->aliases.put(a,UUID.randomUUID().toString()));
+        // Fixture evidence entries name their own alias (round 12: T13-T15/T19 "need"); bind it like any alias.
+        for(JsonNode e:fixture.path("evidence")){String a=e.path("alias").asText(null);if(a!=null&&!aliases.has(a)){aliases.put(a,UUID.randomUUID().toString());((ObjectNode)fixture.path("aliases")).set(a,Json.object().put("type","DocumentVersion"));}}
         // Authored root delegators that are not aliases still need an actor id.
         for(JsonNode actor:fixture.path("actors")) {String d=actor.path("grant").path("delegatorAlias").asText(null);if(d!=null&&!aliases.has(d))aliases.put(d,UUID.randomUUID().toString());}
         organizations();
@@ -225,11 +227,15 @@ final class ScenarioFixtureInstaller {
             }
             // Dimension restrictions are installed as-is; an organization row is added only when no dimension is named.
             if(scopes.isEmpty())scopes.add(new String[]{"ORGANIZATION",org});
-            // Default: one grant, its dimensions intersect (product semantics). Probe mode unionGrantDimensions: one grant per
-            // dimension kind, so the authored item/work/target lists act as alternatives (the plan does not decide this).
+            // grant.scopeComposition (Step 2 round 12): PER_DIMENSION -> one grant per dimension kind (same actions,
+            // delegator, validity, revision), so the authored dimension lists are alternatives; absent or ALL_DIMENSIONS ->
+            // one grant whose dimensions intersect (product semantics). Probe unionGrantDimensions splits every grant.
+            String composition=grant.path("scopeComposition").asText("ALL_DIMENSIONS");
+            if(!Set.of("PER_DIMENSION","ALL_DIMENSIONS").contains(composition))throw new IllegalArgumentException("Unknown grant scopeComposition "+composition);
+            boolean perDimension=unionGrantDimensions||composition.equals("PER_DIMENSION");
             Map<String,List<String[]>> groups=new LinkedHashMap<>();
-            for(String[] sc:scopes)groups.computeIfAbsent(unionGrantDimensions?sc[0]:"ALL",k->new ArrayList<>()).add(sc);
-            if(groups.size()>1)conventions.add("grant of "+alias+" split into "+groups.size()+" single-dimension grants (probe unionGrantDimensions)");
+            for(String[] sc:scopes)groups.computeIfAbsent(perDimension?sc[0]:"ALL",k->new ArrayList<>()).add(sc);
+            if(groups.size()>1)conventions.add("grant of "+alias+" installed as "+groups.size()+" single-dimension grants ("+(composition.equals("PER_DIMENSION")?"scopeComposition PER_DIMENSION":"probe unionGrantDimensions")+")");
             for(var group:groups.values()) {
                 String grantId=uuid();
                 var g=row("organizationId",org,"ID",grantId,"actorId",actor,"delegatorId",delegator,"validFrom",from,"validUntil",until,"createdAt",asOf,"recordedAt",asOf);

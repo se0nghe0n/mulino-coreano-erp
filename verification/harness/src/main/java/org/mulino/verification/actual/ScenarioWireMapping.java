@@ -7,7 +7,7 @@ import java.util.*;
 import org.mulino.verification.Json;
 
 /**
- * Default-mode command slot translations the Step 2 contract owners asked the actual adapter to perform
+ * Probe-mode only (ACTUAL_RELAX_WIRE; since Step 2 round 12 the default adapter never rewrites a request) command slot translations the Step 2 contract owners asked the actual adapter to perform
  * (docs/execution/step2r-round9..11 "Step 3 actual adapter" requests, contracts/execution-preconditions commandBasis).
  * Each translation only renames or projects a value the case already states; the adapter never chooses a value.
  * Every applied translation is returned so the receipt records it (adapterTranslations).
