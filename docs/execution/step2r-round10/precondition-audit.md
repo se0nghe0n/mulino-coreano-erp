@@ -68,7 +68,7 @@ case의 모든 해당 action이 각 검사를 만족하는지 대조했다. fixt
 |---|---|---|---|
 | `dispatchQuantity` (31/32/5, 20 case: C1 C2 C3 C4 E1 E2 T04 T05 T06 T08 T09 T11 T13 T16 T17 T18 T24 T26 V3 V7) | 1 slot 허용 목록 → 2 배분 존재·EXECUTABLE/SUSPENDED (STALE_REVISION) → 3 판매 line 현재·품목/단위 → 4 scope 인가 TARGET·ITEM·PLACE(segment)·WORK (FORBIDDEN) → 5 leaf 미소비 → 6 EXECUTABLE (INSUFFICIENT) → 7 현재 SELL (INSUFFICIENT) → 8 `requireWarehouse` (SCOPE_INELIGIBLE) → 9 pickedAt (TYPE_INVALID) → 10 DISPATCH (INSUFFICIENT) → 11 transitPlaceId·kind TRANSIT (TYPE_INVALID) → 12 PLACE[transit] 인가 (FORBIDDEN) → 13 occurredAt ≤ now, ≥ pickedAt (TYPE_INVALID), SELL·DISPATCH 연속 (INSUFFICIENT) → 14 evidenceRef → G6 revision → execute: leaf 유효시점, 운송 이동 | `allocationId`(alias/`$result`), `cargoPlaceId`, `occurredAt`/요청 `asOf`/시계, 요청 `evidenceRefs`, fixture pick(`pickedAt`) 또는 pick action, grant·장소 scope | 1 adapter / 2 규칙(종결 배분) / 3 case 흐름 / 4·12 규칙 `grantAuthorityProblems`·`dispatchTransitProblems` / 7·10 eligibility 입력은 installer·case 흐름 / 8 규칙 `warehouseCustodyProblems`·`receiptCustodyProblems` / 9 규칙 `pickBeforeDispatchProblems` / 11 규칙 `dispatchTransitProblems` / 13 규칙 `occurrenceTimeProblems` / 14 규칙 `commandBasisProblems` |
 | `pickQuantity` (41/3/4, 13 case) | 1 slot {allocationId} → 2 배분 상태 → 3 line → 4 scope 인가 → 5 leaf → 6 EXECUTABLE → 7 현재 SELL → G6 → execute: 'Allocation already picked' | `allocationId`, actor의 pickQuantity role·grant·`capabilityIds` | 4 규칙 `grantAuthorityProblems`(T26 capabilityIds) / 두 번째 pick 규칙 `pickBeforeDispatchProblems` / 나머지 dispatch 1–7과 같다 |
-| `reserveQuantity` (56/30/3, 21 case) | 1 slot {segmentId, salesLineId, startQuantity, quantity, unit} → 2 segment·line → 3 품목/단위 → 4 scope 인가 → 5 `requireWarehouse` → 6 leaf → 7 단위·scale → 8 start+q ≤ 실물 → 9 SELL 정확 구간 → 10 겹치는 예약 → 11 line 미이행량 (SALES_LINE_QUANTITY_EXCEEDED) → G6 segment revision | segment(slot 또는 QuantitySegment subject), `orderLineId`/`orderId`, `quantity`; startQuantity 미기재는 0(adapter 규약) | 4 규칙 / 5 규칙 `warehouseCustodyProblems`(fixture segment, baseline 행 포함) / 1 adapter: audit에서 segment 없는 적용 기대 예약 6개는 모두 QuantitySegment subject를 가진다. 같은 fixture segment를 기본 좌표로 두 번 예약하는 적용 기대는 0개 / 9·11 case 흐름 |
+| `reserveQuantity` (56/30/3, 21 case) | 1 slot {segmentId, salesLineId, startQuantity, quantity, unit} → 2 segment·line → 3 품목/단위 → 4 scope 인가 → 5 `requireWarehouse` → 6 leaf → 7 단위·scale → 8 start+q ≤ 실물 → 9 SELL 정확 구간 → 10 겹치는 예약 → 11 line 미이행량 (SALES_LINE_QUANTITY_EXCEEDED) → G6 segment revision | segment(slot 또는 QuantitySegment subject), `orderLineId`/`orderId`, `quantity`; startQuantity 미기재는 0(adapter 규약) | 4 규칙 / 5 규칙 `warehouseCustodyProblems`(fixture segment, baseline 행 포함) / 1 adapter: audit에서 segment 없는 적용 기대 예약 6개는 모두 QuantitySegment subject를 가진다. 같은 fixture segment를 기본 좌표로 두 번 예약하는 적용 기대는 0개 / 9 case 흐름 / 10·11은 round 11에서 규칙 `reserveCapacityProblems`(이 점검은 action끼리만 대조하고 fixture 배분을 보지 않아 C3·V4·V2 12개 subcase를 놓쳤다, closure review 8 NF2) |
 | `replaceAllocation` (4/3, C3 T17) | 예약 1–11 + 원 배분 상태, 대체되는 segment scope 인가, 수량 동일 | `allocationId`, 새 segment | 인가 규칙. 나머지 case 흐름 |
 | `releaseAllocation` (4/3, C3 T17) | slot {allocationId} → 배분 상태 → line(현재 아니어도 됨) → scope 인가 → G6 | `allocationId` | 인가 규칙 |
 | `moveQuantity` (18/23/1, 6 case: C3 T08 T13 T16 T26 V4) | 1 slot·intentKind → 2 evidenceRef (TYPE_INVALID) → 3 leaf: occurredAt ≤ now, validFrom ≤ occurredAt → 4 원천 scope 인가 → 5 목적지·출발지 INTERNAL_STORAGE, 서로 다름, 내부 보관자 (TYPE_INVALID) → 6 목적지 PLACE 인가 → 7 제한 guard → G6 | `segmentId`, `destinationId`, 근거, 시계 | 2 규칙 `commandBasisProblems`(T26 safe-retry 원 이동 2개 수정) / 3 규칙 `occurrenceTimeProblems` / 4·6 규칙 `grantAuthorityProblems` / 5 규칙 `warehouseCustodyProblems` |
@@ -118,3 +118,48 @@ case의 모든 해당 action이 각 검사를 만족하는지 대조했다. fixt
   fixture 원천, startQuantity 기본 0)은 값이 case나 fixture에 있음만
   확인했다.
 - 제품 실행은 하지 않았다. 이 점검은 계약과 selftest이며 제품 PASS가 아니다.
+
+## round 11 재점검 (closure review 8 P1)
+
+closure review 8은 이 점검이 두 검사를 놓쳤다고 지적했다. 하나는 설치한
+사실의 기록 시각과 제품 시계다(NF1). 제품은 `recordedAt` ≤ 시계인 행만 읽는데,
+round 10 계약은 기록 시각을 정하지 않았다. 다른 하나는 예약의 구간 겹침과 line
+남은 수량에서 fixture 배분을 빼고 본 것이다(NF2). round 11은 이 두 검사만
+규칙으로 옮기고, 바꾼 action의 검사 사슬을 다시 대조했다. 기록은
+[round 11 README](../step2r-round11/README.md)에 있다.
+
+| 검사 | 분류 | 결과 |
+|---|---|---|
+| 설치 행 recordedAt ≤ 시작 시계(asOf), 근거의 늦은 기록 | 규칙 `fixtureRecordTimeProblems`(계약 `clock.installation`)와 installer 요청 | 시계를 asOf 이전으로 되돌리는 명령 0개. knownAt 이하로 선언된 근거 1448개는 모두 asOf 이전에 발생한다. 늦게 알려진 근거 4개 중 T17 `delivery-20`은 고쳤고, C2·T09 `DOC` 세 subcase는 NF8 backlog(`knownOpen`)다 |
+| fixture `pickedAt` ≤ asOf | 규칙 `pickBeforeDispatchProblems`(knownAt에서 asOf로 강화) | 위반 0 |
+| 예약 구간 겹침(fixture·실행 중 배분, 좌표 없음은 전체), segment 초과, line 남은 수량 | 규칙 `reserveCapacityProblems`(계약 `reserveCapacity`) | 수정 전 C3 3개, V4 8개, V2 1개. 수정 뒤 0 |
+
+바꾼 action의 사슬 대조:
+
+- C3 api·mcp·worker `authorized-same-input`, V4 8개 `authorized-same-route`
+  (reserveQuantity, actor `delegator`). 1 slot 허용 목록은 adapter가 맡는다. 요청의
+  C3 공통 slot 묶음 중 segment(QuantitySegment subject A20), line(`orderLineId`
+  SALE-LINE), quantity만 옮긴다. 2·3 line 설치는 installer가 맡는다(SALE의
+  quantity 20·unit, 품목 P, 고객 CUSTOMER, Work WORK). 4 인가는 규칙으로 본다
+  (delegator scope: item P, work WORK, place W). 5 창고 보관도 규칙이다(W
+  INTERNAL_STORAGE, warehouse). 6 leaf는 설치 시각 규칙으로 본다. 7 구간 [0,20)
+  ≤ 20은 규칙이다. 8 SELL은 installer가 맡는다(BASIS SELL A20과 ALLOWED 정책).
+  9 겹침과 10 line은 규칙으로 본다. 이제 배분 0, line 20 중 0이다. G6 revision은
+  case 흐름(C3는 `authorized-target`)이나 installer가 맡는다(V4 literal 1:
+  segment revision 설치).
+- V2 `reserve-commits-first/winner-call`(reserveQuantity, actor `sales`). segment
+  A60, line ORDER2(20, S2), 구간 [40,60)다. ALLOC [0,40)과 겹치지 않고 line 20
+  중 0이다. 인가 scope(segment A60, work S2, place W)와 위임자 supervisor는
+  규칙으로 본다. SELL eligibilityFacts(A60 전체)는 installer가 맡는다. 뒤의
+  `explicit-fresh-split`은 ALLOC을 child0 [0,40)에, winner를 child1 [40,60)에
+  옮긴다. 이제 좌표와 자식 순서가 맞는다.
+- T17 `post-dispatch-expiry/delivery`(recordDelivery). 원천 근거 `delivery-20`이
+  이제 09:06:00에 기록되어 인도 시계 09:06:00에 보인다. 발생 09:06:00은 시계
+  이하이고 출고(09:00:00) 이후다. 나머지 사슬은 위 표와 같다.
+
+새로 찾은 installer 요구(Step 3 요청으로 옮김)는 다음과 같다. 설치 행의
+recordedAt·createdAt를 asOf로 둔다. 선언된 늦은 근거 recordedAt을 존중한다.
+fixture 배분의 startQuantity를 설치한다. QuantitySegment의 `revision`을
+설치한다(지금 insert는 revision을 비워 둔다). SalesOrder·SalesOrderLine을
+설치한다(TYPES에 없음). C3처럼 quantity가 없는 line은 유일한 SalesOrder에서
+quantity·unit을 받는다.

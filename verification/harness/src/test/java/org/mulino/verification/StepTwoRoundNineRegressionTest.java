@@ -123,7 +123,8 @@ final class StepTwoRoundNineRegressionTest {
             assertEquals(List.of(),pickWithFixture(c[0],c[1],NONE,NONE),c[0]+"/"+c[1]);
             rejects("has no picked state",pickWithFixture(c[0],c[1],NONE,StepTwoRoundNineRegressionTest::unpick));
         }
-        rejects("is after the fixture clock knownAt",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedAt","2026-10-08T00:00:00Z"))));
+        // step2r round 11 (closure review 8 NF1) tightened the bound from knownAt to the starting clock asOf.
+        rejects("is after the fixture clock asOf",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedAt","2026-10-08T00:00:00Z"))));
         rejects("is not an ISO-8601 instant",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedAt","yesterday"))));
         rejects("which is not a fixture actor",pickWithFixture("T04","rollback-afterMovementBeforeAllocation",NONE,f->eachPicked(f,x->x.put("pickedByAlias","nobody"))));
         // A picked fixture allocation picked again: the product answers 'Allocation already picked'.

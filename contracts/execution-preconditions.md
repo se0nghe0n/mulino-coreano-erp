@@ -19,6 +19,35 @@ step2r round 6–9는 리뷰가 찾은 제품 검사 하나씩을 고쳤고, 다
 없으면 `knownAt` parameter로 시계를 맞춘다. 실행 중 pick의 `pickedAt`과
 기록 시각은 그 action의 시계다.
 
+### 설치 시각 (round 11)
+
+제품은 `recordedAt`이 명령의 `knownAt`(곧 시계) 이하인 행만 읽는다
+(`InventoryRepository`, `TradeEvidence`). round 10 계약은 시계를 asOf에서
+시작하라고만 하고 설치 행의 기록 시각을 정하지 않았다. 기존 installer는 행을
+fixture `knownAt`에 기록하므로 asOf 09:00:00·knownAt 09:00:01 fixture나
+02:00·04:00 fixture에서는 명령이 자기가 읽을 사실보다 먼저 실행됐다
+(closure review 8 NF1). 이번에 review의 첫 안을 계약으로 고정했다.
+
+- installer는 모든 fixture 행(createdAt·recordedAt)을 시작 시계(fixture
+  asOf) 이전 또는 그 시각에 기록한다. fixture `knownAt`은 시각을 지정하지 않은
+  조회의 기본 인지 시각일 뿐 기록 시각이 아니다.
+- 근거(evidence)의 선언 `recordedAt`이 fixture `knownAt` 이하이면 설치 지식이고
+  시작 시계에 기록된다. 이런 근거는 asOf 뒤에 발생하지 않는다.
+- 선언 `recordedAt`이 fixture `knownAt`보다 늦은 근거는 늦게 알려진 사실이다.
+  installer는 그 시각에 기록하고, 그 근거를 지명하며 적용을 기대하는 action은
+  그 시각 이후의 시계에서 실행한다.
+- fixture 배분의 `pickedAt`은 asOf 이하다. clock control은 COMMAND·RECORD
+  앞에서 시계를 설치 시각 이전으로 되돌리지 않는다.
+
+규칙은 `ContractValidator.fixtureRecordTimeProblems`다. T17
+`post-dispatch-expiry`의 인도 근거 `delivery-20`(발생 09:06:00, 기록 09:06:01)를
+09:06:00 시계의 인도가 지명해 이 규칙에 걸렸고, 기록 시각을 발생 시각으로
+맞췄다. C2·T09 `cumulative-versus-state`와 T09 `exists-versus-end-throughout`의
+`DOC`(10-07T04:00 기록)를 그보다 이른 시계의 명령이 지명하는 것은 closure
+review 8 NF8로 backlog에 남겼다. 계약 `clock.installation.knownOpen`에 이름을
+남기고, prepare는 문제 대신 `knownOpenGaps`(check `fixture-record-time`)로
+보고한다. 고쳐져 더 맞지 않는 항목은 prepare 문제다.
+
 ## 발생 시각
 
 action의 업무 발생 시각은 명시한 `occurredAt`(slot 또는 요청), 없으면 요청
@@ -65,6 +94,29 @@ C2·T09 `cumulative-versus-state`와 T09 `exists-versus-end-throughout`은
   `evidenceRefs`, `evidenceRef`·`evidenceId`·`evidenceIds`·`evidence`)가 있다.
 - 예약·출고·이동하는 fixture 실물은 INTERNAL_STORAGE에 내부 보관자로 있고,
   이동은 다른 INTERNAL_STORAGE로 간다.
+
+## 예약 용량 (round 11)
+
+`FulfillmentCommands`는 같은 segment의 EXECUTABLE·SUSPENDED 배분과 구간
+`[startQuantity, startQuantity + quantity)`가 겹치는 예약을
+INSUFFICIENT_ELIGIBLE_QUANTITY로 거부한다. 좌표가 없는 배분은 모든 구간과
+겹친다. segment를 넘는 예약은 TYPE_INVALID, 판매 line의 남은 수량(주문량 −
+출고량)을 넘는 배분 합은 SALES_LINE_QUANTITY_EXCEEDED다.
+
+C3·V4가 함께 쓰는 `C3/fixture-reserveQuantity.json`은 A20 20 BOX와 SALE-LINE
+20 전부를 EXECUTABLE `ALLOCATION`으로 잡고 있었다. 그래서 인가된 대조 호출(C3
+api·mcp·worker, V4 direct·nested·batch·projection·mcp·worker·blob·management)이
+같은 실물과 line을 다시 예약했고, 올바른 제품은 이를 거부한다(closure review 8
+NF2). 예약 fixture에서 이 배분을 뺐다. V2 `reserve-commits-first`는 `ALLOC`에
+[0,40) 좌표를 주고 winner가 `startQuantity` 40으로 [40,60)을 예약한다.
+
+규칙 `reserveCapacityProblems`는 적용을 기대하는 reserve·replace를 fixture 배분과
+그 subcase에서 앞서 만든 배분(해제·교체·출고 반영)에 대조한다. 요청
+`startQuantity`가 없으면 0이다. fixture 배분의 line은 `orderLineAlias`, 없으면
+같은 `workAlias`의 유일한 SalesOrderLine이다. line 주문량은 line alias나
+priorEntities의 quantity, fixture에 line과 주문이 하나씩이면 그 주문의 quantity,
+실행 중 line이면 `createSalesOrder`의 quantity다. 주문량을 알 수 없는 line은
+검사하지 않는다.
 
 ## pick 전 반례
 

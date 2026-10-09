@@ -463,7 +463,8 @@ public final class ContractValidator {
                     for(JsonNode row:declared.getOrDefault(fixtureAllocation,List.of())) if(row.has("pickedAt")) {
                         fixturePicked=true;
                         java.time.Instant at=null;try {at=java.time.Instant.parse(row.path("pickedAt").asText());} catch(RuntimeException bad) {problems.add(what+": fixture pickedAt "+row.path("pickedAt")+" is not an ISO-8601 instant");}
-                        if(at!=null && clock.path("knownAt").isTextual() && at.isAfter(java.time.Instant.parse(clock.path("knownAt").asText()))) problems.add(what+": fixture pickedAt "+at+" is after the fixture clock knownAt "+clock.path("knownAt").asText()+"; an installed pick is a past fact");
+                        // step2r round 11 (closure review 8 NF1): installed rows are recorded no later than the starting clock asOf.
+                        if(at!=null && clock.path("asOf").isTextual() && at.isAfter(java.time.Instant.parse(clock.path("asOf").asText()))) problems.add(what+": fixture pickedAt "+at+" is after the fixture clock asOf "+clock.path("asOf").asText()+"; an installed pick is a past fact recorded no later than the starting clock (contracts/execution-preconditions.json clock.installation)");
                         String by=row.path("pickedByAlias").asText(null);
                         if(by==null || !actors.has(by)) problems.add(what+": fixture pick names pickedByAlias "+by+", which is not a fixture actor; an installed pick records who picked");
                     }
@@ -825,6 +826,197 @@ public final class ContractValidator {
             }
         }
         return problems;
+    }
+    // ---- step2r round 11: Step 2 closure review 8 P1 (contracts/execution-preconditions.json clock.installation, reserveCapacity) ----
+    private record RecordTimeHit(String text,String knownOpenKey) {}
+    /**
+     * contracts/execution-preconditions.json clock.installation (closure review 8 NF1). The installer records every fixture row
+     * no later than the starting clock (fixture asOf); evidence declared recorded after the fixture knownAt is a late-known
+     * fact installed at its own recordedAt. Products read only rows recorded at or before the command's knownAt, which is the
+     * clock, so no COMMAND/RECORD runs before the installation and none that is expected to apply names late-known evidence
+     * before its recordedAt. Hits listed in clock.installation.knownOpen are reported as known open gaps instead.
+     */
+    public List<String> fixtureRecordTimeProblems(JsonNode caseFile) throws IOException {
+        List<String> out=new ArrayList<>();for(RecordTimeHit h:recordTimeHits(caseFile)) if(h.knownOpenKey()==null) out.add(h.text());return out;
+    }
+    /** The hits of fixtureRecordTimeProblems that clock.installation.knownOpen names (backlog with a finding reference). */
+    public List<String> fixtureRecordTimeKnownOpen(JsonNode caseFile) throws IOException {
+        List<String> out=new ArrayList<>();for(RecordTimeHit h:recordTimeHits(caseFile)) if(h.knownOpenKey()!=null) out.add("KNOWN_OPEN "+h.knownOpenKey()+": "+h.text());return out;
+    }
+    private List<RecordTimeHit> recordTimeHits(JsonNode caseFile) throws IOException {
+        JsonNode installation=Json.read(path("contracts/execution-preconditions.json")).path("clock").path("installation");
+        String caseId=caseFile.path("caseId").asText();
+        Map<String,String> backlog=new LinkedHashMap<>();
+        for(JsonNode k:installation.path("knownOpen")) if(k.path("caseId").asText().equals(caseId))
+            backlog.put(caseId+"/"+k.path("subcaseId").asText()+"/"+k.path("evidenceAlias").asText(),k.path("finding").asText());
+        Map<String,String> kinds=new HashMap<>();
+        for(JsonNode c:Json.read(path("contracts/acceptance-capabilities.json")).path("capabilities")) kinds.put(c.path("id").asText(),c.path("kind").asText());
+        List<RecordTimeHit> hits=new ArrayList<>();Set<String> matched=new HashSet<>(),fixtures=new HashSet<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseId+"/"+sub.path("id").asText(),ref=sub.path("fixtureRef").asText();
+            if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
+            JsonNode clock=fixtureClockNode(ref,new HashSet<>());
+            java.time.Instant start=instant(clock.path("asOf")),known=instant(clock.path("knownAt"));if(start==null) continue;if(known==null || known.isBefore(start)) known=start;
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode evidence=Json.array();mergeFixture(ref,new HashSet<>(),aliases,actors,evidence);
+            Map<String,java.time.Instant> late=new HashMap<>();
+            for(JsonNode e:evidence) {
+                java.time.Instant recorded=instant(e.path("recordedAt")),occurred=instant(e.path("occurredAt"));String alias=e.path("alias").asText();
+                if(recorded==null) continue;
+                if(recorded.isAfter(known)) {
+                    late.put(alias,recorded);
+                    if(occurred!=null && occurred.isAfter(recorded) && fixtures.add(ref+"#"+alias)) hits.add(new RecordTimeHit(caseId+" "+ref+": evidence "+alias+" is recorded at "+recorded+" before it occurred at "+occurred,null));
+                } else if(occurred!=null && occurred.isAfter(start) && fixtures.add(ref+"#"+alias))
+                    hits.add(new RecordTimeHit(caseId+" "+ref+": evidence "+alias+" occurs at "+occurred+", after the starting clock "+start+", but declares recordedAt "+recorded+" inside the fixture knowledge window (at or before knownAt "+known
+                        +"); the installer records such rows at the starting clock, before they occurred. Declare it recorded after knownAt (a late-known fact) or date it at or before asOf (contracts/execution-preconditions.json clock.installation)",null));
+            }
+            List<JsonNode> actions=actionsOf(sub);List<java.time.Instant> clocks=clocks(sub,actions);
+            for(int i=0;i<actions.size();i++) {
+                JsonNode a=actions.get(i);java.time.Instant now=clocks.get(i);
+                if(now==null || !a.has("request") || !Set.of("COMMAND","RECORD").contains(kinds.getOrDefault(capabilityOf(a),"")) || !a.path("kind").asText().equals("invoke")) continue;
+                String id=where+"/"+a.path("id").asText();
+                if(now.isBefore(start)) hits.add(new RecordTimeHit(id+": "+capabilityOf(a)+" runs at the product clock "+now+", before the fixture is installed at the starting clock "+start
+                    +"; the product reads only rows recorded at or before the clock, so the command sees no fixture fact (contracts/execution-preconditions.json clock.installation)",null));
+                if(!applies(sub,actions,i)) continue;
+                for(String alias:aliasRefs(a.path("request"))) {
+                    java.time.Instant recorded=late.get(alias);if(recorded==null || !now.isBefore(recorded)) continue;
+                    String key=where+"/"+alias;if(backlog.containsKey(key)) matched.add(key);
+                    hits.add(new RecordTimeHit(id+": "+capabilityOf(a)+" is expected to apply at the product clock "+now+" and names evidence "+alias+", which the fixture records later, at "+recorded
+                        +"; the product reads only evidence recorded at or before the clock (TradeEvidence, InventoryRepository), so advance the clock to the recording or record the evidence no later than its first use (contracts/execution-preconditions.json clock.installation)",
+                        backlog.containsKey(key)?key+" ("+backlog.get(key)+")":null));
+                }
+            }
+        }
+        for(String key:backlog.keySet()) if(!matched.contains(key))
+            hits.add(new RecordTimeHit(key+": contracts/execution-preconditions.json clock.installation.knownOpen lists this late-known evidence use, but no action reads it before its recording any more; remove the entry",null));
+        return hits;
+    }
+    /** The fixture clock of a fixture or of the first of its baseRefs that declares one (the clock that sets the starting asOf). */
+    private JsonNode fixtureClockNode(String ref,Set<String> visiting) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return Json.object();
+        JsonNode fixture=Json.read(path(ref));
+        if(instant(fixture.path("clock").path("asOf"))!=null) return fixture.path("clock");
+        for(JsonNode base:fixture.path("baseRefs")) {JsonNode found=fixtureClockNode(base.asText(),visiting);if(instant(found.path("asOf"))!=null) return found;}
+        return Json.object();
+    }
+    private static final class Booking {
+        final String segment,line;final java.math.BigDecimal start,quantity;String state;
+        Booking(String segment,java.math.BigDecimal start,java.math.BigDecimal quantity,String line,String state) {this.segment=segment;this.start=start;this.quantity=quantity;this.line=line;this.state=state;}
+        String range() {return start==null?"(no startQuantity: the whole segment)":"["+start.toPlainString()+","+start.add(quantity).toPlainString()+")";}
+    }
+    private static java.math.BigDecimal decimal(JsonNode n) {
+        JsonNode v=n.isObject()?n.path("value"):n;
+        if(!(v.isTextual() || v.isNumber())) return null;
+        try {return new java.math.BigDecimal(v.asText());} catch(NumberFormatException bad) {return null;}
+    }
+    /** A slot of a command intent: request.slots first, then the request itself. */
+    private static JsonNode intentSlot(JsonNode intent,String key) {return intent.path("slots").has(key)?intent.path("slots").path(key):intent.path(key);}
+    /** The command intents of an action: the request, the operations of a batch and the business action of a blob upload. */
+    private static List<JsonNode> intents(JsonNode a,String cap) {
+        JsonNode req=a.path("request");List<JsonNode> out=new ArrayList<>();
+        if(req.has("slots") || req.has("subjectRefs")) out.add(req);
+        for(JsonNode op:req.path("operations")) if(cap.equals(op.path("capabilityId").asText())) out.add(op);
+        if(cap.equals(req.path("businessAction").path("capabilityId").asText())) out.add(req.path("businessAction"));
+        return out;
+    }
+    /** A fixture alias or a runtime reference ("$" + producing action id) named by a slot, or null. */
+    private static String bookingRef(JsonNode slot) {
+        String alias=slotAlias(slot);if(alias!=null) return alias;
+        List<JsonNode> r=resultNodes(slot);return r.size()==1?"$"+r.get(0).path("actionId").asText():null;
+    }
+    /**
+     * contracts/execution-preconditions.json reserveCapacity (closure review 8 NF2). FulfillmentCommands rejects a reservation
+     * overlapping an EXECUTABLE/SUSPENDED allocation of the same segment (a null coordinate overlaps every interval) with
+     * INSUFFICIENT_ELIGIBLE_QUANTITY, one exceeding the segment with TYPE_INVALID and one exceeding the sales line remainder
+     * (quantity minus dispatched) with SALES_LINE_QUANTITY_EXCEEDED. A reserve or replace a subcase expects to apply is checked
+     * against the fixture allocations and the earlier runtime allocations, with releases, replacements and dispatches applied.
+     */
+    public List<String> reserveCapacityProblems(JsonNode caseFile) throws IOException {
+        JsonNode rule=Json.read(path("contracts/execution-preconditions.json")).path("reserveCapacity");
+        Set<String> active=new HashSet<>(),usage=new HashSet<>();List<String> lineSlots=new ArrayList<>();
+        for(JsonNode s:rule.path("activeStates")) active.add(s.asText());
+        for(JsonNode s:rule.path("lineUsageStates")) usage.add(s.asText());
+        for(JsonNode s:rule.path("lineSlots")) lineSlots.add(s.asText());
+        List<String> problems=new ArrayList<>();
+        for(JsonNode sub:caseFile.path("subcases")) {
+            String where=caseFile.path("caseId").asText()+"/"+sub.path("id").asText(),ref=sub.path("fixtureRef").asText();
+            if(ref.isBlank() || !Files.isRegularFile(path(ref))) continue;
+            ObjectNode aliases=Json.object(),actors=Json.object();ArrayNode ignored=Json.array();mergeFixture(ref,new HashSet<>(),aliases,actors,ignored);
+            Map<String,ObjectNode> rows=new LinkedHashMap<>();mergeSegments(ref,new HashSet<>(),rows);
+            Map<String,List<JsonNode>> declared=new HashMap<>();allocationDeclarations(ref,new HashSet<>(),declared);
+            ObjectNode prior=Json.object();mergePrior(ref,new HashSet<>(),prior);
+            List<String> lines=new ArrayList<>(),orders=new ArrayList<>();
+            aliases.fields().forEachRemaining(e->{String t=e.getValue().path("type").asText();if(t.equals("SalesOrderLine")) lines.add(e.getKey());if(t.equals("SalesOrder")) orders.add(e.getKey());});
+            Map<String,Booking> bookings=new LinkedHashMap<>();
+            for(var e:declared.entrySet()) {
+                if(!aliases.path(e.getKey()).path("type").asText().equals("Allocation")) continue;
+                ObjectNode m=Json.object();for(JsonNode row:e.getValue()) if(row.isObject()) m.setAll((ObjectNode)row);
+                java.math.BigDecimal q=decimal(m.path("quantity"));String seg=m.path("segmentAlias").asText(null);
+                if(seg==null || q==null) continue;
+                String line=m.path("orderLineAlias").asText(null);
+                if(line==null && m.path("workAlias").isTextual()) {List<String> same=new ArrayList<>();for(String l:lines) if(m.path("workAlias").asText().equals(aliases.path(l).path("workAlias").asText())) same.add(l);if(same.size()==1) line=same.get(0);}
+                bookings.put(e.getKey(),new Booking(seg,m.has("startQuantity")?decimal(m.path("startQuantity")):null,q,line,m.path("state").asText(m.path("status").asText("EXECUTABLE"))));
+            }
+            List<JsonNode> actions=actionsOf(sub);Map<String,JsonNode> byId=new HashMap<>();for(JsonNode a:actions) byId.putIfAbsent(a.path("id").asText(),a);
+            for(int i=0;i<actions.size();i++) {
+                JsonNode a=actions.get(i);String cap=capabilityOf(a);
+                if(!a.path("kind").asText().equals("invoke") || !a.has("request") || !applies(sub,actions,i)) continue;
+                for(JsonNode intent:intents(a,cap)) {
+                    String old=Set.of("releaseAllocation","replaceAllocation",DISPATCH).contains(cap)?bookingRef(intentSlot(intent,"allocationId")):null;
+                    if(!Set.of("reserveQuantity","replaceAllocation").contains(cap)) {
+                        if(old!=null && bookings.containsKey(old)) bookings.get(old).state=cap.equals(DISPATCH)?"CONSUMED":"RELEASED";
+                        continue;
+                    }
+                    String id=where+"/"+a.path("id").asText();
+                    String seg=fixtureSegment(Json.object().set("request",intent),"reserveQuantity",aliases,declared);
+                    if(seg==null) seg=bookingRef(intentSlot(intent,"segmentId"));
+                    java.math.BigDecimal q=decimal(intentSlot(intent,"quantity")),start=decimal(intentSlot(intent,"startQuantity"));if(start==null) start=java.math.BigDecimal.ZERO;
+                    String line=null;
+                    if(cap.equals("replaceAllocation")) line=old==null || !bookings.containsKey(old)?null:bookings.get(old).line;
+                    else for(String key:lineSlots) {String l=bookingRef(intentSlot(intent,key));if(l!=null) {line=l;break;}}
+                    if(seg==null || q==null) continue;
+                    java.math.BigDecimal end=start.add(q);
+                    java.math.BigDecimal physical=null;for(JsonNode r:List.of(aliases.path(seg),rows.getOrDefault(seg,Json.object()))) if(physical==null) physical=decimal(r.path("quantity"));
+                    if(physical!=null && end.compareTo(physical)>0) problems.add(id+": "+cap+" is expected to apply to ["+start.toPlainString()+","+end.toPlainString()+") of segment "+seg+", which holds only "+physical.toPlainString()+"; the product answers TYPE_INVALID 'Reservation exceeds physical scope'");
+                    for(var b:bookings.entrySet()) {
+                        Booking o=b.getValue();
+                        if(b.getKey().equals(old) || !seg.equals(o.segment) || !active.contains(o.state)) continue;
+                        if(o.start==null || start.compareTo(o.start.add(o.quantity))<0 && o.start.compareTo(end)<0)
+                            problems.add(id+": "+cap+" is expected to apply to ["+start.toPlainString()+","+end.toPlainString()+") of segment "+seg+", which overlaps the "+o.state+" allocation "+b.getKey()+" "+o.range()
+                                +"; the product rejects INSUFFICIENT_ELIGIBLE_QUANTITY 'Physical interval already reserved' (FulfillmentCommands). Reserve free stock, or declare both coordinates (startQuantity) so the intervals are disjoint (contracts/execution-preconditions.json reserveCapacity)");
+                    }
+                    java.math.BigDecimal ordered=lineQuantity(line,aliases,prior,lines,orders,byId);
+                    if(ordered!=null) {
+                        java.math.BigDecimal used=java.math.BigDecimal.ZERO;
+                        for(var b:bookings.entrySet()) if(!b.getKey().equals(old) && line.equals(b.getValue().line) && usage.contains(b.getValue().state)) used=used.add(b.getValue().quantity);
+                        if(used.add(q).compareTo(ordered)>0) problems.add(id+": "+cap+" is expected to apply "+q.toPlainString()+" to sales line "+line+" of "+ordered.toPlainString()+", which allocations (executable, suspended or dispatched) already hold "+used.toPlainString()
+                            +"; the product rejects SALES_LINE_QUANTITY_EXCEEDED (contracts/execution-preconditions.json reserveCapacity)");
+                    }
+                    if(old!=null && bookings.containsKey(old)) bookings.get(old).state="REPLACED";
+                    bookings.put("$"+a.path("id").asText(),new Booking(seg,start,q,line,"EXECUTABLE"));
+                }
+            }
+        }
+        return problems;
+    }
+    /**
+     * The ordered quantity of a sales line: the line alias or its priorEntities entry; the only SalesOrder priorEntity when
+     * the fixture has exactly one line and one order (the C3 template); for a runtime line, the createSalesOrder quantity.
+     */
+    private static java.math.BigDecimal lineQuantity(String line,JsonNode aliases,JsonNode prior,List<String> lines,List<String> orders,Map<String,JsonNode> byId) {
+        if(line==null) return null;
+        if(line.startsWith("$")) {
+            JsonNode order=byId.get(line.substring(1));
+            return order!=null && capabilityOf(order).equals("createSalesOrder")?decimal(intentSlot(order.path("request"),"quantity")):null;
+        }
+        for(JsonNode r:List.of(aliases.path(line),prior.path(line))) {java.math.BigDecimal q=decimal(r.path("quantity"));if(q!=null) return q;}
+        if(lines.size()==1 && lines.get(0).equals(line) && orders.size()==1) return decimal(prior.path(orders.get(0)).path("quantity"));
+        return null;
+    }
+    private void mergePrior(String ref,Set<String> visiting,ObjectNode out) throws IOException {
+        if(ref.isBlank() || !visiting.add(ref) || !Files.isRegularFile(path(ref))) return;
+        JsonNode fixture=Json.read(path(ref));
+        for(JsonNode base:fixture.path("baseRefs")) mergePrior(base.asText(),visiting,out);
+        if(fixture.path("baseline").path("priorEntities").isObject()) out.setAll((ObjectNode)fixture.path("baseline").path("priorEntities"));
     }
     /** Every declaration of a fixture allocation (alias entry, baseline.priorEntities entry, baseline.allocations/allocation row), baseRefs first. */
     private void allocationDeclarations(String ref,Set<String> visiting,Map<String,List<JsonNode>> out) throws IOException {
