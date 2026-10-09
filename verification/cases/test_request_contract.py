@@ -167,6 +167,21 @@ class QueryContract(unittest.TestCase):
         self.assertEqual([], problems)
         self.assertTrue(all('PG-INVENTORY-ACTION-ELIGIBILITY' in k for k in known) and len(known) == 2, known)
 
+    def test_reads_name_their_identifier(self):
+        problems, known = self.check(query({'scope': {'organizationId': A('ORG')}}, cap='getWork'))
+        self.assertTrue(any('getWork needs one of id|workId' in p for p in problems), problems)
+        problems, known = self.check(query({'scope': {'organizationId': A('ORG')}}))
+        self.assertEqual([], problems)
+        self.assertTrue(any('PG-ORGANIZATION-SNAPSHOT' in k for k in known), known)
+
+    def test_conformance_derives_identifiers_from_the_case(self):
+        work = invoke(command(capabilityId='createWork'), cap='createWork', aid='work')
+        read = query({'scope': {'organizationId': A('ORG'), 'itemId': A('P')}}, cap='getAssessment', aid='assess')
+        noun = query({'scope': {'organizationId': A('ORG'), 'itemId': A('P')}}, cap='getObject', aid='noun')
+        C.conform_case(case([work, read, noun]))
+        self.assertEqual({'$result': {'actionId': 'work', 'pointer': '/response/workId'}}, read['request']['workId'])
+        self.assertEqual(A('P'), noun['request']['id'])
+
     def test_instants_must_be_utc(self):
         problems, _ = self.check(query({'scope': {'itemId': A('P')}, 'asOf': '2026-10-07T09:00:00+09:00'}))
         self.assertTrue(any('/asOf: UTC instant required' in p for p in problems))

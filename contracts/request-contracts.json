@@ -118,6 +118,9 @@
         "filters": [
           "type",
           "sort"
+        ],
+        "requires": [
+          "id"
         ]
       },
       "searchObjects": {
@@ -138,18 +141,29 @@
         "filters": [
           "type",
           "sort"
+        ],
+        "requires": [
+          "scope/itemId",
+          "id"
         ]
       },
       "traceLot": {
         "filters": [
           "type",
           "sort"
+        ],
+        "requires": [
+          "id",
+          "scope/lotId"
         ]
       },
       "getTrace": {
         "filters": [
           "type",
           "sort"
+        ],
+        "requires": [
+          "id"
         ]
       },
       "getWork": {
@@ -161,6 +175,10 @@
           "sort",
           "action",
           "customerId"
+        ],
+        "requires": [
+          "id",
+          "workId"
         ]
       },
       "searchWorks": {
@@ -183,6 +201,10 @@
           "sort",
           "action",
           "customerId"
+        ],
+        "requires": [
+          "id",
+          "workId"
         ]
       },
       "getAssessment": {
@@ -194,6 +216,10 @@
           "sort",
           "action",
           "customerId"
+        ],
+        "requires": [
+          "id",
+          "workId"
         ]
       },
       "getEvidence": {
@@ -237,19 +263,29 @@
         "filters": []
       },
       "getDefinition": {
-        "filters": []
+        "filters": [],
+        "requires": [
+          "id"
+        ]
       },
       "getPolicy": {
-        "filters": []
+        "filters": [],
+        "requires": [
+          "id"
+        ]
       },
       "getAccessContext": {
         "filters": []
       },
       "getGrant": {
-        "filters": []
+        "filters": [],
+        "requires": [
+          "id"
+        ]
       }
     },
-    "operationsWithoutProductHandler": "an operation outside 'operations' has no product handler at ce4970c4; only the shared envelope is checked and any parameter outside it needs a knownOpen entry"
+    "operationsWithoutProductHandler": "an operation outside 'operations' has no product handler at ce4970c4; only the shared envelope is checked and any parameter outside it needs a knownOpen entry",
+    "requiresNote": "requires lists the identifiers of which a read names at least one (InventoryQueries object/inventory/trace, WorkReadHandler, DefinitionQueries, PolicyQueries, IdentityQueries getGrant); without them the product answers TYPE_INVALID before any authorization or business rule."
   },
   "harnessDeclarations": {
     "description": "Values a case needs that are not product request content move to the action's 'harness' object (contracts/acceptance-case.schema.json); adapters read them and never send them as request fields.",
@@ -332,9 +368,10 @@
         "scopeKeys": [
           "allocationId",
           "kind"
-        ]
+        ],
+        "missingIdentifier": true
       },
-      "reason": "cases read one obligation by id, the obligations of one kind or those of one allocation; getObligations takes only a work id and work filters.",
+      "reason": "cases read one obligation by id, the obligations of one kind or those of one allocation; getObligations takes only a work id and work filters. A read without a work id is refused (Work ID required).",
       "closeWhen": "the query contract names an obligation id/kind selector"
     },
     {
@@ -413,7 +450,8 @@
         ],
         "fields": [
           "invoiceId"
-        ]
+        ],
+        "missingIdentifier": true
       },
       "reason": "T19 reads the invoice-match assessment by invoice; getAssessment takes a work id only.",
       "closeWhen": "the query contract names an invoice assessment selector"
@@ -448,6 +486,33 @@
       },
       "reason": "plan section 4.1 keeps ExternalIdentifier (issuer/namespace/validity) beside the internal id; T02 resolves an object by its issuer-scoped external identifier, which the object query has no selector for.",
       "closeWhen": "the object query names an external identifier selector"
+    },
+    {
+      "id": "PG-ORGANIZATION-SNAPSHOT",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getInventory",
+          "getObject"
+        ],
+        "missingIdentifier": true
+      },
+      "reason": "T02, T07, T21 and V1 take the snapshot revision of an organization-wide observation (the observation names no item) from a read without an item or id; getInventory and getObject need one, so the plan's snapshotRevision has no organization-wide read.",
+      "closeWhen": "the product offers an organization-scoped snapshot read, or the plan scopes these observations to an item"
+    },
+    {
+      "id": "PG-DEFINITION-LISTING",
+      "owner": "Step 3",
+      "kind": "query",
+      "match": {
+        "operations": [
+          "getDefinition"
+        ],
+        "missingIdentifier": true
+      },
+      "reason": "T21 lists the organization's definitions (drafts included) after validation; getDefinition reads one pinned definition id.",
+      "closeWhen": "the query contract names a definition listing"
     },
     {
       "id": "PG-QUERY-CAPABILITY-ABSENT",

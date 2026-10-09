@@ -243,11 +243,13 @@ class Contracts:
         cache = {} if cache is None else cache
         for sub in case.get('subcases', []):
             world = World(self.root, sub.get('fixtureRef'), cache)
+            prior = []
             for action in iter_actions(sub.get('actions', [])):
-                self.conform_action(action, case.get('caseId'), sub.get('id'), world)
+                self.conform_action(action, case.get('caseId'), sub.get('id'), world, prior)
+                prior.append(action)
         return case
 
-    def conform_action(self, action, case_id, sub_id, world):
+    def conform_action(self, action, case_id, sub_id, world, prior=()):
         override = OVERRIDES.get((case_id, sub_id, action.get('id')), {})
         if not isinstance(action.get('request'), dict):
             return
@@ -265,7 +267,7 @@ class Contracts:
             elif route == 'blob':
                 self.conform_intent(request['businessAction'] if 'businessAction' in request else request, action, world, override)
         elif action.get('kind') == 'query' and route in self.query['routes']:
-            self.conform_query(request, action, world)
+            self.conform_query(request, action, world, prior)
         if route == 'wire' and action.get('kind') in ('invoke', 'query'):
             for args, proxy in self.tool_calls(action):
                 if self.kinds.get(proxy['capabilityId']) == 'QUERY' and proxy['capabilityId'] != 'structureIntent':
@@ -371,7 +373,7 @@ class Contracts:
         merge_harness(action, harness)
 
     # -- queries --
-    def conform_query(self, request, action, world):
+    def conform_query(self, request, action, world, prior=()):
         op, harness = action.get('capabilityId'), {}
         scope = request.get('scope') if isinstance(request.get('scope'), dict) else None
         env = request.pop('environmentId', None)
@@ -443,6 +445,12 @@ class Contracts:
             if kind and kind != 'TradeItem':
                 request['type'] = kind
         self.place_by_operation(request, scope, op)
+        if op == 'getObject' and 'id' not in request and 'itemId' in scope:
+            request['id'] = scope['itemId']  # the object a getObject without id reads is the item its scope names
+        if op in ('getAssessment', 'getWork') and 'id' not in request and 'workId' not in request:
+            works = [a for a in prior if a.get('kind') == 'invoke' and a.get('capabilityId') in ('createWork', 'createDraft')]
+            if len(works) == 1:
+                request['workId'] = {'$result': {'actionId': works[0]['id'], 'pointer': '/response/workId'}}  # the subcase's only Work
         if scope:
             if 'scope' not in request:
                 request['scope'] = scope
@@ -651,11 +659,14 @@ class Contracts:
                 filters[key] = request[key]
         if spec is not None:
             violations += [('filter', k) for k in filters if k not in spec['filters']]
+        required = (spec or {}).get('requires')
+        if required and not any(present(request, path) for path in required):
+            violations.append(('requires', '|'.join(required)))
         problems, known = [], []
         for kind, key in violations:
             gap = self.query_gap(op, kind, key)
             text = {'field': f'/{key}: not a query envelope field', 'scope': f'/scope/{key}: not a {op} scope key',
-                    'filter': f'/{key}: not a {op} filter'}[kind]
+                    'filter': f'/{key}: not a {op} filter', 'requires': f': {op} needs one of {key}'}[kind]
             (known if gap else problems).append(f'{text}' + (f' KNOWN_OPEN {gap}' if gap else ' (contracts/request-contracts.json queryEnvelope)'))
         for key in ('asOf', 'knownAt'):
             if key in request and not (isinstance(request[key], str) and re.match(r'^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?Z$', request[key])):
@@ -668,6 +679,10 @@ class Contracts:
         for gap in self.known:
             match = gap['match']
             if gap['kind'] != 'query' or op not in match.get('operations', []):
+                continue
+            if kind == 'requires':
+                if match.get('missingIdentifier'):
+                    return gap['id']
                 continue
             if match.get('anyParameter') or key in match.get({'field': 'fields', 'scope': 'scopeKeys', 'filter': 'filters'}[kind], []):
                 return gap['id']
@@ -728,6 +743,15 @@ def default_provenance(value):
     if isinstance(value, list) and value and all(is_ref(v) or is_typed_ref(v) for v in value):
         return 'CONTEXT'
     return 'USER'
+
+
+def present(request, path):
+    node = request
+    for part in path.split('/'):
+        if not isinstance(node, dict) or part not in node:
+            return False
+        node = node[part]
+    return True
 
 
 def pinned_rejection(sub, action_id):
