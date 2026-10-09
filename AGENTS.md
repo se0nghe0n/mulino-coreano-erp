@@ -72,6 +72,12 @@ adversarial review를 수행한다. 이미 닫은 Step 1·2도 이 두 reviewer�
 `delegate_task`, provider `codex_2`)로 대체하고 그 사실을 기록한다.
 2026-10-09 사용자가 GPT-6-Astra 대체를 중단하고 Sol로 바꾸게 했다.
 
+2026-10-09 사용자가 grant scope 해석을 정했다. 여러 차원을 지정한 grant는
+모든 차원이 일치할 때만 권한을 준다(all-of). 제품의 현재 규칙이 기준이고,
+case fixture의 grant는 이 규칙으로 통과하도록 작성한다. 차원별 분리
+설치(`scopeComposition: PER_DIMENSION`)는 probe 진단에만 쓴다. S4
+backlog의 ManagementCoverage 단일 차원 통과도 all-of로 고친다.
+
 2026-10-09 사용자가 review 시점을 바꿨다. Step 2 closure가 정적
 review 8회 동안 매번 새 P1·P2를 찾으며 수렴하지 않았고, 지적 대부분이
 제품에 한 번 실행하면 드러나는 동작 불일치였기 때문이다. 이 결정이
