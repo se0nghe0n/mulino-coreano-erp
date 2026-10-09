@@ -7,13 +7,12 @@
 통합 인수 관문이다. 예를 들어 사용자 단계1의 skill 작성은 S5 전체의
 완료가 아니며, 단계2의 테스트 준비는 S0 기술 검증의 성공이 아니다.
 
-단계별 모델·effort와 매 단계의 adversarial reviewer(이미 닫은 Step 1·2의
-재검토 포함)는 저장소 루트 [AGENTS.md](../../../../AGENTS.md)의 현재 표가
-단일 원본이다. 이 skill에 표를 복제하지 않는다. AGENTS.md가 바뀌면 그
-표를 따른다. 단계의 통합 산출물은 지정 reviewer의 검토와 지적 통합·수정·
-재검증 뒤에 닫는다. prompt에 모델 이름을 적는 것은 runtime model/effort
-선택이 아니며, 지정 모델을 쓸 수 없으면 실제 제한을 보고하고 성공한
-review처럼 표시하지 않는다.
+모델·effort와 review 시점은 [AGENTS.md](../../../../AGENTS.md)가
+단일 원본이다. 2026-10-09 결정에 따라 정적 adversarial review를
+반복하지 않는다. S5·S6 구현 중에는 실제 scenarios 실행과 결합 checks로
+중간 gate를 판정하고, S6 실행 뒤 지정 reviewer가 실행 증거와 함께
+전체를 한 번 검토한다. prompt의 모델 이름은 runtime 선택이 아니며,
+지정 모델을 쓸 수 없으면 제한을 보고한다.
 
 테스트를 먼저 만드는 사용자 순서를 S gate의 순환 의존으로 바꾸지 않는다.
 테스트 단계에서는 계획의 공개 계약·fixture·oracle와 필요한 harness를

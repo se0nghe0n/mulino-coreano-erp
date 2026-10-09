@@ -20,8 +20,9 @@ T01–T26, C1–C5, V1–V8, E1/E2가 인수 기준이다. 명사·동사 진입
   준비 gate의 vocabulary·binding·생성기 검사, 감사 원행, runtimeProfile·
   scheduler 제출 증거·관찰 경계, PREPARATION checkout 대조,
   RESULT_REVISION/RUNTIME_TASK_SNAPSHOT, MCP 오류 우선순위, receipt 조건,
-  Place.kind/내부 보관자 준비 검사, Accept·Origin 반례, -32600/-32602
-  구분, V4 QUERY 면제와 V7 원행 primary 규칙이 있다.
+  장소·직접/운송 수령·custody 반례, pick/TRANSIT 출고·시계·예약 용량,
+  intent/query request-contracts와 grant all-of, NO_TASK 완료 주기,
+  run inventory triage, V4 QUERY 면제와 V7 원행 primary 규칙이 있다.
 - 테스트 계층을 설계할 때 [방법론](references/methodology.md)을 읽는다.
   #57에서 업무 시나리오·공통 SIT/UAT·보류 증거 원칙을 재사용했다.
 - 반례와 종단 수량을 작성할 때
@@ -49,6 +50,12 @@ Docker 미기동, 잘못된 인증 설정은 환경 실패이며 의미 있는 R
 항상 참 assertion·전부 skip된 suite만으로 Step2를 완료하지 않는다.
 Step2의 테스트 계약 납품 완료는 시스템 인수 완료가 아니다. 이후 구현을
 통합한 뒤 실제 경로에서 필수 사례가 통과해야 시스템 완료를 주장한다.
+
+2026-10-09 결정은 정적 review 반복을 중단했다. S5·S6 중간 gate는
+`./verify scenarios --actual` 실행과 inventory.py의 run 간 첫 실패 비교,
+결합 checks로 판정한다. TEST/ADAPTER/PRODUCT 원인과 NOT_IMPLEMENTED
+상태를 구별하고 해당 Step owner가 수정한다. S6 실행 뒤 전체 review를
+한 번 한다([AGENTS.md](../../../AGENTS.md)).
 
 Step별 baseline commit, 소유 경로, fixture hash, 실행 command,
 RED/PASS 결과와 미실행 경로를 남긴다. 기능 부재를 해결하려고
@@ -115,8 +122,10 @@ PREPARATION commit/clean 필드도 공개 계약을 따른다(`repository-harnes
 api·worker는 group 밖에서 시작하고 group의 loop start는 branch당 하나다.
 관찰 창은 harness가 요청에 넣은 observeFrom부터 잰다(group에서는
 `data.observationBoundaryAt`, group 밖 watcher는 dispatch 직전이다).
-case는 observeFrom을 직접 쓰지 않고 extractor는 해당 창의 지속 제출
-행만 읽는다. 실제 watcher adapter는 NOT_RUN이다. snapshotRef는 API revision과
+case는 observeFrom/naturalTickSeconds를 직접 쓰지 않는다. NO_TASK는
+두 tick 이상 관찰·종료 뒤 extractor·창 안 자연 완료 주기와 제출0을
+모두 요구하며 기록이 없으면 SCHEDULER_CYCLE_RECORD gate로 남긴다.
+snapshotRef는 API revision과
 runtime task snapshot을 구별한다. 고정 수량 primary의 source·baseline·
 unitSource·baselineUnitSource에는 `/data/data/` 파생값을 쓰지 않는다.
 
@@ -177,9 +186,9 @@ PASS가 없거나 검증이 실패하면 PASS로 인용하지 않는다.
 STUB·LOGIC_REVIEW는 보고서에서만 구별하는 범주다.
 `./verify coverage`는 assembler(`--check-preparation`)의 exit code를 그대로 돌려준다.
 `--actual` profile 실행은 엄격한 조건에서만 `ExecutionReceiptProducer`로 receipt를
-만들고, 조건을 못 채우면 `NOT_EMITTED`와 이유를 낸다. 현재 actual driver는
-`api`·`fixture`·`db` adapter만 공급하므로 mcp·client·model·process·host가 필요한
-subcase는 `NOT_RUN`이고 manifest PASS를 주장할 수 없다. 이 차이를 receipt·report를
+만들고, 조건을 못 채우면 `NOT_EMITTED`와 이유를 낸다. S5b의 실제
+route 연결과 남은 adapter/fixture 공백을 새 run inventory로 대조한다.
+probe·partial fixture PASS를 전체 인수로 쓰거나 receipt·report를
 손으로 만들어 메우지 않는다. native `actual-sN` 결과는 한정된 custody 증거로 따로
 보고한다.
 전체 gate는 D26개·C5개·V8개·E2개의 assertion/artifact 추적, 실제 필수

@@ -11,9 +11,9 @@
 |---|---|
 | `./verify validate <case.json>` | JSON Schema·semantic 검증. 제품 PASS 아님 |
 | `./verify contract-red <case.json>` | 미구현 driver로 실행한 의미 있는 RED. 정상 exit1 |
-| `./verify prepare` | case↔assertion↔Gherkin·registry·catalog 연결, 비정규 오류 pointer 거부, `caseAssetChecks` 11개와 감사 원행·runtimeProfile 검사(아래). 결과 `PREPARED`(제품 PASS 아님) |
+| `./verify prepare` | case↔assertion↔Gherkin·registry·catalog 연결, 비정규 오류 pointer 거부, `caseAssetChecks` 12개와 감사 원행·runtimeProfile 검사(아래). 결과 `PREPARED`(제품 PASS 아님) |
 | `./verify coverage [--index <file>]` | `model-binding/run prepare` 뒤 `assemble.py --check-preparation`을 실행하고 assembler exit code(0 PASS·1 FAIL·2 NOT_RUN·3 형식)를 그대로 돌려준다. 준비 보고만 만드는 명령이 아니다. 기본 index가 비어 있으면 runtime은 `NOT_RUN`(exit2) |
-| `./verify scenarios --actual` | loopback 실제 backend와 disposable DB 필요(`ACTUAL_BASE_URL`, `ACTUAL_DISPOSABLE_DATABASE=true`, `DB_URL` 등). `--actual` 없으면 `NOT_RUN` exit2 |
+| `./verify scenarios --actual` | backend를 새로 package하고 verification/actual/scenarios/run.sh가 loopback backend·disposable PostgreSQL을 소유해 실행한다. `--actual` 없으면 `NOT_RUN` exit2 |
 | `./verify actual-s1`…`actual-s4` | `verification/actual/sN/run.sh`: 복사한 빌드, disposable PostgreSQL, native flow 실행. 커밋된 clean tree가 필요하고 s2–s4는 먼저 `python3 verification/actual/sN/build.py`로 custody를 만든다 |
 | `./verify schema`·`contracts`·`scenarios`·`recovery`·`mcp`·`skills` | profile 실행. `--actual` 없이는 위반이 없어도 `NOT_RUN` exit2(위반이 있으면 exit1), `--actual`이 있어야 실제 driver로 실행하고 조건이 맞으면 coverage receipt를 낸다(아래 "실행 receipt producer") |
 | `./verify model`·`deployment` | `--manifest <path>`로 실행 manifest를 검증한다. 승인 증거가 있어도 실행은 `NOT_RUN`(exit2). `--actual`은 exit3 |
@@ -27,11 +27,12 @@ exit0 harness/준비 성공, exit1 assertion·계약 실패, exit2 필수 경로
 
 ## 준비 gate의 case 자산 검사
 
-현재 `caseAssetChecks`는 11개다. 정확한 argv·script와 추가 조건은
+현재 `caseAssetChecks`는 12개다. 정확한 argv·script와 추가 조건은
 [PreparationAssetChecks.java](../../../../verification/harness/src/main/java/org/mulino/verification/PreparationAssetChecks.java)와
 harness 가이드의 prepare 절을 따른다.
 
 - `normative-catalog-lock`, `layer-routes`, `cases-b-invariants`, `vocabulary`.
+- `request-contracts`: 아래 요청 계약과 기록된 product gap을 검사한다.
 - `t08-observation-bindings`, `v4-observation-bindings`,
   `v6-observation-bindings`, `v7-observation-bindings`: 생성기의 `--check`다.
 - `observation-binding-stamps`: 모든 bindings의 case·catalog hash를 검사한다.
@@ -51,6 +52,47 @@ fail-closed다. 명시적 PENDING만 owner·근거가 있는 `KNOWN_OPEN`으로 
 같은 필드에 드러난다. assembler는 같은 `review()`를 읽고 `validate.py`는
 현재 입력과 다시 대조한다. 검사 exit0이 gap 해소나 제품 PASS는 아니다.
 
+## 요청·실행 전제의 준비 검사
+
+모든 명령은 [intent.schema.json](../../../../contracts/intent.schema.json)을
+검사한다. api/mcp/worker/management·우회 route, batch operations,
+blob businessAction, wire tools/call arguments도 빠뜨리지 않는다.
+slot별 USER/CONTEXT/APPROVED_DEFAULT는 case가 근거에 따라 작성하고
+provenance key 집합을 slots와 같게 둔다. APPROVED_DEFAULT를 추론하지
+않는다. 명령의 scope/asOf/knownAt/requesterContext를 되살리지 않는다.
+명령은 인증 문맥과 제품 시계를 쓴다. harness 전용 문맥은 action.harness에
+두고 request에 섞지 않는다. 조회는 contracted key만 쓰며 없는 selector는
+KNOWN_OPEN product gap으로 기록한다. 상세 작성 규칙은
+[Agent intent 계약](../../ontology-agent-implementation/references/protocol-and-intent.md),
+검사 원본은 [request_contract.py](../../../../verification/cases/request_contract.py)와
+[request-contracts.json](../../../../contracts/request-contracts.json)이다.
+prepare의 request-contracts check 성공은 gap 해소가 아니다.
+
+fixture는 grant의 모든 차원이 일치하는 all-of에서 통과하도록 쓴다.
+PER_DIMENSION은 probe 진단에만 쓴다. 과거 round 12의 분리 설치 요청은
+[AGENTS.md](../../../../AGENTS.md)의 2026-10-09 결정으로 대체됐다.
+검사기가 scopeComposition 선언을 받는다고 실제 all-of 인가까지
+입증한 것은 아니다. capabilityIds·위임자·현재 권한·PLACE scope는
+[execution-preconditions.json](../../../../contracts/execution-preconditions.json)의
+권한 사슬을 따른다.
+
+제품 시계는 fixture asOf에서 시작하고 clock control로만 움직인다.
+설치 행 createdAt/recordedAt과 fixture pickedAt은 시작 시계 이하다.
+fixture knownAt은 조회 기본 인지 시각이다. 설치 근거(recordedAt≤knownAt)는
+asOf에 기록하고 asOf 뒤에 발생하지 않는다. 늦게 알려진 근거는 선언
+recordedAt에 기록하고, 이를 지명하는 적용 기대 action은 그 이후에
+실행한다. COMMAND/RECORD를 설치 시각 이전에 실행하지 않는다.
+fixtureRecordTimeProblems가 강제하며 C2/T09 DOC의 명시 backlog는
+knownOpenGaps의 fixture-record-time에 남긴다.
+
+reserve/replace의 segment 구간·판매 line 잔여를 fixture와 앞선 실행
+배분에 대조해 이중 예약을 막는다. EXECUTABLE/SUSPENDED의 구간은
+겹치지 않고 좌표 없는 배분은 전체 segment와 겹친다. line 사용량에는
+CONSUMED도 센다. reserveCapacityProblems가 batch/blob까지 검사한다.
+시계·근거·창고 보관·예약의 정확한 예외와 precondition check는
+[execution-preconditions.md](../../../../contracts/execution-preconditions.md)를
+따르며 기록된 KNOWN_OPEN을 조용히 수선하지 않는다.
+
 ## fixture 장소 종류와 transport 준비 검사
 
 장소 종류의 기계 원본은
@@ -64,9 +106,10 @@ fixture(baseRefs 포함)의 모든 Place alias에 kind를 적고
   `custodianAlias`로 가진다. 내부 보관이 확인돼야 QC·규제·고객·처분
   조건으로 판매·출고 적격을 판단한다. Organization·Customer·Supplier·
   Manufacturer alias는 내부 보관자가 아니다.
-- `TRANSIT`·`CUSTOMER`·`SUPPLIER`·`EXTERNAL_PORT`는 외부 장소이며
-  적격은 확정 0이다. 수입 운송 화물의 내부 보관자는 확인 수령 때
-  이어받지만 외부 장소에서 적격을 만들지 않는다.
+- QualityEligibility는 CONFIRMED 내부 보관, UNCONFIRMED 미확인,
+  OUTSIDE 외부 보관을 구별한다. 미확인은 UNKNOWN·적격0이다.
+  `TRANSIT`·`CUSTOMER`·`SUPPLIER`·`EXTERNAL_PORT`는 OUTSIDE로 확정0이다.
+  외부 장소의 내부 보관자만으로 적격을 만들지 않는다.
 - 어휘 밖 kind는 Place alias의
   `kindControl=UNRECOGNIZED_PLACE_KIND`로 선언한 반례만 쓴다.
   kind는 어휘 밖이고 `EXTERNAL_`로 시작하지 않아야 한다. 제품은 이를
@@ -87,17 +130,45 @@ INTERNAL_STORAGE 적격40·ALLOWED와 WAREHOUSE 반례 적격0·UNKNOWN을
 Streamable HTTP의 `route=wire` 요청은
 `Accept: application/json, text/event-stream`을 보내고 Origin을 생략한다.
 Origin은 T20 `wire-bad-origin`의 허용 목록 밖 403 반례에만 둔다.
-Accept 누락은 T20 `wire-missing-accept`의 406 반례다. 두 경우 모두
+Accept에 두 media type을 모두 나열하지 않으면 406이다. 순서·공백·
+대소문자·parameter는 무관하고 q=0·wildcard는 세지 않는다. T20
+`wire-missing-accept`는 누락 반례다. 두 경우 모두
 업무 효과0을 단언한다. `ContractValidator.wireTransportProblems`는
 해당 action의 `/response/httpStatus`를 각각 403·406으로 고정한 반례만
-예외로 받고, Accept 누락/변경·Origin 포함이나 두 위반을 함께 가진
+예외로 받고, 유효하지 않은 Accept·Origin 포함이나 두 위반을 함께 가진
 요청은 거부한다. raw adapter가 header를 보충하거나 바꾸지 않는다.
 
-Step 3 FixtureInstaller의 kind 기본값 제거·반례 그대로 설치, native
-fixture의 kind/내부 보관자 전환은 cross-owner 요청이다. E1·T13 첫 수령의
-`receivingCustodianId` slot도 receipt 계약과 함께 정해야 한다.
-[round 6 기록](../../../../docs/execution/step2r-round6/README.md)의 남은
-범위이며 이 skill 변경으로 구현됐다고 보고하지 않는다.
+직접/운송 수령은 위 JSON의 directReceiptCustody·transitReceipt를
+따른다. receiptCustodyProblems가 아래를 강제한다.
+
+- 직접 수령은 INTERNAL_STORAGE이며 후속 실행에 쓰는 실물은
+  receivingCustodianId를 명시한다. 같은 조직 Human/Agent의 현재 수령
+  권한과 검증 basis 원본의 receivingCustodianAlias를 맞추고 canonical
+  content hash를 고정한다. basis는 evidenceId/evidenceIds/verifiedEvidenceIds
+  및 같은 occurrence의 검증 chain이다. 요청 evidenceRefs는 증인이다.
+  confirm/retry는 보관자를 바꾸지 않는다. 호출자에서 추론하지 않는다.
+- 운송 수령은 TRANSIT의 식별된 leaf 하나와 수량·단위·item·LOT가
+  정확히 같고 목적지는 INTERNAL_STORAGE다. 일부는 먼저 split한다.
+  receivingCustodianId를 보내지 않고 leaf 보관자를 이어받는다.
+- custodyControl 반례는 첫 실패를 FORBIDDEN→SCOPE_INELIGIBLE→
+  EVIDENCE_CONFLICT→EVIDENCE_UNVERIFIED 순서로 도출한다. 앞 두 outcome은
+  REJECTED, 뒤 둘은 HELD다. outcome/code 고정, 뒤 원행 segments/receipts
+  count0, 거부 수령 실물의 후속 사용0을 단언한다. 선언은 제품에
+  보내지 않는다. 장소 오류로 QC 적격0을 대신 증명하지 않는다.
+
+배분 출고는 앞선 pickQuantity 또는 fixture pickedAt/pickedByAlias를
+가지고 pick revision을 잇는다. 발생 시각은 pickedAt 이전일 수 없다.
+배분을 지명한 출고는 PLACE scope 안의 TRANSIT 장소를 명시한다
+(dispatchTransitProblems). cargoPlaceId는 corpus 이름이고 transitPlaceId는
+제품 이름이다. 일반 adapter가 장소·pick·slot을 수선하지 않는다.
+pick 없는 거부는 prePickDispatch 계약의 선행 이유를 case가 보일 때만
+허용하며 오류 code 하나만으로 선행 검사를 추정하지 않는다
+([round 9](../../../../docs/execution/step2r-round9/README.md),
+[round 10](../../../../docs/execution/step2r-round10/README.md)).
+
+fixture 설치·원본/event payload·slot의 실제 구현 범위는
+[S5b](../../../../docs/execution/s5b-adapter/README.md)에 대조한다.
+계약 검사 성공으로 installer 누락이나 backend 동작을 PASS로 쓰지 않는다.
 
 ## case 한 개의 구성
 
@@ -247,9 +318,20 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
   제출 증거는 독립 extractor의 `rawRows.schedulerSubmissions`다.
   SUBMITTED identity는 관찰 창 안 가장 이른 제출 행과 일치해야 하고,
   NO_TASK는 행이 없어야 한다. T26은 그 행의 `submittedBy`를 단언한다.
-  자연 tick 증거를 만들려고 harness tick·sweep·resumeWork를 실행하지 않는다.
-  observeFrom 전달·검증은 harness 계약이며 실제 watcher host adapter와
-  extractor 구현/인수는 Step 3 actual 소유, `NOT_RUN`이다.
+  harness는 fixture runtimeProfile.tickSeconds를 naturalTickSeconds로
+  전달한다. case의 직접 지정은 prepare가 거부하며 tick은 1–창/2의
+  정수다. NO_TASK는 observeFrom부터 두 tick 이상 관찰하고 extractor가
+  watcher 종료 뒤 read해야 한다.
+  rawRows.schedulerCycles에 같은 scheduler의 tickId/sweepId·startedAt·
+  completedAt·startedBy를 요구한다. SCHEDULER_LOOP 주기가 observeFrom
+  이후 시작해 watcher 종료까지 완료된 기록 하나 이상이 필요하다.
+  행 부재는 NO_TASK가 아니라 미완료 관찰이다. harness tick·sweep·
+  resumeWork로 자연 tick 증거를 만들지 않는다.
+  실제 주기 hook/extractor가 없으면 SCHEDULER_CYCLE_RECORD gate를
+  NOT_RUN_GATED로 남긴다
+  ([round 8](../../../../docs/execution/step2r-round8/README.md),
+  [round 9](../../../../docs/execution/step2r-round9/README.md),
+  [round 10](../../../../docs/execution/step2r-round10/README.md)).
 - verifyCoverage의 PREPARATION `rawRows.input`에는 `codeCommit`,
   `workingTreeDirty`, `checkoutCommit`, `checkoutDirty`를 둔다.
   validator는 commit 형식(40/64자리 소문자 hex)·boolean과 묶인 준비 보고의
@@ -262,6 +344,33 @@ case-local capability를 만들지 않는다. 공통 schema·runner·registry·c
   coverage manifest를 만들 뿐 T25 host의 input snapshot·currentExecution·
   mutatedInput·CURRENT_EXECUTION link를 내지 않는다. 그 출력과 checkout
   관찰은 Step 3 verifyCoverage actual adapter 소유이며 T25는 `NOT_RUN`이다.
+
+## 실행 inventory로 다음 수정 판단
+
+[AGENTS.md](../../../../AGENTS.md)의 2026-10-09 결정대로 S5·S6의 중간
+검증은 `./verify scenarios --actual` 실행과 결합 checks로 한다.
+실행 report에서 [inventory.py](../../../../verification/actual/scenarios/inventory.py)로
+inventory를 만들고 이전 run과 case/subcase별 첫 실패·실행 action·
+status·fixtureComplete·omitted 사실을 비교한다.
+
+```sh
+./verify scenarios --actual
+python3 verification/actual/scenarios/inventory.py <evidence-dir>/scenarios.json <out.json>
+```
+
+요청/case 결함은 TEST, 설치·route·observer 공백은 ADAPTER로 triage하고
+미실행 capability는 NOT_IMPLEMENTED로 남긴다. inventory의 status
+(PASS/FAIL/NOT_IMPLEMENTED)와 classification(TEST/ADAPTER/PRODUCT)는
+별도 축이며 자동 분류는 추정이다. 완전한 fixture에서 계약과 다른
+제품 동작은 PRODUCT로 확인하고 구현 owner에게 넘긴다. TEST는 Step 2,
+제품/adapter는 Step 3의 지정 모델로 수정한다. 총계가 같아도 첫 실패가
+다음 검사로 옮겼는지 확인한다. oracle를 제품에 맞춰 바꾸지 않는다.
+
+기본 run과 ACTUAL_RELAX_WIRE=true probe는 runMode와 함께 분리한다.
+probe의 요청 수선·차원별 grant 분리나 partial fixture의 PASS는 인수
+증거가 아니다. 이전 실행의 분류를 확정 사실로 옮기지 않는다
+([S5a](../../../../docs/execution/s5a-adapter/README.md),
+[S5b](../../../../docs/execution/s5b-adapter/README.md)).
 
 ## 증거 pipeline과 증거 class
 
@@ -319,12 +428,12 @@ producer의 전체 조건은 harness 가이드의 `--actual` 절과 coverage REA
 receipt는 무결성·연결 증거이며 adapter 뒤 시스템이 진짜라는 attestation이
 아니다. receipt가 있어도 PASS가 아니다. assembler가 assertion 기록(`op`·
 `unit`·`where`·`baseline`·observed)을 캡처된 bytes로 다시 판정해 manifest status를
-정한다. 현재 `ActualAcceptanceDriver`는 `api`·`fixture`·`db` adapter만 공급하므로
-mcp·client·process·host가 필요한 subcase는 `NOT_RUN`이고, 따라서 그 profile의 `gateComplete`·manifest PASS를
-주장하지 않는다. native `actual-sN`의 `run-receipt.json`은 case 결과가 아니라
-custody 증거라 그대로 coverage receipt가 되지 않는다. 같은 disposable backend에
-`./verify scenarios --actual`을 실행하는 연결은 Step 3 소유다
-(`verification/coverage/README.md`). receipt·report를 손으로 만들지 않는다.
+정한다. 현재 공급/미공급 route는 S5b 기록과 새 run inventory로
+확인한다. mcp·wire·direct·batch가 연결됐다고 process/barrier/fault·
+worker/blob·client/model까지 PASS로 주장하지 않는다. partial fixture와
+observer approximate 원천도 남긴다. native run-receipt.json과 triage
+inventory는 coverage receipt를 대신하지 않는다. receipt·report를
+손으로 만들지 않는다.
 
 ## 모든 쓰기 경로 열거(V4)
 
@@ -397,8 +506,8 @@ API의 logical revision, runtime task terminal snapshot과 DB MVCC snapshot은
 
 - API revision은 `snapshotRef=RESULT_REVISION`이다. `snapshotSource`에는
   발급 action의 id·pointer·kind·route·capabilityId·actorRef·fixture actor·
-  해석된 request만 보낸다. observer는 권한 범위의 원행에서 projection
-  revision을 독립 재계산해 `data.snapshotRevision`,
+  해석된 request만 보낸다. observer는 권한 범위의 독립 원행 대조로
+  revision을 검증해 `data.snapshotRevision`,
   `data.snapshot.readMode=RESULT_REVISION`, `snapshot.revisionQuery`를 낸다.
   harness는 보관한 발급 revision과 비교한다.
 - `awaitRuntimeTask` control의
@@ -421,9 +530,11 @@ API의 logical revision, runtime task terminal snapshot과 DB MVCC snapshot은
 
 prepare의 `ContractValidator.snapshotRefProblems`는 `$result` 참조가
 invoke/query/start의 `/response/snapshotRevision` 또는 위 awaitRuntimeTask
-snapshot id인 경우만 받는다. 다른 pointer는 준비 실패다. 두 read mode의
-실제 `ObserverSnapshot` 구현은 Step 3 actual 소유이며 현재
-`NOT_IMPLEMENTED`→`NOT_RUN`이다. harness selftest 성공과 구별한다.
+snapshot id인 경우만 받는다. 다른 pointer는 준비 실패다.
+RESULT_REVISION은 S5b의 query 전후 원행 digest 불변과 독립
+REPEATABLE READ digest 대조를 따른다. projection 정확성은 assertion으로
+따로 검사한다. RUNTIME_TASK_SNAPSHOT은 실제 adapter 공백으로 남기며
+harness selftest 성공과 구별한다.
 
 같은 ID·`snapshotRevision`·`asOf`/`knownAt`·`scope`로 두 진입점
 (`getObject`/`getWork`, `searchObjects`/`searchWorks` 등)을 호출한다.
