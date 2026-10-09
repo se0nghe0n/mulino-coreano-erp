@@ -31,7 +31,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);hostControls=new HostProcessControls(root,run);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","clock","barrier","host","coverage","fixture","db"):Set.of("api","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","blob","clock","barrier","host","coverage","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
         if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;}
@@ -139,6 +139,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         return signer.sign(bound,claim,Json.required(auth,"invalidValue"));
     }
     @Override public StepResult query(String id,String route,JsonNode actor,String operation,JsonNode request) {
+        if(suiteIsolation&&route.equals("blob"))return blobDownload(id,actor,operation,request);
         if(!route.equals("api")&&!(suiteIsolation&&route.equals("mcp")))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);
         // Suite isolation: every api/mcp query reaches the product; an unknown capability is the product's answer, not an adapter skip.
         if(!suiteIsolation&&!QUERIES.contains(operation))return StepResult.missing(id,"NOT_IMPLEMENTED: actual query route/capability "+route+"/"+operation);
@@ -150,7 +151,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         if(!operation.matches("[A-Za-z][A-Za-z0-9]*"))throw new IllegalArgumentException("Invalid operation name");
         if(suiteIsolation&&externalOrganization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: no fixture organization installed for this subcase");
         try {
-            java.net.URI uri=configuration.baseUri().resolve("/api/ontology/"+category+"/"+operation);
+            java.net.URI uri=configuration.baseUri().resolve(category.equals("evidence-upload")?"/api/evidence/uploads":"/api/ontology/"+category+"/"+operation);
             JsonNode wireRequest=request.deepCopy();
             var translated=Json.array();
             if(relaxWire&&category.equals("queries")&&wireRequest.has("objectId")&&!wireRequest.has("id")){((ObjectNode)wireRequest).set("id",wireRequest.path("objectId"));((ObjectNode)wireRequest).remove("objectId");translated.add("objectId->id");}
@@ -241,7 +242,37 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         p.set("authenticatedActor",actor==null?Json.MAPPER.nullNode():actor);p.put("source",source).put("independent",independent).put("scopeComplete",true);
         p.set("sourceQuery",query==null?Json.MAPPER.nullNode():query);p.set("snapshot",snapshot==null?Json.MAPPER.nullNode():snapshot);return p;
     }
+    /**
+     * route=blob query: the product evidence download surface GET /api/evidence/documents/{id}/content (EvidenceDownload),
+     * for getEvidence with download=true and an evidenceId. The response is the transport outcome and the content digest;
+     * the bytes stay in the artifact only as their hash.
+     */
+    private StepResult blobDownload(String id,JsonNode actor,String operation,JsonNode request) {
+        if(!operation.equals("getEvidence")||!request.path("download").asBoolean(false)||!request.hasNonNull("evidenceId"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual blob query "+operation+" without download evidenceId");
+        if(externalOrganization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: no fixture organization installed for this subcase");
+        try {
+            String document=request.path("evidenceId").asText();UUID.fromString(document);
+            var uri=configuration.baseUri().resolve("/api/evidence/documents/"+document+"/content");String credential=credential(actor);
+            var result=http.send(HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Authorization","Bearer "+credential).GET().build(),HttpResponse.BodyHandlers.ofByteArray());
+            var response=Json.object();response.put("httpStatus",result.statusCode());
+            if(result.statusCode()==200){response.put("sha256",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(result.body()))).put("sizeBytes",result.body().length);}
+            else{JsonNode body=parseOrText(new String(result.body(),java.nio.charset.StandardCharsets.UTF_8));response.set("body",body);if(body.has("error"))response.set("error",body.path("error"));if(body.has("outcome"))response.set("outcome",body.path("outcome"));}
+            var headers=response.putObject("headers");for(String h:List.of("content-type","cache-control","content-disposition","x-content-type-options"))result.headers().firstValue(h).ifPresent(v->headers.put(h,v));
+            var receipt=Json.object();receipt.put("method","GET").put("path",uri.getPath()).put("route","blob").put("httpStatus",result.statusCode());receipt.set("request",request);receipt.set("response",response);
+            var identity=Json.object().put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
+            return executed(id,Json.object().put("httpStatus",result.statusCode()).put("route","blob"),response,provenance(identity,"HTTP_BLOB_DOWNLOAD",false,null,null),receipt);
+        } catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Actual blob interrupted",interrupted);}
+        catch(Exception failure){throw new IllegalStateException("Actual blob environment/response failure",failure);}
+    }
     @Override public StepResult invoke(String id,String route,JsonNode actor,String capability,JsonNode request) {
+        // route=blob upload: the product upload surface POST /api/evidence/uploads carries the authored businessAction intent
+        // unchanged; documentId/contentHash have no field on that endpoint and stay in the receipt only.
+        if(suiteIsolation&&route.equals("blob")){
+            if(!request.path("businessAction").isObject())return StepResult.missing(id,"NOT_IMPLEMENTED: actual blob command without businessAction");
+            return send(id,actor,"evidence-upload",capability,request.path("businessAction"),"blob");
+        }
+        if(suiteIsolation&&route.equals("worker"))
+            return StepResult.missing(id,"NOT_IMPLEMENTED: no product surface for route worker: the product exposes no external worker submission endpoint; durable workers execute only server-claimed intake/recovery commands (ApplicationCommands.executeClaimed)");
         if(suiteIsolation&&Set.of("nested","projection").contains(route))
             return StepResult.missing(id,"NOT_IMPLEMENTED: no product surface for route "+route+": OntologyService exposes only the query/command/validateCommand actions, no entity set or navigation to write through");
         if(suiteIsolation&&route.equals("direct"))return odataCommand(id,actor,capability,request);
