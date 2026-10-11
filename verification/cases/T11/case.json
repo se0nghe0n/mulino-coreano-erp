@@ -821,26 +821,11 @@
               }
             ],
             "slots": {
-              "obligationId": {
-                "$result": {
-                  "actionId": "parent-assessment",
-                  "pointer": "/response/obligationId"
-                }
-              },
-              "sourceWorkId": {
-                "$result": {
-                  "actionId": "parent",
-                  "pointer": "/response/workId"
-                }
-              },
               "targetWorkId": {
                 "$result": {
                   "actionId": "followup",
                   "pointer": "/response/workId"
                 }
-              },
-              "acceptedById": {
-                "$alias": "A"
               },
               "acceptanceEvidenceId": {
                 "$alias": "DOC"
@@ -850,7 +835,22 @@
                 "unit": "BOX"
               },
               "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "assignmentId": {
+                "$result": {
+                  "actionId": "parent-assessment",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "recipientId": {
+                "$alias": "A"
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -865,14 +865,14 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
-              "sourceWorkId": "CONTEXT",
               "targetWorkId": "CONTEXT",
-              "acceptedById": "CONTEXT",
               "acceptanceEvidenceId": "CONTEXT",
               "quantity": "USER",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "assignmentId": "CONTEXT",
+              "recipientId": "CONTEXT",
+              "workId": "CONTEXT"
             }
           }
         },
@@ -2669,26 +2669,11 @@
               }
             ],
             "slots": {
-              "obligationId": {
-                "$result": {
-                  "actionId": "parent-assessment",
-                  "pointer": "/response/obligationId"
-                }
-              },
-              "sourceWorkId": {
-                "$result": {
-                  "actionId": "parent",
-                  "pointer": "/response/workId"
-                }
-              },
               "targetWorkId": {
                 "$result": {
                   "actionId": "followup",
                   "pointer": "/response/workId"
                 }
-              },
-              "acceptedById": {
-                "$alias": "A"
               },
               "acceptanceEvidenceId": {
                 "$alias": "DOC"
@@ -2698,7 +2683,22 @@
                 "unit": "BOX"
               },
               "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "assignmentId": {
+                "$result": {
+                  "actionId": "parent-assessment",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "recipientId": {
+                "$alias": "A"
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -2713,14 +2713,14 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
-              "sourceWorkId": "CONTEXT",
               "targetWorkId": "CONTEXT",
-              "acceptedById": "CONTEXT",
               "acceptanceEvidenceId": "CONTEXT",
               "quantity": "USER",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "assignmentId": "CONTEXT",
+              "recipientId": "CONTEXT",
+              "workId": "CONTEXT"
             }
           }
         },
@@ -4517,26 +4517,11 @@
               }
             ],
             "slots": {
-              "obligationId": {
-                "$result": {
-                  "actionId": "parent-assessment",
-                  "pointer": "/response/obligationId"
-                }
-              },
-              "sourceWorkId": {
-                "$result": {
-                  "actionId": "parent",
-                  "pointer": "/response/workId"
-                }
-              },
               "targetWorkId": {
                 "$result": {
                   "actionId": "followup",
                   "pointer": "/response/workId"
                 }
-              },
-              "acceptedById": {
-                "$alias": "A"
               },
               "acceptanceEvidenceId": {
                 "$alias": "DOC"
@@ -4546,7 +4531,22 @@
                 "unit": "BOX"
               },
               "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "assignmentId": {
+                "$result": {
+                  "actionId": "parent-assessment",
+                  "pointer": "/response/obligationId"
+                }
+              },
+              "recipientId": {
+                "$alias": "A"
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -4561,14 +4561,14 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
-              "sourceWorkId": "CONTEXT",
               "targetWorkId": "CONTEXT",
-              "acceptedById": "CONTEXT",
               "acceptanceEvidenceId": "CONTEXT",
               "quantity": "USER",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "assignmentId": "CONTEXT",
+              "recipientId": "CONTEXT",
+              "workId": "CONTEXT"
             }
           }
         },
@@ -8686,10 +8686,10 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "orderId": {
+              "salesLineId": {
                 "$result": {
                   "actionId": "sale",
-                  "pointer": "/response/id"
+                  "pointer": "/response/line/id"
                 }
               },
               "quantity": "100",
@@ -8704,7 +8704,7 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderId": "CONTEXT",
+              "salesLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER"
             }
@@ -8784,13 +8784,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
               "occurredAt": "2026-10-07T02:00:00Z",
               "transitPlaceId": {
                 "$alias": "TRANSIT"
@@ -8813,8 +8806,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "quantity": "USER",
-              "destinationId": "CONTEXT",
               "occurredAt": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT"
@@ -8955,20 +8946,20 @@
               }
             ],
             "slots": {
-              "obligationId": {
-                "$alias": "ROOT"
-              },
               "targetWorkId": {
                 "$alias": "TARGET"
-              },
-              "acceptedById": {
-                "$alias": "B"
               },
               "acceptanceEvidenceId": {
                 "$alias": "TRANSFERPROPOSAL"
               },
               "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "assignmentId": {
+                "$alias": "ROOT"
+              },
+              "recipientId": {
+                "$alias": "B"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-cancel-after-shipment-transfer",
@@ -8978,12 +8969,12 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
               "targetWorkId": "CONTEXT",
-              "acceptedById": "CONTEXT",
               "acceptanceEvidenceId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "assignmentId": "CONTEXT",
+              "recipientId": "CONTEXT"
             }
           }
         },
@@ -10844,9 +10835,6 @@
               }
             ],
             "slots": {
-              "parentWorkId": {
-                "$alias": "PARENT"
-              },
               "sourceOccurrenceId": {
                 "$result": {
                   "actionId": "temperature",
@@ -10860,7 +10848,10 @@
                 "$alias": "supervisor"
               },
               "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "workId": {
+                "$alias": "PARENT"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-closed-followup-followup",
@@ -10870,12 +10861,12 @@
               }
             ],
             "provenance": {
-              "parentWorkId": "CONTEXT",
               "sourceOccurrenceId": "CONTEXT",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workId": "CONTEXT"
             }
           }
         },

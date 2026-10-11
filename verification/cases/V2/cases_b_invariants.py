@@ -16,6 +16,7 @@ TEST_ARMING = ('transactionId', 'participantId', 'barrierId', 'point')
 RACE_SUBCASES = {('V2', 'split-commits-first'), ('V2', 'reserve-commits-first'),
                  ('V3', 'hold-first'), ('V3', 'dispatch-first')}
 problems = []
+DISPATCH_SLOTS = set(json.loads((ROOT / 'contracts/capability-slots.json').read_text())['capabilities']['dispatchQuantity']['slots'])
 
 
 def load(path):
@@ -81,9 +82,14 @@ for cid in CASES:
             # 4. dispatch probes in E1/E2/C4 are well-formed siblings of the accepted dispatch
             if cap == 'dispatchQuantity' and cid in ('E1', 'E2', 'C4'):
                 # step2r round 13: the transit place is the product slot transitPlaceId (commandSlots renames).
-                for slot in ('allocationId', 'transitPlaceId', 'originId', 'destinationId', 'quantity'):
+                # step2r round 14: well-formed means the published slot list (contracts/capability-slots.json, user
+                # decision 2026-10-11 (3)): the allocation fixes quantity, origin and destination, so a sibling names
+                # the allocation and the transit place and no unpublished slot.
+                for slot in ('allocationId', 'transitPlaceId'):
                     if slot not in slots:
                         fail(where, f'{action["id"]} dispatch lacks {slot}')
+                for slot in sorted(set(slots) - DISPATCH_SLOTS):
+                    fail(where, f'{action["id"]} dispatch sends unpublished slot {slot}')
                 for plural in ('allocationIds', 'segmentIds'):
                     if plural in slots:
                         fail(where, f'{action["id"]} dispatch uses plural {plural}')

@@ -337,10 +337,10 @@
                   "pointer": "/response/segmentId"
                 }
               },
-              "orderId": {
+              "salesLineId": {
                 "$result": {
                   "actionId": "sale60",
-                  "pointer": "/response/id"
+                  "pointer": "/response/line/id"
                 }
               }
             },
@@ -355,7 +355,7 @@
               "quantity": "USER",
               "unit": "USER",
               "segmentId": "CONTEXT",
-              "orderId": "CONTEXT"
+              "salesLineId": "CONTEXT"
             }
           }
         },
@@ -456,14 +456,7 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
               "occurredAt": "2026-10-06T09:00:00Z",
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -485,9 +478,7 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "quantity": "USER",
               "occurredAt": "USER",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT"
             }
@@ -6287,10 +6278,10 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "orderId": {
+              "salesLineId": {
                 "$result": {
                   "actionId": "sale",
-                  "pointer": "/response/id"
+                  "pointer": "/response/line/id"
                 }
               },
               "quantity": "100",
@@ -6305,7 +6296,7 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderId": "CONTEXT",
+              "salesLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER"
             }
@@ -6408,14 +6399,7 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
               "occurredAt": "2026-10-07T01:00:00Z",
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -6437,9 +6421,7 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "quantity": "USER",
               "occurredAt": "USER",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT"
             }

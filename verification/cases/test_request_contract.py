@@ -75,13 +75,17 @@ class CommandContract(unittest.TestCase):
         found = self.problems(invoke(body))
         self.assertTrue(any('commandIdempotencyKey: required' in p for p in found) and any('differs from the action capability' in p for p in found), found)
 
-    def test_list_slot_is_a_known_product_gap(self):
+    def test_list_slot_is_the_bounded_array_value(self):
+        # user decision 2026-10-11 (1): intent.schema.json publishes a bounded array value, so a list slot is no product gap.
         body = command()
         body['slots']['segmentIds'] = [A('A20'), A('A60')]
         body['provenance']['segmentIds'] = 'CONTEXT'
         problems, known = C.case_problems(case([invoke(body)]))
         self.assertEqual([], problems)
-        self.assertTrue(any('PG-INTENT-ARRAY-SLOT' in k for k in known))
+        self.assertFalse(any('ARRAY-SLOT' in k for k in known), known)
+        body['slots']['segmentIds'] = [A(f'S{i}') for i in range(101)]
+        found = C.case_problems(case([invoke(body)]))[0]
+        self.assertTrue(any('/slots/segmentIds: oneOf matched 0' in p for p in found), found)
 
     def test_intentional_violation_must_match_and_be_pinned(self):
         action = invoke(command(organizationId=A('ORG-B')), harness={'intentionalViolation': {'fields': ['organizationId'], 'reason': 'forged org'}})
@@ -201,6 +205,14 @@ class Conformance(unittest.TestCase):
         self.assertFalse({'children', 'loss', 'allocationTransfer', 'reason'} & set(split['slots']))
         named = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'alias': 'A', 'quantity': '12', 'unit': 'BOX'}, {'alias': 'B', 'quantity': '8', 'unit': 'BOX'}]})
         self.assertIn('children', named['slots'], 'children read back by alias stay until their response pointer is rewritten')
+        # step2r round 14 splitPart: one part split off a known leaf states the part and the remainder, part first.
+        part = run('splitQuantity', {'segmentId': A('Q20'), 'quantity': {'value': '8', 'unit': 'BOX'}, 'evidenceRef': A('DOC')})
+        self.assertEqual((['8', '12'], 'BOX'), (part['slots']['quantities'], part['slots']['unit']))
+        self.assertNotIn('quantity', part['slots'])
+        whole_part = run('splitQuantity', {'segmentId': A('Q20'), 'quantity': '20', 'unit': 'BOX'})
+        self.assertIn('quantity', whole_part['slots'], 'a part equal to the leaf is no split and stays a finding')
+        unknown = run('splitQuantity', {'segmentId': R('receipt', '/response/segmentId'), 'quantity': '8', 'unit': 'BOX'})
+        self.assertIn('quantity', unknown['slots'], 'an unknown parent quantity stays')
         lossy = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'value': '12', 'unit': 'BOX'}], 'loss': {'value': '2', 'unit': 'BOX'}})
         self.assertIn('loss', lossy['slots'])
         whole = run('moveQuantity', {'segmentId': A('Q20'), 'destinationId': A('W2'), 'quantity': '20', 'unit': 'BOX'})
@@ -232,6 +244,32 @@ class Conformance(unittest.TestCase):
         world.evidence = set()
         grant = run('createGrant', {'actorId': A('reader')}, subjectRefs=[{'type': 'Grant', 'id': A('GRANT')}, {'type': 'Agent', 'id': A('reader')}])
         self.assertEqual([{'type': 'Agent', 'id': A('reader')}], grant['subjectRefs'], 'only the created noun is dropped')
+
+    def test_round14_drops_restate_the_named_fact(self):
+        # step2r round 14 item 1: a pick/dispatch quantity equal to its allocation, a release quantity equal to its hold and
+        # an approval time equal to the subcase clock restate the fact; any other value stays a finding.
+        world = RC.World(ROOT, None)
+        world.allocations = {'AL': {'alias': 'AL', 'quantity': '20', 'unit': 'BOX'}}
+        hold = invoke({'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'placeHold', 'subjectRefs': [],
+                       'slots': {'segmentId': A('Q20'), 'quantity': '20', 'unit': 'BOX'}, 'expectedRevision': 1, 'commandIdempotencyKey': 'h'},
+                      cap='placeHold', aid='hold')
+        def run(cap, slots):
+            action = invoke({'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': cap, 'subjectRefs': [], 'slots': slots,
+                             'expectedRevision': 1, 'commandIdempotencyKey': 'k'}, cap=cap)
+            C._world, C._prior, C._clock = world, [hold], '2026-10-07T09:00:00Z'
+            try:
+                C.conform_action(action, 'T99', 's', world)
+            finally:
+                C._world = C._prior = C._clock = None
+            return action['request']['slots']
+        self.assertEqual({'allocationId'}, set(run('pickQuantity', {'allocationId': A('AL'), 'quantity': {'value': '20', 'unit': 'BOX'}})))
+        self.assertIn('quantity', run('pickQuantity', {'allocationId': A('AL'), 'quantity': {'value': '5', 'unit': 'BOX'}}))
+        released = run('releaseHold', {'restrictionId': R('hold', '/response/restrictionId'), 'quantity': {'value': '20', 'unit': 'BOX'}})
+        self.assertNotIn('quantity', released)
+        approved = run('approvePurchase', {'proposalId': A('PR'), 'decidedAt': '2026-10-07T09:00:00Z', 'consumptionPolicy': 'SINGLE_GOAL_REVISION'})
+        self.assertNotIn('decidedAt', approved)
+        self.assertIn('consumptionPolicy', approved, 'only the product consumption rule is restated')
+        self.assertIn('decidedAt', run('approvePurchase', {'proposalId': A('PR'), 'decidedAt': '2026-10-08T00:00:00Z'}))
 
     def test_wait_slots_form_the_wait_contract(self):
         flat = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'waitWork', 'subjectRefs': [],

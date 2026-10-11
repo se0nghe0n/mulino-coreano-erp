@@ -155,10 +155,11 @@
               "segmentId": {
                 "$alias": "A"
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantities": [
+                "20",
+                "40"
+              ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "delivery-proof"
               },
@@ -178,7 +179,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "quantity": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -212,10 +214,6 @@
                   "actionId": "split",
                   "pointer": "/response/allocations/0/id"
                 }
-              },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -231,8 +229,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -264,10 +261,6 @@
                   "actionId": "split",
                   "pointer": "/response/allocations/1/id"
                 }
-              },
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -283,8 +276,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -314,7 +306,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/0/id"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "quantity": "20",
@@ -366,12 +358,11 @@
               },
               "quantity": "60",
               "unit": "BOX",
-              "classification": "CANDIDATE",
-              "evidenceId": {
-                "$alias": "recall-proof"
-              },
               "itemId": {
                 "$alias": "P"
+              },
+              "basisEvidenceId": {
+                "$alias": "recall-proof"
               }
             },
             "expectedRevision": 1,
@@ -385,9 +376,8 @@
               "lotId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "classification": "USER",
-              "evidenceId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "basisEvidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -421,13 +411,13 @@
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/0/id"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/1/id"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],
@@ -697,16 +687,6 @@
                   "pointer": "/response/allocations/0/id"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -729,9 +709,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -796,16 +773,6 @@
                   "pointer": "/response/allocations/1/id"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -828,9 +795,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -1858,7 +1822,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/0/id"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "QC_REVIEW",
@@ -1928,7 +1892,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/0/id"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "QC_REVIEW",
@@ -2065,7 +2029,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/0/id"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "QC_REVIEW",
@@ -2880,10 +2844,11 @@
               "segmentId": {
                 "$alias": "A"
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
+              "quantities": [
+                "20",
+                "40"
+              ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "delivery-proof"
               },
@@ -2903,7 +2868,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "quantity": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -2937,10 +2903,6 @@
                   "actionId": "split",
                   "pointer": "/response/allocations/0/id"
                 }
-              },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -2956,8 +2918,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2989,10 +2950,6 @@
                   "actionId": "split",
                   "pointer": "/response/allocations/1/id"
                 }
-              },
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -3008,8 +2965,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3039,7 +2995,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/0/id"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "quantity": "20",
@@ -3300,16 +3256,6 @@
                   "pointer": "/response/allocations/1/id"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -3332,9 +3278,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -3888,10 +3831,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "50",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -3907,8 +3846,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3941,16 +3879,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "50",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -3973,9 +3901,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -4091,12 +4016,11 @@
               },
               "quantity": "50",
               "unit": "BOX",
-              "classification": "CANDIDATE",
-              "evidenceId": {
-                "$alias": "recall-proof"
-              },
               "itemId": {
                 "$alias": "P"
+              },
+              "basisEvidenceId": {
+                "$alias": "recall-proof"
               }
             },
             "expectedRevision": 1,
@@ -4110,9 +4034,8 @@
               "lotId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "classification": "USER",
-              "evidenceId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "basisEvidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4196,25 +4119,19 @@
               }
             ],
             "slots": {
-              "proposalId": {
+              "scopeId": {
                 "$result": {
                   "actionId": "recall-proposal",
-                  "pointer": "/response/proposalId"
+                  "pointer": "/response/scopeId"
                 }
               },
               "scopeHash": {
                 "$result": {
                   "actionId": "recall-proposal",
-                  "pointer": "/response/proposalHash"
+                  "pointer": "/response/scopeHash"
                 }
               },
-              "scopeVersion": {
-                "$result": {
-                  "actionId": "recall-proposal",
-                  "pointer": "/response/revision"
-                }
-              },
-              "decision": "APPROVED",
+              "decision": "APPROVE",
               "validUntil": "2026-10-31T23:59:59Z"
             },
             "expectedRevision": {
@@ -4230,9 +4147,8 @@
               }
             ],
             "provenance": {
-              "proposalId": "CONTEXT",
+              "scopeId": "CONTEXT",
               "scopeHash": "CONTEXT",
-              "scopeVersion": "CONTEXT",
               "decision": "USER",
               "validUntil": "USER"
             }
@@ -6453,10 +6369,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "50",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -6472,8 +6384,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6506,16 +6417,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "50",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -6538,9 +6439,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -6656,12 +6554,11 @@
               },
               "quantity": "50",
               "unit": "BOX",
-              "classification": "CANDIDATE",
-              "evidenceId": {
-                "$alias": "recall-proof"
-              },
               "itemId": {
                 "$alias": "P"
+              },
+              "basisEvidenceId": {
+                "$alias": "recall-proof"
               }
             },
             "expectedRevision": 1,
@@ -6675,9 +6572,8 @@
               "lotId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "classification": "USER",
-              "evidenceId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "basisEvidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6761,25 +6657,19 @@
               }
             ],
             "slots": {
-              "proposalId": {
+              "scopeId": {
                 "$result": {
                   "actionId": "recall-proposal",
-                  "pointer": "/response/proposalId"
+                  "pointer": "/response/scopeId"
                 }
               },
               "scopeHash": {
                 "$result": {
                   "actionId": "recall-proposal",
-                  "pointer": "/response/proposalHash"
+                  "pointer": "/response/scopeHash"
                 }
               },
-              "scopeVersion": {
-                "$result": {
-                  "actionId": "recall-proposal",
-                  "pointer": "/response/revision"
-                }
-              },
-              "decision": "APPROVED",
+              "decision": "APPROVE",
               "validUntil": "2026-10-31T23:59:59Z"
             },
             "expectedRevision": {
@@ -6795,9 +6685,8 @@
               }
             ],
             "provenance": {
-              "proposalId": "CONTEXT",
+              "scopeId": "CONTEXT",
               "scopeHash": "CONTEXT",
-              "scopeVersion": "CONTEXT",
               "decision": "USER",
               "validUntil": "USER"
             }

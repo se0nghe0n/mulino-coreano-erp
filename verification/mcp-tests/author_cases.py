@@ -137,7 +137,10 @@ for sid,title,cap in questions:
  T01.append(sub('T01',sid,title,o,a,x))
 o='T01.excluded-effects'
 for excluded in ['manufacture','BOM','B2C','generalLedger','taxSubmit','bankTransfer']:
- a=[setup(),action('noun','getInventory'),obs('db-before'),action('unsupported','structureIntent',{'intentKind':'COMMAND','definitionVersion':'definition-v1','requestedEffect':excluded,'subjectRefs':[{'type':'TradeItem','id':alias('P')}],'conversationRequestId':'excluded-'+excluded},'invoke',actor='writer'),action('after','getInventory'),obs('db-after','after')]
+ a=[setup(),action('noun','getInventory'),obs('db-before'),action('unsupported','structureIntent',{'intentKind':'COMMAND','definitionVersion':'definition-v1','requestedEffect':excluded,'subjectRefs':[{'type':'TradeItem','id':alias('P')}],'conversationRequestId':'excluded-'+excluded,
+                                                  # step2r round 14 (s5d finding 5): plan section 3.3 checks the envelope before capability support,
+                                                  # so only a valid envelope (with its idempotency key) can observe CAPABILITY_UNSUPPORTED.
+                                                  'commandIdempotencyKey':'T01-excluded-'+excluded},'invoke',actor='writer'),action('after','getInventory'),obs('db-after','after')]
  x=no_effect(o,'excluded-effects-created')+[eq('unsupported-outcome',o,'unsupported-result','unsupported','/response/outcome','REJECTED'),eq('unsupported-code',o,'unsupported-result','unsupported','/response/error/code','CAPABILITY_UNSUPPORTED'),eq('unsupported-effect',o,'unsupported-result','unsupported','/response/error/requestedEffect',excluded),assertion('no-substitute-command',o,'unsupported-result','count','db-after','/data/rawRows/commandResults',0,where={'requestId':'excluded-'+excluded,'status':'COMMITTED'})]
  T01.append(sub('T01','excluded-'+excluded,'미지원 '+excluded+' 요청의 효과0',o,a,x))
 
@@ -151,10 +154,15 @@ def purchase_slot(value,provenance='CONTEXT'):
  return dict(value,provenance=provenance) if isinstance(value,dict) and 'value' in value else {'value':value,'provenance':provenance}
 def purchase_command(cap,key,slots,revision=1):
  return {'intentKind':'COMMAND','definitionVersion':'definition-v1','capabilityId':cap,'subjectRefs':[{'type':'TradeItem','id':alias('P')}],'slots':slots,'conditions':[],'evidenceRefs':[],'expectedRevision':revision,'commandIdempotencyKey':key}
+# step2r round 14 (s5d finding 8): the purchase Work O1 has no LOT (plan section 3.3 identifies the lot at receipt), so its
+# read names the organization and item only; a lotId scope the Work does not present is refused FORBIDDEN (all-of).
+PURCHASE_SCOPE={k:v for k,v in SCOPE.items() if k!='lotId'}
+# step2r round 14: getWork answers the current GoalVersion as data.currentGoalVersionId (and data.currentGoal); no read
+# contract names data.goal (run-f977b2d5 partial: purchase-work answered 200 without /response/data/goal/id).
 def purchase_work():
- return action('purchase-work','getWork',{'id':alias('O1'),'scope':SCOPE,'asOf':TIME,'knownAt':KNOWN})
+ return action('purchase-work','getWork',{'id':alias('O1'),'scope':PURCHASE_SCOPE,'asOf':TIME,'knownAt':KNOWN})
 def purchase_proposal(key):
- slots={'quantity':purchase_slot({'value':'100','unit':'BOX'},'USER'),'price':purchase_slot({'value':'2','currency':'EUR'},'USER'),'supplierId':purchase_slot(alias('SUP')),'destinationId':purchase_slot(alias('W')),'dueAt':purchase_slot('2026-10-09T09:00:00Z','USER'),'endpoint':purchase_slot('ARRIVED','USER'),'quantityMode':purchase_slot('CUMULATIVE_EVENT','USER'),'ownerId':purchase_slot(alias('writer')),'supervisorId':purchase_slot(alias('supervisor')),'workId':purchase_slot(alias('O1')),'goalVersionId':purchase_slot(ref('purchase-work','/response/data/goal/id'))}
+ slots={'quantity':purchase_slot({'value':'100','unit':'BOX'},'USER'),'price':purchase_slot({'value':'2','currency':'EUR'},'USER'),'supplierId':purchase_slot(alias('SUP')),'destinationId':purchase_slot(alias('W')),'dueAt':purchase_slot('2026-10-09T09:00:00Z','USER'),'endpoint':purchase_slot('ARRIVED','USER'),'quantityMode':purchase_slot('CUMULATIVE_EVENT','USER'),'ownerId':purchase_slot(alias('writer')),'supervisorId':purchase_slot(alias('supervisor')),'workId':purchase_slot(alias('O1')),'goalVersionId':purchase_slot(ref('purchase-work','/response/data/currentGoalVersionId'))}
  return purchase_command('proposePurchase',key,slots)
 def purchase_binding(proposalAction='proposal'):
  return {'proposalId':purchase_slot(ref(proposalAction,'/response/proposalId')),'proposalHash':purchase_slot(ref(proposalAction,'/response/proposalHash'))}

@@ -149,13 +149,13 @@
               }
             ],
             "slots": {
-              "custodianId": {
-                "$alias": "warehouse"
-              },
               "quantity": "60",
               "unit": "BOX",
-              "confirmedLocationId": {
+              "placeId": {
                 "$alias": "W"
+              },
+              "toCustodianId": {
+                "$alias": "warehouse"
               }
             },
             "expectedRevision": 1,
@@ -166,10 +166,10 @@
               }
             ],
             "provenance": {
-              "custodianId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "confirmedLocationId": "CONTEXT"
+              "placeId": "CONTEXT",
+              "toCustodianId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -247,11 +247,7 @@
                   "pointer": "/response/restrictionId"
                 }
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
-              "qcDecisionEvidenceId": {
+              "evidenceId": {
                 "$alias": "qc-proof"
               }
             },
@@ -269,8 +265,7 @@
             ],
             "provenance": {
               "restrictionId": "CONTEXT",
-              "quantity": "USER",
-              "qcDecisionEvidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2304,18 +2299,11 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
               },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
@@ -2338,9 +2326,7 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
               "allocationId": "CONTEXT",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
