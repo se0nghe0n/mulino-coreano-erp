@@ -1362,7 +1362,8 @@
       "note": "UD-3 (2026-10-11): children carry no name slot; quantities is the ordered list of child quantities (decision 1 array slot, 2..100).",
       "response": {
         "children": "array in request order of {index, segmentId, quantity, unit}; index is the 0-based position in quantities. A later action reads child i as /response/children/<i>/segmentId (RFC6901 index pointer)",
-        "effects.segmentIds": "the same child segment IDs in quantity order"
+        "effects.segmentIds": "the same child segment IDs in quantity order",
+        "allocations": "EXECUTABLE/SUSPENDED allocations this split moved onto its children, in child order then range start: {id, revision, childIndex, segmentId, startQuantity, quantity, unit, state, predecessorId}"
       }
     },
     "submitDefinitionReview": {
