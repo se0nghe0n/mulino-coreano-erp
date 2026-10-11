@@ -317,8 +317,17 @@ final class ScenarioFixtureInstaller {
         for(var it=fixture.path("aliases").fields();it.hasNext();) {
             var e=it.next();JsonNode a=e.getValue();if(!a.path("type").asText().equals("PolicyVersion"))continue;
             if(DRAFT_POLICY_STATES.contains(a.path("state").asText())&&!a.path("content").isObject())continue; // installed as a PolicyDraft by tradeAliases()
-            if(!a.path("content").isObject()||!a.hasNonNull("kind")||!a.hasNonNull("effectiveFrom")){omitted.add("PolicyVersion "+e.getKey()+" without authored kind/content/effectiveFrom");continue;}
-            String org=orgOf.get(e.getKey());policy(org,id(e.getKey()),a.path("kind").asText(),a.path("version").asText(e.getKey()),a.path("content"),time(a.path("effectiveFrom").asText()),a.hasNonNull("effectiveUntil")?time(a.path("effectiveUntil").asText()):null,a.path("activate").asBoolean(true));
+            // effectiveFrom: authored, else the content's effectiveAt (round 14 fixtures state it there), else 30 days before the clock.
+            String from=a.hasNonNull("effectiveFrom")?a.path("effectiveFrom").asText():a.path("content").path("effectiveAt").asText(null);
+            if(!a.path("content").isObject()||!a.hasNonNull("kind")){omitted.add("PolicyVersion "+e.getKey()+" without authored kind/content");continue;}
+            if(from==null)conventions.add("PolicyVersion "+e.getKey()+" effectiveFrom 30 days before the fixture clock (not authored)");
+            OffsetDateTime effective=from==null?asOf.minusDays(30):time(from),until=a.hasNonNull("effectiveUntil")?time(a.path("effectiveUntil").asText()):null;
+            String org=orgOf.get(e.getKey());boolean activate=a.path("activate").asBoolean(true);policy(org,id(e.getKey()),a.path("kind").asText(),a.path("version").asText(e.getKey()),a.path("content"),effective,until,activate);
+            // Round 14 Step 3 finding 6: retirePolicy reads the policy's PolicyDrafts row in state ACTIVE (PolicyCommands), which
+            // activatePolicy writes together with the PolicyVersions row. An installed active policy gets the same draft row.
+            if(activate){insert("mulino_governance_PolicyDrafts",row("organizationId",org,"ID",id(e.getKey()),"kind",a.path("kind").asText(),"version",a.path("version").asText(e.getKey()),"content",a.path("content").toString(),"contentHash",FixtureInstaller.contentHash(a.path("content")),"source",a.path("content").path("source").asText("scenario fixture"),"regressionEvidence","scenario fixture",
+                "effectiveFrom",effective,"effectiveUntil",until,"legallyRestrictive",a.path("legallyRestrictive").asBoolean(false),"fixtureOnly",true,"status","ACTIVE","revision",a.path("revision").asInt(1)));
+                conventions.add("PolicyVersion "+e.getKey()+" active: PolicyVersions, ActivePolicies and an ACTIVE PolicyDrafts row (the state retirePolicy reads)");}
             authoredKinds.add(org+":"+a.path("kind").asText());
         }
         for(String org:orgs) for(JsonNode p:conv.path("policies")) if(!authoredKinds.contains(org+":"+p.path("kind").asText())) {
@@ -836,7 +845,9 @@ final class ScenarioFixtureInstaller {
         insert("mulino_governance_PolicyDrafts",row("organizationId",org,"ID",id(alias),"kind",a.path("kind").asText("SCENARIO_FIXTURE_DRAFT"),"version",a.path("version").asText(alias),"content",content.toString(),"contentHash",hash,"source","scenario fixture","regressionEvidence","scenario fixture",
             "effectiveFrom",a.hasNonNull("effectiveFrom")?time(a.path("effectiveFrom").asText()):asOf,"legallyRestrictive",false,"fixtureOnly",true,"status",Set.of("APPROVED","PUBLISHED").contains(state)?"APPROVED":"DRAFT","revision",a.path("revision").asInt(1)));
         conventions.add("PolicyVersion "+alias+" ("+state+") installed as a PolicyDrafts row with the authored hash; content is a synthetic placeholder (the fixture states state/hash only), kind SCENARIO_FIXTURE_DRAFT unless authored");
-        if(Set.of("APPROVED","PUBLISHED").contains(state))notRepresented.add("PolicyVersion "+alias+" "+state+" installed as an APPROVED draft without a PolicyApprovals row (approver not authored; the product's policy states are DRAFT/APPROVED/ACTIVE/RETIRED)");
+        if(Set.of("APPROVED","PUBLISHED").contains(state)){String approver=a.path("approverAlias").asText(null);
+            if(approver!=null&&aliases.has(approver)){insert("mulino_governance_PolicyApprovals",row("organizationId",org,"ID",uuid(),"draftId",id(alias),"contentHash",hash,"approverId",id(approver),"approvedAt",asOf));conventions.add("PolicyVersion "+alias+" "+state+" installed as an APPROVED draft with a PolicyApprovals row by "+approver);}
+            else notRepresented.add("PolicyVersion "+alias+" "+state+" installed as an APPROVED draft without a PolicyApprovals row (approver not authored; the product's policy states are DRAFT/APPROVED/ACTIVE/RETIRED)");}
     }
     /** baseline.managementAuthorities -> ManagementAuthorities (plan §7.2 management capability of a human; scope ORGANIZATION or an installed alias). */
     private void managementAuthorities() throws SQLException {
