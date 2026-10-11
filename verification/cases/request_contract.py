@@ -550,6 +550,10 @@ class Contracts:
                 provenance.pop(name)
             provenance.update(kept)
             self.fill_required(body, slots, provenance, action, capability, declared)
+            for rule in spec['contractDrops']['rules']:  # a case-scoped drop also holds against the projection's subject fill
+                if capability in rule['capabilities'] and self._case in rule.get('cases', ()) and rule['when'] == 'always':
+                    slots.pop(rule['slot'], None)
+                    provenance.pop(rule['slot'], None)
         else:
             for name in declared['allowed']:
                 sources = [s for s in self.SLOT_SOURCES.get(name, ()) if s.startswith('@') and s not in ('@clock', '@evidenceRefs')]
@@ -628,7 +632,7 @@ class Contracts:
                 provenance[rule['unitSlot']] = provenance.get(rule['unitSlot']) or said
         for rule in spec['contractDrops']['rules']:
             name = rule['slot']
-            if capability not in rule['capabilities'] or name not in slots:
+            if capability not in rule['capabilities'] or name not in slots or ('cases' in rule and self._case not in rule['cases']):
                 continue
             value, when = slots[name], rule['when']
             if when == 'always':

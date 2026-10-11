@@ -337,10 +337,10 @@
                   "pointer": "/response/segmentId"
                 }
               },
-              "orderId": {
+              "salesLineId": {
                 "$result": {
                   "actionId": "sale60",
-                  "pointer": "/response/id"
+                  "pointer": "/response/line/id"
                 }
               }
             },
@@ -355,7 +355,7 @@
               "quantity": "USER",
               "unit": "USER",
               "segmentId": "CONTEXT",
-              "orderId": "CONTEXT"
+              "salesLineId": "CONTEXT"
             }
           }
         },
@@ -6278,10 +6278,10 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "orderId": {
+              "salesLineId": {
                 "$result": {
                   "actionId": "sale",
-                  "pointer": "/response/id"
+                  "pointer": "/response/line/id"
                 }
               },
               "quantity": "100",
@@ -6296,7 +6296,7 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "orderId": "CONTEXT",
+              "salesLineId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER"
             }

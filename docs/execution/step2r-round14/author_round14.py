@@ -211,6 +211,36 @@ def edit_split_children(changed, check):
         write(path, data, fmt, text, changed, check)
 
 
+# ---- reserve the sales line, not the order (item 1) ---------------------------------------------------------------------
+# contracts/capability-slots.json reserveQuantity takes salesLineId (plan section 6 reserve: order line). C2, T09 and T11
+# reserved by orderId read as the order's /response/id; createSalesOrder answers its one line as /response/line/id
+# (s5d S3-4/UD-1 response: workId, orderId, line{id, revisionId, orderId}). The same order's only line is named instead.
+RESERVE_DIRS = ('C2', 'T09', 'T11')
+
+
+def edit_reserve_lines(changed, check):
+    for case_id in RESERVE_DIRS:
+        path = ROOT / f'verification/cases/{case_id}/case.json'
+        data, fmt, text = R12.load(path)
+        for sub in data['subcases']:
+            sales = {a['id'] for a in R12.RC.iter_actions(sub.get('actions', [])) if a.get('capabilityId') == 'createSalesOrder'}
+            for action in R12.RC.iter_actions(sub.get('actions', [])):
+                request = action.get('request') if isinstance(action.get('request'), dict) else {}
+                slots = request.get('slots') or {}
+                order = slots.get('orderId')
+                source = order.get('$result') if isinstance(order, dict) else None
+                if action.get('capabilityId') != 'reserveQuantity' or 'salesLineId' in slots or not source \
+                        or source.get('actionId') not in sales or source.get('pointer') != '/response/id':
+                    continue
+                items = [('salesLineId', {'$result': {'actionId': source['actionId'], 'pointer': '/response/line/id'}}) if n == 'orderId' else (n, v)
+                         for n, v in slots.items()]
+                slots.clear()
+                slots.update(items)
+                provenance = request.get('provenance') or {}
+                request['provenance'] = {('salesLineId' if n == 'orderId' else n): v for n, v in provenance.items()}
+        write(path, data, fmt, text, changed, check)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
@@ -218,6 +248,7 @@ def main():
     edit_c3_base_world(changed, check)
     edit_c3_policies(changed, check)
     edit_split_children(changed, check)
+    edit_reserve_lines(changed, check)
     if check and changed:
         sys.exit('round 14 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 14: {len(changed)} file(s) changed')

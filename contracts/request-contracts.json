@@ -1450,6 +1450,18 @@
           "slot": "workId",
           "when": "always",
           "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the purchase order line names its Work"
+        },
+        {
+          "capabilities": [
+            "createSalesOrder"
+          ],
+          "slot": "workId",
+          "when": "always",
+          "cases": [
+            "C3",
+            "V4"
+          ],
+          "contractRef": "step2r round 14 item 1: AGENTS.md 2026-10-11 product decision 1 (UD-1): createSalesOrder creates its own delivery Work (plan section 6 별도 인도 목표) and cases stop sending workId; the created Work is read from the response (/response/workId). The C3 and V4 trade subcases sent the fixture WORK only to satisfy the old required slot and assert the command outcome and unchanged rows, not the Work. T11 cancel-after-shipment keeps it: its sale ships under the SOURCE Work it later cancels, so the order's own Work would change what it tests (round README)."
         }
       ]
     },
@@ -1952,20 +1964,17 @@
           "reason"
         ],
         "required": [
-          "workId",
           "customerId",
           "itemId",
           "quantity",
           "unit",
-          "price",
-          "currency",
           "dueAt",
           "destinationId",
           "deliveryEndpoint",
           "qualityTerms",
           "packageTerms"
         ],
-        "ref": "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java:16-18"
+        "ref": "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java:16-18; AGENTS.md 2026-10-11 product decision 1: workId, price and currency are optional (the order creates its own delivery Work, price is a settlement fact)"
       },
       "createShipment": {
         "allowed": [
