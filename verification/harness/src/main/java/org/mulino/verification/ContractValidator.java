@@ -352,7 +352,7 @@ public final class ContractValidator {
                         String key=r.path("actionId").asText()+r.path("pointer").asText();
                         if(children.containsKey(key)) named.put(key,children.get(key));
                         else if(splitSource(source.path("request").path("slots"),leaves,children)!=null)
-                            problems.add(where+"/"+id+": transit receipt names "+key+", which is not a "+transit.path("splitChildPointer").asText()+" of an explicit children entry of that split; the received leaf quantity cannot be checked");
+                            problems.add(where+"/"+id+": transit receipt names "+key+", which is not a "+transit.path("splitChildPointer").asText()+" of an explicit children entry or a /response/children/<index>/segmentId of the quantities of that split; the received leaf quantity cannot be checked");
                     }
                     if(!named.isEmpty()) {
                         if(slots.has(slot)) problems.add(where+"/"+id+": transit receipt of "+named.keySet()+" carries "+slot+"; a transit receipt keeps the leaf's custodian (contracts/fixture-place-kinds.json directReceiptCustody)");
@@ -1069,6 +1069,16 @@ public final class ContractValidator {
         for(JsonNode c:list) if(c.path("alias").isTextual()) {
             ObjectNode child=source.deepCopy();child.set("quantity",c.path("quantity"));child.set("unit",c.path("unit"));
             children.put(id+"/response/children/"+c.path("alias").asText()+"/segmentId",child);
+        }
+        // UD-3 (2026-10-11): a split names its children by position. quantities[i] is child i and the product answers
+        // children[{index,segmentId,quantity,unit}], so /response/children/<i>/segmentId is child i of quantities.
+        JsonNode quantities=slots.path("quantities").has("value")?slots.path("quantities").path("value"):slots.path("quantities");
+        JsonNode unit=slots.path("unit").has("value")?slots.path("unit").path("value"):slots.path("unit");
+        if(quantities.isArray()) for(int i=0;i<quantities.size();i++) {
+            JsonNode q=quantities.get(i);ObjectNode child=source.deepCopy();
+            if(q.isObject()){child.set("quantity",q.has("value")?q.path("value"):q.path("quantity"));child.set("unit",q.has("unit")?q.path("unit"):unit);}
+            else {child.set("quantity",q);child.set("unit",unit);}
+            children.put(id+"/response/children/"+i+"/segmentId",child);
         }
     }
     private static List<JsonNode> resultNodes(JsonNode node) {List<JsonNode> out=new ArrayList<>();resultNodes(node,out);return out;}
