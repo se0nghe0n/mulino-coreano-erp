@@ -216,6 +216,11 @@ class Conformance(unittest.TestCase):
         self.assertEqual('QC', hold['slots']['category'])
         handover = run('proposeHandover', {'workId': A('WORK'), 'toOwnerId': A('B')})
         self.assertEqual(A('B'), handover['slots']['recipientId'])
+        world.evidence = {'invoice'}
+        invoice = run('recordInvoice', {'invoiceKind': 'COMMERCIAL', 'evidence': 'invoice', 'note': 'invoice-text'})
+        self.assertEqual(A('invoice'), invoice['slots']['evidence'], 'a bare evidence alias names the evidence')
+        self.assertEqual('invoice-text', invoice['slots']['note'])
+        world.evidence = set()
         grant = run('createGrant', {'actorId': A('reader')}, subjectRefs=[{'type': 'Grant', 'id': A('GRANT')}, {'type': 'Agent', 'id': A('reader')}])
         self.assertEqual([{'type': 'Agent', 'id': A('reader')}], grant['subjectRefs'], 'only the created noun is dropped')
 
@@ -376,6 +381,15 @@ class GrantAuthorization(unittest.TestCase):
             self.assertTrue(C.item_less_object(world, 'getObject', read['request'], read))
             item = query({'id': A('P')}, cap='getObject')
             self.assertFalse(C.item_less_object(world, 'getObject', item['request'], item))
+
+    def test_a_command_citing_evidence_needs_get_evidence(self):
+        # step2r round 13 run-53e71c0c: T19 recordInvoice FORBIDDEN, TradeEvidence/SettlementCommands authorize getEvidence.
+        f = self.world({}, ['recordInvoice'])
+        f['evidence'] = [{'alias': 'invoice'}]
+        cite = invoke({'intentKind': 'RECORD', 'capabilityId': 'recordInvoice', 'slots': {'evidence': A('invoice')}}, cap='recordInvoice', aid='invoice')
+        applied = {'id': 'applied', 'op': 'equals', 'source': {'actionId': 'invoice', 'pointer': '/response/outcome'}, 'expected': 'APPLIED'}
+        self.assertTrue(any('reads the evidence it cites' in p for p in self.problems(f, [cite], [applied])))
+        self.assertEqual([], self.problems(self.world({}, ['recordInvoice', 'getEvidence']) | {'evidence': [{'alias': 'invoice'}]}, [cite], [applied]))
 
     def test_retired_composition_and_unrepresented_keys_fail_the_fixture(self):
         f = self.world({'itemAliases': ['P'], 'customerAliases': ['C']}, ['getInventory'])

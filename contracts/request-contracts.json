@@ -735,6 +735,54 @@
       ],
       "meaning": "Plan section 7.1 gives these actions a decision authority beyond the grant (MANAGER, QC, ADMIN, CONFIG_APPROVER, a guarded approval or ManagementAuthorities/ManagementCoverage of a HUMAN, backend PurchaseCommands.manager, RecallCommands.admin, ReturnCommands.manager, SettlementCommands.manager, ResponsibilityCommands.designated, IdentityControlGuard). A FORBIDDEN pinned on them is decided by that authority, so a grant that covers the call does not contradict it; the static check reports it as not judged instead of as a broken negative."
     },
+    "citedEvidenceRead": {
+      "capabilities": [
+        "approvePurchase",
+        "approveRecall",
+        "attachEvidence",
+        "authorizeReturn",
+        "cancelPurchase",
+        "closeRecall",
+        "confirmReceipt",
+        "correctEvidence",
+        "createSalesOrder",
+        "createShipment",
+        "decideReturnDisposition",
+        "dispatchPurchaseOrder",
+        "linkCanonicalOccurrence",
+        "matchInvoice",
+        "matchSourceIdentity",
+        "openInvestigation",
+        "placeHold",
+        "prepareRegulatoryProcedure",
+        "proposePurchase",
+        "proposeRecall",
+        "receiveProvisional",
+        "receiveReturn",
+        "recordActivity",
+        "recordCharge",
+        "recordDelivery",
+        "recordDispositionBasis",
+        "recordHandover",
+        "recordInvoice",
+        "recordLegEvent",
+        "recordObservedMovement",
+        "recordPaymentReference",
+        "recordRecallNotice",
+        "recordRecovery",
+        "recordRegulatoryDecision",
+        "recordSettlementAdjustment",
+        "recordSubmission",
+        "releaseHold",
+        "resolveEvidenceConflict",
+        "revisePurchase",
+        "reviseSalesOrder",
+        "revokeDispositionBasis",
+        "verifyLabel"
+      ],
+      "requires": "getEvidence",
+      "meaning": "The handler of these commands authorizes getEvidence on the evidence it cites before it uses it, so an actor (and each fixture-actor delegator) that cites evidence needs getEvidence in its role capabilities and current grant: TradeEvidence.verifiedCanonical (TradeEvidence.java:33,43, used by purchase, receipt, shipment, delivery, return, recall, regulatory, settlement and quality evidence scopes), SettlementCommands.document (SettlementCommands.java:83), ReceiptEvidenceScopes.java:17. Plan section 7.1: 조회·증거 다운로드 needs READ, and the authority of an action is the intersection of organization, role, current delegation and action permission. conform_fixture adds getEvidence to an actor the cases have cite evidence in an action not pinned FORBIDDEN; check_request_contracts.py treats a citing call without it as uncovered (step2r round 13, run-53e71c0c: T19 recordInvoice FORBIDDEN)."
+    },
     "nonGrantForbidden": [
       {
         "caseId": "V6",
@@ -1022,6 +1070,10 @@
         ]
       },
       "contractRef": "docs/execution/s2-inventory/contracts.md 명사 subject의 실제 대상 결합: subjectRefs do not copy authorization scopes; a command that creates an ID has no existing subject (registerItem), the typed slots already name the required targets so zero declarations are allowed, and a declared noun is checked by the common resolver against the handler's exact targets (CommandDefinitionResolver.verifySubjects: 'Declared subject differs from command target'). The shared-slot cases declared the noun of the entity the command creates (or, for assignCapability, the grant), which no handler binds; those declarations are dropped. A subject the handler binds (the Work and item of a sales order, the recipient actor of a grant) stays when a case declares it."
+    },
+    "evidenceAliasSlots": {
+      "rule": "A slot whose value is a plain string equal to a fixture evidence alias names that evidence: it is written {\"$alias\": name} so the harness sends the installed document ID.",
+      "contractRef": "docs/execution/s1-evidence/contracts.md (every evidence ID is a server UUID; DocumentVersions, Events, CanonicalOccurrences), backend QueryRequests: aliases are resolved by clients, never as server IDs; SettlementCommands.java:83 and the trade/receipt/regulatory evidence ports read the slot as a document ID. Round 12 applied the same rule to request evidenceRefs. T13/T14/T15/T19/V8 wrote evidence, receiptEvidence, externalReceiptEvidence and evidenceRef slots as bare alias strings (T19 recordInvoice refused FORBIDDEN in run-9d213f5a)."
     },
     "basisSlot": {
       "capabilities": [

@@ -66,7 +66,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -126,7 +128,9 @@
                 "value": "0",
                 "currency": "EUR"
               },
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-charge",
@@ -242,7 +246,9 @@
                 "value": "1",
                 "currency": "EUR"
               },
-              "evidence": "invoice"
+              "evidence": {
+                "$alias": "invoice"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-sale-invoice",
@@ -346,7 +352,9 @@
                 "currency": "EUR"
               },
               "reason": "원 차이 확인 제안",
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-match-difference-adjustment-proposal",
@@ -935,7 +943,9 @@
                   "currency": "EUR"
                 }
               },
-              "evidence": "invoice"
+              "evidence": {
+                "$alias": "invoice"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-invoice-quantity-difference-invoice",
@@ -1451,7 +1461,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -1570,7 +1582,9 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-qc-result",
@@ -1624,7 +1638,9 @@
                 "currency": "EUR"
               },
               "observedAt": "2026-10-07T09:00:00Z",
-              "evidence": "payment-reference"
+              "evidence": {
+                "$alias": "payment-reference"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-payment-ref",
@@ -2467,7 +2483,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -2586,7 +2604,9 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-qc-result",
@@ -2640,7 +2660,9 @@
                 "currency": "EUR"
               },
               "observedAt": "2026-10-07T09:00:00Z",
-              "evidence": "payment-reference"
+              "evidence": {
+                "$alias": "payment-reference"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-payment-ref",
@@ -3443,7 +3465,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -3562,7 +3586,9 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-qc-result",
@@ -3616,7 +3642,9 @@
                 "currency": "EUR"
               },
               "observedAt": "2026-10-07T09:00:00Z",
-              "evidence": "payment-reference"
+              "evidence": {
+                "$alias": "payment-reference"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-payment-ref",
@@ -4419,7 +4447,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -4538,7 +4568,9 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-qc-result",
@@ -4592,7 +4624,9 @@
                 "currency": "EUR"
               },
               "observedAt": "2026-10-07T09:00:00Z",
-              "evidence": "payment-reference"
+              "evidence": {
+                "$alias": "payment-reference"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-payment-ref",
@@ -5395,7 +5429,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -5507,7 +5543,9 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-valid-proposal",
@@ -5631,7 +5669,9 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -5762,7 +5802,9 @@
                 "currency": "EUR"
               },
               "decidedAt": "2026-10-07T09:00:00Z",
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -6655,7 +6697,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -6767,7 +6811,9 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-unauthorized-proposal",
@@ -6891,7 +6937,9 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -7022,7 +7070,9 @@
                 "currency": "EUR"
               },
               "decidedAt": "2026-10-07T09:00:00Z",
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -7772,7 +7822,9 @@
                 }
               },
               "scopeKind": "PURCHASE",
-              "evidence": "invoice",
+              "evidence": {
+                "$alias": "invoice"
+              },
               "fxSnapshot": {
                 "pair": "EUR/KRW",
                 "rate": "1500",
@@ -7884,7 +7936,9 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-settlement-stale-proposal",
@@ -8008,7 +8062,9 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -8133,7 +8189,9 @@
                 "currency": "EUR"
               },
               "reason": "추가 근거 version",
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -8203,7 +8261,9 @@
                 "currency": "EUR"
               },
               "decidedAt": "2026-10-07T09:00:00Z",
-              "evidence": "adjustment"
+              "evidence": {
+                "$alias": "adjustment"
+              }
             },
             "expectedRevision": {
               "$result": {

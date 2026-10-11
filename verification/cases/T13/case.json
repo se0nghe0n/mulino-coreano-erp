@@ -8021,7 +8021,9 @@
               "policyVersion": "SYNTHETIC-policy-v2",
               "effectiveAt": "2026-10-07T09:00:00Z",
               "requires": "MANAGER_NEW_DECISION",
-              "source": "policy-source",
+              "source": {
+                "$alias": "policy-source"
+              },
               "scope": {
                 "organizationId": {
                   "$alias": "ORG"
@@ -8869,7 +8871,9 @@
             "slots": {
               "externalOperationId": "T13-supplier-accept-external",
               "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": "supplier-ship"
+              "receiptEvidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-accept-transmission",
@@ -8979,7 +8983,9 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-accept-supplier-reply",
@@ -9661,7 +9667,9 @@
             "slots": {
               "externalOperationId": "T13-supplier-reject-external",
               "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": "supplier-ship"
+              "receiptEvidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-reject-transmission",
@@ -9771,7 +9779,9 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-reject-supplier-reply",
@@ -10453,7 +10463,9 @@
             "slots": {
               "externalOperationId": "T13-supplier-change-external",
               "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": "supplier-ship"
+              "receiptEvidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-change-transmission",
@@ -10563,7 +10575,9 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-change-supplier-reply",
@@ -12099,7 +12113,9 @@
               "quantity": "60",
               "unit": "BOX",
               "basisKind": "QC",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-qc-allow",
@@ -12157,7 +12173,9 @@
                 "unit": "BOX"
               },
               "policyVersion": "SYNTHETIC-policy-v1",
-              "evidence": "need"
+              "evidence": {
+                "$alias": "need"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-agency-procedure",
@@ -12205,7 +12223,9 @@
                 }
               },
               "externalReceiptId": "T13-AGENCY-ACK",
-              "externalReceiptEvidence": "agency-receipt"
+              "externalReceiptEvidence": {
+                "$alias": "agency-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-agency-submit",
@@ -12260,7 +12280,9 @@
               "quantity": "60",
               "unit": "BOX",
               "policyVersion": "SYNTHETIC-policy-v1",
-              "evidence": "agency-decision"
+              "evidence": {
+                "$alias": "agency-decision"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-agency-allow",
@@ -12313,7 +12335,9 @@
               "quantity": "60",
               "unit": "BOX",
               "basisKind": "OWNER_PERMISSION",
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-disposition",
@@ -12364,7 +12388,9 @@
                 "value": "60",
                 "unit": "BOX"
               },
-              "evidence": "label"
+              "evidence": {
+                "$alias": "label"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-label",
@@ -12575,7 +12601,9 @@
               "quantity": "10",
               "unit": "BOX",
               "occurredAt": "2026-10-07T09:00:00Z",
-              "evidence": "delivery",
+              "evidence": {
+                "$alias": "delivery"
+              },
               "itemId": {
                 "$alias": "P"
               }
@@ -12678,7 +12706,9 @@
               "placeId": {
                 "$alias": "W"
               },
-              "evidence": "return"
+              "evidence": {
+                "$alias": "return"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-return",

@@ -460,6 +460,9 @@ class Contracts:
                 continue
             slots[name] = value
             provenance[name] = provenance.get(name) or stated.get(name) or said or default_provenance(value)
+        for name, value in list(slots.items()):
+            if isinstance(value, str) and value in world.evidence and value not in world.aliases and f'slots/{name}' not in intentional:
+                slots[name] = {'$alias': value}  # commandSlots evidenceAliasSlots: a bare evidence alias names that evidence
         self.conform_slots(body, slots, provenance, action, intentional)
         body['provenance'] = {name: provenance[name] for name in slots}
         if intentional:
@@ -939,6 +942,8 @@ class Contracts:
                             names = {capability}
                             if self.item_less_object(world, capability, request, action):
                                 names.add(capability + self.NO_ITEM)
+                            if self.cites_evidence(world, capability, request):
+                                names.add(self.CITED)
                             who, seen = action['actorRef'], set()
                             while who in world.actors and who not in seen:
                                 seen.add(who)
@@ -948,6 +953,17 @@ class Contracts:
         return self._usage
 
     NO_ITEM = '#noItem'
+    CITED = '#citedEvidence'
+
+    def cites_evidence(self, world, capability, request):
+        """True when a command whose handler reads the evidence it cites (grantAuthorization citedEvidenceRead) names
+        evidence: request evidenceRefs or a slot naming a fixture evidence alias."""
+        if capability not in self.grants['citedEvidenceRead']['capabilities'] or not isinstance(request, dict):
+            return False
+        if request.get('evidenceRefs'):
+            return True
+        slots = request.get('slots') if isinstance(request.get('slots'), dict) else {}
+        return any(isinstance(v, dict) and v.get('$alias') in world.evidence for v in slots.values())
 
     def item_less_object(self, world, capability, request, action):
         """True when an OBJECT-family read names a noun whose product row presents no ITEM (a SalesOrder row carries
@@ -1001,6 +1017,14 @@ class Contracts:
                 keep = self.kept_scope_keys(fixture.get('fixtureId'), name, grant)
                 for key in [k for k in scope if k not in keep]:
                     scope.pop(key)
+            if self.CITED in self.grant_usage().get((fixture.get('fixtureId'), name), set()):
+                needed = self.grants['citedEvidenceRead']['requires']
+                lists = [actor.get('roleCapabilities'), grant.get('actions')]
+                if isinstance(scope, dict) and isinstance(scope.get('capabilityIds'), list):
+                    lists.append(scope['capabilityIds'])
+                for values in lists:
+                    if isinstance(values, list) and needed not in values:
+                        values.append(needed)
         return fixture
 
     # -- checks --
@@ -1267,6 +1291,11 @@ class Contracts:
         ids = (grant.get('scope') or {}).get('capabilityIds')
         if isinstance(ids, list) and capability not in ids:
             return False, f'{capability} is not in its grant scope capabilityIds'
+        needed = self.grants['citedEvidenceRead']['requires']
+        if self.cites_evidence(world, capability, request) and not all(
+                needed in (values or []) for values in (actor.get('roleCapabilities'), grant.get('actions'))
+                + ((ids,) if isinstance(ids, list) else ())):
+            return False, f'{capability} reads the evidence it cites and {needed} is not in its roleCapabilities and grant actions'
         if clock and not (str(grant.get('validFrom', '')) <= clock < str(grant.get('validUntil', '~'))):
             return False, f'the grant is not valid at the product clock {clock}'
         revoked = (grant.get('scope') or {}).get('revokedAt')

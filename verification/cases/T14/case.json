@@ -503,7 +503,9 @@
               },
               "occurredAt": "2026-10-07T09:00:00Z",
               "eventClass": "ACTUAL",
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-port",
@@ -558,7 +560,9 @@
               },
               "occurredAt": "2026-10-07T09:00:00Z",
               "eventClass": "ACTUAL",
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-port",
@@ -672,7 +676,9 @@
               },
               "occurredAt": "2026-10-07T09:00:00Z",
               "ownerTransfer": false,
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-handover",
@@ -727,7 +733,9 @@
               },
               "occurredAt": "2026-10-07T09:00:00Z",
               "eventClass": "ACTUAL",
-              "evidence": "warehouse-receipt"
+              "evidence": {
+                "$alias": "warehouse-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-W",
@@ -786,7 +794,9 @@
               },
               "occurredAt": "2026-10-07T09:00:00Z",
               "ownerTransfer": false,
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-handover",
@@ -841,7 +851,9 @@
               },
               "occurredAt": "2026-10-07T09:00:00Z",
               "eventClass": "ACTUAL",
-              "evidence": "warehouse-receipt"
+              "evidence": {
+                "$alias": "warehouse-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-W",
@@ -1738,7 +1750,9 @@
               "placeId": {
                 "$alias": "IT-origin"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-shipped",
@@ -1861,7 +1875,9 @@
               },
               "physicalScope": "Q100-received98",
               "sourceEventId": "RECEIVE98",
-              "evidence": "warehouse-receipt"
+              "evidence": {
+                "$alias": "warehouse-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-receive98",
@@ -1920,7 +1936,9 @@
               "placeId": {
                 "$alias": "TRANSIT"
               },
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-transit2",
@@ -2735,7 +2753,9 @@
               "placeId": {
                 "$alias": "IT-origin"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-shipped",
@@ -2858,7 +2878,9 @@
               },
               "physicalScope": "Q100-received98",
               "sourceEventId": "RECEIVE98",
-              "evidence": "warehouse-receipt"
+              "evidence": {
+                "$alias": "warehouse-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-receive98",
@@ -3619,7 +3641,9 @@
               "kind": "TEMPERATURE_ABNORMAL",
               "value": "35",
               "unit": "CELSIUS",
-              "evidence": "temperature"
+              "evidence": {
+                "$alias": "temperature"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-orphan-temperature-temperature",
