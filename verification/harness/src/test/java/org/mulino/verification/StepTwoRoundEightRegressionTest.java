@@ -156,7 +156,7 @@ final class StepTwoRoundEightRegressionTest {
         for(JsonNode a:s.path("assertions")) assertions.add(a.path("id").asText());
         for(String db:List.of("return-db","move-db")) {boolean seg=false;for(JsonNode x:action(s,db).at("/observation/sources")) seg|=x.asText().equals("segments");assertTrue(seg,db);}
         assertTrue(actions.indexOf("return-db")<actions.indexOf("split40") && actions.indexOf("split40")<actions.indexOf("move"));
-        assertEquals("/response/children/MOVE20/segmentId",slots(s,"move").at("/segmentId/$result/pointer").asText(),"the whole-leaf move takes the split 20 child");
+        assertEquals("/response/children/0/segmentId",slots(s,"move").at("/segmentId/$result/pointer").asText(),"the whole-leaf move takes the split 20 child");
         for(String id:List.of("dispatch-sale-applied","return-applied","returned-at-W")) assertTrue(assertions.indexOf(id)>=0 && assertions.indexOf(id)<assertions.indexOf("return-no-new-contribution"),id);
         for(String id:List.of("move-applied","relocated-at-W-alt","left-at-W")) assertTrue(assertions.indexOf(id)>assertions.indexOf("return-no-new-contribution") && assertions.indexOf(id)<assertions.indexOf("relocation-no-new-contribution"),id);
         assertEquals(List.of(),new ContractValidator(root).receiptCustodyProblems(only(caseJson("T13"),s)));

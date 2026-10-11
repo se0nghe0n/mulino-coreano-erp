@@ -88,7 +88,8 @@ final class StepTwoRoundElevenRegressionTest {
             List<String> p=run(rule,"C3",route+"-reserveQuantity",NONE,heldA20);
             rejects("overlaps the EXECUTABLE allocation ALLOCATION (no startQuantity",p);rejects("SALES_LINE_QUANTITY_EXCEEDED",p);
         }
-        for(String sid:List.of("direct-allocation","batch-allocation","blob-allocation","management-allocation")) rejects("overlaps the EXECUTABLE allocation ALLOCATION",run(rule,"V4",sid,NONE,heldA20));
+        // round 14: V4 blob-allocation expects TYPE_INVALID for the authorized call too (the blob endpoint carries no business command), so it reserves nothing.
+        for(String sid:List.of("direct-allocation","batch-allocation","management-allocation")) rejects("overlaps the EXECUTABLE allocation ALLOCATION",run(rule,"V4",sid,NONE,heldA20));
         // A SUSPENDED fixture allocation still holds the interval; a CONSUMED one only the line.
         rejects("overlaps the SUSPENDED allocation",run(rule,"C3","api-reserveQuantity",NONE,heldA20.andThen(f->((ObjectNode)f.path("baseline").path("priorEntities").path("ALLOCATION")).put("state","SUSPENDED"))));
         List<String> consumed=run(rule,"C3","api-reserveQuantity",NONE,heldA20.andThen(f->((ObjectNode)f.path("baseline").path("priorEntities").path("ALLOCATION")).put("state","CONSUMED")));

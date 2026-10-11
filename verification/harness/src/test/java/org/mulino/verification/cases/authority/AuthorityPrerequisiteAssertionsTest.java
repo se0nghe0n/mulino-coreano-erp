@@ -99,7 +99,7 @@ public class AuthorityPrerequisiteAssertionsTest {
         }
         JsonNode closure=assertion(scenario("api","closeRecall"),"authorized-business-recall-closure");
         var rows=capture("{\"recallClosures\":[{\"recallId\":\"recall\",\"approvalId\":\"approval\",\"closedBy\":\"admin\",\"recoveredQuantity\":\"20\",\"disposedQuantity\":\"20\",\"exceptionQuantity\":\"0\",\"unknownQuantity\":\"0\",\"unit\":\"BOX\"}]}","{}");
-        var results=new HashMap<String,JsonNode>();results.put("authorized-after",rows);results.put("precondition-approval",capture("{}","{\"approvalId\":\"approval\"}"));
+        var results=new HashMap<String,JsonNode>();results.put("authorized-after",rows);results.put("precondition-approval",capture("{}","{\"approvalId\":\"approval\",\"effects\":{\"approvalId\":\"approval\"}}"));
         ObjectNode aliases=(ObjectNode)aliases();aliases.put("RECALL","recall").put("admin","admin");
         engine.check(closure,results,aliases);
         ((ObjectNode)rows.at("/data/rawRows/recallClosures/0")).put("unknownQuantity","20").put("disposedQuantity","0");assertThrows(AssertionError.class,()->engine.check(closure,results,aliases));
