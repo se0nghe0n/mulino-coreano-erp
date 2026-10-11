@@ -22,7 +22,7 @@ import org.mulino.verification.Json;
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
         "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
-        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant");
+        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
     static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities");
     /**
@@ -639,6 +639,8 @@ final class ScenarioFixtureInstaller {
         for(String a:aliasesOfType("RegulatoryProcedure"))regulatory(a);
         for(String a:aliasesOfType("ReconciliationCase"))reconciliation(a);
         for(String a:aliasesOfType("PolicyVersion"))policyDraft(a);
+        for(String a:aliasesOfType("Obligation"))obligation(a);
+        for(String a:aliasesOfType("Handover"))handover(a);
         if(syntheticTradeTerms)conventions.add("trade aliases: NOT NULL terms the fixture does not state are synthetic placeholders (price 0 / currency XXX unless authored, dueAt asOf+30d, endpoint ARRIVED, quantityMode CUMULATIVE_EVENT, channel/carrier 'fixture-unspecified', source namespace scenario-fixture)");
     }
     private JsonNode facts(String alias){return fixture.path("aliases").path(alias);}
@@ -826,6 +828,35 @@ final class ScenarioFixtureInstaller {
             insert("mulino_identity_ManagementAuthorities",row("organizationId",org,"ID",uuid(),"actorId",id(actor),"capabilityId",m.path("capabilityId").asText(),"scopeKind",kind,"scopeId",scopeId,"validFrom",time(m.path("validFrom").asText()),"validUntil",time(m.path("validUntil").asText()),
                 "revokedAt",m.hasNonNull("revokedAt")?time(m.path("revokedAt").asText()):null,"revision",m.path("revision").asInt(1)));
         }
+    }
+    /**
+     * Obligation -> a stable duty root (the alias id), one leaf scope and its one current assignment on the Work the
+     * fixture names (plan §5.3). The fixture states kind, scope, owner, status and next action; the duty source is not
+     * authored, so the root cites the fixture document (sourceKind DOCUMENT, version 1) as a synthetic source.
+     */
+    private void obligation(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias),work=workFor(a,org),doc=document(a,org);
+        String owner=human(org,firstAlias(a,"ownerAlias")),supervisor=human(org,firstAlias(a,"supervisorAlias"));if(supervisor==null)supervisor=owner;
+        if(work==null||doc==null||owner==null||!a.hasNonNull("kind")||!a.hasNonNull("nextAction")||!a.hasNonNull("nextCheckAt")){omitted.add("Obligation "+alias+" (work/document/owner/kind/next action not resolvable)");return;}
+        String state=a.path("status").asText("OPEN");if(!state.equals("OPEN")){omitted.add("Obligation "+alias+" status "+state+" (only an open duty is installable without resolution evidence)");return;}
+        var scope=Json.object();a.path("scope").fields().forEachRemaining(f->{String k=f.getKey();if(k.endsWith("Alias")&&f.getValue().isTextual()&&aliases.has(f.getValue().asText()))scope.put(k.substring(0,k.length()-5)+"Id",id(f.getValue().asText()));else scope.set(k,f.getValue());});
+        BigDecimal q=a.hasNonNull("quantity")?new BigDecimal(a.path("quantity").asText()):null;String unit=q==null?null:a.path("unit").asText(null);if(q!=null&&unit==null){omitted.add("Obligation "+alias+" quantity without unit");return;}
+        String scopeId=uuid(),assignment=uuid();String scopeJson=CANONICAL.writeValueAsString(Json.MAPPER.treeToValue(scope,Object.class));
+        insert("mulino_responsibility_Roots",row("organizationId",org,"ID",id(alias),"revision",a.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"dutyKey",sha(("scenario-fixture-duty:"+alias+":"+id(alias)).getBytes()),"sourceId",id(doc),"sourceKind","DOCUMENT","sourceVersion","1","kind",a.path("kind").asText(),"scopeJson",scopeJson,"quantity",q,"unit",unit));
+        insert("mulino_responsibility_Scopes",row("organizationId",org,"ID",scopeId,"revision",1,"createdAt",asOf,"recordedAt",asOf,"rootId",id(alias),"startQuantity",BigDecimal.ZERO,"quantity",q==null?BigDecimal.ONE:q,"unit",unit,"leaf",true,"scopeJson",scopeJson));
+        insert("mulino_work_read_ObligationReferences",row("organizationId",org,"ID",assignment,"revision",1,"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf,"workId",id(work),"kind",a.path("kind").asText(),"status","OPEN","ownerId",id(owner),"supervisorId",id(supervisor),
+            "nextAction",a.path("nextAction").asText(),"nextCheckAt",time(a.path("nextCheckAt").asText()),"quantity",q,"unit",unit,"scopeJson",scopeJson,"rootId",id(alias),"scopeId",scopeId,"valid",true));
+        conventions.add("Obligation "+alias+" installed as duty root (alias id) + one leaf scope + one OPEN assignment on "+work+"; synthetic source DOCUMENT "+doc);
+    }
+    /** Handover PROPOSED -> responsibility Handovers (OWNER, from the Work's owner to the named recipient); expiry and next action synthetic unless authored. */
+    private void handover(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias),work=workFor(a,org);
+        String from=human(org,firstAlias(a,"fromOwnerAlias")),to=human(org,firstAlias(a,"toOwnerAlias","recipientAlias"));
+        if(work==null||from==null||to==null){omitted.add("Handover "+alias+" (work/from/to not resolvable)");return;}
+        String state=a.path("status").asText("PROPOSED");
+        insert("mulino_responsibility_Handovers",row("organizationId",org,"ID",id(alias),"revision",a.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"kind",a.hasNonNull("targetWorkAlias")?"TRANSFER":"OWNER","workId",id(work),"targetWorkId",firstAlias(a,"targetWorkAlias")!=null?id(firstAlias(a,"targetWorkAlias")):id(work),
+            "previousOwnerId",id(from),"recipientId",id(to),"status",state,"expiresAt",a.hasNonNull("expiresAt")?time(a.path("expiresAt").asText()):asOf.plusDays(1),"nextAction",a.path("nextAction").asText("authored fixture handover review"),"nextCheckAt",a.hasNonNull("nextCheckAt")?time(a.path("nextCheckAt").asText()):asOf.plusHours(1)));
+        conventions.add("Handover "+alias+" ("+state+") installed from "+from+" to "+to+" on "+work+"; expiresAt/nextAction/nextCheckAt synthetic unless authored");
     }
     /** The Grant alias whose facts name this actor (and its delegator): the actor's installed grant takes the alias id. */
     private String grantAlias(String actor,String delegator) {
