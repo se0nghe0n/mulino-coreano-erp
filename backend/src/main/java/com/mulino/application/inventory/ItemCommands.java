@@ -28,7 +28,7 @@ public final class ItemCommands implements CommandHandler {
    if(!Set.of("name","baseUnit","decimalPlaces","specificationHash","packagingHash","specificationDescription","packagingDescription").containsAll(p.keySet()))throw DomainError.invalid("Unsupported item slot");
    InventoryCommands.text(p,"name",240);InventoryCommands.text(p,"baseUnit",40);
    for(String key:List.of("specificationHash","packagingHash"))if(!InventoryCommands.text(p,key,64).matches("[0-9a-f]{64}"))throw DomainError.invalid("Version SHA-256 required");
-   if(!(p.get("decimalPlaces") instanceof Integer precision)||precision<0||precision>12)throw DomainError.invalid("Integer base precision required");
+   decimalPlaces(p);
    for(String key:List.of("specificationDescription","packagingDescription"))if(p.containsKey(key)&&(!(p.get(key) instanceof String description)||description.length()>100000))throw DomainError.invalid("Version description invalid");
    return CommandPreparation.ordinary(Map.of("ORGANIZATION",List.of(c.organizationId())),List.of("inventory/metadata"),"ITEM_METADATA",null,null);
   }
@@ -46,7 +46,7 @@ public final class ItemCommands implements CommandHandler {
    var productRow=StockPrimitives.row(c,product,c.knownAt());productRow.put("name",p.get("name"));repository.register("Products",productRow);
    var specRow=StockPrimitives.row(c,spec,c.knownAt());specRow.put("productId",product);specRow.put("version","1");specRow.put("contentHash",p.get("specificationHash"));specRow.put("description",p.getOrDefault("specificationDescription",""));repository.register("SpecificationVersions",specRow);
    var packRow=StockPrimitives.row(c,pack,c.knownAt());packRow.put("productId",product);packRow.put("version","1");packRow.put("contentHash",p.get("packagingHash"));packRow.put("description",p.getOrDefault("packagingDescription",""));repository.register("PackagingVersions",packRow);
-   var itemRow=StockPrimitives.row(c,item,c.knownAt());for(String key:List.of("name","baseUnit","decimalPlaces"))itemRow.put(key,p.get(key));itemRow.put("productId",product);itemRow.put("specificationVersionId",spec);itemRow.put("packagingVersionId",pack);repository.register("TradeItems",itemRow);
+   var itemRow=StockPrimitives.row(c,item,c.knownAt());for(String key:List.of("name","baseUnit"))itemRow.put(key,p.get(key));itemRow.put("decimalPlaces",decimalPlaces(p));itemRow.put("productId",product);itemRow.put("specificationVersionId",spec);itemRow.put("packagingVersionId",pack);repository.register("TradeItems",itemRow);
    return Map.of("outcome","APPLIED","revision",0,"effects",Map.of("itemId",item,"productId",product,"specificationVersionId",spec,"packagingVersionId",pack),"quantityEffects",List.of());
   }
   String item=InventoryCommands.uuid(p,"itemId");Instant[] interval=interval(p);
@@ -64,4 +64,13 @@ public final class ItemCommands implements CommandHandler {
  }
  private static Instant[] interval(Map<String,Object> p){try{Instant from=Instant.parse(InventoryCommands.text(p,"validFrom",80)),until=p.containsKey("validUntil")?Instant.parse(InventoryCommands.text(p,"validUntil",80)):null;if(until!=null&&!until.isAfter(from))throw DomainError.invalid("External identity interval invalid");return new Instant[]{from,until};}catch(java.time.format.DateTimeParseException e){throw DomainError.invalid("UTC identity interval required");}}
  private static String hash(List<String> values){try{var digest=MessageDigest.getInstance("SHA-256");for(String value:values){digest.update(Integer.toString(value.length()).getBytes(StandardCharsets.UTF_8));digest.update((byte)':');digest.update(value.getBytes(StandardCharsets.UTF_8));}return HexFormat.of().formatHex(digest.digest());}catch(java.security.NoSuchAlgorithmException impossible){throw new IllegalStateException(impossible);}}
+ /**
+  * S3-6: contracts/intent.schema.json has no number value, so the base precision travels as a canonical non-negative
+  * integer string ("0".."12", the schema's decimal-string form); a JSON integer from an internal caller stays accepted.
+  */
+ public static int decimalPlaces(Map<String,Object> p){
+  Object v=p.get("decimalPlaces");int precision;
+  if(v instanceof Integer i)precision=i;else if(v instanceof String s&&s.matches("0|[1-9][0-9]?"))precision=Integer.parseInt(s);else throw DomainError.invalid("Integer base precision required");
+  if(precision<0||precision>12)throw DomainError.invalid("Integer base precision required");return precision;
+ }
 }
