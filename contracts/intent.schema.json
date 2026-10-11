@@ -183,6 +183,14 @@
               }
             ]
           }
+        },
+        {
+          "type": "array",
+          "description": "Bounded list slot (user decision 2026-10-11): at most 100 elements, each itself a slot value. Handlers keep their own tighter bounds.",
+          "maxItems": 100,
+          "items": {
+            "$ref": "#/$defs/value"
+          }
         }
       ]
     }

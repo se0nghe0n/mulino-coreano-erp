@@ -13,6 +13,7 @@ public final class CommandRequests {
     for(String key:List.of("intentKind","definitionVersion","capabilityId"))text(input,key,120);
     if(!Set.of("RECORD","COMMAND").contains(input.get("intentKind")))throw DomainError.invalid("Explicit write intent required");
     if(!(input.get("slots") instanceof Map<?,?>)||!(input.get("provenance") instanceof Map<?,?>)||!(input.get("subjectRefs") instanceof List<?> refs))throw DomainError.invalid("Typed slots, provenance and subjects required");
+    ((Map<?,?>)input.get("slots")).values().forEach(CommandRequests::listSlot);
     for(Object ref:refs){if(!(ref instanceof Map<?,?> r)||!r.keySet().equals(Set.of("type","id"))||!(r.get("type") instanceof String)||!(r.get("id") instanceof String id))throw DomainError.invalid("Typed subject required");uuid(id);}
     ((Map<?,?>)input.get("provenance")).forEach((k,v)->{if(!(k instanceof String)||!Set.of("USER","CONTEXT","APPROVED_DEFAULT").contains(v))throw DomainError.invalid("Invalid provenance");});
     for(String field:List.of("expectedRevision","proposalRevision"))if(input.containsKey(field)&&(!(input.get(field) instanceof Number n)||n.longValue()<0||n.doubleValue()!=n.longValue()||n.longValue()>Integer.MAX_VALUE))throw DomainError.invalid("Integer revision required");
@@ -25,6 +26,14 @@ public final class CommandRequests {
     if(input.containsKey("capabilityVersion"))text(input,"capabilityVersion",80);
     if(executing)text(input,"commandIdempotencyKey",160);
     return Map.copyOf(input);
+  }
+  /** contracts/intent.schema.json $defs.value array branch (user decision 2026-10-11): a list slot has at most this many elements. */
+  public static final int MAX_LIST_SLOT_ITEMS=100;
+  /** A list slot value is bounded and every element is itself a slot value (string, boolean, object or bounded list); handlers keep tighter bounds. */
+  private static void listSlot(Object value){
+    if(!(value instanceof List<?> list))return;
+    if(list.size()>MAX_LIST_SLOT_ITEMS)throw DomainError.invalid("List slot exceeds "+MAX_LIST_SLOT_ITEMS+" values");
+    for(Object element:list){if(!(element instanceof String||element instanceof Boolean||element instanceof Map<?,?>||element instanceof List<?>))throw DomainError.invalid("List slot values must be typed slot values");listSlot(element);}
   }
   public static void uuid(String id){try{UUID.fromString(id);}catch(Exception failure){throw DomainError.invalid("UUID required");}}
   private static void text(Map<String,Object> in,String key,int limit){if(!(in.get(key) instanceof String s)||s.isBlank()||s.length()>limit)throw DomainError.invalid("Invalid "+key);}
