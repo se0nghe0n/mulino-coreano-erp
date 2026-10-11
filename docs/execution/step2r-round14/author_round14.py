@@ -241,6 +241,39 @@ def edit_reserve_lines(changed, check):
         write(path, data, fmt, text, changed, check)
 
 
+# ---- V4 probes that are malformed by design (item 4) --------------------------------------------------------------------
+# Plan section 3.3 validates slots, type, unit, cardinality and the supported effect before the applicable policy (and
+# section 3.4 lists TYPE_INVALID for such a request). These V4 probes are malformed by construction, so the product
+# answers TYPE_INVALID before any authorization and a FORBIDDEN oracle can never be met:
+# - blob-<family>: the evidence blob endpoint carries no business command ("Capability and intent kind must match
+#   endpoint"). Neither the READ reader nor the authorized counter-call can write through it, so both expect a
+#   TYPE_INVALID refusal and zero commits. The FORBIDDEN proof for the same command stays on the well-formed direct/api
+#   variants (direct-<family>, C3 api-<capability>), and every zero-effect oracle of the blob subcase stays.
+# - destination-id-swap, renamed-action, return-bypass, disposal-bypass: an internal moveQuantity to a customer place is
+#   not a supported effect ("Configured internal storage and confirmed custody required", s2-inventory moveQuantity).
+# - raw-primitive: a raw primitive field is not a command field ("Unsupported command field").
+# The zero-effect and no-dispatch/return/disposal oracles of these subcases stay unchanged.
+V4_MALFORMED_MOVES = ('destination-id-swap', 'renamed-action', 'return-bypass', 'disposal-bypass', 'raw-primitive')
+
+
+def edit_v4_codes(changed, check):
+    path = ROOT / 'verification/cases/V4/case.json'
+    data, fmt, text = R12.load(path)
+    for sub in data['subcases']:
+        blob = sub['id'].startswith('blob-')
+        if not blob and sub['id'] not in V4_MALFORMED_MOVES:
+            continue
+        for assertion in sub['assertions']:
+            source = assertion.get('source') or {}
+            if source.get('pointer') == '/response/error/code' and assertion.get('expected') == 'FORBIDDEN' and source.get('actionId') in ('attempt', 'move'):
+                assertion['expected'] = 'TYPE_INVALID'
+            elif blob and assertion['id'] == 'authorized-route-reaches-command' and assertion.get('expected') == 'APPLIED':
+                assertion['expected'] = 'REJECTED'
+            elif blob and assertion['id'] == 'authorized-route-committed' and assertion.get('expected') == 1:
+                assertion['expected'] = 0
+    write(path, data, fmt, text, changed, check)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
@@ -249,6 +282,7 @@ def main():
     edit_c3_policies(changed, check)
     edit_split_children(changed, check)
     edit_reserve_lines(changed, check)
+    edit_v4_codes(changed, check)
     if check and changed:
         sys.exit('round 14 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 14: {len(changed)} file(s) changed')

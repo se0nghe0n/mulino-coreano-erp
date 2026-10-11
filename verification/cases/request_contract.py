@@ -671,7 +671,7 @@ class Contracts:
             interval, said = slots.pop(rule['from']), provenance.pop(rule['from'], None)
             slots[rule['to']] = interval  # replaces the cumulative period in place, else appended
             provenance[rule['to']] = said or provenance.get(rule['to']) or 'USER'
-        created = spec['createdSubjects']['capabilities'].get(capability)
+        created = list(spec['createdSubjects']['capabilities'].get(capability) or []) + list(spec['unboundSubjects']['capabilities'].get(capability) or [])
         if created and isinstance(body.get('subjectRefs'), list):
             body['subjectRefs'] = [r for r in body['subjectRefs'] if not (isinstance(r, dict) and r.get('type') in created)]
         rule = spec['subjectSlots']

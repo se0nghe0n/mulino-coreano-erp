@@ -1528,6 +1528,98 @@
       },
       "contractRef": "docs/execution/s2-inventory/contracts.md 명사 subject의 실제 대상 결합: subjectRefs do not copy authorization scopes; a command that creates an ID has no existing subject (registerItem), the typed slots already name the required targets so zero declarations are allowed, and a declared noun is checked by the common resolver against the handler's exact targets (CommandDefinitionResolver.verifySubjects: 'Declared subject differs from command target'). The shared-slot cases declared the noun of the entity the command creates (or, for assignCapability, the grant), which no handler binds; those declarations are dropped. A subject the handler binds (the Work and item of a sales order, the recipient actor of a grant) stays when a case declares it."
     },
+    "unboundSubjects": {
+      "capabilities": {
+        "approvePurchase": [
+          "PurchaseProposal"
+        ],
+        "revisePurchase": [
+          "PurchaseProposal"
+        ],
+        "proposeHandover": [
+          "Handover"
+        ],
+        "acceptHandover": [
+          "Handover"
+        ],
+        "rejectHandover": [
+          "Handover"
+        ],
+        "activatePolicy": [
+          "PolicyVersion"
+        ],
+        "approvePolicy": [
+          "PolicyVersion"
+        ],
+        "retirePolicy": [
+          "PolicyVersion"
+        ],
+        "recordCharge": [
+          "Invoice"
+        ],
+        "dispatchQuantity": [
+          "Allocation"
+        ],
+        "pickQuantity": [
+          "Allocation"
+        ],
+        "releaseAllocation": [
+          "Allocation"
+        ],
+        "replaceAllocation": [
+          "Allocation"
+        ],
+        "revokeGrant": [
+          "Grant"
+        ],
+        "revokeCapability": [
+          "Grant"
+        ],
+        "resolveObligation": [
+          "Obligation"
+        ],
+        "transferObligation": [
+          "Obligation"
+        ],
+        "waiveObligation": [
+          "Obligation"
+        ],
+        "proposeRecall": [
+          "Recall"
+        ],
+        "approveRecall": [
+          "Recall"
+        ],
+        "recordRecallNotice": [
+          "Recall"
+        ],
+        "recordRecovery": [
+          "Recall"
+        ],
+        "closeRecall": [
+          "Recall"
+        ],
+        "linkCanonicalOccurrence": [
+          "ReconciliationCase"
+        ],
+        "matchSourceIdentity": [
+          "ReconciliationCase"
+        ],
+        "recordExternalReconciliation": [
+          "ReconciliationCase"
+        ],
+        "resolveEvidenceConflict": [
+          "ReconciliationCase"
+        ],
+        "receiveReturn": [
+          "ReturnAuthorization"
+        ],
+        "decideReturnDisposition": [
+          "ReturnAuthorization"
+        ]
+      },
+      "contractRef": "step2r round 14 item 4 (s5d README Step 2 defect 4): the declared subject must be a noun the definition publishes and the handler binds (CommandDefinitionResolver.verifySubjects: 'Declared subject differs from command target', and with any declaration the definition must publish the capability verb: 'Subject action is not published'). The purchase handler binds TradeItem and Work, not the proposal (PurchaseCommands.subjectBindings); handovers, policy versions and invoices are not published definition nouns. Plan section 3.3 checks the subject contract before the applicable policy, so these C3/V4 probes were refused TYPE_INVALID before the authorization they test. The typed slots (proposalId, handoverId, id, invoiceId) already name the target and zero declarations are allowed (docs/execution/s2-inventory/contracts.md), so the unbound declaration is dropped; a bound one stays. The same holds for a declared noun the definition does not publish at all (Allocation, Grant, Obligation, Recall, ReconciliationCase, ReturnAuthorization are not nouns of the installed convention definition, verification/actual/scenarios/installer-conventions.json): the resolver refuses any declaration of an unpublished noun."
+    },
     "evidenceAliasSlots": {
       "rule": "A slot whose value is a plain string equal to a fixture evidence alias names that evidence: it is written {\"$alias\": name} so the harness sends the installed document ID.",
       "contractRef": "docs/execution/s1-evidence/contracts.md (every evidence ID is a server UUID; DocumentVersions, Events, CanonicalOccurrences), backend QueryRequests: aliases are resolved by clients, never as server IDs; SettlementCommands.java:83 and the trade/receipt/regulatory evidence ports read the slot as a document ID. Round 12 applied the same rule to request evidenceRefs. T13/T14/T15/T19/V8 wrote evidence, receiptEvidence, externalReceiptEvidence and evidenceRef slots as bare alias strings (T19 recordInvoice refused FORBIDDEN in run-9d213f5a)."
@@ -3742,6 +3834,24 @@
           ],
           "startQuantity": [
             "@literal:\"0\""
+          ]
+        },
+        "proposeRecall": {
+          "investigationId": [
+            "@Recall"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ]
+        },
+        "linkCanonicalOccurrence": {
+          "reconciliationId": [
+            "@ReconciliationCase"
+          ]
+        },
+        "revisePurchase": {
+          "changes": [
+            "@literal:{\"dueAt\": \"2026-10-10T09:00:00Z\"}"
           ]
         }
       }
