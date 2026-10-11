@@ -129,6 +129,8 @@ final class ScenarioJdbcObservation {
      *                name without the trailing plural s, entity = full CDS entity name, privilege).
      * @conditionResults  each element of AssessmentReferences.conditionsJson, with assessmentId, workId and the
      *                assessment's evaluatorVersion added when the element does not state them.
+     * @supervisionIssues  open supervisor hand-offs: RecoverySchedules HELD_MANUAL (kind = lastOutcome) and
+     *                IntakeRecoveries HELD_* (kind = lastCode); status OPEN, the recorded state kept as recordedState.
      */
     private static ArrayNode virtual(Connection c,String source,List<String> orgs,ObjectNode statement) throws SQLException {
         var out=Json.array();String in=String.join(",",Collections.nCopies(orgs.size(),"?"));
@@ -153,6 +155,16 @@ final class ScenarioJdbcObservation {
                 try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){JsonNode conditions;try{conditions=Json.parse(r.getString(4));}catch(Exception invalid){continue;}
                     if(conditions.isObject()&&conditions.has("conditions"))conditions=conditions.path("conditions");
                     for(JsonNode cond:conditions)if(cond.isObject()){var row=(ObjectNode)cond.deepCopy();if(!row.has("assessmentId"))row.put("assessmentId",r.getString(1));if(!row.has("workId"))row.put("workId",r.getString(2));if(!row.has("evaluatorVersion"))row.put("evaluatorVersion",r.getString(3));out.add(row);}}}}
+                statement.put("sql",sql);
+            }
+            case "@supervisionIssues" -> {
+                // A runtime recovery the scheduler could not complete by itself and handed to the supervisor (HELD_MANUAL),
+                // and an intake recovery held for its owner/supervisor. kind is the recorded hold outcome/code.
+                String sql="SELECT 'RecoverySchedules' AS src,ID,workId,ownerId,supervisorId,lastOutcome AS kind,recoveryStatus AS state,nextAction,nextCheckAt FROM mulino_runtime_RecoverySchedules WHERE organizationId IN ("+in+") AND recoveryStatus='HELD_MANUAL'"
+                    +" UNION ALL SELECT 'IntakeRecoveries',ID,COALESCE(linkedWorkId,createdWorkId),intakeOwnerId,supervisorId,lastCode,state,nextAction,nextCheckAt FROM mulino_runtime_IntakeRecoveries WHERE organizationId IN ("+in+") AND state LIKE 'HELD%' ORDER BY 2";
+                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++){st.setString(i+1,orgs.get(i));st.setString(orgs.size()+i+1,orgs.get(i));}
+                    try(var r=st.executeQuery()){while(r.next()){var row=Json.object();row.put("source",r.getString(1)).put("id",r.getString(2));put(row,"workId",r.getObject(3));put(row,"ownerId",r.getObject(4));put(row,"supervisorId",r.getObject(5));
+                        put(row,"kind",r.getObject(6));put(row,"recordedState",r.getObject(7));row.put("status","OPEN");put(row,"nextAction",r.getObject(8));put(row,"nextCheckAt",r.getObject(9));out.add(row);}}}
                 statement.put("sql",sql);
             }
             default -> throw new UnsupportedOperationException("virtual observation source "+source+" not implemented");

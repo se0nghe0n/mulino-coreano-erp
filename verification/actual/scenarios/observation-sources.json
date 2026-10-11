@@ -332,6 +332,9 @@
     ],
     "obligationResolutions": [
       "mulino_responsibility_ResolutionCredits"
+    ],
+    "supervisionIssues": [
+      "@supervisionIssues"
     ]
   },
   "approximate": [
@@ -349,7 +352,8 @@
     "dbPrivileges",
     "conditionResults",
     "workClosures",
-    "obligationResolutions"
+    "obligationResolutions",
+    "supervisionIssues"
   ],
   "approximateNote": "Sources whose table choice is still a guess (s5b review); an assertion failure on them is classified ADAPTER until the mapping is confirmed. confirmed lists the s5b review of the former s5a guesses.",
   "confirmed": {
@@ -390,6 +394,11 @@
   "virtual": {
     "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",
     "@dbPrivileges": "information_schema.role_table_grants of mulino_* tables",
-    "@conditionResults": "elements of AssessmentReferences.conditionsJson"
+    "@conditionResults": "elements of AssessmentReferences.conditionsJson",
+    "@supervisionIssues": "open supervisor hand-offs: RecoverySchedules HELD_MANUAL (kind=lastOutcome) and IntakeRecoveries HELD_* (kind=lastCode), status OPEN"
+  },
+  "unmapped": {
+    "locks": "the product keeps no durable record of fence/lock acquisitions (advisory locks are transaction-scoped); T04/T16/V3 read acquisitionOrdinal, lockedRevision, scopeFenceId of each acquisition",
+    "lockWaits": "pg_locks shows a waiting backend, but the product exposes neither the fence-key-to-scopeId mapping nor the barrier transactionId of a PostgreSQL backend; V2/V3/V8 read scopeId and transactionId"
   }
 }
