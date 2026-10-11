@@ -21,9 +21,10 @@ import org.mulino.verification.Json;
  */
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
-        "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation");
+        "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
+        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
-    static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation");
+    static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities");
     /**
      * Grant scope keys with no installable product dimension: mulino_identity_GrantScopes.scopeKind is CHECKed to
      * ORGANIZATION, TARGET, WORK, ITEM, PLACE, SOURCE. The grant is installed without them (broader than authored), so the
@@ -92,7 +93,7 @@ final class ScenarioFixtureInstaller {
             c=connection;c.setAutoCommit(false);
             try {
                 for(String org:externals.keySet()) insert("mulino_identity_Organizations",row("ID",aliases.path(org).asText(),"externalAlias",externals.get(org),"createdAt",asOf,"recordedAt",asOf));
-                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();sourceProfiles();evidence();sales();allocations();grants();
+                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();sourceProfiles();evidence();sales();allocations();tradeAliases();grants();
                 if(!partial&&!omitted.isEmpty())throw new UnsupportedOperationException("scenario fixture facts not installable: "+String.join("; ",omitted.subList(0,Math.min(12,omitted.size()))));
                 c.commit();
             } catch(Exception failure){c.rollback();for(Path b:writtenBlobs)java.nio.file.Files.deleteIfExists(b);throw failure;}
@@ -235,8 +236,9 @@ final class ScenarioFixtureInstaller {
             Map<String,List<String[]>> groups=new LinkedHashMap<>();
             for(String[] sc:scopes)groups.computeIfAbsent(unionGrantDimensions?sc[0]:"ALL",k->new ArrayList<>()).add(sc);
             if(groups.size()>1)conventions.add("grant of "+alias+" split into "+groups.size()+" single-dimension grants (probe unionGrantDimensions)");
+            String boundGrant=grantAlias(alias,grant.path("delegatorAlias").asText(alias));
             for(var group:groups.values()) {
-                String grantId=uuid();
+                String grantId=boundGrant!=null?id(boundGrant):uuid();boundGrant=null;
                 var g=row("organizationId",org,"ID",grantId,"actorId",actor,"delegatorId",delegator,"validFrom",from,"validUntil",until,"createdAt",asOf,"recordedAt",asOf);
                 if(grant.hasNonNull("revision"))g.put("revision",grant.path("revision").asInt());
                 if(grant.path("scope").hasNonNull("revokedAt"))g.put("revokedAt",time(grant.path("scope").path("revokedAt").asText()));
@@ -250,6 +252,8 @@ final class ScenarioFixtureInstaller {
                 var v=rootValidity.computeIfAbsent(delegatorAlias,k->new OffsetDateTime[]{from,until});if(from.isBefore(v[0]))v[0]=from;if(until.isAfter(v[1]))v[1]=until;
             }
         }
+        for(String g:aliasesOfType("Grant"))if(!boundGrantAliases.contains(g))omitted.add("Grant alias "+g+" names no installed actor grant");
+        managementAuthorities();
         for(var e:rootActions.entrySet()) {
             String alias=e.getKey(),actor=id(alias),org=org(alias);var v=rootValidity.get(alias);String grantId=uuid();
             insert("mulino_identity_Memberships",row("organizationId",org,"ID",uuid(),"actorId",actor,"validFrom",v[0],"validUntil",v[1],"createdAt",asOf,"recordedAt",asOf));
@@ -293,6 +297,7 @@ final class ScenarioFixtureInstaller {
         Set<String> authoredKinds=new HashSet<>();
         for(var it=fixture.path("aliases").fields();it.hasNext();) {
             var e=it.next();JsonNode a=e.getValue();if(!a.path("type").asText().equals("PolicyVersion"))continue;
+            if(DRAFT_POLICY_STATES.contains(a.path("state").asText())&&!a.path("content").isObject())continue; // installed as a PolicyDraft by tradeAliases()
             if(!a.path("content").isObject()||!a.hasNonNull("kind")||!a.hasNonNull("effectiveFrom")){omitted.add("PolicyVersion "+e.getKey()+" without authored kind/content/effectiveFrom");continue;}
             String org=orgOf.get(e.getKey());policy(org,id(e.getKey()),a.path("kind").asText(),a.path("version").asText(e.getKey()),a.path("content"),time(a.path("effectiveFrom").asText()),a.hasNonNull("effectiveUntil")?time(a.path("effectiveUntil").asText()):null,a.path("activate").asBoolean(true));
             authoredKinds.add(org+":"+a.path("kind").asText());
@@ -442,7 +447,7 @@ final class ScenarioFixtureInstaller {
             wait.put("overdueAction",authored.path("overdueAction").asText(w.path("overdueAction").asText("supervisor review")));
             row.put("waitJson",wait.toString());
         }
-        insert("mulino_work_read_Works",row);installedWorks.add(alias);
+        insert("mulino_work_read_Works",row);installedWorks.add(alias);workItems.put(alias,item);
         JsonNode goal=w.path("goal");
         if(goal.isObject()&&!goal.isEmpty()) {
             var slots=Json.object();
@@ -554,7 +559,7 @@ final class ScenarioFixtureInstaller {
                 "deliveryEndpoint",a.path("endpoint").asText(o.path("endpoint").asText("DELIVERED")),"qualityTerms","fixture-unspecified","packageTerms","fixture-unspecified","createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf);
             if(!syntheticLineTerms){syntheticLineTerms=true;conventions.add("SalesOrderLine terms not authored (price 0 / currency XXX unless monetaryReference, dueAt asOf+30d unless authored, endpoint DELIVERED unless authored, quality/package terms 'fixture-unspecified') installed as synthetic placeholders");}
             insert("mulino_trade_sales_OrderLines",r);
-            var installed=Json.object();installed.put("work",work).put("customer",customer).put("unit",unit);lines.put(l,installed);
+            var installed=Json.object();installed.put("work",work).put("customer",customer).put("unit",unit).put("item",item);lines.put(l,installed);
         }
     }
     /**
@@ -602,6 +607,228 @@ final class ScenarioFixtureInstaller {
     private boolean referencedByLine(String order,List<String> saleLines){for(String l:saleLines)if(order.equals(fixture.path("aliases").path(l).path("salesOrderAlias").asText(null)))return true;return !saleLines.isEmpty();}
     private final Set<String> installedWorks=new HashSet<>();
     private boolean installedWork(String alias){return installedWorks.contains(alias);}
+
+
+    // ---- trade, governance and evidence aliases (S3-2) ---------------------------------------------------------------
+    static final Set<String> DRAFT_POLICY_STATES=Set.of("DRAFT","IN_REVIEW","APPROVED","PUBLISHED");
+    private final Map<String,String> workItems=new HashMap<>();
+    private final Set<String> installedDocs=new HashSet<>();
+    /** Installed purchase lines: alias -> {work,item,destination,unit,quantity,price,currency}. */
+    private final Map<String,ObjectNode> purchaseLines=new LinkedHashMap<>();
+    private final Set<String> boundGrantAliases=new HashSet<>();
+    private boolean syntheticTradeTerms;
+    /**
+     * Authored trade/governance aliases (plan §6 and §7.2 nouns) become the product rows their getObject/verb reads use.
+     * Facts the fixture states are copied; NOT NULL columns it never states get explicit synthetic placeholders recorded as
+     * installer conventions. Every install is all-or-omitted: an alias whose required relation (Work, item, segment, place,
+     * document, sales/purchase line) is not installed is listed in omittedFacts instead of being guessed further.
+     */
+    private void tradeAliases() throws Exception {
+        for(String a:aliasesOfType("PurchaseProposal"))purchaseProposal(a);
+        for(String a:aliasesOfType("PurchaseOrderLine"))purchaseOrder(null,a);
+        for(String a:aliasesOfType("PurchaseOrder"))purchaseOrder(a,null);
+        for(String a:aliasesOfType("Invoice"))invoice(a);
+        Set<String> investigations=new HashSet<>();
+        for(String a:aliasesOfType("Recall"))recall(a,investigations);
+        for(String a:aliasesOfType("Investigation"))if(!investigations.contains(a))investigation(a,null);
+        for(String a:aliasesOfType("Shipment"))shipment(a);
+        for(String a:aliasesOfType("CargoScope"))if(!installedCargo.contains(a))omitted.add("CargoScope "+a+" without an installed Shipment");
+        for(String a:aliasesOfType("RegulatoryProcedure"))regulatory(a);
+        for(String a:aliasesOfType("ReconciliationCase"))reconciliation(a);
+        for(String a:aliasesOfType("PolicyVersion"))policyDraft(a);
+        if(syntheticTradeTerms)conventions.add("trade aliases: NOT NULL terms the fixture does not state are synthetic placeholders (price 0 / currency XXX unless authored, dueAt asOf+30d, endpoint ARRIVED, quantityMode CUMULATIVE_EVENT, channel/carrier 'fixture-unspecified', source namespace scenario-fixture)");
+    }
+    private JsonNode facts(String alias){return fixture.path("aliases").path(alias);}
+    private String recorder(String org){if(aliases.has("supervisor")&&org.equals(orgOf.get("supervisor")))return id("supervisor");return firstActor(org);}
+    private String human(String org,String... preferred){for(String p:preferred)if(p!=null&&aliases.has(p)&&org.equals(orgOf.get(p))&&Set.of("Human").contains(facts(p).path("type").asText("Human")))return p;return aliases.has("supervisor")&&org.equals(orgOf.get("supervisor"))?"supervisor":null;}
+    private String workFor(JsonNode a,String org){
+        String w=firstAlias(a,"workAlias","logisticsWorkAlias","responsibleWorkAlias");if(w!=null)return installedWorks.contains(w)?w:null;
+        String baseline=fixture.path("baseline").path("work").path("alias").asText(null);if(baseline!=null&&installedWorks.contains(baseline)&&org.equals(orgOf.get(baseline)))return baseline;
+        String only=null;for(String x:installedWorks)if(org.equals(orgOf.get(x))){if(only!=null)return null;only=x;}return only;
+    }
+    private String itemFor(JsonNode a,String org,String work){String i=firstAlias(a,"itemAlias");if(i!=null)return itemUnits.containsKey(i)?i:null;if(work!=null&&workItems.containsKey(work))return workItems.get(work);String only=onlyInOrg("TradeItem",org);return only!=null&&itemUnits.containsKey(only)?only:null;}
+    /** The segment a scoped fact names, else the organization's only installed segment of that item with the same quantity/unit. */
+    private String segmentFor(JsonNode a,String org,String item) {
+        String s=firstAlias(a,"rootSegmentAlias","segmentAlias","scopeSegmentAlias","physicalScopeAlias");if(s!=null)return installedSegments.contains(s)?s:null;
+        String found=null;for(var e:segmentEntries().entrySet()){if(!installedSegments.contains(e.getKey())||!org.equals(orgOf.get(e.getKey())))continue;JsonNode v=e.getValue();
+            if(item!=null&&!item.equals(v.path("itemAlias").asText(item)))continue;if(a.hasNonNull("quantity")&&new BigDecimal(a.path("quantity").asText()).compareTo(new BigDecimal(v.path("quantity").asText("0")))!=0)continue;if(found!=null)return null;found=e.getKey();}
+        return found;
+    }
+    private String document(JsonNode a,String org){String d=firstAlias(a,"evidenceAlias","documentAlias","basisDocumentAlias");if(d!=null)return installedDocs.contains(d)?d:null;if(installedDocs.contains("DOC")&&org.equals(orgOf.get("DOC")))return "DOC";for(String x:installedDocs)if(org.equals(orgOf.get(x)))return x;return null;}
+    private String internalPlace(String org,String except){List<String> c=new ArrayList<>();for(String p:aliasesOfType("Place"))if(org.equals(orgOf.get(p))&&"INTERNAL_STORAGE".equals(facts(p).path("kind").asText())&&!p.equals(except))c.add(p);Collections.sort(c);return c.isEmpty()?null:c.get(0);}
+    private static boolean hex64(String v){return v!=null&&v.matches("[0-9a-f]{64}");}
+    private String supplier(JsonNode a,String org) throws SQLException {
+        String s=firstAlias(a,"supplierAlias");if(s==null)s=onlyInOrg("Supplier",org);if(s!=null)return id(s);
+        String key=org+":S:synthetic";String id=aliases.has(key)?aliases.path(key).asText():null;if(id!=null)return id;id=uuid();aliases.put(key,id);orgOf.put(key,org);
+        insert("mulino_trade_purchase_Suppliers",row("organizationId",org,"ID",id,"name","scenario synthetic supplier","revision",1,"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+        conventions.add("purchase facts without a Supplier alias use one synthetic Supplier row per organization");return id;
+    }
+    /** ProposalRevisions terms; null when a required relation is not installed. */
+    private ObjectNode proposalTerms(String alias,JsonNode a,String org) throws Exception {
+        String work=workFor(a,org),item=itemFor(a,org,work),destination=firstAlias(a,"destinationAlias","placeAlias");
+        if(destination==null){JsonNode goal=fixture.path("baseline").path("work").path("goal");if(work!=null&&work.equals(fixture.path("baseline").path("work").path("alias").asText()))destination=firstAlias(goal,"destinationAlias");}
+        if(work==null||item==null||destination==null||!a.hasNonNull("quantity")){omitted.add(facts(alias).path("type").asText()+" "+alias+" (work/item/destination/quantity not resolvable)");return null;}
+        var t=Json.object();t.put("work",work).put("item",item).put("destination",destination).put("quantity",a.path("quantity").asText()).put("unit",a.path("unit").asText(itemUnits.get(item)));
+        if(!a.hasNonNull("price")&&!a.hasNonNull("unitPrice")||!a.hasNonNull("currency")||!a.hasNonNull("dueAt"))syntheticTradeTerms=true;
+        t.put("price",a.path("price").asText(a.path("unitPrice").asText("0"))).put("currency",a.path("currency").asText("XXX")).put("dueAt",a.hasNonNull("dueAt")?time(a.path("dueAt").asText()).toInstant().toString():asOf.plusDays(30).toInstant().toString());
+        t.put("endpoint",a.path("endpoint").asText("ARRIVED")).put("quantityMode",a.path("quantityMode").asText("CUMULATIVE_EVENT"));
+        return t;
+    }
+    private void proposalRows(String org,String proposal,ObjectNode t,JsonNode a,String status,int revision) throws Exception {
+        String supplier=supplier(a,org);
+        var canonical=new TreeMap<String,Object>();t.fields().forEachRemaining(f->canonical.put(f.getKey(),f.getValue().asText()));canonical.put("proposalId",proposal);canonical.put("revision",String.valueOf(revision));canonical.put("supplierId",supplier);
+        String hash=hex64(a.path("canonicalHash").asText(null))?a.path("canonicalHash").asText():sha(Json.MAPPER.writeValueAsBytes(canonical));
+        insert("mulino_trade_purchase_Proposals",row("organizationId",org,"ID",proposal,"workId",id(t.path("work").asText()),"currentRevision",revision,"status",status,"createdAt",asOf,"revision",1,"recordedAt",asOf,"effectiveAt",asOf));
+        insert("mulino_trade_purchase_ProposalRevisions",row("organizationId",org,"ID",uuid(),"proposalId",proposal,"revision",revision,"workId",id(t.path("work").asText()),"itemId",id(t.path("item").asText()),"supplierId",supplier,"destinationId",id(t.path("destination").asText()),
+            "quantity",new BigDecimal(t.path("quantity").asText()),"unit",t.path("unit").asText(),"price",new BigDecimal(t.path("price").asText()),"currency",t.path("currency").asText(),"dueAt",time(t.path("dueAt").asText()),"endpoint",t.path("endpoint").asText(),"quantityMode",t.path("quantityMode").asText(),
+            "proposalHash",hash,"reason","authored fixture proposal","recordedAt",asOf,"createdAt",asOf,"effectiveAt",asOf));
+        t.put("proposalHash",hash).put("supplierId",supplier);
+    }
+    /** PurchaseProposal IN_REVIEW/PROPOSED -> Proposals(PROPOSED) + its one ProposalRevision (proposalRevision, else revision, else 1). */
+    private void purchaseProposal(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias);String state=a.path("state").asText("PROPOSED");
+        if(!Set.of("PROPOSED","IN_REVIEW").contains(state)){omitted.add("PurchaseProposal "+alias+" state "+state+" (only an unapproved proposal is installable without an authored approval)");return;}
+        ObjectNode t=proposalTerms(alias,a,org);if(t==null)return;
+        proposalRows(org,id(alias),t,a,"PROPOSED",a.path("proposalRevision").asInt(a.path("revision").asInt(1)));
+        if(state.equals("IN_REVIEW"))conventions.add("PurchaseProposal "+alias+" IN_REVIEW installed as product status PROPOSED (the product has no separate review state before approvePurchase)");
+    }
+    /**
+     * PurchaseOrder / PurchaseOrderLine -> an ORDERED proposal, its APPROVE decision, the dispatched order and one line. The
+     * approval, order channel and outbox id are synthetic: the fixture states the order, not the approval/dispatch history.
+     * A line alias takes its terms from baseline.historicalFacts.purchase when that names the line (T19).
+     */
+    private void purchaseOrder(String orderAlias,String lineAlias) throws Exception {
+        String alias=orderAlias!=null?orderAlias:lineAlias;ObjectNode a=(ObjectNode)facts(alias).deepCopy();String org=orgOf.get(alias);
+        JsonNode history=fixture.path("baseline").path("historicalFacts").path("purchase");
+        if(lineAlias!=null&&lineAlias.equals(history.path("lineAlias").asText(null))){history.fields().forEachRemaining(f->{if(!a.has(f.getKey()))a.set(f.getKey(),f.getValue());});
+            if(!a.has("price")&&history.has("unitPrice"))a.set("price",history.path("unitPrice"));
+            if(history.has("received"))notRepresented.add("PurchaseOrderLine "+lineAlias+" historical receipt "+history.path("received").asText()+" (ReceiptCredits need a canonical receipt occurrence the fixture does not install)");}
+        if(orderAlias!=null){for(String l:aliasesOfType("PurchaseOrderLine"))if(orderAlias.equals(facts(l).path("orderAlias").asText(null))){conventions.add("PurchaseOrder "+orderAlias+" installed with its line alias "+l);return;}}
+        if(lineAlias!=null&&purchaseLines.containsKey(lineAlias))return;
+        ObjectNode t=proposalTerms(alias,a,org);if(t==null)return;
+        String proposal=uuid(),approval=uuid(),order=orderAlias!=null?id(orderAlias):firstAlias(a,"orderAlias")!=null?id(firstAlias(a,"orderAlias")):uuid(),line=lineAlias!=null?id(lineAlias):uuid();
+        String approver=human(org,firstAlias(a,"approverAlias"),"manager");if(approver==null){omitted.add("PurchaseOrder "+alias+" without a human approver alias");return;}
+        proposalRows(org,proposal,t,a,"ORDERED",1);
+        insert("mulino_trade_purchase_Approvals",row("organizationId",org,"ID",approval,"proposalId",proposal,"proposalRevision",1,"proposalHash",t.path("proposalHash").asText(),"approverId",id(approver),"policyHash",sha(("scenario-fixture-policy:"+alias).getBytes()),"decision","APPROVE","conditionsJson","[]",
+            "decidedAt",asOf,"validUntil",asOf.plusDays(1),"revision",1,"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+        update("UPDATE mulino_trade_purchase_Proposals SET currentApprovalId=? WHERE organizationId=? AND ID=?",approval,org,proposal);
+        insert("mulino_trade_purchase_Orders",row("organizationId",org,"ID",order,"proposalId",proposal,"proposalRevision",1,"proposalHash",t.path("proposalHash").asText(),"approvalId",approval,"channel","fixture-unspecified","externalOperationId","scenario-fixture:"+alias,"outboxId",uuid(),"createdAt",asOf,"conditionAssessmentJson","{\"decision\":\"UNCONDITIONAL\"}","revision",a.path("revision").asInt(1),"recordedAt",asOf,"effectiveAt",asOf));
+        String state=a.path("state").asText("DISPATCH_PENDING"),status=switch(state){case "ACCEPTED","SUPPLIER_ACCEPTED"->"SUPPLIER_ACCEPTED";case "REJECTED","SUPPLIER_REJECTED"->"SUPPLIER_REJECTED";default->"DISPATCH_PENDING";};
+        insert("mulino_trade_purchase_OrderLines",row("organizationId",org,"ID",line,"orderId",order,"proposalId",proposal,"proposalRevision",1,"workId",id(t.path("work").asText()),"itemId",id(t.path("item").asText()),"destinationId",id(t.path("destination").asText()),
+            "quantity",new BigDecimal(t.path("quantity").asText()),"unit",t.path("unit").asText(),"status",status,"revision",1,"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf));
+        if(status.startsWith("SUPPLIER_"))notRepresented.add("PurchaseOrder "+alias+" supplier "+state+" (line status only: a SupplierReply row needs a verified canonical occurrence the fixture does not state)");
+        conventions.add("PurchaseOrder "+alias+" installed as an ORDERED proposal, a synthetic APPROVE decision by "+approver+", a dispatched order (channel fixture-unspecified) and line status "+status);
+        purchaseLines.put(lineAlias!=null?lineAlias:alias,t.put("line",line).put("lineAlias",lineAlias!=null?lineAlias:alias));
+    }
+    /** Invoice -> settlement Invoices on the purchase line it names (else the only purchase line, else the only sales line). */
+    private void invoice(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias);
+        String line=firstAlias(a,"lineAlias","purchaseLineAlias","salesLineAlias","orderLineAlias");String scope=null,work=null,item=null;
+        List<String> purchase=new ArrayList<>();for(var e:purchaseLines.entrySet())if(org.equals(orgOf.get(e.getKey())))purchase.add(e.getKey());
+        List<String> sale=new ArrayList<>();for(String l:lines.keySet())if(org.equals(orgOf.get(l)))sale.add(l);
+        if(line==null&&purchase.size()==1)line=purchase.get(0);if(line==null&&purchase.isEmpty()&&sale.size()==1)line=sale.get(0);
+        if(line!=null&&purchaseLines.containsKey(line)){scope="PURCHASE";work=purchaseLines.get(line).path("work").asText();item=purchaseLines.get(line).path("item").asText();}
+        else if(line!=null&&lines.containsKey(line)){scope="SALE";work=lines.get(line).path("work").asText();item=lines.get(line).path("item").asText(null);}
+        String doc=document(a,org);
+        if(scope==null||item==null||doc==null||!a.hasNonNull("quantity")||!a.hasNonNull("amount")&&!a.hasNonNull("originalAmount")){omitted.add("Invoice "+alias+" (line/item/document/quantity/amount not resolvable)");return;}
+        BigDecimal q=new BigDecimal(a.path("quantity").asText()),amount=new BigDecimal(a.path("amount").asText(a.path("originalAmount").asText()));
+        BigDecimal unitPrice=a.hasNonNull("unitPrice")?new BigDecimal(a.path("unitPrice").asText()):amount.divide(q,12,java.math.RoundingMode.UNNECESSARY);
+        String lineId=scope.equals("PURCHASE")?purchaseLines.get(line).path("line").asText():id(line);String kind=a.path("kind").asText(a.path("invoiceKind").asText("COMMERCIAL"));
+        insert("mulino_trade_settlement_Invoices",row("organizationId",org,"ID",id(alias),"revision",a.path("revision").asInt(1),"createdAt",asOf.toLocalDateTime(),"recordedAt",asOf.toLocalDateTime(),"effectiveAt",asOf.toLocalDateTime(),"workId",id(work),"itemId",id(item),"lineId",lineId,"referenceId",uuid(),
+            "scopeKind",scope,"invoiceKind",kind,"sourceNamespace","scenario-fixture","sourceKey",alias+"-"+id(alias),"sourceVersion","1","sourceHash",sha(("scenario-fixture-invoice:"+alias).getBytes()),"evidenceId",id(doc),"quantity",q,"unit",a.path("unit").asText(),
+            "unitPrice",unitPrice,"originalAmount",amount,"currency",a.path("currency").asText(),"taxReferenceOnly",kind.equals("DOMESTIC_TAX")));
+        conventions.add("Invoice "+alias+" installed on "+scope+" line "+line+" with evidence "+doc+" and a synthetic referenceId/source key (the fixture states amounts only)");
+    }
+    private final Set<String> installedCargo=new HashSet<>();
+    /**
+     * Recall -> the product Recall noun is the recall Investigation; a Recall naming investigationAlias shares that
+     * Investigation's id (alias rebound) and its scope version is the RecallScope (version, hash, root segment, range).
+     */
+    private void recall(String alias,Set<String> investigations) throws Exception {
+        JsonNode a=facts(alias);String inv=firstAlias(a,"investigationAlias");
+        if(inv!=null&&"Investigation".equals(facts(inv).path("type").asText())){aliases.put(alias,id(inv));investigations.add(inv);conventions.add("Recall "+alias+" bound to its investigation "+inv+" (the product Recall noun is the Investigation; the recall scope version is its RecallScope)");investigation(inv,a);}
+        else investigation(alias,a);
+    }
+    private void investigation(String alias,JsonNode recall) throws Exception {
+        ObjectNode a=(ObjectNode)facts(alias).deepCopy();if(recall!=null)recall.fields().forEachRemaining(f->{if(!a.has(f.getKey()))a.set(f.getKey(),f.getValue());});
+        String org=orgOf.get(alias),work=workFor(a,org),item=itemFor(a,org,work),segment=segmentFor(a,org,item);
+        if(work==null||item==null||segment==null||!a.hasNonNull("quantity")){omitted.add(facts(alias).path("type").asText()+" "+alias+" (work/item/segment/quantity not resolvable)");return;}
+        String lot=firstAlias(a,"lotAlias");if(lot==null){JsonNode s=segmentEntries().get(segment);lot=s==null?null:firstAlias(s,"lotAlias");}
+        String owner=human(org,firstAlias(a,"ownerAlias")),supervisor=human(org,firstAlias(a,"supervisorAlias"));if(owner==null)owner=supervisor;
+        if(owner==null){omitted.add("Investigation "+alias+" owner/supervisor not resolvable");return;}
+        String scope=recall!=null?uuid():null;
+        insert("mulino_trade_recall_Investigations",row("organizationId",org,"ID",id(alias),"revision",a.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"occurredAt",asOf,"itemId",id(item),"lotId",lot==null?null:id(lot),"segmentId",id(segment),"workId",id(work),
+            "quantity",new BigDecimal(a.path("quantity").asText()),"unit",a.path("unit").asText(itemUnits.get(item)),"startQuantity",new BigDecimal(a.path("startQuantity").asText("0")),"basisEvidenceId",document(a,org)==null?null:id(document(a,org)),"impactState",a.path("impactState").asText("CANDIDATE"),
+            "status",scope==null?"INVESTIGATING":"PROPOSED","currentScopeId",scope,"ownerId",id(owner),"supervisorId",id(supervisor==null?owner:supervisor),"nextAction",a.path("nextAction").asText("authored fixture recall review"),"nextCheckAt",a.hasNonNull("nextCheckAt")?time(a.path("nextCheckAt").asText()):asOf.plusHours(1)));
+        if(scope!=null){
+            int version=a.path("scopeVersion").asInt(1);String hash=hex64(a.path("scopeHash").asText(null))?a.path("scopeHash").asText():sha(("scenario-fixture-recall-scope:"+alias+":"+version).getBytes());
+            insert("mulino_trade_recall_Scopes",row("organizationId",org,"ID",scope,"revision",1,"createdAt",asOf,"recordedAt",asOf,"investigationId",id(alias),"version",version,"scopeHash",hash,"rootSegmentId",id(segment),"startQuantity",new BigDecimal(a.path("startQuantity").asText("0")),
+                "quantity",new BigDecimal(a.path("quantity").asText()),"unit",a.path("unit").asText(itemUnits.get(item)),"itemId",id(item),"lotId",lot==null?null:id(lot),"workId",id(work),"reason","authored fixture recall scope"));
+        }
+    }
+    /** Shipment -> Shipments(state as authored) + one ShipmentCargo per CargoScope alias naming it (else one synthetic cargo from the shipment's own quantity). */
+    private void shipment(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias);
+        String origin=firstAlias(a,"originAlias");if(origin==null)origin=internalPlace(org,null);String destination=firstAlias(a,"destinationAlias");if(destination==null)destination=internalPlace(org,origin);
+        List<String> cargo=new ArrayList<>();for(String cs:aliasesOfType("CargoScope"))if(alias.equals(facts(cs).path("shipmentAlias").asText(null))||cs.equals(a.path("cargoScopeAlias").asText(null)))cargo.add(cs);
+        String rec=recorder(org);
+        if(origin==null||destination==null||rec==null){omitted.add("Shipment "+alias+" (origin/destination/recorder not resolvable)");return;}
+        String work=firstAlias(a,"workAlias");if(work!=null&&!installedWorks.contains(work))work=null;
+        insert("mulino_trade_shipment_Shipments",row("organizationId",org,"ID",id(alias),"revision",a.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"originId",id(origin),"destinationId",id(destination),"carrierRef","fixture-unspecified","workId",work==null?null:id(work),"state",a.path("state").asText("PLANNED")));
+        if(!a.hasNonNull("originAlias"))conventions.add("Shipment "+alias+" origin/destination not authored: the organization's first two INTERNAL_STORAGE places "+origin+" -> "+destination);
+        if(cargo.isEmpty()&&a.hasNonNull("quantity")){String item=itemFor(a,org,null);if(item!=null){insert("mulino_trade_shipment_ShipmentCargo",row("organizationId",org,"ID",uuid(),"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"shipmentId",id(alias),"itemId",id(item),"plannedQuantity",new BigDecimal(a.path("quantity").asText()),"unit",a.path("unit").asText(itemUnits.get(item))));}}
+        for(String cs:cargo){JsonNode c0=facts(cs);String item=itemFor(c0,org,null);if(item==null||!c0.hasNonNull("quantity")){omitted.add("CargoScope "+cs+" (item/quantity not resolvable)");continue;}
+            insert("mulino_trade_shipment_ShipmentCargo",row("organizationId",org,"ID",id(cs),"revision",c0.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"shipmentId",id(alias),"itemId",id(item),"plannedQuantity",new BigDecimal(c0.path("quantity").asText()),"unit",c0.path("unit").asText(itemUnits.get(item))));installedCargo.add(cs);}
+    }
+    /** RegulatoryProcedure -> Procedures + one ProcedureVersions head (status = authored state) on the physical segment it scopes. */
+    private void regulatory(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias),work=workFor(a,org),item=itemFor(a,org,work),segment=segmentFor(a,org,item),rec=recorder(org);
+        if(work==null||item==null||segment==null||rec==null){omitted.add("RegulatoryProcedure "+alias+" (work/item/segment not resolvable)");return;}
+        String lot=firstAlias(a,"lotAlias");if(lot==null){JsonNode s=segmentEntries().get(segment);lot=s==null?null:firstAlias(s,"lotAlias");}String version=uuid();
+        insert("mulino_trade_regulatory_Procedures",row("organizationId",org,"ID",id(alias),"revision",a.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"itemId",id(item),"lotId",lot==null?null:id(lot),"physicalScopeId",id(segment),"workId",id(work)));
+        insert("mulino_trade_regulatory_ProcedureVersions",row("organizationId",org,"ID",version,"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"procedureId",id(alias),"itemId",id(item),"lotId",lot==null?null:id(lot),"physicalScopeId",id(segment),"workId",id(work),"status",a.path("state").asText("PREPARED"),"occurredAt",asOf));
+        update("UPDATE mulino_trade_regulatory_Procedures SET currentVersionId=? WHERE organizationId=? AND ID=?",version,org,id(alias));
+        if(a.hasNonNull("policyVersion"))notRepresented.add("RegulatoryProcedure "+alias+" policyVersion "+a.path("policyVersion").asText()+" (no regulatory Policies row is authored; the procedure is installed without policyId)");
+    }
+    /** ReconciliationCase OPEN -> an UNVERIFIED Reconciliations row over a synthetic item Claim on the fixture document. */
+    private void reconciliation(String alias) throws Exception {
+        JsonNode a=facts(alias);String org=orgOf.get(alias),item=itemFor(a,org,workFor(a,org)),doc=document(a,org),rec=recorder(org);
+        String owner=human(org,firstAlias(a,"ownerAlias","intakeOwnerAlias")),supervisor=human(org,firstAlias(a,"supervisorAlias"));if(supervisor==null)supervisor=owner;
+        if(item==null||doc==null||rec==null||owner==null){omitted.add("ReconciliationCase "+alias+" (item/document/owner not resolvable)");return;}
+        String state=a.path("state").asText("OPEN");if(!Set.of("OPEN","UNVERIFIED").contains(state)){omitted.add("ReconciliationCase "+alias+" state "+state+" (only an open case is installable without an authored decision basis)");return;}
+        String profile=profile(org,"scenario-fixture",rec,rec,"fixture-v1"),claim=uuid(),event=uuid(),zone=fixture.path("clock").path("timezone").asText("UTC"),payload="{\"source\":\"scenario-fixture-reconciliation-case\",\"alias\":\""+alias+"\"}";
+        insert("mulino_evidence_Events",row("ID",event,"organizationId",org,"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"subjectKind","ITEM","subjectId",id(item),"itemId",id(item),"effectiveFrom",asOf,"timeZone",zone,"timePrecision","SECOND","valueState","UNKNOWN",
+            "kind","SCENARIO_FIXTURE_RECONCILIATION","sourceNamespace","scenario-fixture","sourceProfileId",profile,"externalEventId","scenario-fixture:"+alias+":"+id(alias),"sourceVersion","1","payloadHash",sha(payload.getBytes(java.nio.charset.StandardCharsets.UTF_8)),"payload",payload));
+        insert("mulino_evidence_Claims",row("sourceProfileId",profile,"ID",claim,"organizationId",org,"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"subjectKind","ITEM","subjectId",id(item),"itemId",id(item),"effectiveFrom",asOf,"timeZone",zone,"timePrecision","SECOND","valueState","UNKNOWN","eventId",event,"documentVersionId",id(doc),"assertion",payload));
+        insert("mulino_evidence_Reconciliations",row("ID",id(alias),"organizationId",org,"revision",a.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"recordedBy",rec,"subjectKind","ITEM","subjectId",id(item),"itemId",id(item),"sourceProfileId",profile,"claimId",claim,"basisDocumentId",id(doc),"policyVersion","fixture-v1",
+            "decision","UNVERIFIED","reason","authored fixture reconciliation case "+state,"sourceIdentity","scenario-fixture:"+alias,"effectiveFrom",asOf,"intakeOwnerId",id(owner),"supervisorId",id(supervisor),"nextAction",a.path("nextAction").asText("authored fixture reconciliation review"),"nextCheckAt",a.hasNonNull("nextCheckAt")?time(a.path("nextCheckAt").asText()):asOf.plusHours(1)));
+        conventions.add("ReconciliationCase "+alias+" ("+state+") installed as an UNVERIFIED reconciliation over a synthetic item event/claim on "+doc);
+    }
+    /** PolicyVersion with a draft state and no content -> PolicyDrafts (IN_REVIEW -> DRAFT: the product's approvePolicy takes a DRAFT). */
+    private void policyDraft(String alias) throws Exception {
+        JsonNode a=facts(alias);String state=a.path("state").asText();if(!DRAFT_POLICY_STATES.contains(state)||a.path("content").isObject())return;
+        String org=orgOf.get(alias);var content=Json.object();content.put("source","scenario-fixture-policy-draft").put("alias",alias);
+        String hash=hex64(a.path("hash").asText(null))?a.path("hash").asText():FixtureInstaller.contentHash(content);
+        insert("mulino_governance_PolicyDrafts",row("organizationId",org,"ID",id(alias),"kind",a.path("kind").asText("SCENARIO_FIXTURE_DRAFT"),"version",a.path("version").asText(alias),"content",content.toString(),"contentHash",hash,"source","scenario fixture","regressionEvidence","scenario fixture",
+            "effectiveFrom",a.hasNonNull("effectiveFrom")?time(a.path("effectiveFrom").asText()):asOf,"legallyRestrictive",false,"fixtureOnly",true,"status",Set.of("APPROVED","PUBLISHED").contains(state)?"APPROVED":"DRAFT","revision",a.path("revision").asInt(1)));
+        conventions.add("PolicyVersion "+alias+" ("+state+") installed as a PolicyDrafts row with the authored hash; content is a synthetic placeholder (the fixture states state/hash only), kind SCENARIO_FIXTURE_DRAFT unless authored");
+        if(Set.of("APPROVED","PUBLISHED").contains(state))notRepresented.add("PolicyVersion "+alias+" "+state+" installed as an APPROVED draft without a PolicyApprovals row (approver not authored; the product's policy states are DRAFT/APPROVED/ACTIVE/RETIRED)");
+    }
+    /** baseline.managementAuthorities -> ManagementAuthorities (plan §7.2 management capability of a human; scope ORGANIZATION or an installed alias). */
+    private void managementAuthorities() throws Exception {
+        for(JsonNode m:fixture.path("baseline").path("managementAuthorities")){
+            String actor=firstAlias(m,"actorAlias");String kind=m.path("scopeKind").asText("ORGANIZATION");String scope=firstAlias(m,"scopeAlias");
+            if(actor==null||!m.hasNonNull("capabilityId")||!m.hasNonNull("validFrom")||!m.hasNonNull("validUntil")){omitted.add("managementAuthority without actor/capability/validity");continue;}
+            String org=org(actor);String scopeId=scope!=null?id(scope):kind.equals("ORGANIZATION")?org:null;if(scopeId==null){omitted.add("managementAuthority "+actor+" "+m.path("capabilityId").asText()+" scope not resolvable");continue;}
+            insert("mulino_identity_ManagementAuthorities",row("organizationId",org,"ID",uuid(),"actorId",id(actor),"capabilityId",m.path("capabilityId").asText(),"scopeKind",kind,"scopeId",scopeId,"validFrom",time(m.path("validFrom").asText()),"validUntil",time(m.path("validUntil").asText()),
+                "revokedAt",m.hasNonNull("revokedAt")?time(m.path("revokedAt").asText()):null,"revision",m.path("revision").asInt(1)));
+        }
+    }
+    /** The Grant alias whose facts name this actor (and its delegator): the actor's installed grant takes the alias id. */
+    private String grantAlias(String actor,String delegator) {
+        for(String g:aliasesOfType("Grant")){JsonNode a=facts(g);if(boundGrantAliases.contains(g)||!actor.equals(a.path("actorAlias").asText(null)))continue;if(a.hasNonNull("delegatorAlias")&&!a.path("delegatorAlias").asText().equals(delegator))continue;boundGrantAliases.add(g);conventions.add("Grant alias "+g+" bound to the installed grant of "+actor);return g;}
+        return null;
+    }
 
     // ---- evidence documents ----------------------------------------------------------------------------------------
     private final Map<String,String> profiles=new HashMap<>();
@@ -661,7 +888,7 @@ final class ScenarioFixtureInstaller {
                 "sourceNamespace",namespace,"sourceProfileId",profile,"sourceReference",e.path("externalEventId").asText(a.path("fixtureContent").path("externalEventId").asText(null)),"availability",blob!=null?"AVAILABLE":"UNKNOWN",
                 "provenance",blob!=null?"{\"source\":\"scenario-installer-resolved-canonical-content\"}":"{\"source\":\"scenario-installer-authored-hash-only\"}");
             if(blob!=null)doc.put("blobId",blob);
-            insert("mulino_evidence_DocumentVersions",doc);
+            insert("mulino_evidence_DocumentVersions",doc);installedDocs.add(alias);
             if(recorded!=asOf)conventions.add("evidence "+alias+" recorded at its declared late-known instant "+recorded);
         }
     }
