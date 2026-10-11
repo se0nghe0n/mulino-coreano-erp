@@ -8,7 +8,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class AssessmentQueries implements com.mulino.application.work.WorkAssessmentRead {
  private final AssessmentRepository repository;private final ReadAuthorizer auth;
  public AssessmentQueries(AssessmentRepository repository,ReadAuthorizer auth){this.repository=repository;this.auth=auth;}
- @Transactional(readOnly=true) public List<Map<String,Object>> snapshots(DomainContext c,String workId){auth.authorizeScopes(c,"getAssessment",Map.of("WORK",List.of(workId)));return repository.rows(c,"mulino.evaluation.InputSnapshots").stream().filter(x->workId.equals(x.get("workId"))).toList();}
+ /** An optional sub-read of getWork: its FORBIDDEN is caught by the caller, so it must not mark the shared read transaction rollback-only. */
+ @Transactional(readOnly=true,noRollbackFor=DomainError.class) public List<Map<String,Object>> snapshots(DomainContext c,String workId){auth.authorizeScopes(c,"getAssessment",Map.of("WORK",List.of(workId)));return repository.rows(c,"mulino.evaluation.InputSnapshots").stream().filter(x->workId.equals(x.get("workId"))).toList();}
  @Transactional(readOnly=true) public QueryResult query(DomainContext c,QueryRequest q){
   if(q.id()==null||!q.filters().isEmpty()||!Set.of("organizationId","workId").containsAll(q.scope().keySet()))throw DomainError.invalid("Assessment identifier required");
   var a=repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(x->q.id().equals(x.get("ID"))).findFirst().orElseThrow(DomainError::forbidden);
