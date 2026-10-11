@@ -27,7 +27,7 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 class ControlPersistenceTest {
  @org.springframework.boot.test.context.TestConfiguration static class TimeFixture { @org.springframework.context.annotation.Bean Clock clock(){return Clock.fixed(Instant.parse("2026-10-08T00:00:00Z"),ZoneOffset.UTC);}
   @org.springframework.context.annotation.Bean CommandHandler twoWorksHandler(JdbcTemplate jdbc){return new CommandHandler(){
-    public Set<String> capabilities(){return Set.of("fixtureTwoWorks");}
+    public Set<String> capabilities(){return Set.of("fixtureTwoWorks");}public boolean publishesSlots(){return false;}
     public CommandPreparation prepare(DomainContext c,Map<String,Object> intent){var works=(List<String>)IdentityCommands.payload(intent).get("works");if(works==null||works.size()!=2||new HashSet<>(works).size()!=2)throw DomainError.invalid("Two distinct works required");works.forEach(CommandRequests::uuid);return CommandPreparation.ordinary(Map.of("WORK",List.copyOf(works)),works.stream().map(w->"control-fixture:"+w).toList(),"CONTROL_TEST",null,null);}
     public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){var works=(List<String>)IdentityCommands.payload(intent).get("works");jdbc.update("INSERT INTO control_fixture_effects(organizationId,ID,work1,work2) VALUES(?,?,?,?)",c.organizationId(),UUID.randomUUID().toString(),works.get(0),works.get(1));return Map.of("outcome","APPLIED","effects",Map.of("works",List.copyOf(works)));}
   };}

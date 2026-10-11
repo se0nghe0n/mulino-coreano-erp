@@ -57,7 +57,7 @@ public class ResponsibilityCommands implements CommandHandler {
   * Negative decisions are kept. The guard re-verifies all bindings when the waiver executes.
   */
  private Map<String,Object> decideWaiver(DomainContext c,Map<String,Object> i,Map<String,Object> p,String cap){
-  if(!Set.of("assignmentId","decision","reason","validUntil").containsAll(p.keySet()))throw DomainError.invalid("Unsupported waiver decision slot");
+  if(!CapabilitySlots.allowed(cap).containsAll(p.keySet()))throw DomainError.invalid("Unsupported waiver decision slot");
   String assignmentId=text(p,"assignmentId"),decision=text(p,"decision"),reason=text(p,"reason");
   if(!Set.of("APPROVE","REJECT").contains(decision))throw DomainError.invalid("Waiver decision must be APPROVE or REJECT");
   Instant until;try{until=Instant.parse(text(p,"validUntil"));}catch(java.time.format.DateTimeParseException e){throw DomainError.invalid("validUntil instant required");}

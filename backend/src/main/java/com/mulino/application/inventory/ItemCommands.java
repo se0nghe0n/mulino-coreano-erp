@@ -25,7 +25,7 @@ public final class ItemCommands implements CommandHandler {
   var p=InventoryCommands.slots(intent);String capability=InventoryCommands.text(intent,"capabilityId",100);
   if(!"COMMAND".equals(intent.get("intentKind")))throw DomainError.invalid("Metadata COMMAND required");
   if(capability.equals("registerItem")) {
-   if(!Set.of("name","baseUnit","decimalPlaces","specificationHash","packagingHash","specificationDescription","packagingDescription").containsAll(p.keySet()))throw DomainError.invalid("Unsupported item slot");
+   if(!CapabilitySlots.allowed("registerItem").containsAll(p.keySet()))throw DomainError.invalid("Unsupported item slot");
    InventoryCommands.text(p,"name",240);InventoryCommands.text(p,"baseUnit",40);
    for(String key:List.of("specificationHash","packagingHash"))if(!InventoryCommands.text(p,key,64).matches("[0-9a-f]{64}"))throw DomainError.invalid("Version SHA-256 required");
    decimalPlaces(p);
@@ -33,7 +33,7 @@ public final class ItemCommands implements CommandHandler {
    return CommandPreparation.ordinary(Map.of("ORGANIZATION",List.of(c.organizationId())),List.of("inventory/metadata"),"ITEM_METADATA",null,null);
   }
   if(!capability.equals("linkExternalId"))throw DomainError.unsupported();
-  if(!Set.of("itemId","issuer","namespace","value","validFrom","validUntil").containsAll(p.keySet()))throw DomainError.invalid("Unsupported external identity slot");
+  if(!CapabilitySlots.allowed("linkExternalId").containsAll(p.keySet()))throw DomainError.invalid("Unsupported external identity slot");
   String item=InventoryCommands.uuid(p,"itemId");var row=repository.current(c,"TradeItems",item);
   String issuer=InventoryCommands.text(p,"issuer",240),namespace=InventoryCommands.text(p,"namespace",160),value=InventoryCommands.text(p,"value",240);
   interval(p);

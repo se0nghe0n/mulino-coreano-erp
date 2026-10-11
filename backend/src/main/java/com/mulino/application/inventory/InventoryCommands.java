@@ -26,15 +26,7 @@ public final class InventoryCommands implements CommandHandler {
   public Set<String> intentKinds(){return Set.of("COMMAND","RECORD");}
   public CommandPreparation prepare(DomainContext c,Map<String,Object> intent) {
     String capability=text(intent,"capabilityId",100);var slots=slots(intent);Instant at=time(c,slots);
-    Set<String> allowed=switch(capability) {
-      case "splitQuantity" -> Set.of("segmentId","quantities","unit","occurredAt","evidenceRef");
-      case "mergeQuantity" -> Set.of("segmentIds","expectedRevisions","occurredAt","evidenceRef");
-      case "moveQuantity" -> Set.of("segmentId","destinationId","occurredAt","evidenceRef");
-      case "recordStocktake" -> Set.of("segmentId","observedQuantity","unit","occurredAt","evidenceRef");
-      case "adjustQuantity" -> Set.of("segmentId","quantity","unit","direction","reason","stocktakeId","occurredAt","evidenceRef");
-      case "disposeQuantity" -> Set.of("segmentId","quantity","unit","reason","occurredAt","evidenceRef");
-      default -> throw DomainError.unsupported();
-    };
+    Set<String> allowed=CapabilitySlots.allowed(capability);
     if(!allowed.containsAll(slots.keySet()))throw DomainError.invalid("Unsupported stock command slot");
     if(!Objects.equals(intent.get("intentKind"),capability.equals("recordStocktake")?"RECORD":"COMMAND"))throw DomainError.invalid("Stock command intent kind mismatch");
     text(slots,"evidenceRef",240);

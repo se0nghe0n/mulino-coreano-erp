@@ -9,9 +9,9 @@ import static com.mulino.application.evidence.EvidenceCommandInputs.*;
 import static com.mulino.domain.evidence.EvidenceTypes.*;
 @Service
 public class EvidenceRecordCommands implements CommandHandler {
-  private static final Set<String> EVENT=Set.of("subject","kind","sourceNamespace","externalEventId","sourceVersion","effectiveFrom","effectiveUntil","timeZone","timePrecision","valueState","payload","supersedesId","invalidatesId","documentId","assertion","quantity","unit","evidenceType");
-  private static final Set<String> DOCUMENT=Set.of("subject","sourceNamespace","sourceReference","mediaType","expectedHash","provenance","supersedesId","contentBase64","evidenceType");
-  private static final Set<String> CLAIM=Set.of("subject","sourceNamespace","eventId","documentId","assertion","quantity","unit","valueState","supersedesId","evidenceType");
+  private static final Set<String> EVENT=CapabilitySlots.form("correctEvidence","EVENT");
+  private static final Set<String> DOCUMENT=CapabilitySlots.form("correctEvidence","DOCUMENT");
+  private static final Set<String> CLAIM=CapabilitySlots.form("correctEvidence","CLAIM");
   private static String type(String capability,Map<String,Object> slots) {
     String type=Objects.toString(slots.get("evidenceType"),"attachEvidence".equals(capability)?"DOCUMENT":"EVENT");
     if(!Set.of("EVENT","DOCUMENT","CLAIM").contains(type))throw new DomainError("HELD","CAPABILITY_UNSUPPORTED","Evidence correction type unsupported");

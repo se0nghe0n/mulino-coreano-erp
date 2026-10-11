@@ -150,7 +150,7 @@ class S3SharedIntegrationTest {
   }
   @TestConfiguration static class Configuration {
     @Bean CommandHandler sharedImpactHandler(TradeImpact impact,WorkAccess works){return new CommandHandler(){
-      public Set<String> capabilities(){return Set.of("s3SharedImpact");}
+      public Set<String> capabilities(){return Set.of("s3SharedImpact");}public boolean publishesSlots(){return false;}
       public CommandPreparation prepare(DomainContext c,Map<String,Object> intent){var p=(Map<String,Object>)intent.get("slots");String id=p.get("workId").toString();var w=works.require(c,id,false);return CommandPreparation.ordinary(Map.of("WORK",List.of(id),"ITEM",List.of(w.get("itemId").toString())),List.of("work:"+id),"TRADE_IMPACT",id,((Number)w.get("revision")).intValue());}
       public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation p){return List.of(SubjectBinding.required("Work",Set.of(p.targetId())));}
       public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){var p=(Map<String,Object>)intent.get("slots");String id=p.get("workId").toString();impact.recorded(c,id,p.get("sourceId").toString(),"REGULATORY_REVIEW",p.get("physicalScopeId").toString(),"Review regulatory evidence",Instant.now().plusSeconds(3600));if(Boolean.TRUE.equals(p.get("fail")))throw new DomainError("HELD","FIXTURE_FAILURE","Rollback shared impact");return Map.of("outcome","APPLIED","effects",Map.of("workId",id));}
