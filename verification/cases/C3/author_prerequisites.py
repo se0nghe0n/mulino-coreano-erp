@@ -209,7 +209,9 @@ def patch_sub(sub, cap):
         # Plan §6/§13.1 D18·§13.3 E2: recall decisions need a current ADMIN approval of the exact scope;
         # closure needs notice, recovery and disposal of the whole approved scope and a closure record.
         query=copy.deepcopy(actions['target-before']);query.update(id='precondition-recall',actorRef='delegator',request={'objectId':alias('RECALL')},evidenceRefs=['precondition-recall:actual-artifact']);pre.append(query)
-        scope=lambda:{'recallId':alias('RECALL'),'scopeVersion':ref('precondition-recall','/response/data/scopeVersion'),'scopeHash':ref('precondition-recall','/response/data/scopeHash')}
+        # step2r round 14 (s5d finding 6): the product Recall noun is the Investigation; its approval, notice, recovery and
+        # closure name the current RecallScope, which the recall read returns as data.scopeId (RecallQueries.view).
+        scope=lambda:{'scopeId':ref('precondition-recall','/response/data/scopeId'),'scopeVersion':ref('precondition-recall','/response/data/scopeVersion'),'scopeHash':ref('precondition-recall','/response/data/scopeHash')}
         approval_slots=dict(scope(),decision='APPROVED',validUntil=END,reason='승인 scope20의 회수 결정')
         approved=lambda:dict(scope(),approvalId=ref('precondition-approval','/response/approvalId'))
         notice_slots=lambda:dict(approved(),noticeEvidenceId=alias('RECALL-NOTICE-DOC'),noticedAt=NOW,channel='SYNTHETIC_CUSTOMER_NOTICE')
@@ -389,6 +391,13 @@ def self_check(n):
         strip=lambda r:{k:v for k,v in r.items() if k not in ['commandIdempotencyKey','expectedRevision']}
         assert strip(acts['attempt']['request'])==strip(acts['authorized-same-input']['request']),s['id']
         assert all(x['oracleRef']['observationNames']!=['read-audit-permitted'] for x in s['assertions'] if x['id'].startswith(('precondition-','authorized-business-'))),s['id']
+# step2r round 14 (s5d finding 3): getAccessContext answers the caller's active grants as data.grants[] (each ID, actions,
+# scopes; IdentityQueries.grantView). No contract names a flat grantId/grantActions field. Each actor holds one all-of grant
+# (user decision 2026-10-09), so the reader's current grant is grants/0.
+ACCESS_POINTERS={'/response/data/grantId':'/response/data/grants/0/ID','/response/data/grantActions':'/response/data/grants/0/actions'}
+def access_pointers(sub):
+    for a in sub['assertions']:
+        if a['source'].get('pointer') in ACCESS_POINTERS:a['source']['pointer']=ACCESS_POINTERS[a['source']['pointer']]
 def main():
     path=DIR/'case.json';n=json.loads(path.read_text())
     public=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
@@ -396,6 +405,7 @@ def main():
     for cap in RECALL_CAPS+('emergencyReassign',):prepare_recall_fixture(cap)
     if 'skills' not in n['profiles']:n['profiles'].append('skills')
     for s in n['subcases']:
+        access_pointers(s)
         if s['id'].startswith('model-query'):model_query(s,public);continue
         cap=s['id'].split('-',1)[1]
         if cap in PREREQUISITE_CAPS:patch_sub(s,cap)
