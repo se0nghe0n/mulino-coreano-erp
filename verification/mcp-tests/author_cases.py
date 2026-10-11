@@ -154,8 +154,11 @@ def purchase_slot(value,provenance='CONTEXT'):
  return dict(value,provenance=provenance) if isinstance(value,dict) and 'value' in value else {'value':value,'provenance':provenance}
 def purchase_command(cap,key,slots,revision=1):
  return {'intentKind':'COMMAND','definitionVersion':'definition-v1','capabilityId':cap,'subjectRefs':[{'type':'TradeItem','id':alias('P')}],'slots':slots,'conditions':[],'evidenceRefs':[],'expectedRevision':revision,'commandIdempotencyKey':key}
+# step2r round 14 (s5d finding 8): the purchase Work O1 has no LOT (plan section 3.3 identifies the lot at receipt), so its
+# read names the organization and item only; a lotId scope the Work does not present is refused FORBIDDEN (all-of).
+PURCHASE_SCOPE={k:v for k,v in SCOPE.items() if k!='lotId'}
 def purchase_work():
- return action('purchase-work','getWork',{'id':alias('O1'),'scope':SCOPE,'asOf':TIME,'knownAt':KNOWN})
+ return action('purchase-work','getWork',{'id':alias('O1'),'scope':PURCHASE_SCOPE,'asOf':TIME,'knownAt':KNOWN})
 def purchase_proposal(key):
  slots={'quantity':purchase_slot({'value':'100','unit':'BOX'},'USER'),'price':purchase_slot({'value':'2','currency':'EUR'},'USER'),'supplierId':purchase_slot(alias('SUP')),'destinationId':purchase_slot(alias('W')),'dueAt':purchase_slot('2026-10-09T09:00:00Z','USER'),'endpoint':purchase_slot('ARRIVED','USER'),'quantityMode':purchase_slot('CUMULATIVE_EVENT','USER'),'ownerId':purchase_slot(alias('writer')),'supervisorId':purchase_slot(alias('supervisor')),'workId':purchase_slot(alias('O1')),'goalVersionId':purchase_slot(ref('purchase-work','/response/data/goal/id'))}
  return purchase_command('proposePurchase',key,slots)

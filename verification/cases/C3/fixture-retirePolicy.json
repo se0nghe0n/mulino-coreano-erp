@@ -1640,7 +1640,26 @@
       "POLICY": {
         "state": "ACTIVE",
         "revision": 1,
-        "hash": "421bf77e57b1afab10a6c229c232cd1ab613295ad0d2c8416bb7fc84c74ed7e3"
+        "hash": "421bf77e57b1afab10a6c229c232cd1ab613295ad0d2c8416bb7fc84c74ed7e3",
+        "kind": "SCENARIO_BUSINESS_POLICY",
+        "version": "synthetic-authority-v1",
+        "content": {
+          "synthetic": true,
+          "source": "개발 fixture의 가상 승인된 업무 정책이며 실제 법규가 아니다",
+          "effectiveAt": "2026-10-07T00:00:00Z",
+          "decisionOwnerAlias": "delegator",
+          "regulatory": "ALLOWED",
+          "qc": "ALLOWED",
+          "customer": "ALLOWED",
+          "disposition": "ALLOWED",
+          "receiptEvidencePolicy": "identified-physical-event-with-immutable-versioned-source-evidence",
+          "audit": "query-and-denial-allowed; business-effects-atomic",
+          "retention": {
+            "effectRecordsUntil": "2027-10-07T00:00:00Z",
+            "idempotencyTombstonesUntil": "2027-10-07T00:00:00Z"
+          }
+        },
+        "effectiveFrom": "2026-10-07T00:00:00Z"
       },
       "SHIPMENT": {
         "revision": 1,
