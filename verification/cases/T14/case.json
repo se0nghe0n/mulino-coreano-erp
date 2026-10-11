@@ -49,28 +49,13 @@
               "segmentId": {
                 "$alias": "Q100"
               },
-              "children": [
-                {
-                  "alias": "A40",
-                  "quantity": "40",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "B10",
-                  "quantity": "10",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "A20",
-                  "quantity": "20",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "B30",
-                  "quantity": "30",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "40",
+                "10",
+                "20",
+                "30"
               ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "need"
               },
@@ -85,7 +70,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -127,7 +113,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/A40/segmentId"
+                      "pointer": "/response/children/0/segmentId"
                     }
                   },
                   "quantity": {
@@ -142,7 +128,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/B10/segmentId"
+                      "pointer": "/response/children/1/segmentId"
                     }
                   },
                   "quantity": {
@@ -229,7 +215,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/A20/segmentId"
+                      "pointer": "/response/children/2/segmentId"
                     }
                   },
                   "quantity": {
@@ -244,7 +230,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/B30/segmentId"
+                      "pointer": "/response/children/3/segmentId"
                     }
                   },
                   "quantity": {
@@ -387,7 +373,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/A40/segmentId"
+                      "pointer": "/response/children/0/segmentId"
                     }
                   },
                   "quantity": {
@@ -497,7 +483,6 @@
                 }
               },
               "legIndex": "1",
-              "eventKind": "ARRIVED",
               "placeId": {
                 "$alias": "KR-port"
               },
@@ -505,7 +490,8 @@
               "eventClass": "ACTUAL",
               "evidence": {
                 "$alias": "supplier-ship"
-              }
+              },
+              "kind": "ARRIVED"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-port",
@@ -517,11 +503,11 @@
             "provenance": {
               "shipmentId": "CONTEXT",
               "legIndex": "USER",
-              "eventKind": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "eventClass": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -554,7 +540,6 @@
                 }
               },
               "legIndex": "1",
-              "eventKind": "ARRIVED",
               "placeId": {
                 "$alias": "KR-port"
               },
@@ -562,7 +547,8 @@
               "eventClass": "ACTUAL",
               "evidence": {
                 "$alias": "supplier-ship"
-              }
+              },
+              "kind": "ARRIVED"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-port",
@@ -574,11 +560,11 @@
             "provenance": {
               "shipmentId": "CONTEXT",
               "legIndex": "USER",
-              "eventKind": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "eventClass": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -727,7 +713,6 @@
                 }
               },
               "legIndex": "2",
-              "eventKind": "ARRIVED",
               "placeId": {
                 "$alias": "W"
               },
@@ -735,7 +720,8 @@
               "eventClass": "ACTUAL",
               "evidence": {
                 "$alias": "warehouse-receipt"
-              }
+              },
+              "kind": "ARRIVED"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S1-W",
@@ -747,11 +733,11 @@
             "provenance": {
               "shipmentId": "CONTEXT",
               "legIndex": "USER",
-              "eventKind": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "eventClass": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -845,7 +831,6 @@
                 }
               },
               "legIndex": "2",
-              "eventKind": "ARRIVED",
               "placeId": {
                 "$alias": "W"
               },
@@ -853,7 +838,8 @@
               "eventClass": "ACTUAL",
               "evidence": {
                 "$alias": "warehouse-receipt"
-              }
+              },
+              "kind": "ARRIVED"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-many-to-many-S2-W",
@@ -865,11 +851,11 @@
             "provenance": {
               "shipmentId": "CONTEXT",
               "legIndex": "USER",
-              "eventKind": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "eventClass": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -1137,7 +1123,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A40/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "40",
@@ -1156,7 +1142,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B10/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "10",
@@ -1175,7 +1161,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A20/segmentId"
+                  "pointer": "/response/children/2/segmentId"
                 }
               },
               "20",
@@ -1194,7 +1180,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B30/segmentId"
+                  "pointer": "/response/children/3/segmentId"
                 }
               },
               "30",
@@ -1351,7 +1337,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A40/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               {
@@ -1362,7 +1348,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B10/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               {
@@ -1373,7 +1359,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A20/segmentId"
+                  "pointer": "/response/children/2/segmentId"
                 }
               },
               {
@@ -1384,7 +1370,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B30/segmentId"
+                  "pointer": "/response/children/3/segmentId"
                 }
               },
               {
@@ -1576,7 +1562,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A40/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "40",
@@ -1589,7 +1575,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B10/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "10",
@@ -1602,7 +1588,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A20/segmentId"
+                  "pointer": "/response/children/2/segmentId"
                 }
               },
               "20",
@@ -1615,7 +1601,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B30/segmentId"
+                  "pointer": "/response/children/3/segmentId"
                 }
               },
               "30",
@@ -1744,7 +1730,6 @@
               "segmentId": {
                 "$alias": "Q100"
               },
-              "eventKind": "SHIPPED_CLAIM",
               "quantity": "100",
               "unit": "BOX",
               "placeId": {
@@ -1752,7 +1737,8 @@
               },
               "evidence": {
                 "$alias": "supplier-ship"
-              }
+              },
+              "kind": "SHIPPED_CLAIM"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-shipped",
@@ -1764,11 +1750,11 @@
             "provenance": {
               "purchaseId": "CONTEXT",
               "segmentId": "CONTEXT",
-              "eventKind": "USER",
               "quantity": "CONTEXT",
               "unit": "CONTEXT",
               "placeId": "CONTEXT",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -1930,7 +1916,6 @@
                   "pointer": "/response/children/REMAINDER2/segmentId"
                 }
               },
-              "eventKind": "IN_TRANSIT_CONFIRMED",
               "quantity": "2",
               "unit": "BOX",
               "placeId": {
@@ -1938,7 +1923,8 @@
               },
               "evidence": {
                 "$alias": "custody"
-              }
+              },
+              "kind": "IN_TRANSIT_CONFIRMED"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-transit2-transit2",
@@ -1950,11 +1936,11 @@
             "provenance": {
               "purchaseId": "CONTEXT",
               "segmentId": "CONTEXT",
-              "eventKind": "USER",
               "quantity": "CONTEXT",
               "unit": "CONTEXT",
               "placeId": "CONTEXT",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -2747,7 +2733,6 @@
               "segmentId": {
                 "$alias": "Q100"
               },
-              "eventKind": "SHIPPED_CLAIM",
               "quantity": "100",
               "unit": "BOX",
               "placeId": {
@@ -2755,7 +2740,8 @@
               },
               "evidence": {
                 "$alias": "supplier-ship"
-              }
+              },
+              "kind": "SHIPPED_CLAIM"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-discrepancy-unobserved2-shipped",
@@ -2767,11 +2753,11 @@
             "provenance": {
               "purchaseId": "CONTEXT",
               "segmentId": "CONTEXT",
-              "eventKind": "USER",
               "quantity": "CONTEXT",
               "unit": "CONTEXT",
               "placeId": "CONTEXT",
-              "evidence": "USER"
+              "evidence": "USER",
+              "kind": "USER"
             }
           },
           "evidenceRefs": [
@@ -3690,14 +3676,14 @@
                   "pointer": "/response/activityId"
                 }
               },
-              "parentWorkId": {
-                "$alias": "OLD-WORK"
-              },
               "ownerId": {
                 "$alias": "intake"
               },
               "nextAction": "원천 물량과 근거를 대조한다",
-              "nextCheckAt": "2026-10-07T10:00:00Z"
+              "nextCheckAt": "2026-10-07T10:00:00Z",
+              "workId": {
+                "$alias": "OLD-WORK"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T14-orphan-temperature-followup",
@@ -3708,10 +3694,10 @@
             ],
             "provenance": {
               "sourceActivityId": "CONTEXT",
-              "parentWorkId": "CONTEXT",
               "ownerId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workId": "CONTEXT"
             }
           },
           "evidenceRefs": [

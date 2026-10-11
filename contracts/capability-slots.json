@@ -2,12 +2,23 @@
   "$id": "urn:mulino:capability-slots:1",
   "recordType": "CAPABILITY_SLOT_CONTRACT",
   "schemaVersion": "1.0.0",
-  "description": "User decision 2026-10-11 (3): the product publishes the slot names each command capability accepts. The backend loads this file (CapabilitySlots) and the command pipeline rejects any other slot name with TYPE_INVALID before the handler; handlers that distinguish forms read their form from the same file. ./verify prepare checks every case command against it. Value shapes are contracts/intent.schema.json; names here are wire names.",
+  "description": "User decision 2026-10-11 (3): the product publishes the slot names each command capability accepts. The backend loads this file (CapabilitySlots) and the command pipeline rejects any other slot name with TYPE_INVALID before the handler; handlers that distinguish forms read their form from the same file. ./verify prepare checks every case command against it. Value shapes are contracts/intent.schema.json; names here are wire names. A capability may also state its response fields (response); those are documentation of the product response, not request slots.",
   "capabilities": {
     "acceptHandover": {
       "slots": [
         "handoverId"
       ]
+    },
+    "activateDefinition": {
+      "slots": [
+        "definitionId",
+        "effectiveAt",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. Moves the organization's single ACTIVE pointer to a PUBLISHED, not retired package (also a rollback to a prior package).",
+      "response": {
+        "state": "ACTIVE"
+      }
     },
     "activatePolicy": {
       "slots": [
@@ -30,6 +41,26 @@
         "stocktakeId",
         "unit"
       ]
+    },
+    "approveDefinition": {
+      "slots": [
+        "affectedWorkIds",
+        "consumptionPolicy",
+        "decision",
+        "definitionId",
+        "goalChanges",
+        "hash",
+        "reason",
+        "reviewId",
+        "reviewKind",
+        "validFrom",
+        "validUntil"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. A human other than the drafter and the submitter decides APPROVED or REJECTED (reason required); REJECTED returns the package to DRAFT. consumptionPolicy ONE_PACKAGE_PUBLISH (DEFINITION) or ONE_MIGRATION (WORK_MIGRATION).",
+      "response": {
+        "approvalId": "approval ID",
+        "decision": "APPROVED|REJECTED"
+      }
     },
     "approvePolicy": {
       "slots": [
@@ -218,6 +249,24 @@
       },
       "note": "evidenceType selects the form (default EVENT)"
     },
+    "createDefinitionDraft": {
+      "slots": [
+        "definitionId",
+        "package",
+        "parentDefinitionId",
+        "parentDraftRevision",
+        "regressionFixtureRefs",
+        "version"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. A new draft names package (+ version, parentDefinitionId, regressionFixtureRefs); a revised draft names definitionId and parentDraftRevision (= the lifecycle revision) and keeps the version. organizationId is optional, id/state/contentHash are server-assigned, unknown fields are TYPE_INVALID.",
+      "response": {
+        "definitionId": "package ID",
+        "hash": "SHA-256 of the stored content",
+        "revision": "lifecycle revision (expectedRevision of the next lifecycle command)",
+        "state": "DRAFT|IN_REVIEW|PUBLISHED|ACTIVE|RETIRED_FOR_NEW_WORK",
+        "version": "package version"
+      }
+    },
     "createDraft": {
       "slots": [
         "conditions",
@@ -237,6 +286,8 @@
         "itemId",
         "kind",
         "lotId",
+        "nextAction",
+        "nextCheckAt",
         "observationPolicy",
         "originalText",
         "ownerId",
@@ -262,6 +313,8 @@
           "evidencePolicyVersion",
           "includeReservations",
           "lotId",
+          "nextAction",
+          "nextCheckAt",
           "observationPolicy",
           "originalText",
           "ownerId",
@@ -280,12 +333,14 @@
           "itemId",
           "kind",
           "lotId",
+          "nextAction",
+          "nextCheckAt",
           "originalText",
           "ownerId",
           "supervisorId"
         ]
       },
-      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject"
+      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject. UD-2 (2026-10-11, plan §5.2): nextAction (text ≤320) and nextCheckAt (instant) are stated together; activation opens the Work-sourced initial duty WORK_NEXT_ACTION and closeWork discharges it."
     },
     "createFollowup": {
       "slots": [
@@ -340,14 +395,26 @@
         "dueAt",
         "itemId",
         "orderId",
+        "ownerId",
         "packageTerms",
         "price",
         "qualityTerms",
         "quantity",
         "reason",
+        "supervisorId",
         "unit",
         "workId"
-      ]
+      ],
+      "note": "UD-1 (2026-10-11, plan §6): workId is optional. Without it the order creates its own DRAFT delivery Work owned by ownerId (default: the requesting human) and supervised by supervisorId (default: the owner). price and currency are optional and stated together.",
+      "response": {
+        "workId": "the order's delivery Work (created or named)",
+        "orderId": "order root",
+        "line": {
+          "id": "order line ID (= effects.lineId)",
+          "revisionId": "order revision",
+          "orderId": "order root"
+        }
+      }
     },
     "createShipment": {
       "slots": [
@@ -378,6 +445,8 @@
         "itemId",
         "kind",
         "lotId",
+        "nextAction",
+        "nextCheckAt",
         "observationPolicy",
         "originalText",
         "ownerId",
@@ -403,6 +472,8 @@
           "evidencePolicyVersion",
           "includeReservations",
           "lotId",
+          "nextAction",
+          "nextCheckAt",
           "observationPolicy",
           "originalText",
           "ownerId",
@@ -421,12 +492,14 @@
           "itemId",
           "kind",
           "lotId",
+          "nextAction",
+          "nextCheckAt",
           "originalText",
           "ownerId",
           "supervisorId"
         ]
       },
-      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject"
+      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject. UD-2 (2026-10-11, plan §5.2): nextAction (text ≤320) and nextCheckAt (instant) are stated together; activation opens the Work-sourced initial duty WORK_NEXT_ACTION and closeWork discharges it."
     },
     "createWorkLink": {
       "slots": [
@@ -582,6 +655,22 @@
         "segmentIds"
       ]
     },
+    "migrateWorkDefinition": {
+      "slots": [
+        "approvalId",
+        "endpoint",
+        "migrationId",
+        "quantity",
+        "reason",
+        "targetDefinitionId",
+        "workId"
+      ],
+      "note": "Plan §8 explicit Work migration. The Work's human owner applies a current WORK_MIGRATION approval of the PUBLISHED, not retired target whose capability manifest lists migrationId in supportedWorkMigration and whose review names the Work. quantity {value,unit} and endpoint must equal the approved goalChanges. A new GoalVersion keeps previousGoalId; the approval is consumed (ONE_MIGRATION).",
+      "response": {
+        "goalVersionId": "new GoalVersion",
+        "workId": "migrated Work"
+      }
+    },
     "moveQuantity": {
       "slots": [
         "destinationId",
@@ -685,6 +774,18 @@
         "startQuantity",
         "unit"
       ]
+    },
+    "publishDefinition": {
+      "slots": [
+        "approvalId",
+        "definitionId",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. IN_REVIEW→PUBLISHED with a current unconsumed APPROVED approval of the hash; without one WAITING_APPROVAL. Published content cannot be resubmitted (no package slot).",
+      "response": {
+        "hash": "unchanged package hash",
+        "approvalId": "consumed approval"
+      }
     },
     "receiveProvisional": {
       "slots": [
@@ -795,6 +896,7 @@
     },
     "recordDelivery": {
       "slots": [
+        "allocationId",
         "canonicalOccurrenceId",
         "cargoScopeId",
         "customerId",
@@ -820,6 +922,7 @@
           "observationId"
         ],
         "observation": [
+          "allocationId",
           "cargoScopeId",
           "customerId",
           "dispatchId",
@@ -839,7 +942,7 @@
           "workId"
         ]
       },
-      "note": "confirmation form when canonicalOccurrenceId confirms an observation"
+      "note": "confirmation form when canonicalOccurrenceId confirms an observation. allocationId (plan §6 '이미 소비된 배분 참조', optional) must be the CONSUMED allocation of the named dispatchId."
     },
     "recordDispositionBasis": {
       "slots": [
@@ -1168,6 +1271,16 @@
         "workId"
       ]
     },
+    "retireDefinition": {
+      "slots": [
+        "definitionId",
+        "reason"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. RETIRED_FOR_NEW_WORK: no new Work may pin it; the ACTIVE pointer to it is removed; existing Work keeps its pinned meaning.",
+      "response": {
+        "state": "RETIRED_FOR_NEW_WORK"
+      }
+    },
     "retirePolicy": {
       "slots": [
         "id",
@@ -1220,7 +1333,8 @@
         "reason",
         "unit",
         "workId"
-      ]
+      ],
+      "note": "workId is optional and must equal the order's Work when stated; price and currency are optional and stated together."
     },
     "revokeCapability": {
       "slots": [
@@ -1246,7 +1360,32 @@
         "quantities",
         "segmentId",
         "unit"
-      ]
+      ],
+      "note": "UD-3 (2026-10-11): children carry no name slot; quantities is the ordered list of child quantities (decision 1 array slot, 2..100).",
+      "response": {
+        "children": "array in request order of {index, segmentId, quantity, unit}; index is the 0-based position in quantities. A later action reads child i as /response/children/<i>/segmentId (RFC6901 index pointer)",
+        "effects.segmentIds": "the same child segment IDs in quantity order",
+        "allocations": "EXECUTABLE/SUSPENDED allocations this split moved onto its children, in child order then range start: {id, revision, childIndex, segmentId, startQuantity, quantity, unit, state, predecessorId}"
+      }
+    },
+    "submitDefinitionReview": {
+      "slots": [
+        "affectedDataIds",
+        "affectedWorkIds",
+        "definitionId",
+        "hash",
+        "mapping",
+        "migrationId",
+        "regressionRunIds",
+        "reviewKind",
+        "unsupportedValues",
+        "validationId"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. reviewKind DEFINITION (default; DRAFT→IN_REVIEW, needs a publishable validationId of the same hash) or WORK_MIGRATION (on a PUBLISHED package; migrationId, affectedWorkIds, mapping).",
+      "response": {
+        "reviewId": "review ID",
+        "data": "review payload"
+      }
     },
     "transferObligation": {
       "slots": [
@@ -1259,6 +1398,19 @@
         "targetWorkId",
         "workId"
       ]
+    },
+    "validateDefinition": {
+      "slots": [
+        "definitionId",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. Records a validation; APPLIED even when not publishable.",
+      "response": {
+        "validationId": "validation ID",
+        "publishable": "boolean",
+        "regressionRunIds": "[] (regression NOT_RUN, deferred)",
+        "data": "{validationId, publishable, outcome, problems[{path,code}], diffClasses[], regression{fixtureRefs,status}}"
+      }
     },
     "verifyLabel": {
       "slots": [

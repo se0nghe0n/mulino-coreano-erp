@@ -86,7 +86,8 @@ final class BusinessReviewAssertionTest {
             if(sid.contains("accepted")) {
                 JsonNode approval=action(s,"approval").path("request");
                 assertEquals("APPROVE",approval.at("/slots/decision").asText());
-                assertEquals("SINGLE_ORDER_REVISION",approval.at("/slots/consumptionPolicy").asText());
+                // round 14: the single-order-revision consumption is the product rule (PurchaseCommands), so the case no longer restates it.
+                assertFalse(approval.at("/slots").has("consumptionPolicy"));
             }
         }
         JsonNode concurrent=sub("T20","mrtr-concurrent-approval-consumption");
@@ -156,7 +157,7 @@ final class BusinessReviewAssertionTest {
         var results=new HashMap<String,JsonNode>();results.put("before-dispatch-db",db.deepCopy());results.put("after-dispatch-db",db);
         ObjectNode active=db.deepCopy();((ObjectNode)active.at("/data/rawRows/restrictions/0")).put("status","ACTIVE");results.put("before-release-db",active);
         results.put("qc-hold20",sample("{\"response\":{\"restrictionId\":\"qc20\"}}"));results.put("recall-hold60",sample("{\"response\":{\"restrictionId\":\"recall60\"}}"));
-        results.put("split",sample("{\"response\":{\"children\":[{\"id\":\"physical20\"}]}}"));results.put("qc-release20",sample("{\"response\":{\"outcome\":\"APPLIED\",\"restrictionId\":\"qc20\"}}"));return results;
+        results.put("split",sample("{\"response\":{\"children\":[{\"index\":0,\"segmentId\":\"physical20\",\"quantity\":\"20\",\"unit\":\"BOX\"}]}}"));results.put("qc-release20",sample("{\"response\":{\"outcome\":\"APPLIED\",\"restrictionId\":\"qc20\"}}"));return results;
     }
     @Test void e2QcReleaseCannotBeANoopOrReleaseTheWrongRestrictionScopeQuantityOrUnit() throws Exception {
         var results=overlap();String sid="overlapping-holds";

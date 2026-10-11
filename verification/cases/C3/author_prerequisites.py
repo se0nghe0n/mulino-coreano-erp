@@ -206,19 +206,26 @@ def patch_sub(sub, cap):
             actions[observation]['observation']['sources']+= [x for x in ['recipientAcceptances','obligationTransfers'] if x not in actions[observation]['observation']['sources']]
         check(sub,'authorized-business-transfer-once','authorized-after','/data/rawRows/obligationTransfers',[[alias('DUTY'),alias('WORK2'),alias('WORK'),alias('warehouse'),alias('RECIPIENT-ACCEPTANCE'),'20','BOX',auth_key]],'relationSet',field=['sourceObligationId','sourceWorkId','targetWorkId','acceptingOwnerId','acceptanceEvidenceId','quantity','unit','commandIdempotencyKey'])
     if cap in RECALL_CAPS:
+        # step2r round 14 (run-0183320b): approveRecall answers its approval in effects (RecallCommands; plan section 3.4
+        # 명령은 적용 효과를 반환), so every recall step reads /response/effects/approvalId.
+        RECALL_APPROVAL='/response/effects/approvalId'
         # Plan §6/§13.1 D18·§13.3 E2: recall decisions need a current ADMIN approval of the exact scope;
         # closure needs notice, recovery and disposal of the whole approved scope and a closure record.
         query=copy.deepcopy(actions['target-before']);query.update(id='precondition-recall',actorRef='delegator',request={'objectId':alias('RECALL')},evidenceRefs=['precondition-recall:actual-artifact']);pre.append(query)
-        scope=lambda:{'recallId':alias('RECALL'),'scopeVersion':ref('precondition-recall','/response/data/scopeVersion'),'scopeHash':ref('precondition-recall','/response/data/scopeHash')}
-        approval_slots=dict(scope(),decision='APPROVED',validUntil=END,reason='승인 scope20의 회수 결정')
-        approved=lambda:dict(scope(),approvalId=ref('precondition-approval','/response/approvalId'))
+        # step2r round 14 (s5d finding 6): the product Recall noun is the Investigation; its approval, notice, recovery and
+        # closure name the current RecallScope, which the recall read returns as data.scopeId (RecallQueries.view).
+        scope=lambda:{'scopeId':ref('precondition-recall','/response/data/scopeId'),'scopeVersion':ref('precondition-recall','/response/data/scopeVersion'),'scopeHash':ref('precondition-recall','/response/data/scopeHash')}
+        # step2r round 14: the recall decision vocabulary is APPROVE|REJECT (RecallCommands approveRecall, the same words as
+        # approvePurchase); the recorded decision is the decision sent.
+        approval_slots=dict(scope(),decision='APPROVE',validUntil=END,reason='승인 scope20의 회수 결정')
+        approved=lambda:dict(scope(),approvalId=ref('precondition-approval',RECALL_APPROVAL))
         notice_slots=lambda:dict(approved(),noticeEvidenceId=alias('RECALL-NOTICE-DOC'),noticedAt=NOW,channel='SYNTHETIC_CUSTOMER_NOTICE')
         recovery_slots=lambda outcome,doc:dict(approved(),quantity={'value':'20','unit':'BOX'},physicalScopeId=alias('A20'),currentLocationId=alias('W2'),outcome=outcome,evidenceId=alias(doc),occurredAt=NOW)
         subject=[{'type':'Recall','id':alias('RECALL')}]
         if cap!='approveRecall':
             pre.append(invoke(sub,'precondition-approval','admin','approveRecall',approval_slots,ref('precondition-recall','/response/data/revision'),subject))
             check(sub,'precondition-approval-applied','precondition-approval','/response/outcome','APPLIED',observation='approval-effects')
-            check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('precondition-approval','/response/approvalId')},observation='approval-effects',
+            check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval',RECALL_APPROVAL),alias('admin'),'APPROVE']],'relationSet',field=['id','approverId','decision'],where={'id':ref('precondition-approval',RECALL_APPROVAL)},observation='approval-effects',
                 explain='회수 승인은 ADMIN management authority를 가진 admin이 정확한 scope hash/version에 대해 먼저 확정한다.')
         if cap=='closeRecall':
             # Each step re-reads the recall and sends that current revision, so the chain holds whether or not
@@ -242,14 +249,14 @@ def patch_sub(sub, cap):
         for observation in ['before','after','authorized-after']:
             actions[observation]['observation']['sources']+= [x for x in ['recallScopes','recallClosures','notices','recoveries'] if x not in actions[observation]['observation']['sources']]
         if cap=='approveRecall':
-            check(sub,'authorized-business-recall-approval','authorized-after','/data/rawRows/approvals',[[ref('authorized-same-input','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('authorized-same-input','/response/approvalId')},observation='approval-effects')
+            check(sub,'authorized-business-recall-approval','authorized-after','/data/rawRows/approvals',[[ref('authorized-same-input',RECALL_APPROVAL),alias('admin'),'APPROVE']],'relationSet',field=['id','approverId','decision'],where={'id':ref('authorized-same-input',RECALL_APPROVAL)},observation='approval-effects')
         elif cap=='recordRecallNotice':
-            check(sub,'authorized-business-notice','authorized-after','/data/rawRows/notices',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),alias('RECALL-NOTICE-DOC')]],'relationSet',field=['recallId','approvalId','evidenceId'],where={'recallId':alias('RECALL')},observation='followup-effects')
+            check(sub,'authorized-business-notice','authorized-after','/data/rawRows/notices',[[alias('RECALL'),ref('precondition-approval',RECALL_APPROVAL),alias('RECALL-NOTICE-DOC')]],'relationSet',field=['recallId','approvalId','evidenceId'],where={'recallId':alias('RECALL')},observation='followup-effects')
         elif cap=='recordRecovery':
-            check(sub,'authorized-business-recovery','authorized-after','/data/rawRows/recoveries',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),'20','BOX','RECOVERED',alias('W2')]],'relationSet',field=['recallId','approvalId','quantity','unit','outcome','currentLocationId'],where={'recallId':alias('RECALL')},observation='inventory-effects')
+            check(sub,'authorized-business-recovery','authorized-after','/data/rawRows/recoveries',[[alias('RECALL'),ref('precondition-approval',RECALL_APPROVAL),'20','BOX','RECOVERED',alias('W2')]],'relationSet',field=['recallId','approvalId','quantity','unit','outcome','currentLocationId'],where={'recallId':alias('RECALL')},observation='inventory-effects')
         else:
             check(sub,'precondition-not-closed','before','/data/rawRows/recallClosures',0,'count',where={'recallId':alias('RECALL')},observation='followup-effects')
-            check(sub,'authorized-business-recall-closure','authorized-after','/data/rawRows/recallClosures',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),alias('admin'),'20','20','0','0','BOX']],'relationSet',
+            check(sub,'authorized-business-recall-closure','authorized-after','/data/rawRows/recallClosures',[[alias('RECALL'),ref('precondition-approval',RECALL_APPROVAL),alias('admin'),'20','20','0','0','BOX']],'relationSet',
                 field=['recallId','approvalId','closedBy','recoveredQuantity','disposedQuantity','exceptionQuantity','unknownQuantity','unit'],where={'recallId':alias('RECALL')},observation='followup-effects',
                 explain='회수20·같은 실물 폐기20은 처리량20이며 미확인0·예외0일 때만 ADMIN이 종료한다. 회수와 폐기를 더해40으로 세지 않는다.')
     if cap=='emergencyReassign':
@@ -389,6 +396,13 @@ def self_check(n):
         strip=lambda r:{k:v for k,v in r.items() if k not in ['commandIdempotencyKey','expectedRevision']}
         assert strip(acts['attempt']['request'])==strip(acts['authorized-same-input']['request']),s['id']
         assert all(x['oracleRef']['observationNames']!=['read-audit-permitted'] for x in s['assertions'] if x['id'].startswith(('precondition-','authorized-business-'))),s['id']
+# step2r round 14 (s5d finding 3): getAccessContext answers the caller's active grants as data.grants[] (each ID, actions,
+# scopes; IdentityQueries.grantView). No contract names a flat grantId/grantActions field. Each actor holds one all-of grant
+# (user decision 2026-10-09), so the reader's current grant is grants/0.
+ACCESS_POINTERS={'/response/data/grantId':'/response/data/grants/0/ID','/response/data/grantActions':'/response/data/grants/0/actions'}
+def access_pointers(sub):
+    for a in sub['assertions']:
+        if a['source'].get('pointer') in ACCESS_POINTERS:a['source']['pointer']=ACCESS_POINTERS[a['source']['pointer']]
 def main():
     path=DIR/'case.json';n=json.loads(path.read_text())
     public=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
@@ -396,6 +410,7 @@ def main():
     for cap in RECALL_CAPS+('emergencyReassign',):prepare_recall_fixture(cap)
     if 'skills' not in n['profiles']:n['profiles'].append('skills')
     for s in n['subcases']:
+        access_pointers(s)
         if s['id'].startswith('model-query'):model_query(s,public);continue
         cap=s['id'].split('-',1)[1]
         if cap in PREREQUISITE_CAPS:patch_sub(s,cap)

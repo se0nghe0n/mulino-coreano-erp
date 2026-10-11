@@ -2052,16 +2052,12 @@
               "$alias": "supervisor"
             },
             "slots": {
-              "segmentId": {
-                "$alias": "A60"
-              },
               "quantity": "20",
               "unit": "BOX",
               "occurredAt": "2026-10-07T00:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
-              "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
               "occurredAt": "CONTEXT"
@@ -2679,15 +2675,15 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T24-deny-admin-attack",
             "slots": {
-              "subjectId": {
+              "assignedCapability": "dispatchQuantity",
+              "actorId": {
                 "$alias": "B-human"
-              },
-              "capability": "dispatchQuantity"
+              }
             },
             "subjectRefs": [],
             "provenance": {
-              "subjectId": "CONTEXT",
-              "capability": "USER"
+              "assignedCapability": "USER",
+              "actorId": "CONTEXT"
             }
           }
         },
@@ -3444,19 +3440,8 @@
               }
             ],
             "slots": {
-              "segmentId": {
-                "$alias": "A60"
-              },
               "allocationId": {
                 "$alias": "old-allocation"
-              },
-              "workId": {
-                "$alias": "S1"
-              },
-              "quantity": "20",
-              "unit": "BOX",
-              "destinationId": {
-                "$alias": "C"
               },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
@@ -3468,12 +3453,7 @@
             },
             "subjectRefs": [],
             "provenance": {
-              "segmentId": "CONTEXT",
               "allocationId": "CONTEXT",
-              "workId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -3601,19 +3581,8 @@
               }
             ],
             "slots": {
-              "segmentId": {
-                "$alias": "A60"
-              },
               "allocationId": {
                 "$alias": "old-allocation"
-              },
-              "workId": {
-                "$alias": "S1"
-              },
-              "quantity": "20",
-              "unit": "BOX",
-              "destinationId": {
-                "$alias": "C"
               },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
@@ -3625,12 +3594,7 @@
             },
             "subjectRefs": [],
             "provenance": {
-              "segmentId": "CONTEXT",
               "allocationId": "CONTEXT",
-              "workId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"

@@ -95,7 +95,7 @@ public class SupplyAssertionTest {
     @Test void regulatoryDecisionVersionAndPhysicalScopeAreExact() throws Exception {
         JsonNode a=assertion("T15","agency30-qc100","decision-scope-raw");
         String hash=a.path("expected").get(0).get(7).asText();
-        ObjectNode procedure=captured("{\"objectId\":\"procedure-1\"}","{}");ObjectNode split=captured("{\"children\":{\"ALLOW30\":{\"segmentId\":\"allow30\"}}}","{}");
+        ObjectNode procedure=captured("{\"objectId\":\"procedure-1\"}","{}");ObjectNode split=captured("{\"children\":[{\"index\":0,\"segmentId\":\"allow30\",\"quantity\":\"30\",\"unit\":\"BOX\"}]}","{}");
         ObjectNode r=captured("{}","{\"regulatoryDecisions\":[{\"procedureId\":\"procedure-1\",\"itemId\":\"captured-P\",\"lotId\":\"captured-L\",\"segmentId\":\"allow30\",\"quantity\":\"30\",\"unit\":\"BOX\",\"decisionVersion\":\"agency-v1\",\"evidenceHash\":\""+hash+"\"}]}");
         Map<String,JsonNode> m=Map.of("procedure",procedure,"split",split,"db",r);check(a,m,"T15","agency30-qc100");
         ((ObjectNode)r.at("/data/rawRows/regulatoryDecisions/0")).put("decisionVersion","agency-v2");

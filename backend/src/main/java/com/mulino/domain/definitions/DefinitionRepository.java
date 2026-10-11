@@ -26,9 +26,16 @@ public class DefinitionRepository {
           ||!Objects.equals(row.get("evaluatorVersion"),d.evaluatorVersion())
           ||!Objects.equals(row.get("schemaVersion"),d.schemaVersion())
           ||!Objects.equals(row.get("parentVersionId"),d.parentVersionId())
-          ||!"PUBLISHED".equals(row.get("state"))||!"PUBLISHED".equals(d.state())) throw new IllegalStateException("Definition metadata mismatch or unpublished");
+          ||!"PUBLISHED".equals(row.get("state"))||d.state()!=null&&!"PUBLISHED".equals(d.state())) throw new IllegalStateException("Definition metadata mismatch or unpublished");
       return new Definition(d.organizationId(),d.id(),d.version(),d.parentVersionId(),"PUBLISHED",(String)row.get("contentHash"),d.evaluatorVersion(),d.schemaVersion(),d.nouns(),d.attributes(),d.verbs(),d.relations(),d.goals(),d.capabilities());
     } catch(java.io.IOException e) {throw new IllegalStateException("Invalid stored definition",e);}
+  }
+  /** Any lifecycle state (plan §8 getDefinition of a draft); the content hash is checked like a published package. */
+  public Map<String,Object> read(String organizationId,String id){
+    var row=db.run(Select.from("mulino.definitions.DefinitionVersions").where(x->x.get("organizationId").eq(organizationId).and(x.get("ID").eq(id)))).first().orElseThrow(()->new NoSuchElementException("Definition unavailable"));
+    String content=(String)row.get("content");if(!sha256(content).equals(row.get("contentHash")))throw new IllegalStateException("Definition hash mismatch");
+    try{Map<String,Object> data=new LinkedHashMap<>(json.readValue(content,Map.class));data.put("organizationId",organizationId);data.put("id",id);data.put("state",row.get("state"));data.put("contentHash",row.get("contentHash"));data.put("hash",row.get("contentHash"));return data;}
+    catch(java.io.IOException e){throw new IllegalStateException("Invalid stored definition",e);}
   }
   public static String sha256(String content) {
     try {return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(content.getBytes(StandardCharsets.UTF_8)));}

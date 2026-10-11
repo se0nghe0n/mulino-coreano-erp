@@ -167,6 +167,18 @@ final class ScenarioJdbcObservation {
                         put(row,"kind",r.getObject(6));put(row,"recordedState",r.getObject(7));row.put("status","OPEN");put(row,"nextAction",r.getObject(8));put(row,"nextCheckAt",r.getObject(9));out.add(row);}}}
                 statement.put("sql",sql);
             }
+            case "@domainRecords" -> {
+                // One row per organization-scoped business table (not mulino_commands_*/mulino_runtime_*: a denial writes its
+                // own command record and audit): row count and md5 of the organization's rows in this snapshot. A sameAs over
+                // these rows says no business row of any table changed; it does not name a domain record state.
+                List<String> tables=new ArrayList<>();
+                try(var st=c.prepareStatement("SELECT c.table_name FROM information_schema.columns c JOIN information_schema.tables t ON t.table_schema=c.table_schema AND t.table_name=c.table_name AND t.table_type='BASE TABLE' WHERE c.table_schema=current_schema() AND c.column_name='organizationid' AND c.table_name LIKE 'mulino\\_%' AND c.table_name NOT LIKE 'mulino\\_runtime\\_%' AND c.table_name NOT LIKE 'mulino\\_commands\\_%' ORDER BY c.table_name");var r=st.executeQuery()){while(r.next())if(r.getString(1).matches("[a-z0-9_]+"))tables.add(r.getString(1));}
+                var parts=new ArrayList<String>();for(String t:tables)parts.add("SELECT '"+t+"' AS t,count(*) AS n,md5(coalesce(string_agg(x::text,'|' ORDER BY x::text),'')) AS d FROM "+t+" x WHERE x.organizationid::text = ANY(?)");
+                String sql=String.join(" UNION ALL ",parts)+" ORDER BY 1";
+                try(var st=c.prepareStatement(sql)){var array=c.createArrayOf("text",orgs.toArray());for(int i=1;i<=parts.size();i++)st.setArray(i,array);
+                    try(var r=st.executeQuery()){while(r.next()){var row=Json.object();row.put("id",r.getString(1)).put("table",r.getString(1)).put("rowCount",r.getLong(2)).put("digest",r.getString(3));out.add(row);}}}
+                statement.put("sql","per-table count and md5 over "+tables.size()+" organization-scoped business tables");
+            }
             default -> throw new UnsupportedOperationException("virtual observation source "+source+" not implemented");
         }
         statement.set("boundValues",Json.MAPPER.valueToTree(orgs));
@@ -217,6 +229,7 @@ final class ScenarioJdbcObservation {
                     if(root!=null){if(!row.has("sourceKind"))row.set("sourceKind",root.path("sourceKind"));if(!row.has("sourceId"))row.set("sourceId",root.path("sourceId"));}}
                 case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));}
                 case "mulino_runtime_Outbox" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));}
+                case "mulino_definitions_DefinitionVersions" -> {row.set("hash",row.path("contentHash"));row.set("definitionId",row.path("id"));}
                 default -> {}
             }
         }

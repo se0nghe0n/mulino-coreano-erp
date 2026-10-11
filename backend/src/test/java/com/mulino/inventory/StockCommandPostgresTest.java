@@ -89,10 +89,14 @@ class StockCommandPostgresTest {
   assertThrows(DomainError.class,()->tx(()->commands.execute(context(),splitIntent())));
   assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_GenealogyEdges WHERE sourceId=?",Integer.class,source));
  }
- @Test void allocation40TransfersExactlyOnceAndLeaves60Unallocated(){
+ @SuppressWarnings("unchecked") @Test void allocation40TransfersExactlyOnceAndLeaves60Unallocated(){
   // S4 reservations always carry the exact physical interval; 0..40 lies wholly inside the first child 0..60.
   jdbc.update("INSERT INTO mulino_inventory_SegmentAllocations(organizationId,id,createdAt,recordedAt,rootId,segmentId,orderLineId,startQuantity,quantity,unit,state,commandId) VALUES (?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP,?,?,?,0,40,'EA','EXECUTABLE',?)",org,id(301),id(302),source,id(303),id(304));
-  var effects=(Map<?,?>)tx(()->commands.execute(context(),splitIntent())).get("effects");var children=(List<?>)effects.get("segmentIds");
+  var result=tx(()->commands.execute(context(),splitIntent()));var effects=(Map<?,?>)result.get("effects");var children=(List<?>)effects.get("segmentIds");
+  // Round 14 Step 3 finding 3: the response names the allocation the split moved onto child 0 (/response/allocations/0/id).
+  var moved=(List<Map<?,?>>)result.get("allocations");assertEquals(1,moved.size(),String.valueOf(result));
+  assertEquals(children.getFirst(),moved.getFirst().get("segmentId"));assertEquals(0,moved.getFirst().get("childIndex"));assertEquals(id(301),moved.getFirst().get("predecessorId"));assertEquals("40",moved.getFirst().get("quantity"));
+  assertEquals(moved.getFirst().get("id"),jdbc.queryForObject("SELECT id FROM mulino_inventory_SegmentAllocations WHERE state='EXECUTABLE' AND predecessorId=?",String.class,id(301)));
   assertEquals("40.000000000000",jdbc.queryForObject("SELECT SUM(quantity)::text FROM mulino_inventory_SegmentAllocations WHERE state='EXECUTABLE'",String.class));
   assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations WHERE state='EXECUTABLE' AND predecessorId=? AND segmentId=? AND startQuantity=0",Integer.class,id(301),children.getFirst()));
   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations WHERE segmentId=?",Integer.class,children.getLast()));

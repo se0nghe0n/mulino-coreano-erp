@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 class DefinitionQueriesUnavailableTest {
   @Test void unknownDefinitionIsAnUnavailableScope() {
     var repository=mock(DefinitionRepository.class);var authorizer=mock(ReadAuthorizer.class);
-    when(repository.get(anyString(),anyString())).thenThrow(new NoSuchElementException("Definition unavailable"));
-    var queries=new DefinitionQueries(repository,authorizer);
+    when(repository.read(anyString(),anyString())).thenThrow(new NoSuchElementException("Definition unavailable"));
+    var queries=new DefinitionQueries(repository,authorizer,mock(com.mulino.domain.definitions.DefinitionLifecycleRepository.class));
     var c=new DomainContext("org","actor","owner",Instant.parse("2026-10-07T09:00:00Z"),Instant.parse("2026-10-07T09:00:00Z"));
     var q=new QueryRequest("getDefinition",UUID.randomUUID().toString(),Map.of(),Map.of(),10,null,null,null,null,null);
     assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->queries.query(c,q)).code());

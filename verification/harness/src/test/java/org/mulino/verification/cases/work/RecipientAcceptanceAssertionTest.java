@@ -146,7 +146,7 @@ class RecipientAcceptanceAssertionTest {
         for (JsonNode sub : file.path("subcases")) for (JsonNode action : sub.path("actions")) {
             if (!action.path("capabilityId").asText().equals("transferObligation") ||
                 action.path("id").asText().equals("impersonated-acceptance")) continue;
-            assertEquals(action.at("/request/slots/acceptedById/$alias").asText(), action.path("actorRef").asText());
+            assertEquals(action.at("/request/slots/recipientId/$alias").asText(), action.path("actorRef").asText());
             var fixture = Json.read(Path.of(System.getProperty("repo.root"), sub.path("fixtureRef").asText()));
             String actor = action.path("actorRef").asText();
             assertTrue(fixture.path("actors").path(actor).path("roleCapabilities").toString().contains("transferObligation"));

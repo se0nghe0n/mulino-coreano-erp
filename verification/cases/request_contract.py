@@ -152,6 +152,9 @@ def schema_errors(value, schema, root, path=''):
             if isinstance(value, list):
                 for i, item in enumerate(value):
                     out += schema_errors(item, rule, root, f'{path}/{i}')
+        elif key == 'maxItems':
+            if isinstance(value, list) and len(value) > rule:
+                out.append(f'{path}: more than {rule} items')
         elif key == 'uniqueItems':
             if rule and isinstance(value, list) and len({json.dumps(v, sort_keys=True) for v in value}) != len(value):
                 out.append(f'{path}: duplicate items')
@@ -333,14 +336,14 @@ class Contracts:
         for sub in case.get('subcases', []):
             world = World(self.root, sub.get('fixtureRef'), cache)
             prior = []
-            self._clock, self._case, self._world = world.clock, case.get('caseId'), world
+            self._clock, self._case, self._world, self._prior = world.clock, case.get('caseId'), world, prior
             for action in iter_actions(sub.get('actions', [])):
                 if action.get('kind') == 'control' and (action.get('control') or {}).get('type') == 'clock':
                     params = action['control'].get('parameters') or {}
                     self._clock = next((params[k] for k in ('instant', 'asOf', 'knownAt') if isinstance(params.get(k), str)), self._clock)
                 self.conform_action(action, case.get('caseId'), sub.get('id'), world, prior)
                 prior.append(action)
-        self._clock = self._case = self._world = None
+        self._clock = self._case = self._world = self._prior = None
         return case
 
     def conform_action(self, action, case_id, sub_id, world, prior=()):
@@ -547,6 +550,10 @@ class Contracts:
                 provenance.pop(name)
             provenance.update(kept)
             self.fill_required(body, slots, provenance, action, capability, declared)
+            for rule in spec['contractDrops']['rules']:  # a case-scoped drop also holds against the projection's subject fill
+                if capability in rule['capabilities'] and self._case in rule.get('cases', ()) and rule['when'] == 'always':
+                    slots.pop(rule['slot'], None)
+                    provenance.pop(rule['slot'], None)
         else:
             for name in declared['allowed']:
                 sources = [s for s in self.SLOT_SOURCES.get(name, ()) if s.startswith('@') and s not in ('@clock', '@evidenceRefs')]
@@ -600,9 +607,32 @@ class Contracts:
                 slots.update(items)
                 provenance[rule['to']] = said
                 provenance[rule['unitSlot']] = provenance.get(rule['unitSlot']) or said
+        rule = spec['splitPart']
+        if capability in rule['capabilities'] and rule['from'] in slots and rule['to'] not in slots:
+            part, unit = slots[rule['from']], slots.get(rule['unitSlot'])
+            if isinstance(part, dict) and set(part) == {'value', 'unit'}:
+                part, unit = part['value'], part['unit']
+            segment = slots.get('segmentId') or self.slot_source('@QuantitySegment', body, slots)[0]
+            parent = self.split_parent(segment)
+            try:
+                rest = Decimal(parent[0]) - Decimal(part) if parent and isinstance(part, str) and parent[1] == unit else None
+            except InvalidOperation:
+                rest = None
+            if rest is not None and rest > 0 and Decimal(part) > 0:
+                said = provenance.pop(rule['from'], None) or 'USER'
+                items = []
+                for name, value in slots.items():
+                    if name == rule['from']:
+                        items += [(rule['to'], [part, format(rest, 'f')]), (rule['unitSlot'], unit)]
+                    elif name != rule['unitSlot']:
+                        items.append((name, value))
+                slots.clear()
+                slots.update(items)
+                provenance[rule['to']] = said
+                provenance[rule['unitSlot']] = provenance.get(rule['unitSlot']) or said
         for rule in spec['contractDrops']['rules']:
             name = rule['slot']
-            if capability not in rule['capabilities'] or name not in slots:
+            if capability not in rule['capabilities'] or name not in slots or ('cases' in rule and self._case not in rule['cases']):
                 continue
             value, when = slots[name], rule['when']
             if when == 'always':
@@ -611,6 +641,12 @@ class Contracts:
                 drop = isinstance(value, dict) and set(value) == {'value', 'unit'} and re.fullmatch(r'0(\.0+)?', str(value['value'])) is not None
             elif when == 'wholeLeaf':
                 drop = self.whole_leaf(slots)
+            elif when == 'allocationQuantity':
+                drop = self.same_quantity(slots, self.allocation_quantity(slots.get('allocationId')))
+            elif when == 'heldQuantity':
+                drop = self.same_quantity(slots, self.held_quantity(slots.get('restrictionId')))
+            elif when == 'clock':
+                drop = isinstance(value, str) and getattr(self, '_clock', None) is not None and self.same_instant(value, self._clock)
             elif when == 'sameSourceAsWork':
                 source = lambda v: (v.get('$result') or {}).get('actionId') if isinstance(v, dict) else None
                 drop = source(value) is not None and source(value) == source(slots.get('workId'))
@@ -619,7 +655,7 @@ class Contracts:
             if drop:
                 slots.pop(name)
                 provenance.pop(name, None)
-                if when == 'wholeLeaf' and 'unit' in slots:
+                if when in ('wholeLeaf', 'allocationQuantity', 'heldQuantity') and 'unit' in slots:
                     slots.pop('unit')  # the unit of the restated leaf quantity
                     provenance.pop('unit', None)
         for rule in spec['typedRefRenames']:
@@ -635,7 +671,7 @@ class Contracts:
             interval, said = slots.pop(rule['from']), provenance.pop(rule['from'], None)
             slots[rule['to']] = interval  # replaces the cumulative period in place, else appended
             provenance[rule['to']] = said or provenance.get(rule['to']) or 'USER'
-        created = spec['createdSubjects']['capabilities'].get(capability)
+        created = list(spec['createdSubjects']['capabilities'].get(capability) or []) + list(spec['unboundSubjects']['capabilities'].get(capability) or [])
         if created and isinstance(body.get('subjectRefs'), list):
             body['subjectRefs'] = [r for r in body['subjectRefs'] if not (isinstance(r, dict) and r.get('type') in created)]
         rule = spec['subjectSlots']
@@ -650,11 +686,98 @@ class Contracts:
                 slots.pop(rule['slot'])
                 provenance.pop(rule['slot'], None)
 
+    @staticmethod
+    def same_instant(a, b):
+        try:
+            return datetime.fromisoformat(a.replace('Z', '+00:00')) == datetime.fromisoformat(b.replace('Z', '+00:00'))
+        except ValueError:
+            return False
+
+    @staticmethod
+    def same_quantity(slots, known):
+        """True when the slots' quantity (a {value, unit} or a decimal string beside unit) equals known (value, unit)."""
+        quantity = slots.get('quantity')
+        value, unit = (quantity['value'], quantity['unit']) if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'} else (quantity, slots.get('unit'))
+        try:
+            return known is not None and isinstance(value, str) and unit == known[1] and Decimal(value) == Decimal(str(known[0]))
+        except InvalidOperation:
+            return False
+
+    def prior_action(self, reference):
+        source = (reference or {}).get('$result') if isinstance(reference, dict) else None
+        for action in getattr(self, '_prior', None) or []:
+            if source and action.get('id') == source.get('actionId'):
+                return action, source.get('pointer')
+        return None, None
+
+    @staticmethod
+    def stated_quantity(slots):
+        quantity = slots.get('quantity')
+        if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'}:
+            return quantity['value'], quantity['unit']
+        return (quantity, slots.get('unit')) if isinstance(quantity, str) else None
+
+    def allocation_quantity(self, allocation):
+        """(quantity, unit) of the allocation a pick/dispatch names: the reserve/replacement that returned it, the split child
+        it moved to (/response/allocations/<i>/id of a split: the i-th requested quantity), or a fixture allocation."""
+        world = getattr(self, '_world', None)
+        if isinstance(allocation, dict) and '$alias' in allocation and world is not None:
+            row = world.allocations.get(allocation['$alias']) or world.aliases.get(allocation['$alias']) or {}
+            return (str(row['quantity']), row.get('unit')) if row.get('quantity') is not None else None
+        action, pointer = self.prior_action(allocation)
+        if action is None:
+            return None
+        slots = (action.get('request') or {}).get('slots') or {}
+        if action.get('capabilityId') in ('reserveQuantity', 'replaceAllocation') and pointer == '/response/allocationId':
+            return self.stated_quantity(slots)
+        match = re.fullmatch(r'/response/allocations/(\d+)/id', pointer or '')
+        if action.get('capabilityId') == 'splitQuantity' and match and isinstance(slots.get('quantities'), list):
+            i = int(match.group(1))
+            return (slots['quantities'][i], slots.get('unit')) if i < len(slots['quantities']) else None
+        return None
+
+    def held_quantity(self, restriction):
+        """(quantity, unit) of the restriction a release names: the placeHold that returned it."""
+        action, pointer = self.prior_action(restriction)
+        if action is None or action.get('capabilityId') != 'placeHold' or pointer != '/response/restrictionId':
+            return None
+        return self.stated_quantity((action.get('request') or {}).get('slots') or {})
+
+    def split_parent(self, segment):
+        """(quantity, unit) of the leaf a split divides: a fixture segment, or the quantity an earlier action of the
+        subcase stated for the segment it returned (a receipt read as /response/segmentId)."""
+        world = getattr(self, '_world', None)
+        if world is None or not isinstance(segment, dict):
+            return None
+        if '$alias' in segment:
+            row = world.segments.get(segment['$alias']) or world.aliases.get(segment['$alias']) or {}
+            return (str(row['quantity']), row.get('unit')) if row.get('quantity') is not None else None
+        source = (segment.get('$result') or {})
+        if source.get('pointer') != '/response/segmentId':
+            return None
+        for action in getattr(self, '_prior', None) or []:
+            if action.get('id') == source.get('actionId'):
+                slots = (action.get('request') or {}).get('slots') or {}
+                quantity = slots.get('quantity')
+                if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'}:
+                    return quantity['value'], quantity['unit']
+                return (quantity, slots.get('unit')) if isinstance(quantity, str) else None
+        return None
+
     def whole_leaf(self, slots):
         """True when a moveQuantity quantity restates the whole fixture leaf it names (s2-inventory moveQuantity)."""
         world, segment = getattr(self, '_world', None), slots.get('segmentId')
-        if world is None or not isinstance(segment, dict) or '$alias' not in segment:
+        if world is None or not isinstance(segment, dict):
             return False
+        if '$alias' not in segment:
+            # step2r round 14: a split child read by index (/response/children/<i>/segmentId) holds the i-th quantity.
+            action, pointer = self.prior_action(segment)
+            match = re.fullmatch(r'/response/children/(\d+)/segmentId', pointer or '')
+            parts = ((action or {}).get('request') or {}).get('slots') or {}
+            if action is None or action.get('capabilityId') != 'splitQuantity' or not match or not isinstance(parts.get('quantities'), list) \
+                    or int(match.group(1)) >= len(parts['quantities']):
+                return False
+            return self.same_quantity(slots, (parts['quantities'][int(match.group(1))], parts.get('unit')))
         row = world.segments.get(segment['$alias']) or {}
         quantity = slots.get('quantity')
         if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'}:
@@ -1116,13 +1239,8 @@ class Contracts:
         body = {k: v for k, v in body.items() if k != skip}
         known, problems, violations = [], [], {}
         slots = body.get('slots')
-        candidate = copy.deepcopy(body)
-        if isinstance(slots, dict):
-            for name, value in slots.items():
-                if isinstance(value, list):
-                    known.append(f'/slots/{name}: KNOWN_OPEN PG-INTENT-ARRAY-SLOT (list slot, intent.schema.json has no array value)')
-                    candidate['slots'][name] = 'array-slot'
-        candidate = Placeholders()(candidate)
+        # A list slot is the schema's bounded array value (user decision 2026-10-11 (1)); it validates like any other slot.
+        candidate = Placeholders()(copy.deepcopy(body))
         for error in schema_errors(candidate, self.intent, self.intent):
             path = error.split(':', 1)[0]
             parts = path.strip('/').split('/')

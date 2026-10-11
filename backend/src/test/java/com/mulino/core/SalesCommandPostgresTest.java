@@ -151,6 +151,29 @@ class SalesCommandPostgresTest {
   var rejected=runtime.requestContext().run(c->{return commands.execute(row("intentKind","COMMAND","capabilityId","createSalesOrder","definitionVersion","1.1.0","expectedRevision",0,"slots",mismatch,"provenance",Map.of(),"subjectRefs",List.of(Map.of("type","TradeItem","id",item)),"commandIdempotencyKey",id()));});
   assertEquals("TYPE_INVALID",((Map<?,?>)rejected.get("error")).get("code"),String.valueOf(rejected));assertEquals(1,count("mulino_trade_sales_OrderLines"));
  }
+ /** User decision 2026-10-11 UD-1 (plan §6 "SalesOrderRevision/Line·별도 인도 목표"): without a workId the order creates its own
+  * delivery Work in the same transaction, owned by the requesting human; price and currency are optional together. */
+ @Test void orderWithoutWorkCreatesItsOwnDeliveryWorkAndPriceIsOptional(){
+  var slots=saleSlots("100");slots.remove("workId");slots.remove("price");slots.remove("currency");
+  var result=purchase("createSalesOrder",0,slots,id());var e=effects(result);
+  String created=String.valueOf(result.get("workId"));assertEquals(created,e.get("workId"));assertNotEquals(work,created);
+  assertEquals(e.get("lineId"),((Map<?,?>)result.get("line")).get("id"),result.toString());
+  var w=jdbc.queryForMap("SELECT kind,status,ownerId,supervisorId,itemId,definitionVersionId FROM mulino_work_read_Works WHERE ID=?",created);
+  assertEquals("DELIVERY",w.get("kind"));assertEquals("DRAFT",w.get("status"));assertEquals(actor,w.get("ownerId"));assertEquals(actor,w.get("supervisorId"));assertEquals(item,w.get("itemId"));
+  var g=jdbc.queryForMap("SELECT endpoint,unit,targetQuantity,dueAt FROM mulino_work_read_GoalReferences WHERE workId=?",created);
+  assertEquals("DELIVERED",g.get("endpoint"));assertEquals("BOX",g.get("unit"));assertEquals(0,new java.math.BigDecimal("100").compareTo((java.math.BigDecimal)g.get("targetQuantity")));
+  var line=jdbc.queryForMap("SELECT workId,price,currency FROM mulino_trade_sales_OrderLines WHERE ID=?",e.get("lineId"));
+  assertEquals(created,line.get("workId"));assertNull(line.get("price"));assertNull(line.get("currency"));
+  var revise=new LinkedHashMap<>(slots);revise.put("orderId",e.get("orderId"));revise.put("reason","quantity revised");revise.put("quantity","120");
+  var revised=effects(purchase("reviseSalesOrder",1,revise,id()));
+  assertEquals(created,jdbc.queryForObject("SELECT workId FROM mulino_trade_sales_OrderLines WHERE ID=?",String.class,revised.get("lineId")));
+  assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_Works WHERE organizationId=? AND kind='DELIVERY'",Integer.class,org));
+  var priceOnly=saleSlots("10");priceOnly.remove("workId");priceOnly.remove("currency");
+  assertEquals("TYPE_INVALID",((Map<?,?>)purchase("createSalesOrder",0,priceOnly,id()).get("error")).get("code"));
+  var owned=saleSlots("10");owned.remove("workId");owned.put("ownerId",id());
+  assertEquals("REJECTED",purchase("createSalesOrder",0,owned,id()).get("outcome"));
+  assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_Works WHERE organizationId=? AND kind='DELIVERY'",Integer.class,org));
+ }
  @Test void readonlyAuthorityHasZeroCommercialEffects(){jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE organizationId=? AND capabilityId='createSalesOrder'",org);assertEquals("REJECTED",purchase("createSalesOrder",0,saleSlots("100"),id()).get("outcome"));assertEquals(0,count("mulino_trade_sales_Orders"));assertEquals(0,count("mulino_trade_sales_OrderLines"));}
  @Test void invoiceAndDispatchHistoryCannotBeErasedByRevision(){var e=effects(purchase("createSalesOrder",0,saleSlots("100"),id()));runtime.requestContext().run(ctx->{new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->{sales.recordExecutionEffect(commitContext(),e.get("lineId").toString(),"DISPATCHED",id(),new java.math.BigDecimal("60"),"BOX");return null;});});var changed=saleSlots("59");changed.put("orderId",e.get("orderId"));changed.put("reason","cannot erase dispatched");assertEquals("HELD",purchase("reviseSalesOrder",1,changed,id()).get("outcome"));assertEquals(1,count("mulino_trade_sales_OrderRevisions"));changed.put("quantity","120");var revised=effects(purchase("reviseSalesOrder",1,changed,id()));runtime.requestContext().run(ctx->{assertEquals(60,sales.remainingQuantity(context(),revised.get("lineId").toString()).intValueExact());assertEquals(0,sales.remainingQuantity(context(),e.get("lineId").toString()).intValueExact());});}
  @Test void auditInsertFailureRollsBackCommercialRows(){jdbc.execute("CREATE FUNCTION sales_test_audit_fail() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'sales test audit failure'; END $$");jdbc.execute("CREATE TRIGGER sales_test_audit_fail BEFORE INSERT ON mulino_commands_CommandAudits FOR EACH ROW EXECUTE FUNCTION sales_test_audit_fail()");try{assertThrows(Exception.class,()->purchase("createSalesOrder",0,saleSlots("100"),id()));assertEquals(0,count("mulino_trade_sales_Orders"));assertEquals(0,count("mulino_trade_sales_OrderRevisions"));assertEquals(0,count("mulino_trade_sales_OrderLines"));}finally{jdbc.execute("DROP TRIGGER sales_test_audit_fail ON mulino_commands_CommandAudits");jdbc.execute("DROP FUNCTION sales_test_audit_fail()");}}

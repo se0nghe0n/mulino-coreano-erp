@@ -22,6 +22,7 @@ cleanup() {
   code=$?
   trap - EXIT HUP INT TERM
   set +e
+  if [ -f "$fixture/backend.pid" ]; then server_pid=$(cat "$fixture/backend.pid"); fi
   if [ -n "$server_pid" ]; then
     kill "$server_pid" 2>/dev/null
     i=0
@@ -71,6 +72,11 @@ docker exec -e "PGPASSWORD=$DB_PASSWORD" "$container" psql -h 127.0.0.1 -U postg
 # The starting instant is a placeholder: every installed fixture resets the clock to its own asOf (fixture-start).
 java -jar "$fixture/ontology.jar" --spring.profiles.active=local,verification --mulino.verification.instant=2026-10-01T00:00:00Z --server.address=127.0.0.1 --server.port=0 "--mulino.evidence.blob-root=$fixture/blobs" > "$evidence/backend-runtime.log" 2>&1 &
 server_pid=$!
+# Test-profile process controls (BackendProcessControls) stop and relaunch this same command on the same port; the
+# current pid is kept in this file so cleanup terminates whichever backend is running at exit.
+printf '%s' "$server_pid" > "$fixture/backend.pid"
+ACTUAL_BACKEND_ARGV=$(python3 -c 'import json,sys; print(json.dumps(sys.argv[1:]))' java -jar "$fixture/ontology.jar" --spring.profiles.active=local,verification --mulino.verification.instant=2026-10-01T00:00:00Z --server.address=127.0.0.1 --server.port=0 "--mulino.evidence.blob-root=$fixture/blobs")
+export ACTUAL_BACKEND_ARGV ACTUAL_BACKEND_PID_FILE="$fixture/backend.pid" ACTUAL_BACKEND_LOG="$evidence/backend-runtime.log"
 i=0
 while :; do
   kill -0 "$server_pid"

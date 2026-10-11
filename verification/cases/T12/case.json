@@ -3950,20 +3950,20 @@
               }
             ],
             "slots": {
-              "obligationId": {
+              "resolutionKind": "QUANTITY_ARRIVED",
+              "reason": "늦은 실제 도착100으로 수량 의무 해소. 납기 위반은 남긴다.",
+              "assignmentId": {
                 "$result": {
                   "actionId": "late-assessment",
                   "pointer": "/response/obligationId"
                 }
               },
-              "resolutionEvidenceId": {
+              "evidenceId": {
                 "$result": {
                   "actionId": "receipt",
                   "pointer": "/response/evidenceId"
                 }
-              },
-              "resolutionKind": "QUANTITY_ARRIVED",
-              "reason": "늦은 실제 도착100으로 수량 의무 해소. 납기 위반은 남긴다."
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T12-deadline-revision-and-correction-resolve-quantity-duty",
@@ -3973,10 +3973,10 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
-              "resolutionEvidenceId": "CONTEXT",
               "resolutionKind": "USER",
-              "reason": "USER"
+              "reason": "USER",
+              "assignmentId": "CONTEXT",
+              "evidenceId": "CONTEXT"
             }
           }
         },

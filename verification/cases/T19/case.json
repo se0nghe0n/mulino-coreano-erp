@@ -1582,7 +1582,7 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": {
+              "evidenceId": {
                 "$alias": "qc-result"
               }
             },
@@ -1600,7 +1600,7 @@
               "decision": "USER",
               "quantity": "USER",
               "unit": "USER",
-              "evidence": "USER"
+              "evidenceId": "USER"
             }
           },
           "evidenceRefs": [
@@ -1681,11 +1681,11 @@
             ],
             "slots": {
               "kind": "FX",
-              "policyVersion": "fx-v2",
               "pair": "EUR/KRW",
               "rate": "1600",
               "source": "synthetic-fx",
-              "effectiveAt": "2026-10-07T09:00:00Z"
+              "version": "fx-v2",
+              "effectiveFrom": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-commercial-fx-policy-draft",
@@ -1696,11 +1696,11 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
               "pair": "USER",
               "rate": "USER",
               "source": "USER",
-              "effectiveAt": "USER"
+              "version": "USER",
+              "effectiveFrom": "USER"
             }
           },
           "evidenceRefs": [
@@ -1726,19 +1726,19 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "regressionEvidence": "synthetic-FX-policy-change",
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
                 }
               },
-              "policyHash": {
+              "contentHash": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyHash"
                 }
-              },
-              "regressionEvidence": "synthetic-FX-policy-change"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -1753,9 +1753,9 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT",
-              "policyHash": "CONTEXT",
-              "regressionEvidence": "USER"
+              "regressionEvidence": "USER",
+              "id": "CONTEXT",
+              "contentHash": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1781,7 +1781,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
@@ -1801,7 +1801,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2604,7 +2604,7 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": {
+              "evidenceId": {
                 "$alias": "qc-result"
               }
             },
@@ -2622,7 +2622,7 @@
               "decision": "USER",
               "quantity": "USER",
               "unit": "USER",
-              "evidence": "USER"
+              "evidenceId": "USER"
             }
           },
           "evidenceRefs": [
@@ -2703,11 +2703,11 @@
             ],
             "slots": {
               "kind": "FX",
-              "policyVersion": "fx-v2",
               "pair": "EUR/KRW",
               "rate": "1600",
               "source": "synthetic-fx",
-              "effectiveAt": "2026-10-07T09:00:00Z"
+              "version": "fx-v2",
+              "effectiveFrom": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-domestic_tax-fx-policy-draft",
@@ -2718,11 +2718,11 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
               "pair": "USER",
               "rate": "USER",
               "source": "USER",
-              "effectiveAt": "USER"
+              "version": "USER",
+              "effectiveFrom": "USER"
             }
           },
           "evidenceRefs": [
@@ -2748,19 +2748,19 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "regressionEvidence": "synthetic-FX-policy-change",
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
                 }
               },
-              "policyHash": {
+              "contentHash": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyHash"
                 }
-              },
-              "regressionEvidence": "synthetic-FX-policy-change"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -2775,9 +2775,9 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT",
-              "policyHash": "CONTEXT",
-              "regressionEvidence": "USER"
+              "regressionEvidence": "USER",
+              "id": "CONTEXT",
+              "contentHash": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2803,7 +2803,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
@@ -2823,7 +2823,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3586,7 +3586,7 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": {
+              "evidenceId": {
                 "$alias": "qc-result"
               }
             },
@@ -3604,7 +3604,7 @@
               "decision": "USER",
               "quantity": "USER",
               "unit": "USER",
-              "evidence": "USER"
+              "evidenceId": "USER"
             }
           },
           "evidenceRefs": [
@@ -3685,11 +3685,11 @@
             ],
             "slots": {
               "kind": "FX",
-              "policyVersion": "fx-v2",
               "pair": "EUR/KRW",
               "rate": "1600",
               "source": "synthetic-fx",
-              "effectiveAt": "2026-10-07T09:00:00Z"
+              "version": "fx-v2",
+              "effectiveFrom": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-correction-fx-policy-draft",
@@ -3700,11 +3700,11 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
               "pair": "USER",
               "rate": "USER",
               "source": "USER",
-              "effectiveAt": "USER"
+              "version": "USER",
+              "effectiveFrom": "USER"
             }
           },
           "evidenceRefs": [
@@ -3730,19 +3730,19 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "regressionEvidence": "synthetic-FX-policy-change",
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
                 }
               },
-              "policyHash": {
+              "contentHash": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyHash"
                 }
-              },
-              "regressionEvidence": "synthetic-FX-policy-change"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -3757,9 +3757,9 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT",
-              "policyHash": "CONTEXT",
-              "regressionEvidence": "USER"
+              "regressionEvidence": "USER",
+              "id": "CONTEXT",
+              "contentHash": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3785,7 +3785,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
@@ -3805,7 +3805,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4568,7 +4568,7 @@
               "decision": "PASS",
               "quantity": "100",
               "unit": "BOX",
-              "evidence": {
+              "evidenceId": {
                 "$alias": "qc-result"
               }
             },
@@ -4586,7 +4586,7 @@
               "decision": "USER",
               "quantity": "USER",
               "unit": "USER",
-              "evidence": "USER"
+              "evidenceId": "USER"
             }
           },
           "evidenceRefs": [
@@ -4667,11 +4667,11 @@
             ],
             "slots": {
               "kind": "FX",
-              "policyVersion": "fx-v2",
               "pair": "EUR/KRW",
               "rate": "1600",
               "source": "synthetic-fx",
-              "effectiveAt": "2026-10-07T09:00:00Z"
+              "version": "fx-v2",
+              "effectiveFrom": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T19-fx-credit_note-fx-policy-draft",
@@ -4682,11 +4682,11 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
               "pair": "USER",
               "rate": "USER",
               "source": "USER",
-              "effectiveAt": "USER"
+              "version": "USER",
+              "effectiveFrom": "USER"
             }
           },
           "evidenceRefs": [
@@ -4712,19 +4712,19 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "regressionEvidence": "synthetic-FX-policy-change",
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
                 }
               },
-              "policyHash": {
+              "contentHash": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyHash"
                 }
-              },
-              "regressionEvidence": "synthetic-FX-policy-change"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -4739,9 +4739,9 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT",
-              "policyHash": "CONTEXT",
-              "regressionEvidence": "USER"
+              "regressionEvidence": "USER",
+              "id": "CONTEXT",
+              "contentHash": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4767,7 +4767,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "fx-policy-draft",
                   "pointer": "/response/policyId"
@@ -4787,7 +4787,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5801,7 +5801,6 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "decidedAt": "2026-10-07T09:00:00Z",
               "evidence": {
                 "$alias": "adjustment"
               }
@@ -5824,7 +5823,6 @@
               "proposalId": "CONTEXT",
               "proposalHash": "CONTEXT",
               "amount": "USER",
-              "decidedAt": "USER",
               "evidence": "USER"
             }
           },
@@ -7069,7 +7067,6 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "decidedAt": "2026-10-07T09:00:00Z",
               "evidence": {
                 "$alias": "adjustment"
               }
@@ -7092,7 +7089,6 @@
               "proposalId": "CONTEXT",
               "proposalHash": "CONTEXT",
               "amount": "USER",
-              "decidedAt": "USER",
               "evidence": "USER"
             }
           },
@@ -8260,7 +8256,6 @@
                 "value": "5",
                 "currency": "EUR"
               },
-              "decidedAt": "2026-10-07T09:00:00Z",
               "evidence": {
                 "$alias": "adjustment"
               }
@@ -8283,7 +8278,6 @@
               "proposalId": "CONTEXT",
               "proposalHash": "CONTEXT",
               "amount": "USER",
-              "decidedAt": "USER",
               "evidence": "USER"
             }
           },
