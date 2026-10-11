@@ -78,9 +78,12 @@ class StockCommandPostgresTest {
  <T> T tx(java.util.function.Supplier<T> action){return new org.springframework.transaction.support.TransactionTemplate(transactionManager).execute(status->runtime.requestContext().run(ctx->{try(var commandContext=mockStatic(CommandExecution.class)){commandContext.when(CommandExecution::commandId).thenReturn(id(300));return action.get();}}));}
  Map<String,Object> intent(String capability,Map<String,Object> slots){return Map.of("capabilityId",capability,"intentKind",capability.equals("recordStocktake")?"RECORD":"COMMAND","slots",slots);}
  Map<String,Object> splitIntent(){return intent("splitQuantity",Map.of("segmentId",source,"quantities",List.of("60","40"),"unit","EA","occurredAt",at.toString(),"evidenceRef","split-witness"));}
- @Test void split60and40RetiresParentAndRejectsSecondConsumption(){
+ @SuppressWarnings("unchecked") @Test void split60and40RetiresParentAndRejectsSecondConsumption(){
   var result=tx(()->commands.execute(context(),splitIntent()));var effects=(Map<?,?>)result.get("effects");
   assertEquals(2,((List<?>)effects.get("segmentIds")).size());
+  // S3-7: children in requested order, each with its index, segment ID and quantity.
+  var children=(List<Map<?,?>>)result.get("children");assertEquals(List.of(0,1),children.stream().map(x->x.get("index")).toList());
+  assertEquals(effects.get("segmentIds"),children.stream().map(x->x.get("segmentId")).toList());assertEquals(List.of("60","40"),children.stream().map(x->x.get("quantity")).toList());
   assertEquals("100.000000000000",jdbc.queryForObject("SELECT SUM(quantity)::text FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND id IN (SELECT targetId FROM mulino_inventory_GenealogyEdges WHERE organizationId=? AND sourceId=?)",String.class,org,org,source));
   assertNotNull(jdbc.queryForObject("SELECT retiredAt FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND id=?",java.sql.Timestamp.class,org,source));
   assertThrows(DomainError.class,()->tx(()->commands.execute(context(),splitIntent())));
