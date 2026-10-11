@@ -108,7 +108,7 @@ public final class Main {
         }
         String reportRef="verification/harness/target/evidence/"+profile+".json";
         Json.write(root.resolve(reportRef),report);
-        System.out.println(report.toPrettyString());
+        Json.print(System.out,report);
         if(mode.equals("profile") && actual) {
             List<String> argv=new ArrayList<>();
             JsonNode declaredArgv=Json.parse(System.getProperty("verification.argv","[]"));
