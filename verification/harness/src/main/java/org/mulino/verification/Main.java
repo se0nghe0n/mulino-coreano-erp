@@ -173,6 +173,9 @@ public final class Main {
         ArrayNode knownOpen=Json.array();for(JsonNode check:assetChecks) for(JsonNode line:check.path("knownOpen")) knownOpen.add(Json.object().put("check",check.path("name").asText()).put("gap",line.asText()));
         // step2r round 11: late-known evidence uses that contracts/execution-preconditions.json clock.installation.knownOpen keeps as backlog.
         for(String line:recordTimeKnownOpen) knownOpen.add(Json.object().put("check","fixture-record-time").put("gap",line));
+        // User decision 2026-10-11 (3): every case command against the product's published capability slot names.
+        report.set("capabilitySlotContract",CapabilitySlotCheck.run(validator.root(),cases,problems,knownOpen));
+        if(!problems.isEmpty()&&status.equals("PREPARED")){status="FAIL";report.put("status",status).put("exitCode",1);report.set("preparationProblems",Json.MAPPER.valueToTree(problems));}
         report.set("knownOpenGaps",knownOpen);report.set("runtimeGates",runtimeGates(validator.root(),cases));report.put("artifactCoverageStatus","NOT_RUN");report.put("semanticOracleEquivalence","REQUIRES_CASE_REVIEW");
         Json.write(validator.root().resolve("verification/harness/target/evidence/"+mode+".json"),report);System.out.println(report.toPrettyString());return problems.isEmpty()?0:1;
     }
