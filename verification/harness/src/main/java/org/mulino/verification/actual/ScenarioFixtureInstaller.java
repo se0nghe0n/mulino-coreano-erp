@@ -815,7 +815,7 @@ final class ScenarioFixtureInstaller {
         if(Set.of("APPROVED","PUBLISHED").contains(state))notRepresented.add("PolicyVersion "+alias+" "+state+" installed as an APPROVED draft without a PolicyApprovals row (approver not authored; the product's policy states are DRAFT/APPROVED/ACTIVE/RETIRED)");
     }
     /** baseline.managementAuthorities -> ManagementAuthorities (plan §7.2 management capability of a human; scope ORGANIZATION or an installed alias). */
-    private void managementAuthorities() throws Exception {
+    private void managementAuthorities() throws SQLException {
         for(JsonNode m:fixture.path("baseline").path("managementAuthorities")){
             String actor=firstAlias(m,"actorAlias");String kind=m.path("scopeKind").asText("ORGANIZATION");String scope=firstAlias(m,"scopeAlias");
             if(actor==null||!m.hasNonNull("capabilityId")||!m.hasNonNull("validFrom")||!m.hasNonNull("validUntil")){omitted.add("managementAuthority without actor/capability/validity");continue;}
