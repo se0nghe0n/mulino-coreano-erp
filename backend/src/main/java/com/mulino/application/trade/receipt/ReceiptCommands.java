@@ -24,7 +24,7 @@ public final class ReceiptCommands implements CommandHandler {
  private Map<String,Object> observation(DomainContext c,Map<String,Object> intent){return r.require(c,"Observations",uuid(slots(intent),"receiptId"));}
  public CommandPreparation prepare(DomainContext c,Map<String,Object> intent){
   String cap=text(intent,"capabilityId",100);var s=slots(intent);boolean provisional=cap.equals("receiveProvisional");
-  var allowed=provisional?Set.of("eventId","rangeRootId","startQuantity","quantity","unit","itemId","lotId","placeId","purchaseLineId","transitSegmentId","workId","ownerId","supervisorId","nextAction","nextCheckAt","occurredAt"):Set.of("receiptId","canonicalOccurrenceId","lotId","receivingCustodianId");
+  var allowed=CapabilitySlots.allowed(cap);
   if(!allowed.containsAll(s.keySet())||!Objects.equals(intent.get("intentKind"),provisional?"RECORD":"COMMAND"))throw DomainError.invalid("Receipt slots or intent kind mismatch");
   Map<String,Object> row;
   if(provisional){

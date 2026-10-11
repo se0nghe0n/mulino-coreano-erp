@@ -28,6 +28,6 @@ public class RuntimeCommands implements CommandHandler {
   service.recordExternalReconciliation(c,text(slots,"outboxId"),result,text(slots,"evidenceId"));
   return Map.of("outcome","APPLIED","effects",Map.of("outboxId",text(slots,"outboxId"),"reconciliationDecision",decision));
  }
- private Map<String,Object> slots(Map<String,Object> intent){if(!(intent.get("slots") instanceof Map<?,?> raw)||!Set.of("outboxId","decision","evidenceId").containsAll(raw.keySet()))throw DomainError.invalid("Unsupported reconciliation slots");var s=new LinkedHashMap<String,Object>();raw.forEach((k,v)->s.put(k.toString(),v instanceof Map<?,?> typed?typed.containsKey("value")?typed.get("value"):typed.get("id"):v));return s;}
+ private Map<String,Object> slots(Map<String,Object> intent){if(!(intent.get("slots") instanceof Map<?,?> raw)||!CapabilitySlots.allowed("recordExternalReconciliation").containsAll(raw.keySet()))throw DomainError.invalid("Unsupported reconciliation slots");var s=new LinkedHashMap<String,Object>();raw.forEach((k,v)->s.put(k.toString(),v instanceof Map<?,?> typed?typed.containsKey("value")?typed.get("value"):typed.get("id"):v));return s;}
  private String text(Map<String,Object> slots,String key){if(!(slots.get(key) instanceof String v)||v.isBlank())throw DomainError.invalid("Missing reconciliation slot");return v;}
 }

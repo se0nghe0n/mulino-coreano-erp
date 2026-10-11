@@ -27,7 +27,7 @@ public class RuntimeFixtureCommands implements CommandHandler {
   return Map.of("outcome","ACCEPTED_PENDING_EXTERNAL","effects",Map.of("workId",payload.get("workId"),"outboxId",outbox,"externalOperationId",external));
  }
  private Map<String,Object> slots(Map<String,Object> intent){
-  if(!(intent.get("slots") instanceof Map<?,?> raw)||!Set.of("workId","dropResponse").containsAll(raw.keySet()))throw DomainError.invalid("Unsupported fixture slots");
+  if(!(intent.get("slots") instanceof Map<?,?> raw)||!CapabilitySlots.allowed("fixtureExternalEffect").containsAll(raw.keySet()))throw DomainError.invalid("Unsupported fixture slots");
   var result=new LinkedHashMap<String,Object>();raw.forEach((k,v)->result.put(k.toString(),v instanceof Map<?,?> t?t.containsKey("id")?t.get("id"):t.get("value"):v));
   if(!(result.get("workId") instanceof String id))throw DomainError.invalid("Actual fixture Work required");CommandRequests.uuid(id);
   if(result.containsKey("dropResponse")&&!(result.get("dropResponse") instanceof Boolean))throw DomainError.invalid("Boolean fixture response control required");

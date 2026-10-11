@@ -1,0 +1,1287 @@
+{
+  "$id": "urn:mulino:capability-slots:1",
+  "recordType": "CAPABILITY_SLOT_CONTRACT",
+  "schemaVersion": "1.0.0",
+  "description": "User decision 2026-10-11 (3): the product publishes the slot names each command capability accepts. The backend loads this file (CapabilitySlots) and the command pipeline rejects any other slot name with TYPE_INVALID before the handler; handlers that distinguish forms read their form from the same file. ./verify prepare checks every case command against it. Value shapes are contracts/intent.schema.json; names here are wire names.",
+  "capabilities": {
+    "acceptHandover": {
+      "slots": [
+        "handoverId"
+      ]
+    },
+    "activatePolicy": {
+      "slots": [
+        "id"
+      ]
+    },
+    "activateWork": {
+      "slots": [
+        "workId"
+      ]
+    },
+    "adjustQuantity": {
+      "slots": [
+        "direction",
+        "evidenceRef",
+        "occurredAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "stocktakeId",
+        "unit"
+      ]
+    },
+    "approvePolicy": {
+      "slots": [
+        "contentHash",
+        "id"
+      ]
+    },
+    "approvePurchase": {
+      "slots": [
+        "conditions",
+        "decision",
+        "proposalHash",
+        "proposalId",
+        "validUntil"
+      ]
+    },
+    "approveRecall": {
+      "slots": [
+        "decision",
+        "scopeHash",
+        "scopeId",
+        "validUntil"
+      ]
+    },
+    "assessGoal": {
+      "slots": [
+        "workId"
+      ]
+    },
+    "assignCapability": {
+      "slots": [
+        "actorId",
+        "assignedCapability",
+        "scopeId",
+        "scopeKind",
+        "validFrom",
+        "validUntil"
+      ]
+    },
+    "attachEvidence": {
+      "slots": [
+        "contentBase64",
+        "evidenceType",
+        "expectedHash",
+        "mediaType",
+        "provenance",
+        "sourceNamespace",
+        "sourceReference",
+        "subject",
+        "supersedesId"
+      ],
+      "forms": {
+        "DOCUMENT": [
+          "contentBase64",
+          "evidenceType",
+          "expectedHash",
+          "mediaType",
+          "provenance",
+          "sourceNamespace",
+          "sourceReference",
+          "subject",
+          "supersedesId"
+        ]
+      }
+    },
+    "authorizeReturn": {
+      "slots": [
+        "deliveryId",
+        "destinationId",
+        "quantity",
+        "reason",
+        "startQuantity",
+        "unit",
+        "validUntil"
+      ]
+    },
+    "cancelDraft": {
+      "slots": [
+        "reason",
+        "workId"
+      ]
+    },
+    "cancelPurchase": {
+      "slots": [
+        "externalAcceptance",
+        "purchaseId",
+        "quantity",
+        "reason",
+        "unit"
+      ]
+    },
+    "closeRecall": {
+      "slots": [
+        "approvalId",
+        "canonicalOccurrenceId",
+        "partitionHash",
+        "scopeHash",
+        "scopeId"
+      ]
+    },
+    "closeWork": {
+      "slots": [
+        "reason",
+        "workId"
+      ]
+    },
+    "confirmReceipt": {
+      "slots": [
+        "canonicalOccurrenceId",
+        "lotId",
+        "receiptId",
+        "receivingCustodianId"
+      ]
+    },
+    "correctEvidence": {
+      "slots": [
+        "assertion",
+        "contentBase64",
+        "documentId",
+        "effectiveFrom",
+        "effectiveUntil",
+        "eventId",
+        "evidenceType",
+        "expectedHash",
+        "externalEventId",
+        "invalidatesId",
+        "kind",
+        "mediaType",
+        "payload",
+        "provenance",
+        "quantity",
+        "sourceNamespace",
+        "sourceReference",
+        "sourceVersion",
+        "subject",
+        "supersedesId",
+        "timePrecision",
+        "timeZone",
+        "unit",
+        "valueState"
+      ],
+      "forms": {
+        "EVENT": [
+          "assertion",
+          "documentId",
+          "effectiveFrom",
+          "effectiveUntil",
+          "evidenceType",
+          "externalEventId",
+          "invalidatesId",
+          "kind",
+          "payload",
+          "quantity",
+          "sourceNamespace",
+          "sourceVersion",
+          "subject",
+          "supersedesId",
+          "timePrecision",
+          "timeZone",
+          "unit",
+          "valueState"
+        ],
+        "DOCUMENT": [
+          "contentBase64",
+          "evidenceType",
+          "expectedHash",
+          "mediaType",
+          "provenance",
+          "sourceNamespace",
+          "sourceReference",
+          "subject",
+          "supersedesId"
+        ],
+        "CLAIM": [
+          "assertion",
+          "documentId",
+          "eventId",
+          "evidenceType",
+          "quantity",
+          "sourceNamespace",
+          "subject",
+          "supersedesId",
+          "unit",
+          "valueState"
+        ]
+      },
+      "note": "evidenceType selects the form (default EVENT)"
+    },
+    "createDraft": {
+      "slots": [
+        "conditions",
+        "conversationRequestId",
+        "definitionVersionId",
+        "destinationId",
+        "distinctContributionScope",
+        "dueAt",
+        "eligibilityAction",
+        "endpoint",
+        "evaluationTime",
+        "evaluatorVersion",
+        "eventKinds",
+        "evidencePolicyVersion",
+        "goal",
+        "includeReservations",
+        "itemId",
+        "kind",
+        "lotId",
+        "observationPolicy",
+        "originalText",
+        "ownerId",
+        "period",
+        "placeId",
+        "quantity",
+        "quantityMode",
+        "supervisorId",
+        "timezone",
+        "workType"
+      ],
+      "forms": {
+        "public": [
+          "conditions",
+          "destinationId",
+          "distinctContributionScope",
+          "dueAt",
+          "eligibilityAction",
+          "endpoint",
+          "evaluationTime",
+          "evaluatorVersion",
+          "eventKinds",
+          "evidencePolicyVersion",
+          "includeReservations",
+          "lotId",
+          "observationPolicy",
+          "originalText",
+          "ownerId",
+          "period",
+          "placeId",
+          "quantity",
+          "quantityMode",
+          "supervisorId",
+          "timezone",
+          "workType"
+        ],
+        "goal": [
+          "conversationRequestId",
+          "definitionVersionId",
+          "goal",
+          "itemId",
+          "kind",
+          "lotId",
+          "originalText",
+          "ownerId",
+          "supervisorId"
+        ]
+      },
+      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject"
+    },
+    "createFollowup": {
+      "slots": [
+        "draft",
+        "obligationIds",
+        "reason",
+        "workId"
+      ]
+    },
+    "createGrant": {
+      "slots": [
+        "actions",
+        "actorId",
+        "scopes",
+        "validFrom",
+        "validUntil"
+      ]
+    },
+    "createObligation": {
+      "slots": [
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "scopeJson",
+        "sourceId",
+        "sourceKind",
+        "sourceVersion",
+        "unit",
+        "workId"
+      ]
+    },
+    "createPolicyDraft": {
+      "slots": [
+        "content",
+        "effectiveFrom",
+        "effectiveUntil",
+        "fixtureOnly",
+        "kind",
+        "legallyRestrictive",
+        "regressionEvidence",
+        "source",
+        "version"
+      ]
+    },
+    "createSalesOrder": {
+      "slots": [
+        "currency",
+        "customerId",
+        "deliveryEndpoint",
+        "destinationId",
+        "dueAt",
+        "itemId",
+        "orderId",
+        "packageTerms",
+        "price",
+        "qualityTerms",
+        "quantity",
+        "reason",
+        "unit",
+        "workId"
+      ]
+    },
+    "createShipment": {
+      "slots": [
+        "cargo",
+        "carrierRef",
+        "destinationId",
+        "legs",
+        "originId",
+        "workId"
+      ]
+    },
+    "createWork": {
+      "slots": [
+        "conditions",
+        "conversationRequestId",
+        "definitionVersionId",
+        "destinationId",
+        "distinctContributionScope",
+        "dueAt",
+        "eligibilityAction",
+        "endpoint",
+        "evaluationTime",
+        "evaluatorVersion",
+        "eventKinds",
+        "evidencePolicyVersion",
+        "goal",
+        "includeReservations",
+        "itemId",
+        "kind",
+        "lotId",
+        "observationPolicy",
+        "originalText",
+        "ownerId",
+        "period",
+        "placeId",
+        "quantity",
+        "quantityMode",
+        "supervisorId",
+        "timezone",
+        "workType"
+      ],
+      "forms": {
+        "public": [
+          "conditions",
+          "destinationId",
+          "distinctContributionScope",
+          "dueAt",
+          "eligibilityAction",
+          "endpoint",
+          "evaluationTime",
+          "evaluatorVersion",
+          "eventKinds",
+          "evidencePolicyVersion",
+          "includeReservations",
+          "lotId",
+          "observationPolicy",
+          "originalText",
+          "ownerId",
+          "period",
+          "placeId",
+          "quantity",
+          "quantityMode",
+          "supervisorId",
+          "timezone",
+          "workType"
+        ],
+        "goal": [
+          "conversationRequestId",
+          "definitionVersionId",
+          "goal",
+          "itemId",
+          "kind",
+          "lotId",
+          "originalText",
+          "ownerId",
+          "supervisorId"
+        ]
+      },
+      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject"
+    },
+    "createWorkLink": {
+      "slots": [
+        "activityId",
+        "conditionId",
+        "kind",
+        "linkKind",
+        "occurrenceId",
+        "physicalScope",
+        "quantity",
+        "quantityUnit",
+        "quantityValue",
+        "sourceWorkId",
+        "startQuantity",
+        "targetWorkId",
+        "workId"
+      ],
+      "note": "physicalScope is accepted only to answer NEEDS_INPUT VERIFIED_RANGE_REQUIRED (a disjoint range needs startQuantity)"
+    },
+    "decideQualityDutyWaiver": {
+      "slots": [
+        "assignmentId",
+        "decision",
+        "reason",
+        "validUntil"
+      ]
+    },
+    "decideQuantityDutyWaiver": {
+      "slots": [
+        "assignmentId",
+        "decision",
+        "reason",
+        "validUntil"
+      ]
+    },
+    "decideRecallDutyWaiver": {
+      "slots": [
+        "assignmentId",
+        "decision",
+        "reason",
+        "validUntil"
+      ]
+    },
+    "decideReturnDisposition": {
+      "slots": [
+        "decision",
+        "evidenceId",
+        "nextCheckAt",
+        "reason",
+        "returnId"
+      ]
+    },
+    "dispatchPurchaseOrder": {
+      "slots": [
+        "approvalId",
+        "channel",
+        "externalOperationId",
+        "proposalHash",
+        "proposalId"
+      ]
+    },
+    "dispatchQuantity": {
+      "slots": [
+        "allocationId",
+        "evidenceRef",
+        "occurredAt",
+        "transitPlaceId"
+      ]
+    },
+    "disposeQuantity": {
+      "slots": [
+        "evidenceRef",
+        "occurredAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "unit"
+      ]
+    },
+    "emergencyReassign": {
+      "slots": [
+        "effectiveAt",
+        "newOwnerId",
+        "nextAction",
+        "nextCheckAt",
+        "obligationId",
+        "reason",
+        "workId"
+      ]
+    },
+    "expireHandover": {
+      "slots": [
+        "handoverId"
+      ]
+    },
+    "fixtureExternalEffect": {
+      "slots": [
+        "dropResponse",
+        "workId"
+      ],
+      "note": "verification profile only",
+      "profile": "verification"
+    },
+    "linkCanonicalOccurrence": {
+      "slots": [
+        "reconciliationId"
+      ]
+    },
+    "linkExternalId": {
+      "slots": [
+        "issuer",
+        "itemId",
+        "namespace",
+        "validFrom",
+        "validUntil",
+        "value"
+      ]
+    },
+    "matchInvoice": {
+      "slots": [
+        "canonicalOccurrenceId",
+        "currency",
+        "deliveryId",
+        "evidence",
+        "invoiceId",
+        "matchQuantity",
+        "orderedAmount",
+        "purchaseLineId",
+        "receiptOccurrenceId",
+        "receiptOccurrenceKey",
+        "saleLineId"
+      ]
+    },
+    "matchSourceIdentity": {
+      "slots": [
+        "basisDocumentId",
+        "claimId",
+        "effectiveFrom",
+        "existingCanonicalId",
+        "physicalScopeId",
+        "policyVersion",
+        "quantity",
+        "reason",
+        "sourceIdentity",
+        "unit"
+      ]
+    },
+    "mergeQuantity": {
+      "slots": [
+        "evidenceRef",
+        "expectedRevisions",
+        "occurredAt",
+        "segmentIds"
+      ]
+    },
+    "moveQuantity": {
+      "slots": [
+        "destinationId",
+        "evidenceRef",
+        "occurredAt",
+        "segmentId"
+      ]
+    },
+    "openInvestigation": {
+      "slots": [
+        "basisEvidenceId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "occurredAt",
+        "quantity",
+        "segmentId",
+        "startQuantity",
+        "unit",
+        "workId"
+      ]
+    },
+    "openObligation": {
+      "slots": [
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "scopeJson",
+        "sourceId",
+        "sourceKind",
+        "sourceVersion",
+        "unit",
+        "workId"
+      ]
+    },
+    "pickQuantity": {
+      "slots": [
+        "allocationId"
+      ]
+    },
+    "placeHold": {
+      "slots": [
+        "action",
+        "category",
+        "customerId",
+        "evidenceId",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "startQuantity",
+        "unit",
+        "validFrom",
+        "validUntil",
+        "workId"
+      ]
+    },
+    "prepareRegulatoryProcedure": {
+      "slots": [
+        "documentVersionId",
+        "itemId",
+        "lotId",
+        "physicalScopeId",
+        "policyId",
+        "procedureId",
+        "workId"
+      ]
+    },
+    "proposeHandover": {
+      "slots": [
+        "expiresAt",
+        "nextAction",
+        "nextCheckAt",
+        "recipientId",
+        "workId"
+      ]
+    },
+    "proposePurchase": {
+      "slots": [
+        "currency",
+        "destinationId",
+        "dueAt",
+        "endpoint",
+        "goalVersionId",
+        "itemId",
+        "price",
+        "quantity",
+        "quantityMode",
+        "supplierId",
+        "unit",
+        "workId"
+      ]
+    },
+    "proposeRecall": {
+      "slots": [
+        "investigationId",
+        "quantity",
+        "reason",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "receiveProvisional": {
+      "slots": [
+        "eventId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "occurredAt",
+        "ownerId",
+        "placeId",
+        "purchaseLineId",
+        "quantity",
+        "rangeRootId",
+        "startQuantity",
+        "supervisorId",
+        "transitSegmentId",
+        "unit",
+        "workId"
+      ]
+    },
+    "receiveReturn": {
+      "slots": [
+        "authorizationId",
+        "canonicalOccurrenceId",
+        "eventId",
+        "nextCheckAt",
+        "occurredAt",
+        "quantity",
+        "receivingCustodianId",
+        "returnId",
+        "startQuantity",
+        "unit"
+      ],
+      "forms": {
+        "confirmation": [
+          "authorizationId",
+          "canonicalOccurrenceId",
+          "nextCheckAt",
+          "receivingCustodianId",
+          "returnId"
+        ],
+        "observation": [
+          "authorizationId",
+          "eventId",
+          "nextCheckAt",
+          "occurredAt",
+          "quantity",
+          "startQuantity",
+          "unit"
+        ]
+      },
+      "note": "confirmation form when returnId is present"
+    },
+    "recordActivity": {
+      "slots": [
+        "assertion",
+        "documentId",
+        "effectiveFrom",
+        "effectiveUntil",
+        "evidenceType",
+        "externalEventId",
+        "invalidatesId",
+        "kind",
+        "payload",
+        "quantity",
+        "sourceNamespace",
+        "sourceVersion",
+        "subject",
+        "supersedesId",
+        "timePrecision",
+        "timeZone",
+        "unit",
+        "valueState"
+      ],
+      "forms": {
+        "EVENT": [
+          "assertion",
+          "documentId",
+          "effectiveFrom",
+          "effectiveUntil",
+          "evidenceType",
+          "externalEventId",
+          "invalidatesId",
+          "kind",
+          "payload",
+          "quantity",
+          "sourceNamespace",
+          "sourceVersion",
+          "subject",
+          "supersedesId",
+          "timePrecision",
+          "timeZone",
+          "unit",
+          "valueState"
+        ]
+      }
+    },
+    "recordCharge": {
+      "slots": [
+        "amount",
+        "canonicalOccurrenceId",
+        "currency",
+        "evidence",
+        "invoiceId",
+        "kind"
+      ]
+    },
+    "recordDelivery": {
+      "slots": [
+        "canonicalOccurrenceId",
+        "cargoScopeId",
+        "customerId",
+        "dispatchId",
+        "eventId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "observationId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "rangeRootId",
+        "salesLineId",
+        "startQuantity",
+        "unit",
+        "workId"
+      ],
+      "forms": {
+        "confirmation": [
+          "canonicalOccurrenceId",
+          "observationId"
+        ],
+        "observation": [
+          "cargoScopeId",
+          "customerId",
+          "dispatchId",
+          "eventId",
+          "itemId",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "observationId",
+          "occurredAt",
+          "placeId",
+          "quantity",
+          "rangeRootId",
+          "salesLineId",
+          "startQuantity",
+          "unit",
+          "workId"
+        ]
+      },
+      "note": "confirmation form when canonicalOccurrenceId confirms an observation"
+    },
+    "recordDispositionBasis": {
+      "slots": [
+        "action",
+        "category",
+        "customerId",
+        "evidenceId",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "startQuantity",
+        "unit",
+        "validFrom",
+        "validUntil",
+        "workId"
+      ]
+    },
+    "recordExternalReconciliation": {
+      "slots": [
+        "decision",
+        "evidenceId",
+        "outboxId"
+      ]
+    },
+    "recordHandover": {
+      "slots": [
+        "cargoId",
+        "fromCustodianId",
+        "legId",
+        "occurredAt",
+        "occurrenceId",
+        "physicalScopeId",
+        "placeId",
+        "quantity",
+        "shipmentId",
+        "toCustodianId",
+        "unit"
+      ],
+      "forms": {
+        "exact": [
+          "cargoId",
+          "fromCustodianId",
+          "legId",
+          "occurredAt",
+          "occurrenceId",
+          "physicalScopeId",
+          "placeId",
+          "quantity",
+          "shipmentId",
+          "toCustodianId",
+          "unit"
+        ]
+      },
+      "note": "every slot is required"
+    },
+    "recordInvoice": {
+      "slots": [
+        "canonicalOccurrenceId",
+        "currency",
+        "deliveryId",
+        "evidence",
+        "fxSnapshot",
+        "invoiceKind",
+        "line",
+        "originalAmount",
+        "purchaseLineId",
+        "quantity",
+        "receiptOccurrenceId",
+        "receiptOccurrenceKey",
+        "relatedInvoiceId",
+        "saleLineId",
+        "scopeKind",
+        "sourceKey",
+        "unit",
+        "unitPrice"
+      ]
+    },
+    "recordLegEvent": {
+      "slots": [
+        "cargoId",
+        "kind",
+        "legId",
+        "lineAllocations",
+        "occurredAt",
+        "occurrenceId",
+        "physicalScopeId",
+        "placeId",
+        "quantity",
+        "shipmentId",
+        "unit"
+      ],
+      "forms": {
+        "exact": [
+          "cargoId",
+          "kind",
+          "legId",
+          "occurredAt",
+          "occurrenceId",
+          "physicalScopeId",
+          "placeId",
+          "quantity",
+          "shipmentId",
+          "unit"
+        ]
+      },
+      "note": "every exact slot is required; lineAllocations is optional"
+    },
+    "recordObservedMovement": {
+      "slots": [
+        "cargoScopeId",
+        "customerId",
+        "dispatchId",
+        "eventId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "observationId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "rangeRootId",
+        "salesLineId",
+        "startQuantity",
+        "unit",
+        "workId"
+      ],
+      "forms": {
+        "observation": [
+          "cargoScopeId",
+          "customerId",
+          "dispatchId",
+          "eventId",
+          "itemId",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "observationId",
+          "occurredAt",
+          "placeId",
+          "quantity",
+          "rangeRootId",
+          "salesLineId",
+          "startQuantity",
+          "unit",
+          "workId"
+        ]
+      }
+    },
+    "recordPaymentReference": {
+      "slots": [
+        "amount",
+        "canonicalOccurrenceId",
+        "currency",
+        "evidence",
+        "externalPaymentReference",
+        "invoiceId",
+        "observedAt"
+      ]
+    },
+    "recordRecallNotice": {
+      "slots": [
+        "actualEventId",
+        "approvalId",
+        "canonicalOccurrenceId",
+        "currentPlaceId",
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "returnId",
+        "rootSegmentId",
+        "scopeHash",
+        "scopeId",
+        "sourceSegmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "recordRecovery": {
+      "slots": [
+        "actualEventId",
+        "approvalId",
+        "canonicalOccurrenceId",
+        "currentPlaceId",
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "returnId",
+        "rootSegmentId",
+        "scopeHash",
+        "scopeId",
+        "sourceSegmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "recordRegulatoryDecision": {
+      "slots": [
+        "action",
+        "decision",
+        "occurrenceId",
+        "previousVersionId",
+        "procedureId",
+        "quantity",
+        "startQuantity",
+        "unit",
+        "validFrom",
+        "validUntil"
+      ]
+    },
+    "recordSettlementAdjustment": {
+      "slots": [
+        "amount",
+        "canonicalOccurrenceId",
+        "currency",
+        "dutyRootId",
+        "evidence",
+        "invoiceId",
+        "mode",
+        "policyVersion",
+        "proposalHash",
+        "proposalId",
+        "reason"
+      ]
+    },
+    "recordStocktake": {
+      "slots": [
+        "evidenceRef",
+        "observedQuantity",
+        "occurredAt",
+        "segmentId",
+        "unit"
+      ]
+    },
+    "recordSubmission": {
+      "slots": [
+        "occurredAt",
+        "occurrenceId",
+        "procedureId"
+      ]
+    },
+    "recordSupplierReply": {
+      "slots": [
+        "canonicalOccurrenceId",
+        "evidence",
+        "proposedQuantity",
+        "purchaseId",
+        "reply",
+        "unit"
+      ]
+    },
+    "registerItem": {
+      "slots": [
+        "baseUnit",
+        "decimalPlaces",
+        "name",
+        "packagingDescription",
+        "packagingHash",
+        "specificationDescription",
+        "specificationHash"
+      ]
+    },
+    "rejectHandover": {
+      "slots": [
+        "handoverId"
+      ]
+    },
+    "releaseAllocation": {
+      "slots": [
+        "allocationId"
+      ]
+    },
+    "releaseHold": {
+      "slots": [
+        "evidenceId",
+        "reason",
+        "restrictionId"
+      ]
+    },
+    "replaceAllocation": {
+      "slots": [
+        "allocationId",
+        "quantity",
+        "segmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "reserveQuantity": {
+      "slots": [
+        "quantity",
+        "salesLineId",
+        "segmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "resolveEvidenceConflict": {
+      "slots": [
+        "basisDocumentId",
+        "claimId",
+        "effectiveFrom",
+        "existingCanonicalId",
+        "physicalScopeId",
+        "policyVersion",
+        "quantity",
+        "reason",
+        "sourceIdentity",
+        "unit"
+      ]
+    },
+    "resolveObligation": {
+      "slots": [
+        "assignmentId",
+        "evidenceId"
+      ]
+    },
+    "resumeWork": {
+      "slots": [
+        "evidence",
+        "workId"
+      ]
+    },
+    "retirePolicy": {
+      "slots": [
+        "id",
+        "replacementPolicyId",
+        "terminationBasis"
+      ]
+    },
+    "reviseGoal": {
+      "slots": [
+        "goal",
+        "newDueAt",
+        "previousGoalVersion",
+        "reason",
+        "workId"
+      ],
+      "forms": {
+        "goal": [
+          "goal",
+          "reason",
+          "workId"
+        ],
+        "dueAt": [
+          "newDueAt",
+          "previousGoalVersion",
+          "reason",
+          "workId"
+        ]
+      }
+    },
+    "revisePurchase": {
+      "slots": [
+        "changes",
+        "proposalId",
+        "reason"
+      ]
+    },
+    "reviseSalesOrder": {
+      "slots": [
+        "currency",
+        "customerId",
+        "deliveryEndpoint",
+        "destinationId",
+        "dueAt",
+        "itemId",
+        "orderId",
+        "packageTerms",
+        "price",
+        "qualityTerms",
+        "quantity",
+        "reason",
+        "unit",
+        "workId"
+      ]
+    },
+    "revokeCapability": {
+      "slots": [
+        "id"
+      ]
+    },
+    "revokeDispositionBasis": {
+      "slots": [
+        "dispositionBasisId",
+        "evidenceId",
+        "reason"
+      ]
+    },
+    "revokeGrant": {
+      "slots": [
+        "id"
+      ]
+    },
+    "splitQuantity": {
+      "slots": [
+        "evidenceRef",
+        "occurredAt",
+        "quantities",
+        "segmentId",
+        "unit"
+      ]
+    },
+    "transferObligation": {
+      "slots": [
+        "assignmentId",
+        "expiresAt",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "recipientId",
+        "targetWorkId",
+        "workId"
+      ]
+    },
+    "verifyLabel": {
+      "slots": [
+        "decision",
+        "occurrenceId",
+        "packagingVersionId",
+        "procedureId",
+        "specificationVersionId",
+        "validFrom",
+        "validUntil"
+      ]
+    },
+    "waitWork": {
+      "slots": [
+        "wait",
+        "workId"
+      ]
+    },
+    "waiveObligation": {
+      "slots": [
+        "assignmentId",
+        "reason"
+      ]
+    }
+  }
+}

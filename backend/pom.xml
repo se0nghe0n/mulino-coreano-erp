@@ -77,6 +77,14 @@
         <directory>../database/migrations</directory>
         <targetPath>db/migration</targetPath>
       </resource>
+      <!-- User decision 2026-10-11 (3): the published capability slot contract is the product's slot registry. -->
+      <resource>
+        <directory>../contracts</directory>
+        <targetPath>contracts</targetPath>
+        <includes>
+          <include>capability-slots.json</include>
+        </includes>
+      </resource>
     </resources>
     <plugins>
       <plugin>

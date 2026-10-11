@@ -389,7 +389,8 @@
     "mulino_commands_CommandRecords": "status=state, stableRequestOwnerId=stableRequestOwner",
     "mulino_inventory_SegmentAllocations": "status=state",
     "mulino_work_read_Works": "state=status",
-    "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row"
+    "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row; a row whose commandId is null or names no CommandRecords row (fixture-installed) carries commandIdempotencyKey NO_COMMAND_RECORD",
+    "any row without a commandId column": "commandIdempotencyKey, capabilityId, stableRequestOwnerId of the earliest COMMITTED CommandRecords row whose resultJson (effects, *Id fields) names the row id (approximate creating command); otherwise commandIdempotencyKey NO_COMMAND_RECORD"
   },
   "virtual": {
     "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",

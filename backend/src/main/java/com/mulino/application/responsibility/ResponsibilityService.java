@@ -62,7 +62,7 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
   * accepted on the recipient's behalf (handoverAccepted=false) and no approval row is involved.
   */
  public Map<String,Object> emergency(DomainContext c,Map<String,Object>p){
-  if(!Set.of("workId","newOwnerId","reason","obligationId","effectiveAt","nextAction","nextCheckAt").containsAll(p.keySet()))throw DomainError.invalid("Unsupported emergency reassignment slot");
+  if(!CapabilitySlots.allowed("emergencyReassign").containsAll(p.keySet()))throw DomainError.invalid("Unsupported emergency reassignment slot");
   String workId=text(p,"workId"),recipient=text(p,"newOwnerId"),reason=text(p,"reason");
   if((p.get("nextAction")==null)!=(p.get("nextCheckAt")==null))throw DomainError.invalid("nextAction and nextCheckAt are set together");
   if(p.get("effectiveAt")!=null&&at(p.get("effectiveAt")).isAfter(c.knownAt()))throw DomainError.invalid("Emergency reassignment cannot be future-dated");

@@ -33,7 +33,7 @@ class CommandTransactionTest {
   @Bean @Primary Guard guard(ReadAuthorizer auth){return new Guard(auth);}
   @Bean com.mulino.application.runtime.VerificationFaults verificationFaults(){return new com.mulino.application.runtime.VerificationFaults();}
   @Bean CommandHandler fixtureHandler(JdbcTemplate jdbc){return new CommandHandler(){
-   public Set<String> capabilities(){return Set.of("fixtureIncrement","fixtureClose");}
+   public Set<String> capabilities(){return Set.of("fixtureIncrement","fixtureClose");}public boolean publishesSlots(){return false;}
    public CommandPreparation prepare(DomainContext c,Map<String,Object> i){if("fixtureClose".equals(i.get("capabilityId"))&&jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId())>0)throw DomainError.invalid("Parent consumed");if(!((Map<?,?>)i.get("slots")).keySet().equals(Set.of("amount")))throw DomainError.invalid("Typed amount required");return CommandPreparation.ordinary(Map.of("ORGANIZATION",List.of(c.organizationId()),"WORK",List.of(c.actorId())),List.of("fixture-state"),"INTERNAL_MOVE",null,jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId()));}
    public Map<String,Object> execute(DomainContext c,Map<String,Object> i){jdbc.update("UPDATE command_fixture SET revision=revision+1,quantity=quantity+? WHERE organizationId=?",Integer.parseInt((String)((Map<?,?>)i.get("slots")).get("amount")),c.organizationId());return Map.of("outcome","APPLIED","revision",jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId()),"effects",Map.of("movement","fixture"));}
   };}

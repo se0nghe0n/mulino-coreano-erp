@@ -20,7 +20,7 @@ public class QualityCommands implements CommandHandler {
  private String targetKey(String cap){return cap.equals("releaseHold")?"restrictionId":"dispositionBasisId";}
  public CommandPreparation prepare(DomainContext c,Map<String,Object>intent){
   String cap=text(intent,"capabilityId",80);if(!capabilities().contains(cap))throw DomainError.unsupported();var s=slots(intent);boolean release=releasing(cap);
-  Set<String>allowed=release?Set.of(targetKey(cap),"evidenceId","reason"):Set.of("segmentId","action","category","customerId","evidenceId","reason","validFrom","validUntil","startQuantity","quantity","unit","workId","nextCheckAt");
+  Set<String>allowed=CapabilitySlots.allowed(cap);
   if(!allowed.containsAll(s.keySet()))throw DomainError.invalid("Unsupported quality slot");
   if(!Objects.equals(intent.get("intentKind"),cap.equals("recordDispositionBasis")?"RECORD":"COMMAND"))throw DomainError.invalid("Quality intent kind mismatch");
   Map<String,Object>target=release?r.current(c,entity(cap),uuid(s,targetKey(cap))):r.current(c,"QuantitySegments",uuid(s,"segmentId"));String segmentId=release?(String)target.get("segmentId"):(String)target.get("ID");if(segmentId==null)throw DomainError.invalid("Legacy restriction requires identified physical scope");var segment=r.current(c,"QuantitySegments",segmentId);

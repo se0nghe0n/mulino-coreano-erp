@@ -26,15 +26,7 @@ public final class InventoryCommands implements CommandHandler {
   public Set<String> intentKinds(){return Set.of("COMMAND","RECORD");}
   public CommandPreparation prepare(DomainContext c,Map<String,Object> intent) {
     String capability=text(intent,"capabilityId",100);var slots=slots(intent);Instant at=time(c,slots);
-    Set<String> allowed=switch(capability) {
-      case "splitQuantity" -> Set.of("segmentId","quantities","unit","occurredAt","evidenceRef");
-      case "mergeQuantity" -> Set.of("segmentIds","expectedRevisions","occurredAt","evidenceRef");
-      case "moveQuantity" -> Set.of("segmentId","destinationId","occurredAt","evidenceRef");
-      case "recordStocktake" -> Set.of("segmentId","observedQuantity","unit","occurredAt","evidenceRef");
-      case "adjustQuantity" -> Set.of("segmentId","quantity","unit","direction","reason","stocktakeId","occurredAt","evidenceRef");
-      case "disposeQuantity" -> Set.of("segmentId","quantity","unit","reason","occurredAt","evidenceRef");
-      default -> throw DomainError.unsupported();
-    };
+    Set<String> allowed=CapabilitySlots.allowed(capability);
     if(!allowed.containsAll(slots.keySet()))throw DomainError.invalid("Unsupported stock command slot");
     if(!Objects.equals(intent.get("intentKind"),capability.equals("recordStocktake")?"RECORD":"COMMAND"))throw DomainError.invalid("Stock command intent kind mismatch");
     text(slots,"evidenceRef",240);
@@ -97,7 +89,10 @@ public final class InventoryCommands implements CommandHandler {
     };
     if(impact!=null&&capability.equals("adjustQuantity"))for(var a:repository.currentRows(c,"SegmentAllocations"))if(command.equals(a.get("commandId"))&&"PHYSICAL_SHORTAGE".equals(a.get("suspensionReason"))&&a.get("workId")!=null)impact.recorded(c,(String)a.get("workId"),(String)a.get("ID"),"ALLOCATION_SHORTAGE",(String)a.get("segmentId"),"Reconcile missing physical allocation",c.knownAt().plusSeconds(60),Map.of("allocationId",a.get("ID"),"startQuantity",InventoryQuantity.text(a.get("startQuantity"))),(BigDecimal)a.get("quantity"),(String)a.get("unit"));
     var effects=new LinkedHashMap<String,Object>();effects.put(capability.equals("recordStocktake")?"stocktakeIds":"segmentIds",ids);effects.put("quantityEffects",capability.equals("recordStocktake")?List.of():ids.stream().map(id->repository.current(c,"QuantitySegments",id)).map(r->Map.of("segmentId",r.get("ID"),"quantity",InventoryQuantity.text(r.get("quantity")),"unit",r.get("unit"))).toList());
-    return Map.of("outcome","APPLIED","revision",capability.equals("recordStocktake")?0:1,"effects",effects);
+    var result=new LinkedHashMap<String,Object>();result.put("outcome","APPLIED");result.put("revision",capability.equals("recordStocktake")?0:1);result.put("effects",effects);
+    // S3-7: split children are identified by their position in the requested quantities (plan §3.4 명령은 적용 효과를 반환).
+    if(capability.equals("splitQuantity")){var children=new ArrayList<Map<String,Object>>();var quantities=(List<?>)effects.get("quantityEffects");for(int index=0;index<ids.size();index++){var child=new LinkedHashMap<String,Object>((Map<String,Object>)quantities.get(index));child.put("index",index);children.add(child);}result.put("children",children);}
+    return Collections.unmodifiableMap(result);
   }
   @SuppressWarnings("unchecked") public static Map<String,Object> slots(Map<String,Object> intent) {if(!(intent.get("slots") instanceof Map<?,?> m)||m.keySet().stream().anyMatch(k->!(k instanceof String)))throw DomainError.invalid("Typed slots required");return TypedQuantities.expand((Map<String,Object>)m);}
   public static String text(Map<String,Object> m,String k,int max){if(!(m.get(k) instanceof String s)||s.isBlank()||s.length()>max)throw DomainError.invalid("Invalid "+k);return s;}

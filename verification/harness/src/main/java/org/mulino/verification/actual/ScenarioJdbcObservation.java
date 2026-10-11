@@ -186,6 +186,7 @@ final class ScenarioJdbcObservation {
         COLUMNS.put(table,out);return out;
     }
     /** Observation conveniences computed only from the same transaction's rows; never from the product API. */
+    static final String NO_COMMAND_RECORD="NO_COMMAND_RECORD";
     private static void derive(Connection c,String table,ArrayNode rows,Map<String,JsonNode> commands) throws SQLException {
         Map<String,JsonNode> roots=new HashMap<>();
         for(JsonNode n:rows) {
@@ -194,6 +195,17 @@ final class ScenarioJdbcObservation {
             if(commandId!=null&&!row.has("commandIdempotencyKey")) {
                 JsonNode cmd=commands.computeIfAbsent(commandId,id->command(c,id));
                 if(cmd!=null){row.set("commandIdempotencyKey",cmd.path("commandIdempotencyKey"));if(!row.has("capabilityId"))row.set("capabilityId",cmd.path("capabilityId"));if(!row.has("stableRequestOwnerId"))row.set("stableRequestOwnerId",cmd.path("stableRequestOwner"));}
+            }
+            // A row of a command-attributed table that no CommandRecord produced (fixture-installed opening balance,
+            // installer allocation) was made by no command: it carries the explicit NO_COMMAND_RECORD key, which equals
+            // no case idempotency key, instead of a missing field (round 13: 59 "filter field missing" failures).
+            if(row.has("commandId")&&!row.has("commandIdempotencyKey"))row.put("commandIdempotencyKey",NO_COMMAND_RECORD);
+            // A table without a commandId column (Works, CapabilityAssignments, ...) is attributed to the earliest COMMITTED
+            // command whose result names the row id (approximate: the creating command); otherwise to NO_COMMAND_RECORD.
+            if(!row.has("commandId")&&!row.has("commandIdempotencyKey")&&row.hasNonNull("id")&&row.hasNonNull("organizationId")&&!table.equals("mulino_commands_CommandRecords")) {
+                JsonNode cmd=effectCommands(c,row.path("organizationId").asText(),commands).get(row.path("id").asText());
+                if(cmd!=null){row.set("commandIdempotencyKey",cmd.path("commandIdempotencyKey"));if(!row.has("capabilityId"))row.set("capabilityId",cmd.path("capabilityId"));if(!row.has("stableRequestOwnerId"))row.set("stableRequestOwnerId",cmd.path("stableRequestOwner"));}
+                else row.put("commandIdempotencyKey",NO_COMMAND_RECORD);
             }
             switch(table) {
                 case "mulino_inventory_QuantitySegments" -> {row.put("active",row.path("retiredAt").isNull()||row.path("retiredAt").isMissingNode());row.set("locationId",row.path("placeId"));row.set("physicalScope",row.path("controlScope"));}
@@ -209,6 +221,20 @@ final class ScenarioJdbcObservation {
             }
         }
     }
+    /** Row id -> the earliest COMMITTED command of the organization whose result (effects and *Id fields) names it. */
+    private static JsonNode effectCommands(Connection c,String org,Map<String,JsonNode> cache) {
+        return cache.computeIfAbsent("effects:"+org,k->{
+            var out=Json.object();
+            try(var s=c.prepareStatement("SELECT commandIdempotencyKey,capabilityId,stableRequestOwner,resultJson FROM mulino_commands_CommandRecords WHERE organizationId=? AND state='COMMITTED' ORDER BY createdAt,ID")){s.setString(1,org);
+                try(var r=s.executeQuery()){while(r.next()){var cmd=Json.object();cmd.put("commandIdempotencyKey",r.getString(1));cmd.put("capabilityId",r.getString(2));cmd.put("stableRequestOwner",r.getString(3));
+                    String result=r.getString(4);if(result==null)continue;Set<String> named=new HashSet<>();JsonNode parsed;try{parsed=Json.parse(result);}catch(IllegalArgumentException bad){continue;}
+                    named(parsed.path("effects"),named);parsed.fields().forEachRemaining(f->{if((f.getKey().endsWith("Id")||f.getKey().equals("id"))&&f.getValue().isTextual())named.add(f.getValue().asText());});
+                    for(String id:named)if(!out.has(id))out.set(id,cmd);}}}
+            catch(SQLException failure){throw new IllegalStateException(failure);}
+            return out;
+        });
+    }
+    private static void named(JsonNode node,Set<String> out){if(node.isTextual()&&node.asText().matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))out.add(node.asText());else if(node.isContainerNode())node.elements().forEachRemaining(v->named(v,out));}
     private static JsonNode root(Connection c,String id) {
         try(var s=c.prepareStatement("SELECT sourceKind,sourceId FROM mulino_responsibility_Roots WHERE ID=?")){s.setString(1,id);
             try(var r=s.executeQuery()){if(!r.next())return null;var o=Json.object();o.put("sourceKind",r.getString(1));o.put("sourceId",r.getString(2));return o;}}

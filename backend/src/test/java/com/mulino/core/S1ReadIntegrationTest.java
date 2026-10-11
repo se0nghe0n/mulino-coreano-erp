@@ -100,6 +100,26 @@ class S1ReadIntegrationTest {
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE organizationId=? AND status='OPEN'",Integer.class,org));
     assertEquals(new java.math.BigDecimal("100.000000000000"),jdbc.queryForObject("SELECT sum(quantity) FROM mulino_inventory_QuantitySegments WHERE organizationId=?",java.math.BigDecimal.class,org));
   }
+  Map<String,Object> readType(String operation,String target,String type){var body=row("scope",Map.of("organizationId",org,"objectType",type),"asOf",AS_OF.toString(),"knownAt",KNOWN.toString());if(target!=null)body.put("id",target);return runtime.requestContext().run(c->{return queries.query(QueryRequests.parse(operation,body));});}
+  /** S3-3: plan record nouns (Obligation, CommandRecord, ...) are getObject nouns with the same scope and owner rules. */
+  @Test @SuppressWarnings("unchecked") void recordNounsReadThroughGetObjectWithTheSameScopeRules(){
+    // Root and its leaf scope in one statement: the root quantity-conservation trigger checks them together.
+    String root=id();Timestamp created=Timestamp.from(AS_OF.minusSeconds(10)),recorded=Timestamp.from(KNOWN.minusSeconds(10));
+    jdbc.update("WITH r AS (INSERT INTO mulino_responsibility_Roots(organizationId,ID,revision,createdAt,recordedAt,dutyKey,sourceId,sourceKind,sourceVersion,kind,scopeJson) VALUES(?,?,1,?,?,?,?,'DOCUMENT','1','QC_REVIEW','{}') RETURNING ID),"
+      +" s AS (INSERT INTO mulino_responsibility_Scopes(organizationId,ID,revision,createdAt,recordedAt,rootId,startQuantity,quantity,leaf,scopeJson) SELECT ?,?,1,?,?,ID,0,1,true,'{}' FROM r RETURNING ID,rootId)"
+      +" UPDATE mulino_work_read_ObligationReferences o SET rootId=s.rootId,scopeId=s.ID FROM s WHERE o.organizationId=? AND o.ID=?",
+      org,root,created,recorded,"duty-"+root,document,org,id(),created,recorded,org,obligation);
+    var duty=(Map<String,Object>)readType("getObject",root,"Obligation").get("data");
+    assertEquals("Obligation",duty.get("type"));assertEquals(item,duty.get("itemId"));assertEquals(List.of(work),duty.get("workIds"));assertEquals("OPEN",duty.get("status"));assertEquals(1,duty.get("revision"));
+    String owner=jdbc.queryForObject("SELECT stableRequestOwner FROM mulino_identity_Actors WHERE organizationId=? AND ID=?",String.class,org,actor);
+    String mine=id(),other=id();
+    for(String[] r:new String[][]{{mine,owner},{other,id()}})insert("mulino_commands_CommandRecords",row("ID",r[0],"organizationId",org,"actorId",actor,"stableRequestOwner",r[1],"capabilityId","moveQuantity","commandIdempotencyKey","key-"+r[0],"canonicalHash","5".repeat(64),"definitionVersion","integration-v1","capabilityVersion","1.0.0","state","COMMITTED","canonicalIntentJson","{}","createdAt",Timestamp.from(KNOWN.minusSeconds(5))));
+    var record=(Map<String,Object>)readType("getObject",mine,"CommandRecord").get("data");
+    assertEquals("key-"+mine,record.get("commandIdempotencyKey"));assertFalse(record.containsKey("canonicalIntentJson"));
+    assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readType("getObject",other,"CommandRecord")).code());
+    assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readType("getObject",id(),"Allocation")).code());
+    assertEquals("TYPE_INVALID",assertThrows(DomainError.class,()->readType("getObject",root,"NotANoun")).code());
+  }
   @Test void wrongOrgAndReadProjectionChangesFailClosed(){
     var noun=read("getObject",item,null);
     assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->read("getWork",id(),null)).code());

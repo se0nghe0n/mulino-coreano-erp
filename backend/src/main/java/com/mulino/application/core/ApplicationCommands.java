@@ -18,13 +18,18 @@ public class ApplicationCommands {
       ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,ObjectProvider<CommandBarrier> barriers,ObjectProvider<CommandFaults> faults,PlatformTransactionManager manager){
     this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;this.barriers=barriers;this.faults=faults;
     for(CommandHandler h:handlers)for(String cap:h.capabilities())if(this.handlers.put(cap,h)!=null)throw new IllegalStateException("Duplicate command capability "+cap);
+    // The published slot contract and the registered handlers name the same capabilities (user decision 2026-10-11 (3)).
+    var published=new TreeSet<String>();this.handlers.forEach((cap,h)->{if(h.publishesSlots())published.add(cap);});
+    // Every published handler capability is listed, and every listed capability not bound to a named profile has a handler.
+    var missing=new TreeSet<String>(published);missing.removeAll(CapabilitySlots.capabilities());var absent=new TreeSet<String>(CapabilitySlots.unconditional());absent.removeAll(published);
+    if(!missing.isEmpty()||!absent.isEmpty())throw new IllegalStateException("Capability slot contract differs from handlers: unlisted "+missing+", without handler "+absent);
     transaction=new TransactionTemplate(manager);transaction.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
     denial=new TransactionTemplate(manager);denial.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
   }
   public Set<String> operations(){return Set.copyOf(handlers.keySet());}
   public List<Map<String,Object>> manifest(){return handlers.entrySet().stream().map(e->Map.<String,Object>of("capabilityId",e.getKey(),"semanticVersion",e.getValue().semanticVersion(),"definitionVersions",e.getValue().definitionVersions(),"intentKinds",e.getValue().intentKinds())).toList();}
   public Map<String,Object> validate(Map<String,Object> input){
-    return transaction.execute(status->{Map<String,Object> intent=typed(input,false);DomainContext c=auth.context(clock.instant(),clock.instant());CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation prep=h.prepare(c,intent);definitions.verifySubjects(c,intent,h,prep);auth.authorizeScopes(c,(String)intent.get("capabilityId"),prep.scopes());return Map.of("outcome","VALIDATED","canonicalIntentHash",CommandRequests.hash(intent),"proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1,"capabilityVersion",h.semanticVersion(),"effectClass",prep.effectClass(),"scope",prep.scopes());});
+    return transaction.execute(status->{Map<String,Object> intent=typed(input,false);DomainContext c=auth.context(clock.instant(),clock.instant());CommandHandler h=handler(intent);definitions.verify(c,intent,h);if(h.publishesSlots())CapabilitySlots.require((String)intent.get("capabilityId"),(Map<?,?>)intent.get("slots"));CommandPreparation prep=h.prepare(c,intent);definitions.verifySubjects(c,intent,h,prep);auth.authorizeScopes(c,(String)intent.get("capabilityId"),prep.scopes());return Map.of("outcome","VALIDATED","canonicalIntentHash",CommandRequests.hash(intent),"proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1,"capabilityVersion",h.semanticVersion(),"effectClass",prep.effectClass(),"scope",prep.scopes());});
   }
   /** Safe operational replay of the stored canonical command; never creates a new revision or key. */
   public Map<String,Object> retryOriginal(String commandRecordId,Map<String,Object> serverClaim){
@@ -80,7 +85,7 @@ public class ApplicationCommands {
       if(old.get().get("resultJson")==null)throw new DomainError("CONFLICT","COMMAND_IN_PROGRESS","Command unavailable");
       return repository.result(old.get());
     }
-    CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);List<SubjectBinding> initialSubjects=definitions.verifySubjects(c,intent,h,initial);
+    CommandHandler h=handler(intent);definitions.verify(c,intent,h);if(h.publishesSlots())CapabilitySlots.require(cap,(Map<?,?>)intent.get("slots"));CommandPreparation initial=h.prepare(c,intent);List<SubjectBinding> initialSubjects=definitions.verifySubjects(c,intent,h,initial);
     barrier("AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK","BEFORE_SCOPE_LOCK","AFTER_INITIAL_READ_BEFORE_SCOPE_FENCE","AFTER_ELIGIBILITY_READ_BEFORE_SCOPE_FENCE","AFTER_AUTH_READ_BEFORE_SCOPE_FENCE");
     blocking("WAITING_FOR_GRANT_SCOPE_FENCE","WAITING_FOR_SCOPE_FENCE");
     repository.fence(c,initial.fenceKeys());

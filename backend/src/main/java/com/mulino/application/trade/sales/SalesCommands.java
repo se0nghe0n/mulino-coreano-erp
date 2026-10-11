@@ -13,7 +13,7 @@ public class SalesCommands implements CommandHandler,SalesOrderLinePort,SalesExe
  public SalesCommands(SalesRepository r,InventoryRepository inventory,WorkAccess works){this.r=r;this.inventory=inventory;this.works=works;}
  public Set<String> capabilities(){return Set.of("createSalesOrder","reviseSalesOrder");}
  private Map<String,Object> valid(DomainContext c,Map<String,Object>s){
-  if(!Set.of("orderId","workId","customerId","itemId","quantity","unit","price","currency","dueAt","destinationId","deliveryEndpoint","qualityTerms","packageTerms","reason").containsAll(s.keySet()))throw DomainError.invalid("Unsupported sales order slots");
+  if(!CapabilitySlots.allowed("createSalesOrder").containsAll(s.keySet()))throw DomainError.invalid("Unsupported sales order slots");
   for(String k:List.of("workId","customerId","itemId","destinationId"))uuid(s,k);works.require(c,uuid(s,"workId"),false);r.require(c,"Customers",uuid(s,"customerId"));inventory.current(c,"Places",uuid(s,"destinationId"));var item=inventory.current(c,"TradeItems",uuid(s,"itemId"));
   String unit=text(s,"unit",40);if(!unit.equals(item.get("baseUnit")))throw DomainError.invalid("Sales base unit mismatch");var row=new LinkedHashMap<>(s);row.put("quantity",InventoryQuantity.parse(s.get("quantity"),((Number)item.get("decimalPlaces")).intValue()));row.put("price",decimal(s.get("price"),true));String currency=text(s,"currency",3);if(!currency.matches("[A-Z]{3}"))throw DomainError.invalid("Currency required");row.put("dueAt",Instant.parse(text(s,"dueAt",80)));if(!"DELIVERED".equals(text(s,"deliveryEndpoint",40)))throw DomainError.invalid("Supported endpoint is DELIVERED");text(s,"qualityTerms",500);text(s,"packageTerms",500);return row;
  }
