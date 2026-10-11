@@ -458,8 +458,25 @@ final class ScenarioFixtureInstaller {
                 "timezone",slots.path("timezone").asText(null),"dueAt",slots.hasNonNull("dueAt")?time(slots.path("dueAt").asText()):null,"goalVersion",w.path("goalVersion").asInt(1));
             insert("mulino_work_read_GoalReferences",g);
             update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE organizationId=? AND ID=?",goalId,org,id(alias));
+            row.put("currentGoalVersionId",goalId);
             conventions.add("Work "+alias+" goal mapped quantity->targetQuantity, destinationAlias->scope.placeId");
         }
+        workTransition(org,alias,row);
+    }
+    /**
+     * S3-1: the product reads a COMMAND Work only through its WorkTransitions snapshot (WorkReadRepository.workHistory), the
+     * row every lifecycle command writes. An installed Work gets the same revision snapshot (operation INSTALLED_FIXTURE),
+     * recorded at the starting clock, so getWork sees exactly the Works row the installer wrote.
+     */
+    private void workTransition(String org,String alias,Map<String,Object> work) throws Exception {
+        var snapshot=new TreeMap<String,Object>();
+        for(String k:List.of("organizationId","ID","revision","createdAt","recordedAt","effectiveAt","itemId","lotId","definitionVersionId","kind","status","ownerId","supervisorId","waitJson","currentGoalVersionId","closeReason","pendingInvalidation","goalRevisionRequired","originalText","conversationRequestId","lifecycleMode"))snapshot.put(k,null);
+        work.forEach((k,v)->snapshot.put(k,v instanceof OffsetDateTime t?t.toInstant().toString():v));
+        snapshot.putIfAbsent("goalRevisionRequired",false);if(snapshot.get("goalRevisionRequired")==null)snapshot.put("goalRevisionRequired",false);
+        String status=String.valueOf(work.get("status"));
+        insert("mulino_work_WorkTransitions",row("organizationId",org,"ID",uuid(),"workId",id(alias),"revision",work.get("revision"),"operation","INSTALLED_FIXTURE","previousState",null,"state",status,
+            "actorId",work.get("ownerId"),"reason","scenario fixture installation","recordedAt",asOf,"snapshotJson",Json.MAPPER.writeValueAsString(snapshot)));
+        if(conventions.stream().noneMatch(x->x.startsWith("installed COMMAND Works carry")))conventions.add("installed COMMAND Works carry one INSTALLED_FIXTURE WorkTransitions snapshot at the starting clock (the product reads COMMAND Works only through transition snapshots)");
     }
     private String guessKind(String alias) {
         for(JsonNode r:fixture.path("baseline").path("works"))if(alias.equals(r.path("alias").asText())&&r.hasNonNull("kind"))return r.path("kind").asText();
