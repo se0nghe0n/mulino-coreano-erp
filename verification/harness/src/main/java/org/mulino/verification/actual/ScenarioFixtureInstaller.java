@@ -194,7 +194,10 @@ final class ScenarioFixtureInstaller {
     }
     private void actor(String alias,String kind) throws SQLException {
         String org=org(alias),id=id(alias);
-        insert("mulino_identity_Actors",row("organizationId",org,"ID",id,"kind",kind,"stableRequestOwner",UUID.randomUUID().toString(),"createdAt",asOf,"recordedAt",asOf));
+        // The stable request owner is the installed principal itself (plan §7.3: server-verified requester continuity, not a
+        // token/RPC/Run id), so case observations that name the actor as stableRequestOwnerId see the same identity.
+        insert("mulino_identity_Actors",row("organizationId",org,"ID",id,"kind",kind,"stableRequestOwner",id,"createdAt",asOf,"recordedAt",asOf));
+        if(conventions.stream().noneMatch(x->x.startsWith("installed actors use their actor id")))conventions.add("installed actors use their actor id as stableRequestOwner");
         insert("mulino_identity_AuthorityFences",row("organizationId",org,"actorId",id));
     }
     private void grants() throws SQLException {
