@@ -1704,3 +1704,61 @@ def conform_case(case, root=ROOT, cache=None):
 
 def conform_fixture(fixture, root=ROOT):
     return Contracts(root).conform_fixture(fixture)
+
+
+# ---- definition packages (step2r round 13, AGENTS.md 2026-10-11 decision 2) -----------------------------------------
+# The contract of a definition-lifecycle package is the definition the product stores
+# (backend/src/main/java/com/mulino/domain/definitions/Definition.java: nouns, attributes, verbs, relations, goals,
+# capabilities, read by DefinitionRepository and checked by DefinitionValidator). The cases wrote an authoring shape
+# (nounTypes, verbDefinitions, goalTemplates, compatibilityManifest); these helpers write the same statement in the
+# stored shape. GoalVersion values a template does not hold (quantity target, dueAt, evaluationTime, evidence policy)
+# become the goal predicate's minimum or stay with the Work; evaluatorId repeated evaluatorVersion.
+STORED_SLOT_TYPES = {'DecimalWithUnit': 'DECIMAL', 'String': 'STRING', 'Instant': 'INSTANT', 'Date': 'DATE', 'Boolean': 'BOOLEAN'}
+CREATE_WORK_CONTRACT = {'capabilityId': 'createWork', 'semanticVersion': '1.0.0', 'evaluatorVersion': 'core-v1',
+                        'inputSchemaVersion': '1.0.0', 'outputSchemaVersion': '1.0.0', 'supportedWorkMigration': []}
+
+
+def stored_attribute(noun, name, kind, unit=None, reference=None, minimum=1, maximum=1, stage='READ', core=True):
+    return {'nounType': noun, 'name': name, 'type': kind, 'referenceType': reference, 'unit': unit, 'decimalPlaces': 0,
+            'minimumCount': minimum, 'maximumCount': maximum, 'requiredStage': stage, 'core': core}
+
+
+def goal_predicate(noun, mode, quantity, unit):
+    """The template's target quantity as the typed predicate the evaluator reads (installer-conventions definition-v1)."""
+    operator, selector = ('stateQuantity', 'CURRENT_STATE') if mode == 'STATE_AT' else ('quantitySum', 'VERIFIED_DISTINCT')
+    return {'operator': operator, 'property': f'{noun}.quantity', 'minimum': {'value': quantity, 'unit': unit}, 'unit': unit,
+            'evidenceSelector': selector}
+
+
+def stored_definition(package, version, parent):
+    """An authoring package (nounTypes, verbDefinitions, goalTemplates, compatibilityManifest) as the stored Definition."""
+    nouns = [{'name': n['name'], 'core': n.get('coreRef') == n['name']} for n in package.get('nounTypes') or []]
+    names = {n['name'] for n in nouns}
+    goals_in = package.get('goalTemplates') or []
+    unit = next((g.get('unit') for g in goals_in if g.get('unit')), None)
+    noun = nouns[0]['name'] if nouns else 'QuantitySegment'
+    verbs, attributes = [], []
+    for v in package.get('verbDefinitions') or []:
+        slots = {}
+        for slot, kind in (v.get('slotTypes') or {}).items():
+            slots[slot] = STORED_SLOT_TYPES.get(kind, kind)
+            if slots[slot] not in STORED_SLOT_TYPES.values() and slots[slot] not in names:
+                nouns.append({'name': slots[slot], 'core': True})
+                names.add(slots[slot])
+            if kind == 'DecimalWithUnit' and not any(a['name'] == slot for a in attributes):
+                attributes.append(stored_attribute(noun, slot, 'DECIMAL', unit=unit))
+        verbs.append({'name': v['name'], 'intentKind': 'COMMAND', 'capabilityId': 'createWork', 'stage': 'DRAFT', 'slots': slots})
+    goals = [{'name': g['name'], 'quantityMode': g.get('quantityMode'), 'endpoint': g.get('endpoint'),
+              'evaluatorVersion': g.get('evaluatorVersion'), 'predicate': goal_predicate(noun, g.get('quantityMode'), g.get('quantity'), g.get('unit'))}
+             for g in goals_in]
+    capabilities = [dict(c) for c in package.get('compatibilityManifest') or []]
+    if verbs and not any(c['capabilityId'] == 'createWork' for c in capabilities):
+        capabilities.insert(0, dict(CREATE_WORK_CONTRACT))
+    return {'organizationId': package.get('organizationId'), 'version': version, 'parentVersionId': parent,
+            'evaluatorVersion': next((g.get('evaluatorVersion') for g in goals_in if g.get('evaluatorVersion')), None),
+            'schemaVersion': '1.0.0', 'nouns': nouns, 'attributes': attributes, 'verbs': verbs, 'relations': [],
+            'goals': goals, 'capabilities': capabilities}
+
+
+def is_stored_definition(package):
+    return isinstance(package, dict) and 'nouns' in package and 'capabilities' in package

@@ -49,39 +49,84 @@
               },
               "version": "definition-v2",
               "package": {
-                "nounTypes": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
                     "name": "QuantitySegment",
-                    "coreRef": "QuantitySegment"
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
                   }
                 ],
-                "verbDefinitions": [
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
                   {
                     "name": "arrive",
-                    "kind": "WORK",
-                    "slotTypes": {
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
                       "item": "TradeItem",
                       "destination": "Place",
-                      "quantity": "DecimalWithUnit"
-                    },
-                    "endpoint": "SELL_ELIGIBLE"
+                      "quantity": "DECIMAL"
+                    }
                   }
                 ],
-                "goalTemplates": [
+                "relations": [],
+                "goals": [
                   {
                     "name": "default",
-                    "quantity": "60",
-                    "unit": "BOX",
                     "quantityMode": "STATE_AT",
                     "endpoint": "SELL_ELIGIBLE",
-                    "evaluatorId": "eligibility-v2",
                     "evaluatorVersion": "eligibility-v2",
-                    "evidencePolicyVersion": "synthetic-policy-v1",
-                    "evaluationTime": "2026-10-07T09:00:00Z",
-                    "dueAt": "2026-10-09T09:00:00Z"
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
                   }
                 ],
-                "compatibilityManifest": [
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
                   {
                     "capabilityId": "resumeWork",
                     "semanticVersion": "sell-eligible-v2",
@@ -92,24 +137,22 @@
                       "v1-to-v2"
                     ]
                   }
-                ],
-                "regressionFixtureRefs": [
-                  "T02",
-                  "T07",
-                  "T21",
-                  "V1"
-                ],
-                "organizationId": {
-                  "$alias": "ORG"
-                }
-              }
+                ]
+              },
+              "regressionFixtureRefs": [
+                "T02",
+                "T07",
+                "T21",
+                "V1"
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V1-pinned-meaning-current-policy-draft",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },

@@ -17,8 +17,9 @@ def _request_contract():
     import importlib.util
     spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
     module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-    return module.Contracts(ROOT)
-REQUEST_CONTRACT = _request_contract()  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
+    return module
+RC_MODULE = _request_contract()
+REQUEST_CONTRACT = RC_MODULE.Contracts(ROOT)  # step2r round 12: every written case/fixture meets contracts/request-contracts.json
 DIR = ROOT / 'verification/cases/C3'
 NOW = '2026-10-07T09:00:00Z'
 END = '2026-10-08T00:00:00Z'
@@ -160,8 +161,11 @@ def patch_sub(sub, cap):
         package={'nounTypes':[{'name':'QuantitySegment','coreRef':'QuantitySegment'}],'verbDefinitions':[{'name':'arrive','kind':'WORK','slotTypes':{'item':'TradeItem','destination':'Place','quantity':'DecimalWithUnit'},'endpoint':'ARRIVED'}],
             'goalTemplates':[{'name':'default','quantity':'100','unit':'BOX','quantityMode':'CUMULATIVE_EVENT','endpoint':'ARRIVED','evaluatorId':'arrival-v1','evaluatorVersion':'arrival-v1','evidencePolicyVersion':'synthetic-authority-v1','dueAt':'2026-10-09T18:00:00+09:00'}],
             'compatibilityManifest':[{'capabilityId':'migrateWorkDefinition','semanticVersion':'core-v1','evaluatorVersion':'arrival-v1','inputSchemaVersion':'1.0.0','outputSchemaVersion':'1.0.0','supportedWorkMigration':['C3-v1-to-v2']}],
-            'regressionFixtureRefs':['T07','T21'],'organizationId':alias('ORG-A')}
-        pre.append(invoke(sub,'precondition-draft','fde','createDefinitionDraft',{'parentDefinitionId':alias('DEFINITION'),'version':'definition-v2','package':package}))
+            'organizationId':alias('ORG-A')}
+        # step2r round 13 (AGENTS.md 2026-10-11 decision 2): the package is the definition the product stores; the
+        # regression fixtures it names are a draft input beside it, not definition content.
+        package=RC_MODULE.stored_definition(package,'definition-v2',alias('DEFINITION'))
+        pre.append(invoke(sub,'precondition-draft','fde','createDefinitionDraft',{'parentDefinitionId':alias('DEFINITION'),'version':'definition-v2','package':package,'regressionFixtureRefs':['T07','T21']}))
         target=ref('precondition-draft','/response/definitionId');hash=ref('precondition-draft','/response/hash')
         pre.append(invoke(sub,'precondition-validate','fde','validateDefinition',{'definitionId':target,'hash':hash},ref('precondition-draft','/response/revision')))
         pre.append(invoke(sub,'precondition-review','fde','submitDefinitionReview',{'definitionId':target,'hash':hash,'validationId':ref('precondition-validate','/response/validationId')},ref('precondition-validate','/response/revision')))

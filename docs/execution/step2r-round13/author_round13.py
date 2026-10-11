@@ -204,12 +204,153 @@ def edit_c3_aliases(changed, check):
                 path.write_text(new)
 
 
+# ---- definition packages (AGENTS.md 2026-10-11 decision 2) -------------------------------------------------------------
+# T21 and V1 createDefinitionDraft/publishDefinition packages in the stored Definition shape (request_contract
+# stored_definition). The T21 lifecycle package is the base of the one-defect validation packages; the six impact-diff
+# drafts change the v1 definition the fixtures state (DEF1 goalTemplate: ARRIVED, CUMULATIVE_EVENT, arrival-v1, slots
+# item·quantity·unit·destination·dueAt; relation locatedAt 1). relation-meaning stays in its change form: the stored
+# relation has no meaning field, so only its cardinality could be written (recorded in the round README).
+V2_AUTHORING = {'nounTypes': [{'name': 'QuantitySegment', 'coreRef': 'QuantitySegment'}],
+                'verbDefinitions': [{'name': 'arrive', 'kind': 'WORK', 'slotTypes': {'item': 'TradeItem', 'destination': 'Place', 'quantity': 'DecimalWithUnit'}, 'endpoint': 'SELL_ELIGIBLE'}],
+                'goalTemplates': [{'name': 'default', 'quantity': '60', 'unit': 'BOX', 'quantityMode': 'STATE_AT', 'endpoint': 'SELL_ELIGIBLE', 'evaluatorVersion': 'eligibility-v2'}],
+                'compatibilityManifest': [{'capabilityId': 'resumeWork', 'semanticVersion': 'sell-eligible-v2', 'evaluatorVersion': 'eligibility-v2',
+                                           'inputSchemaVersion': '2.0.0', 'outputSchemaVersion': '2.0.0', 'supportedWorkMigration': ['v1-to-v2']}],
+                'organizationId': {'$alias': 'ORG'}}
+V1_AUTHORING = {'nounTypes': [{'name': 'QuantitySegment', 'coreRef': 'QuantitySegment'}],
+                'verbDefinitions': [{'name': 'arrive', 'kind': 'WORK', 'slotTypes': {'item': 'TradeItem', 'quantity': 'DecimalWithUnit', 'destination': 'Place', 'dueAt': 'Instant'}}],
+                'goalTemplates': [{'name': 'default', 'quantity': '1', 'unit': 'BOX', 'quantityMode': 'CUMULATIVE_EVENT', 'endpoint': 'ARRIVED', 'evaluatorVersion': 'arrival-v1'}],
+                'organizationId': {'$alias': 'ORG'}}
+SIBLINGS = ('regressionFixtureRefs', 'regressionResults')
+
+
+def v2_base(version, parent):
+    return R12.RC.stored_definition(copy.deepcopy(V2_AUTHORING), version, parent)
+
+
+def one_defect(mini, version, parent):
+    """A T21 one-field package as the stored v2 definition carrying that one defect."""
+    d = v2_base(version, parent)
+    keys = set(mini) - set(SIBLINGS)
+    if keys == {'slotType'}:
+        d['verbs'][0]['slots']['item'] = mini['slotType']
+    elif keys == {'cardinality'}:
+        d['attributes'][0].update(minimumCount=mini['cardinality']['min'], maximumCount=mini['cardinality']['max'])
+    elif keys == {'requiredStage'}:
+        d['attributes'][0]['requiredStage'] = mini['requiredStage']
+    elif keys == {'unitCompare'}:
+        left, right = mini['unitCompare']
+        d['goals'][0]['predicate'] = {'operator': 'compare', 'property': 'QuantitySegment.quantity', 'minimum': {'value': '60', 'unit': left},
+                                      'unit': right, 'evidenceSelector': 'CURRENT_STATE'}
+    elif keys == {'relationCycle', 'cycleAllowed'}:
+        path = mini['relationCycle']
+        for name in dict.fromkeys(path):
+            d['nouns'].append({'name': name, 'core': False})
+        d['relations'] = [{'name': f'{a}-{b}', 'sourceType': a, 'targetType': b, 'minimumCount': 1, 'maximumCount': 1,
+                           'cycleAllowed': mini['cycleAllowed']} for a, b in zip(path, path[1:])]
+    elif keys == {'goalTemplate'}:
+        g = mini['goalTemplate']
+        d['goals'] = [{'name': 'default', 'quantityMode': None, 'endpoint': None, 'evaluatorVersion': None,
+                       'predicate': R12.RC.goal_predicate('QuantitySegment', None, g['quantity'], g['unit'])}]
+    elif keys == {'organizationId'}:
+        d['organizationId'] = mini['organizationId']
+    elif keys == {'manifest'}:
+        m = mini['manifest']
+        d['capabilities'] = [d['capabilities'][0], {**d['capabilities'][1], 'capabilityId': m['capabilityId'], 'evaluatorVersion': m['evaluatorVersion'],
+                                                     'inputSchemaVersion': m['inputSchemaVersion'], 'supportedWorkMigration': []}]
+    elif keys == {'rename'}:
+        d['verbs'][0]['name'] = mini['rename']
+    elif keys == {'endpoint'}:
+        d['goals'][0]['endpoint'] = mini['endpoint']
+    elif keys == {'operator'}:
+        d['goals'][0]['predicate']['operator'] = mini['operator']
+    elif keys in ({'sql'}, {'script'}, {'newExecutionPrivilege'}):
+        d.update(mini)  # deliberate: a field outside the stored definition
+    elif not keys:
+        pass
+    else:
+        raise ValueError(f'unmapped definition package {sorted(keys)}')
+    return d
+
+
+def changed_v1(change, manifest, version, parent):
+    """A six-impact draft: the v1 definition with one change and the draft's compatibility manifest."""
+    d = R12.RC.stored_definition(copy.deepcopy(V1_AUTHORING), version, parent)
+    d['relations'] = [{'name': 'locatedAt', 'sourceType': 'QuantitySegment', 'targetType': 'Place', 'minimumCount': 1, 'maximumCount': 1, 'cycleAllowed': False}]
+    d['capabilities'].append(dict(manifest))
+    (kind, value), = change.items()
+    if kind == 'rename':
+        d['verbs'][0]['name'] = value['to']
+    elif kind == 'attribute':
+        d['attributes'].append(R12.RC.stored_attribute('QuantitySegment', value['name'], R12.RC.STORED_SLOT_TYPES.get(value['type'], value['type']),
+                                                         minimum=1 if value.get('required') else 0, stage=None, core=False))
+    elif kind == 'slot':
+        d['nouns'].append({'name': 'Work', 'core': True})
+        d['attributes'].append(R12.RC.stored_attribute('Work', value['name'], 'REFERENCE', reference=value['type'], stage=value['requiredAt']))
+    elif kind == 'baseUnit':
+        d['attributes'][0]['unit'] = value['to']
+        for g in d['goals']:
+            g['predicate']['unit'] = value['to']
+            g['predicate']['minimum']['unit'] = value['to']
+    elif kind == 'endpoint':
+        d['goals'][0]['endpoint'] = value['to']
+    else:
+        return None
+    return d
+
+
+def edit_definitions(changed, check):
+    for case_id in ('T21', 'V1'):
+        path = ROOT / f'verification/cases/{case_id}/case.json'
+        data, fmt, text = R12.load(path)
+        for sub in data['subcases']:
+            for action in R12.RC.iter_actions(sub.get('actions', [])):
+                if action.get('capabilityId') not in ('createDefinitionDraft', 'publishDefinition'):
+                    continue
+                request = action.get('request') or {}
+                slots, provenance = request.get('slots') or {}, request.setdefault('provenance', {})
+                version, parent = slots.get('version'), slots.get('parentDefinitionId')
+                package = slots.get('package')
+                if isinstance(package, dict) and not R12.RC.is_stored_definition(package):
+                    extra = {k: package[k] for k in SIBLINGS if k in package}
+                    if 'nounTypes' in package:
+                        stored = R12.RC.stored_definition({k: v for k, v in package.items() if k not in SIBLINGS}, version, parent)
+                    else:
+                        stored = one_defect(package, version or 'definition-v2', parent or {'$alias': 'DEF1'})  # a publish names the v2 draft
+                    slots['package'] = stored
+                    for k, v in extra.items():
+                        slots[k] = v
+                        provenance[k] = provenance.get('package', 'USER')
+                elif isinstance(slots.get('change'), dict) and isinstance(slots.get('compatibilityManifest'), dict):
+                    stored = changed_v1(slots['change'], slots['compatibilityManifest'], version, parent)
+                    if stored is None:
+                        continue
+                    said = provenance.get('change', 'USER')
+                    rebuilt = {}
+                    for k, v in slots.items():
+                        if k == 'change':
+                            rebuilt['package'] = stored
+                        elif k != 'compatibilityManifest':
+                            rebuilt[k] = v
+                    slots.clear()
+                    slots.update(rebuilt)
+                    for k in ('change', 'compatibilityManifest'):
+                        provenance.pop(k, None)
+                    provenance['package'] = said
+                request['provenance'] = {k: provenance.get(k, 'USER') for k in slots}
+        new = R12.render(data, fmt)
+        if new != text:
+            changed.append(str(path.relative_to(ROOT)))
+            if not check:
+                path.write_text(new)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
     edit_fixtures(changed, check)
     edit_t08(changed, check)
     edit_c3_aliases(changed, check)
+    edit_definitions(changed, check)
     if check and changed:
         sys.exit('round 13 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 13: {len(changed)} file(s) changed')
