@@ -3329,16 +3329,6 @@
   },
   "knownOpen": [
     {
-      "id": "PG-INTENT-ARRAY-SLOT",
-      "owner": "Step 3",
-      "kind": "command",
-      "match": {
-        "arraySlot": true
-      },
-      "reason": "contracts/intent.schema.json $defs.value has no array branch, yet the product handlers read list slots (InventoryCommands splitQuantity quantities and mergeQuantity segmentIds) and the plan's split/merge/multi-evidence commands need them. Cases keep their list slots; the product contract must publish an array value or an aggregate shape.",
-      "closeWhen": "intent.schema.json allows the list representation the handlers read"
-    },
-    {
       "id": "PG-INVENTORY-ACTION-ELIGIBILITY",
       "owner": "Step 3",
       "kind": "query",

@@ -152,6 +152,9 @@ def schema_errors(value, schema, root, path=''):
             if isinstance(value, list):
                 for i, item in enumerate(value):
                     out += schema_errors(item, rule, root, f'{path}/{i}')
+        elif key == 'maxItems':
+            if isinstance(value, list) and len(value) > rule:
+                out.append(f'{path}: more than {rule} items')
         elif key == 'uniqueItems':
             if rule and isinstance(value, list) and len({json.dumps(v, sort_keys=True) for v in value}) != len(value):
                 out.append(f'{path}: duplicate items')
@@ -1116,13 +1119,8 @@ class Contracts:
         body = {k: v for k, v in body.items() if k != skip}
         known, problems, violations = [], [], {}
         slots = body.get('slots')
-        candidate = copy.deepcopy(body)
-        if isinstance(slots, dict):
-            for name, value in slots.items():
-                if isinstance(value, list):
-                    known.append(f'/slots/{name}: KNOWN_OPEN PG-INTENT-ARRAY-SLOT (list slot, intent.schema.json has no array value)')
-                    candidate['slots'][name] = 'array-slot'
-        candidate = Placeholders()(candidate)
+        # A list slot is the schema's bounded array value (user decision 2026-10-11 (1)); it validates like any other slot.
+        candidate = Placeholders()(copy.deepcopy(body))
         for error in schema_errors(candidate, self.intent, self.intent):
             path = error.split(':', 1)[0]
             parts = path.strip('/').split('/')

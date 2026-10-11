@@ -75,13 +75,17 @@ class CommandContract(unittest.TestCase):
         found = self.problems(invoke(body))
         self.assertTrue(any('commandIdempotencyKey: required' in p for p in found) and any('differs from the action capability' in p for p in found), found)
 
-    def test_list_slot_is_a_known_product_gap(self):
+    def test_list_slot_is_the_bounded_array_value(self):
+        # user decision 2026-10-11 (1): intent.schema.json publishes a bounded array value, so a list slot is no product gap.
         body = command()
         body['slots']['segmentIds'] = [A('A20'), A('A60')]
         body['provenance']['segmentIds'] = 'CONTEXT'
         problems, known = C.case_problems(case([invoke(body)]))
         self.assertEqual([], problems)
-        self.assertTrue(any('PG-INTENT-ARRAY-SLOT' in k for k in known))
+        self.assertFalse(any('ARRAY-SLOT' in k for k in known), known)
+        body['slots']['segmentIds'] = [A(f'S{i}') for i in range(101)]
+        found = C.case_problems(case([invoke(body)]))[0]
+        self.assertTrue(any('/slots/segmentIds: oneOf matched 0' in p for p in found), found)
 
     def test_intentional_violation_must_match_and_be_pinned(self):
         action = invoke(command(organizationId=A('ORG-B')), harness={'intentionalViolation': {'fields': ['organizationId'], 'reason': 'forged org'}})
