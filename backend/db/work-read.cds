@@ -24,6 +24,8 @@ entity Works : scopedRead {
   originalText : LargeString;
   conversationRequestId : String(240);
   lifecycleMode : String(20) not null default 'IMPORTED';
+  nextAction : String(320);
+  nextCheckAt : Timestamp;
 }
 entity GoalReferences : scopedRead {
   workId : UUID not null;

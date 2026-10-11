@@ -648,6 +648,14 @@
       "extension": "§4.2·§6 주문량과 적격량의 구별"
     },
     {
+      "code": "SALES_PRICE_UNSET",
+      "outcomes": [
+        "NEEDS_INPUT"
+      ],
+      "meaning": "단가 없는 판매 line의 송장을 대조하려 했다",
+      "extension": "§6 정산 대조, 사용자 결정 UD-1(가격 선택 입력)"
+    },
+    {
       "code": "SCOPE_INELIGIBLE",
       "outcomes": [
         "REJECTED"
@@ -866,6 +874,16 @@
     }
   ],
   "obligationKinds": [
+    {
+      "kind": "WORK_NEXT_ACTION",
+      "createdBy": "ResponsibilityService.initialDuty (WorkLifecycle activateWork/createWork, UD-2)",
+      "resolveObligation": null,
+      "autoClosure": "closeWork of the source Work (UD-2 initial duty)",
+      "waiverAuthority": null,
+      "waiverDecisionCapability": null,
+      "defaultNextAction": "업무의 다음 행동을 수행하고 업무를 종료한다",
+      "planRef": "§5.2·§5.3"
+    },
     {
       "kind": "FOLLOWUP_REVIEW",
       "createdBy": "ResponsibilityService.ensureCorrectionDuty (AssessmentCorrectionImpact)",

@@ -134,6 +134,28 @@ class S2WorkActualIntegrationTest {
     run("closeWork",revision(source),Map.of("workId",source,"reason","CANCELLED"));assertEquals("UNSATISFIED",((Map<?,?>)assess(parent).get("assessment")).get("outcome"));assertThrows(DomainError.class,()->run("closeWork",revision(parent),Map.of("workId",parent,"reason","FULFILLED")));assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,parent));
   }
 
+  /** User decision 2026-10-11 UD-2 (plan §5.2 activateWork "초기 의무", §5.3 owner·nextAction·nextCheck): createWork and createDraft
+   * take nextAction/nextCheckAt, activation opens the Work-sourced initial duty in the same transaction and closing the Work
+   * discharges it. */
+  @Test void nextActionOnCreationOpensTheInitialWorkSourcedDuty() throws Exception {
+    var slots=row("workType","PURCHASE_ARRIVAL","quantity",Map.of("value","100","unit","BOX","provenance","USER"),"dueAt","2026-10-31T00:00:00Z","endpoint","ARRIVED","quantityMode","CUMULATIVE_EVENT","period",Map.of("start","2026-10-01T00:00:00Z","end","2026-10-31T00:00:00Z","startInclusive",true,"endInclusive",false),"eventKinds",List.of("RECEIPT"),"distinctContributionScope","DIRECT","evidencePolicyVersion","fixture-v1","timezone","UTC","ownerId",actor,"supervisorId",actor,"nextAction","공급자 회신을 확인한다","nextCheckAt","2026-10-08T09:00:00Z");
+    var intent=row("capabilityId","createWork","definitionVersion","1.0.0","subjectRefs",List.of(Map.of("type","TradeItem","id",item)),"slots",slots,"provenance",Map.of("quantity","USER"),"expectedRevision",0,"intentKind","COMMAND","commandIdempotencyKey","public-create-duty");
+    var response=runtime.requestContext().run(ctx->{return commands.execute(intent);});assertEquals("APPLIED",response.get("outcome"),response.toString());String created=String.valueOf(response.get("workId"));
+    assertEquals("공급자 회신을 확인한다",jdbc.queryForObject("SELECT nextAction FROM mulino_work_read_Works WHERE ID=?",String.class,created));
+    String duty="SELECT a.kind,a.status,a.ownerId,a.nextAction,a.nextCheckAt,r.sourceKind,r.sourceId FROM mulino_work_read_ObligationReferences a JOIN mulino_responsibility_Roots r ON r.organizationId=a.organizationId AND r.ID=a.rootId WHERE a.workId=?";
+    var initial=jdbc.queryForMap(duty,created);
+    assertEquals("WORK_NEXT_ACTION",initial.get("kind"));assertEquals("OPEN",initial.get("status"));assertEquals(actor,initial.get("ownerId"));assertEquals("공급자 회신을 확인한다",initial.get("nextAction"));assertEquals(Instant.parse("2026-10-08T09:00:00Z"),((Timestamp)initial.get("nextCheckAt")).toInstant());assertEquals("WORK",initial.get("sourceKind"));assertEquals(created,initial.get("sourceId"));
+    var draftSlots=row("itemId",item,"definitionVersionId",definition,"kind","PURCHASE","ownerId",actor,"supervisorId",actor,"goal",goalInputs(),"nextAction","입고 일정을 확인한다","nextCheckAt","2026-10-09T09:00:00Z");
+    String d=String.valueOf(((Map<?,?>)run("createDraft",0,draftSlots).get("effects")).get("workId"));
+    assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE workId=?",Integer.class,d));
+    run("activateWork",0,Map.of("workId",d));
+    assertEquals("OPEN",jdbc.queryForMap(duty,d).get("status"));
+    run("closeWork",revision(d),Map.of("workId",d,"reason","CANCELLED"));
+    assertEquals("RESOLVED",jdbc.queryForMap(duty,d).get("status"));assertEquals("CLOSED",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,d));
+    var half=new LinkedHashMap<>(draftSlots);half.remove("nextCheckAt");
+    assertThrows(DomainError.class,()->run("createDraft",0,half));
+  }
+
   @Test void publicCreateWorkPinsExplicitExclusivePeriodEnd() throws Exception {
     var slots=row("workType","PURCHASE_ARRIVAL","quantity",Map.of("value","100","unit","BOX","provenance","USER"),"dueAt","2026-10-31T00:00:00Z","endpoint","ARRIVED","quantityMode","CUMULATIVE_EVENT","period",Map.of("start","2026-10-01T00:00:00Z","end","2026-10-31T00:00:00Z","startInclusive",true,"endInclusive",false),"eventKinds",List.of("RECEIPT"),"distinctContributionScope","DIRECT","evidencePolicyVersion","fixture-v1","timezone","UTC","ownerId",actor,"supervisorId",actor);
     var intent=row("capabilityId","createWork","definitionVersion","1.0.0","subjectRefs",List.of(Map.of("type","TradeItem","id",item)),"slots",slots,"provenance",Map.of("quantity","USER"),"expectedRevision",0,"intentKind","COMMAND","commandIdempotencyKey","public-create");
