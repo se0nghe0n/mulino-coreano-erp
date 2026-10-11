@@ -2438,12 +2438,12 @@
             "slots": {
               "quantity": "10",
               "unit": "BOX",
-              "kind": "QC",
               "action": "SELL",
               "reason": "파손 검사",
               "segmentId": {
                 "$alias": "B10"
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T04-hold-dispose-hold",
@@ -2455,10 +2455,10 @@
             "provenance": {
               "quantity": "USER",
               "unit": "USER",
-              "kind": "USER",
               "action": "USER",
               "reason": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [
@@ -6697,20 +6697,11 @@
               }
             ],
             "slots": {
-              "children": [
-                {
-                  "value": "40",
-                  "unit": "BOX"
-                },
-                {
-                  "value": "20",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "40",
+                "20"
               ],
-              "loss": {
-                "value": "0",
-                "unit": "BOX"
-              },
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "operation-proof"
               },
@@ -6727,8 +6718,8 @@
               }
             ],
             "provenance": {
-              "children": "USER",
-              "loss": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT",
               "segmentId": "CONTEXT"

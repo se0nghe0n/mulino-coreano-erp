@@ -197,11 +197,11 @@
             "slots": {
               "quantity": "60",
               "unit": "BOX",
-              "kind": "QC",
               "action": "SELL",
               "segmentId": {
                 "$alias": "CUS60"
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C1-custody-not-sale-hold-customer",
@@ -213,9 +213,9 @@
             "provenance": {
               "quantity": "USER",
               "unit": "USER",
-              "kind": "USER",
               "action": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [

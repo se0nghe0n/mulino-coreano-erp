@@ -355,11 +355,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v2",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -387,7 +391,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-work",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",

@@ -172,6 +172,53 @@ class Conformance(unittest.TestCase):
         problems, known = C.case_problems({'caseId': 'C3', 'subcases': [sub]})
         self.assertFalse(any('placeHold requires' in k for k in known), known)
 
+    def test_contract_shapes_rewrite_slots_the_capability_contract_states_another_way(self):
+        # step2r round 13 item 3: s2-inventory splitQuantity/moveQuantity, plan sections 3.3 and 5.1, placeHold category.
+        world = RC.World(ROOT, None)
+        world.segments = {'Q20': {'alias': 'Q20', 'quantity': '20', 'unit': 'BOX'}}
+        def run(cap, slots, **extra):
+            body = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': cap, 'subjectRefs': [], 'slots': slots,
+                    'expectedRevision': 1, 'commandIdempotencyKey': 'k', **extra}
+            sub = {'id': 's', 'actions': [invoke(body, cap=cap)], 'assertions': []}
+            C._world = world
+            try:
+                C.conform_action(sub['actions'][0], 'T99', 's', world)
+            finally:
+                C._world = None
+            again = copy.deepcopy(sub['actions'][0])
+            C._world = world
+            try:
+                C.conform_action(again, 'T99', 's', world)
+            finally:
+                C._world = None
+            self.assertEqual(sub['actions'][0], again, 'contract shapes are idempotent')
+            return sub['actions'][0]['request']
+        split = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'value': '12', 'unit': 'BOX'}, {'value': '8', 'unit': 'BOX'}],
+                                      'loss': {'value': '0', 'unit': 'BOX'}, 'allocationTransfer': [{'childIndex': 0}], 'reason': 'r'},
+                    evidenceRefs=[A('DOC')])
+        self.assertEqual(['12', '8'], split['slots']['quantities'])
+        self.assertEqual('BOX', split['slots']['unit'])
+        self.assertFalse({'children', 'loss', 'allocationTransfer', 'reason'} & set(split['slots']))
+        named = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'alias': 'A', 'quantity': '12', 'unit': 'BOX'}, {'alias': 'B', 'quantity': '8', 'unit': 'BOX'}]})
+        self.assertIn('children', named['slots'], 'children read back by alias stay until their response pointer is rewritten')
+        lossy = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'value': '12', 'unit': 'BOX'}], 'loss': {'value': '2', 'unit': 'BOX'}})
+        self.assertIn('loss', lossy['slots'])
+        whole = run('moveQuantity', {'segmentId': A('Q20'), 'destinationId': A('W2'), 'quantity': '20', 'unit': 'BOX'})
+        self.assertFalse({'quantity', 'unit'} & set(whole['slots']))
+        part = run('moveQuantity', {'segmentId': A('Q20'), 'destinationId': A('W2'), 'quantity': '5', 'unit': 'BOX'})
+        self.assertEqual(('5', 'BOX'), (part['slots']['quantity'], part['slots']['unit']))
+        draft = run('createDraft', {'itemId': A('P'), 'quantityMode': 'THROUGHOUT', 'period': {'start': 'a'}, 'interval': {'start': 'b'},
+                                    'lotIdentification': 'MISSING', 'ownerId': A('o'), 'supervisorId': A('s')})
+        self.assertEqual({'start': 'b'}, draft['slots']['period'])
+        self.assertFalse({'interval', 'lotIdentification', 'itemId'} & set(draft['slots']))
+        self.assertEqual([{'type': 'TradeItem', 'id': A('P')}], draft['subjectRefs'])
+        hold = run('placeHold', {'segmentId': A('Q20'), 'kind': 'QC'})
+        self.assertEqual('QC', hold['slots']['category'])
+        handover = run('proposeHandover', {'workId': A('WORK'), 'toOwnerId': A('B')})
+        self.assertEqual(A('B'), handover['slots']['recipientId'])
+        grant = run('createGrant', {'actorId': A('reader')}, subjectRefs=[{'type': 'Grant', 'id': A('GRANT')}, {'type': 'Agent', 'id': A('reader')}])
+        self.assertEqual([{'type': 'Agent', 'id': A('reader')}], grant['subjectRefs'], 'only the created noun is dropped')
+
     def test_wait_slots_form_the_wait_contract(self):
         flat = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'waitWork', 'subjectRefs': [],
                 'slots': {'workId': A('W'), 'reason': 'r', 'targetId': A('PO'), 'resumePredicate': {'kind': 'x'}, 'verifierId': A('V'),
@@ -315,6 +362,20 @@ class GrantAuthorization(unittest.TestCase):
         f = self.world({'itemAliases': ['P']}, ['getInventory', 'getDefinition'])
         self.assertEqual({'itemAliases'}, C.kept_scope_keys('unit', 'reader', f['actors']['reader']['grant']) & {'itemAliases'})
         self.assertTrue(any('names ITEM but TARGET_ID' in p for p in self.problems(f, [self.read(cap='getDefinition', id=A('P'))])))
+
+    def test_item_restriction_drops_when_a_read_names_a_noun_without_item(self):
+        # step2r round 13 run-9d213f5a: getObject of a SalesOrder (Orders row: TARGET, WORK) under an ITEM grant was FORBIDDEN.
+        f = self.world({'itemAliases': ['P']}, ['getObject'])
+        f['aliases']['SALE'] = {'type': 'SalesOrder', 'organizationAlias': 'ORG'}
+        read = query({'id': A('SALE'), 'scope': {'objectType': 'SalesOrder'}}, cap='getObject')
+        self.assertTrue(any('names ITEM' in p for p in self.problems(f, [read])), 'the ITEM grant refuses the order read')
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'f.json'
+            path.write_text(json.dumps(f))
+            world = RC.World(ROOT, str(path))
+            self.assertTrue(C.item_less_object(world, 'getObject', read['request'], read))
+            item = query({'id': A('P')}, cap='getObject')
+            self.assertFalse(C.item_less_object(world, 'getObject', item['request'], item))
 
     def test_retired_composition_and_unrepresented_keys_fail_the_fixture(self):
         f = self.world({'itemAliases': ['P'], 'customerAliases': ['C']}, ['getInventory'])

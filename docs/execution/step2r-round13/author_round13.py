@@ -21,15 +21,21 @@ grants were all-of:
   unit, cardinality, supported effect, then applicable policy; section 3.4 lists TYPE_INVALID for such an
   envelope. The product's TYPE_INVALID before authorization follows that order, so the code oracle becomes
   TYPE_INVALID; the zero-effect, no-foreign-data and REJECTED oracles stay.
-- C3 fixtures (item 4 of the round): transaction aliases the installer cannot install (no installer type) and that
-  no C3 or V4 action, assertion or other fixture fact names are removed with their prior facts (PO2, PO-LINE,
-  PO2-LINE, INBOX). The used ones that stated no fact receive the relational facts their neighbours already
-  imply (DISPATCH of ALLOCATION/A20, CARGO of SHIPMENT, HOLD on A20, EXTERNAL-OP of PROPOSAL, OCCURRENCE of the
-  receipt event, LEASE of WORK) so a Step 3 installer type has its inputs; installing them remains a Step 3
-  finding.
+- C3 fixtures (item 4 of the round): per fixture, an alias that no C3 or V4 subcase installing that fixture names in
+  its actions or assertions, and that no other fixture fact names, is removed with its prior facts when the installer
+  cannot install its type (PurchaseOrder, Invoice, Recall, Shipment...) or when it states no fact at all (Q60, B20,
+  WORK-B, ALLOCATION2, and WORK2 outside the transferObligation fixture); removal repeats until nothing changes. The
+  used ones that stated no fact receive the relational facts their neighbours already imply (DISPATCH of
+  ALLOCATION/A20, CARGO of SHIPMENT, HOLD on A20, EXTERNAL-OP of PROPOSAL, OCCURRENCE of the receipt event, LEASE of
+  WORK) so a Step 3 installer type has its inputs; installing them remains a Step 3 finding. The base fixture.json of
+  the model-query subcases keeps every alias any C3 or V4 subcase names (a model reads that world through questions,
+  not alias references). A Work stated only as
+  prior facts (WORK2, the transferObligation source work) gets the baseline works entry the installer reads
+  (ScenarioFixtureInstaller.works reads baseline works/work only), with the item of its responsibility scope.
 Idempotent: a second run changes nothing (verification/requirements/test_case_generators_reproduce.py).
 Run: python3 -I docs/execution/step2r-round13/author_round13.py [--check]
 """
+import copy
 import importlib.util
 import json
 import sys
@@ -119,34 +125,81 @@ def strings(node):
         yield node
 
 
-def case_aliases():
-    names = set()
+def fixture_uses():
+    """fixtureRef -> aliases the C3 and V4 subcases installing that fixture name in their actions and assertions."""
+    uses = {}
     for case in ('C3', 'V4'):
-        names |= R12.RC.aliases_in(json.loads((ROOT / f'verification/cases/{case}/case.json').read_text()))
-    return names
+        for sub in json.loads((ROOT / f'verification/cases/{case}/case.json').read_text())['subcases']:
+            refs = {sub.get('fixtureRef')} | {a['fixtureRef'] for a in R12.RC.iter_actions(sub.get('actions', [])) if a.get('fixtureRef')}
+            names = R12.RC.aliases_in({'actions': sub.get('actions', []), 'assertions': sub.get('assertions', [])})
+            for ref in refs - {None}:
+                uses.setdefault(ref, set()).update(names)
+    return uses
+
+
+ACTOR_TYPES = {'Organization', 'Human', 'Agent'}
+
+
+def referenced(data, prior):
+    """Strings the fixture states outside its alias table (baseline, actors, evidence, responsibilities, prior facts)."""
+    inside = set()
+    for key, value in data.items():
+        if key != 'aliases':
+            inside |= set(strings(value if key != 'baseline' else {k: v for k, v in value.items() if k != 'priorEntities'}))
+    for facts in prior.values():
+        inside |= set(strings(facts))
+    return inside
+
+
+def work_entry(name, facts, data):
+    """A baseline works entry for a Work stated only as prior facts (the installer reads baseline works/work only)."""
+    items = [r['scope']['itemAlias'] for r in data.get('responsibilities') or []
+             if (r.get('scope') or {}).get('workAlias') == name and isinstance(r['scope'].get('itemAlias'), str)]
+    org = data['aliases'][name].get('organizationAlias')
+    if not items:
+        items = [a for a, v in data['aliases'].items() if v.get('type') == 'TradeItem' and v.get('organizationAlias') == org]
+    if len(set(items)) != 1:
+        return None
+    entry = {'alias': name, 'itemAlias': items[0]}
+    for key in ('revision', 'state', 'ownerAlias', 'supervisorAlias', 'definitionVersion', 'goal'):
+        if key in facts:
+            entry[key] = copy.deepcopy(facts[key])
+    return entry
 
 
 def edit_c3_aliases(changed, check):
-    used_by_cases = case_aliases()
+    uses = fixture_uses()
     for path in sorted((ROOT / 'verification/cases/C3').glob('fixture*.json')):
+        ref = str(path.relative_to(ROOT))
         data, fmt, text = R12.load(path)
-        aliases, prior = data.get('aliases') or {}, (data.get('baseline') or {}).get('priorEntities') or {}
-        inside = set()
-        for key, value in data.items():
-            if key != 'aliases':
-                for s in strings(value if key != 'baseline' else {k: v for k, v in value.items() if k != 'priorEntities'}):
-                    inside.add(s)
-        for name, facts in prior.items():
-            inside |= {s for s in strings(facts)}
-        for name in [n for n, a in aliases.items() if a.get('type') not in INSTALLABLE and n not in used_by_cases and n not in inside]:
-            aliases.pop(name)
-            prior.pop(name, None)
+        aliases = data.get('aliases') or {}
+        baseline = data.setdefault('baseline', {})
+        prior = baseline.get('priorEntities') or {}
+        # The base world of the model-query subcases is read by a model through natural-language questions, so it keeps
+        # every alias any C3 or V4 subcase names (the case-wide rule), not only the ones its own subcases reference.
+        used = set().union(*uses.values()) if path.name == 'fixture.json' else uses.get(ref, set())
+        while True:
+            inside = referenced(data, prior)
+            drop = [n for n, a in aliases.items() if a.get('type') not in ACTOR_TYPES and n not in used and n not in inside
+                    and (a.get('type') not in INSTALLABLE or n not in prior)]
+            if not drop:
+                break
+            for name in drop:
+                aliases.pop(name)
+                prior.pop(name, None)
         for name, facts in C3_FACTS.items():
             if name in aliases and name not in prior:
                 prior[name] = dict(facts)
+        stated = {r.get('alias') for key in ('works', 'work') for r in (baseline.get(key) if isinstance(baseline.get(key), list)
+                  else [baseline.get(key)] if isinstance(baseline.get(key), dict) else [])}
+        for name, a in aliases.items():
+            if a.get('type') == 'Work' and name in prior and name not in stated:
+                entry = work_entry(name, prior[name], data)
+                if entry:
+                    baseline.setdefault('works', []).append(entry)
         new = R12.render(data, fmt)
         if new != text:
-            changed.append(str(path.relative_to(ROOT)))
+            changed.append(ref)
             if not check:
                 path.write_text(new)
 

@@ -123,28 +123,11 @@
               }
             ],
             "slots": {
-              "children": [
-                {
-                  "value": "60",
-                  "unit": "BOX"
-                },
-                {
-                  "value": "40",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "60",
+                "40"
               ],
-              "loss": {
-                "value": "0",
-                "unit": "BOX"
-              },
-              "allocationTransfer": [
-                {
-                  "allocationId": {
-                    "$alias": "ALLOC"
-                  },
-                  "childIndex": 0
-                }
-              ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "operation-proof"
               },
@@ -161,9 +144,8 @@
               }
             ],
             "provenance": {
-              "children": "USER",
-              "loss": "USER",
-              "allocationTransfer": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT",
               "segmentId": "CONTEXT"
@@ -2620,20 +2602,11 @@
               }
             ],
             "slots": {
-              "children": [
-                {
-                  "value": "60",
-                  "unit": "BOX"
-                },
-                {
-                  "value": "40",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "60",
+                "40"
               ],
-              "loss": {
-                "value": "0",
-                "unit": "BOX"
-              },
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "operation-proof"
               },
@@ -2650,8 +2623,8 @@
               }
             ],
             "provenance": {
-              "children": "USER",
-              "loss": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT",
               "segmentId": "CONTEXT"
@@ -3445,20 +3418,11 @@
               }
             ],
             "slots": {
-              "children": [
-                {
-                  "value": "60",
-                  "unit": "BOX"
-                },
-                {
-                  "value": "40",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "60",
+                "40"
               ],
-              "loss": {
-                "value": "0",
-                "unit": "BOX"
-              },
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "operation-proof"
               },
@@ -3475,8 +3439,8 @@
               }
             ],
             "provenance": {
-              "children": "USER",
-              "loss": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT",
               "segmentId": "CONTEXT"
@@ -3582,12 +3546,10 @@
               }
             ],
             "slots": {
-              "children": [
-                {
-                  "value": "100",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "100"
               ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "operation-proof"
               },
@@ -3609,7 +3571,8 @@
               }
             ],
             "provenance": {
-              "children": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT",
               "segmentId": "CONTEXT"
@@ -6105,11 +6068,11 @@
               "quantity": "100",
               "unit": "BOX",
               "action": "SELL",
-              "kind": "QC",
               "identificationPolicy": "whole-indistinguishable-mixture",
               "segmentId": {
                 "$alias": "M100"
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T03-indistinguishable-mixture-hold",
@@ -6123,9 +6086,9 @@
               "quantity": "USER",
               "unit": "USER",
               "action": "USER",
-              "kind": "USER",
               "identificationPolicy": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [

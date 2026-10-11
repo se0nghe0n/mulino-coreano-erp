@@ -25,6 +25,7 @@ import hashlib
 import json
 import re
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -503,6 +504,7 @@ class Contracts:
             if capability in rule['capabilities'] and rule['from'] in slots and rule['to'] not in slots:
                 slots[rule['to']] = slots.pop(rule['from'])
                 provenance[rule['to']] = provenance.pop(rule['from'], None) or default_provenance(slots[rule['to']])
+        self.contract_shapes(body, slots, provenance, capability)
         wait = spec['waitContract']
         if capability in wait['capabilities'] and wait['slot'] not in slots and any(v in slots for v in wait['fields'].values()):
             value, said = {}, set()
@@ -567,6 +569,88 @@ class Contracts:
             ordered = sorted(slots.items(), key=lambda kv: order.get(kv[0], len(order)))
             slots.clear()
             slots.update(ordered)
+
+    def contract_shapes(self, body, slots, provenance, capability):
+        """Step2r round 13 item 3: slot shapes the capability contract states another way (commandSlots listQuantities,
+        contractDrops, intervalPeriod, subjectSlots). Each rewrite keeps the slot order and is a no-op on its own output."""
+        spec = self.data['commandSlots']
+        rule = spec['listQuantities']
+        parts = slots.get(rule['from'])
+        if capability in rule['capabilities'] and isinstance(parts, list) and parts and rule['to'] not in slots:
+            values, units = [], set()
+            for part in parts:
+                if isinstance(part, dict) and set(part) == {'value', 'unit'}:
+                    values.append(part['value']); units.add(part['unit'])
+                else:
+                    values = None
+                    break
+            unit = slots.get(rule['unitSlot'])
+            if values and all(isinstance(v, str) for v in values) and len(units) == 1 and unit in (None, *units):
+                said = provenance.pop(rule['from'], None) or 'USER'
+                items = []
+                for name, value in slots.items():
+                    if name == rule['from']:
+                        items += [(rule['to'], values), (rule['unitSlot'], units.pop())]
+                    elif name != rule['unitSlot']:
+                        items.append((name, value))
+                slots.clear()
+                slots.update(items)
+                provenance[rule['to']] = said
+                provenance[rule['unitSlot']] = provenance.get(rule['unitSlot']) or said
+        for rule in spec['contractDrops']['rules']:
+            name = rule['slot']
+            if capability not in rule['capabilities'] or name not in slots:
+                continue
+            value, when = slots[name], rule['when']
+            if when == 'always':
+                drop = True
+            elif when == 'zero':
+                drop = isinstance(value, dict) and set(value) == {'value', 'unit'} and re.fullmatch(r'0(\.0+)?', str(value['value'])) is not None
+            elif when == 'wholeLeaf':
+                drop = self.whole_leaf(slots)
+            else:
+                drop = value == when.get('equals')
+            if drop:
+                slots.pop(name)
+                provenance.pop(name, None)
+                if when == 'wholeLeaf' and 'unit' in slots:
+                    slots.pop('unit')  # the unit of the restated leaf quantity
+                    provenance.pop('unit', None)
+        rule = spec['intervalPeriod']
+        if capability in rule['capabilities'] and slots.get('quantityMode') in rule['modes'] and isinstance(slots.get(rule['from']), dict):
+            interval, said = slots.pop(rule['from']), provenance.pop(rule['from'], None)
+            slots[rule['to']] = interval  # replaces the cumulative period in place, else appended
+            provenance[rule['to']] = said or provenance.get(rule['to']) or 'USER'
+        created = spec['createdSubjects']['capabilities'].get(capability)
+        if created and isinstance(body.get('subjectRefs'), list):
+            body['subjectRefs'] = [r for r in body['subjectRefs'] if not (isinstance(r, dict) and r.get('type') in created)]
+        rule = spec['subjectSlots']
+        if capability in rule['capabilities'] and rule['slot'] in slots:
+            refs = body.setdefault('subjectRefs', [])
+            typed = [r for r in refs if isinstance(r, dict) and r.get('type') == rule['type']]
+            value = slots[rule['slot']]
+            if not typed:
+                refs.append({'type': rule['type'], 'id': value})
+                typed = refs[-1:]
+            if len(typed) == 1 and typed[0].get('id') == value:
+                slots.pop(rule['slot'])
+                provenance.pop(rule['slot'], None)
+
+    def whole_leaf(self, slots):
+        """True when a moveQuantity quantity restates the whole fixture leaf it names (s2-inventory moveQuantity)."""
+        world, segment = getattr(self, '_world', None), slots.get('segmentId')
+        if world is None or not isinstance(segment, dict) or '$alias' not in segment:
+            return False
+        row = world.segments.get(segment['$alias']) or {}
+        quantity = slots.get('quantity')
+        if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'}:
+            value, unit = quantity['value'], quantity['unit']
+        else:
+            value, unit = quantity, slots.get('unit')
+        try:
+            return row.get('quantity') is not None and Decimal(str(row['quantity'])) == Decimal(str(value)) and unit == row.get('unit')
+        except InvalidOperation:
+            return False
 
     def fill_required(self, body, slots, provenance, action, capability, declared):
         """Required slots a shared-slot case did not state, from commandSlots.requiredFill (step2r round 13)."""
@@ -851,22 +935,36 @@ class Contracts:
                     for action in actions:
                         if action.get('kind') not in ('invoke', 'query') or not action.get('actorRef') or pins.get(action.get('id')) == 'FORBIDDEN':
                             continue
-                        for capability, _ in self.authorized_calls(action):
+                        for capability, request in self.authorized_calls(action):
+                            names = {capability}
+                            if self.item_less_object(world, capability, request, action):
+                                names.add(capability + self.NO_ITEM)
                             who, seen = action['actorRef'], set()
                             while who in world.actors and who not in seen:
                                 seen.add(who)
-                                usage.setdefault((world.actor_source.get(who), who), set()).add(capability)
+                                usage.setdefault((world.actor_source.get(who), who), set()).update(names)
                                 who = (world.actors[who].get('grant') or {}).get('delegatorAlias')
             self._usage = usage
         return self._usage
+
+    NO_ITEM = '#noItem'
+
+    def item_less_object(self, world, capability, request, action):
+        """True when an OBJECT-family read names a noun whose product row presents no ITEM (a SalesOrder row carries
+        TARGET and WORK only), so an ITEM grant would refuse it under the all-of rule."""
+        if self.family(capability) != 'OBJECT' or not isinstance(request, dict):
+            return False
+        presented = self.presentations(world, capability, request, action)
+        return isinstance(presented, list) and bool(presented) and all('ITEM' not in p for p in presented)
 
     def kept_scope_keys(self, fixture_id, actor, grant):
         """Scope keys conform_fixture keeps: metadata, the ITEM keys unless a capability the cases call with this actor (or
         through it as delegator) presents no item, and the keys an override names (contracts/request-contracts.json
         grantAuthorization)."""
         without = set(self.grants['familiesWithoutItem'])
-        used = self.grant_usage().get((fixture_id, actor), set()) & set(grant.get('actions') or [])
-        item = not any(self.family(cap) in without for cap in used)
+        usage = self.grant_usage().get((fixture_id, actor), set())
+        used = usage & set(grant.get('actions') or [])
+        item = not any(self.family(cap) in without or cap + self.NO_ITEM in usage for cap in used)
         override = self.grant_override(fixture_id, actor)
         keep = set(self.grants['metadataScopeKeys']) | set((override or {}).get('keep') or [])
         if item and not (override and override.get('dropItem')):
@@ -1442,6 +1540,8 @@ class TargetRefs:
             return [{'TARGET': one, 'WORK': one, 'ITEM': known(w.work_item(name))}]
         if kind in ('Customer', 'Supplier'):
             return [{'TARGET': one}]
+        if kind == 'SalesOrder':
+            return [{'TARGET': one, 'WORK': (set(), True)}]  # Orders carry workId, no itemId (SalesQueries.scopes)
         return 'unknown'
 
 

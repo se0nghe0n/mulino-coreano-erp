@@ -346,7 +346,7 @@
     "intentionalViolation": "a field the case sends on purpose to prove the product rejects it; prepare requires the declared fields to equal the actual violations and a pinned rejection on the action"
   },
   "grantAuthorization": {
-    "rule": "User decision 2026-10-09 (AGENTS.md): a grant naming several dimension kinds authorizes only when every kind matches the targets the product presents (all-of, IdentityAuthorization.permittedScopes); identifiers within one kind are alternatives, and the policy guard requires every presented identifier of a command (PolicyCommandGuard.everyScope). The fixture schema and the Step 3 installer hold one grant per actor, so a fixture grant keeps only the dimension kinds that every capability the cases call with that actor presents (directly or through it as a fixture delegator): ITEM when all those capabilities carry the item (familiesWithoutItem name those that do not), none otherwise (an organization-wide grant). WORK, PLACE, TARGET and SOURCE restrictions of a multi-purpose grant would refuse its own reads (an inventory or item row presents no WORK; a Work presents no PLACE), so conform_fixture drops them unless an override keeps them for a negative oracle. Keys with no product grant scope kind are dropped too: the installer could not install them. check_request_contracts.py then proves statically, per subcase, that every read or command the case expects to be authorized is covered and that every action pinned to FORBIDDEN stays uncovered.",
+    "rule": "User decision 2026-10-09 (AGENTS.md): a grant naming several dimension kinds authorizes only when every kind matches the targets the product presents (all-of, IdentityAuthorization.permittedScopes); identifiers within one kind are alternatives, and the policy guard requires every presented identifier of a command (PolicyCommandGuard.everyScope). The fixture schema and the Step 3 installer hold one grant per actor, so a fixture grant keeps only the dimension kinds that every capability the cases call with that actor presents (directly or through it as a fixture delegator): ITEM when all those capabilities carry the item (familiesWithoutItem name those that do not, and an OBJECT read of a noun without item counts the same), none otherwise (an organization-wide grant). WORK, PLACE, TARGET and SOURCE restrictions of a multi-purpose grant would refuse its own reads (an inventory or item row presents no WORK; a Work presents no PLACE), so conform_fixture drops them unless an override keeps them for a negative oracle. Keys with no product grant scope kind are dropped too: the installer could not install them. check_request_contracts.py then proves statically, per subcase, that every read or command the case expects to be authorized is covered and that every action pinned to FORBIDDEN stays uncovered.",
     "productRefs": [
       "backend/src/main/java/com/mulino/application/identity/IdentityAuthorization.java (permittedScopes: membership, CapabilityAssignment, Grant with GrantAction, every non-ORGANIZATION grant scope kind present in targets with a matching id, delegator permitted for the same targets)",
       "backend/src/main/java/com/mulino/application/policy/PolicyCommandGuard.java (everyScope: every single-id combination of the command scopes must pass)",
@@ -407,7 +407,7 @@
         "presents": "inventory"
       },
       "OBJECT": {
-        "meaning": "the requested row by noun type: TradeItem/ManufacturingLot {TARGET, ITEM}, QuantitySegment {TARGET, ITEM, PLACE}, Place {TARGET, PLACE}, Work {TARGET, WORK, ITEM}, PurchaseOrder/PurchaseProposal {ITEM, WORK}, Customer/Supplier {TARGET}; other provider nouns are not modelled (InventoryQueries.java:146-157, PurchaseQueries.java:20, SalesQueries.java:22)",
+        "meaning": "the requested row by noun type: TradeItem/ManufacturingLot {TARGET, ITEM}, QuantitySegment {TARGET, ITEM, PLACE}, Place {TARGET, PLACE}, Work {TARGET, WORK, ITEM}, PurchaseOrder/PurchaseProposal {ITEM, WORK}, Customer/Supplier {TARGET}, SalesOrder {TARGET, WORK} (the Orders row carries no itemId); other provider nouns are not modelled (InventoryQueries.java:146-157, PurchaseQueries.java:20, SalesQueries.java:22). A read of a noun that presents no ITEM (Place, Customer, Supplier, SalesOrder) counts like a family without item when conform_fixture decides whether the actor keeps its ITEM keys (step2r round 13, run-9d213f5a: C3 getObject SalesOrder SALE refused FORBIDDEN under an ITEM grant)",
         "presents": "object"
       },
       "WORK_ROW": {
@@ -835,6 +835,22 @@
         "from": "workKind",
         "to": "workType",
         "contractRef": "plan section 5.1 Work (업무 유형), WorkLifecycle.java:92"
+      },
+      {
+        "capabilities": [
+          "placeHold"
+        ],
+        "from": "kind",
+        "to": "category",
+        "contractRef": "plan section 6 placeHold (QC 담당 결정: the restriction category decides the decision authority), QualityCommands.java:23,31: category QC|CUSTOMER|COMMERCIAL|RECALL; the cases write the same values under kind"
+      },
+      {
+        "capabilities": [
+          "proposeHandover"
+        ],
+        "from": "toOwnerId",
+        "to": "recipientId",
+        "contractRef": "plan section 5.3 Handover(PROPOSED→ACCEPTED|REJECTED|EXPIRED): the proposed new owner; ResponsibilityService.java:37 names it recipientId (the C3 sourceOverrides already map acceptingOwnerId the same way). The current owner is read from the Work, so fromOwnerId has no slot and stays KNOWN_OPEN S2-SLOT-VOCABULARY"
       }
     ],
     "waitContract": {
@@ -886,6 +902,126 @@
         "quantity",
         "observedQuantity"
       ]
+    },
+    "listQuantities": {
+      "capabilities": [
+        "splitQuantity"
+      ],
+      "from": "children",
+      "to": "quantities",
+      "unitSlot": "unit",
+      "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity (segmentId, quantities[], unit, occurredAt, evidenceRef; parent quantity = sum of the children), InventoryCommands.java:29-35,48: cases that wrote the child quantities as children [{value, unit}] carry the same statement as quantities in order plus one unit. Children that name an alias ({alias, quantity, unit}, T13/T14/T15) stay: later actions read the child as /response/children/<alias>/segmentId and ContractValidator.splitChildren tracks the child by that alias, while the product returns the new leaves only as effects.segmentIds in quantity order (InventoryCommands.java:99) and contracts/command-response.schema.json names no child list; rewriting them needs the response pointer and the validator changed together (open, docs/execution/step2r-round13/README.md). Other shapes (T03 reject-cycle children that target a segment) are deliberate and stay."
+    },
+    "contractDrops": {
+      "description": "Slots no capability contract or plan section declares for the capability, whose value the contract already states another way (step2r round 13 item 3). Each rule names when the slot carries no meaning of its own; any other value stays and remains KNOWN_OPEN S2-SLOT-VOCABULARY.",
+      "rules": [
+        {
+          "capabilities": [
+            "splitQuantity"
+          ],
+          "slot": "loss",
+          "when": "zero",
+          "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity: the children sum to the parent; a declared loss of 0 is that rule, a loss is not a split input"
+        },
+        {
+          "capabilities": [
+            "splitQuantity"
+          ],
+          "slot": "allocationTransfer",
+          "when": "always",
+          "contractRef": "docs/execution/s2-inventory/contracts.md 잠금과 거래: an EXECUTABLE/SUSPENDED allocation moves once to the new child its range falls in; the request does not choose the child. The case oracles on the transferred allocation stay"
+        },
+        {
+          "capabilities": [
+            "splitQuantity"
+          ],
+          "slot": "reason",
+          "when": "always",
+          "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity declares no reason; the basis is evidenceRef"
+        },
+        {
+          "capabilities": [
+            "moveQuantity"
+          ],
+          "slot": "quantity",
+          "when": "wholeLeaf",
+          "contractRef": "docs/execution/s2-inventory/contracts.md moveQuantity (segmentId, destinationId, occurredAt, evidenceRef): a move takes the whole leaf; a quantity equal to the fixture leaf restates it (a part needs splitQuantity first)"
+        },
+        {
+          "capabilities": [
+            "createWork",
+            "createDraft"
+          ],
+          "slot": "lotIdentification",
+          "when": {
+            "equals": "MISSING"
+          },
+          "contractRef": "plan section 3.3: the manufacturing LOT is a receipt-stage slot, so a purchase draft without it is not rejected; its absence is stated by not sending lotId"
+        }
+      ]
+    },
+    "intervalPeriod": {
+      "capabilities": [
+        "createWork",
+        "createDraft"
+      ],
+      "modes": [
+        "EXISTS_IN",
+        "THROUGHOUT"
+      ],
+      "from": "interval",
+      "to": "period",
+      "contractRef": "plan section 5.1: EXISTS_IN and THROUGHOUT take an interval and an observation policy; WorkLifecycle.java:93 reads that interval from period (start, end, startInclusive, endInclusive) and AssessmentService.java:69 evaluates it. A period the case also carried is the cumulative template value the interval modes never read"
+    },
+    "subjectSlots": {
+      "capabilities": [
+        "createWork",
+        "createDraft"
+      ],
+      "slot": "itemId",
+      "type": "TradeItem",
+      "contractRef": "plan section 5.1 (Work 대상), WorkLifecycle.java:93: the Work item is the one TradeItem subject; an itemId slot is rejected as Unsupported Work goal slot"
+    },
+    "createdSubjects": {
+      "capabilities": {
+        "createGrant": [
+          "Grant"
+        ],
+        "assignCapability": [
+          "Grant",
+          "CapabilityAssignment"
+        ],
+        "createPolicyDraft": [
+          "PolicyVersion"
+        ],
+        "createSalesOrder": [
+          "SalesOrder"
+        ],
+        "createDefinitionDraft": [
+          "DefinitionPackage",
+          "DefinitionVersion"
+        ],
+        "createShipment": [
+          "Shipment"
+        ],
+        "proposePurchase": [
+          "PurchaseOrder",
+          "PurchaseProposal"
+        ],
+        "recordInvoice": [
+          "Invoice"
+        ],
+        "authorizeReturn": [
+          "ReturnAuthorization"
+        ],
+        "openInvestigation": [
+          "Recall"
+        ],
+        "registerItem": [
+          "TradeItem"
+        ]
+      },
+      "contractRef": "docs/execution/s2-inventory/contracts.md 명사 subject의 실제 대상 결합: subjectRefs do not copy authorization scopes; a command that creates an ID has no existing subject (registerItem), the typed slots already name the required targets so zero declarations are allowed, and a declared noun is checked by the common resolver against the handler's exact targets (CommandDefinitionResolver.verifySubjects: 'Declared subject differs from command target'). The shared-slot cases declared the noun of the entity the command creates (or, for assignCapability, the grant), which no handler binds; those declarations are dropped. A subject the handler binds (the Work and item of a sales order, the recipient actor of a grant) stays when a case declares it."
     },
     "basisSlot": {
       "capabilities": [

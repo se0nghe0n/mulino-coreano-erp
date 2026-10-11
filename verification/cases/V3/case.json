@@ -227,11 +227,11 @@
               "slots": {
                 "quantity": "20",
                 "unit": "BOX",
-                "kind": "QC",
                 "action": "SELL",
                 "segmentId": {
                   "$alias": "A20"
-                }
+                },
+                "category": "QC"
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V3-hold-first-winner",
@@ -243,9 +243,9 @@
               "provenance": {
                 "quantity": "USER",
                 "unit": "USER",
-                "kind": "USER",
                 "action": "USER",
-                "segmentId": "CONTEXT"
+                "segmentId": "CONTEXT",
+                "category": "USER"
               }
             },
             "harness": {
@@ -1733,11 +1733,11 @@
               "slots": {
                 "quantity": "20",
                 "unit": "BOX",
-                "kind": "QC",
                 "action": "SELL",
                 "segmentId": {
                   "$alias": "A20"
-                }
+                },
+                "category": "QC"
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V3-dispatch-first-contender-call",
@@ -1749,9 +1749,9 @@
               "provenance": {
                 "quantity": "USER",
                 "unit": "USER",
-                "kind": "USER",
                 "action": "USER",
-                "segmentId": "CONTEXT"
+                "segmentId": "CONTEXT",
+                "category": "USER"
               }
             },
             "harness": {
@@ -2127,11 +2127,11 @@
             "slots": {
               "quantity": "20",
               "unit": "BOX",
-              "kind": "QC",
               "action": "SELL",
               "segmentId": {
                 "$alias": "A20"
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": {
               "$result": {
@@ -2148,9 +2148,9 @@
             "provenance": {
               "quantity": "USER",
               "unit": "USER",
-              "kind": "USER",
               "action": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [
@@ -3355,7 +3355,6 @@
             "slots": {
               "quantity": "20",
               "unit": "BOX",
-              "kind": "QC",
               "action": "SELL",
               "sourceNamespace": "synthetic-qc",
               "externalEventId": "QC-A20",
@@ -3365,7 +3364,8 @@
               },
               "segmentId": {
                 "$alias": "A20"
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V3-late-v1-release-new-hold",
@@ -3377,13 +3377,13 @@
             "provenance": {
               "quantity": "USER",
               "unit": "USER",
-              "kind": "USER",
               "action": "USER",
               "sourceNamespace": "USER",
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "supersedesRestrictionId": "CONTEXT",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [

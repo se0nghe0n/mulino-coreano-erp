@@ -197,11 +197,11 @@
             "slots": {
               "quantity": "60",
               "unit": "BOX",
-              "kind": "QC",
               "action": "SELL",
               "segmentId": {
                 "$alias": "CUS60"
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T05-custody-not-sale-hold-customer",
@@ -213,9 +213,9 @@
             "provenance": {
               "quantity": "USER",
               "unit": "USER",
-              "kind": "USER",
               "action": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [
@@ -2452,13 +2452,13 @@
               "quantity": "30",
               "unit": "BOX",
               "action": "SELL",
-              "kind": "QC",
               "segmentId": {
                 "$result": {
                   "actionId": "dispatch",
                   "pointer": "/response/remainingSegmentId"
                 }
-              }
+              },
+              "category": "QC"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T05-manager-disposition-independent-qc",
@@ -2471,8 +2471,8 @@
               "quantity": "USER",
               "unit": "USER",
               "action": "USER",
-              "kind": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [
@@ -2504,13 +2504,13 @@
               "quantity": "30",
               "unit": "BOX",
               "action": "SELL",
-              "kind": "RECALL",
               "segmentId": {
                 "$result": {
                   "actionId": "dispatch",
                   "pointer": "/response/remainingSegmentId"
                 }
-              }
+              },
+              "category": "RECALL"
             },
             "expectedRevision": {
               "$result": {
@@ -2528,8 +2528,8 @@
               "quantity": "USER",
               "unit": "USER",
               "action": "USER",
-              "kind": "USER",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "USER"
             }
           },
           "evidenceRefs": [
