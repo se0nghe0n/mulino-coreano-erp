@@ -274,6 +274,35 @@ def edit_v4_codes(changed, check):
     write(path, data, fmt, text, changed, check)
 
 
+# ---- T16 adjustment direction (item 1) ----------------------------------------------------------------------------------
+# docs/execution/s2-inventory/contracts.md adjustQuantity takes segmentId, stocktakeId, quantity, unit, direction
+# (INCREASE|DECREASE) and reason. T16 wrote the decrease as decrease {value, unit}: the same statement is direction DECREASE
+# with that quantity and unit.
+def edit_adjust_direction(changed, check):
+    path = ROOT / 'verification/cases/T16/case.json'
+    data, fmt, text = R12.load(path)
+    for sub in data['subcases']:
+        for action in R12.RC.iter_actions(sub.get('actions', [])):
+            request = action.get('request') if isinstance(action.get('request'), dict) else {}
+            slots = request.get('slots') or {}
+            amount = slots.get('decrease')
+            if action.get('capabilityId') != 'adjustQuantity' or not (isinstance(amount, dict) and set(amount) == {'value', 'unit'}) \
+                    or {'direction', 'quantity'} & set(slots):
+                continue
+            items = []
+            for name, value in slots.items():
+                if name == 'decrease':
+                    items += [('direction', 'DECREASE'), ('quantity', amount['value']), ('unit', amount['unit'])]
+                elif name != 'unit':
+                    items.append((name, value))
+            slots.clear()
+            slots.update(items)
+            provenance = request.get('provenance') or {}
+            said = provenance.get('decrease', 'USER')
+            request['provenance'] = {n: (said if n in ('direction', 'quantity', 'unit') else provenance.get(n, said)) for n in slots}
+    write(path, data, fmt, text, changed, check)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
@@ -283,6 +312,7 @@ def main():
     edit_split_children(changed, check)
     edit_reserve_lines(changed, check)
     edit_v4_codes(changed, check)
+    edit_adjust_direction(changed, check)
     if check and changed:
         sys.exit('round 14 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 14: {len(changed)} file(s) changed')

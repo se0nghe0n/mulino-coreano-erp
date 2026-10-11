@@ -767,8 +767,17 @@ class Contracts:
     def whole_leaf(self, slots):
         """True when a moveQuantity quantity restates the whole fixture leaf it names (s2-inventory moveQuantity)."""
         world, segment = getattr(self, '_world', None), slots.get('segmentId')
-        if world is None or not isinstance(segment, dict) or '$alias' not in segment:
+        if world is None or not isinstance(segment, dict):
             return False
+        if '$alias' not in segment:
+            # step2r round 14: a split child read by index (/response/children/<i>/segmentId) holds the i-th quantity.
+            action, pointer = self.prior_action(segment)
+            match = re.fullmatch(r'/response/children/(\d+)/segmentId', pointer or '')
+            parts = ((action or {}).get('request') or {}).get('slots') or {}
+            if action is None or action.get('capabilityId') != 'splitQuantity' or not match or not isinstance(parts.get('quantities'), list) \
+                    or int(match.group(1)) >= len(parts['quantities']):
+                return False
+            return self.same_quantity(slots, (parts['quantities'][int(match.group(1))], parts.get('unit')))
         row = world.segments.get(segment['$alias']) or {}
         quantity = slots.get('quantity')
         if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'}:

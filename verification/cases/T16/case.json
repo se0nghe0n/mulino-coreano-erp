@@ -2050,10 +2050,9 @@
               }
             ],
             "slots": {
-              "decrease": {
-                "value": "2",
-                "unit": "BOX"
-              },
+              "direction": "DECREASE",
+              "quantity": "2",
+              "unit": "BOX",
               "stocktakeId": {
                 "$result": {
                   "actionId": "stocktake",
@@ -2082,7 +2081,9 @@
               }
             ],
             "provenance": {
-              "decrease": "USER",
+              "direction": "USER",
+              "quantity": "USER",
+              "unit": "USER",
               "stocktakeId": "CONTEXT",
               "reason": "USER",
               "evidenceRef": "CONTEXT",
@@ -2195,10 +2196,9 @@
               }
             ],
             "slots": {
-              "decrease": {
-                "value": "2",
-                "unit": "BOX"
-              },
+              "direction": "DECREASE",
+              "quantity": "2",
+              "unit": "BOX",
               "stocktakeId": {
                 "$result": {
                   "actionId": "stocktake",
@@ -2230,7 +2230,9 @@
               }
             ],
             "provenance": {
-              "decrease": "USER",
+              "direction": "USER",
+              "quantity": "USER",
+              "unit": "USER",
               "stocktakeId": "CONTEXT",
               "reason": "USER",
               "decisionEvidenceId": "CONTEXT",
@@ -2403,10 +2405,6 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
               "destinationId": {
                 "$alias": "W2"
               },
@@ -2437,7 +2435,6 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
               "destinationId": "CONTEXT",
               "custodianId": "CONTEXT",
               "evidenceRef": "CONTEXT",
