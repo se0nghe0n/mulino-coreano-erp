@@ -49,28 +49,13 @@
               "segmentId": {
                 "$alias": "Q100"
               },
-              "children": [
-                {
-                  "alias": "A40",
-                  "quantity": "40",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "B10",
-                  "quantity": "10",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "A20",
-                  "quantity": "20",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "B30",
-                  "quantity": "30",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "40",
+                "10",
+                "20",
+                "30"
               ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "need"
               },
@@ -85,7 +70,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -127,7 +113,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/A40/segmentId"
+                      "pointer": "/response/children/0/segmentId"
                     }
                   },
                   "quantity": {
@@ -142,7 +128,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/B10/segmentId"
+                      "pointer": "/response/children/1/segmentId"
                     }
                   },
                   "quantity": {
@@ -229,7 +215,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/A20/segmentId"
+                      "pointer": "/response/children/2/segmentId"
                     }
                   },
                   "quantity": {
@@ -244,7 +230,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/B30/segmentId"
+                      "pointer": "/response/children/3/segmentId"
                     }
                   },
                   "quantity": {
@@ -387,7 +373,7 @@
                   "segmentId": {
                     "$result": {
                       "actionId": "split",
-                      "pointer": "/response/children/A40/segmentId"
+                      "pointer": "/response/children/0/segmentId"
                     }
                   },
                   "quantity": {
@@ -1137,7 +1123,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A40/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "40",
@@ -1156,7 +1142,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B10/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "10",
@@ -1175,7 +1161,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A20/segmentId"
+                  "pointer": "/response/children/2/segmentId"
                 }
               },
               "20",
@@ -1194,7 +1180,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B30/segmentId"
+                  "pointer": "/response/children/3/segmentId"
                 }
               },
               "30",
@@ -1351,7 +1337,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A40/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               {
@@ -1362,7 +1348,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B10/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               {
@@ -1373,7 +1359,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A20/segmentId"
+                  "pointer": "/response/children/2/segmentId"
                 }
               },
               {
@@ -1384,7 +1370,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B30/segmentId"
+                  "pointer": "/response/children/3/segmentId"
                 }
               },
               {
@@ -1576,7 +1562,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A40/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "40",
@@ -1589,7 +1575,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B10/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "10",
@@ -1602,7 +1588,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/A20/segmentId"
+                  "pointer": "/response/children/2/segmentId"
                 }
               },
               "20",
@@ -1615,7 +1601,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/B30/segmentId"
+                  "pointer": "/response/children/3/segmentId"
                 }
               },
               "30",

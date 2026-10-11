@@ -968,6 +968,15 @@
       "unitSlot": "unit",
       "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity (segmentId, quantities[], unit, occurredAt, evidenceRef; parent quantity = sum of the children), InventoryCommands.java:29-35,48: cases that wrote the child quantities as children [{value, unit}] carry the same statement as quantities in order plus one unit. Children that name an alias ({alias, quantity, unit}, T13/T14/T15) stay: later actions read the child as /response/children/<alias>/segmentId and ContractValidator.splitChildren tracks the child by that alias, while the product returns the new leaves only as effects.segmentIds in quantity order (InventoryCommands.java:99) and contracts/command-response.schema.json names no child list; rewriting them needs the response pointer and the validator changed together (open, docs/execution/step2r-round13/README.md). Other shapes (T03 reject-cycle children that target a segment) are deliberate and stay."
     },
+    "splitPart": {
+      "capabilities": [
+        "splitQuantity"
+      ],
+      "from": "quantity",
+      "to": "quantities",
+      "unitSlot": "unit",
+      "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity (segmentId, quantities[], unit; the children sum to the parent) and contracts/capability-slots.json splitQuantity (no quantity slot): a case that split one part off a leaf as a single quantity states the children part and remainder. The part is the first child (index 0, the s5d S3-7 response children[{index,segmentId,quantity,unit}] in request order), the remainder the second. The parent quantity is the fixture leaf or the quantity the earlier action that returned the segment stated (step2r round 14); any other parent stays and remains a capability-slot finding."
+    },
     "contractDrops": {
       "description": "Slots no capability contract or plan section declares for the capability, whose value the contract already states another way (step2r round 13 item 3). Each rule names when the slot carries no meaning of its own; any other value stays and remains KNOWN_OPEN S2-SLOT-VOCABULARY.",
       "rules": [

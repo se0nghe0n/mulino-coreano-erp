@@ -12810,18 +12810,11 @@
                   "pointer": "/response/segmentId"
                 }
               },
-              "children": [
-                {
-                  "alias": "MOVE20",
-                  "quantity": "20",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "STAY20",
-                  "quantity": "20",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "20",
+                "20"
               ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "need"
               },
@@ -12836,7 +12829,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -12867,7 +12861,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split40",
-                  "pointer": "/response/children/MOVE20/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "quantity": {

@@ -49,18 +49,11 @@
               "segmentId": {
                 "$alias": "Q100"
               },
-              "children": [
-                {
-                  "alias": "ALLOW30",
-                  "quantity": "30",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "UNKNOWN70",
-                  "quantity": "70",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "30",
+                "70"
               ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "need"
               },
@@ -75,7 +68,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -113,13 +107,13 @@
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/ALLOW30/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/UNKNOWN70/segmentId"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],
@@ -234,7 +228,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/ALLOW30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "itemId": {
@@ -354,13 +348,13 @@
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/ALLOW30/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/UNKNOWN70/segmentId"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],
@@ -507,7 +501,7 @@
               "id": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/ALLOW30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               }
             }
@@ -517,7 +511,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/ALLOW30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "30",
@@ -559,7 +553,7 @@
               "id": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/ALLOW30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               }
             }
@@ -597,7 +591,7 @@
               "id": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/ALLOW30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               }
             }
@@ -618,7 +612,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/UNKNOWN70/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "condition": "AGENCY"
@@ -629,7 +623,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/UNKNOWN70/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "AGENCY",
@@ -679,13 +673,13 @@
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/ALLOW30/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/children/UNKNOWN70/segmentId"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],
@@ -788,7 +782,7 @@
               {
                 "$result": {
                   "actionId": "split",
-                  "pointer": "/response/children/ALLOW30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "30",
@@ -863,18 +857,11 @@
               "segmentId": {
                 "$alias": "Q100"
               },
-              "children": [
-                {
-                  "alias": "PART30",
-                  "quantity": "30",
-                  "unit": "BOX"
-                },
-                {
-                  "alias": "REST70",
-                  "quantity": "70",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "30",
+                "70"
               ],
+              "unit": "BOX",
               "evidenceRef": {
                 "$alias": "need"
               },
@@ -889,7 +876,8 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER",
+              "quantities": "USER",
+              "unit": "USER",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
             }
@@ -983,13 +971,13 @@
                 {
                   "$result": {
                     "actionId": "split-life",
-                    "pointer": "/response/children/PART30/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split-life",
-                    "pointer": "/response/children/REST70/segmentId"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],
@@ -1332,7 +1320,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split-life",
-                  "pointer": "/response/children/PART30/segmentId"
+                  "pointer": "/response/children/0/segmentId"
                 }
               },
               "itemId": {
@@ -1407,7 +1395,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split-life",
-                  "pointer": "/response/children/REST70/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "itemId": {
@@ -1482,7 +1470,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split-life",
-                  "pointer": "/response/children/REST70/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "itemId": {
@@ -1563,7 +1551,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "split-life",
-                  "pointer": "/response/children/REST70/segmentId"
+                  "pointer": "/response/children/1/segmentId"
                 }
               },
               "itemId": {
@@ -1680,13 +1668,13 @@
                 {
                   "$result": {
                     "actionId": "split-life",
-                    "pointer": "/response/children/PART30/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split-life",
-                    "pointer": "/response/children/REST70/segmentId"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],
@@ -2272,13 +2260,13 @@
                 {
                   "$result": {
                     "actionId": "split-life",
-                    "pointer": "/response/children/PART30/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 },
                 {
                   "$result": {
                     "actionId": "split-life",
-                    "pointer": "/response/children/REST70/segmentId"
+                    "pointer": "/response/children/1/segmentId"
                   }
                 }
               ],

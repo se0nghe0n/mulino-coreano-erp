@@ -138,12 +138,86 @@ def edit_c3_policies(changed, check):
         write(path, data, fmt, text, changed, check)
 
 
+# ---- split children by index (user decision 2026-10-11, product 3) ------------------------------------------------------
+# The product answers splitQuantity with children[{index, segmentId, quantity, unit}] in the order of the requested
+# quantities (InventoryCommands, s5d S3-7) and names no child. Cases that named their children ({alias, quantity, unit})
+# send the quantities in order plus one unit and read the child by its index; a child is read by segmentId, never id.
+# T14 discrepancy-transit2/unobserved2 keep their named children: their confirmReceipt is a transit receipt of a split
+# child and ContractValidator.receiptCustodyProblems (verification/harness, Step 3) identifies that child only by
+# /response/children/<alias>/segmentId (contracts/fixture-place-kinds.json transitReceipt.splitChildPointer). Indexing
+# them fails ./verify prepare until the validator reads the index form (round README, Step 3 finding).
+SPLIT_DIRS = ('E1', 'E2', 'T03', 'T13', 'T14', 'T15', 'T16', 'V2')
+NAMED_TRANSIT_SPLITS = {('T14', 'discrepancy-transit2'), ('T14', 'discrepancy-unobserved2')}
+
+
+def named_children(slots):
+    children = slots.get('children')
+    if not isinstance(children, list) or not children:
+        return None
+    if not all(isinstance(c, dict) and set(c) == {'alias', 'quantity', 'unit'} and isinstance(c['alias'], str) and isinstance(c['quantity'], str)
+               for c in children):
+        return None
+    return children if len({c['unit'] for c in children}) == 1 else None
+
+
+def child_pointer(node, split, index):
+    """Rewrite every {actionId: <split>, pointer: /response/children/<alias or i>/<field>} below node."""
+    if isinstance(node, dict):
+        if node.get('actionId') in split and isinstance(node.get('pointer'), str) and node['pointer'].startswith('/response/children/'):
+            parts = node['pointer'].split('/')
+            mapping = index.get(node['actionId'], {})
+            if len(parts) > 3 and parts[3] in mapping:
+                parts[3] = str(mapping[parts[3]])
+            if len(parts) == 5 and parts[4] == 'id':
+                parts[4] = 'segmentId'
+            node['pointer'] = '/'.join(parts)
+        for value in node.values():
+            child_pointer(value, split, index)
+    elif isinstance(node, list):
+        for value in node:
+            child_pointer(value, split, index)
+
+
+def edit_split_children(changed, check):
+    for case_id in SPLIT_DIRS:
+        path = ROOT / f'verification/cases/{case_id}/case.json'
+        data, fmt, text = R12.load(path)
+        for sub in data['subcases']:
+            split, index = set(), {}
+            for action in R12.RC.iter_actions(sub.get('actions', [])):
+                if action.get('capabilityId') != 'splitQuantity' or not isinstance(action.get('request'), dict):
+                    continue
+                split.add(action['id'])
+                request = action['request']
+                slots, provenance = request.get('slots') or {}, request.get('provenance') or {}
+                children = named_children(slots)
+                if children is None or (case_id, sub['id']) in NAMED_TRANSIT_SPLITS or 'quantities' in slots:
+                    continue
+                index[action['id']] = {c['alias']: i for i, c in enumerate(children)}
+                said = provenance.get('children', 'USER')
+                items = []
+                for name, value in slots.items():
+                    if name == 'children':
+                        items += [('quantities', [c['quantity'] for c in children]), ('unit', children[0]['unit'])]
+                    elif name != 'unit':
+                        items.append((name, value))
+                slots.clear()
+                slots.update(items)
+                request['provenance'] = {n: (said if n in ('quantities', 'unit') else provenance.get(n, said)) for n in slots}
+            if (case_id, sub['id']) in NAMED_TRANSIT_SPLITS:
+                continue
+            if split:
+                child_pointer({'actions': sub.get('actions', []), 'assertions': sub.get('assertions', [])}, split, index)
+        write(path, data, fmt, text, changed, check)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
     edit_t19_works(changed, check)
     edit_c3_base_world(changed, check)
     edit_c3_policies(changed, check)
+    edit_split_children(changed, check)
     if check and changed:
         sys.exit('round 14 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 14: {len(changed)} file(s) changed')
