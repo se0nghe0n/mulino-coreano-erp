@@ -3483,7 +3483,7 @@
       }
     },
     "requiredFill": {
-      "description": "Required slots the shared-slot cases (declaredOnlyCases) did not state (step2r round 13, run-7b6c69b4: 35 negative authorization probes answered TYPE_INVALID before the authorization they test). Plan section 3.3 validates required slots, type, unit and cardinality before the applicable policy, so a probe that must reach the authorization check sends a type-valid complete request. Each missing required slot takes the first available source: a slot of the same request, a typed subject (@Type), a fixture alias that exists (@alias:NAME), a fixture prior fact (@fact:ALIAS.field), the fixture document named by the first request evidenceRefs entry (@document:path|mediaType|sha256|base64), the typed evidence subject of the one subjectRef (@evidenceSubject), the item of the QuantitySegment subject (@subjectItem), the requesting actor's granted item (@actorItem, @actorItemScopes), the unit of the quantity slot (@quantityUnit), the fixture clock settings (@fixture:timezone|precision), the product clock at the action (@clock, @clock+ISO-8601 duration), the first request evidenceRefs entry (@evidenceRefs), a SHA-256 of a fixed text (@sha256:text) or a literal (@literal:json). Values the requester sets are USER, values taken from the fixture or the clock are CONTEXT. Slots that need an entity the fixture does not install (stocktake, receipt, canonical occurrence, cargo, leg, investigation, outbox) stay KNOWN_OPEN S2-SLOT-REQUIRED until the installer writes those aliases.",
+      "description": "Required slots the shared-slot cases (declaredOnlyCases) did not state (step2r round 13, run-7b6c69b4: 35 negative authorization probes answered TYPE_INVALID before the authorization they test). Plan section 3.3 validates required slots, type, unit and cardinality before the applicable policy, so a probe that must reach the authorization check sends a type-valid complete request. Each missing required slot takes the first available source: a slot of the same request, a typed subject (@Type), a fixture alias that exists (@alias:NAME), a fixture prior fact (@fact:ALIAS.field), the fixture document named by the first request evidenceRefs entry (@document:path|mediaType|sha256|base64), the typed evidence subject of the one subjectRef (@evidenceSubject), the item of the QuantitySegment subject (@subjectItem), the requesting actor's granted item (@actorItem, @actorItemScopes), the unit of the quantity slot (@quantityUnit), the fixture clock settings (@fixture:timezone|precision), the product clock at the action (@clock, @clock+ISO-8601 duration), the first request evidenceRefs entry (@evidenceRefs), a SHA-256 of a fixed text (@sha256:text) or a literal (@literal:json). Values the requester sets are USER, values taken from the fixture or the clock are CONTEXT. Slots that need an entity the fixture does not install (stocktake, receipt, canonical occurrence, cargo, leg, investigation, outbox) stay KNOWN_OPEN S2-SLOT-REQUIRED until the installer writes those aliases. Step2r round 14: cancelPurchase externalAcceptance is UNKNOWN (plan section 6: an external cancellation acceptance is unconfirmed until reconciled; PurchaseCommands accepts only UNKNOWN), openInvestigation names the fixture item P when no segment subject is declared, and the shared splitQuantity probe divides the fixture leaf A20 (20 BOX) into 10+10.",
       "contractRef": "the handler references of commandSlots.capabilities; QualityCommands.java:31 (category QC|CUSTOMER|COMMERCIAL|RECALL), ItemCommands.java:30 (SHA-256 hex), EvidenceCommandInputs.java:16-23 (typed subject {kind,id}, ValueState), IdentityCommands.java:52-54,73 (scopes [{scopeKind,scopeId}]), SalesCommands.java:16-18, RuntimeCommands decision",
       "capabilities": {
         "registerItem": {
@@ -3674,7 +3674,8 @@
         },
         "openInvestigation": {
           "itemId": [
-            "@subjectItem"
+            "@subjectItem",
+            "@alias:P"
           ],
           "workId": [
             "@Work",
@@ -3852,6 +3853,19 @@
         "revisePurchase": {
           "changes": [
             "@literal:{\"dueAt\": \"2026-10-10T09:00:00Z\"}"
+          ]
+        },
+        "cancelPurchase": {
+          "externalAcceptance": [
+            "@literal:\"UNKNOWN\""
+          ]
+        },
+        "splitQuantity": {
+          "quantities": [
+            "@literal:[\"10\", \"10\"]"
+          ],
+          "unit": [
+            "@literal:\"BOX\""
           ]
         }
       }

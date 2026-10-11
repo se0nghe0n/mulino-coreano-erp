@@ -212,7 +212,9 @@ def patch_sub(sub, cap):
         # step2r round 14 (s5d finding 6): the product Recall noun is the Investigation; its approval, notice, recovery and
         # closure name the current RecallScope, which the recall read returns as data.scopeId (RecallQueries.view).
         scope=lambda:{'scopeId':ref('precondition-recall','/response/data/scopeId'),'scopeVersion':ref('precondition-recall','/response/data/scopeVersion'),'scopeHash':ref('precondition-recall','/response/data/scopeHash')}
-        approval_slots=dict(scope(),decision='APPROVED',validUntil=END,reason='승인 scope20의 회수 결정')
+        # step2r round 14: the recall decision vocabulary is APPROVE|REJECT (RecallCommands approveRecall, the same words as
+        # approvePurchase); the recorded decision is the decision sent.
+        approval_slots=dict(scope(),decision='APPROVE',validUntil=END,reason='승인 scope20의 회수 결정')
         approved=lambda:dict(scope(),approvalId=ref('precondition-approval','/response/approvalId'))
         notice_slots=lambda:dict(approved(),noticeEvidenceId=alias('RECALL-NOTICE-DOC'),noticedAt=NOW,channel='SYNTHETIC_CUSTOMER_NOTICE')
         recovery_slots=lambda outcome,doc:dict(approved(),quantity={'value':'20','unit':'BOX'},physicalScopeId=alias('A20'),currentLocationId=alias('W2'),outcome=outcome,evidenceId=alias(doc),occurredAt=NOW)
@@ -220,7 +222,7 @@ def patch_sub(sub, cap):
         if cap!='approveRecall':
             pre.append(invoke(sub,'precondition-approval','admin','approveRecall',approval_slots,ref('precondition-recall','/response/data/revision'),subject))
             check(sub,'precondition-approval-applied','precondition-approval','/response/outcome','APPLIED',observation='approval-effects')
-            check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('precondition-approval','/response/approvalId')},observation='approval-effects',
+            check(sub,'precondition-approval-record','before','/data/rawRows/approvals',[[ref('precondition-approval','/response/approvalId'),alias('admin'),'APPROVE']],'relationSet',field=['id','approverId','decision'],where={'id':ref('precondition-approval','/response/approvalId')},observation='approval-effects',
                 explain='회수 승인은 ADMIN management authority를 가진 admin이 정확한 scope hash/version에 대해 먼저 확정한다.')
         if cap=='closeRecall':
             # Each step re-reads the recall and sends that current revision, so the chain holds whether or not
@@ -244,7 +246,7 @@ def patch_sub(sub, cap):
         for observation in ['before','after','authorized-after']:
             actions[observation]['observation']['sources']+= [x for x in ['recallScopes','recallClosures','notices','recoveries'] if x not in actions[observation]['observation']['sources']]
         if cap=='approveRecall':
-            check(sub,'authorized-business-recall-approval','authorized-after','/data/rawRows/approvals',[[ref('authorized-same-input','/response/approvalId'),alias('admin'),'APPROVED']],'relationSet',field=['id','approverId','decision'],where={'id':ref('authorized-same-input','/response/approvalId')},observation='approval-effects')
+            check(sub,'authorized-business-recall-approval','authorized-after','/data/rawRows/approvals',[[ref('authorized-same-input','/response/approvalId'),alias('admin'),'APPROVE']],'relationSet',field=['id','approverId','decision'],where={'id':ref('authorized-same-input','/response/approvalId')},observation='approval-effects')
         elif cap=='recordRecallNotice':
             check(sub,'authorized-business-notice','authorized-after','/data/rawRows/notices',[[alias('RECALL'),ref('precondition-approval','/response/approvalId'),alias('RECALL-NOTICE-DOC')]],'relationSet',field=['recallId','approvalId','evidenceId'],where={'recallId':alias('RECALL')},observation='followup-effects')
         elif cap=='recordRecovery':

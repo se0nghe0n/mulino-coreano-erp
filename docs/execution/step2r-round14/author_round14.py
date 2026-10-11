@@ -303,6 +303,45 @@ def edit_adjust_direction(changed, check):
     write(path, data, fmt, text, changed, check)
 
 
+# ---- recall approval by scope (item 4/6 follow-up) ----------------------------------------------------------------------
+# approveRecall takes the RecallScope (scopeId, scopeHash) and decision APPROVE|REJECT (contracts/capability-slots.json;
+# RecallCommands). proposeRecall answers the scope it proposed as /response/scopeId and /response/scopeHash. E2 and T18
+# named the proposal (/response/proposalId, /response/proposalHash) and APPROVED; the scope hash binds the scope version,
+# so scopeVersion is not sent. The same scope and decision are named.
+RECALL_DIRS = ('E2', 'T18')
+RECALL_POINTERS = {'/response/proposalId': '/response/scopeId', '/response/proposalHash': '/response/scopeHash'}
+
+
+def edit_recall_approvals(changed, check):
+    for case_id in RECALL_DIRS:
+        path = ROOT / f'verification/cases/{case_id}/case.json'
+        data, fmt, text = R12.load(path)
+        for sub in data['subcases']:
+            proposals = {a['id'] for a in R12.RC.iter_actions(sub.get('actions', [])) if a.get('capabilityId') == 'proposeRecall'}
+            for action in R12.RC.iter_actions(sub.get('actions', [])):
+                request = action.get('request') if isinstance(action.get('request'), dict) else {}
+                slots = request.get('slots') or {}
+                if action.get('capabilityId') != 'approveRecall':
+                    continue
+                items = []
+                for name, value in slots.items():
+                    source = value.get('$result') if isinstance(value, dict) else None
+                    if source and source.get('actionId') in proposals and source.get('pointer') in RECALL_POINTERS:
+                        value = {'$result': {'actionId': source['actionId'], 'pointer': RECALL_POINTERS[source['pointer']]}}
+                        name = 'scopeId' if name == 'proposalId' else name
+                    elif name == 'scopeVersion' and source and source.get('actionId') in proposals:
+                        continue
+                    elif name == 'decision' and value == 'APPROVED':
+                        value = 'APPROVE'
+                    items.append((name, value))
+                if items != list(slots.items()):
+                    slots.clear()
+                    slots.update(items)
+                    provenance = request.get('provenance') or {}
+                    request['provenance'] = {n: provenance.get('proposalId' if n == 'scopeId' and 'scopeId' not in provenance else n, 'CONTEXT') for n in slots}
+        write(path, data, fmt, text, changed, check)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
@@ -313,6 +352,7 @@ def main():
     edit_reserve_lines(changed, check)
     edit_v4_codes(changed, check)
     edit_adjust_direction(changed, check)
+    edit_recall_approvals(changed, check)
     if check and changed:
         sys.exit('round 14 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 14: {len(changed)} file(s) changed')
