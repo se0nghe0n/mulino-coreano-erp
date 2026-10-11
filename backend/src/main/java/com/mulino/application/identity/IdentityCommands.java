@@ -19,7 +19,9 @@ public class IdentityCommands implements CommandHandler {
    if(op.equals("createGrant")) for(var s:scopes(p)) scopes.computeIfAbsent(s.kind(),k->new ArrayList<>()).add(s.id());
    else if(op.equals("assignCapability"))scopes.put(text(p,"scopeKind"),List.of(text(p,"scopeId")));
    else if(op.equals("revokeGrant"))for(var s:repo.rows("GrantScopes",c.organizationId()))if(row.get("ID").equals(s.get("grantId")))scopes.computeIfAbsent((String)s.get("scopeKind"),k->new ArrayList<>()).add((String)s.get("scopeId"));
-   else scopes.put((String)row.get("scopeKind"),List.of((String)row.get("scopeId")));
+   else {if(row.get("scopeKind")==null||row.get("scopeId")==null)throw DomainError.forbidden();scopes.put((String)row.get("scopeKind"),List.of((String)row.get("scopeId")));}
+   // A target row without its actor or scope cannot be authorized against a current scope: fail closed, not HTTP 500.
+   if(recipient==null)throw DomainError.forbidden();
    return new CommandPreparation(scopes,List.of(),Set.of(recipient),"IDENTITY_CONTROL",null,null,0,row==null?recipient:(String)row.get("ID"),row==null?null:((Number)row.get("revision")).intValue());
  }
  public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){

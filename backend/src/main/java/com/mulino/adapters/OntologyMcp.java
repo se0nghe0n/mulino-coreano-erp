@@ -52,6 +52,8 @@ public class OntologyMcp {
     properties.put("scope",Map.of("type","object"));properties.put("filters",Map.of("type","object"));properties.put("limit",Map.of("type","integer","minimum",1,"maximum",200));
     return Map.of("name",operation,"description","Authorized ontology read", "inputSchema",Map.of("type","object","properties",properties,"additionalProperties",false));
   }
-  private Map<String,Object> toolResult(Object value,boolean error){try{return Map.of("isError",error,"structuredContent",value,"content",List.of(Map.of("type","text","text",json.writeValueAsString(value))));}catch(Exception failure){throw new IllegalStateException(failure);}}
+  /** Tool results carry domain values such as java.time.Instant and BigDecimal; they are normalized to their transport text
+   * (TransportValues) before both the structured and the text content, so serialization never ends in HTTP 500. */
+  private Map<String,Object> toolResult(Object raw,boolean error){Object value;try{value=com.mulino.application.core.TransportValues.normalize(raw);}catch(DomainError binary){value=raw;}try{return Map.of("isError",error,"structuredContent",value,"content",List.of(Map.of("type","text","text",json.writeValueAsString(value))));}catch(Exception failure){throw new IllegalStateException(failure);}}
   private ResponseEntity<Map<String,Object>> rpcError(Object id,int status,int code,String message){Map<String,Object> body=new LinkedHashMap<>();body.put("jsonrpc","2.0");body.put("id",id);body.put("error",Map.of("code",code,"message",message));return ResponseEntity.status(status).body(body);}
 }
