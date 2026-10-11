@@ -87,6 +87,15 @@ backlog의 ManagementCoverage 단일 차원 통과도 all-of로 고친다.
 3. 제품은 capability별 허용 slot 목록을 공개하고, `./verify prepare`는
    모든 명령을 그 목록에 대조한다.
 
+같은 날 사용자가 제품 동작 세 가지를 정했다.
+
+1. `createSalesOrder`는 계획 §6대로 자기 인도 Work를 만든다. 가격은
+   선택 입력이다.
+2. `createWork`는 `nextAction`·`nextCheckAt`을 받고, `activateWork`가
+   계획 §5.2대로 Work를 출처로 한 첫 의무를 연다.
+3. 분할 결과의 자식은 응답 `children[]`의 `index`로 가리킨다. 자식에
+   이름을 붙이는 slot은 두지 않는다.
+
 2026-10-09 사용자가 review 시점을 바꿨다. Step 2 closure가 정적
 review 8회 동안 매번 새 P1·P2를 찾으며 수렴하지 않았고, 지적 대부분이
 제품에 한 번 실행하면 드러나는 동작 불일치였기 때문이다. 이 결정이
