@@ -655,6 +655,22 @@
         "segmentIds"
       ]
     },
+    "migrateWorkDefinition": {
+      "slots": [
+        "approvalId",
+        "endpoint",
+        "migrationId",
+        "quantity",
+        "reason",
+        "targetDefinitionId",
+        "workId"
+      ],
+      "note": "Plan §8 explicit Work migration. The Work's human owner applies a current WORK_MIGRATION approval of the PUBLISHED, not retired target whose capability manifest lists migrationId in supportedWorkMigration and whose review names the Work. quantity {value,unit} and endpoint must equal the approved goalChanges. A new GoalVersion keeps previousGoalId; the approval is consumed (ONE_MIGRATION).",
+      "response": {
+        "goalVersionId": "new GoalVersion",
+        "workId": "migrated Work"
+      }
+    },
     "moveQuantity": {
       "slots": [
         "destinationId",

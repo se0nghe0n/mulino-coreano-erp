@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
  * organization's pointer. Regression fixtures are recorded as declared and reported NOT_RUN (deferred, see s5e README).
  */
 @Component
-public class DefinitionLifecycle implements CommandHandler {
+public class DefinitionLifecycle implements CommandHandler,DefinitionMigrationApprovals {
   static final Set<String> CAPABILITIES=Set.of("createDefinitionDraft","validateDefinition","submitDefinitionReview","approveDefinition","publishDefinition","activateDefinition","retireDefinition");
   private final DefinitionLifecycleRepository r;private final DefinitionRepository definitions;private final DefinitionValidator validator;private final IdentityRepository identities;private final ExecutionClock clock;
   private final ObjectMapper json=new ObjectMapper();
@@ -73,6 +73,19 @@ public class DefinitionLifecycle implements CommandHandler {
         r.retire(org,id,reason,c.actorId(),now);r.unpoint(org,id);int rev=r.bump(org,id,c.actorId(),now);yield response(org,id,String.valueOf(row.get("contentHash")),row,rev,Map.of("reason",reason));}
       default->throw DomainError.unsupported();
     };
+  }
+  @SuppressWarnings("unchecked")
+  public Map<String,Object> requireMigrationApproval(DomainContext c,String approvalId,String target,String workId,String migrationId){
+    String org=c.organizationId();var a=r.approval(org,approvalId).orElseThrow(DomainError::forbidden);Instant now=clock.instant();
+    if(!"WORK_MIGRATION".equals(a.get("reviewKind"))||!"APPROVED".equals(a.get("decision"))||!target.equals(a.get("definitionId")))throw DomainError.forbidden();
+    if(a.get("consumedAt")!=null||now.isBefore(at(a.get("validFrom")))||!now.isBefore(at(a.get("validUntil"))))throw new DomainError("WAITING_APPROVAL","DEFINITION_APPROVAL_REQUIRED","The migration approval is consumed or outside its validity");
+    var review=r.review(org,String.valueOf(a.get("reviewId"))).orElseThrow(DomainError::forbidden);Map<String,Object> payload;try{payload=json.readValue(String.valueOf(review.get("payloadJson")),Map.class);}catch(Exception e){throw new IllegalStateException(e);}
+    if(!migrationId.equals(review.get("migrationId"))||!(payload.get("affectedWorkIds") instanceof List<?> works)||!works.contains(workId))throw DomainError.forbidden();
+    Map<String,Object> changes;try{changes=a.get("goalChangesJson")==null?Map.of():json.readValue(String.valueOf(a.get("goalChangesJson")),Map.class);}catch(Exception e){throw new IllegalStateException(e);}
+    var out=new LinkedHashMap<String,Object>();out.put("approvalId",approvalId);out.put("goalChanges",changes);out.put("mapping",payload.getOrDefault("mapping",Map.of()));return out;
+  }
+  public void recordMigration(DomainContext c,String approvalId,String workId,String migrationId,String previousDefinitionId,String definitionId,String previousGoal,String goal,String reason){
+    String org=c.organizationId();Instant now=clock.instant();r.consume(org,approvalId,c.actorId(),now);var m=new LinkedHashMap<String,Object>();m.put("organizationId",org);m.put("ID",UUID.randomUUID().toString());m.put("workId",workId);m.put("approvalId",approvalId);m.put("migrationId",migrationId);m.put("previousDefinitionId",previousDefinitionId);m.put("definitionId",definitionId);m.put("previousGoalVersionId",previousGoal);m.put("goalVersionId",goal);m.put("actorId",c.actorId());m.put("reason",reason);m.put("recordedAt",now);r.insertMigration(m);
   }
   private Definition published(DomainContext c,String id){try{return definitions.get(c.organizationId(),id);}catch(NoSuchElementException unavailable){throw DomainError.forbidden();}catch(IllegalStateException unreadable){throw DomainError.unsupported();}}
   private static Instant at(Object o){return o instanceof java.sql.Timestamp t?t.toInstant():o instanceof Instant i?i:Instant.parse(String.valueOf(o));}
