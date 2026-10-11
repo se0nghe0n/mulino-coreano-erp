@@ -76,29 +76,59 @@ public class InventoryQueries implements QueryHandler {
     String next=after.size()>q.limit() ? ReadCursor.encode((String)page.getLast().get("ID"),c,q) : null;
     return new QueryResult(page,q.scope(),List.of(),List.of(),List.of(),next);
   }
+  /** Bound of an organization-level snapshot: more items than this fail closed instead of truncating. */
+  static final int ORGANIZATION_ITEM_LIMIT=500;
   private QueryResult inventory(DomainContext c, QueryRequest q) {
     Set<String> allowed=Set.of("itemId","placeId","lotId","objectType","organizationId","customerId");
     if (!allowed.containsAll(q.scope().keySet())) throw DomainError.invalid("Unsupported inventory scope");
     String item=(String)q.scope().get("itemId");
     if (item==null) item=q.id();
-    if (item==null) throw DomainError.invalid("Item scope required");
+    var factScope=eligibilityScope(q);
+    if (item==null) return organizationInventory(c,q,factScope);
     var itemRow=repository.object(c,"TradeItems",item);
-    String chosen=item;
-    var rows=repository.rows(c,"QuantitySegments").stream().filter(r -> chosen.equals(r.get("itemId")) && active(r,c) && matches(r,q.scope()) && permitted(c,q.operation(),r)).toList();
-    if(rows.isEmpty()) authorize(c,q.operation(),itemRow);
+    var block=itemInventory(c,q,item,itemRow,factScope);
+    if(block==null) {authorize(c,q.operation(),itemRow);block=itemInventory(c,q,item,itemRow,factScope,true);}
+    var scope=new LinkedHashMap<String,Object>(q.scope());scope.put("itemId",item);if(factScope.get("customerId")!=null)scope.put("customerId",factScope.get("customerId"));
+    return new QueryResult(block.data(),scope,block.unknowns(),block.conflicts(),block.evidence(),null);
+  }
+  private record ItemInventory(Map<String,Object> data,List<String> unknowns,List<String> conflicts,List<String> evidence){}
+  private ItemInventory itemInventory(DomainContext c,QueryRequest q,String item,Map<String,Object> itemRow,Map<String,Object> factScope){return itemInventory(c,q,item,itemRow,factScope,false);}
+  /** One item's snapshot; null when the caller may read no segment of it and the item itself was not yet authorized. */
+  private ItemInventory itemInventory(DomainContext c,QueryRequest q,String item,Map<String,Object> itemRow,Map<String,Object> factScope,boolean itemAuthorized) {
+    var rows=repository.rows(c,"QuantitySegments").stream().filter(r -> item.equals(r.get("itemId")) && active(r,c) && matches(r,q.scope()) && permitted(c,q.operation(),r)).toList();
+    if(rows.isEmpty()&&!itemAuthorized) return null;
     BigDecimal held=rows.stream().map(r -> (BigDecimal)r.get("quantity")).reduce(BigDecimal.ZERO,BigDecimal::add);
     Map<String,Object> data=new LinkedHashMap<>();
     data.put("itemId",item); data.put("heldQuantity",held.stripTrailingZeros().toPlainString()); data.put("unit",itemRow.get("baseUnit"));
     data.put("eligibleQuantity",null); data.put("reservedQuantity",null); data.put("unreservedEligibleQuantity",null); data.put("cumulativeArrival",null);
     data.put("eligibilityStatus","UNKNOWN"); data.put("segmentIds",rows.stream().map(r -> r.get("ID")).toList()); data.put("segments",rows.stream().map(this::dto).toList());
     var unknowns=new ArrayList<String>();var conflicts=new ArrayList<String>();var evidence=new ArrayList<String>();var implemented=new HashSet<String>();
-    var factScope=eligibilityScope(q);
     for(var provider:facts){var extra=provider.read(c,q.operation(),item,factScope,rows);if(!extra.values().keySet().equals(provider.metrics()))throw new IllegalStateException("Inventory metric contract differs from installed provider");data.putAll(extra.values());implemented.addAll(provider.metrics());unknowns.addAll(extra.unknowns());conflicts.addAll(extra.conflicts());evidence.addAll(extra.evidenceRefs());}
     if(!implemented.contains("eligibleQuantity"))unknowns.add("ELIGIBILITY_NOT_IMPLEMENTED_S1");
     if(!implemented.containsAll(Set.of("reservedQuantity","unreservedEligibleQuantity")))unknowns.add("ALLOCATION_NOT_IMPLEMENTED_S1");
     if(!implemented.contains("cumulativeArrival"))unknowns.add("CUMULATIVE_ARRIVAL_REQUIRES_CONFIRMED_RECEIPT_S3");
-    var scope=new LinkedHashMap<String,Object>(q.scope());scope.put("itemId",item);if(factScope.get("customerId")!=null)scope.put("customerId",factScope.get("customerId"));
-    return new QueryResult(data,scope,unknowns,conflicts,evidence,null);
+    return new ItemInventory(data,unknowns,conflicts,evidence);
+  }
+  /**
+   * Organization-level snapshot (no itemId): one item block, in item ID order, for every item whose active segments the
+   * caller may read or which the caller may read itself. Items outside the caller's scope are omitted without revealing
+   * them; a caller who may read none is FORBIDDEN, as for a single item. More than ORGANIZATION_ITEM_LIMIT items fail
+   * closed rather than truncate.
+   */
+  private QueryResult organizationInventory(DomainContext c,QueryRequest q,Map<String,Object> factScope) {
+    var items=repository.rows(c,"TradeItems").stream().sorted(Comparator.comparing(r -> (String)r.get("ID"))).toList();
+    if(items.size()>ORGANIZATION_ITEM_LIMIT) throw DomainError.invalid("Organization inventory snapshot exceeds "+ORGANIZATION_ITEM_LIMIT+" items; scope it by item");
+    var blocks=new ArrayList<Map<String,Object>>();var unknowns=new LinkedHashSet<String>();var conflicts=new LinkedHashSet<String>();var evidence=new LinkedHashSet<String>();
+    for(var itemRow:items) {
+      String id=(String)itemRow.get("ID");
+      var block=itemInventory(c,q,id,itemRow,factScope,permitted(c,q.operation(),itemRow));
+      if(block==null) continue;
+      blocks.add(block.data());unknowns.addAll(block.unknowns());conflicts.addAll(block.conflicts());evidence.addAll(block.evidence());
+    }
+    if(blocks.isEmpty()&&!items.isEmpty()) throw DomainError.forbidden();
+    var data=new LinkedHashMap<String,Object>();data.put("itemIds",blocks.stream().map(b -> b.get("itemId")).toList());data.put("items",blocks);
+    var scope=new LinkedHashMap<String,Object>(q.scope());if(factScope.get("customerId")!=null)scope.put("customerId",factScope.get("customerId"));
+    return new QueryResult(data,scope,List.copyOf(unknowns),List.copyOf(conflicts),List.copyOf(evidence),null);
   }
   /** Eligibility inputs of getInventory: action filter (an upper-case action token, default SELL) and customer (filter or scope, not conflicting). */
   private static Map<String,Object> eligibilityScope(QueryRequest q) {

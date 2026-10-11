@@ -80,8 +80,8 @@ public final class CaseRunner {
             result=!adaptersAvailable && !kind.equals("parallel") ? StepResult.missing(id,"NOT_IMPLEMENTED: no real product adapters installed")
                 : dependency!=null ? StepResult.missing(id,"NOT_IMPLEMENTED: "+dependency) : switch(kind) {
                 case "installFixture" -> dispatch(() -> driver.installFixture(id,fixtureBundle()));
-                case "invoke" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
-                case "query" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request"))));
+                case "invoke" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.invoke(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")),harness(a)));
+                case "query" -> dispatch(() -> a.has("protocolOperation") ? driver.wire(id,actor(a),Json.required(a,"protocolOperation"),resolve(a.path("request"))) : driver.query(id,Json.required(a,"route"),actor(a),Json.required(a,"capabilityId"),resolve(a.path("request")),harness(a)));
                 case "observe" -> dispatch(() -> driver.observe(id,observationRequest(a.path("observation"))));
                 case "control" -> {JsonNode control=controlRequest(id,a);yield dispatch(() -> driver.control(id,control));}
                 case "agent" -> {
@@ -94,7 +94,7 @@ public final class CaseRunner {
                     JsonNode call=a.path("call");
                     yield dispatch(() -> call.has("protocolOperation")
                         ? driver.startWire(id,actor(call),Json.required(call,"protocolOperation"),resolve(call.path("request")))
-                        : driver.start(id,Json.required(call,"route"),actor(call),Json.required(call,"capabilityId"),resolve(call.path("request"))));
+                        : driver.start(id,Json.required(call,"route"),actor(call),Json.required(call,"capabilityId"),resolve(call.path("request")),harness(call)));
                 }
                 case "await" -> {
                     String sourceId=Json.required(a,"awaitActionId"); JsonNode previous=results.get(sourceId);
@@ -417,6 +417,8 @@ public final class CaseRunner {
         bundle.set("bases",bases);return bundle;
     }
     private JsonNode resolve(JsonNode node) { return new ReferenceResolver(results,aliases).resolve(node); }
+    /** The action's harness block (never sent as request body), resolved like the request; an empty object when absent. */
+    private JsonNode harness(JsonNode action) { return action.path("harness").isObject() ? resolve(action.path("harness")) : Json.object(); }
     /** Read-mode directive sent to the observer in place of a $result-bound API snapshotRevision. */
     public static final String RESULT_REVISION="RESULT_REVISION";
     /** Read-mode directive sent to the observer in place of a $result-bound host runtime task snapshot id. */

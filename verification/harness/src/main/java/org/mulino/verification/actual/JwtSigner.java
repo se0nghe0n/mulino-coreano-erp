@@ -20,13 +20,19 @@ public final class JwtSigner {
             key=KeyFactory.getInstance("RSA").generatePrivate(new PKCS8EncodedKeySpec(Base64.getDecoder().decode(pem)));
         } catch(Exception failure) { throw new IllegalArgumentException("Cannot load local PKCS8 RSA signing key",failure); }
     }
-    public String sign(JsonNode actor) {
+    public String sign(JsonNode actor) {return sign(actor,null,null);}
+    /**
+     * action.harness.authenticationTest: the same credential with exactly one claim (iss, sub or aud) replaced by the
+     * authored invalid value, so the product must reject that claim and nothing else.
+     */
+    public String sign(JsonNode actor,String replacedClaim,String replacement) {
         try {
             Instant now=Instant.now(); var claims=Json.object();
             // A declared untrusted authored identity keeps its own iss/aud so the backend must reject it.
             boolean untrusted=actor.path(ActualFixtureBindings.UNTRUSTED).asBoolean(false);
             claims.put("iss",untrusted?Json.required(actor,"issuer"):configuration.issuer()).put("aud",untrusted?Json.required(actor,"audience"):configuration.audience()).put("sub",Json.required(actor,"subject"));
             claims.put("jti",java.util.UUID.randomUUID().toString());
+            if(replacedClaim!=null){if(!java.util.Set.of("iss","sub","aud").contains(replacedClaim))throw new IllegalArgumentException("Unsupported credential variant claim");claims.put(replacedClaim,replacement);}
             claims.put("organizationId",Json.required(actor,"organizationAlias"));
             // This claim satisfies the S0 decoder shape; current server identity ignores it for ownership.
             claims.put("stableRequestOwner","UNTRUSTED-CLIENT-CLAIM").put("iat",now.getEpochSecond()).put("exp",now.plusSeconds(120).getEpochSecond());

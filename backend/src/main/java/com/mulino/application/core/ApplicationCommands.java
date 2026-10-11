@@ -10,11 +10,13 @@ import org.springframework.security.access.AccessDeniedException;
 public class ApplicationCommands {
   private final Map<String,CommandHandler> handlers=new TreeMap<>();
   private final CommandDefinitionResolver definitions;private final ReadAuthorizer auth;private final CommandRepository repository;private final ExecutionClock clock;
-  private final ObjectProvider<CommandGuard> guard;private final ObjectProvider<CommandLeasePort> leases;
+  private final ObjectProvider<CommandGuard> guard;private final ObjectProvider<CommandLeasePort> leases;private final ObjectProvider<CommandBarrier> barriers;private final ObjectProvider<CommandFaults> faults;
+  /** Organization of the command the current thread last applied; read only by the after-commit fault point. */
+  private final ThreadLocal<String> appliedOrganization=new ThreadLocal<>();
   private final TransactionTemplate transaction;private final TransactionTemplate denial;
   public ApplicationCommands(List<CommandHandler> handlers,ReadAuthorizer auth,CommandRepository repository,
-      ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,PlatformTransactionManager manager){
-    this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;
+      ExecutionClock clock,CommandDefinitionResolver definitions,ObjectProvider<CommandGuard> guard,ObjectProvider<CommandLeasePort> leases,ObjectProvider<CommandBarrier> barriers,ObjectProvider<CommandFaults> faults,PlatformTransactionManager manager){
+    this.definitions=definitions;this.auth=auth;this.repository=repository;this.clock=clock;this.guard=guard;this.leases=leases;this.barriers=barriers;this.faults=faults;
     for(CommandHandler h:handlers)for(String cap:h.capabilities())if(this.handlers.put(cap,h)!=null)throw new IllegalStateException("Duplicate command capability "+cap);
     transaction=new TransactionTemplate(manager);transaction.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
     denial=new TransactionTemplate(manager);denial.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
@@ -36,26 +38,38 @@ public class ApplicationCommands {
   }
   public Map<String,Object> execute(Map<String,Object> input){return execute(input,Map.of());}
   /** Internal runtime entrypoint; executionClaim is server-issued and never accepted by public adapters. */
-  public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){return executeInternal(input,serverExecutionClaim,false);}
+  public Map<String,Object> execute(Map<String,Object> input,Map<String,Object> serverExecutionClaim){return executeInternal(input,serverExecutionClaim,false,null);}
+  /**
+   * Adapter entrypoint for a caller-owned changeset (CAP OData action or atomic $batch changeset): the command runs in the
+   * caller's transaction, so the changeset commits or rolls back as one. A rejected command still holds its command-key
+   * fence in that open transaction, so its denial audit is handed to the caller to run after the changeset closed, in its
+   * own transaction, instead of waiting on the caller's lock until lock timeout.
+   */
+  public Map<String,Object> executeInChangeSet(Map<String,Object> input,java.util.function.Consumer<Runnable> afterChangeSet){
+    if(afterChangeSet==null)throw new IllegalArgumentException("Changeset completion hook required");
+    return executeInternal(input,Map.of(),false,afterChangeSet);
+  }
   /** Internal worker entrypoint; identity is resolved from the fenced persistent claim, never payload. */
   public Map<String,Object> executeClaimed(Map<String,Object> input,Map<String,Object> serverExecutionClaim){
-    if(serverExecutionClaim.isEmpty())throw DomainError.forbidden();return executeInternal(input,serverExecutionClaim,true);
+    if(serverExecutionClaim.isEmpty())throw DomainError.forbidden();return executeInternal(input,serverExecutionClaim,true,null);
   }
-  private Map<String,Object> executeInternal(Map<String,Object> input,Map<String,Object> serverExecutionClaim,boolean claimed){
+  private Map<String,Object> executeInternal(Map<String,Object> input,Map<String,Object> serverExecutionClaim,boolean claimed,java.util.function.Consumer<Runnable> afterChangeSet){
     Map<String,Object> intent;
     try{intent=typed(input,true);}catch(DomainError failure){return failure.response();}
     String hash=CommandRequests.hash(intent);
-    if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return reject(intent,hash,new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed"),serverExecutionClaim,claimed);
-    for(int attempt=0;attempt<3;attempt++)try{return transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));}
-    catch(DomainError failure){return reject(intent,hash,failure,serverExecutionClaim,claimed);}
-    catch(AccessDeniedException failure){return reject(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed);}
-    catch(RuntimeException failure){if(transientFailure(failure)&&attempt<2)continue;throw failure;}
+    if(intent.containsKey("canonicalIntentHash")&&!hash.equals(intent.get("canonicalIntentHash")))return rejectWhenClosed(intent,hash,new DomainError("CONFLICT","IDEMPOTENCY_CONFLICT","Canonical intent changed"),serverExecutionClaim,claimed,afterChangeSet);
+    for(int attempt=0;attempt<3;attempt++)try{appliedOrganization.remove();Map<String,Object> committed=transaction.execute(status->apply(intent,hash,serverExecutionClaim,claimed));if(afterChangeSet==null&&appliedOrganization.get()!=null)fault(appliedOrganization.get(),(String)intent.get("capabilityId"),(String)intent.get("commandIdempotencyKey"),"AFTER_DB_COMMIT_BEFORE_RESPONSE");return committed;}
+    catch(DomainError failure){return rejectWhenClosed(intent,hash,failure,serverExecutionClaim,claimed,afterChangeSet);}
+    catch(AccessDeniedException failure){return rejectWhenClosed(intent,hash,DomainError.forbidden(),serverExecutionClaim,claimed,afterChangeSet);}
+    // A caller-owned changeset cannot be retried here: its transaction already holds this attempt's work.
+    catch(RuntimeException failure){if(afterChangeSet==null&&transientFailure(failure)&&attempt<2)continue;throw failure;}
     throw new IllegalStateException("Unreachable retry state");
   }
   private Map<String,Object> typed(Map<String,Object> input,boolean executing){Map<String,Object> intent=new LinkedHashMap<>(CommandRequests.parse(input,executing));CommandHandler h=handlers.get(intent.get("capabilityId"));if(h!=null)intent.putIfAbsent("capabilityVersion",h.semanticVersion());else intent.putIfAbsent("capabilityVersion","UNKNOWN");return Map.copyOf(intent);}
   private CommandHandler handler(Map<String,Object> intent){CommandHandler h=handlers.get(intent.get("capabilityId"));if(h==null||!h.semanticVersion().equals(intent.get("capabilityVersion"))||!h.intentKinds().contains(intent.get("intentKind")))throw DomainError.unsupported();return h;}
   private Map<String,Object> apply(Map<String,Object> intent,String hash,Map<String,Object> claim,boolean claimed){
     DomainContext c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");
+    barrier("AFTER_AUTH_BEFORE_IDEMPOTENCY_FENCE");
     // The key fence and saved scope precede prerequisites which a successful action may consume.
     repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));
     Optional<Map<String,Object>> old=repository.find(c,cap,key);
@@ -67,12 +81,16 @@ public class ApplicationCommands {
       return repository.result(old.get());
     }
     CommandHandler h=handler(intent);definitions.verify(c,intent,h);CommandPreparation initial=h.prepare(c,intent);List<SubjectBinding> initialSubjects=definitions.verifySubjects(c,intent,h,initial);
+    barrier("AFTER_INITIAL_READ_BEFORE_SCOPE_LOCK","BEFORE_SCOPE_LOCK","AFTER_INITIAL_READ_BEFORE_SCOPE_FENCE","AFTER_ELIGIBILITY_READ_BEFORE_SCOPE_FENCE","AFTER_AUTH_READ_BEFORE_SCOPE_FENCE");
+    blocking("WAITING_FOR_GRANT_SCOPE_FENCE","WAITING_FOR_SCOPE_FENCE");
     repository.fence(c,initial.fenceKeys());
     CommandGuard current=guard.getIfAvailable();if(current==null)throw new DomainError("REJECTED","POLICY_UNRESOLVED","Current command guard unavailable");current.fence(c,initial);
+    barrier("AFTER_SCOPE_LOCK");
     CommandPreparation prep=h.prepare(c,intent);if(!initial.authorityActors().equals(prep.authorityActors())||!initial.effectClass().equals(prep.effectClass())||!Objects.equals(initial.approvalAction(),prep.approvalAction())||!initial.scopes().equals(prep.scopes())||!new TreeSet<>(initial.fenceKeys()).equals(new TreeSet<>(prep.fenceKeys())))throw new DomainError("CONFLICT","STALE_REVISION","Command scope changed");
     List<SubjectBinding> subjects=definitions.verifySubjects(c,intent,h,prep);if(!initialSubjects.equals(subjects))throw new DomainError("CONFLICT","STALE_REVISION","Command subject changed");
     auth.authorizeScopes(c,cap,prep.scopes());
     if(!claim.isEmpty()){verifyClaim(intent,claim,prep.scopes());CommandLeasePort lease=leases.getIfAvailable();if(lease==null)throw DomainError.forbidden();lease.fenceAndVerify(c,claim);}
+    barrier("AFTER_AUTH_SCOPE_FENCE_ACQUIRED_BEFORE_EFFECT_COMMIT");
     if(prep.currentRevision()!=null&&(!intent.containsKey("expectedRevision")||((Number)intent.get("expectedRevision")).intValue()!=prep.currentRevision()))throw new DomainError("CONFLICT","STALE_REVISION","Expected revision changed");
     if(intent.containsKey("proposalRevision")&&((Number)intent.get("proposalRevision")).intValue()!=(prep.proposalRevision()>0?prep.proposalRevision():1))throw new DomainError("CONFLICT","STALE_REVISION","Proposal revision changed");
     current.verify(c,cap,hash,prep,intent);
@@ -84,7 +102,9 @@ public class ApplicationCommands {
     if(!h.mutatesAuthorization(cap))auth.authorizeScopes(c,cap,prep.scopes());current.verifyCommit(c,cap,hash,prep,intent,h.mutatesAuthorization(cap));if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
     current.consume(c,prep,intent,id);
     result.put("commandId",id);result.put("canonicalIntentHash",hash);result.put("proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1);
-    result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
+    result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));
+    fault(c.organizationId(),cap,key,"command.beforeCommit","AFTER_IN_PROGRESS_BEFORE_EFFECT_COMMIT","AUDIT_INSERT");appliedOrganization.set(c.organizationId());
+    repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;
   }
   private void verifyClaim(Map<String,Object> intent,Map<String,Object> claim,Map<String,List<String>> scopes){
     if(!Objects.equals(claim.get("capabilityId"),intent.get("capabilityId"))||!Objects.equals(claim.get("commandId"),intent.get("commandIdempotencyKey")))throw DomainError.forbidden();
@@ -94,6 +114,10 @@ public class ApplicationCommands {
     }
     if(!(claim.get("workId") instanceof String workId)||!scopes.getOrDefault("WORK",List.of()).contains(workId))throw DomainError.forbidden();
   }
+  private Map<String,Object> rejectWhenClosed(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed,java.util.function.Consumer<Runnable> afterChangeSet){
+    if(afterChangeSet==null)return reject(intent,hash,failure,claim,claimed);
+    afterChangeSet.accept(()->reject(intent,hash,failure,claim,claimed));return failure.response();
+  }
   /** Expected denial audit is committed separately only after the effect transaction rolled back. */
   private Map<String,Object> reject(Map<String,Object> intent,String hash,DomainError failure,Map<String,Object> claim,boolean claimed){
     Map<String,Object> result=failure.response();
@@ -101,5 +125,8 @@ public class ApplicationCommands {
       String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");repository.fence(c,List.of("command:"+c.stableRequestOwner()+":"+cap+":"+key));var old=repository.find(c,cap,key);
       if(old.isPresent()){repository.audit(c,(String)old.get().get("ID"),intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"replayAttempt",true));return result;}String id=repository.begin(c,intent,hash,clock.instant(),null);repository.finish(c,id,intent,hash,result,clock.instant(),Map.of("expectedDenial",true,"definitionVersion",intent.get("definitionVersion"),"capabilityVersion",intent.get("capabilityVersion")));return result;});
   }
+  private void barrier(String... points){CommandBarrier b=barriers.getIfAvailable();if(b!=null)b.reach(points);}
+  private void fault(String organizationId,String capability,String key,String... points){CommandFaults f=faults.getIfAvailable();if(f!=null)f.check(organizationId,capability,key,points);}
+  private void blocking(String... points){CommandBarrier b=barriers.getIfAvailable();if(b!=null)b.blocking(points);}
   private boolean transientFailure(RuntimeException failure){Throwable cause=failure;while(cause!=null){if(cause instanceof java.sql.SQLException sql&&Set.of("55P03","40P01","40001").contains(sql.getSQLState()))return true;cause=cause.getCause();}return false;}
 }
