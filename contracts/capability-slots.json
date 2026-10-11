@@ -340,14 +340,26 @@
         "dueAt",
         "itemId",
         "orderId",
+        "ownerId",
         "packageTerms",
         "price",
         "qualityTerms",
         "quantity",
         "reason",
+        "supervisorId",
         "unit",
         "workId"
-      ]
+      ],
+      "note": "UD-1 (2026-10-11, plan §6): workId is optional. Without it the order creates its own DRAFT delivery Work owned by ownerId (default: the requesting human) and supervised by supervisorId (default: the owner). price and currency are optional and stated together.",
+      "response": {
+        "workId": "the order's delivery Work (created or named)",
+        "orderId": "order root",
+        "line": {
+          "id": "order line ID (= effects.lineId)",
+          "revisionId": "order revision",
+          "orderId": "order root"
+        }
+      }
     },
     "createShipment": {
       "slots": [
@@ -1220,7 +1232,8 @@
         "reason",
         "unit",
         "workId"
-      ]
+      ],
+      "note": "workId is optional and must equal the order's Work when stated; price and currency are optional and stated together."
     },
     "revokeCapability": {
       "slots": [
