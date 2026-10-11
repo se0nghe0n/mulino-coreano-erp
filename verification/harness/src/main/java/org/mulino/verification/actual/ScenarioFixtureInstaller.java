@@ -22,7 +22,7 @@ import org.mulino.verification.Json;
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
         "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
-        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover");
+        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
     static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities");
     /**
@@ -180,7 +180,7 @@ final class ScenarioFixtureInstaller {
         Set<String> works=new HashSet<>();for(String k:List.of("works","work")){JsonNode v=fixture.path("baseline").path(k);if(v.isArray())v.forEach(w->works.add(w.path("alias").asText()));else if(v.isObject())works.add(v.path("alias").asText());}
         int unrepresented=0;
         for(JsonNode r:fixture.path("responsibilities")){String w=r.path("scope").path("workAlias").asText(null);if(w!=null&&works.contains(w))continue;unrepresented++;}
-        if(!fixture.path("responsibilities").isEmpty())notRepresented.add("responsibility nextAction/nextCheckAt (no Work-level product column; owner/supervisor of an installed Work scope are installed on the Work)");
+        if(!fixture.path("responsibilities").isEmpty())notRepresented.add("responsibility nextAction/nextCheckAt of a Work scope is installed on the Work (V34) without an initial WORK_NEXT_ACTION duty row (the Work is not activated by a command)");
         if(unrepresented>0)notRepresented.add("responsibilities without an installed Work scope ("+unrepresented+"): no product row without an obligation kind");
     }
 
@@ -296,6 +296,18 @@ final class ScenarioFixtureInstaller {
         for(String org:orgs) if(!publishedFor.contains(org+":"+version)) {
             ObjectNode content=(ObjectNode)conv.path("definition").deepCopy();content.put("version",version);publish(org,uuid(),content,"PUBLISHED");publishedFor.add(org+":"+version);
             conventions.add("published convention definition "+version);
+        }
+        // Plan §8 DefinitionPackage alias (a package under authoring): a DRAFT DefinitionVersions row with the convention content
+        // under an alias-specific version, and its lifecycle row (revision 1). The drafter is a synthetic installer actor id.
+        for(var it=fixture.path("aliases").fields();it.hasNext();) {
+            var e=it.next();JsonNode a=e.getValue();if(!a.path("type").asText().equals("DefinitionPackage"))continue;
+            ObjectNode content=a.path("content").isObject()&&!a.path("content").isEmpty()?(ObjectNode)a.path("content").deepCopy():(ObjectNode)conv.path("definition").deepCopy();
+            String org=orgOf.get(e.getKey());String packageVersion=a.path("version").asText("draft-"+e.getKey().toLowerCase(Locale.ROOT));content.put("version",packageVersion);content.remove("parentVersionId");content.putNull("parentVersionId");
+            content.put("organizationId",org).put("id",id(e.getKey()));content.putNull("state");content.putNull("contentHash");
+            String state=a.path("state").asText("DRAFT");if(!Set.of("DRAFT","IN_REVIEW").contains(state)){omitted.add("DefinitionPackage "+e.getKey()+" state "+state+" (only DRAFT/IN_REVIEW packages are installed as drafts)");continue;}
+            insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",id(e.getKey()),"version",packageVersion,"state",state,"contentHash",FixtureInstaller.contentHash(content),"content",content.toString(),"evaluatorVersion",Json.required(content,"evaluatorVersion"),"schemaVersion",Json.required(content,"schemaVersion"),"createdAt",asOf.toLocalDateTime()));
+            insert("mulino_definitions_DefinitionLifecycles",row("organizationId",org,"definitionId",id(e.getKey()),"revision",1,"createdBy",uuid(),"regressionFixtureRefs","[]","createdAt",asOf,"recordedAt",asOf));
+            conventions.add("DefinitionPackage "+e.getKey()+" installed as a "+state+" package with convention content, version "+packageVersion+" and a synthetic drafter");
         }
         Set<String> authoredKinds=new HashSet<>();
         for(var it=fixture.path("aliases").fields();it.hasNext();) {
@@ -440,6 +452,9 @@ final class ScenarioFixtureInstaller {
         var row=row("organizationId",org,"ID",id(alias),"revision",w.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf,"itemId",id(item),"definitionVersionId",definition,
             "kind",w.path("kind").asText(guessKind(alias)),"status",status,"ownerId",id(owner),"supervisorId",id(supervisor),"lifecycleMode","COMMAND","pendingInvalidation",false);
         if(w.hasNonNull("closeReason"))row.put("closeReason",w.path("closeReason").asText());
+        // UD-2 (V34): the Work-scope responsibility's nextAction/nextCheckAt are the Work's declared next action. The
+        // installed Work is not activated by a command, so no initial WORK_NEXT_ACTION duty row is opened here.
+        for(JsonNode r:fixture.path("responsibilities"))if(alias.equals(r.path("scope").path("workAlias").asText(null))&&r.hasNonNull("nextAction")&&r.hasNonNull("nextCheckAt")){row.put("nextAction",r.path("nextAction").asText());row.put("nextCheckAt",time(r.path("nextCheckAt").asText()));break;}
         if(status.equals("WAITING")) {
             var wait=Json.object();JsonNode authored=w.path("wait");
             wait.put("reason",authored.path("reason").asText(w.path("waitReason").asText("authored fixture wait")));
@@ -478,7 +493,7 @@ final class ScenarioFixtureInstaller {
      */
     private void workTransition(String org,String alias,Map<String,Object> work) throws Exception {
         var snapshot=new TreeMap<String,Object>();
-        for(String k:List.of("organizationId","ID","revision","createdAt","recordedAt","effectiveAt","itemId","lotId","definitionVersionId","kind","status","ownerId","supervisorId","waitJson","currentGoalVersionId","closeReason","pendingInvalidation","goalRevisionRequired","originalText","conversationRequestId","lifecycleMode"))snapshot.put(k,null);
+        for(String k:List.of("organizationId","ID","revision","createdAt","recordedAt","effectiveAt","itemId","lotId","definitionVersionId","kind","status","ownerId","supervisorId","waitJson","currentGoalVersionId","closeReason","pendingInvalidation","goalRevisionRequired","originalText","conversationRequestId","lifecycleMode","nextAction","nextCheckAt"))snapshot.put(k,null);
         work.forEach((k,v)->snapshot.put(k,v instanceof OffsetDateTime t?t.toInstant().toString():v));
         snapshot.putIfAbsent("goalRevisionRequired",false);if(snapshot.get("goalRevisionRequired")==null)snapshot.put("goalRevisionRequired",false);
         String status=String.valueOf(work.get("status"));

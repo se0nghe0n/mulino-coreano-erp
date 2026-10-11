@@ -335,6 +335,37 @@
     ],
     "supervisionIssues": [
       "@supervisionIssues"
+    ],
+    "activeDefinitionPointers": [
+      "mulino_definitions_ActiveDefinitionPointers"
+    ],
+    "definitionApprovals": [
+      "mulino_definitions_DefinitionApprovals"
+    ],
+    "definitionValidations": [
+      "mulino_definitions_DefinitionValidations"
+    ],
+    "definitionReviews": [
+      "mulino_definitions_DefinitionReviews"
+    ],
+    "definitionRetirements": [
+      "mulino_definitions_DefinitionRetirements"
+    ],
+    "definitionLifecycles": [
+      "mulino_definitions_DefinitionLifecycles"
+    ],
+    "workDefinitionMigrations": [
+      "mulino_definitions_WorkDefinitionMigrations"
+    ],
+    "capabilities": [
+      "mulino_definitions_CapabilityContracts"
+    ],
+    "identity_matches": [
+      "mulino_evidence_Reconciliations",
+      "mulino_evidence_Verifications"
+    ],
+    "domain_records": [
+      "@domainRecords"
     ]
   },
   "approximate": [
@@ -353,9 +384,12 @@
     "conditionResults",
     "workClosures",
     "obligationResolutions",
-    "supervisionIssues"
+    "supervisionIssues",
+    "identity_matches",
+    "domain_records",
+    "capabilities"
   ],
-  "approximateNote": "Sources whose table choice is still a guess (s5b review); an assertion failure on them is classified ADAPTER until the mapping is confirmed. confirmed lists the s5b review of the former s5a guesses.",
+  "approximateNote": "Sources whose table choice is still a guess (s5b review); an assertion failure on them is classified ADAPTER until the mapping is confirmed. confirmed lists the s5b review of the former s5a guesses. identity_matches: source-identity reconciliations and claim verifications (identityMatched) together. domain_records: per-table count/digest of organization business rows, not a domain state. capabilities: the definitions' CapabilityContracts table (the product keeps capability manifests inside the package content).",
   "confirmed": {
     "commandResults": "CommandRecords carries state and resultJson of each command",
     "idempotency": "CommandRecords is keyed by stableRequestOwner+capabilityId+commandIdempotencyKey",
@@ -396,10 +430,13 @@
     "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",
     "@dbPrivileges": "information_schema.role_table_grants of mulino_* tables",
     "@conditionResults": "elements of AssessmentReferences.conditionsJson",
-    "@supervisionIssues": "open supervisor hand-offs: RecoverySchedules HELD_MANUAL (kind=lastOutcome) and IntakeRecoveries HELD_* (kind=lastCode), status OPEN"
+    "@supervisionIssues": "open supervisor hand-offs: RecoverySchedules HELD_MANUAL (kind=lastOutcome) and IntakeRecoveries HELD_* (kind=lastCode), status OPEN",
+    "@domainRecords": "per organization-scoped business table (mulino_* except commands/runtime): table, rowCount, md5 digest of the organization's rows"
   },
   "unmapped": {
     "locks": "the product keeps no durable record of fence/lock acquisitions (advisory locks are transaction-scoped); T04/T16/V3 read acquisitionOrdinal, lockedRevision, scopeFenceId of each acquisition",
-    "lockWaits": "pg_locks shows a waiting backend, but the product exposes neither the fence-key-to-scopeId mapping nor the barrier transactionId of a PostgreSQL backend; V2/V3/V8 read scopeId and transactionId"
+    "lockWaits": "pg_locks shows a waiting backend, but the product exposes neither the fence-key-to-scopeId mapping nor the barrier transactionId of a PostgreSQL backend; V2/V3/V8 read scopeId and transactionId",
+    "tombstones": "the product implements no retention deletion (plan §7.4 retention policy, tombstone/redaction and blob deletion reconciliation are not built); T24 reads document tombstones",
+    "deletion_log": "no deletion reconciliation log exists for the same reason (plan §7.4 not implemented); T24 reads documentId, originalHash, blobState, policyVersion, reviewerId"
   }
 }

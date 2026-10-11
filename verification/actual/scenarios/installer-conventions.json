@@ -91,6 +91,10 @@
    {
     "name": "Dispatch",
     "core": true
+   },
+   {
+    "name": "DefinitionPackage",
+    "core": true
    }
   ],
   "attributes": [
@@ -853,6 +857,62 @@
     "intentKind": "QUERY",
     "capabilityId": "traceRecall",
     "stage": "READ",
+    "slots": {}
+   },
+   {
+    "name": "createDefinitionDraft",
+    "intentKind": "COMMAND",
+    "capabilityId": "createDefinitionDraft",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "validateDefinition",
+    "intentKind": "COMMAND",
+    "capabilityId": "validateDefinition",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "submitDefinitionReview",
+    "intentKind": "COMMAND",
+    "capabilityId": "submitDefinitionReview",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "approveDefinition",
+    "intentKind": "COMMAND",
+    "capabilityId": "approveDefinition",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "publishDefinition",
+    "intentKind": "COMMAND",
+    "capabilityId": "publishDefinition",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "activateDefinition",
+    "intentKind": "COMMAND",
+    "capabilityId": "activateDefinition",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "retireDefinition",
+    "intentKind": "COMMAND",
+    "capabilityId": "retireDefinition",
+    "stage": "DRAFT",
+    "slots": {}
+   },
+   {
+    "name": "migrateWorkDefinition",
+    "intentKind": "COMMAND",
+    "capabilityId": "migrateWorkDefinition",
+    "stage": "DRAFT",
     "slots": {}
    }
   ],
@@ -1659,6 +1719,70 @@
     "inputSchemaVersion": "1.0.0",
     "outputSchemaVersion": "1.0.0",
     "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "createDefinitionDraft",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "validateDefinition",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "submitDefinitionReview",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "approveDefinition",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "publishDefinition",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "activateDefinition",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "retireDefinition",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
+   },
+   {
+    "capabilityId": "migrateWorkDefinition",
+    "semanticVersion": "1.0.0",
+    "evaluatorVersion": "core-v1",
+    "inputSchemaVersion": "1.0.0",
+    "outputSchemaVersion": "1.0.0",
+    "supportedWorkMigration": []
    }
   ]
  },
@@ -1961,6 +2085,30 @@
      },
      "dispatchQuantity": {
       "effectClass": "DISPATCH"
+     },
+     "createDefinitionDraft": {
+      "effectClass": "DEFINITION"
+     },
+     "validateDefinition": {
+      "effectClass": "DEFINITION"
+     },
+     "submitDefinitionReview": {
+      "effectClass": "DEFINITION"
+     },
+     "approveDefinition": {
+      "effectClass": "DEFINITION"
+     },
+     "publishDefinition": {
+      "effectClass": "DEFINITION"
+     },
+     "activateDefinition": {
+      "effectClass": "DEFINITION"
+     },
+     "retireDefinition": {
+      "effectClass": "DEFINITION"
+     },
+     "migrateWorkDefinition": {
+      "effectClass": "WORK"
      }
     }
    }
