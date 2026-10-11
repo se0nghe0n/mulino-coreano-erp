@@ -1338,15 +1338,18 @@
                   }
                 ],
                 "slots": {
-                  "quantity": {
-                    "value": "20",
-                    "unit": "BOX"
+                  "quantity": "20",
+                  "unit": "BOX",
+                  "segmentId": {
+                    "$alias": "A60"
                   }
                 },
                 "expectedRevision": 1,
                 "commandIdempotencyKey": "T24-deny-batch-attack-1",
                 "provenance": {
-                  "quantity": "USER"
+                  "quantity": "USER",
+                  "unit": "USER",
+                  "segmentId": "CONTEXT"
                 }
               },
               {
@@ -1365,12 +1368,14 @@
                   "quantity": {
                     "value": "20",
                     "unit": "BOX"
-                  }
+                  },
+                  "occurredAt": "2026-10-07T00:00:00Z"
                 },
                 "expectedRevision": 1,
                 "commandIdempotencyKey": "T24-deny-batch-attack-2",
                 "provenance": {
-                  "quantity": "USER"
+                  "quantity": "USER",
+                  "occurredAt": "CONTEXT"
                 }
               }
             ]
@@ -2051,13 +2056,15 @@
                 "$alias": "A60"
               },
               "quantity": "20",
-              "unit": "BOX"
+              "unit": "BOX",
+              "occurredAt": "2026-10-07T00:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
               "segmentId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "occurredAt": "CONTEXT"
             }
           },
           "harness": {
@@ -3451,9 +3458,13 @@
               "destinationId": {
                 "$alias": "C"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "dispatch-basis"
+              },
+              "occurredAt": "2026-10-07T00:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
@@ -3463,7 +3474,9 @@
               "quantity": "USER",
               "unit": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           }
         },
@@ -3602,9 +3615,13 @@
               "destinationId": {
                 "$alias": "C"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "dispatch-basis"
+              },
+              "occurredAt": "2026-10-07T00:00:00Z"
             },
             "subjectRefs": [],
             "provenance": {
@@ -3614,7 +3631,9 @@
               "quantity": "USER",
               "unit": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           }
         },

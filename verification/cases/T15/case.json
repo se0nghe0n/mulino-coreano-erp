@@ -60,7 +60,11 @@
                   "quantity": "70",
                   "unit": "BOX"
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-split",
@@ -71,7 +75,9 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER"
+              "children": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -122,7 +128,9 @@
                 "unit": "BOX"
               },
               "policyVersion": "SYNTHETIC-policy-v1",
-              "evidence": "need"
+              "evidence": {
+                "$alias": "need"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-procedure",
@@ -175,7 +183,9 @@
                   "pointer": "/response/evidenceHash"
                 }
               },
-              "externalReceiptEvidence": "agency-receipt",
+              "externalReceiptEvidence": {
+                "$alias": "agency-receipt"
+              },
               "externalReceiptId": "AGENCY-ACK30"
             },
             "expectedRevision": 1,
@@ -233,13 +243,13 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
+              "quantity": "30",
+              "unit": "BOX",
               "decision": "ALLOW",
               "decisionVersion": "agency-v1",
-              "evidence": "agency-decision"
+              "evidence": {
+                "$alias": "agency-decision"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-allow30",
@@ -254,6 +264,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -353,14 +364,14 @@
                   }
                 }
               ],
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "basisKind": "QC",
               "action": "SELL",
               "decision": "PASS",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-agency30-qc100-qc100",
@@ -372,6 +383,7 @@
             "provenance": {
               "segmentIds": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "basisKind": "USER",
               "action": "USER",
               "decision": "USER",
@@ -862,7 +874,11 @@
                   "quantity": "70",
                   "unit": "BOX"
                 }
-              ]
+              ],
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-split-life",
@@ -873,7 +889,9 @@
             ],
             "provenance": {
               "segmentId": "CONTEXT",
-              "children": "USER"
+              "children": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -982,7 +1000,9 @@
               "procedureVersion": "procedure-v1",
               "policyVersion": "SYNTHETIC-policy-v1",
               "documentKind": "IMPORT_DECLARATION",
-              "evidence": "need"
+              "evidence": {
+                "$alias": "need"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-prepare",
@@ -1092,7 +1112,9 @@
                 }
               },
               "submissionStatus": "UNCONFIRMED",
-              "evidence": "need"
+              "evidence": {
+                "$alias": "need"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-unknown-submit",
@@ -1196,7 +1218,9 @@
                 }
               },
               "externalReceiptId": "EXT-AGENCY-1",
-              "externalReceiptEvidence": "agency-receipt"
+              "externalReceiptEvidence": {
+                "$alias": "agency-receipt"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -1317,13 +1341,13 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "30",
-                "unit": "BOX"
-              },
+              "quantity": "30",
+              "unit": "BOX",
               "decision": "ALLOW",
               "decisionVersion": "partial-v1",
-              "evidence": "agency-decision"
+              "evidence": {
+                "$alias": "agency-decision"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -1344,6 +1368,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -1391,13 +1416,13 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "70",
-                "unit": "BOX"
-              },
+              "quantity": "70",
+              "unit": "BOX",
               "decision": "SUPPLEMENT_REQUIRED",
               "decisionVersion": "supplement-v1",
-              "evidence": "agency-decision"
+              "evidence": {
+                "$alias": "agency-decision"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -1418,6 +1443,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -1465,13 +1491,13 @@
               "lotId": {
                 "$alias": "L"
               },
-              "quantity": {
-                "value": "70",
-                "unit": "BOX"
-              },
+              "quantity": "70",
+              "unit": "BOX",
               "decision": "REJECTED",
               "decisionVersion": "reject-v1",
-              "evidence": "agency-decision"
+              "evidence": {
+                "$alias": "agency-decision"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -1492,6 +1518,7 @@
               "itemId": "CONTEXT",
               "lotId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "decision": "USER",
               "decisionVersion": "USER",
               "evidence": "USER"
@@ -1550,7 +1577,9 @@
                 "unit": "BOX"
               },
               "reason": "보완 후 재제출",
-              "evidence": "need"
+              "evidence": {
+                "$alias": "need"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-resubmit-prepare",
@@ -1601,7 +1630,9 @@
                 }
               },
               "externalReceiptId": "EXT-AGENCY-2",
-              "externalReceiptEvidence": "agency-receipt"
+              "externalReceiptEvidence": {
+                "$alias": "agency-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-resubmit",
@@ -1664,7 +1695,9 @@
                 "unit": "BOX"
               },
               "labelVersion": "label-v1",
-              "evidence": "label"
+              "evidence": {
+                "$alias": "label"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-procedure-lifecycle-label",

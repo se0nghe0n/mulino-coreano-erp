@@ -128,11 +128,8 @@
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               }
             },
             "conditions": [],
@@ -149,7 +146,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER"
+              "destinationId": "USER"
             }
           },
           "evidenceRefs": [
@@ -1570,11 +1567,8 @@
               "dueAt": "금요일",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               }
             },
             "conditions": [],
@@ -1591,7 +1585,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER"
+              "destinationId": "USER"
             }
           },
           "evidenceRefs": [
@@ -2184,11 +2178,8 @@
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               },
               "itemName": "비스킷"
             },
@@ -2206,7 +2197,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER",
+              "destinationId": "USER",
               "itemName": "USER"
             }
           },
@@ -4237,10 +4228,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
@@ -4262,6 +4251,7 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
@@ -5067,11 +5057,8 @@
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               }
             },
             "conditions": [],
@@ -5088,7 +5075,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER"
+              "destinationId": "USER"
             }
           },
           "evidenceRefs": [
@@ -5938,11 +5925,8 @@
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               }
             },
             "conditions": [],
@@ -5959,7 +5943,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER"
+              "destinationId": "USER"
             }
           },
           "evidenceRefs": [
@@ -6046,6 +6030,9 @@
                   "actionId": "purchase-work",
                   "pointer": "/response/data/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "conditions": [],
@@ -6063,7 +6050,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -23161,11 +23149,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -23183,7 +23168,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "_meta": {
@@ -25453,6 +25438,9 @@
                   "actionId": "purchase-work",
                   "pointer": "/response/data/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "conditions": [],
@@ -25470,7 +25458,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -26493,11 +26482,8 @@
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               }
             },
             "conditions": [],
@@ -26515,7 +26501,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER"
+              "destinationId": "USER"
             }
           },
           "evidenceRefs": [
@@ -26565,11 +26551,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -26587,7 +26570,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "_meta": {
@@ -26710,11 +26693,8 @@
               "dueAt": "2026-10-09T09:00:00Z",
               "endpoint": "ARRIVED",
               "quantityMode": "CUMULATIVE_EVENT",
-              "destination": {
-                "type": "Place",
-                "id": {
-                  "$alias": "W"
-                }
+              "destinationId": {
+                "$alias": "W"
               }
             },
             "conditions": [],
@@ -26732,7 +26712,7 @@
               "dueAt": "USER",
               "endpoint": "CONTEXT",
               "quantityMode": "APPROVED_DEFAULT",
-              "destination": "USER"
+              "destinationId": "USER"
             }
           },
           "evidenceRefs": [
@@ -26782,11 +26762,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -26804,7 +26781,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "_meta": {
@@ -27789,20 +27766,19 @@
               "segmentId": {
                 "$alias": "B40"
               },
-              "salesOrderLineId": {
+              "quantity": "20",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "SL1"
-              },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
               }
             },
             "subjectRefs": [],
             "capabilityId": "reserveQuantity",
             "provenance": {
               "segmentId": "CONTEXT",
-              "salesOrderLineId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -27846,20 +27822,19 @@
                     "segmentId": {
                       "$alias": "B40"
                     },
-                    "salesOrderLineId": {
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "salesLineId": {
                       "$alias": "SL1"
-                    },
-                    "quantity": {
-                      "value": "20",
-                      "unit": "BOX"
                     }
                   },
                   "subjectRefs": [],
                   "capabilityId": "reserveQuantity",
                   "provenance": {
                     "segmentId": "CONTEXT",
-                    "salesOrderLineId": "CONTEXT",
-                    "quantity": "USER"
+                    "quantity": "USER",
+                    "unit": "USER",
+                    "salesLineId": "CONTEXT"
                   }
                 },
                 "_meta": {
@@ -28852,20 +28827,19 @@
               "segmentId": {
                 "$alias": "B40"
               },
-              "salesOrderLineId": {
+              "quantity": "20",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "SL1"
-              },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
               }
             },
             "subjectRefs": [],
             "capabilityId": "reserveQuantity",
             "provenance": {
               "segmentId": "CONTEXT",
-              "salesOrderLineId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER",
+              "salesLineId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -28909,20 +28883,19 @@
                     "segmentId": {
                       "$alias": "B40"
                     },
-                    "salesOrderLineId": {
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "salesLineId": {
                       "$alias": "SL1"
-                    },
-                    "quantity": {
-                      "value": "20",
-                      "unit": "BOX"
                     }
                   },
                   "subjectRefs": [],
                   "capabilityId": "reserveQuantity",
                   "provenance": {
                     "segmentId": "CONTEXT",
-                    "salesOrderLineId": "CONTEXT",
-                    "quantity": "USER"
+                    "quantity": "USER",
+                    "unit": "USER",
+                    "salesLineId": "CONTEXT"
                   }
                 },
                 "_meta": {
@@ -29902,6 +29875,9 @@
                   "actionId": "purchase-work",
                   "pointer": "/response/data/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "conditions": [],
@@ -29919,7 +29895,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -30949,11 +30926,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -30970,7 +30944,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -32206,11 +32180,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -32227,7 +32198,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -33450,11 +33421,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -33471,7 +33439,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -34687,11 +34655,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -34708,7 +34673,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -35944,11 +35909,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -35965,7 +35927,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -36134,11 +36096,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -36155,7 +36114,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -39100,11 +39059,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -39121,7 +39077,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -40321,11 +40277,8 @@
                     "dueAt": "2026-10-09T09:00:00Z",
                     "endpoint": "ARRIVED",
                     "quantityMode": "CUMULATIVE_EVENT",
-                    "destination": {
-                      "type": "Place",
-                      "id": {
-                        "$alias": "W"
-                      }
+                    "destinationId": {
+                      "$alias": "W"
                     }
                   },
                   "conditions": [],
@@ -40342,7 +40295,7 @@
                     "dueAt": "USER",
                     "endpoint": "CONTEXT",
                     "quantityMode": "APPROVED_DEFAULT",
-                    "destination": "USER"
+                    "destinationId": "USER"
                   }
                 },
                 "requestState": {
@@ -41421,6 +41374,9 @@
                   "actionId": "purchase-work",
                   "pointer": "/response/data/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "conditions": [],
@@ -41438,7 +41394,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -43827,6 +43784,9 @@
                   "actionId": "purchase-work",
                   "pointer": "/response/data/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "conditions": [],
@@ -43844,7 +43804,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -47447,6 +47408,9 @@
                   "actionId": "purchase-work",
                   "pointer": "/response/data/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "conditions": [],
@@ -47464,7 +47428,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -59073,20 +59038,19 @@
                     "segmentId": {
                       "$alias": "B40"
                     },
-                    "salesOrderLineId": {
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "salesLineId": {
                       "$alias": "SL1"
-                    },
-                    "quantity": {
-                      "value": "20",
-                      "unit": "BOX"
                     }
                   },
                   "subjectRefs": [],
                   "capabilityId": "reserveQuantity",
                   "provenance": {
                     "segmentId": "CONTEXT",
-                    "salesOrderLineId": "CONTEXT",
-                    "quantity": "USER"
+                    "quantity": "USER",
+                    "unit": "USER",
+                    "salesLineId": "CONTEXT"
                   }
                 },
                 "_meta": {

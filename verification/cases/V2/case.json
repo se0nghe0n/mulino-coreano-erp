@@ -132,12 +132,13 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "20",
-                  "unit": "BOX"
-                },
-                "orderLineId": {
+                "quantity": "20",
+                "unit": "BOX",
+                "salesLineId": {
                   "$alias": "ORDER2"
+                },
+                "segmentId": {
+                  "$alias": "A60"
                 }
               },
               "expectedRevision": 1,
@@ -149,7 +150,9 @@
               ],
               "provenance": {
                 "quantity": "USER",
-                "orderLineId": "CONTEXT"
+                "unit": "USER",
+                "salesLineId": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -215,28 +218,18 @@
                 }
               ],
               "slots": {
-                "children": [
-                  {
-                    "value": "40",
-                    "unit": "BOX"
-                  },
-                  {
-                    "value": "20",
-                    "unit": "BOX"
-                  }
+                "quantities": [
+                  "40",
+                  "20"
                 ],
-                "loss": {
-                  "value": "0",
-                  "unit": "BOX"
+                "unit": "BOX",
+                "evidenceRef": {
+                  "$alias": "operation-proof"
                 },
-                "allocationTransfer": [
-                  {
-                    "allocationId": {
-                      "$alias": "ALLOC"
-                    },
-                    "childIndex": 0
-                  }
-                ]
+                "occurredAt": "2026-10-07T09:00:00Z",
+                "segmentId": {
+                  "$alias": "A60"
+                }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V2-split-commits-first-winner",
@@ -246,9 +239,11 @@
                 }
               ],
               "provenance": {
-                "children": "USER",
-                "loss": "USER",
-                "allocationTransfer": "USER"
+                "quantities": "USER",
+                "unit": "USER",
+                "evidenceRef": "CONTEXT",
+                "occurredAt": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -615,12 +610,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "1",
-                "unit": "BOX"
-              },
-              "orderLineId": {
+              "quantity": "1",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "ORDER2"
+              },
+              "segmentId": {
+                "$alias": "A60"
               }
             },
             "expectedRevision": {
@@ -637,7 +633,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2351,28 +2349,18 @@
                 }
               ],
               "slots": {
-                "children": [
-                  {
-                    "value": "40",
-                    "unit": "BOX"
-                  },
-                  {
-                    "value": "20",
-                    "unit": "BOX"
-                  }
+                "quantities": [
+                  "40",
+                  "20"
                 ],
-                "loss": {
-                  "value": "0",
-                  "unit": "BOX"
+                "unit": "BOX",
+                "evidenceRef": {
+                  "$alias": "operation-proof"
                 },
-                "allocationTransfer": [
-                  {
-                    "allocationId": {
-                      "$alias": "ALLOC"
-                    },
-                    "childIndex": 0
-                  }
-                ]
+                "occurredAt": "2026-10-07T09:00:00Z",
+                "segmentId": {
+                  "$alias": "A60"
+                }
               },
               "expectedRevision": 1,
               "commandIdempotencyKey": "V2-reserve-commits-first-contender-call",
@@ -2382,9 +2370,11 @@
                 }
               ],
               "provenance": {
-                "children": "USER",
-                "loss": "USER",
-                "allocationTransfer": "USER"
+                "quantities": "USER",
+                "unit": "USER",
+                "evidenceRef": "CONTEXT",
+                "occurredAt": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -2450,16 +2440,17 @@
                 }
               ],
               "slots": {
-                "quantity": {
-                  "value": "20",
-                  "unit": "BOX"
-                },
+                "quantity": "20",
+                "unit": "BOX",
                 "startQuantity": {
                   "value": "40",
                   "unit": "BOX"
                 },
-                "orderLineId": {
+                "salesLineId": {
                   "$alias": "ORDER2"
+                },
+                "segmentId": {
+                  "$alias": "A60"
                 }
               },
               "expectedRevision": 1,
@@ -2471,8 +2462,10 @@
               ],
               "provenance": {
                 "quantity": "USER",
+                "unit": "USER",
                 "startQuantity": "USER",
-                "orderLineId": "CONTEXT"
+                "salesLineId": "CONTEXT",
+                "segmentId": "CONTEXT"
               }
             },
             "harness": {
@@ -2793,37 +2786,18 @@
               }
             ],
             "slots": {
-              "children": [
-                {
-                  "value": "40",
-                  "unit": "BOX"
-                },
-                {
-                  "value": "20",
-                  "unit": "BOX"
-                }
+              "quantities": [
+                "40",
+                "20"
               ],
-              "loss": {
-                "value": "0",
-                "unit": "BOX"
+              "unit": "BOX",
+              "evidenceRef": {
+                "$alias": "operation-proof"
               },
-              "allocationTransfer": [
-                {
-                  "allocationId": {
-                    "$alias": "ALLOC"
-                  },
-                  "childIndex": 0
-                },
-                {
-                  "allocationId": {
-                    "$result": {
-                      "actionId": "winner-terminal",
-                      "pointer": "/response/allocationId"
-                    }
-                  },
-                  "childIndex": 1
-                }
-              ]
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "segmentId": {
+                "$alias": "A60"
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -2838,9 +2812,11 @@
               }
             ],
             "provenance": {
-              "children": "USER",
-              "loss": "USER",
-              "allocationTransfer": "USER"
+              "quantities": "USER",
+              "unit": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2973,12 +2949,13 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "1",
-                "unit": "BOX"
-              },
-              "orderLineId": {
+              "quantity": "1",
+              "unit": "BOX",
+              "salesLineId": {
                 "$alias": "ORDER3"
+              },
+              "segmentId": {
+                "$alias": "A60"
               }
             },
             "expectedRevision": {
@@ -2995,7 +2972,9 @@
             ],
             "provenance": {
               "quantity": "USER",
-              "orderLineId": "CONTEXT"
+              "unit": "USER",
+              "salesLineId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [

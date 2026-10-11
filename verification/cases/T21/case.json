@@ -47,39 +47,84 @@
               },
               "version": "definition-v2",
               "package": {
-                "nounTypes": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
                     "name": "QuantitySegment",
-                    "coreRef": "QuantitySegment"
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
                   }
                 ],
-                "verbDefinitions": [
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
                   {
                     "name": "arrive",
-                    "kind": "WORK",
-                    "slotTypes": {
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
                       "item": "TradeItem",
                       "destination": "Place",
-                      "quantity": "DecimalWithUnit"
-                    },
-                    "endpoint": "SELL_ELIGIBLE"
+                      "quantity": "DECIMAL"
+                    }
                   }
                 ],
-                "goalTemplates": [
+                "relations": [],
+                "goals": [
                   {
                     "name": "default",
-                    "quantity": "60",
-                    "unit": "BOX",
                     "quantityMode": "STATE_AT",
                     "endpoint": "SELL_ELIGIBLE",
-                    "evaluatorId": "eligibility-v2",
                     "evaluatorVersion": "eligibility-v2",
-                    "evidencePolicyVersion": "synthetic-policy-v1",
-                    "evaluationTime": "2026-10-07T09:00:00Z",
-                    "dueAt": "2026-10-09T09:00:00Z"
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
                   }
                 ],
-                "compatibilityManifest": [
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
                   {
                     "capabilityId": "resumeWork",
                     "semanticVersion": "sell-eligible-v2",
@@ -90,24 +135,22 @@
                       "v1-to-v2"
                     ]
                   }
-                ],
-                "regressionFixtureRefs": [
-                  "T02",
-                  "T07",
-                  "T21",
-                  "V1"
-                ],
-                "organizationId": {
-                  "$alias": "ORG"
-                }
-              }
+                ]
+              },
+              "regressionFixtureRefs": [
+                "T02",
+                "T07",
+                "T21",
+                "V1"
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-approved-lifecycle-draft",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },
@@ -925,7 +968,95 @@
               },
               "version": "definition-v2",
               "package": {
-                "rename": "arrival-label"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrival-label",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -1183,11 +1314,99 @@
                 }
               },
               "package": {
-                "rename": "arrival-label-reviewed",
-                "regressionFixtureRefs": [
-                  "T07"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrival-label-reviewed",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
-              }
+              },
+              "regressionFixtureRefs": [
+                "T07"
+              ]
             },
             "expectedRevision": {
               "$result": {
@@ -1199,7 +1418,8 @@
             "provenance": {
               "definitionId": "CONTEXT",
               "parentDraftRevision": "CONTEXT",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },
@@ -1499,39 +1719,84 @@
               },
               "version": "definition-v2",
               "package": {
-                "nounTypes": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
                     "name": "QuantitySegment",
-                    "coreRef": "QuantitySegment"
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
                   }
                 ],
-                "verbDefinitions": [
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
                   {
                     "name": "arrive",
-                    "kind": "WORK",
-                    "slotTypes": {
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
                       "item": "TradeItem",
                       "destination": "Place",
-                      "quantity": "DecimalWithUnit"
-                    },
-                    "endpoint": "SELL_ELIGIBLE"
+                      "quantity": "DECIMAL"
+                    }
                   }
                 ],
-                "goalTemplates": [
+                "relations": [],
+                "goals": [
                   {
                     "name": "default",
-                    "quantity": "60",
-                    "unit": "BOX",
                     "quantityMode": "STATE_AT",
                     "endpoint": "SELL_ELIGIBLE",
-                    "evaluatorId": "eligibility-v2",
                     "evaluatorVersion": "eligibility-v2",
-                    "evidencePolicyVersion": "synthetic-policy-v1",
-                    "evaluationTime": "2026-10-07T09:00:00Z",
-                    "dueAt": "2026-10-09T09:00:00Z"
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
                   }
                 ],
-                "compatibilityManifest": [
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
                   {
                     "capabilityId": "resumeWork",
                     "semanticVersion": "sell-eligible-v2",
@@ -1542,24 +1807,22 @@
                       "v1-to-v2"
                     ]
                   }
-                ],
-                "regressionFixtureRefs": [
-                  "T02",
-                  "T07",
-                  "T21",
-                  "V1"
-                ],
-                "organizationId": {
-                  "$alias": "ORG"
-                }
-              }
+                ]
+              },
+              "regressionFixtureRefs": [
+                "T02",
+                "T07",
+                "T21",
+                "V1"
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-published-content-immutable-draft",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },
@@ -1871,7 +2134,95 @@
               },
               "hash": "d95c7b37ff881b44c9b680b68a5560690631b945a1e2d1d9ad3f0bd8d2663756",
               "package": {
-                "endpoint": "CHANGED"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "CHANGED",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               },
               "approvalId": {
                 "$result": {
@@ -2324,20 +2675,105 @@
                 "$alias": "DEF1"
               },
               "version": "definition-v2-rename",
-              "change": {
-                "rename": {
-                  "from": "arrive",
-                  "to": "arrival"
-                }
-              },
-              "compatibilityManifest": {
-                "capabilityId": "resumeWork",
-                "semanticVersion": "sell-eligible-v2",
-                "evaluatorVersion": "eligibility-v2",
-                "inputSchemaVersion": "2.0.0",
-                "outputSchemaVersion": "2.0.0",
-                "supportedWorkMigration": [
-                  "v1-to-v2"
+              "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-rename",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "arrival-v1",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrival",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "quantity": "DECIMAL",
+                      "destination": "Place",
+                      "dueAt": "INSTANT"
+                    }
+                  }
+                ],
+                "relations": [
+                  {
+                    "name": "locatedAt",
+                    "sourceType": "QuantitySegment",
+                    "targetType": "Place",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  }
+                ],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "CUMULATIVE_EVENT",
+                    "endpoint": "ARRIVED",
+                    "evaluatorVersion": "arrival-v1",
+                    "predicate": {
+                      "operator": "quantitySum",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "1",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "VERIFIED_DISTINCT"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
               },
               "regressionFixtureRefs": [
@@ -2352,8 +2788,7 @@
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "change": "USER",
-              "compatibilityManifest": "USER",
+              "package": "USER",
               "regressionFixtureRefs": "USER"
             }
           }
@@ -2472,21 +2907,117 @@
                 "$alias": "DEF1"
               },
               "version": "definition-v2-optional-attribute",
-              "change": {
-                "attribute": {
-                  "name": "note",
-                  "type": "String",
-                  "required": false
-                }
-              },
-              "compatibilityManifest": {
-                "capabilityId": "resumeWork",
-                "semanticVersion": "sell-eligible-v2",
-                "evaluatorVersion": "eligibility-v2",
-                "inputSchemaVersion": "2.0.0",
-                "outputSchemaVersion": "2.0.0",
-                "supportedWorkMigration": [
-                  "v1-to-v2"
+              "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-optional-attribute",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "arrival-v1",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  },
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "note",
+                    "type": "STRING",
+                    "referenceType": null,
+                    "unit": null,
+                    "decimalPlaces": 0,
+                    "minimumCount": 0,
+                    "maximumCount": 1,
+                    "requiredStage": null,
+                    "core": false
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "quantity": "DECIMAL",
+                      "destination": "Place",
+                      "dueAt": "INSTANT"
+                    }
+                  }
+                ],
+                "relations": [
+                  {
+                    "name": "locatedAt",
+                    "sourceType": "QuantitySegment",
+                    "targetType": "Place",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  }
+                ],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "CUMULATIVE_EVENT",
+                    "endpoint": "ARRIVED",
+                    "evaluatorVersion": "arrival-v1",
+                    "predicate": {
+                      "operator": "quantitySum",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "1",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "VERIFIED_DISTINCT"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
               },
               "regressionFixtureRefs": [
@@ -2501,8 +3032,7 @@
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "change": "USER",
-              "compatibilityManifest": "USER",
+              "package": "USER",
               "regressionFixtureRefs": "USER"
             }
           }
@@ -2621,21 +3151,121 @@
                 "$alias": "DEF1"
               },
               "version": "definition-v2-required-slot",
-              "change": {
-                "slot": {
-                  "name": "destination",
-                  "type": "Place",
-                  "requiredAt": "ACTIVATE_WORK"
-                }
-              },
-              "compatibilityManifest": {
-                "capabilityId": "resumeWork",
-                "semanticVersion": "sell-eligible-v2",
-                "evaluatorVersion": "eligibility-v2",
-                "inputSchemaVersion": "2.0.0",
-                "outputSchemaVersion": "2.0.0",
-                "supportedWorkMigration": [
-                  "v1-to-v2"
+              "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-required-slot",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "arrival-v1",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  },
+                  {
+                    "name": "Work",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  },
+                  {
+                    "nounType": "Work",
+                    "name": "destination",
+                    "type": "REFERENCE",
+                    "referenceType": "Place",
+                    "unit": null,
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "ACTIVATE_WORK",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "quantity": "DECIMAL",
+                      "destination": "Place",
+                      "dueAt": "INSTANT"
+                    }
+                  }
+                ],
+                "relations": [
+                  {
+                    "name": "locatedAt",
+                    "sourceType": "QuantitySegment",
+                    "targetType": "Place",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  }
+                ],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "CUMULATIVE_EVENT",
+                    "endpoint": "ARRIVED",
+                    "evaluatorVersion": "arrival-v1",
+                    "predicate": {
+                      "operator": "quantitySum",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "1",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "VERIFIED_DISTINCT"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
               },
               "regressionFixtureRefs": [
@@ -2650,8 +3280,7 @@
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "change": "USER",
-              "compatibilityManifest": "USER",
+              "package": "USER",
               "regressionFixtureRefs": "USER"
             }
           }
@@ -2770,20 +3399,105 @@
                 "$alias": "DEF1"
               },
               "version": "definition-v2-unit",
-              "change": {
-                "baseUnit": {
-                  "from": "BOX",
-                  "to": "EA"
-                }
-              },
-              "compatibilityManifest": {
-                "capabilityId": "resumeWork",
-                "semanticVersion": "sell-eligible-v2",
-                "evaluatorVersion": "eligibility-v2",
-                "inputSchemaVersion": "2.0.0",
-                "outputSchemaVersion": "2.0.0",
-                "supportedWorkMigration": [
-                  "v1-to-v2"
+              "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-unit",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "arrival-v1",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "EA",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "quantity": "DECIMAL",
+                      "destination": "Place",
+                      "dueAt": "INSTANT"
+                    }
+                  }
+                ],
+                "relations": [
+                  {
+                    "name": "locatedAt",
+                    "sourceType": "QuantitySegment",
+                    "targetType": "Place",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  }
+                ],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "CUMULATIVE_EVENT",
+                    "endpoint": "ARRIVED",
+                    "evaluatorVersion": "arrival-v1",
+                    "predicate": {
+                      "operator": "quantitySum",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "1",
+                        "unit": "EA"
+                      },
+                      "unit": "EA",
+                      "evidenceSelector": "VERIFIED_DISTINCT"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
               },
               "regressionFixtureRefs": [
@@ -2798,8 +3512,7 @@
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "change": "USER",
-              "compatibilityManifest": "USER",
+              "package": "USER",
               "regressionFixtureRefs": "USER"
             }
           }
@@ -2918,20 +3631,105 @@
                 "$alias": "DEF1"
               },
               "version": "definition-v2-endpoint",
-              "change": {
-                "endpoint": {
-                  "from": "ARRIVED",
-                  "to": "SELL_ELIGIBLE"
-                }
-              },
-              "compatibilityManifest": {
-                "capabilityId": "resumeWork",
-                "semanticVersion": "sell-eligible-v2",
-                "evaluatorVersion": "eligibility-v2",
-                "inputSchemaVersion": "2.0.0",
-                "outputSchemaVersion": "2.0.0",
-                "supportedWorkMigration": [
-                  "v1-to-v2"
+              "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-endpoint",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "arrival-v1",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "quantity": "DECIMAL",
+                      "destination": "Place",
+                      "dueAt": "INSTANT"
+                    }
+                  }
+                ],
+                "relations": [
+                  {
+                    "name": "locatedAt",
+                    "sourceType": "QuantitySegment",
+                    "targetType": "Place",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  }
+                ],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "CUMULATIVE_EVENT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "arrival-v1",
+                    "predicate": {
+                      "operator": "quantitySum",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "1",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "VERIFIED_DISTINCT"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
               },
               "regressionFixtureRefs": [
@@ -2946,8 +3744,7 @@
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "change": "USER",
-              "compatibilityManifest": "USER",
+              "package": "USER",
               "regressionFixtureRefs": "USER"
             }
           }
@@ -4417,7 +5214,95 @@
               },
               "version": "definition-v2-types",
               "package": {
-                "slotType": "UnknownType"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-types",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "UnknownType",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -4531,10 +5416,95 @@
               },
               "version": "definition-v2-cardinality",
               "package": {
-                "cardinality": {
-                  "min": 2,
-                  "max": 1
-                }
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-cardinality",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 2,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -4648,7 +5618,95 @@
               },
               "version": "definition-v2-required-stage",
               "package": {
-                "requiredStage": "AFTER_EXECUTION_UNKNOWN"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-required-stage",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "AFTER_EXECUTION_UNKNOWN",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -4762,9 +5820,94 @@
               },
               "version": "definition-v2-unit",
               "package": {
-                "unitCompare": [
-                  "EA",
-                  "KG"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-unit",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "compare",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "EA"
+                      },
+                      "unit": "KG",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
                 ]
               }
             },
@@ -4879,12 +6022,120 @@
               },
               "version": "definition-v2-cycle",
               "package": {
-                "relationCycle": [
-                  "A",
-                  "B",
-                  "A"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-cycle",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  },
+                  {
+                    "name": "A",
+                    "core": false
+                  },
+                  {
+                    "name": "B",
+                    "core": false
+                  }
                 ],
-                "cycleAllowed": false
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [
+                  {
+                    "name": "A-B",
+                    "sourceType": "A",
+                    "targetType": "B",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  },
+                  {
+                    "name": "B-A",
+                    "sourceType": "B",
+                    "targetType": "A",
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "cycleAllowed": false
+                  }
+                ],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -4998,10 +6249,95 @@
               },
               "version": "definition-v2-goal",
               "package": {
-                "goalTemplate": {
-                  "quantity": "60",
-                  "unit": "BOX"
-                }
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-goal",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": null,
+                    "endpoint": null,
+                    "evaluatorVersion": null,
+                    "predicate": {
+                      "operator": "quantitySum",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "VERIFIED_DISTINCT"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -5115,7 +6451,93 @@
               },
               "version": "definition-v2-organization",
               "package": {
-                "organizationId": "synthetic-other-org"
+                "organizationId": "synthetic-other-org",
+                "version": "definition-v2-organization",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -5229,20 +6651,110 @@
               },
               "version": "definition-v2-regression",
               "package": {
-                "regressionResults": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-regression",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
-                    "fixtureId": "T07",
-                    "result": "FAIL"
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
                   }
                 ]
-              }
+              },
+              "regressionResults": [
+                {
+                  "fixtureId": "T07",
+                  "result": "FAIL"
+                }
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-validation-constraints-draft-regression",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionResults": "USER"
             }
           }
         },
@@ -5348,12 +6860,93 @@
               },
               "version": "definition-v2-manifest",
               "package": {
-                "manifest": {
-                  "definitionVersion": "definition-v2",
-                  "capabilityId": "not-deployed",
-                  "evaluatorVersion": "unavailable",
-                  "inputSchemaVersion": "unregistered"
-                }
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-manifest",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "not-deployed",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "unavailable",
+                    "inputSchemaVersion": "unregistered",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": []
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -6664,6 +8257,95 @@
               },
               "version": "definition-v2-sql",
               "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-sql",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ],
                 "sql": "SELECT 1"
               }
             },
@@ -6696,6 +8378,95 @@
               },
               "version": "definition-v2-script",
               "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-script",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ],
                 "script": "return true"
               }
             },
@@ -6728,6 +8499,95 @@
               },
               "version": "definition-v2-privilege",
               "package": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-privilege",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ],
                 "newExecutionPrivilege": "SELL_ALL"
               }
             },
@@ -6760,7 +8620,95 @@
               },
               "version": "definition-v2-operator",
               "package": {
-                "operator": "runCode"
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2-operator",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
+                  {
+                    "name": "QuantitySegment",
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
+                  }
+                ],
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
+                  {
+                    "name": "arrive",
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
+                      "item": "TradeItem",
+                      "destination": "Place",
+                      "quantity": "DECIMAL"
+                    }
+                  }
+                ],
+                "relations": [],
+                "goals": [
+                  {
+                    "name": "default",
+                    "quantityMode": "STATE_AT",
+                    "endpoint": "SELL_ELIGIBLE",
+                    "evaluatorVersion": "eligibility-v2",
+                    "predicate": {
+                      "operator": "runCode",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
+                  }
+                ],
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
+                  {
+                    "capabilityId": "resumeWork",
+                    "semanticVersion": "sell-eligible-v2",
+                    "evaluatorVersion": "eligibility-v2",
+                    "inputSchemaVersion": "2.0.0",
+                    "outputSchemaVersion": "2.0.0",
+                    "supportedWorkMigration": [
+                      "v1-to-v2"
+                    ]
+                  }
+                ]
               }
             },
             "expectedRevision": 1,
@@ -7228,39 +9176,84 @@
               },
               "version": "definition-v2",
               "package": {
-                "nounTypes": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
                     "name": "QuantitySegment",
-                    "coreRef": "QuantitySegment"
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
                   }
                 ],
-                "verbDefinitions": [
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
                   {
                     "name": "arrive",
-                    "kind": "WORK",
-                    "slotTypes": {
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
                       "item": "TradeItem",
                       "destination": "Place",
-                      "quantity": "DecimalWithUnit"
-                    },
-                    "endpoint": "SELL_ELIGIBLE"
+                      "quantity": "DECIMAL"
+                    }
                   }
                 ],
-                "goalTemplates": [
+                "relations": [],
+                "goals": [
                   {
                     "name": "default",
-                    "quantity": "60",
-                    "unit": "BOX",
                     "quantityMode": "STATE_AT",
                     "endpoint": "SELL_ELIGIBLE",
-                    "evaluatorId": "eligibility-v2",
                     "evaluatorVersion": "eligibility-v2",
-                    "evidencePolicyVersion": "synthetic-policy-v1",
-                    "evaluationTime": "2026-10-07T09:00:00Z",
-                    "dueAt": "2026-10-09T09:00:00Z"
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
                   }
                 ],
-                "compatibilityManifest": [
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
                   {
                     "capabilityId": "resumeWork",
                     "semanticVersion": "sell-eligible-v2",
@@ -7271,24 +9264,22 @@
                       "v1-to-v2"
                     ]
                   }
-                ],
-                "regressionFixtureRefs": [
-                  "T02",
-                  "T07",
-                  "T21",
-                  "V1"
-                ],
-                "organizationId": {
-                  "$alias": "ORG"
-                }
-              }
+                ]
+              },
+              "regressionFixtureRefs": [
+                "T02",
+                "T07",
+                "T21",
+                "V1"
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-pinned-meaning-current-policy-draft",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },
@@ -7534,11 +9525,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v2",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -7566,7 +9561,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-pinned-meaning-current-policy-new-work",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -7602,12 +9596,6 @@
                   "actionId": "new-work",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "new-work",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -7618,8 +9606,7 @@
             },
             "commandIdempotencyKey": "T21-pinned-meaning-current-policy-new-active",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -7641,10 +9628,8 @@
               "segmentId": {
                 "$alias": "A40"
               },
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
-              },
+              "quantity": "40",
+              "unit": "BOX",
               "action": "SELL",
               "reason": "synthetic-QC-hold",
               "decisionEvidenceHash": "7f9e4a22a2724081747e6f487d9322b519afe9f88bd0e9de32d8d63c9e0a4830"
@@ -7654,6 +9639,7 @@
             "provenance": {
               "segmentId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "action": "USER",
               "reason": "USER",
               "decisionEvidenceHash": "USER"
@@ -7803,22 +9789,19 @@
               "segmentId": {
                 "$alias": "A40"
               },
-              "quantity": {
-                "value": "1",
-                "unit": "BOX"
-              },
+              "quantity": "1",
+              "unit": "BOX",
               "workId": {
                 "$alias": "WORK1"
-              },
-              "action": "SELL"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-pinned-meaning-current-policy-try-v1-reserve",
             "provenance": {
               "segmentId": "CONTEXT",
               "quantity": "USER",
-              "workId": "CONTEXT",
-              "action": "USER"
+              "unit": "USER",
+              "workId": "CONTEXT"
             }
           }
         },
@@ -9883,39 +11866,84 @@
               },
               "version": "definition-v2",
               "package": {
-                "nounTypes": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
                     "name": "QuantitySegment",
-                    "coreRef": "QuantitySegment"
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
                   }
                 ],
-                "verbDefinitions": [
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
                   {
                     "name": "arrive",
-                    "kind": "WORK",
-                    "slotTypes": {
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
                       "item": "TradeItem",
                       "destination": "Place",
-                      "quantity": "DecimalWithUnit"
-                    },
-                    "endpoint": "SELL_ELIGIBLE"
+                      "quantity": "DECIMAL"
+                    }
                   }
                 ],
-                "goalTemplates": [
+                "relations": [],
+                "goals": [
                   {
                     "name": "default",
-                    "quantity": "80",
-                    "unit": "BOX",
                     "quantityMode": "STATE_AT",
                     "endpoint": "SELL_ELIGIBLE",
-                    "evaluatorId": "eligibility-v2",
                     "evaluatorVersion": "eligibility-v2",
-                    "evidencePolicyVersion": "synthetic-policy-v1",
-                    "evaluationTime": "2026-10-07T09:00:00Z",
-                    "dueAt": "2026-10-09T09:00:00Z"
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "80",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
                   }
                 ],
-                "compatibilityManifest": [
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
                   {
                     "capabilityId": "resumeWork",
                     "semanticVersion": "sell-eligible-v2",
@@ -9926,24 +11954,22 @@
                       "v1-to-v2"
                     ]
                   }
-                ],
-                "regressionFixtureRefs": [
-                  "T02",
-                  "T07",
-                  "T21",
-                  "V1"
-                ],
-                "organizationId": {
-                  "$alias": "ORG"
-                }
-              }
+                ]
+              },
+              "regressionFixtureRefs": [
+                "T02",
+                "T07",
+                "T21",
+                "V1"
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-explicit-authorized-migration-draft",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },
@@ -10872,39 +12898,84 @@
               },
               "version": "definition-v2",
               "package": {
-                "nounTypes": [
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "version": "definition-v2",
+                "parentVersionId": {
+                  "$alias": "DEF1"
+                },
+                "evaluatorVersion": "eligibility-v2",
+                "schemaVersion": "1.0.0",
+                "nouns": [
                   {
                     "name": "QuantitySegment",
-                    "coreRef": "QuantitySegment"
+                    "core": true
+                  },
+                  {
+                    "name": "TradeItem",
+                    "core": true
+                  },
+                  {
+                    "name": "Place",
+                    "core": true
                   }
                 ],
-                "verbDefinitions": [
+                "attributes": [
+                  {
+                    "nounType": "QuantitySegment",
+                    "name": "quantity",
+                    "type": "DECIMAL",
+                    "referenceType": null,
+                    "unit": "BOX",
+                    "decimalPlaces": 0,
+                    "minimumCount": 1,
+                    "maximumCount": 1,
+                    "requiredStage": "READ",
+                    "core": true
+                  }
+                ],
+                "verbs": [
                   {
                     "name": "arrive",
-                    "kind": "WORK",
-                    "slotTypes": {
+                    "intentKind": "COMMAND",
+                    "capabilityId": "createWork",
+                    "stage": "DRAFT",
+                    "slots": {
                       "item": "TradeItem",
                       "destination": "Place",
-                      "quantity": "DecimalWithUnit"
-                    },
-                    "endpoint": "SELL_ELIGIBLE"
+                      "quantity": "DECIMAL"
+                    }
                   }
                 ],
-                "goalTemplates": [
+                "relations": [],
+                "goals": [
                   {
                     "name": "default",
-                    "quantity": "60",
-                    "unit": "BOX",
                     "quantityMode": "STATE_AT",
                     "endpoint": "SELL_ELIGIBLE",
-                    "evaluatorId": "eligibility-v2",
                     "evaluatorVersion": "eligibility-v2",
-                    "evidencePolicyVersion": "synthetic-policy-v1",
-                    "evaluationTime": "2026-10-07T09:00:00Z",
-                    "dueAt": "2026-10-09T09:00:00Z"
+                    "predicate": {
+                      "operator": "stateQuantity",
+                      "property": "QuantitySegment.quantity",
+                      "minimum": {
+                        "value": "60",
+                        "unit": "BOX"
+                      },
+                      "unit": "BOX",
+                      "evidenceSelector": "CURRENT_STATE"
+                    }
                   }
                 ],
-                "compatibilityManifest": [
+                "capabilities": [
+                  {
+                    "capabilityId": "createWork",
+                    "semanticVersion": "1.0.0",
+                    "evaluatorVersion": "core-v1",
+                    "inputSchemaVersion": "1.0.0",
+                    "outputSchemaVersion": "1.0.0",
+                    "supportedWorkMigration": []
+                  },
                   {
                     "capabilityId": "resumeWork",
                     "semanticVersion": "sell-eligible-v2",
@@ -10915,24 +12986,22 @@
                       "v1-to-v2"
                     ]
                   }
-                ],
-                "regressionFixtureRefs": [
-                  "T02",
-                  "T07",
-                  "T21",
-                  "V1"
-                ],
-                "organizationId": {
-                  "$alias": "ORG"
-                }
-              }
+                ]
+              },
+              "regressionFixtureRefs": [
+                "T02",
+                "T07",
+                "T21",
+                "V1"
+              ]
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T21-active-pointer-rollback-preserves-effects-draft",
             "provenance": {
               "parentDefinitionId": "CONTEXT",
               "version": "USER",
-              "package": "USER"
+              "package": "USER",
+              "regressionFixtureRefs": "USER"
             }
           }
         },

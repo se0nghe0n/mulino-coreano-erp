@@ -275,10 +275,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "customerId": {
                 "$alias": "CUSTOMER"
               },
@@ -286,7 +284,10 @@
                 "$alias": "CUSTOMER"
               },
               "dueAt": "2026-10-06T09:00:00Z",
-              "endpoint": "CUSTOMER_ACCEPTED"
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-cumulative-versus-state-sale60",
@@ -297,10 +298,12 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "customerId": "CONTEXT",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
-              "endpoint": "USER"
+              "deliveryEndpoint": "USER",
+              "itemId": "CONTEXT"
             }
           }
         },
@@ -326,10 +329,8 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "segmentId": {
                 "$result": {
                   "actionId": "receive60",
@@ -352,6 +353,7 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "segmentId": "CONTEXT",
               "orderId": "CONTEXT"
             }
@@ -462,8 +464,11 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "DOC"
               }
             },
             "expectedRevision": {
@@ -483,7 +488,8 @@
               "quantity": "USER",
               "occurredAt": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT"
             }
           }
         },
@@ -2054,8 +2060,7 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "lotIdentification": "MISSING"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-lot-not-yet-required-draft",
@@ -2080,8 +2085,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "lotIdentification": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -2518,8 +2522,7 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "lotIdentification": "MISSING"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-missing-quantity-draft",
@@ -2543,8 +2546,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "lotIdentification": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -3026,8 +3028,7 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "lotIdentification": "MISSING"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-missing-dueAt-draft",
@@ -3051,8 +3052,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "lotIdentification": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -3534,8 +3534,7 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "lotIdentification": "MISSING"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-missing-endpoint-draft",
@@ -3559,8 +3558,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "lotIdentification": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -4043,8 +4041,7 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "lotIdentification": "MISSING"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-receipt-missing-lot-draft",
@@ -4069,8 +4066,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "lotIdentification": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -4680,8 +4676,8 @@
               "endpoint": "ARRIVED",
               "quantityMode": "THROUGHOUT",
               "period": {
-                "start": "2026-10-05T09:00:00Z",
-                "end": "2026-10-07T01:30:00Z",
+                "start": "2026-10-07T00:00:00Z",
+                "end": "2026-10-07T02:00:00Z",
                 "endInclusive": true
               },
               "eventKinds": [
@@ -4700,11 +4696,6 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "interval": {
-                "start": "2026-10-07T00:00:00Z",
-                "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
               }
             },
             "expectedRevision": 1,
@@ -4730,8 +4721,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "interval": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -4761,10 +4751,8 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "W"
               },
@@ -4785,6 +4773,7 @@
               "activityKind": "USER",
               "segmentId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "coverageStart": "USER",
@@ -4820,10 +4809,8 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "W"
               },
@@ -4844,6 +4831,7 @@
               "activityKind": "USER",
               "segmentId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "coverageStart": "USER",
@@ -5235,8 +5223,8 @@
               "endpoint": "ARRIVED",
               "quantityMode": "THROUGHOUT",
               "period": {
-                "start": "2026-10-05T09:00:00Z",
-                "end": "2026-10-07T01:30:00Z",
+                "start": "2026-10-07T00:00:00Z",
+                "end": "2026-10-07T02:00:00Z",
                 "endInclusive": true
               },
               "eventKinds": [
@@ -5255,11 +5243,6 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "interval": {
-                "start": "2026-10-07T00:00:00Z",
-                "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
               }
             },
             "expectedRevision": 1,
@@ -5285,8 +5268,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "interval": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -5316,10 +5298,8 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "W"
               },
@@ -5340,6 +5320,7 @@
               "activityKind": "USER",
               "segmentId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "coverageStart": "USER",
@@ -5375,10 +5356,8 @@
               "segmentId": {
                 "$alias": "Q"
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "W"
               },
@@ -5399,6 +5378,7 @@
               "activityKind": "USER",
               "segmentId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "placeId": "CONTEXT",
               "occurredAt": "USER",
               "coverageStart": "USER",
@@ -5939,8 +5919,8 @@
               "endpoint": "ARRIVED",
               "quantityMode": "EXISTS_IN",
               "period": {
-                "start": "2026-10-05T09:00:00Z",
-                "end": "2026-10-07T01:30:00Z",
+                "start": "2026-10-07T00:00:00Z",
+                "end": "2026-10-07T02:00:00Z",
                 "endInclusive": true
               },
               "eventKinds": [
@@ -5959,11 +5939,6 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "interval": {
-                "start": "2026-10-07T00:00:00Z",
-                "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
               }
             },
             "expectedRevision": 1,
@@ -5989,8 +5964,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "interval": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -6117,8 +6091,8 @@
               "endpoint": "ARRIVED",
               "quantityMode": "THROUGHOUT",
               "period": {
-                "start": "2026-10-05T09:00:00Z",
-                "end": "2026-10-07T01:30:00Z",
+                "start": "2026-10-07T00:00:00Z",
+                "end": "2026-10-07T02:00:00Z",
                 "endInclusive": true
               },
               "eventKinds": [
@@ -6137,11 +6111,6 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "interval": {
-                "start": "2026-10-07T00:00:00Z",
-                "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
               }
             },
             "expectedRevision": 1,
@@ -6167,8 +6136,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "interval": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -6266,15 +6234,16 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
+              "quantity": "100",
+              "unit": "BOX",
               "customerId": {
                 "$alias": "CUSTOMER"
               },
               "dueAt": "2026-10-07T02:00:00Z",
-              "endpoint": "CUSTOMER_ACCEPTED"
+              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-exists-versus-end-throughout-sale",
@@ -6285,9 +6254,11 @@
             ],
             "provenance": {
               "quantity": "USER",
+              "unit": "USER",
               "customerId": "CONTEXT",
               "dueAt": "USER",
-              "endpoint": "USER"
+              "deliveryEndpoint": "USER",
+              "itemId": "CONTEXT"
             }
           }
         },
@@ -6322,10 +6293,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              }
+              "quantity": "100",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-exists-versus-end-throughout-reserve",
@@ -6337,7 +6306,8 @@
             "provenance": {
               "segmentId": "CONTEXT",
               "orderId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },
@@ -6446,8 +6416,11 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
+              },
+              "evidenceRef": {
+                "$alias": "DOC"
               }
             },
             "expectedRevision": {
@@ -6467,7 +6440,8 @@
               "quantity": "USER",
               "occurredAt": "USER",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT"
             }
           }
         },

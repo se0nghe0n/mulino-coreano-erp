@@ -1,7 +1,7 @@
 {
   "$id": "urn:mulino:request-contracts:1",
-  "version": "1.0.0",
-  "description": "Request-side contracts every case invoke/query action must meet before it reaches the product (step2r round 12, run-driven: docs/execution/s5a-adapter/run-61bd0f8a.json showed every api command and most queries rejected for envelope shape). verification/cases/request_contract.py applies and checks them; ./verify prepare runs verification/cases/check_request_contracts.py (PreparationAssetChecks 'request-contracts'), so a violation fails preparation and a recorded product gap prints KNOWN_OPEN. Product code is read, never changed.",
+  "version": "1.1.0",
+  "description": "Request-side contracts every case invoke/query action must meet before it reaches the product (step2r round 12, run-driven: docs/execution/s5a-adapter/run-61bd0f8a.json showed every api command and most queries rejected for envelope shape). verification/cases/request_contract.py applies and checks them; ./verify prepare runs verification/cases/check_request_contracts.py (PreparationAssetChecks 'request-contracts'), so a violation fails preparation and a recorded product gap prints KNOWN_OPEN. Step 2 round 13 replaces grantComposition with grantAuthorization: one all-of grant per actor, checked statically against every authorized read and command and every pinned FORBIDDEN. Product code is read, never changed.",
   "productRefs": {
     "commandEnvelope": "contracts/intent.schema.json (product-published; backend CommandRequests.ALLOWED and CommandSchemas.input are the same field set and add commandIdempotencyKey as required when executing)",
     "queryEnvelope": "backend QueryRequests.FIELDS, ApplicationQueries scope keys, per-handler scope/filter guards (InventoryQueries, WorkReadHandler, EvidenceQueries, RuntimeQueries, DefinitionQueries, PolicyQueries, IdentityQueries) at ce4970c4; MCP read tools expose the same fields without operation (OntologyMcp.tool)",
@@ -345,12 +345,13 @@
     "mcp": "MCP protocol fields outside tool arguments: transport rpcId, MRTR requestState and inputResponses (V6)",
     "intentionalViolation": "a field the case sends on purpose to prove the product rejects it; prepare requires the declared fields to equal the actual violations and a pinned rejection on the action"
   },
-  "grantComposition": {
-    "field": "scopeComposition",
-    "values": {
-      "PER_DIMENSION": "install one grant per product dimension kind (same actions, delegator, validity, revision); the authored lists act as alternatives",
-      "ALL_DIMENSIONS": "install one grant whose dimension kinds intersect (product all-of semantics)"
-    },
+  "grantAuthorization": {
+    "rule": "User decision 2026-10-09 (AGENTS.md): a grant naming several dimension kinds authorizes only when every kind matches the targets the product presents (all-of, IdentityAuthorization.permittedScopes); identifiers within one kind are alternatives, and the policy guard requires every presented identifier of a command (PolicyCommandGuard.everyScope). The fixture schema and the Step 3 installer hold one grant per actor, so a fixture grant keeps only the dimension kinds that every capability the cases call with that actor presents (directly or through it as a fixture delegator): ITEM when all those capabilities carry the item (familiesWithoutItem name those that do not, and an OBJECT read of a noun without item counts the same), none otherwise (an organization-wide grant). WORK, PLACE, TARGET and SOURCE restrictions of a multi-purpose grant would refuse its own reads (an inventory or item row presents no WORK; a Work presents no PLACE), so conform_fixture drops them unless an override keeps them for a negative oracle. Keys with no product grant scope kind are dropped too: the installer could not install them. check_request_contracts.py then proves statically, per subcase, that every read or command the case expects to be authorized is covered and that every action pinned to FORBIDDEN stays uncovered.",
+    "productRefs": [
+      "backend/src/main/java/com/mulino/application/identity/IdentityAuthorization.java (permittedScopes: membership, CapabilityAssignment, Grant with GrantAction, every non-ORGANIZATION grant scope kind present in targets with a matching id, delegator permitted for the same targets)",
+      "backend/src/main/java/com/mulino/application/policy/PolicyCommandGuard.java (everyScope: every single-id combination of the command scopes must pass)",
+      "verification/harness/src/main/java/org/mulino/verification/actual/ScenarioFixtureInstaller.java (grants: one grant per actor, scope kinds ITEM/WORK/PLACE/TARGET/SOURCE; workItem infers a Work item from grant scopes when the work entry names none)"
+    ],
     "dimensionKinds": {
       "itemAliases": "ITEM",
       "items": "ITEM",
@@ -362,14 +363,2969 @@
       "segmentAliases": "TARGET",
       "segments": "TARGET",
       "lotAliases": "TARGET",
-      "customerAliases": "TARGET",
-      "supplierAliases": "TARGET",
       "documentAliases": "TARGET",
       "targetAliases": "TARGET",
       "physicalRootAliases": "TARGET",
       "sourceNamespaces": "SOURCE"
     },
-    "rule": "A grant naming two or more dimension kinds declares scopeComposition. Step 2 round 12 sets PER_DIMENSION on every such fixture grant: the cases read and act across items, works and segments the grant lists, which the product's all-of match of one grant refuses (run-61bd0f8a: 111 subcases FORBIDDEN). The plan (section 7.1) does not say whether the lists of one grant are alternatives; the installer must split a PER_DIMENSION grant (probe mode unionGrantDimensions does exactly this today)."
+    "unrepresentedScopeKeys": [
+      "customerAliases",
+      "supplierAliases",
+      "workKinds",
+      "derivedSegmentsWithinSamePhysicalRoot",
+      "settlementModes",
+      "basisKinds",
+      "managementOrganizationAliases"
+    ],
+    "unrepresentedNote": "mulino_identity_GrantScopes.scopeKind is CHECKed to ORGANIZATION, TARGET, WORK, ITEM, PLACE, SOURCE; the installer drops these keys and reports the fixture incomplete. The grant is installed without them, so conform_fixture removes them instead of letting a fixture claim a restriction the product never enforces.",
+    "metadataScopeKeys": [
+      "organizationAlias",
+      "caseId",
+      "subcaseId",
+      "caseNamespace",
+      "createdWorkNamespace",
+      "environmentId",
+      "capabilityIds",
+      "revokedAt"
+    ],
+    "families": {
+      "NULL": {
+        "meaning": "authorize(context, capability, null): any active grant with the capability passes (ApplicationQueries.java:55 for getAccessContext, IdentityQueries.java:15)",
+        "presents": null
+      },
+      "ITEM_ROW": {
+        "meaning": "TradeItem row {TARGET:item, ITEM:item}",
+        "presents": [
+          {
+            "TARGET": "item",
+            "ITEM": "item"
+          }
+        ]
+      },
+      "INVENTORY": {
+        "meaning": "every visible fixture segment of the item {TARGET:segment, ITEM:item, PLACE:segment place}; when none is visible the item row {TARGET:item, ITEM:item} must pass (InventoryQueries.java:87-88)",
+        "presents": "inventory"
+      },
+      "OBJECT": {
+        "meaning": "the requested row by noun type: TradeItem/ManufacturingLot {TARGET, ITEM}, QuantitySegment {TARGET, ITEM, PLACE}, Place {TARGET, PLACE}, Work {TARGET, WORK, ITEM}, PurchaseOrder/PurchaseProposal {ITEM, WORK}, Customer/Supplier {TARGET}, SalesOrder {TARGET, WORK} (the Orders row carries no itemId); other provider nouns are not modelled (InventoryQueries.java:146-157, PurchaseQueries.java:20, SalesQueries.java:22). A read of a noun that presents no ITEM (Place, Customer, Supplier, SalesOrder) counts like a family without item when conform_fixture decides whether the actor keeps its ITEM keys (step2r round 13, run-9d213f5a: C3 getObject SalesOrder SALE refused FORBIDDEN under an ITEM grant)",
+        "presents": "object"
+      },
+      "WORK_ROW": {
+        "meaning": "the Work row {TARGET:work, WORK:work, ITEM:work item} (WorkReadHandler.java:65, WorkLifecycle.java:34)",
+        "presents": [
+          {
+            "TARGET": "work",
+            "WORK": "work",
+            "ITEM": "workItem"
+          }
+        ]
+      },
+      "CREATE_WORK": {
+        "meaning": "{ITEM:item} only (WorkLifecycle.java:30)",
+        "presents": [
+          {
+            "ITEM": "item"
+          }
+        ]
+      },
+      "WORK_ONLY": {
+        "meaning": "{WORK:work} only, no ITEM (ResponsibilityCommands.java:46, RuntimeCommands.java:20, RuntimeFixtureCommands.java:21)",
+        "presents": [
+          {
+            "WORK": "work"
+          }
+        ]
+      },
+      "ORGANIZATION": {
+        "meaning": "{ORGANIZATION:org} only: a grant naming any dimension fails (ItemCommands.java:33, PolicyCommands.java:20)",
+        "presents": [
+          {
+            "ORGANIZATION": "organization"
+          }
+        ]
+      },
+      "STOCK": {
+        "meaning": "each source leaf {TARGET:segment, ITEM:item, PLACE:segment place}, a move also {PLACE:destination}; the policy guard requires every value (InventoryCommands.java:45,64,82-84)",
+        "presents": [
+          {
+            "TARGET": "segment",
+            "ITEM": "item",
+            "PLACE": "segmentPlace+destination"
+          }
+        ]
+      },
+      "FULFILLMENT": {
+        "meaning": "{TARGET:segment, ITEM:item, PLACE:segment place (+transit place of a dispatch), WORK:sales line work} (FulfillmentCommands.java:28,31,38)",
+        "presents": [
+          {
+            "TARGET": "segment",
+            "ITEM": "item",
+            "PLACE": "segmentPlace+transit",
+            "WORK": "?"
+          }
+        ]
+      },
+      "QUALITY": {
+        "meaning": "{TARGET:segment, ITEM, PLACE, WORK} (QualityCommands.java:42-44)",
+        "presents": [
+          {
+            "TARGET": "segment",
+            "ITEM": "item",
+            "PLACE": "segmentPlace",
+            "WORK": "?"
+          }
+        ]
+      },
+      "ITEM_TRADE": {
+        "meaning": "trade and evidence scopes that always carry the item of the row (purchase {ITEM, WORK, PLACE, SUPPLIER}, sales/receipt/delivery/return/recall {TARGET, ITEM, PLACE, WORK}, settlement {ITEM, WORK, PLACE, SUPPLIER|CUSTOMER}, shipment {ITEM, TARGET, PLACE, WORK}, regulatory {ITEM, TARGET, WORK, SOURCE}, evidence rows {TARGET, ITEM?, PLACE?, WORK?, SOURCE}); only the ITEM value is modelled",
+        "presents": [
+          {
+            "ITEM": "item",
+            "TARGET": "?",
+            "PLACE": "?",
+            "WORK": "?",
+            "SOURCE": "?"
+          }
+        ]
+      },
+      "ITEM_TARGET": {
+        "meaning": "{ITEM:item, TARGET:item} (ItemCommands.java:40)",
+        "presents": [
+          {
+            "ITEM": "item",
+            "TARGET": "item"
+          }
+        ]
+      },
+      "WORK_ITEM": {
+        "meaning": "{WORK:work, ITEM:work item} (AssessmentService.java:23)",
+        "presents": [
+          {
+            "WORK": "work",
+            "ITEM": "workItem"
+          }
+        ]
+      },
+      "TARGET_ID": {
+        "meaning": "{TARGET:requested id} (DefinitionQueries.java:17, PolicyQueries.java:12)",
+        "presents": [
+          {
+            "TARGET": "id"
+          }
+        ]
+      },
+      "SOURCE_ONLY": {
+        "meaning": "{SOURCE:source profile} only (PurchaseCommands.java:59, RuntimeQueries.java:26)",
+        "presents": [
+          {
+            "SOURCE": "?"
+          }
+        ]
+      },
+      "IDENTITY": {
+        "meaning": "the requested or stored grant/assignment scopes (IdentityCommands.java:19-22, IdentityControlGuard.java:17-66, IdentityQueries.java:20-26); not modelled, never assumed to carry ITEM",
+        "presents": "unknown"
+      },
+      "WORK_SEARCH": {
+        "meaning": "searchOperationalIssues rows {WORK} or {SOURCE} (RuntimeQueries.java:21-26)",
+        "presents": [
+          {
+            "WORK": "?"
+          }
+        ]
+      },
+      "NO_HANDLER": {
+        "meaning": "no product handler is installed (contracts/request-contracts.json queryEnvelope operationsWithoutProductHandler, missing CommandHandler): the product answers VERSION_UNSUPPORTED before any authorization, so the grant decides nothing",
+        "presents": "unknown"
+      },
+      "GRANT_READ": {
+        "meaning": "the read grant's own GrantScopes plus TARGET:grant (IdentityQueries.java:20-26); a holder reading a grant of its own item scope presents that item. Values are not modelled",
+        "presents": [
+          {
+            "ITEM": "?",
+            "TARGET": "?",
+            "WORK": "?",
+            "PLACE": "?",
+            "SOURCE": "?"
+          }
+        ]
+      }
+    },
+    "familiesWithoutItem": [
+      "ORGANIZATION",
+      "WORK_ONLY",
+      "TARGET_ID",
+      "SOURCE_ONLY",
+      "IDENTITY",
+      "WORK_SEARCH"
+    ],
+    "capabilityFamilies": {
+      "acceptHandover": "WORK_ONLY",
+      "activateDefinition": "NO_HANDLER",
+      "activatePolicy": "ORGANIZATION",
+      "activateWork": "WORK_ROW",
+      "adjustQuantity": "STOCK",
+      "approveDefinition": "NO_HANDLER",
+      "approvePolicy": "ORGANIZATION",
+      "approvePurchase": "ITEM_TRADE",
+      "approveRecall": "ITEM_TRADE",
+      "assessGoal": "WORK_ITEM",
+      "assignCapability": "IDENTITY",
+      "attachEvidence": "ITEM_TRADE",
+      "authorizeReturn": "ITEM_TRADE",
+      "cancelDraft": "WORK_ROW",
+      "cancelPurchase": "ITEM_TRADE",
+      "closeRecall": "ITEM_TRADE",
+      "closeWork": "WORK_ROW",
+      "confirmReceipt": "ITEM_TRADE",
+      "convertUnit": "NO_HANDLER",
+      "correctEvidence": "ITEM_TRADE",
+      "createDefinitionDraft": "NO_HANDLER",
+      "createDraft": "CREATE_WORK",
+      "createFollowup": "WORK_ROW",
+      "createGrant": "IDENTITY",
+      "createObligation": "WORK_ONLY",
+      "createPolicyDraft": "ORGANIZATION",
+      "createSalesOrder": "ITEM_TRADE",
+      "createShipment": "ITEM_TRADE",
+      "createWork": "CREATE_WORK",
+      "createWorkLink": "WORK_ROW",
+      "decideQualityDutyWaiver": "WORK_ONLY",
+      "decideQuantityDutyWaiver": "WORK_ONLY",
+      "decideRecallDutyWaiver": "WORK_ONLY",
+      "decideReturnDisposition": "ITEM_TRADE",
+      "dispatchPurchaseOrder": "ITEM_TRADE",
+      "dispatchQuantity": "FULFILLMENT",
+      "disposeQuantity": "STOCK",
+      "emergencyReassign": "WORK_ONLY",
+      "emergencyRepair": "NO_HANDLER",
+      "evaluateEligibility": "NO_HANDLER",
+      "expireHandover": "WORK_ONLY",
+      "fixtureExternalEffect": "WORK_ONLY",
+      "getAccessContext": "NULL",
+      "getAssessment": "WORK_ROW",
+      "getCommandResult": "NO_HANDLER",
+      "getDefinition": "TARGET_ID",
+      "getDeliveries": "ITEM_TRADE",
+      "getDelivery": "ITEM_TRADE",
+      "getEvidence": "ITEM_TRADE",
+      "getGrant": "GRANT_READ",
+      "getInbox": "ITEM_TRADE",
+      "getInventory": "INVENTORY",
+      "getObject": "OBJECT",
+      "getObligations": "WORK_ROW",
+      "getPolicy": "TARGET_ID",
+      "getPurchase": "ITEM_TRADE",
+      "getRecall": "ITEM_TRADE",
+      "getRecalls": "ITEM_TRADE",
+      "getReceipt": "ITEM_TRADE",
+      "getReceipts": "ITEM_TRADE",
+      "getReconciliation": "ITEM_TRADE",
+      "getRegulatoryProcedure": "ITEM_TRADE",
+      "getReturn": "ITEM_TRADE",
+      "getReturns": "ITEM_TRADE",
+      "getSalesOrder": "ITEM_TRADE",
+      "getSalesOrders": "ITEM_TRADE",
+      "getSettlement": "ITEM_TRADE",
+      "getShipment": "ITEM_TRADE",
+      "getTrace": "NO_HANDLER",
+      "getWork": "WORK_ROW",
+      "linkCanonicalOccurrence": "ITEM_TRADE",
+      "linkExternalId": "ITEM_TARGET",
+      "matchInvoice": "ITEM_TRADE",
+      "matchSourceIdentity": "ITEM_TRADE",
+      "mergeQuantity": "STOCK",
+      "migrateWorkDefinition": "NO_HANDLER",
+      "moveQuantity": "STOCK",
+      "openInvestigation": "ITEM_TRADE",
+      "openObligation": "WORK_ONLY",
+      "pickQuantity": "FULFILLMENT",
+      "placeHold": "QUALITY",
+      "prepareRegulatoryProcedure": "ITEM_TRADE",
+      "proposeHandover": "WORK_ONLY",
+      "proposePurchase": "ITEM_TRADE",
+      "proposeRecall": "ITEM_TRADE",
+      "publishDefinition": "NO_HANDLER",
+      "receiveProvisional": "ITEM_TRADE",
+      "receiveReturn": "ITEM_TRADE",
+      "recordActivity": "ITEM_TRADE",
+      "recordCharge": "ITEM_TRADE",
+      "recordDelivery": "ITEM_TRADE",
+      "recordDispositionBasis": "QUALITY",
+      "recordExternalReconciliation": "WORK_ONLY",
+      "recordHandover": "ITEM_TRADE",
+      "recordInvoice": "ITEM_TRADE",
+      "recordLegEvent": "ITEM_TRADE",
+      "recordObservedMovement": "ITEM_TRADE",
+      "recordPaymentReference": "ITEM_TRADE",
+      "recordRecallNotice": "ITEM_TRADE",
+      "recordRecovery": "ITEM_TRADE",
+      "recordRegulatoryDecision": "ITEM_TRADE",
+      "recordRelation": "NO_HANDLER",
+      "recordSettlementAdjustment": "ITEM_TRADE",
+      "recordStocktake": "STOCK",
+      "recordSubmission": "ITEM_TRADE",
+      "recordSupplierReply": "SOURCE_ONLY",
+      "registerItem": "ORGANIZATION",
+      "rejectHandover": "WORK_ONLY",
+      "releaseAllocation": "FULFILLMENT",
+      "releaseHold": "QUALITY",
+      "replaceAllocation": "FULFILLMENT",
+      "reserveQuantity": "FULFILLMENT",
+      "resolveEvidenceConflict": "ITEM_TRADE",
+      "resolveObligation": "WORK_ONLY",
+      "resumeWork": "WORK_ROW",
+      "retireDefinition": "NO_HANDLER",
+      "retirePolicy": "ORGANIZATION",
+      "retrySafeCommand": "NO_HANDLER",
+      "reviseGoal": "WORK_ROW",
+      "revisePurchase": "ITEM_TRADE",
+      "reviseSalesOrder": "ITEM_TRADE",
+      "revokeCapability": "IDENTITY",
+      "revokeDispositionBasis": "QUALITY",
+      "revokeGrant": "IDENTITY",
+      "searchObjects": "OBJECT",
+      "searchOperationalIssues": "WORK_SEARCH",
+      "searchShipments": "ITEM_TRADE",
+      "searchWorks": "WORK_ROW",
+      "splitQuantity": "STOCK",
+      "structureIntent": "NO_HANDLER",
+      "submitDefinitionReview": "NO_HANDLER",
+      "traceLot": "OBJECT",
+      "traceRecall": "ITEM_TRADE",
+      "transferObligation": "WORK_ONLY",
+      "validateDefinition": "NO_HANDLER",
+      "verifyLabel": "ITEM_TRADE",
+      "waitWork": "WORK_ROW",
+      "waiveObligation": "WORK_ONLY"
+    },
+    "defaultFamily": "NULL",
+    "overrides": [],
+    "overridesNote": "(fixtureId, actor) entries whose grant keeps named scope keys after conform_fixture, each with the negative oracle that needs the restriction. Empty unless a check shows a pinned FORBIDDEN that only a dimension restriction refuses.",
+    "decisionAuthority": {
+      "capabilities": [
+        "activatePolicy",
+        "adjustQuantity",
+        "approvePolicy",
+        "approvePurchase",
+        "approveRecall",
+        "assignCapability",
+        "authorizeReturn",
+        "closeRecall",
+        "createGrant",
+        "decideQualityDutyWaiver",
+        "decideQuantityDutyWaiver",
+        "decideRecallDutyWaiver",
+        "decideReturnDisposition",
+        "dispatchPurchaseOrder",
+        "disposeQuantity",
+        "emergencyReassign",
+        "placeHold",
+        "proposeRecall",
+        "receiveReturn",
+        "recordDispositionBasis",
+        "recordRecallNotice",
+        "recordRecovery",
+        "recordSettlementAdjustment",
+        "releaseHold",
+        "revokeCapability",
+        "revokeDispositionBasis",
+        "revokeGrant",
+        "waiveObligation"
+      ],
+      "meaning": "Plan section 7.1 gives these actions a decision authority beyond the grant (MANAGER, QC, ADMIN, CONFIG_APPROVER, a guarded approval or ManagementAuthorities/ManagementCoverage of a HUMAN, backend PurchaseCommands.manager, RecallCommands.admin, ReturnCommands.manager, SettlementCommands.manager, ResponsibilityCommands.designated, IdentityControlGuard). A FORBIDDEN pinned on them is decided by that authority, so a grant that covers the call does not contradict it; the static check reports it as not judged instead of as a broken negative."
+    },
+    "citedEvidenceRead": {
+      "capabilities": [
+        "approvePurchase",
+        "approveRecall",
+        "attachEvidence",
+        "authorizeReturn",
+        "cancelPurchase",
+        "closeRecall",
+        "confirmReceipt",
+        "correctEvidence",
+        "createSalesOrder",
+        "createShipment",
+        "decideReturnDisposition",
+        "dispatchPurchaseOrder",
+        "linkCanonicalOccurrence",
+        "matchInvoice",
+        "matchSourceIdentity",
+        "openInvestigation",
+        "placeHold",
+        "prepareRegulatoryProcedure",
+        "proposePurchase",
+        "proposeRecall",
+        "receiveProvisional",
+        "receiveReturn",
+        "recordActivity",
+        "recordCharge",
+        "recordDelivery",
+        "recordDispositionBasis",
+        "recordHandover",
+        "recordInvoice",
+        "recordLegEvent",
+        "recordObservedMovement",
+        "recordPaymentReference",
+        "recordRecallNotice",
+        "recordRecovery",
+        "recordRegulatoryDecision",
+        "recordSettlementAdjustment",
+        "recordSubmission",
+        "releaseHold",
+        "resolveEvidenceConflict",
+        "revisePurchase",
+        "reviseSalesOrder",
+        "revokeDispositionBasis",
+        "verifyLabel"
+      ],
+      "requires": "getEvidence",
+      "meaning": "The handler of these commands authorizes getEvidence on the evidence it cites before it uses it, so an actor (and each fixture-actor delegator) that cites evidence needs getEvidence in its role capabilities and current grant: TradeEvidence.verifiedCanonical (TradeEvidence.java:33,43, used by purchase, receipt, shipment, delivery, return, recall, regulatory, settlement and quality evidence scopes), SettlementCommands.document (SettlementCommands.java:83), ReceiptEvidenceScopes.java:17. Plan section 7.1: 조회·증거 다운로드 needs READ, and the authority of an action is the intersection of organization, role, current delegation and action permission. conform_fixture adds getEvidence to an actor the cases have cite evidence in an action not pinned FORBIDDEN; check_request_contracts.py treats a citing call without it as uncovered (step2r round 13, run-53e71c0c: T19 recordInvoice FORBIDDEN)."
+    },
+    "nonGrantForbidden": [
+      {
+        "caseId": "V6",
+        "subcaseId": "rejected-new-key",
+        "actionId": "bad",
+        "basis": "ORACLE_REVIEW",
+        "note": "The request repeats the committed receipt with a new key and names nothing the actor lacks (same item, place, work, capability); no grant, identity or decision basis makes it FORBIDDEN. Open Step 2 finding: the rejected change of V6.key-conflicts-owner-and-distinct-order rejectedChangeNewKey must be authored. The oracle is kept."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "destination-id-swap",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "renamed-action",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "raw-primitive",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "return-bypass",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      },
+      {
+        "caseId": "V4",
+        "subcaseId": "disposal-bypass",
+        "actionId": "move",
+        "basis": "DOMAIN_CHECK_ORDER",
+        "note": "moveQuantity to the CUSTOMER place CUSTOMER-PLACE: InventoryCommands.java:61-63 rejects a non-INTERNAL_STORAGE destination with TYPE_INVALID before the destination PLACE authorization (line 64), and the authored grant lists CUSTOMER-PLACE. No grant ever refused this move. The FORBIDDEN oracle is kept and reported as a check-order finding (docs/execution/step2r-round13/README.md)."
+      }
+    ]
+  },
+  "commandSlots": {
+    "description": "Slots each command capability declares (step2r round 13, item 2 and 3 of docs/execution/step2r-round13/README.md). The plan names the inputs of each command (sections 5.2 and 6) but not their slot names; the published Step 3 capability contracts (docs/execution/s2-inventory/contracts.md for the stock commands, docs/execution/s4-sales/contracts.md for delivery) and, where no contract document exists, the handler allowlists transcribed here name them. Each entry cites its source. allowed: the slots the handler accepts (a handler without an allowlist ignores others, which is noted). required: the slots it rejects a command without (TYPE_INVALID before authorization).",
+    "declaredOnlyCases": {
+      "cases": [
+        "C3",
+        "T08",
+        "V4",
+        "V6",
+        "V7"
+      ],
+      "reason": "These cases send one shared slot set to every capability, so the product rejected them with TYPE_INVALID before the authorization they test (run-85ce2365 and probe-85ce2365: expected FORBIDDEN observed TYPE_INVALID; V7 sends the same set to its dispatches). conform_intent projects each command onto its declared slots: a declared slot takes its value from the same slot, a listed rename, the typed subject, the request evidenceRefs or the product clock; undeclared slots are dropped. Deliberate violations stay (action.harness.intentionalViolation)."
+    },
+    "renames": [
+      {
+        "capabilities": [
+          "dispatchQuantity"
+        ],
+        "from": "cargoPlaceId",
+        "to": "transitPlaceId",
+        "contractRef": "contracts/fixture-place-kinds.json dispatchTransit (accepts either; the product reads transitPlaceId, FulfillmentCommands.java:22)"
+      },
+      {
+        "capabilities": [
+          "reserveQuantity"
+        ],
+        "from": "orderLineId",
+        "to": "salesLineId",
+        "contractRef": "plan section 6 reserve (order line), docs/execution/s4-sales/contracts.md salesLineId, FulfillmentCommands.java:22"
+      },
+      {
+        "capabilities": [
+          "createSalesOrder",
+          "reviseSalesOrder"
+        ],
+        "from": "endpoint",
+        "to": "deliveryEndpoint",
+        "contractRef": "plan section 6 createSalesOrder (인도 끝점), SalesCommands.java:16"
+      },
+      {
+        "capabilities": [
+          "createSalesOrder",
+          "reviseSalesOrder"
+        ],
+        "from": "packagingVersion",
+        "to": "packageTerms",
+        "contractRef": "plan section 6 createSalesOrder (포장 조건), SalesCommands.java:16"
+      },
+      {
+        "capabilities": [
+          "createWork",
+          "createDraft"
+        ],
+        "from": "workKind",
+        "to": "workType",
+        "contractRef": "plan section 5.1 Work (업무 유형), WorkLifecycle.java:92"
+      },
+      {
+        "capabilities": [
+          "placeHold"
+        ],
+        "from": "kind",
+        "to": "category",
+        "contractRef": "plan section 6 placeHold (QC 담당 결정: the restriction category decides the decision authority), QualityCommands.java:23,31: category QC|CUSTOMER|COMMERCIAL|RECALL; the cases write the same values under kind"
+      },
+      {
+        "capabilities": [
+          "proposeHandover"
+        ],
+        "from": "toOwnerId",
+        "to": "recipientId",
+        "contractRef": "plan section 5.3 Handover(PROPOSED→ACCEPTED|REJECTED|EXPIRED): the proposed new owner; ResponsibilityService.java:37 names it recipientId (the C3 sourceOverrides already map acceptingOwnerId the same way). The current owner is read from the Work, so fromOwnerId has no slot and stays KNOWN_OPEN S2-SLOT-VOCABULARY"
+      },
+      {
+        "capabilities": [
+          "reserveQuantity"
+        ],
+        "from": "salesOrderLineId",
+        "to": "salesLineId",
+        "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning (FulfillmentCommands.java:22 salesLineId; T20 domain-rejected names the same sales order line)"
+      }
+    ],
+    "waitContract": {
+      "capabilities": [
+        "waitWork"
+      ],
+      "slot": "wait",
+      "fields": {
+        "reason": "reason",
+        "target": "targetId",
+        "resumePredicate": "resumePredicate",
+        "verifier": "verifierId",
+        "nextCheckAt": "nextCheckAt",
+        "overdueAction": "overdueAction"
+      },
+      "contractRef": "plan section 5.2 waitWork (reason·대상·재개 predicate·verifier·nextCheckAt·overdueAction), WorkLifecycle.java:43,97: the six values form one wait object"
+    },
+    "quantityWithUnit": {
+      "capabilities": [
+        "adjustQuantity",
+        "attachEvidence",
+        "authorizeReturn",
+        "correctEvidence",
+        "createSalesOrder",
+        "disposeQuantity",
+        "matchSourceIdentity",
+        "openInvestigation",
+        "placeHold",
+        "proposeRecall",
+        "receiveProvisional",
+        "receiveReturn",
+        "recordActivity",
+        "recordDelivery",
+        "recordDispositionBasis",
+        "recordHandover",
+        "recordLegEvent",
+        "recordObservedMovement",
+        "recordRecallNotice",
+        "recordRecovery",
+        "recordRegulatoryDecision",
+        "recordStocktake",
+        "replaceAllocation",
+        "reserveQuantity",
+        "resolveEvidenceConflict",
+        "reviseSalesOrder"
+      ],
+      "contractRef": "docs/execution/s2-inventory/contracts.md (quantity·unit, quantities[]·unit), docs/execution/s4-sales/contracts.md (quantity, unit), InventoryQuantity.parse: these handlers read the quantity as a decimal string beside a unit slot. contracts/intent.schema.json allows both forms, so a typed {value, unit} quantity is written as its value plus the unit slot.",
+      "slots": [
+        "quantity",
+        "observedQuantity"
+      ]
+    },
+    "listQuantities": {
+      "capabilities": [
+        "splitQuantity"
+      ],
+      "from": "children",
+      "to": "quantities",
+      "unitSlot": "unit",
+      "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity (segmentId, quantities[], unit, occurredAt, evidenceRef; parent quantity = sum of the children), InventoryCommands.java:29-35,48: cases that wrote the child quantities as children [{value, unit}] carry the same statement as quantities in order plus one unit. Children that name an alias ({alias, quantity, unit}, T13/T14/T15) stay: later actions read the child as /response/children/<alias>/segmentId and ContractValidator.splitChildren tracks the child by that alias, while the product returns the new leaves only as effects.segmentIds in quantity order (InventoryCommands.java:99) and contracts/command-response.schema.json names no child list; rewriting them needs the response pointer and the validator changed together (open, docs/execution/step2r-round13/README.md). Other shapes (T03 reject-cycle children that target a segment) are deliberate and stay."
+    },
+    "contractDrops": {
+      "description": "Slots no capability contract or plan section declares for the capability, whose value the contract already states another way (step2r round 13 item 3). Each rule names when the slot carries no meaning of its own; any other value stays and remains KNOWN_OPEN S2-SLOT-VOCABULARY.",
+      "rules": [
+        {
+          "capabilities": [
+            "splitQuantity"
+          ],
+          "slot": "loss",
+          "when": "zero",
+          "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity: the children sum to the parent; a declared loss of 0 is that rule, a loss is not a split input"
+        },
+        {
+          "capabilities": [
+            "splitQuantity"
+          ],
+          "slot": "allocationTransfer",
+          "when": "always",
+          "contractRef": "docs/execution/s2-inventory/contracts.md 잠금과 거래: an EXECUTABLE/SUSPENDED allocation moves once to the new child its range falls in; the request does not choose the child. The case oracles on the transferred allocation stay"
+        },
+        {
+          "capabilities": [
+            "splitQuantity"
+          ],
+          "slot": "reason",
+          "when": "always",
+          "contractRef": "docs/execution/s2-inventory/contracts.md splitQuantity declares no reason; the basis is evidenceRef"
+        },
+        {
+          "capabilities": [
+            "moveQuantity"
+          ],
+          "slot": "quantity",
+          "when": "wholeLeaf",
+          "contractRef": "docs/execution/s2-inventory/contracts.md moveQuantity (segmentId, destinationId, occurredAt, evidenceRef): a move takes the whole leaf; a quantity equal to the fixture leaf restates it (a part needs splitQuantity first)"
+        },
+        {
+          "capabilities": [
+            "createWork",
+            "createDraft"
+          ],
+          "slot": "lotIdentification",
+          "when": {
+            "equals": "MISSING"
+          },
+          "contractRef": "plan section 3.3: the manufacturing LOT is a receipt-stage slot, so a purchase draft without it is not rejected; its absence is stated by not sending lotId"
+        },
+        {
+          "capabilities": [
+            "reserveQuantity"
+          ],
+          "slot": "action",
+          "when": {
+            "equals": "SELL"
+          },
+          "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: reserveQuantity has no action slot and always reserves for SELL (FulfillmentCommands.java:22,33), so action SELL restates it"
+        },
+        {
+          "capabilities": [
+            "activateWork"
+          ],
+          "slot": "goalVersionId",
+          "when": "sameSourceAsWork",
+          "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: activateWork takes only workId and activates that Work's current GoalVersion (WorkLifecycle.java:42,97); a goalVersionId read from the same draft response as the workId names that current version"
+        }
+      ]
+    },
+    "intervalPeriod": {
+      "capabilities": [
+        "createWork",
+        "createDraft"
+      ],
+      "modes": [
+        "EXISTS_IN",
+        "THROUGHOUT"
+      ],
+      "from": "interval",
+      "to": "period",
+      "contractRef": "plan section 5.1: EXISTS_IN and THROUGHOUT take an interval and an observation policy; WorkLifecycle.java:93 reads that interval from period (start, end, startInclusive, endInclusive) and AssessmentService.java:69 evaluates it. A period the case also carried is the cumulative template value the interval modes never read"
+    },
+    "subjectSlots": {
+      "capabilities": [
+        "createWork",
+        "createDraft"
+      ],
+      "slot": "itemId",
+      "type": "TradeItem",
+      "contractRef": "plan section 5.1 (Work 대상), WorkLifecycle.java:93: the Work item is the one TradeItem subject; an itemId slot is rejected as Unsupported Work goal slot"
+    },
+    "createdSubjects": {
+      "capabilities": {
+        "createGrant": [
+          "Grant"
+        ],
+        "assignCapability": [
+          "Grant",
+          "CapabilityAssignment"
+        ],
+        "createPolicyDraft": [
+          "PolicyVersion"
+        ],
+        "createSalesOrder": [
+          "SalesOrder"
+        ],
+        "createDefinitionDraft": [
+          "DefinitionPackage",
+          "DefinitionVersion"
+        ],
+        "createShipment": [
+          "Shipment"
+        ],
+        "proposePurchase": [
+          "PurchaseOrder",
+          "PurchaseProposal"
+        ],
+        "recordInvoice": [
+          "Invoice"
+        ],
+        "authorizeReturn": [
+          "ReturnAuthorization"
+        ],
+        "openInvestigation": [
+          "Recall"
+        ],
+        "registerItem": [
+          "TradeItem"
+        ]
+      },
+      "contractRef": "docs/execution/s2-inventory/contracts.md 명사 subject의 실제 대상 결합: subjectRefs do not copy authorization scopes; a command that creates an ID has no existing subject (registerItem), the typed slots already name the required targets so zero declarations are allowed, and a declared noun is checked by the common resolver against the handler's exact targets (CommandDefinitionResolver.verifySubjects: 'Declared subject differs from command target'). The shared-slot cases declared the noun of the entity the command creates (or, for assignCapability, the grant), which no handler binds; those declarations are dropped. A subject the handler binds (the Work and item of a sales order, the recipient actor of a grant) stays when a case declares it."
+    },
+    "evidenceAliasSlots": {
+      "rule": "A slot whose value is a plain string equal to a fixture evidence alias names that evidence: it is written {\"$alias\": name} so the harness sends the installed document ID.",
+      "contractRef": "docs/execution/s1-evidence/contracts.md (every evidence ID is a server UUID; DocumentVersions, Events, CanonicalOccurrences), backend QueryRequests: aliases are resolved by clients, never as server IDs; SettlementCommands.java:83 and the trade/receipt/regulatory evidence ports read the slot as a document ID. Round 12 applied the same rule to request evidenceRefs. T13/T14/T15/T19/V8 wrote evidence, receiptEvidence, externalReceiptEvidence and evidenceRef slots as bare alias strings (T19 recordInvoice refused FORBIDDEN in run-9d213f5a)."
+    },
+    "typedRefRenames": [
+      {
+        "capabilities": [
+          "createDraft",
+          "createWork"
+        ],
+        "from": "destination",
+        "to": "destinationId",
+        "type": "Place",
+        "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: the public draft reads the destination Place ID from destinationId (WorkLifecycle.java:92); the cases wrote destination as a typed {type: Place, id} reference to the same place (T20)"
+      }
+    ],
+    "basisSlot": {
+      "capabilities": [
+        "dispatchQuantity",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "recordStocktake",
+        "adjustQuantity",
+        "disposeQuantity"
+      ],
+      "slot": "evidenceRef",
+      "contractRef": "contracts/execution-preconditions.json commandBasis; InventoryCommands.java:40, FulfillmentCommands.java:22: the first request evidenceRefs entry is the named basis"
+    },
+    "occurrenceSlot": {
+      "capabilities": [
+        "dispatchQuantity",
+        "splitQuantity",
+        "mergeQuantity",
+        "moveQuantity",
+        "recordStocktake",
+        "adjustQuantity",
+        "disposeQuantity"
+      ],
+      "slot": "occurredAt",
+      "contractRef": "contracts/execution-preconditions.json occurrence (explicit occurredAt, else the product clock): a command that names none occurs at the product clock of its action"
+    },
+    "capabilities": {
+      "acceptHandover": {
+        "allowed": [
+          "handoverId"
+        ],
+        "required": [
+          "handoverId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:52 (no allowlist)"
+      },
+      "activatePolicy": {
+        "allowed": [
+          "id"
+        ],
+        "required": [
+          "id"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/policy/PolicyCommands.java:45-51 (no allowlist)"
+      },
+      "activateWork": {
+        "allowed": [
+          "workId"
+        ],
+        "required": [
+          "workId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:97"
+      },
+      "adjustQuantity": {
+        "allowed": [
+          "segmentId",
+          "quantity",
+          "unit",
+          "direction",
+          "reason",
+          "stocktakeId",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "segmentId",
+          "quantity",
+          "unit",
+          "direction",
+          "reason",
+          "stocktakeId",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java:29-35; docs/execution/s2-inventory/contracts.md"
+      },
+      "approvePolicy": {
+        "allowed": [
+          "id",
+          "contentHash"
+        ],
+        "required": [
+          "id",
+          "contentHash"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/policy/PolicyCommands.java:39-44 (no allowlist)"
+      },
+      "approvePurchase": {
+        "allowed": [
+          "proposalId",
+          "proposalHash",
+          "decision",
+          "validUntil",
+          "conditions"
+        ],
+        "required": [
+          "proposalId",
+          "proposalHash",
+          "decision",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java (no allowlist)"
+      },
+      "approveRecall": {
+        "allowed": [
+          "scopeId",
+          "scopeHash",
+          "decision",
+          "validUntil"
+        ],
+        "required": [
+          "scopeId",
+          "scopeHash",
+          "decision",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java:26"
+      },
+      "assessGoal": {
+        "allowed": [
+          "workId"
+        ],
+        "required": [
+          "workId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evaluation/AssessmentService.java:25"
+      },
+      "assignCapability": {
+        "allowed": [
+          "actorId",
+          "assignedCapability",
+          "scopeKind",
+          "scopeId",
+          "validFrom",
+          "validUntil"
+        ],
+        "required": [
+          "actorId",
+          "assignedCapability",
+          "scopeKind",
+          "scopeId",
+          "validFrom",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/identity/IdentityCommands.java:52-54 (no allowlist)"
+      },
+      "attachEvidence": {
+        "allowed": [
+          "subject",
+          "sourceNamespace",
+          "sourceReference",
+          "mediaType",
+          "expectedHash",
+          "provenance",
+          "supersedesId",
+          "contentBase64",
+          "evidenceType"
+        ],
+        "required": [
+          "subject",
+          "sourceNamespace",
+          "sourceReference",
+          "mediaType",
+          "expectedHash",
+          "provenance",
+          "contentBase64"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-13,16-23 (per evidence type: attachEvidence is DOCUMENT, recordActivity is EVENT; slots outside the type set are rejected as Unsupported evidence slot)"
+      },
+      "authorizeReturn": {
+        "allowed": [
+          "deliveryId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "destinationId",
+          "validUntil",
+          "reason"
+        ],
+        "required": [
+          "deliveryId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "destinationId",
+          "validUntil",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java:23"
+      },
+      "cancelDraft": {
+        "allowed": [
+          "workId",
+          "reason"
+        ],
+        "required": [
+          "workId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:97"
+      },
+      "cancelPurchase": {
+        "allowed": [
+          "purchaseId",
+          "quantity",
+          "externalAcceptance",
+          "reason"
+        ],
+        "required": [
+          "purchaseId",
+          "quantity",
+          "externalAcceptance",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java (no allowlist)"
+      },
+      "closeRecall": {
+        "allowed": [
+          "scopeId",
+          "approvalId",
+          "scopeHash",
+          "canonicalOccurrenceId",
+          "partitionHash"
+        ],
+        "required": [
+          "scopeId",
+          "approvalId",
+          "scopeHash",
+          "canonicalOccurrenceId",
+          "partitionHash"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java:26"
+      },
+      "closeWork": {
+        "allowed": [
+          "workId",
+          "reason"
+        ],
+        "required": [
+          "workId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:97"
+      },
+      "confirmReceipt": {
+        "allowed": [
+          "receiptId",
+          "canonicalOccurrenceId",
+          "lotId",
+          "receivingCustodianId"
+        ],
+        "required": [
+          "receiptId",
+          "canonicalOccurrenceId",
+          "lotId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java:27"
+      },
+      "correctEvidence": {
+        "allowed": [
+          "subject",
+          "kind",
+          "sourceNamespace",
+          "externalEventId",
+          "sourceVersion",
+          "effectiveFrom",
+          "effectiveUntil",
+          "timeZone",
+          "timePrecision",
+          "valueState",
+          "payload",
+          "supersedesId",
+          "invalidatesId",
+          "documentId",
+          "assertion",
+          "quantity",
+          "unit",
+          "evidenceType",
+          "sourceReference",
+          "mediaType",
+          "expectedHash",
+          "provenance",
+          "contentBase64",
+          "eventId"
+        ],
+        "required": [
+          "supersedesId",
+          "evidenceType"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-14"
+      },
+      "createDraft": {
+        "allowed": [
+          "workType",
+          "quantity",
+          "destinationId",
+          "dueAt",
+          "endpoint",
+          "quantityMode",
+          "period",
+          "eventKinds",
+          "distinctContributionScope",
+          "evidencePolicyVersion",
+          "evaluationTime",
+          "placeId",
+          "eligibilityAction",
+          "includeReservations",
+          "ownerId",
+          "supervisorId",
+          "timezone",
+          "observationPolicy",
+          "conditions",
+          "evaluatorVersion",
+          "lotId",
+          "originalText"
+        ],
+        "required": [
+          "ownerId",
+          "supervisorId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:92 (public draft slots; the item is the one TradeItem subject, NEEDS_INPUT ITEM_MISSING without it)"
+      },
+      "createFollowup": {
+        "allowed": [
+          "workId",
+          "draft",
+          "reason",
+          "obligationIds"
+        ],
+        "required": [
+          "workId",
+          "draft",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:97"
+      },
+      "createGrant": {
+        "allowed": [
+          "actorId",
+          "actions",
+          "scopes",
+          "validFrom",
+          "validUntil"
+        ],
+        "required": [
+          "actorId",
+          "actions",
+          "scopes",
+          "validFrom",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/identity/IdentityCommands.java:45,73 (no allowlist)"
+      },
+      "createObligation": {
+        "allowed": [
+          "workId",
+          "kind",
+          "scopeJson",
+          "sourceId",
+          "sourceVersion",
+          "sourceKind",
+          "nextAction",
+          "nextCheckAt",
+          "quantity",
+          "unit"
+        ],
+        "required": [
+          "workId",
+          "kind",
+          "scopeJson",
+          "sourceId",
+          "sourceVersion",
+          "sourceKind",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityService.java:33-35 (no allowlist)"
+      },
+      "createPolicyDraft": {
+        "allowed": [
+          "kind",
+          "version",
+          "content",
+          "source",
+          "regressionEvidence",
+          "effectiveFrom",
+          "effectiveUntil",
+          "legallyRestrictive",
+          "fixtureOnly"
+        ],
+        "required": [
+          "kind",
+          "version",
+          "content",
+          "source",
+          "regressionEvidence",
+          "effectiveFrom",
+          "fixtureOnly"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/policy/PolicyCommands.java:30-36 (no allowlist)"
+      },
+      "createSalesOrder": {
+        "allowed": [
+          "orderId",
+          "workId",
+          "customerId",
+          "itemId",
+          "quantity",
+          "unit",
+          "price",
+          "currency",
+          "dueAt",
+          "destinationId",
+          "deliveryEndpoint",
+          "qualityTerms",
+          "packageTerms",
+          "reason"
+        ],
+        "required": [
+          "workId",
+          "customerId",
+          "itemId",
+          "quantity",
+          "unit",
+          "price",
+          "currency",
+          "dueAt",
+          "destinationId",
+          "deliveryEndpoint",
+          "qualityTerms",
+          "packageTerms"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java:16-18"
+      },
+      "createShipment": {
+        "allowed": [
+          "originId",
+          "destinationId",
+          "carrierRef",
+          "workId",
+          "cargo",
+          "legs"
+        ],
+        "required": [
+          "originId",
+          "destinationId",
+          "carrierRef",
+          "cargo",
+          "legs"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentCommands.java:25"
+      },
+      "createWork": {
+        "allowed": [
+          "workType",
+          "quantity",
+          "destinationId",
+          "dueAt",
+          "endpoint",
+          "quantityMode",
+          "period",
+          "eventKinds",
+          "distinctContributionScope",
+          "evidencePolicyVersion",
+          "evaluationTime",
+          "placeId",
+          "eligibilityAction",
+          "includeReservations",
+          "ownerId",
+          "supervisorId",
+          "timezone",
+          "observationPolicy",
+          "conditions",
+          "evaluatorVersion",
+          "lotId",
+          "originalText"
+        ],
+        "required": [
+          "ownerId",
+          "supervisorId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:92 (public draft slots; the item is the one TradeItem subject, NEEDS_INPUT ITEM_MISSING without it)"
+      },
+      "createWorkLink": {
+        "allowed": [
+          "workId",
+          "sourceWorkId",
+          "targetWorkId",
+          "kind",
+          "linkKind",
+          "occurrenceId",
+          "quantity",
+          "quantityValue",
+          "quantityUnit",
+          "startQuantity",
+          "conditionId",
+          "activityId",
+          "physicalScope"
+        ],
+        "required": [
+          "targetWorkId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:74-79,97"
+      },
+      "decideQualityDutyWaiver": {
+        "allowed": [
+          "assignmentId",
+          "decision",
+          "reason",
+          "validUntil"
+        ],
+        "required": [
+          "assignmentId",
+          "decision",
+          "reason",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:60"
+      },
+      "decideQuantityDutyWaiver": {
+        "allowed": [
+          "assignmentId",
+          "decision",
+          "reason",
+          "validUntil"
+        ],
+        "required": [
+          "assignmentId",
+          "decision",
+          "reason",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:60"
+      },
+      "decideRecallDutyWaiver": {
+        "allowed": [
+          "assignmentId",
+          "decision",
+          "reason",
+          "validUntil"
+        ],
+        "required": [
+          "assignmentId",
+          "decision",
+          "reason",
+          "validUntil"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:60"
+      },
+      "decideReturnDisposition": {
+        "allowed": [
+          "returnId",
+          "decision",
+          "evidenceId",
+          "reason",
+          "nextCheckAt"
+        ],
+        "required": [
+          "returnId",
+          "decision",
+          "evidenceId",
+          "reason",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java:23"
+      },
+      "dispatchPurchaseOrder": {
+        "allowed": [
+          "proposalId",
+          "proposalHash",
+          "approvalId",
+          "externalOperationId",
+          "channel"
+        ],
+        "required": [
+          "proposalId",
+          "proposalHash",
+          "approvalId",
+          "externalOperationId",
+          "channel"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java (no allowlist)"
+      },
+      "dispatchQuantity": {
+        "allowed": [
+          "allocationId",
+          "transitPlaceId",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "allocationId",
+          "transitPlaceId",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:22"
+      },
+      "disposeQuantity": {
+        "allowed": [
+          "segmentId",
+          "quantity",
+          "unit",
+          "reason",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "segmentId",
+          "quantity",
+          "unit",
+          "reason",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java:29-35; docs/execution/s2-inventory/contracts.md"
+      },
+      "emergencyReassign": {
+        "allowed": [
+          "workId",
+          "newOwnerId",
+          "reason",
+          "obligationId",
+          "effectiveAt",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "required": [
+          "workId",
+          "newOwnerId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityService.java:65"
+      },
+      "expireHandover": {
+        "allowed": [
+          "handoverId"
+        ],
+        "required": [
+          "handoverId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:52 (no allowlist)"
+      },
+      "fixtureExternalEffect": {
+        "allowed": [
+          "workId",
+          "dropResponse"
+        ],
+        "required": [
+          "workId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/runtime/RuntimeFixtureCommands.java:30"
+      },
+      "linkCanonicalOccurrence": {
+        "allowed": [
+          "reconciliationId"
+        ],
+        "required": [
+          "reconciliationId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceCommandInputs.java"
+      },
+      "linkExternalId": {
+        "allowed": [
+          "itemId",
+          "issuer",
+          "namespace",
+          "value",
+          "validFrom",
+          "validUntil"
+        ],
+        "required": [
+          "itemId",
+          "issuer",
+          "namespace",
+          "value",
+          "validFrom"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/ItemCommands.java:36"
+      },
+      "matchInvoice": {
+        "allowed": [
+          "invoiceId",
+          "line",
+          "reference",
+          "matchQuantity",
+          "orderedAmount",
+          "evidence",
+          "canonicalOccurrenceId"
+        ],
+        "required": [
+          "invoiceId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java:56-66 (no allowlist)"
+      },
+      "matchSourceIdentity": {
+        "allowed": [
+          "claimId",
+          "basisDocumentId",
+          "physicalScopeId",
+          "existingCanonicalId",
+          "policyVersion",
+          "sourceIdentity",
+          "quantity",
+          "unit",
+          "effectiveFrom",
+          "reason"
+        ],
+        "required": [
+          "claimId",
+          "basisDocumentId",
+          "policyVersion",
+          "sourceIdentity",
+          "effectiveFrom",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceCommandInputs.java:9,24"
+      },
+      "mergeQuantity": {
+        "allowed": [
+          "segmentIds",
+          "expectedRevisions",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "segmentIds",
+          "expectedRevisions",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java:29-35; docs/execution/s2-inventory/contracts.md"
+      },
+      "moveQuantity": {
+        "allowed": [
+          "segmentId",
+          "destinationId",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "segmentId",
+          "destinationId",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java:29-35; docs/execution/s2-inventory/contracts.md"
+      },
+      "openInvestigation": {
+        "allowed": [
+          "segmentId",
+          "lotId",
+          "itemId",
+          "workId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "basisEvidenceId",
+          "occurredAt",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "required": [
+          "segmentId",
+          "lotId",
+          "itemId",
+          "workId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "basisEvidenceId",
+          "occurredAt",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java:26"
+      },
+      "openObligation": {
+        "allowed": [
+          "workId",
+          "kind",
+          "scopeJson",
+          "sourceId",
+          "sourceVersion",
+          "sourceKind",
+          "nextAction",
+          "nextCheckAt",
+          "quantity",
+          "unit"
+        ],
+        "required": [
+          "workId",
+          "kind",
+          "scopeJson",
+          "sourceId",
+          "sourceVersion",
+          "sourceKind",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityService.java:33-35 (no allowlist)"
+      },
+      "pickQuantity": {
+        "allowed": [
+          "allocationId"
+        ],
+        "required": [
+          "allocationId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:22"
+      },
+      "placeHold": {
+        "allowed": [
+          "segmentId",
+          "action",
+          "category",
+          "customerId",
+          "evidenceId",
+          "reason",
+          "validFrom",
+          "validUntil",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "workId",
+          "nextCheckAt"
+        ],
+        "required": [
+          "segmentId",
+          "action",
+          "category",
+          "evidenceId",
+          "reason",
+          "validFrom",
+          "validUntil",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "workId",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/quality/QualityCommands.java:23"
+      },
+      "prepareRegulatoryProcedure": {
+        "allowed": [
+          "procedureId",
+          "itemId",
+          "lotId",
+          "physicalScopeId",
+          "workId",
+          "policyId",
+          "documentVersionId"
+        ],
+        "required": [
+          "documentVersionId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java:21"
+      },
+      "proposeHandover": {
+        "allowed": [
+          "workId",
+          "recipientId",
+          "expiresAt",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "required": [
+          "workId",
+          "recipientId",
+          "expiresAt",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityService.java:37 (no allowlist)"
+      },
+      "proposePurchase": {
+        "allowed": [
+          "workId",
+          "destinationId",
+          "supplierId",
+          "quantity",
+          "price",
+          "currency",
+          "unit",
+          "dueAt",
+          "endpoint",
+          "quantityMode",
+          "itemId",
+          "goalVersionId"
+        ],
+        "required": [
+          "workId",
+          "destinationId",
+          "supplierId",
+          "quantity",
+          "price",
+          "currency",
+          "unit",
+          "dueAt",
+          "endpoint",
+          "quantityMode"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java (no allowlist)"
+      },
+      "proposeRecall": {
+        "allowed": [
+          "investigationId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "reason"
+        ],
+        "required": [
+          "investigationId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java:26"
+      },
+      "receiveProvisional": {
+        "allowed": [
+          "eventId",
+          "rangeRootId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "itemId",
+          "lotId",
+          "placeId",
+          "purchaseLineId",
+          "transitSegmentId",
+          "workId",
+          "ownerId",
+          "supervisorId",
+          "nextAction",
+          "nextCheckAt",
+          "occurredAt"
+        ],
+        "required": [
+          "eventId",
+          "rangeRootId",
+          "itemId",
+          "placeId",
+          "workId",
+          "ownerId",
+          "supervisorId",
+          "unit",
+          "quantity",
+          "startQuantity",
+          "occurredAt",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java:27"
+      },
+      "receiveReturn": {
+        "allowed": [
+          "authorizationId",
+          "eventId",
+          "occurredAt",
+          "nextCheckAt",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "returnId",
+          "canonicalOccurrenceId",
+          "receivingCustodianId"
+        ],
+        "required": [
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java:23"
+      },
+      "recordActivity": {
+        "allowed": [
+          "subject",
+          "kind",
+          "sourceNamespace",
+          "externalEventId",
+          "sourceVersion",
+          "effectiveFrom",
+          "effectiveUntil",
+          "timeZone",
+          "timePrecision",
+          "valueState",
+          "payload",
+          "supersedesId",
+          "invalidatesId",
+          "documentId",
+          "assertion",
+          "quantity",
+          "unit",
+          "evidenceType"
+        ],
+        "required": [
+          "subject",
+          "kind",
+          "sourceNamespace",
+          "externalEventId",
+          "sourceVersion",
+          "effectiveFrom",
+          "timeZone",
+          "timePrecision",
+          "valueState",
+          "payload"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java:12-13,16-23 (per evidence type: attachEvidence is DOCUMENT, recordActivity is EVENT; slots outside the type set are rejected as Unsupported evidence slot)"
+      },
+      "recordCharge": {
+        "allowed": [
+          "invoiceId",
+          "amount",
+          "kind",
+          "evidence",
+          "currency"
+        ],
+        "required": [
+          "invoiceId",
+          "amount",
+          "kind",
+          "evidence"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java:37 (no allowlist)"
+      },
+      "recordDelivery": {
+        "allowed": [
+          "observationId",
+          "eventId",
+          "dispatchId",
+          "cargoScopeId",
+          "salesLineId",
+          "workId",
+          "customerId",
+          "itemId",
+          "lotId",
+          "rangeRootId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "placeId",
+          "occurredAt",
+          "nextCheckAt",
+          "nextAction",
+          "canonicalOccurrenceId"
+        ],
+        "required": [],
+        "ref": "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java:13-14"
+      },
+      "recordDispositionBasis": {
+        "allowed": [
+          "segmentId",
+          "action",
+          "category",
+          "customerId",
+          "evidenceId",
+          "reason",
+          "validFrom",
+          "validUntil",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "workId",
+          "nextCheckAt"
+        ],
+        "required": [
+          "segmentId",
+          "action",
+          "category",
+          "evidenceId",
+          "reason",
+          "validFrom",
+          "validUntil",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "workId",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/quality/QualityCommands.java:23"
+      },
+      "recordExternalReconciliation": {
+        "allowed": [
+          "outboxId",
+          "decision",
+          "evidenceId"
+        ],
+        "required": [
+          "outboxId",
+          "decision",
+          "evidenceId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/runtime/RuntimeCommands.java:31"
+      },
+      "recordHandover": {
+        "allowed": [
+          "shipmentId",
+          "cargoId",
+          "legId",
+          "placeId",
+          "physicalScopeId",
+          "occurrenceId",
+          "quantity",
+          "unit",
+          "occurredAt",
+          "fromCustodianId",
+          "toCustodianId"
+        ],
+        "required": [
+          "shipmentId",
+          "cargoId",
+          "legId",
+          "placeId",
+          "physicalScopeId",
+          "occurrenceId",
+          "quantity",
+          "unit",
+          "occurredAt",
+          "fromCustodianId",
+          "toCustodianId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentCommands.java:39"
+      },
+      "recordInvoice": {
+        "allowed": [
+          "invoiceKind",
+          "originalAmount",
+          "evidence",
+          "line",
+          "purchaseLineId",
+          "receiptOccurrenceId",
+          "receiptOccurrenceKey",
+          "saleLineId",
+          "deliveryId",
+          "quantity",
+          "unitPrice",
+          "sourceKey",
+          "fxSnapshot",
+          "relatedInvoiceId",
+          "scopeKind",
+          "unit",
+          "currency"
+        ],
+        "required": [
+          "invoiceKind",
+          "originalAmount",
+          "evidence"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java:44-54 (no allowlist)"
+      },
+      "recordLegEvent": {
+        "allowed": [
+          "shipmentId",
+          "cargoId",
+          "legId",
+          "placeId",
+          "physicalScopeId",
+          "occurrenceId",
+          "quantity",
+          "unit",
+          "occurredAt",
+          "kind",
+          "lineAllocations"
+        ],
+        "required": [
+          "shipmentId",
+          "cargoId",
+          "legId",
+          "placeId",
+          "physicalScopeId",
+          "occurrenceId",
+          "quantity",
+          "unit",
+          "occurredAt",
+          "kind"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/shipment/ShipmentCommands.java:39"
+      },
+      "recordObservedMovement": {
+        "allowed": [
+          "observationId",
+          "eventId",
+          "dispatchId",
+          "cargoScopeId",
+          "salesLineId",
+          "workId",
+          "customerId",
+          "itemId",
+          "lotId",
+          "rangeRootId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "placeId",
+          "occurredAt",
+          "nextCheckAt",
+          "nextAction",
+          "canonicalOccurrenceId"
+        ],
+        "required": [],
+        "ref": "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java:13-14"
+      },
+      "recordPaymentReference": {
+        "allowed": [
+          "invoiceId",
+          "amount",
+          "externalPaymentReference",
+          "observedAt",
+          "evidence",
+          "currency"
+        ],
+        "required": [
+          "invoiceId",
+          "amount",
+          "externalPaymentReference",
+          "observedAt",
+          "evidence"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java:38 (no allowlist)"
+      },
+      "recordRecallNotice": {
+        "allowed": [
+          "scopeId",
+          "approvalId",
+          "scopeHash",
+          "canonicalOccurrenceId",
+          "actualEventId",
+          "kind",
+          "rootSegmentId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "sourceSegmentId",
+          "currentPlaceId",
+          "returnId",
+          "reason",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "required": [
+          "scopeId",
+          "approvalId",
+          "scopeHash",
+          "canonicalOccurrenceId",
+          "actualEventId",
+          "rootSegmentId",
+          "startQuantity",
+          "quantity",
+          "unit"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java:26"
+      },
+      "recordRecovery": {
+        "allowed": [
+          "scopeId",
+          "approvalId",
+          "scopeHash",
+          "canonicalOccurrenceId",
+          "actualEventId",
+          "kind",
+          "rootSegmentId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "sourceSegmentId",
+          "currentPlaceId",
+          "returnId",
+          "reason",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "required": [
+          "scopeId",
+          "approvalId",
+          "scopeHash",
+          "canonicalOccurrenceId",
+          "actualEventId",
+          "rootSegmentId",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "kind"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java:26"
+      },
+      "recordRegulatoryDecision": {
+        "allowed": [
+          "procedureId",
+          "decision",
+          "action",
+          "startQuantity",
+          "quantity",
+          "unit",
+          "validFrom",
+          "validUntil",
+          "occurrenceId",
+          "previousVersionId"
+        ],
+        "required": [
+          "procedureId",
+          "decision",
+          "action",
+          "unit",
+          "startQuantity",
+          "quantity",
+          "validFrom",
+          "occurrenceId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java:21"
+      },
+      "recordSettlementAdjustment": {
+        "allowed": [
+          "invoiceId",
+          "mode",
+          "amount",
+          "reason",
+          "evidence",
+          "dutyRootId",
+          "proposalId",
+          "proposalHash",
+          "policyVersion",
+          "currency"
+        ],
+        "required": [
+          "invoiceId",
+          "mode",
+          "amount",
+          "reason",
+          "evidence"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java:68-73 (no allowlist)"
+      },
+      "recordStocktake": {
+        "allowed": [
+          "segmentId",
+          "observedQuantity",
+          "unit",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "segmentId",
+          "observedQuantity",
+          "unit",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java:29-35; docs/execution/s2-inventory/contracts.md"
+      },
+      "recordSubmission": {
+        "allowed": [
+          "procedureId",
+          "occurredAt",
+          "occurrenceId"
+        ],
+        "required": [
+          "procedureId",
+          "occurredAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java:21"
+      },
+      "recordSupplierReply": {
+        "allowed": [
+          "purchaseId",
+          "reply",
+          "proposedQuantity",
+          "evidence",
+          "canonicalOccurrenceId"
+        ],
+        "required": [
+          "purchaseId",
+          "reply",
+          "proposedQuantity",
+          "evidence"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java:59 (no allowlist)"
+      },
+      "registerItem": {
+        "allowed": [
+          "name",
+          "baseUnit",
+          "decimalPlaces",
+          "specificationHash",
+          "packagingHash",
+          "specificationDescription",
+          "packagingDescription"
+        ],
+        "required": [
+          "name",
+          "baseUnit",
+          "decimalPlaces",
+          "specificationHash",
+          "packagingHash"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/ItemCommands.java:28"
+      },
+      "rejectHandover": {
+        "allowed": [
+          "handoverId"
+        ],
+        "required": [
+          "handoverId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:52 (no allowlist)"
+      },
+      "releaseAllocation": {
+        "allowed": [
+          "allocationId"
+        ],
+        "required": [
+          "allocationId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:22"
+      },
+      "releaseHold": {
+        "allowed": [
+          "restrictionId",
+          "evidenceId",
+          "reason"
+        ],
+        "required": [
+          "restrictionId",
+          "evidenceId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/quality/QualityCommands.java:23"
+      },
+      "replaceAllocation": {
+        "allowed": [
+          "allocationId",
+          "segmentId",
+          "startQuantity",
+          "quantity",
+          "unit"
+        ],
+        "required": [
+          "allocationId",
+          "segmentId",
+          "startQuantity",
+          "quantity",
+          "unit"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:22"
+      },
+      "reserveQuantity": {
+        "allowed": [
+          "segmentId",
+          "salesLineId",
+          "startQuantity",
+          "quantity",
+          "unit"
+        ],
+        "required": [
+          "segmentId",
+          "salesLineId",
+          "startQuantity",
+          "quantity",
+          "unit"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:22"
+      },
+      "resolveEvidenceConflict": {
+        "allowed": [
+          "claimId",
+          "basisDocumentId",
+          "physicalScopeId",
+          "existingCanonicalId",
+          "policyVersion",
+          "sourceIdentity",
+          "quantity",
+          "unit",
+          "effectiveFrom",
+          "reason"
+        ],
+        "required": [
+          "claimId",
+          "basisDocumentId",
+          "policyVersion",
+          "sourceIdentity",
+          "effectiveFrom",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/evidence/EvidenceCommandInputs.java:9,24"
+      },
+      "resolveObligation": {
+        "allowed": [
+          "assignmentId",
+          "evidenceId"
+        ],
+        "required": [
+          "assignmentId",
+          "evidenceId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityService.java:42 (no allowlist)"
+      },
+      "resumeWork": {
+        "allowed": [
+          "workId",
+          "evidence"
+        ],
+        "required": [
+          "workId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:97"
+      },
+      "retirePolicy": {
+        "allowed": [
+          "id",
+          "terminationBasis",
+          "replacementPolicyId"
+        ],
+        "required": [
+          "id",
+          "terminationBasis"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/policy/PolicyCommands.java:53-57 (no allowlist)"
+      },
+      "reviseGoal": {
+        "allowed": [
+          "workId",
+          "goal",
+          "reason",
+          "newDueAt",
+          "previousGoalVersion"
+        ],
+        "required": [
+          "workId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:81,97"
+      },
+      "revisePurchase": {
+        "allowed": [
+          "proposalId",
+          "reason",
+          "changes"
+        ],
+        "required": [
+          "proposalId",
+          "reason",
+          "changes"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseCommands.java:56 (no allowlist)"
+      },
+      "reviseSalesOrder": {
+        "allowed": [
+          "orderId",
+          "workId",
+          "customerId",
+          "itemId",
+          "quantity",
+          "unit",
+          "price",
+          "currency",
+          "dueAt",
+          "destinationId",
+          "deliveryEndpoint",
+          "qualityTerms",
+          "packageTerms",
+          "reason"
+        ],
+        "required": [
+          "orderId",
+          "workId",
+          "customerId",
+          "itemId",
+          "quantity",
+          "unit",
+          "price",
+          "currency",
+          "dueAt",
+          "destinationId",
+          "deliveryEndpoint",
+          "qualityTerms",
+          "packageTerms",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java:16-18"
+      },
+      "revokeCapability": {
+        "allowed": [
+          "id"
+        ],
+        "required": [
+          "id"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/identity/IdentityCommands.java:57 (no allowlist)"
+      },
+      "revokeDispositionBasis": {
+        "allowed": [
+          "dispositionBasisId",
+          "evidenceId",
+          "reason"
+        ],
+        "required": [
+          "dispositionBasisId",
+          "evidenceId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/quality/QualityCommands.java:23"
+      },
+      "revokeGrant": {
+        "allowed": [
+          "id"
+        ],
+        "required": [
+          "id"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/identity/IdentityCommands.java:57 (no allowlist)"
+      },
+      "splitQuantity": {
+        "allowed": [
+          "segmentId",
+          "quantities",
+          "unit",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "required": [
+          "segmentId",
+          "quantities",
+          "unit",
+          "occurredAt",
+          "evidenceRef"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java:29-35; docs/execution/s2-inventory/contracts.md"
+      },
+      "transferObligation": {
+        "allowed": [
+          "workId",
+          "assignmentId",
+          "recipientId",
+          "targetWorkId",
+          "expiresAt",
+          "nextAction",
+          "nextCheckAt",
+          "quantity",
+          "unit"
+        ],
+        "required": [
+          "workId",
+          "assignmentId",
+          "recipientId",
+          "targetWorkId",
+          "expiresAt",
+          "nextAction",
+          "nextCheckAt"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityService.java:37 (no allowlist)"
+      },
+      "verifyLabel": {
+        "allowed": [
+          "procedureId",
+          "decision",
+          "packagingVersionId",
+          "specificationVersionId",
+          "validFrom",
+          "validUntil",
+          "occurrenceId"
+        ],
+        "required": [
+          "procedureId",
+          "decision",
+          "packagingVersionId",
+          "specificationVersionId",
+          "validFrom",
+          "occurrenceId"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java:21"
+      },
+      "waitWork": {
+        "allowed": [
+          "workId",
+          "wait"
+        ],
+        "required": [
+          "workId",
+          "wait"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:97"
+      },
+      "waiveObligation": {
+        "allowed": [
+          "assignmentId",
+          "reason"
+        ],
+        "required": [
+          "assignmentId",
+          "reason"
+        ],
+        "ref": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java:39,50 (no allowlist; evidenceId rejected)"
+      }
+    },
+    "sourceOverrides": {
+      "closeWork": {
+        "reason": [
+          "closeReason",
+          "reason"
+        ]
+      },
+      "approveRecall": {
+        "scopeId": [
+          "scopeId",
+          "recallId"
+        ]
+      },
+      "recordRecallNotice": {
+        "scopeId": [
+          "scopeId",
+          "recallId"
+        ]
+      },
+      "recordRecovery": {
+        "scopeId": [
+          "scopeId",
+          "recallId"
+        ],
+        "kind": [
+          "kind",
+          "outcome"
+        ],
+        "currentPlaceId": [
+          "currentPlaceId",
+          "currentLocationId"
+        ]
+      },
+      "closeRecall": {
+        "scopeId": [
+          "scopeId",
+          "recallId"
+        ]
+      },
+      "resolveObligation": {
+        "evidenceId": [
+          "evidenceId",
+          "resolutionEvidenceId"
+        ]
+      },
+      "transferObligation": {
+        "recipientId": [
+          "recipientId",
+          "acceptingOwnerId",
+          "acceptedById"
+        ]
+      },
+      "receiveReturn": {
+        "authorizationId": [
+          "authorizationId",
+          "returnAuthorizationId"
+        ]
+      },
+      "placeHold": {
+        "segmentId": [
+          "segmentId",
+          "scopeSegmentId",
+          "sourceSegmentId",
+          "@QuantitySegment"
+        ]
+      },
+      "recordDispositionBasis": {
+        "segmentId": [
+          "segmentId",
+          "scopeSegmentId",
+          "sourceSegmentId",
+          "@QuantitySegment"
+        ]
+      },
+      "openInvestigation": {
+        "segmentId": [
+          "segmentId",
+          "scopeSegmentId",
+          "sourceSegmentId",
+          "@QuantitySegment"
+        ]
+      },
+      "registerItem": {
+        "decimalPlaces": [
+          "decimalPlaces",
+          "fractionDigits"
+        ]
+      },
+      "recordInvoice": {
+        "invoiceKind": [
+          "invoiceKind",
+          "kind"
+        ],
+        "originalAmount": [
+          "originalAmount",
+          "amount"
+        ]
+      },
+      "recordPaymentReference": {
+        "externalPaymentReference": [
+          "externalPaymentReference",
+          "externalReference"
+        ]
+      },
+      "recordSupplierReply": {
+        "proposedQuantity": [
+          "proposedQuantity",
+          "quantity"
+        ]
+      },
+      "assignCapability": {
+        "assignedCapability": [
+          "assignedCapability",
+          "capabilityId"
+        ]
+      },
+      "approvePolicy": {
+        "contentHash": [
+          "contentHash",
+          "hash"
+        ]
+      },
+      "recordStocktake": {
+        "observedQuantity": [
+          "observedQuantity",
+          "quantity"
+        ]
+      },
+      "proposeHandover": {
+        "recipientId": [
+          "recipientId",
+          "toOwnerId"
+        ]
+      }
+    },
+    "startCoordinate": {
+      "capabilities": [
+        "reserveQuantity",
+        "replaceAllocation"
+      ],
+      "slot": "startQuantity",
+      "value": "0",
+      "scope": "declaredOnlyCases",
+      "contractRef": "FulfillmentCommands.java:67 reads the allocated range start; the shared-slot cases reserve the whole fixture leaf from its start, which ContractValidator.reserveCapacityProblems checks against the fixture allocations"
+    },
+    "sourceOverridesNote": "Per-capability one-to-one equivalents of the shared C3/V4 vocabulary (the slot the case already states under its earlier name): recall recallId is the recall scope, recovery outcome its kind, resolutionEvidenceId the resolution evidence, acceptingOwnerId the transfer recipient, returnAuthorizationId the authorization a return receipt cites, scopeSegmentId the held segment, fractionDigits the item decimal places, invoice kind/amount, externalReference the payment reference, the supplier reply quantity, the assigned capability, the policy hash, the counted stocktake quantity and the handover recipient.",
+    "planSlots": {
+      "transferObligation": {
+        "slots": [
+          "acceptanceEvidenceId"
+        ],
+        "gap": "PG-PLAN-SLOT",
+        "contractRef": "plan section 5.3: the target work owner accepts in the same transaction; C3 cites the verified recipient decision RECIPIENT-ACCEPTANCE, which the product handler has no slot for (ResponsibilityService.java:37)"
+      }
+    },
+    "requiredFill": {
+      "description": "Required slots the shared-slot cases (declaredOnlyCases) did not state (step2r round 13, run-7b6c69b4: 35 negative authorization probes answered TYPE_INVALID before the authorization they test). Plan section 3.3 validates required slots, type, unit and cardinality before the applicable policy, so a probe that must reach the authorization check sends a type-valid complete request. Each missing required slot takes the first available source: a slot of the same request, a typed subject (@Type), a fixture alias that exists (@alias:NAME), a fixture prior fact (@fact:ALIAS.field), the fixture document named by the first request evidenceRefs entry (@document:path|mediaType|sha256|base64), the typed evidence subject of the one subjectRef (@evidenceSubject), the item of the QuantitySegment subject (@subjectItem), the requesting actor's granted item (@actorItem, @actorItemScopes), the unit of the quantity slot (@quantityUnit), the fixture clock settings (@fixture:timezone|precision), the product clock at the action (@clock, @clock+ISO-8601 duration), the first request evidenceRefs entry (@evidenceRefs), a SHA-256 of a fixed text (@sha256:text) or a literal (@literal:json). Values the requester sets are USER, values taken from the fixture or the clock are CONTEXT. Slots that need an entity the fixture does not install (stocktake, receipt, canonical occurrence, cargo, leg, investigation, outbox) stay KNOWN_OPEN S2-SLOT-REQUIRED until the installer writes those aliases.",
+      "contractRef": "the handler references of commandSlots.capabilities; QualityCommands.java:31 (category QC|CUSTOMER|COMMERCIAL|RECALL), ItemCommands.java:30 (SHA-256 hex), EvidenceCommandInputs.java:16-23 (typed subject {kind,id}, ValueState), IdentityCommands.java:52-54,73 (scopes [{scopeKind,scopeId}]), SalesCommands.java:16-18, RuntimeCommands decision",
+      "capabilities": {
+        "registerItem": {
+          "specificationHash": [
+            "@sha256:fixture specification version 1"
+          ],
+          "packagingHash": [
+            "@sha256:fixture packaging version 1"
+          ]
+        },
+        "attachEvidence": {
+          "subject": [
+            "@evidenceSubject"
+          ],
+          "sourceReference": [
+            "@document:path"
+          ],
+          "mediaType": [
+            "@document:mediaType"
+          ],
+          "expectedHash": [
+            "@document:sha256"
+          ],
+          "provenance": [
+            "@literal:\"fixture source document\""
+          ],
+          "contentBase64": [
+            "@document:base64"
+          ]
+        },
+        "recordActivity": {
+          "subject": [
+            "@evidenceSubject"
+          ],
+          "kind": [
+            "@literal:\"OBSERVATION\""
+          ],
+          "effectiveFrom": [
+            "occurredAt",
+            "@clock"
+          ],
+          "timeZone": [
+            "@fixture:timezone"
+          ],
+          "timePrecision": [
+            "@fixture:precision"
+          ],
+          "valueState": [
+            "@literal:\"KNOWN\""
+          ],
+          "payload": [
+            "@literal:\"{}\""
+          ]
+        },
+        "placeHold": {
+          "category": [
+            "@literal:\"QC\""
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "recordDispositionBasis": {
+          "category": [
+            "@literal:\"QC\""
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "releaseHold": {
+          "evidenceId": [
+            "@evidenceRefs"
+          ]
+        },
+        "revokeDispositionBasis": {
+          "evidenceId": [
+            "@evidenceRefs"
+          ]
+        },
+        "createGrant": {
+          "scopes": [
+            "@actorItemScopes"
+          ]
+        },
+        "assignCapability": {
+          "scopeKind": [
+            "@literal:\"ITEM\""
+          ],
+          "scopeId": [
+            "@actorItem"
+          ]
+        },
+        "createSalesOrder": {
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "price": [
+            "@literal:\"2.50\""
+          ],
+          "currency": [
+            "@literal:\"EUR\""
+          ],
+          "qualityTerms": [
+            "@literal:\"STANDARD\""
+          ],
+          "packageTerms": [
+            "@literal:\"STANDARD\""
+          ]
+        },
+        "reviseSalesOrder": {
+          "orderId": [
+            "@SalesOrder",
+            "@alias:SALE"
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "price": [
+            "@literal:\"2.50\""
+          ],
+          "currency": [
+            "@literal:\"EUR\""
+          ],
+          "qualityTerms": [
+            "@literal:\"STANDARD\""
+          ],
+          "packageTerms": [
+            "@literal:\"STANDARD\""
+          ],
+          "reason": [
+            "@literal:\"fixture 주문 조건 변경\""
+          ]
+        },
+        "approvePurchase": {
+          "proposalHash": [
+            "@fact:PROPOSAL.canonicalHash"
+          ],
+          "validUntil": [
+            "@clock+P1D"
+          ]
+        },
+        "authorizeReturn": {
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "validUntil": [
+            "@clock+P1D"
+          ]
+        },
+        "decideReturnDisposition": {
+          "returnId": [
+            "@alias:RETURN"
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "receiveReturn": {
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "openInvestigation": {
+          "itemId": [
+            "@subjectItem"
+          ],
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "basisEvidenceId": [
+            "@evidenceRefs"
+          ],
+          "nextAction": [
+            "@literal:\"조사 범위와 근거를 확인한다\""
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "proposeHandover": {
+          "expiresAt": [
+            "@clock+P1D"
+          ]
+        },
+        "proposePurchase": {
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "unit": [
+            "@quantityUnit"
+          ],
+          "endpoint": [
+            "@literal:\"ARRIVED\""
+          ],
+          "quantityMode": [
+            "@literal:\"CUMULATIVE_EVENT\""
+          ]
+        },
+        "transferObligation": {
+          "workId": [
+            "@Work",
+            "@alias:WORK"
+          ],
+          "expiresAt": [
+            "@clock+P1D"
+          ],
+          "nextAction": [
+            "@literal:\"인계받은 의무를 확인한다\""
+          ],
+          "nextCheckAt": [
+            "@clock+PT1H"
+          ]
+        },
+        "createPolicyDraft": {
+          "version": [
+            "@literal:\"2\""
+          ],
+          "content": [
+            "@literal:\"{\\\"rule\\\":\\\"fixture\\\"}\""
+          ],
+          "source": [
+            "@literal:\"fixture policy source\""
+          ],
+          "regressionEvidence": [
+            "@literal:\"verification/cases/C3/case.json\""
+          ],
+          "effectiveFrom": [
+            "@clock"
+          ],
+          "fixtureOnly": [
+            "@literal:true"
+          ]
+        },
+        "retirePolicy": {
+          "terminationBasis": [
+            "@literal:\"fixture 정책 종료 근거\""
+          ]
+        },
+        "recordExternalReconciliation": {
+          "decision": [
+            "@literal:\"UNRESOLVED\""
+          ],
+          "evidenceId": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordSettlementAdjustment": {
+          "mode": [
+            "@literal:\"PROPOSE\""
+          ],
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordInvoice": {
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordCharge": {
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordSupplierReply": {
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "recordPaymentReference": {
+          "observedAt": [
+            "@clock"
+          ],
+          "evidence": [
+            "@evidenceRefs"
+          ]
+        },
+        "prepareRegulatoryProcedure": {
+          "documentVersionId": [
+            "@evidenceRefs"
+          ]
+        },
+        "adjustQuantity": {
+          "direction": [
+            "@literal:\"DECREASE\""
+          ]
+        },
+        "recordRegulatoryDecision": {
+          "action": [
+            "@literal:\"SELL\""
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ],
+          "validFrom": [
+            "@clock"
+          ]
+        },
+        "verifyLabel": {
+          "validFrom": [
+            "@clock"
+          ]
+        },
+        "recordRecallNotice": {
+          "rootSegmentId": [
+            "@QuantitySegment",
+            "@alias:A20"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ]
+        },
+        "recordRecovery": {
+          "rootSegmentId": [
+            "@QuantitySegment",
+            "@alias:A20"
+          ],
+          "startQuantity": [
+            "@literal:\"0\""
+          ]
+        }
+      }
+    },
+    "subjectFromWorkItem": {
+      "capabilities": [
+        "createWork",
+        "createDraft"
+      ],
+      "contractRef": "WorkLifecycle.java:92-93 publicDraft: the Work item is the one TradeItem subject (NEEDS_INPUT ITEM_MISSING without it); a shared-slot case that names the Work it drafts names its item instead",
+      "scope": "declaredOnlyCases"
+    }
   },
   "knownOpen": [
     {
@@ -600,6 +3556,36 @@
       },
       "reason": "contracts/acceptance-capabilities.json registers these plan queries; the product has no handler, so their parameters have no product contract.",
       "closeWhen": "the product publishes the query and its parameters"
+    },
+    {
+      "id": "S2-SLOT-VOCABULARY",
+      "owner": "Step 2",
+      "kind": "command",
+      "match": {
+        "commandSlots": "undeclared"
+      },
+      "reason": "A case outside commandSlots.declaredOnlyCases sends a slot its capability does not declare (contracts/request-contracts.json commandSlots). Round 13 renamed the slots with a one-to-one declared equivalent (renames, waitContract, quantityWithUnit) and projected the four shared-slot cases; the rest carries case meaning the declared vocabulary has no slot for, or a capability whose plan inputs the product does not accept (docs/execution/step2r-round13/README.md Step 3 findings). Each needs a case decision, not a mechanical drop.",
+      "closeWhen": "every command sends only declared slots or the capability contract declares the slot"
+    },
+    {
+      "id": "S2-SLOT-REQUIRED",
+      "owner": "Step 2",
+      "kind": "command",
+      "match": {
+        "commandSlots": "required"
+      },
+      "reason": "A command omits a slot its capability requires, so the product answers TYPE_INVALID before authorization and before the business rule the case tests. The value is a business statement (a reason, a stocktake, a direction, a recall scope) the case has to author; round 13 filled only values the case already stated or the contracts derive (typed subject, request evidenceRefs, product clock).",
+      "closeWhen": "every command the case expects to reach authorization names its required slots"
+    },
+    {
+      "id": "PG-PLAN-SLOT",
+      "owner": "Step 3",
+      "kind": "command",
+      "match": {
+        "commandSlots": "planSlots"
+      },
+      "reason": "The plan requires an input the product handler declares no slot for (commandSlots.planSlots). The case keeps it.",
+      "closeWhen": "the handler accepts the planned input or the plan changes"
     }
   ]
 }

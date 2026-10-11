@@ -50,7 +50,9 @@ final class StepTwoRoundSevenRegressionTest {
         mutants.put("names receiving custodian",List.of(none,f->content(f,"warehouse-60").put("receivingCustodianAlias","qc")));
         mutants.put("no receipt original it cites",List.of(none,f->content(f,"warehouse-60").remove("receivingCustodianAlias")));
         mutants.put("is not the SHA-256",List.of(none,f->{for(JsonNode e:f.path("evidence")) if(e.path("alias").asText().equals("warehouse-60")) ((ObjectNode)e).put("sha256","0".repeat(64));}));
-        mutants.put("grant scope placeAliases does not include",List.of(none,f->{ArrayNode places=(ArrayNode)f.at("/actors/receiver/grant/scope/placeAliases");for(int i=places.size()-1;i>=0;i--) if(places.get(i).asText().equals("W")) places.remove(i);}));
+        // Step 2 round 13: fixture grants list no places (one all-of grant); a grant that lists every place but W is refused.
+        mutants.put("grant scope placeAliases does not include",List.of(none,f->{ArrayNode places=Json.array();f.path("aliases").fields().forEachRemaining(e->{if(e.getValue().path("type").asText().equals("Place") && !e.getKey().equals("W")) places.add(e.getKey());});
+            ((ObjectNode)f.at("/actors/receiver/grant/scope")).set("placeAliases",places);}));
         // A retry of the same receipt with another custodian.
         mutants.put("carries different receivingCustodianId values",List.of(s->{ObjectNode retry=action(s,"receipt60").deepCopy();retry.put("id","receipt60-retry");
             ((ObjectNode)retry.path("request").path("slots")).set("receivingCustodianId",Json.parse("{\"$alias\":\"procurement\"}"));((ArrayNode)s.path("actions")).add(retry);},none));

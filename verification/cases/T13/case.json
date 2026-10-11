@@ -46,7 +46,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -63,7 +62,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-quantity-work",
@@ -73,7 +73,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -81,7 +80,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -141,6 +141,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -161,7 +164,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -801,7 +805,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -818,7 +821,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-price-work",
@@ -828,7 +832,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -836,7 +839,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -896,6 +900,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -916,7 +923,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1556,7 +1564,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -1573,7 +1580,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-itemId-work",
@@ -1583,7 +1591,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -1591,7 +1598,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -1651,6 +1659,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -1671,7 +1682,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2309,7 +2321,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -2326,7 +2337,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-supplierId-work",
@@ -2336,7 +2348,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -2344,7 +2355,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -2404,6 +2416,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -2424,7 +2439,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3116,7 +3132,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -3133,7 +3148,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-dueAt-work",
@@ -3143,7 +3159,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -3151,7 +3166,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -3211,6 +3227,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -3231,7 +3250,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3865,7 +3885,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -3882,7 +3901,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-destinationId-work",
@@ -3892,7 +3912,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -3900,7 +3919,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -3960,6 +3980,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -3980,7 +4003,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4618,7 +4642,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -4635,7 +4658,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-changed-endpoint-work",
@@ -4645,7 +4669,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -4653,7 +4676,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -4713,6 +4737,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -4733,7 +4760,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5367,7 +5395,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -5384,7 +5411,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-decision-reject-work",
@@ -5394,7 +5422,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5402,7 +5429,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -5462,6 +5490,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -5482,7 +5513,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5965,7 +5997,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -5982,7 +6013,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-decision-conditional-work",
@@ -5992,7 +6024,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -6000,7 +6031,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -6060,6 +6092,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -6080,7 +6115,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6602,7 +6638,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -6619,7 +6654,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-decision-unauthorized-work",
@@ -6629,7 +6665,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -6637,7 +6672,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -6697,6 +6733,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -6717,7 +6756,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -7152,7 +7192,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -7169,7 +7208,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-decision-expired-work",
@@ -7179,7 +7219,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -7187,7 +7226,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -7247,6 +7287,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -7267,7 +7310,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -7765,7 +7809,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -7782,7 +7825,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-policy-rechecked-work",
@@ -7792,7 +7836,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -7800,7 +7843,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -7860,6 +7904,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -7880,7 +7927,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -7973,7 +8021,9 @@
               "policyVersion": "SYNTHETIC-policy-v2",
               "effectiveAt": "2026-10-07T09:00:00Z",
               "requires": "MANAGER_NEW_DECISION",
-              "source": "policy-source",
+              "source": {
+                "$alias": "policy-source"
+              },
               "scope": {
                 "organizationId": {
                   "$alias": "ORG"
@@ -8473,7 +8523,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -8490,7 +8539,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-supplier-accept-work",
@@ -8500,7 +8550,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -8508,7 +8557,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -8568,6 +8618,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -8588,7 +8641,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -8817,7 +8871,9 @@
             "slots": {
               "externalOperationId": "T13-supplier-accept-external",
               "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": "supplier-ship"
+              "receiptEvidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-accept-transmission",
@@ -8927,7 +8983,9 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-accept-supplier-reply",
@@ -9261,7 +9319,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -9278,7 +9335,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-supplier-reject-work",
@@ -9288,7 +9346,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -9296,7 +9353,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -9356,6 +9414,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -9376,7 +9437,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -9605,7 +9667,9 @@
             "slots": {
               "externalOperationId": "T13-supplier-reject-external",
               "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": "supplier-ship"
+              "receiptEvidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-reject-transmission",
@@ -9715,7 +9779,9 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-reject-supplier-reply",
@@ -10049,7 +10115,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -10066,7 +10131,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-supplier-change-work",
@@ -10076,7 +10142,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -10084,7 +10149,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -10144,6 +10210,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -10164,7 +10233,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10393,7 +10463,9 @@
             "slots": {
               "externalOperationId": "T13-supplier-change-external",
               "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": "supplier-ship"
+              "receiptEvidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-change-transmission",
@@ -10503,7 +10575,9 @@
                 "value": "100",
                 "unit": "BOX"
               },
-              "evidence": "supplier-ship"
+              "evidence": {
+                "$alias": "supplier-ship"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-change-supplier-reply",
@@ -11301,7 +11375,6 @@
               }
             ],
             "slots": {
-              "workKind": "PURCHASE",
               "quantity": {
                 "value": "100",
                 "unit": "BOX"
@@ -11318,7 +11391,8 @@
               "supervisorId": {
                 "$alias": "supervisor"
               },
-              "evidencePolicyVersion": "SYNTHETIC-policy-v1"
+              "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+              "workType": "PURCHASE"
             },
             "expectedRevision": 0,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-work",
@@ -11328,7 +11402,6 @@
               }
             ],
             "provenance": {
-              "workKind": "USER",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -11336,7 +11409,8 @@
               "quantityMode": "USER",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
-              "evidencePolicyVersion": "APPROVED_DEFAULT"
+              "evidencePolicyVersion": "APPROVED_DEFAULT",
+              "workType": "USER"
             }
           },
           "evidenceRefs": [
@@ -11396,6 +11470,9 @@
                   "actionId": "work",
                   "pointer": "/response/goal/id"
                 }
+              },
+              "itemId": {
+                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -11416,7 +11493,8 @@
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "goalVersionId": "CONTEXT",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -11973,18 +12051,16 @@
               "itemId": {
                 "$alias": "P"
               },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "destinationId": {
                 "$alias": "C"
               },
-              "endpoint": "DELIVERED",
               "dueAt": "2026-10-08T09:00:00Z",
               "ownerId": {
                 "$alias": "sales"
-              }
+              },
+              "deliveryEndpoint": "DELIVERED"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-sale",
@@ -11997,10 +12073,11 @@
               "customerId": "CONTEXT",
               "itemId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "destinationId": "CONTEXT",
-              "endpoint": "USER",
               "dueAt": "USER",
-              "ownerId": "CONTEXT"
+              "ownerId": "CONTEXT",
+              "deliveryEndpoint": "USER"
             }
           },
           "evidenceRefs": [
@@ -12033,12 +12110,12 @@
                 }
               },
               "action": "SELL",
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "basisKind": "QC",
-              "evidence": "qc-result"
+              "evidence": {
+                "$alias": "qc-result"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-qc-allow",
@@ -12051,6 +12128,7 @@
               "segmentId": "CONTEXT",
               "action": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "basisKind": "USER",
               "evidence": "USER"
             }
@@ -12095,7 +12173,9 @@
                 "unit": "BOX"
               },
               "policyVersion": "SYNTHETIC-policy-v1",
-              "evidence": "need"
+              "evidence": {
+                "$alias": "need"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-agency-procedure",
@@ -12143,7 +12223,9 @@
                 }
               },
               "externalReceiptId": "T13-AGENCY-ACK",
-              "externalReceiptEvidence": "agency-receipt"
+              "externalReceiptEvidence": {
+                "$alias": "agency-receipt"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-agency-submit",
@@ -12195,12 +12277,12 @@
               },
               "decision": "ALLOW",
               "decisionVersion": "agency-v1",
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "policyVersion": "SYNTHETIC-policy-v1",
-              "evidence": "agency-decision"
+              "evidence": {
+                "$alias": "agency-decision"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-agency-allow",
@@ -12215,6 +12297,7 @@
               "decision": "USER",
               "decisionVersion": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "policyVersion": "USER",
               "evidence": "USER"
             }
@@ -12249,12 +12332,12 @@
                 }
               },
               "action": "SELL",
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
+              "quantity": "60",
+              "unit": "BOX",
               "basisKind": "OWNER_PERMISSION",
-              "evidence": "custody"
+              "evidence": {
+                "$alias": "custody"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-disposition",
@@ -12267,6 +12350,7 @@
               "segmentId": "CONTEXT",
               "action": "USER",
               "quantity": "USER",
+              "unit": "USER",
               "basisKind": "USER",
               "evidence": "USER"
             }
@@ -12304,7 +12388,9 @@
                 "value": "60",
                 "unit": "BOX"
               },
-              "evidence": "label"
+              "evidence": {
+                "$alias": "label"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-label",
@@ -12354,10 +12440,8 @@
                   "pointer": "/response/segmentId"
                 }
               },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              }
+              "quantity": "10",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-reserve",
@@ -12369,7 +12453,8 @@
             "provenance": {
               "saleLineId": "CONTEXT",
               "segmentId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           },
           "evidenceRefs": [
@@ -12450,9 +12535,13 @@
               "destinationId": {
                 "$alias": "C"
               },
-              "cargoPlaceId": {
+              "transitPlaceId": {
                 "$alias": "TRANSIT"
-              }
+              },
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -12469,7 +12558,9 @@
             "provenance": {
               "allocationId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "cargoPlaceId": "CONTEXT"
+              "transitPlaceId": "CONTEXT",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -12507,12 +12598,15 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "occurredAt": "2026-10-07T09:00:00Z",
-              "evidence": "delivery"
+              "evidence": {
+                "$alias": "delivery"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-delivery",
@@ -12525,8 +12619,10 @@
               "dispatchId": "CONTEXT",
               "allocationId": "CONTEXT",
               "quantity": "CONTEXT",
+              "unit": "CONTEXT",
               "occurredAt": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "itemId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -12558,10 +12654,8 @@
                   "pointer": "/response/objectId"
                 }
               },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "reason": "실물 반품"
             },
             "expectedRevision": 1,
@@ -12574,6 +12668,7 @@
             "provenance": {
               "deliveryId": "CONTEXT",
               "quantity": "USER",
+              "unit": "USER",
               "reason": "USER"
             }
           },
@@ -12606,14 +12701,14 @@
                   "pointer": "/response/objectId"
                 }
               },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
+              "unit": "BOX",
               "placeId": {
                 "$alias": "W"
               },
-              "evidence": "return"
+              "evidence": {
+                "$alias": "return"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-return",
@@ -12625,6 +12720,7 @@
             "provenance": {
               "returnId": "CONTEXT",
               "quantity": "CONTEXT",
+              "unit": "CONTEXT",
               "placeId": "CONTEXT",
               "evidence": "USER"
             }
@@ -12726,7 +12822,10 @@
                   "unit": "BOX"
                 }
               ],
-              "reason": "부분 장소 이동 전 범위 분리"
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-split40",
@@ -12738,7 +12837,8 @@
             "provenance": {
               "segmentId": "CONTEXT",
               "children": "USER",
-              "reason": "USER"
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -12780,7 +12880,11 @@
               "destinationId": {
                 "$alias": "W-alt"
               },
-              "reason": "내부 장소 이동"
+              "reason": "내부 장소 이동",
+              "evidenceRef": {
+                "$alias": "need"
+              },
+              "occurredAt": "2026-10-07T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T13-partial-excess-return-relocation-move",
@@ -12794,7 +12898,9 @@
               "quantity": "CONTEXT",
               "sourceId": "CONTEXT",
               "destinationId": "CONTEXT",
-              "reason": "USER"
+              "reason": "USER",
+              "evidenceRef": "CONTEXT",
+              "occurredAt": "CONTEXT"
             }
           },
           "evidenceRefs": [

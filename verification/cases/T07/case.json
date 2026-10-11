@@ -4216,11 +4216,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -4243,7 +4247,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-false-unknown",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -4276,12 +4279,6 @@
                   "actionId": "draft-all-false-unknown",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-all-false-unknown",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -4292,8 +4289,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-false-unknown",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -4370,11 +4366,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -4397,7 +4397,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-true",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -4430,12 +4429,6 @@
                   "actionId": "draft-all-true",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-all-true",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -4446,8 +4439,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-true",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -4524,11 +4516,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -4551,7 +4547,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-true-unknown",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -4584,12 +4579,6 @@
                   "actionId": "draft-all-true-unknown",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-all-true-unknown",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -4600,8 +4589,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-true-unknown",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -4678,11 +4666,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -4705,7 +4697,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-true-unknown",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -4738,12 +4729,6 @@
                   "actionId": "draft-any-true-unknown",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-any-true-unknown",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -4754,8 +4739,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-true-unknown",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -4832,11 +4816,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -4859,7 +4847,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-false",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -4892,12 +4879,6 @@
                   "actionId": "draft-any-false",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-any-false",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -4908,8 +4889,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-false",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -4986,11 +4966,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5013,7 +4997,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-false-unknown",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5046,12 +5029,6 @@
                   "actionId": "draft-any-false-unknown",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-any-false-unknown",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5062,8 +5039,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-false-unknown",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -5140,11 +5116,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5167,7 +5147,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-all-false-conflict",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5200,12 +5179,6 @@
                   "actionId": "draft-all-false-conflict",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-all-false-conflict",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5216,8 +5189,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-all-false-conflict",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -5294,11 +5266,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5321,7 +5297,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-any-true-conflict",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5354,12 +5329,6 @@
                   "actionId": "draft-any-true-conflict",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-any-true-conflict",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5370,8 +5339,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-any-true-conflict",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -5448,11 +5416,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5475,7 +5447,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-true",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5508,12 +5479,6 @@
                   "actionId": "draft-not-true",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-not-true",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5524,8 +5489,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-true",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -5602,11 +5566,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5629,7 +5597,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-false",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5662,12 +5629,6 @@
                   "actionId": "draft-not-false",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-not-false",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5678,8 +5639,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-false",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -5756,11 +5716,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5783,7 +5747,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-unknown",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5816,12 +5779,6 @@
                   "actionId": "draft-not-unknown",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-not-unknown",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5832,8 +5789,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-unknown",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -5910,11 +5866,15 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "createDraft",
-            "subjectRefs": [],
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
             "slots": {
-              "itemId": {
-                "$alias": "P"
-              },
               "quantity": {
                 "value": "60",
                 "unit": "BOX"
@@ -5937,7 +5897,6 @@
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-draft-not-conflict",
             "provenance": {
-              "itemId": "CONTEXT",
               "quantity": "USER",
               "destinationId": "CONTEXT",
               "dueAt": "USER",
@@ -5970,12 +5929,6 @@
                   "actionId": "draft-not-conflict",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "draft-not-conflict",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -5986,8 +5939,7 @@
             },
             "commandIdempotencyKey": "T07-predicate-truth-and-conflict-activate-not-conflict",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -9062,10 +9014,8 @@
               "physicalScopeId": {
                 "$alias": "PHYS60"
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              }
+              "quantity": "60",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-incomplete-upload-attach",
@@ -9075,7 +9025,8 @@
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "physicalScopeId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },
@@ -9445,10 +9396,8 @@
               "physicalScopeId": {
                 "$alias": "PHYS60"
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              }
+              "quantity": "60",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-hash-mismatch-attach",
@@ -9458,7 +9407,8 @@
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "physicalScopeId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },
@@ -9849,10 +9799,8 @@
               "physicalScopeId": {
                 "$alias": "PHYS60"
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              }
+              "quantity": "60",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-db-reference-failure-attach",
@@ -9862,7 +9810,8 @@
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "physicalScopeId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },
@@ -10355,10 +10304,8 @@
               "physicalScopeId": {
                 "$alias": "PHYS60"
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              }
+              "quantity": "60",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-orphan-upload-attach",
@@ -10368,7 +10315,8 @@
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "physicalScopeId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },
@@ -10861,10 +10809,8 @@
               "physicalScopeId": {
                 "$alias": "PHYS60"
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              }
+              "quantity": "60",
+              "unit": "BOX"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T07-unreadable-uri-attach",
@@ -10874,7 +10820,8 @@
               "externalEventId": "USER",
               "sourceVersion": "USER",
               "physicalScopeId": "CONTEXT",
-              "quantity": "USER"
+              "quantity": "USER",
+              "unit": "USER"
             }
           }
         },

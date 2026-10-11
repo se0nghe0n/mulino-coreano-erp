@@ -50,23 +50,6 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "getWork",
             "getInventory",
@@ -77,7 +60,6 @@
             "emergencyRepair"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -107,23 +89,6 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "createWork",
             "activateWork",
@@ -131,7 +96,6 @@
             "getWork"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -201,23 +165,6 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "revokeGrant",
             "getWork",
@@ -245,7 +192,6 @@
             "activateDefinition"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -275,23 +221,6 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "moveQuantity",
             "reserveQuantity",
@@ -299,7 +228,6 @@
             "splitQuantity"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -323,28 +251,10 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "placeHold"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -358,44 +268,29 @@
       "roleCapabilities": [
         "recordActivity",
         "attachEvidence",
-        "recordExternalReconciliation"
+        "recordExternalReconciliation",
+        "getEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
         "actions": [
           "recordActivity",
           "attachEvidence",
-          "recordExternalReconciliation"
+          "recordExternalReconciliation",
+          "getEvidence"
         ],
         "scope": {
           "organizationAlias": "ORG",
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "recordActivity",
             "attachEvidence",
-            "recordExternalReconciliation"
+            "recordExternalReconciliation",
+            "getEvidence"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -421,29 +316,11 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "proposePurchase",
             "dispatchPurchaseOrder"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -467,28 +344,10 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "approvePurchase"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -514,29 +373,11 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "activatePolicy",
             "activateDefinition"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -562,29 +403,11 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "getWork",
             "getInventory"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1
@@ -608,28 +431,10 @@
           "itemAliases": [
             "P"
           ],
-          "segmentAliases": [
-            "Q20"
-          ],
-          "workKinds": [
-            "check",
-            "TEMPERATURE_FOLLOWUP",
-            "purchase",
-            "sales",
-            "externalReconciliation",
-            "recovery"
-          ],
-          "sourceNamespaces": [
-            "synthetic-warehouse",
-            "synthetic-supplier-v1",
-            "synthetic-unmapped",
-            "synthetic-operations"
-          ],
           "capabilityIds": [
             "getWork"
           ]
         },
-        "scopeComposition": "PER_DIMENSION",
         "validFrom": "2026-10-01T00:00:00Z",
         "validUntil": "2026-10-31T00:00:00Z",
         "revision": 1

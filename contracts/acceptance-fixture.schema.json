@@ -120,7 +120,8 @@
                 "minItems": 0
               },
               "scope": {
-                "type": "object"
+                "type": "object",
+                "description": "Grant restriction keys (contracts/request-contracts.json grantAuthorization dimensionKinds and metadataScopeKeys). One all-of grant per actor (user decision 2026-10-09): every named dimension kind must match the targets the product presents, so a grant keeps only the kinds every capability the cases call with it presents. The retired scopeComposition field is rejected (./verify prepare, check_request_contracts.py)."
               },
               "validFrom": {
                 "type": "string",
@@ -133,13 +134,6 @@
               "revision": {
                 "type": "integer",
                 "minimum": 1
-              },
-              "scopeComposition": {
-                "enum": [
-                  "PER_DIMENSION",
-                  "ALL_DIMENSIONS"
-                ],
-                "description": "How the dimension kinds of scope combine (contracts/request-contracts.json grantComposition). PER_DIMENSION: one installed grant per kind, the lists act as alternatives. ALL_DIMENSIONS: one grant whose kinds intersect (the product's all-of match). Required when scope names two or more kinds (./verify prepare, check_request_contracts.py)."
               }
             },
             "required": [

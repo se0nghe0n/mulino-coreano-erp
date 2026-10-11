@@ -80,7 +80,10 @@ final class StepTwoRoundElevenRegressionTest {
     @Test void reservesDoNotDoubleBookFixtureOrRuntimeAllocations() throws Exception {
         Rule rule=ContractValidator::reserveCapacityProblems;clean(rule);
         // The review's shape: C3/V4 reserve fixture with ALLOCATION (EXECUTABLE, A20 20 BOX, all of SALE-LINE 20).
-        Consumer<ObjectNode> heldA20=f->((ObjectNode)f.path("baseline").path("priorEntities")).set("ALLOCATION",Json.parse("{\"revision\":1,\"segmentAlias\":\"A20\",\"quantity\":\"20\",\"unit\":\"BOX\",\"state\":\"EXECUTABLE\",\"orderLineAlias\":\"SALE-LINE\"}"));
+        // Since step2r round 13 the reserve fixtures no longer carry the factless ALLOCATION alias (author_round13.py), so the
+        // review's shape states the alias with its facts.
+        Consumer<ObjectNode> heldA20=f->{((ObjectNode)f.path("aliases")).set("ALLOCATION",Json.parse("{\"type\":\"Allocation\",\"organizationAlias\":\"ORG-A\"}"));
+            ((ObjectNode)f.path("baseline").path("priorEntities")).set("ALLOCATION",Json.parse("{\"revision\":1,\"segmentAlias\":\"A20\",\"quantity\":\"20\",\"unit\":\"BOX\",\"state\":\"EXECUTABLE\",\"orderLineAlias\":\"SALE-LINE\"}"));};
         for(String route:List.of("api","mcp","worker")) {
             List<String> p=run(rule,"C3",route+"-reserveQuantity",NONE,heldA20);
             rejects("overlaps the EXECUTABLE allocation ALLOCATION (no startQuantity",p);rejects("SALES_LINE_QUANTITY_EXCEEDED",p);

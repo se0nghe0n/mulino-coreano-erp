@@ -115,8 +115,9 @@ class Conformance(unittest.TestCase):
         C.conform_action(action, 'X01', 's', RC.World(ROOT, None))
         body = action['request']
         self.assertNotIn('scope', body)
-        self.assertEqual({'quantity': 'USER', 'dueAt': 'CONTEXT', 'orderLineId': 'CONTEXT', 'digits': 'USER', 'segmentId': 'CONTEXT', 'reason': 'USER'}, body['provenance'])
-        self.assertEqual({'value': '20', 'unit': 'BOX'}, body['slots']['quantity'])
+        # step2r round 13: the reserve line is the declared salesLineId, the quantity a decimal string beside its unit slot.
+        self.assertEqual({'quantity': 'USER', 'unit': 'USER', 'dueAt': 'CONTEXT', 'salesLineId': 'CONTEXT', 'digits': 'USER', 'segmentId': 'CONTEXT', 'reason': 'USER'}, body['provenance'])
+        self.assertEqual(('20', 'BOX'), (body['slots']['quantity'], body['slots']['unit']))
         self.assertEqual('0', body['slots']['digits'])
         self.assertNotIn('missing', body['slots'])
         self.assertEqual([], body['subjectRefs'])
@@ -125,6 +126,122 @@ class Conformance(unittest.TestCase):
         again = copy.deepcopy(action)
         C.conform_action(again, 'X01', 's', RC.World(ROOT, None))
         self.assertEqual(action, again, 'conformance is idempotent')
+
+    def test_declared_only_cases_send_the_capability_slots(self):
+        shared = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'moveQuantity',
+                  'subjectRefs': [{'type': 'QuantitySegment', 'id': A('A20')}], 'evidenceRefs': [A('DOC')],
+                  'slots': {'quantity': {'value': '20', 'unit': 'BOX'}, 'destinationId': A('W2'), 'orderLineId': A('LINE'),
+                            'sourceSegmentId': A('A20'), 'reason': 'r'}, 'expectedRevision': 1, 'commandIdempotencyKey': 'k'}
+        sub = {'id': 's', 'actions': [invoke(shared)], 'assertions': []}
+        C.conform_case({'caseId': 'C3', 'subcases': [sub]})
+        body = sub['actions'][0]['request']
+        self.assertEqual({'segmentId': A('A20'), 'destinationId': A('W2'), 'evidenceRef': A('DOC')}, body['slots'])
+        self.assertEqual({'segmentId': 'CONTEXT', 'destinationId': 'CONTEXT', 'evidenceRef': 'CONTEXT'}, body['provenance'])
+        stray = copy.deepcopy(sub)
+        stray['actions'][0]['request']['slots']['reason'] = 'r'
+        stray['actions'][0]['request']['provenance']['reason'] = 'USER'
+        problems, known = C.case_problems({'caseId': 'C3', 'subcases': [stray]})
+        self.assertTrue(any('moveQuantity declares no slot reason' in p for p in problems), problems)
+        self.assertTrue(any('requires occurredAt' in k and 'S2-SLOT-REQUIRED' in k for k in known), known)
+        problems, known = C.case_problems({'caseId': 'T99', 'subcases': [stray]})
+        self.assertEqual([], [p for p in problems if 'declares no slot' in p])
+        self.assertTrue(any('S2-SLOT-VOCABULARY' in k for k in known), known)
+
+    def test_declared_only_cases_complete_required_slots_for_the_authorization_probe(self):
+        # round 13 run-7b6c69b4: a probe missing required slots is TYPE_INVALID before authorization (plan section 3.3).
+        hold = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'placeHold',
+                'subjectRefs': [{'type': 'QuantitySegment', 'id': A('A20')}], 'evidenceRefs': [A('DOC')],
+                'slots': {'segmentId': A('A20'), 'action': 'SELL', 'reason': 'r', 'validFrom': '2026-10-07T09:00:00Z',
+                          'validUntil': '2026-10-08T00:00:00Z', 'quantity': '20', 'unit': 'BOX'},
+                'expectedRevision': 1, 'commandIdempotencyKey': 'k'}
+        draft = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'createDraft',
+                 'subjectRefs': [{'type': 'Work', 'id': A('WORK')}], 'slots': {'ownerId': A('warehouse'), 'supervisorId': A('supervisor')},
+                 'expectedRevision': 1, 'commandIdempotencyKey': 'k2'}
+        sub = {'id': 'api-placeHold', 'fixtureRef': 'verification/cases/C3/fixture-placeHold.json',
+               'actions': [invoke(hold, cap='placeHold'), invoke(draft, cap='createDraft', aid='draft')], 'assertions': []}
+        C.conform_case({'caseId': 'C3', 'subcases': [sub]})
+        slots = sub['actions'][0]['request']['slots']
+        self.assertEqual(('QC', A('DOC'), '0', A('WORK'), '2026-10-07T10:00:00Z'),
+                         (slots['category'], slots['evidenceId'], slots['startQuantity'], slots['workId'], slots['nextCheckAt']))
+        self.assertEqual('USER', sub['actions'][0]['request']['provenance']['category'])
+        self.assertEqual('CONTEXT', sub['actions'][0]['request']['provenance']['nextCheckAt'])
+        self.assertEqual([{'type': 'TradeItem', 'id': A('P')}], sub['actions'][1]['request']['subjectRefs'])
+        again = copy.deepcopy(sub)
+        C.conform_case({'caseId': 'C3', 'subcases': [again]})
+        self.assertEqual(sub, again, 'filling is idempotent')
+        problems, known = C.case_problems({'caseId': 'C3', 'subcases': [sub]})
+        self.assertFalse(any('placeHold requires' in k for k in known), known)
+
+    def test_contract_shapes_rewrite_slots_the_capability_contract_states_another_way(self):
+        # step2r round 13 item 3: s2-inventory splitQuantity/moveQuantity, plan sections 3.3 and 5.1, placeHold category.
+        world = RC.World(ROOT, None)
+        world.segments = {'Q20': {'alias': 'Q20', 'quantity': '20', 'unit': 'BOX'}}
+        def run(cap, slots, **extra):
+            body = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': cap, 'subjectRefs': [], 'slots': slots,
+                    'expectedRevision': 1, 'commandIdempotencyKey': 'k', **extra}
+            sub = {'id': 's', 'actions': [invoke(body, cap=cap)], 'assertions': []}
+            C._world = world
+            try:
+                C.conform_action(sub['actions'][0], 'T99', 's', world)
+            finally:
+                C._world = None
+            again = copy.deepcopy(sub['actions'][0])
+            C._world = world
+            try:
+                C.conform_action(again, 'T99', 's', world)
+            finally:
+                C._world = None
+            self.assertEqual(sub['actions'][0], again, 'contract shapes are idempotent')
+            return sub['actions'][0]['request']
+        split = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'value': '12', 'unit': 'BOX'}, {'value': '8', 'unit': 'BOX'}],
+                                      'loss': {'value': '0', 'unit': 'BOX'}, 'allocationTransfer': [{'childIndex': 0}], 'reason': 'r'},
+                    evidenceRefs=[A('DOC')])
+        self.assertEqual(['12', '8'], split['slots']['quantities'])
+        self.assertEqual('BOX', split['slots']['unit'])
+        self.assertFalse({'children', 'loss', 'allocationTransfer', 'reason'} & set(split['slots']))
+        named = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'alias': 'A', 'quantity': '12', 'unit': 'BOX'}, {'alias': 'B', 'quantity': '8', 'unit': 'BOX'}]})
+        self.assertIn('children', named['slots'], 'children read back by alias stay until their response pointer is rewritten')
+        lossy = run('splitQuantity', {'segmentId': A('Q20'), 'children': [{'value': '12', 'unit': 'BOX'}], 'loss': {'value': '2', 'unit': 'BOX'}})
+        self.assertIn('loss', lossy['slots'])
+        whole = run('moveQuantity', {'segmentId': A('Q20'), 'destinationId': A('W2'), 'quantity': '20', 'unit': 'BOX'})
+        self.assertFalse({'quantity', 'unit'} & set(whole['slots']))
+        part = run('moveQuantity', {'segmentId': A('Q20'), 'destinationId': A('W2'), 'quantity': '5', 'unit': 'BOX'})
+        self.assertEqual(('5', 'BOX'), (part['slots']['quantity'], part['slots']['unit']))
+        draft = run('createDraft', {'itemId': A('P'), 'quantityMode': 'THROUGHOUT', 'period': {'start': 'a'}, 'interval': {'start': 'b'},
+                                    'lotIdentification': 'MISSING', 'ownerId': A('o'), 'supervisorId': A('s')})
+        self.assertEqual({'start': 'b'}, draft['slots']['period'])
+        self.assertFalse({'interval', 'lotIdentification', 'itemId'} & set(draft['slots']))
+        self.assertEqual([{'type': 'TradeItem', 'id': A('P')}], draft['subjectRefs'])
+        hold = run('placeHold', {'segmentId': A('Q20'), 'kind': 'QC'})
+        self.assertEqual('QC', hold['slots']['category'])
+        handover = run('proposeHandover', {'workId': A('WORK'), 'toOwnerId': A('B')})
+        self.assertEqual(A('B'), handover['slots']['recipientId'])
+        reserve = run('reserveQuantity', {'segmentId': A('Q20'), 'salesOrderLineId': A('L'), 'quantity': '20', 'unit': 'BOX', 'action': 'SELL'})
+        self.assertEqual(A('L'), reserve['slots']['salesLineId'])
+        self.assertNotIn('action', reserve['slots'])
+        act = run('activateWork', {'workId': R('draft', '/response/workId'), 'goalVersionId': R('draft', '/response/goalVersionId')})
+        self.assertEqual({'workId'}, set(act['slots']))
+        other = run('activateWork', {'workId': R('draft', '/response/workId'), 'goalVersionId': R('revise', '/response/goalVersionId')})
+        self.assertIn('goalVersionId', other['slots'], 'a goal version from another response is not restated')
+        dest = run('createDraft', {'destination': {'type': 'Place', 'id': A('W')}, 'ownerId': A('o'), 'supervisorId': A('s')})
+        self.assertEqual(A('W'), dest['slots']['destinationId'])
+        world.evidence = {'invoice'}
+        invoice = run('recordInvoice', {'invoiceKind': 'COMMERCIAL', 'evidence': 'invoice', 'note': 'invoice-text'})
+        self.assertEqual(A('invoice'), invoice['slots']['evidence'], 'a bare evidence alias names the evidence')
+        self.assertEqual('invoice-text', invoice['slots']['note'])
+        world.evidence = set()
+        grant = run('createGrant', {'actorId': A('reader')}, subjectRefs=[{'type': 'Grant', 'id': A('GRANT')}, {'type': 'Agent', 'id': A('reader')}])
+        self.assertEqual([{'type': 'Agent', 'id': A('reader')}], grant['subjectRefs'], 'only the created noun is dropped')
+
+    def test_wait_slots_form_the_wait_contract(self):
+        flat = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'waitWork', 'subjectRefs': [],
+                'slots': {'workId': A('W'), 'reason': 'r', 'targetId': A('PO'), 'resumePredicate': {'kind': 'x'}, 'verifierId': A('V'),
+                          'nextCheckAt': '2026-10-08T00:00:00Z', 'overdueAction': 'o'}, 'expectedRevision': 1, 'commandIdempotencyKey': 'k'}
+        sub = {'id': 's', 'actions': [invoke(flat, cap='waitWork')], 'assertions': []}
+        C.conform_case({'caseId': 'T99', 'subcases': [sub]})
+        slots = sub['actions'][0]['request']['slots']
+        self.assertEqual({'workId', 'wait'}, set(slots))
+        self.assertEqual({'reason', 'target', 'resumePredicate', 'verifier', 'nextCheckAt', 'overdueAction'}, set(slots['wait']))
 
     def test_foreign_organization_needs_a_decision(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -201,20 +318,102 @@ class QueryContract(unittest.TestCase):
         self.assertTrue(any('/asOf: UTC instant required' in p for p in problems))
 
 
-class GrantComposition(unittest.TestCase):
-    def fixture(self, scope, **grant):
-        return {'actors': {'reader': {'grant': {'delegatorAlias': 'd', 'actions': [], 'scope': scope, 'validFrom': 'a', 'validUntil': 'b', 'revision': 1, **grant}}}}
+class GrantAuthorization(unittest.TestCase):
+    """Step 2 round 13: one all-of grant per actor, proven against the subcase's reads and commands."""
+    def world(self, scope, actions, roles=None, **fixture):
+        actor = {'organizationAlias': 'ORG', 'roleCapabilities': roles or actions,
+                 'grant': {'delegatorAlias': 'root', 'actions': actions, 'scope': scope, 'validFrom': '2026-10-01T00:00:00Z',
+                           'validUntil': '2026-10-31T00:00:00Z', 'revision': 1}}
+        f = {'fixtureId': 'unit', 'clock': {'asOf': '2026-10-07T09:00:00Z'}, 'actors': {'reader': actor},
+             'aliases': {'ORG': {'type': 'Organization'}, 'P': {'type': 'TradeItem', 'organizationAlias': 'ORG'},
+                         'Q': {'type': 'TradeItem', 'organizationAlias': 'ORG'},
+                         'S': {'type': 'QuantitySegment', 'organizationAlias': 'ORG', 'itemAlias': 'P', 'locationAlias': 'W'},
+                         'W': {'type': 'Place', 'organizationAlias': 'ORG', 'kind': 'INTERNAL_STORAGE'},
+                         'WORK': {'type': 'Work', 'organizationAlias': 'ORG'},
+                         'X': {'type': 'TradeItem', 'organizationAlias': 'ORG-B'}},
+             'baseline': {'work': {'alias': 'WORK', 'ownerAlias': 'reader'}}, **fixture}
+        return f
 
-    def test_multi_dimension_grant_declares_composition(self):
-        two = self.fixture({'itemAliases': ['P'], 'workAliases': ['W']})
-        self.assertTrue(C.fixture_problems('f', two))
-        C.conform_fixture(two)
-        self.assertEqual('PER_DIMENSION', two['actors']['reader']['grant']['scopeComposition'])
-        self.assertEqual([], C.fixture_problems('f', two))
+    def problems(self, fixture, actions, assertions=()):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'fixture.json'
+            path.write_text(json.dumps(fixture))
+            sub = {'id': 's', 'fixtureRef': str(path), 'actions': actions, 'assertions': list(assertions)}
+            return C.grant_problems({'caseId': 'X', 'subcases': [sub]})
 
-    def test_single_dimension_and_empty_lists_need_none(self):
-        self.assertEqual([], C.fixture_problems('f', self.fixture({'itemAliases': ['P'], 'segmentAliases': [], 'caseId': 'X'})))
-        self.assertTrue(C.fixture_problems('f', self.fixture({'itemAliases': ['P']}, scopeComposition='ANY')))
+    def read(self, scope=None, aid='read', cap='getInventory', **request):
+        return query({'scope': scope or {'organizationId': A('ORG'), 'itemId': A('P')}, **request}, cap=cap, aid=aid)
+
+    def test_a_dimension_the_read_does_not_present_refuses_it(self):
+        f = self.world({'itemAliases': ['P'], 'workAliases': ['WORK']}, ['getInventory'])
+        self.assertTrue(any('names WORK' in p for p in self.problems(f, [self.read()])))
+        C.conform_fixture(f)
+        self.assertEqual({'itemAliases': ['P']}, f['actors']['reader']['grant']['scope'])
+        self.assertEqual([], self.problems(f, [self.read()]))
+
+    def test_item_restriction_is_kept_and_checked_by_value(self):
+        f = self.world({'itemAliases': ['P']}, ['getInventory'])
+        problems = self.problems(f, [self.read({'organizationId': A('ORG'), 'itemId': A('Q')})])
+        self.assertTrue(any("ITEM ['Q'] outside the grant" in p for p in problems), problems)
+
+    def test_a_pinned_forbidden_that_the_grant_covers_is_reported(self):
+        f = self.world({'itemAliases': ['P']}, ['getInventory'])
+        pin = {'id': 'code', 'op': 'equals', 'source': {'actionId': 'read', 'pointer': '/response/error/code'}, 'expected': 'FORBIDDEN'}
+        self.assertTrue(any('pinned FORBIDDEN' in p for p in self.problems(f, [self.read()], [pin])))
+        other = self.read({'organizationId': A('ORG'), 'itemId': A('Q')})
+        self.assertEqual([], self.problems(f, [other], [pin]))
+        foreign = self.read({'organizationId': A('ORG'), 'itemId': A('X')})
+        self.assertEqual([], self.problems(self.world({}, ['getInventory']), [foreign], [pin]))
+
+    def test_capability_outside_the_grant_or_revoked_grant_is_uncovered(self):
+        f = self.world({}, ['getInventory'], roles=['getInventory', 'getWork'])
+        problems = self.problems(f, [self.read(cap='getWork', workId=A('WORK'))])
+        self.assertTrue(any('not in its roleCapabilities and grant actions' in p for p in problems), problems)
+        f = self.world({'revokedAt': '2026-10-07T08:00:00Z'}, ['getInventory'])
+        self.assertTrue(any('revoked' in p for p in self.problems(f, [self.read()])))
+
+    def test_item_restriction_drops_when_a_called_capability_presents_no_item(self):
+        f = self.world({'itemAliases': ['P']}, ['getInventory', 'getDefinition'])
+        self.assertEqual({'itemAliases'}, C.kept_scope_keys('unit', 'reader', f['actors']['reader']['grant']) & {'itemAliases'})
+        self.assertTrue(any('names ITEM but TARGET_ID' in p for p in self.problems(f, [self.read(cap='getDefinition', id=A('P'))])))
+
+    def test_item_restriction_drops_when_a_read_names_a_noun_without_item(self):
+        # step2r round 13 run-9d213f5a: getObject of a SalesOrder (Orders row: TARGET, WORK) under an ITEM grant was FORBIDDEN.
+        f = self.world({'itemAliases': ['P']}, ['getObject'])
+        f['aliases']['SALE'] = {'type': 'SalesOrder', 'organizationAlias': 'ORG'}
+        read = query({'id': A('SALE'), 'scope': {'objectType': 'SalesOrder'}}, cap='getObject')
+        self.assertTrue(any('names ITEM' in p for p in self.problems(f, [read])), 'the ITEM grant refuses the order read')
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / 'f.json'
+            path.write_text(json.dumps(f))
+            world = RC.World(ROOT, str(path))
+            self.assertTrue(C.item_less_object(world, 'getObject', read['request'], read))
+            item = query({'id': A('P')}, cap='getObject')
+            self.assertFalse(C.item_less_object(world, 'getObject', item['request'], item))
+
+    def test_a_command_citing_evidence_needs_get_evidence(self):
+        # step2r round 13 run-53e71c0c: T19 recordInvoice FORBIDDEN, TradeEvidence/SettlementCommands authorize getEvidence.
+        f = self.world({}, ['recordInvoice'])
+        f['evidence'] = [{'alias': 'invoice'}]
+        cite = invoke({'intentKind': 'RECORD', 'capabilityId': 'recordInvoice', 'slots': {'evidence': A('invoice')}}, cap='recordInvoice', aid='invoice')
+        applied = {'id': 'applied', 'op': 'equals', 'source': {'actionId': 'invoice', 'pointer': '/response/outcome'}, 'expected': 'APPLIED'}
+        self.assertTrue(any('reads the evidence it cites' in p for p in self.problems(f, [cite], [applied])))
+        self.assertEqual([], self.problems(self.world({}, ['recordInvoice', 'getEvidence']) | {'evidence': [{'alias': 'invoice'}]}, [cite], [applied]))
+
+    def test_retired_composition_and_unrepresented_keys_fail_the_fixture(self):
+        f = self.world({'itemAliases': ['P'], 'customerAliases': ['C']}, ['getInventory'])
+        f['actors']['reader']['grant']['scopeComposition'] = 'PER_DIMENSION'
+        problems = C.fixture_problems('f', f)
+        self.assertTrue(any('scopeComposition is retired' in p for p in problems))
+        self.assertTrue(any('customerAliases has no product grant scope kind' in p for p in problems))
+        C.conform_fixture(f)
+        self.assertEqual([], C.fixture_problems('f', f))
+
+    def test_work_item_survives_the_dropped_work_dimension(self):
+        f = self.world({'itemAliases': ['P'], 'workAliases': ['WORK']}, ['getInventory'])
+        f['aliases']['Q2'] = {'type': 'TradeItem', 'organizationAlias': 'ORG'}
+        C.conform_fixture(f)
+        self.assertEqual('P', f['baseline']['work']['itemAlias'])
 
 
 class RepositoryIsCurrent(unittest.TestCase):
@@ -225,7 +424,7 @@ class RepositoryIsCurrent(unittest.TestCase):
         problems, lines, cases, _ = module.review(ROOT)
         self.assertEqual([], problems)
         self.assertEqual(41, cases)
-        self.assertTrue(all(line.startswith('KNOWN_OPEN PG-') for line in lines))
+        self.assertTrue(all(line.startswith(('KNOWN_OPEN PG-', 'KNOWN_OPEN S2-')) for line in lines))
 
 
 if __name__ == '__main__':

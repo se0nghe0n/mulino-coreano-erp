@@ -6,7 +6,9 @@ Checks every invoke/query action of verification/cases/*/case.json and every fix
   wire tools/call arguments) against contracts/intent.schema.json, one provenance entry per slot, the action's
   capability and the execution idempotency key;
 - queries against the product query envelope (fields, scope keys, filters per operation);
-- fixture grants that name two or more dimension kinds declare scopeComposition;
+- fixture grants keep only the dimension kinds every listed capability presents (one all-of grant per actor), and every
+  read or command a subcase expects to be authorized is covered while every action pinned FORBIDDEN is not
+  (contracts/request-contracts.json grantAuthorization);
 - action.harness.intentionalViolation equals the actual violations and the subcase pins the rejection.
 A violation covered by a contracts/request-contracts.json knownOpen product gap prints one KNOWN_OPEN line per gap and
 case (owner, count, first example) instead of failing; ./verify prepare copies those lines into its report.
@@ -27,12 +29,13 @@ spec.loader.exec_module(RC)
 
 def review(root=ROOT):
     contracts = RC.Contracts(root)
-    problems, known, fixtures = [], collections.OrderedDict(), set()
+    problems, known, fixtures, grant_cache = [], collections.OrderedDict(), set(), {}
     cases = sorted((Path(root) / 'verification/cases').glob('*/case.json'))
     for path in cases:
         case = json.loads(path.read_text())
         p, k = contracts.case_problems(case)
         problems += p
+        problems += contracts.grant_problems(case, grant_cache)
         for line in k:
             gap = line.split('KNOWN_OPEN ', 1)[1].split()[0]
             key = (gap, case['caseId'])
