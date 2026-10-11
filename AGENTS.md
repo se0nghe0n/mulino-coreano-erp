@@ -78,6 +78,15 @@ case fixture의 grant는 이 규칙으로 통과하도록 작성한다. 차원�
 설치(`scopeComposition: PER_DIMENSION`)는 probe 진단에만 쓴다. S4
 backlog의 ManagementCoverage 단일 차원 통과도 all-of로 고친다.
 
+2026-10-11 사용자가 계약 공백 세 가지를 정했다.
+
+1. 명령 slot은 목록을 가질 수 있다. `intent.schema.json`에 상한이 있는
+   배열 값을 공개하고, 제품 handler와 case의 목록 slot은 그대로 둔다.
+2. definition lifecycle package의 계약은 제품이 저장하는 definition
+   형태다. case가 그 형태에 맞춘다.
+3. 제품은 capability별 허용 slot 목록을 공개하고, `./verify prepare`는
+   모든 명령을 그 목록에 대조한다.
+
 2026-10-09 사용자가 review 시점을 바꿨다. Step 2 closure가 정적
 review 8회 동안 매번 새 P1·P2를 찾으며 수렴하지 않았고, 지적 대부분이
 제품에 한 번 실행하면 드러나는 동작 불일치였기 때문이다. 이 결정이
