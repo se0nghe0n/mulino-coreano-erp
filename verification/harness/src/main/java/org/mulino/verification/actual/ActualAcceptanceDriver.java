@@ -246,7 +246,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     /**
      * route=blob query: the product evidence download surface GET /api/evidence/documents/{id}/content (EvidenceDownload),
      * for getEvidence with download=true and an evidenceId. The response is the transport outcome and the content digest;
-     * the bytes stay in the artifact only as their hash.
+     * the received bytes are kept as one run artifact named in response.downloadedArtifacts (path), the receipt keeps the hash.
      */
     private StepResult blobDownload(String id,JsonNode actor,String operation,JsonNode request) {
         if(!operation.equals("getEvidence")||!request.path("download").asBoolean(false)||!request.hasNonNull("evidenceId"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual blob query "+operation+" without download evidenceId");
@@ -256,12 +256,19 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var uri=configuration.baseUri().resolve("/api/evidence/documents/"+document+"/content");String credential=credential(actor);
             var result=http.send(HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(30)).header("Authorization","Bearer "+credential).GET().build(),HttpResponse.BodyHandlers.ofByteArray());
             var response=Json.object();response.put("httpStatus",result.statusCode());
-            if(result.statusCode()==200){response.put("sha256",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(result.body()))).put("sizeBytes",result.body().length);}
+            String saved=null;
+            if(result.statusCode()==200){response.put("sha256",java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(result.body()))).put("sizeBytes",result.body().length);
+                // The received bytes as a run artifact, so a host inspection (T24 inspectArtifacts) can hash the actual download.
+                saved="verification/harness/target/evidence/actual/"+run+"/download-"+UUID.randomUUID()+".bin";java.nio.file.Files.createDirectories(root.resolve(saved).getParent());java.nio.file.Files.write(root.resolve(saved),result.body());
+                response.putArray("downloadedArtifacts").add(Json.object().put("path",saved));}
             else{JsonNode body=parseOrText(new String(result.body(),java.nio.charset.StandardCharsets.UTF_8));response.set("body",body);if(body.has("error"))response.set("error",body.path("error"));if(body.has("outcome"))response.set("outcome",body.path("outcome"));}
             var headers=response.putObject("headers");for(String h:List.of("content-type","cache-control","content-disposition","x-content-type-options"))result.headers().firstValue(h).ifPresent(v->headers.put(h,v));
             var receipt=Json.object();receipt.put("method","GET").put("path",uri.getPath()).put("route","blob").put("httpStatus",result.statusCode());receipt.set("request",request);receipt.set("response",response);
             var identity=Json.object().put("issuer",configuration.issuer()).put("subject",Json.required(actor,"subject")).put("organizationAlias",Json.required(actor,"organizationAlias"));
-            return executed(id,Json.object().put("httpStatus",result.statusCode()).put("route","blob"),response,provenance(identity,"HTTP_BLOB_DOWNLOAD",false,null,null),receipt);
+            var step=executed(id,Json.object().put("httpStatus",result.statusCode()).put("route","blob"),response,provenance(identity,"HTTP_BLOB_DOWNLOAD",false,null,null),receipt);
+            if(saved==null)return step;
+            var refs=new ArrayList<>(step.artifactRefs());refs.add(saved);
+            return new StepResult(id,StepResult.DriverStatus.EXECUTED,step.data(),step.response(),null,step.provenance(),refs);
         } catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Actual blob interrupted",interrupted);}
         catch(Exception failure){throw new IllegalStateException("Actual blob environment/response failure",failure);}
     }
