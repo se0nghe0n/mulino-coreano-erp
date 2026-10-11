@@ -9,6 +9,17 @@
         "handoverId"
       ]
     },
+    "activateDefinition": {
+      "slots": [
+        "definitionId",
+        "effectiveAt",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. Moves the organization's single ACTIVE pointer to a PUBLISHED, not retired package (also a rollback to a prior package).",
+      "response": {
+        "state": "ACTIVE"
+      }
+    },
     "activatePolicy": {
       "slots": [
         "id"
@@ -30,6 +41,26 @@
         "stocktakeId",
         "unit"
       ]
+    },
+    "approveDefinition": {
+      "slots": [
+        "affectedWorkIds",
+        "consumptionPolicy",
+        "decision",
+        "definitionId",
+        "goalChanges",
+        "hash",
+        "reason",
+        "reviewId",
+        "reviewKind",
+        "validFrom",
+        "validUntil"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. A human other than the drafter and the submitter decides APPROVED or REJECTED (reason required); REJECTED returns the package to DRAFT. consumptionPolicy ONE_PACKAGE_PUBLISH (DEFINITION) or ONE_MIGRATION (WORK_MIGRATION).",
+      "response": {
+        "approvalId": "approval ID",
+        "decision": "APPROVED|REJECTED"
+      }
     },
     "approvePolicy": {
       "slots": [
@@ -217,6 +248,24 @@
         ]
       },
       "note": "evidenceType selects the form (default EVENT)"
+    },
+    "createDefinitionDraft": {
+      "slots": [
+        "definitionId",
+        "package",
+        "parentDefinitionId",
+        "parentDraftRevision",
+        "regressionFixtureRefs",
+        "version"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. A new draft names package (+ version, parentDefinitionId, regressionFixtureRefs); a revised draft names definitionId and parentDraftRevision (= the lifecycle revision) and keeps the version. organizationId is optional, id/state/contentHash are server-assigned, unknown fields are TYPE_INVALID.",
+      "response": {
+        "definitionId": "package ID",
+        "hash": "SHA-256 of the stored content",
+        "revision": "lifecycle revision (expectedRevision of the next lifecycle command)",
+        "state": "DRAFT|IN_REVIEW|PUBLISHED|ACTIVE|RETIRED_FOR_NEW_WORK",
+        "version": "package version"
+      }
     },
     "createDraft": {
       "slots": [
@@ -710,6 +759,18 @@
         "unit"
       ]
     },
+    "publishDefinition": {
+      "slots": [
+        "approvalId",
+        "definitionId",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. IN_REVIEW→PUBLISHED with a current unconsumed APPROVED approval of the hash; without one WAITING_APPROVAL. Published content cannot be resubmitted (no package slot).",
+      "response": {
+        "hash": "unchanged package hash",
+        "approvalId": "consumed approval"
+      }
+    },
     "receiveProvisional": {
       "slots": [
         "eventId",
@@ -1192,6 +1253,16 @@
         "workId"
       ]
     },
+    "retireDefinition": {
+      "slots": [
+        "definitionId",
+        "reason"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. RETIRED_FOR_NEW_WORK: no new Work may pin it; the ACTIVE pointer to it is removed; existing Work keeps its pinned meaning.",
+      "response": {
+        "state": "RETIRED_FOR_NEW_WORK"
+      }
+    },
     "retirePolicy": {
       "slots": [
         "id",
@@ -1278,6 +1349,25 @@
         "effects.segmentIds": "the same child segment IDs in quantity order"
       }
     },
+    "submitDefinitionReview": {
+      "slots": [
+        "affectedDataIds",
+        "affectedWorkIds",
+        "definitionId",
+        "hash",
+        "mapping",
+        "migrationId",
+        "regressionRunIds",
+        "reviewKind",
+        "unsupportedValues",
+        "validationId"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. reviewKind DEFINITION (default; DRAFT→IN_REVIEW, needs a publishable validationId of the same hash) or WORK_MIGRATION (on a PUBLISHED package; migrationId, affectedWorkIds, mapping).",
+      "response": {
+        "reviewId": "review ID",
+        "data": "review payload"
+      }
+    },
     "transferObligation": {
       "slots": [
         "assignmentId",
@@ -1289,6 +1379,19 @@
         "targetWorkId",
         "workId"
       ]
+    },
+    "validateDefinition": {
+      "slots": [
+        "definitionId",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. Records a validation; APPLIED even when not publishable.",
+      "response": {
+        "validationId": "validation ID",
+        "publishable": "boolean",
+        "regressionRunIds": "[] (regression NOT_RUN, deferred)",
+        "data": "{validationId, publishable, outcome, problems[{path,code}], diffClasses[], regression{fixtureRefs,status}}"
+      }
     },
     "verifyLabel": {
       "slots": [

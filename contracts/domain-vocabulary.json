@@ -265,6 +265,38 @@
       "extension": "§4.3 동일성 미확인은 자동 합산하지 않음"
     },
     {
+      "code": "DEFINITION_APPROVAL_REQUIRED",
+      "outcomes": [
+        "WAITING_APPROVAL"
+      ],
+      "meaning": "같은 hash의 현재 유효한 승인 없이 정의를 발행하려 했다",
+      "extension": "§8 정의 사전 발행·버전 전환"
+    },
+    {
+      "code": "DEFINITION_HASH_CHANGED",
+      "outcomes": [
+        "CONFLICT"
+      ],
+      "meaning": "요청한 정의 package hash가 현재 revision과 다르다",
+      "extension": "§8 정의 사전 발행·버전 전환"
+    },
+    {
+      "code": "DEFINITION_NOT_PUBLISHABLE",
+      "outcomes": [
+        "REJECTED"
+      ],
+      "meaning": "발행 검사를 통과하지 않은 정의 package다",
+      "extension": "§8 정의 사전 발행·버전 전환"
+    },
+    {
+      "code": "DEFINITION_RETIRED",
+      "outcomes": [
+        "HELD"
+      ],
+      "meaning": "신규 업무에서 퇴역한 정의다",
+      "extension": "§8 정의 사전 발행·버전 전환"
+    },
+    {
       "code": "DELIVERY_UNMATCHED",
       "outcomes": [
         "HELD"

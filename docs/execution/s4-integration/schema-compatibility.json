@@ -12,6 +12,18 @@
     "mulino_commands_commandaudits.createdat",
     "mulino_commands_commandrecords.completedat",
     "mulino_commands_commandrecords.createdat",
+    "mulino_definitions_activedefinitionpointers.effectiveat",
+    "mulino_definitions_activedefinitionpointers.recordedat",
+    "mulino_definitions_definitionapprovals.consumedat",
+    "mulino_definitions_definitionapprovals.recordedat",
+    "mulino_definitions_definitionapprovals.validfrom",
+    "mulino_definitions_definitionapprovals.validuntil",
+    "mulino_definitions_definitionlifecycles.createdat",
+    "mulino_definitions_definitionlifecycles.recordedat",
+    "mulino_definitions_definitionretirements.retiredat",
+    "mulino_definitions_definitionreviews.recordedat",
+    "mulino_definitions_definitionvalidations.recordedat",
+    "mulino_definitions_workdefinitionmigrations.recordedat",
     "mulino_evaluation_inputsnapshots.asof",
     "mulino_evaluation_inputsnapshots.knownat",
     "mulino_evaluation_inputsnapshots.recordedat",
@@ -342,6 +354,7 @@
     "mulino_work_read_subjectlinks.recordedat",
     "mulino_work_read_works.createdat",
     "mulino_work_read_works.effectiveat",
+    "mulino_work_read_works.nextcheckat",
     "mulino_work_read_works.recordedat",
     "mulino_work_workcontributions.recordedat",
     "mulino_work_worklinks.createdat",
@@ -1028,7 +1041,6 @@
     "mulino_trade_sales_observations.unit",
     "mulino_trade_sales_observations.workid",
     "mulino_trade_sales_orderlines.createdat",
-    "mulino_trade_sales_orderlines.currency",
     "mulino_trade_sales_orderlines.customerid",
     "mulino_trade_sales_orderlines.deliveryendpoint",
     "mulino_trade_sales_orderlines.destinationid",
@@ -1037,7 +1049,6 @@
     "mulino_trade_sales_orderlines.itemid",
     "mulino_trade_sales_orderlines.orderid",
     "mulino_trade_sales_orderlines.packageterms",
-    "mulino_trade_sales_orderlines.price",
     "mulino_trade_sales_orderlines.qualityterms",
     "mulino_trade_sales_orderlines.quantity",
     "mulino_trade_sales_orderlines.recordedat",
@@ -1138,9 +1149,9 @@
     "mulino_trade_shipment_shipments.state"
   ],
   "baseline": "2e1d90cc",
-  "observedColumnCount": 1867,
-  "observedArtifactSha256": "b6ba67bd0153223c2e8e2164de2a77c5942e94614746afdf6df1fae2f5315c54",
-  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions",
+  "observedColumnCount": 1938,
+  "observedArtifactSha256": "488b02a3337abe4ffe62c7eccf3f944f4297ba484cb532868872d4dd421b3672",
+  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -4738,7 +4749,8 @@
     "mulino_trade_sales_orderlines.currency": {
       "migration": "database/migrations/V23__sales_and_delivery.sql",
       "cds": "backend/db/sales.cds",
-      "notNullStrengtheningReason": "S4 조직별 확정 관계와 실물·금액·증거의 필수 값을 명시적으로 유지한다."
+      "notNullStrengtheningReason": "S4 조직별 확정 관계와 실물·금액·증거의 필수 값을 명시적으로 유지한다.",
+      "nullableReason": "UD-1(2026-10-11): 판매 가격은 선택 입력이다. V33이 NOT NULL을 풀고 price·currency 동시 존재 CHECK를 둔다."
     },
     "mulino_trade_sales_orderlines.customerid": {
       "migration": "database/migrations/V23__sales_and_delivery.sql",
@@ -4798,7 +4810,8 @@
     "mulino_trade_sales_orderlines.price": {
       "migration": "database/migrations/V23__sales_and_delivery.sql",
       "cds": "backend/db/sales.cds",
-      "notNullStrengtheningReason": "S4 조직별 확정 관계와 실물·금액·증거의 필수 값을 명시적으로 유지한다."
+      "notNullStrengtheningReason": "S4 조직별 확정 관계와 실물·금액·증거의 필수 값을 명시적으로 유지한다.",
+      "nullableReason": "UD-1(2026-10-11): 판매 가격은 선택 입력이다. V33이 NOT NULL을 풀고 price·currency 동시 존재 CHECK를 둔다."
     },
     "mulino_trade_sales_orderlines.qualityterms": {
       "migration": "database/migrations/V23__sales_and_delivery.sql",
@@ -5479,6 +5492,374 @@
       "migration": "database/migrations/V30__delivery_legitimate_ranges.sql",
       "cds": "backend/db/sales.cds",
       "nullableReason": "확정 인도의 정당한 실물 좌표를 불변 JSON 배열로 보존해 인도 정정이 정확한 범위를 교차하게 한다. V30 이전 행과 다른 모듈의 직접 fixture에는 좌표가 없어 nullable이며 없으면 보수적 하한을 쓴다(s4-sales-05)."
+    },
+    "mulino_definitions_activedefinitionpointers.actorid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.effectiveat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.hash": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.recordedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.revision": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_activedefinitionpointers.version": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.approverid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.consumedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.consumedby": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.consumptionpolicy": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.decision": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.goalchangesjson": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.hash": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.id": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.reason": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.recordedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.reviewid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.reviewkind": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.validfrom": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionapprovals.validuntil": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.createdat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.createdby": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.recordedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.regressionfixturerefs": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionlifecycles.revision": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionretirements.actorid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionretirements.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionretirements.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionretirements.reason": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionretirements.retiredat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.actorid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.hash": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.id": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.migrationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.payloadjson": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.recordedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.reviewkind": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionreviews.validationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.actorid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.diffclassesjson": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.hash": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.id": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.outcome": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.problemsjson": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.publishable": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.recordedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_definitionvalidations.regressionjson": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.actorid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.approvalid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.definitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.goalversionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.id": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.migrationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.organizationid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.previousdefinitionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.previousgoalversionid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.reason": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.recordedat": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_definitions_workdefinitionmigrations.workid": {
+      "migration": "database/migrations/V35__definition_lifecycle.sql",
+      "cds": "backend/db/definitions.cds",
+      "reason": "s5e 추가: 계획 §8 정의 package lifecycle(검증·검토·승인·ACTIVE pointer·퇴역·업무 전환)"
+    },
+    "mulino_work_read_works.nextaction": {
+      "migration": "database/migrations/V34__work_initial_duty.sql",
+      "cds": "backend/db/work-read.cds",
+      "reason": "s5e 추가: UD-2 Work 생성 시 첫 다음 행동"
+    },
+    "mulino_work_read_works.nextcheckat": {
+      "migration": "database/migrations/V34__work_initial_duty.sql",
+      "cds": "backend/db/work-read.cds",
+      "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
+      "reason": "s5e 추가: UD-2 Work 생성 시 첫 다음 행동"
     }
   },
   "exactColumnInventory": [
@@ -5529,6 +5910,14 @@
     "mulino_commands_commandrecords.resultjson",
     "mulino_commands_commandrecords.stablerequestowner",
     "mulino_commands_commandrecords.state",
+    "mulino_definitions_activedefinitionpointers.actorid",
+    "mulino_definitions_activedefinitionpointers.definitionid",
+    "mulino_definitions_activedefinitionpointers.effectiveat",
+    "mulino_definitions_activedefinitionpointers.hash",
+    "mulino_definitions_activedefinitionpointers.organizationid",
+    "mulino_definitions_activedefinitionpointers.recordedat",
+    "mulino_definitions_activedefinitionpointers.revision",
+    "mulino_definitions_activedefinitionpointers.version",
     "mulino_definitions_attributedefinitions.core",
     "mulino_definitions_attributedefinitions.createdat",
     "mulino_definitions_attributedefinitions.decimalplaces",
@@ -5555,6 +5944,55 @@
     "mulino_definitions_capabilitycontracts.revision",
     "mulino_definitions_capabilitycontracts.semanticversion",
     "mulino_definitions_capabilitycontracts.supportedworkmigration",
+    "mulino_definitions_definitionapprovals.approverid",
+    "mulino_definitions_definitionapprovals.consumedat",
+    "mulino_definitions_definitionapprovals.consumedby",
+    "mulino_definitions_definitionapprovals.consumptionpolicy",
+    "mulino_definitions_definitionapprovals.decision",
+    "mulino_definitions_definitionapprovals.definitionid",
+    "mulino_definitions_definitionapprovals.goalchangesjson",
+    "mulino_definitions_definitionapprovals.hash",
+    "mulino_definitions_definitionapprovals.id",
+    "mulino_definitions_definitionapprovals.organizationid",
+    "mulino_definitions_definitionapprovals.reason",
+    "mulino_definitions_definitionapprovals.recordedat",
+    "mulino_definitions_definitionapprovals.reviewid",
+    "mulino_definitions_definitionapprovals.reviewkind",
+    "mulino_definitions_definitionapprovals.validfrom",
+    "mulino_definitions_definitionapprovals.validuntil",
+    "mulino_definitions_definitionlifecycles.createdat",
+    "mulino_definitions_definitionlifecycles.createdby",
+    "mulino_definitions_definitionlifecycles.definitionid",
+    "mulino_definitions_definitionlifecycles.organizationid",
+    "mulino_definitions_definitionlifecycles.recordedat",
+    "mulino_definitions_definitionlifecycles.regressionfixturerefs",
+    "mulino_definitions_definitionlifecycles.revision",
+    "mulino_definitions_definitionretirements.actorid",
+    "mulino_definitions_definitionretirements.definitionid",
+    "mulino_definitions_definitionretirements.organizationid",
+    "mulino_definitions_definitionretirements.reason",
+    "mulino_definitions_definitionretirements.retiredat",
+    "mulino_definitions_definitionreviews.actorid",
+    "mulino_definitions_definitionreviews.definitionid",
+    "mulino_definitions_definitionreviews.hash",
+    "mulino_definitions_definitionreviews.id",
+    "mulino_definitions_definitionreviews.migrationid",
+    "mulino_definitions_definitionreviews.organizationid",
+    "mulino_definitions_definitionreviews.payloadjson",
+    "mulino_definitions_definitionreviews.recordedat",
+    "mulino_definitions_definitionreviews.reviewkind",
+    "mulino_definitions_definitionreviews.validationid",
+    "mulino_definitions_definitionvalidations.actorid",
+    "mulino_definitions_definitionvalidations.definitionid",
+    "mulino_definitions_definitionvalidations.diffclassesjson",
+    "mulino_definitions_definitionvalidations.hash",
+    "mulino_definitions_definitionvalidations.id",
+    "mulino_definitions_definitionvalidations.organizationid",
+    "mulino_definitions_definitionvalidations.outcome",
+    "mulino_definitions_definitionvalidations.problemsjson",
+    "mulino_definitions_definitionvalidations.publishable",
+    "mulino_definitions_definitionvalidations.recordedat",
+    "mulino_definitions_definitionvalidations.regressionjson",
     "mulino_definitions_definitionversions.content",
     "mulino_definitions_definitionversions.contenthash",
     "mulino_definitions_definitionversions.createdat",
@@ -5604,6 +6042,18 @@
     "mulino_definitions_verbdefinitions.revision",
     "mulino_definitions_verbdefinitions.slots",
     "mulino_definitions_verbdefinitions.stage",
+    "mulino_definitions_workdefinitionmigrations.actorid",
+    "mulino_definitions_workdefinitionmigrations.approvalid",
+    "mulino_definitions_workdefinitionmigrations.definitionid",
+    "mulino_definitions_workdefinitionmigrations.goalversionid",
+    "mulino_definitions_workdefinitionmigrations.id",
+    "mulino_definitions_workdefinitionmigrations.migrationid",
+    "mulino_definitions_workdefinitionmigrations.organizationid",
+    "mulino_definitions_workdefinitionmigrations.previousdefinitionid",
+    "mulino_definitions_workdefinitionmigrations.previousgoalversionid",
+    "mulino_definitions_workdefinitionmigrations.reason",
+    "mulino_definitions_workdefinitionmigrations.recordedat",
+    "mulino_definitions_workdefinitionmigrations.workid",
     "mulino_evaluation_inputsnapshots.asof",
     "mulino_evaluation_inputsnapshots.assessmentid",
     "mulino_evaluation_inputsnapshots.contenthash",
@@ -7311,6 +7761,8 @@
     "mulino_work_read_works.kind",
     "mulino_work_read_works.lifecyclemode",
     "mulino_work_read_works.lotid",
+    "mulino_work_read_works.nextaction",
+    "mulino_work_read_works.nextcheckat",
     "mulino_work_read_works.organizationid",
     "mulino_work_read_works.originaltext",
     "mulino_work_read_works.ownerid",

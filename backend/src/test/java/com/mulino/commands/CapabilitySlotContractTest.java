@@ -16,7 +16,7 @@ class CapabilitySlotContractTest {
   @Test void packagedRegistryIsThePublishedContractFile() throws Exception {
     byte[] published=Files.readAllBytes(Path.of("../contracts/capability-slots.json"));
     try(var in=CapabilitySlots.class.getClassLoader().getResourceAsStream(CapabilitySlots.RESOURCE)){assertNotNull(in);assertArrayEquals(published,in.readAllBytes());}
-    assertEquals(90,CapabilitySlots.capabilities().size());
+    assertEquals(97,CapabilitySlots.capabilities().size());
     assertTrue(CapabilitySlots.allowed("splitQuantity").containsAll(Set.of("segmentId","quantities","unit")));
     assertTrue(CapabilitySlots.allowed("createWork").containsAll(CapabilitySlots.form("createWork","public")));
     assertEquals(Set.of("observationId","canonicalOccurrenceId"),CapabilitySlots.form("recordDelivery","confirmation"));
