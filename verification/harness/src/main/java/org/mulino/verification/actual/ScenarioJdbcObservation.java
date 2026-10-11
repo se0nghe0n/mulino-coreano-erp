@@ -186,6 +186,7 @@ final class ScenarioJdbcObservation {
         COLUMNS.put(table,out);return out;
     }
     /** Observation conveniences computed only from the same transaction's rows; never from the product API. */
+    static final String NO_COMMAND_RECORD="NO_COMMAND_RECORD";
     private static void derive(Connection c,String table,ArrayNode rows,Map<String,JsonNode> commands) throws SQLException {
         Map<String,JsonNode> roots=new HashMap<>();
         for(JsonNode n:rows) {
@@ -195,6 +196,10 @@ final class ScenarioJdbcObservation {
                 JsonNode cmd=commands.computeIfAbsent(commandId,id->command(c,id));
                 if(cmd!=null){row.set("commandIdempotencyKey",cmd.path("commandIdempotencyKey"));if(!row.has("capabilityId"))row.set("capabilityId",cmd.path("capabilityId"));if(!row.has("stableRequestOwnerId"))row.set("stableRequestOwnerId",cmd.path("stableRequestOwner"));}
             }
+            // A row of a command-attributed table that no CommandRecord produced (fixture-installed opening balance,
+            // installer allocation) was made by no command: it carries the explicit NO_COMMAND_RECORD key, which equals
+            // no case idempotency key, instead of a missing field (round 13: 59 "filter field missing" failures).
+            if(row.has("commandId")&&!row.has("commandIdempotencyKey"))row.put("commandIdempotencyKey",NO_COMMAND_RECORD);
             switch(table) {
                 case "mulino_inventory_QuantitySegments" -> {row.put("active",row.path("retiredAt").isNull()||row.path("retiredAt").isMissingNode());row.set("locationId",row.path("placeId"));row.set("physicalScope",row.path("controlScope"));}
                 case "mulino_commands_CommandRecords" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));row.set("status",row.path("state"));}
