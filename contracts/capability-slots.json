@@ -2,7 +2,7 @@
   "$id": "urn:mulino:capability-slots:1",
   "recordType": "CAPABILITY_SLOT_CONTRACT",
   "schemaVersion": "1.0.0",
-  "description": "User decision 2026-10-11 (3): the product publishes the slot names each command capability accepts. The backend loads this file (CapabilitySlots) and the command pipeline rejects any other slot name with TYPE_INVALID before the handler; handlers that distinguish forms read their form from the same file. ./verify prepare checks every case command against it. Value shapes are contracts/intent.schema.json; names here are wire names.",
+  "description": "User decision 2026-10-11 (3): the product publishes the slot names each command capability accepts. The backend loads this file (CapabilitySlots) and the command pipeline rejects any other slot name with TYPE_INVALID before the handler; handlers that distinguish forms read their form from the same file. ./verify prepare checks every case command against it. Value shapes are contracts/intent.schema.json; names here are wire names. A capability may also state its response fields (response); those are documentation of the product response, not request slots.",
   "capabilities": {
     "acceptHandover": {
       "slots": [
@@ -1271,7 +1271,12 @@
         "quantities",
         "segmentId",
         "unit"
-      ]
+      ],
+      "note": "UD-3 (2026-10-11): children carry no name slot; quantities is the ordered list of child quantities (decision 1 array slot, 2..100).",
+      "response": {
+        "children": "array in request order of {index, segmentId, quantity, unit}; index is the 0-based position in quantities. A later action reads child i as /response/children/<i>/segmentId (RFC6901 index pointer)",
+        "effects.segmentIds": "the same child segment IDs in quantity order"
+      }
     },
     "transferObligation": {
       "slots": [
