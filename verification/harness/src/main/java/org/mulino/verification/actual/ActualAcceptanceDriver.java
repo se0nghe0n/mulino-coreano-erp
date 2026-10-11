@@ -25,13 +25,14 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private volatile JsonNode controlActor;
     private final FixtureInstaller fixtures;
     private final HostProcessControls hostControls;
+    private final SchedulerHostControls schedulerControls;
     private final JdbcObservation observer;
     public ActualAcceptanceDriver(Path root,ActualConfiguration configuration) {
         this.root=root;this.configuration=configuration;signer=new JwtSigner(configuration);
-        fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);hostControls=new HostProcessControls(root,run);
+        fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);hostControls=new HostProcessControls(root,run);schedulerControls=new SchedulerHostControls(root,run);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","blob","clock","barrier","host","coverage","fixture","db"):Set.of("api","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","blob","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
         if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;}
@@ -290,6 +291,13 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Host control interrupted",interrupted);}
             catch(java.io.IOException failure){throw new IllegalStateException("Host control environment failure",failure);}
         }
+        if(suiteIsolation&&request.path("type").asText().equals("process")&&SchedulerHostControls.OPERATIONS.contains(request.path("operation").asText())) {
+            if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
+            try{return schedulerControls.control(id,request,configuration.baseUri().toString(),signer.sign(controlActor),()->provenance(null,"ACTUAL_HOST_PROCESS",true,null,null));}
+            catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Scheduler control interrupted",interrupted);}
+            catch(java.io.IOException failure){throw new IllegalStateException("Scheduler control environment failure",failure);}
+        }
+        if(suiteIsolation&&request.path("type").asText().equals("externalResponder"))return responderControl(id,request);
         if(suiteIsolation&&request.path("type").asText().equals("fault")&&Set.of("arm","inject","install","disarm","remove").contains(request.path("operation").asText()))return faultControl(id,request);
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
             return StepResult.missing(id,"NOT_IMPLEMENTED: actual "+request.path("type").asText()+"/"+request.path("operation").asText()+" host control absent");
@@ -344,6 +352,81 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
      * commandIdempotencyKey, occurrences/times/once, fault/failure); nothing else is sent. A point the product pipeline
      * does not report stays NOT_IMPLEMENTED with its name instead of being armed and never firing.
      */
+    /**
+     * externalResponder control on the verification-profile synthetic receiver (backend VerificationResponder), the external
+     * system the verification scheduler's delivery tick talks to. configure/setResponse/loseResponse/commitThenLoseResponse
+     * set how it answers; inspectRequests/queryOperation/queryStatus read back what it received. Authored names map to the
+     * responder fields below; descriptive parameters (receiver, profile, effect class) are kept in the receipt, and any
+     * behaviour the receiver cannot play (a notification channel, a queue acknowledgement) stays NOT_IMPLEMENTED.
+     * queryOperation/queryStatus materialize the receiver's own answer for one externalOperationId as a receipt document.
+     */
+    private StepResult responderControl(String id,JsonNode request) {
+        if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
+        String operation=request.path("operation").asText();JsonNode p=request.path("parameters");
+        try {
+            if(Set.of("configure","setResponse","loseResponse","commitThenLoseResponse").contains(operation)) {
+                if(p.has("channel"))return StepResult.missing(id,"NOT_IMPLEMENTED: externalResponder channel "+p.path("channel").asText()+": the product has no notification delivery channel, only the transactional outbox");
+                String mode;
+                if(operation.equals("commitThenLoseResponse"))mode="ACCEPT_THEN_DROP_RESPONSE";
+                else if(operation.equals("loseResponse")){if(!"AFTER_EXTERNAL_EFFECT".equals(p.path("when").asText("AFTER_EXTERNAL_EFFECT")))return StepResult.missing(id,"NOT_IMPLEMENTED: externalResponder loseResponse when="+p.path("when").asText());mode="ACCEPT_THEN_DROP_RESPONSE";}
+                else if(p.hasNonNull("behavior")||p.hasNonNull("responseMode"))mode=p.hasNonNull("behavior")?p.path("behavior").asText():p.path("responseMode").asText();
+                else if(p.path("response").isObject())mode=p.path("response").path("delivered").asBoolean(false)||"DELIVERED".equals(p.path("response").path("status").asText())?"CONFIRMED_SUCCESS":"CONFIRMED_FAILURE";
+                else return StepResult.missing(id,"NOT_IMPLEMENTED: externalResponder "+operation+" without a response mode");
+                if(!Set.of("CONFIRMED_SUCCESS","CONFIRMED_FAILURE","ACCEPT_THEN_DROP_RESPONSE","TIMEOUT_BEFORE_EFFECT").contains(mode))
+                    return StepResult.missing(id,"NOT_IMPLEMENTED: externalResponder mode "+mode+": the synthetic outbox receiver answers CONFIRMED_SUCCESS, CONFIRMED_FAILURE, ACCEPT_THEN_DROP_RESPONSE or TIMEOUT_BEFORE_EFFECT");
+                var body=Json.object();body.put("mode",mode);
+                String organization=p.path("scope").path("organizationId").asText("");if(organization.matches("[0-9a-f-]{36}"))body.put("organizationId",organization);
+                String external=p.hasNonNull("externalOperationId")?p.path("externalOperationId").asText():p.hasNonNull("operationId")?p.path("operationId").asText():null;if(external!=null)body.put("externalOperationId",external);
+                if(p.hasNonNull("capabilityId"))body.put("operation",p.path("capabilityId").asText());
+                for(String k:List.of("idempotencySupported","supportsIdempotency"))if(p.path(k).isBoolean())body.put("idempotencySupported",p.path(k).asBoolean());
+                for(String k:List.of("lookupSupported","statusQuerySupported"))if(p.path(k).isBoolean())body.put("lookupSupported",p.path(k).asBoolean());
+                if("ACTUAL_REPLY".equals(p.path("statusQueryMode").asText()))body.put("lookupSupported",true);
+                if(p.hasNonNull("remoteResultId"))body.put("remoteResultId",p.path("remoteResultId").asText());
+                var applied=Set.of("behavior","responseMode","response","externalOperationId","operationId","capabilityId","idempotencySupported","supportsIdempotency","lookupSupported","statusQuerySupported","statusQueryMode","remoteResultId","when");
+                var descriptive=Json.array();p.fieldNames().forEachRemaining(k->{if(!applied.contains(k))descriptive.add(k);});
+                return responderCall(id,request,"POST","/__verification/runtime/responder",body,descriptive,null);
+            }
+            if(Set.of("inspectRequests","queryOperation","queryStatus").contains(operation)) {
+                String external=p.hasNonNull("externalOperationId")?p.path("externalOperationId").asText():null;
+                if(!operation.equals("inspectRequests")&&external==null)return StepResult.missing(id,"NOT_IMPLEMENTED: externalResponder "+operation+" without externalOperationId");
+                String path="/__verification/runtime/responder/requests"+(external==null?"":"?externalOperationId="+java.net.URLEncoder.encode(external,java.nio.charset.StandardCharsets.UTF_8));
+                return responderCall(id,request,"GET",path,null,Json.array(),operation.equals("inspectRequests")?null:external);
+            }
+            return StepResult.missing(id,"NOT_IMPLEMENTED: actual externalResponder/"+operation+" host control absent");
+        }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Responder control interrupted",failure);}
+        catch(Exception failure){throw new IllegalStateException("Responder control environment/response failure",failure);}
+    }
+    private StepResult responderCall(String id,JsonNode request,String method,String path,ObjectNode body,com.fasterxml.jackson.databind.node.ArrayNode descriptive,String queried) throws Exception {
+        var uri=configuration.baseUri().resolve(path);
+        var builder=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(10)).header("Authorization","Bearer "+signer.sign(controlActor));
+        var call=body==null?builder.GET().build():builder.header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
+        var result=http.send(call,HttpResponse.BodyHandlers.ofString());
+        if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification responder profile not installed");
+        var response=Json.parse(result.body());
+        if(result.statusCode()==422)return StepResult.missing(id,"NOT_IMPLEMENTED: synthetic responder refused: "+response.path("reason").asText());
+        if(result.statusCode()!=200)throw new IllegalStateException("Responder control HTTP "+result.statusCode());
+        var data=Json.object();data.put("acknowledged",true).put("controlType","externalResponder").put("operation",request.path("operation").asText()).put("acknowledgedAt",Instant.now().toString());
+        var refs=new ArrayList<String>();
+        if(body!=null){data.set("configuration",response);}
+        else {
+            data.set("requests",response.path("requests"));
+            if(queried!=null) {
+                boolean applied=false,received=false;String remote=null;
+                for(JsonNode r:response.path("requests")){received=true;if(r.path("effectApplied").asBoolean(false)){applied=true;if(r.hasNonNull("remoteResultId"))remote=r.path("remoteResultId").asText();}}
+                String outcome=applied?"CONFIRMED_SUCCESS":received?"CONFIRMED_FAILURE":"NOT_RECEIVED";
+                var receipt=Json.object();receipt.put("recordType","SYNTHETIC_RESPONDER_RECEIPT").put("externalOperationId",queried).put("result",outcome);if(remote!=null)receipt.put("remoteResultId",remote);receipt.set("requests",response.path("requests"));receipt.put("observedAt",response.path("observedAt").asText());
+                String receiptRef="verification/harness/target/evidence/actual/"+run+"/responder-receipt-"+UUID.randomUUID()+".json";Json.write(root.resolve(receiptRef),receipt);refs.add(receiptRef);
+                String hash=Json.sha256(root.resolve(receiptRef));
+                data.put("externalOperationId",queried).put("result",outcome).put("receiptArtifact",receiptRef).put("receiptHash",hash).put("documentUri",receiptRef).put("evidenceHash",hash);
+                if(remote!=null)data.put("remoteResultId",remote);
+            }
+        }
+        var receipt=Json.object();receipt.put("httpStatus",result.statusCode()).put("method",method).put("path",uri.getPath());receipt.set("requestedControl",request);if(body!=null)receipt.set("wireRequest",body);receipt.set("descriptiveParameters",descriptive);receipt.set("serverResponse",response);
+        var step=executed(id,data,response,provenance(null,"HTTP_VERIFICATION_RESPONDER",false,null,null),receipt);
+        if(refs.isEmpty())return step;
+        refs.addAll(step.artifactRefs());
+        return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,response,null,step.provenance(),refs);
+    }
     private StepResult faultControl(String id,JsonNode request) {
         if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
         JsonNode p=request.path("parameters");String operation=request.path("operation").asText();
