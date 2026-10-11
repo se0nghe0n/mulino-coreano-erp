@@ -27,15 +27,20 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private final HostProcessControls hostControls;
     private final SchedulerHostControls schedulerControls;
     private final JdbcObservation observer;
+    private final BackendProcessControls processes;
+    /** Last instant this harness set on the verification clock; re-applied after a process start (test infrastructure). */
+    private volatile String lastClock;
     public ActualAcceptanceDriver(Path root,ActualConfiguration configuration) {
         this.root=root;this.configuration=configuration;signer=new JwtSigner(configuration);
         fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);hostControls=new HostProcessControls(root,run);schedulerControls=new SchedulerHostControls(root,run);
+        processes=new BackendProcessControls(root,run,configuration.baseUri(),System.getenv());
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
     @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","blob","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
-        if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;}
+        if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;lastClock=null;
+            try{processes.ensureRunning();}catch(Exception failure){throw new IllegalStateException("Backend restart before fixture failed",failure);}}
         try {var bound=ActualFixtureBindings.bind(root,bundle,configuration);
             // Suite isolation: each installed fixture is a fresh synthetic organization with its own external alias,
             // because one disposable database serves every subcase. The authored alias key stays the contract.
@@ -73,6 +78,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         if(result.statusCode()!=200)throw new IllegalStateException("Fixture-start clock HTTP "+result.statusCode());
         var response=Json.parse(result.body());
         if(!response.path("authorityClock").asBoolean()||!Instant.parse(start).equals(Instant.parse(response.path("instant").asText())))throw new IllegalStateException("Fixture-start clock not applied");
+        lastClock=start;
     }
     /** Credential identity: binding manifest applied, organization claim set to this suite installation's external alias. */
     private JsonNode credentialActor(JsonNode actor) throws Exception {
@@ -304,6 +310,17 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Scheduler control interrupted",interrupted);}
             catch(java.io.IOException failure){throw new IllegalStateException("Scheduler control environment failure",failure);}
         }
+        if(suiteIsolation&&request.path("type").asText().equals("process")&&BackendProcessControls.OPERATIONS.contains(request.path("operation").asText())) {
+            if(!processes.available())return StepResult.missing(id,"NOT_IMPLEMENTED: backend process launch not exported by the runner (ACTUAL_BACKEND_*)");
+            try{var result=processes.control(id,request,()->provenance(null,"ACTUAL_HOST_PROCESS",true,null,null));
+                // The verification clock is test infrastructure held in backend memory: re-apply the last instant after a launch.
+                if(result.data() instanceof ObjectNode data&&data.path("launched").asBoolean()&&lastClock!=null&&controlActor!=null){
+                    var call=HttpRequest.newBuilder(configuration.baseUri().resolve("/__verification/runtime/clock")).timeout(Duration.ofSeconds(10)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(controlActor)).POST(HttpRequest.BodyPublishers.ofString(Json.object().put("instant",lastClock).toString())).build();
+                    var response=http.send(call,HttpResponse.BodyHandlers.ofString());data.put("clockReapplied",lastClock).put("clockReapplyHttpStatus",response.statusCode());}
+                return result;}
+            catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Process control interrupted",interrupted);}
+            catch(Exception failure){throw new IllegalStateException("Process control failure: "+failure.getMessage(),failure);}
+        }
         if(suiteIsolation&&request.path("type").asText().equals("externalResponder"))return responderControl(id,request);
         if(suiteIsolation&&request.path("type").asText().equals("fault")&&Set.of("arm","inject","install","disarm","remove").contains(request.path("operation").asText()))return faultControl(id,request);
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
@@ -320,6 +337,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification clock profile not installed");
             var response=Json.parse(result.body());
             var data=clockAcknowledgment(result.statusCode(),body.path("instant").asText(),response);data.put("operation",request.path("operation").asText());
+            if(result.statusCode()==200)lastClock=body.path("instant").asText();
             var receipt=Json.object();receipt.put("httpStatus",result.statusCode()).put("path",uri.getPath());receipt.set("requestedControl",request);receipt.set("wireRequest",body);receipt.set("serverResponse",response);
             return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_CLOCK",false,null,null),receipt);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual clock interrupted",failure);}
