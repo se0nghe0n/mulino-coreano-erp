@@ -36,6 +36,20 @@ class CapabilitySlotCheckTest {
         assertEquals(1,out.path("unpublishedCapabilities").path("createDefinitionDraft").asInt());
         assertTrue(known.toString().contains("KNOWN_OPEN CAPABILITY-SLOT owner=Step 2 case=X1 count=2"),known.toString());
     }
+    /** Round 14 Step 3 finding 1: verbs inside a stored Definition package are vocabulary, not commands (30 false positives). */
+    @Test
+    void definitionPackageVerbsAreNotCommands() throws Exception {
+        Files.createDirectories(root.resolve("contracts"));
+        Files.writeString(root.resolve(CapabilitySlotCheck.CONTRACT),"{\"capabilities\":{\"createDefinitionDraft\":{\"slots\":[\"package\",\"version\"]},\"createWork\":{\"slots\":[\"goal\"]}}}");
+        var c=Json.parse("""
+            {"caseId":"X2","subcases":[{"id":"s","actions":[
+              {"id":"draft","kind":"invoke","request":{"intentKind":"COMMAND","capabilityId":"createDefinitionDraft","slots":{"version":"v2","package":{"nouns":[],"verbs":[{"name":"arrive","intentKind":"COMMAND","capabilityId":"createWork","stage":"DRAFT","slots":{"item":"TradeItem"}}]}}}}]}]}
+            """);
+        List<String> problems=new ArrayList<>();
+        var out=CapabilitySlotCheck.run(root,Map.of("X2",c),problems,Json.array());
+        assertEquals(1,out.path("checkedCommands").asInt(),out.toString());
+        assertEquals(0,out.path("violatingCommands").asInt(),out.toString());
+    }
     @Test
     void missingContractIsAPreparationProblem() {
         List<String> problems=new ArrayList<>();

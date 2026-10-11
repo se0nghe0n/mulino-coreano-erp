@@ -54,6 +54,9 @@ final class CapabilitySlotCheck {
     /** Command intents anywhere in a request: an object with a capabilityId string and a slots object (RECORD/COMMAND or unstated kind). */
     static void intents(JsonNode node,List<JsonNode> out) {
         if(node.isObject()) {
+            // A stored Definition package (user decision 2026-10-11 (2), e.g. createDefinitionDraft slots.package) lists verbs
+            // {name,intentKind,capabilityId,stage,slots} whose slots map slot names to types; those are vocabulary, not commands.
+            if(node.path("nouns").isArray()&&node.path("verbs").isArray())return;
             String kind=node.path("intentKind").asText("");
             if(node.path("capabilityId").isTextual()&&node.path("slots").isObject()&&(kind.isEmpty()||kind.equals("COMMAND")||kind.equals("RECORD")))out.add(node);
             node.elements().forEachRemaining(v->intents(v,out));
