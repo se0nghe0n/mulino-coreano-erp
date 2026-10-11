@@ -344,6 +344,40 @@ def edit_definitions(changed, check):
                 path.write_text(new)
 
 
+# ---- sales line destinations (item 4 of the round, run-53e71c0c) -------------------------------------------------------
+# A fixture SalesOrderLine whose destinationAlias names an Organization (the customer) and an organization without a
+# CUSTOMER place: plan section 6 gives a sales order a destination place, and the installer omits such a line
+# ("SalesOrderLine ... (destination not resolvable)"), so the reserve that names it is refused. The line gets a CUSTOMER
+# Place of its own organization as destination (contracts/fixture-place-kinds.json: CUSTOMER is outside custody).
+DESTINATION_DIRS = ('C1', 'T03', 'T04', 'T05', 'T16', 'V2', 'V3')
+
+
+def edit_line_destinations(changed, check):
+    for case_id in DESTINATION_DIRS:
+        for path in sorted((ROOT / f'verification/cases/{case_id}').glob('fixtures/*.json')):
+            data, fmt, text = R12.load(path)
+            aliases = data.get('aliases') or {}
+            for name, line in list(aliases.items()):
+                if line.get('type') != 'SalesOrderLine':
+                    continue
+                target = aliases.get(line.get('destinationAlias')) or {}
+                org = line.get('organizationAlias')
+                places = [a for a, v in aliases.items() if v.get('type') == 'Place' and v.get('kind') == 'CUSTOMER' and v.get('organizationAlias') == org]
+                if target.get('type') != 'Organization' or places:
+                    continue
+                place = f"{line['destinationAlias']}-DELIVERY-PLACE"
+                entry = {'type': 'Place', 'kind': 'CUSTOMER', 'name': f"{line['destinationAlias']} 인도 장소"}
+                if org:
+                    entry['organizationAlias'] = org
+                aliases.setdefault(place, entry)
+                line['destinationAlias'] = place
+            new = R12.render(data, fmt)
+            if new != text:
+                changed.append(str(path.relative_to(ROOT)))
+                if not check:
+                    path.write_text(new)
+
+
 def main():
     check = sys.argv[1:] == ['--check']
     changed = []
@@ -351,6 +385,7 @@ def main():
     edit_t08(changed, check)
     edit_c3_aliases(changed, check)
     edit_definitions(changed, check)
+    edit_line_destinations(changed, check)
     if check and changed:
         sys.exit('round 13 decisions not applied: ' + ', '.join(changed))
     print(('CURRENT' if check else 'WRITTEN') + f' round 13: {len(changed)} file(s) changed')
