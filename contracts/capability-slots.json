@@ -896,6 +896,7 @@
     },
     "recordDelivery": {
       "slots": [
+        "allocationId",
         "canonicalOccurrenceId",
         "cargoScopeId",
         "customerId",
@@ -921,6 +922,7 @@
           "observationId"
         ],
         "observation": [
+          "allocationId",
           "cargoScopeId",
           "customerId",
           "dispatchId",
@@ -940,7 +942,7 @@
           "workId"
         ]
       },
-      "note": "confirmation form when canonicalOccurrenceId confirms an observation"
+      "note": "confirmation form when canonicalOccurrenceId confirms an observation. allocationId (plan §6 '이미 소비된 배분 참조', optional) must be the CONSUMED allocation of the named dispatchId."
     },
     "recordDispositionBasis": {
       "slots": [
