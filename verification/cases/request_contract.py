@@ -611,6 +611,9 @@ class Contracts:
                 drop = isinstance(value, dict) and set(value) == {'value', 'unit'} and re.fullmatch(r'0(\.0+)?', str(value['value'])) is not None
             elif when == 'wholeLeaf':
                 drop = self.whole_leaf(slots)
+            elif when == 'sameSourceAsWork':
+                source = lambda v: (v.get('$result') or {}).get('actionId') if isinstance(v, dict) else None
+                drop = source(value) is not None and source(value) == source(slots.get('workId'))
             else:
                 drop = value == when.get('equals')
             if drop:
@@ -619,6 +622,14 @@ class Contracts:
                 if when == 'wholeLeaf' and 'unit' in slots:
                     slots.pop('unit')  # the unit of the restated leaf quantity
                     provenance.pop('unit', None)
+        for rule in spec['typedRefRenames']:
+            value = slots.get(rule['from'])
+            if capability in rule['capabilities'] and rule['to'] not in slots and isinstance(value, dict) \
+                    and set(value) == {'type', 'id'} and value['type'] == rule['type']:
+                items = [(rule['to'], value['id']) if name == rule['from'] else (name, v) for name, v in slots.items()]
+                slots.clear()
+                slots.update(items)
+                provenance[rule['to']] = provenance.pop(rule['from'], None) or 'CONTEXT'
         rule = spec['intervalPeriod']
         if capability in rule['capabilities'] and slots.get('quantityMode') in rule['modes'] and isinstance(slots.get(rule['from']), dict):
             interval, said = slots.pop(rule['from']), provenance.pop(rule['from'], None)

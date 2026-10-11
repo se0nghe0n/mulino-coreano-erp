@@ -426,12 +426,6 @@
                   "actionId": "new-work",
                   "pointer": "/response/workId"
                 }
-              },
-              "goalVersionId": {
-                "$result": {
-                  "actionId": "new-work",
-                  "pointer": "/response/goalVersionId"
-                }
               }
             },
             "expectedRevision": {
@@ -442,8 +436,7 @@
             },
             "commandIdempotencyKey": "V1-pinned-meaning-current-policy-new-active",
             "provenance": {
-              "workId": "CONTEXT",
-              "goalVersionId": "CONTEXT"
+              "workId": "CONTEXT"
             }
           }
         },
@@ -630,8 +623,7 @@
               "unit": "BOX",
               "workId": {
                 "$alias": "WORK1"
-              },
-              "action": "SELL"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "V1-pinned-meaning-current-policy-try-v1-reserve",
@@ -639,8 +631,7 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "workId": "CONTEXT",
-              "action": "USER"
+              "workId": "CONTEXT"
             }
           }
         },

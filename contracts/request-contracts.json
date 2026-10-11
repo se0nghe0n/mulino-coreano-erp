@@ -899,6 +899,14 @@
         "from": "toOwnerId",
         "to": "recipientId",
         "contractRef": "plan section 5.3 Handover(PROPOSED→ACCEPTED|REJECTED|EXPIRED): the proposed new owner; ResponsibilityService.java:37 names it recipientId (the C3 sourceOverrides already map acceptingOwnerId the same way). The current owner is read from the Work, so fromOwnerId has no slot and stays KNOWN_OPEN S2-SLOT-VOCABULARY"
+      },
+      {
+        "capabilities": [
+          "reserveQuantity"
+        ],
+        "from": "salesOrderLineId",
+        "to": "salesLineId",
+        "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning (FulfillmentCommands.java:22 salesLineId; T20 domain-rejected names the same sales order line)"
       }
     ],
     "waitContract": {
@@ -1005,6 +1013,24 @@
             "equals": "MISSING"
           },
           "contractRef": "plan section 3.3: the manufacturing LOT is a receipt-stage slot, so a purchase draft without it is not rejected; its absence is stated by not sending lotId"
+        },
+        {
+          "capabilities": [
+            "reserveQuantity"
+          ],
+          "slot": "action",
+          "when": {
+            "equals": "SELL"
+          },
+          "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: reserveQuantity has no action slot and always reserves for SELL (FulfillmentCommands.java:22,33), so action SELL restates it"
+        },
+        {
+          "capabilities": [
+            "activateWork"
+          ],
+          "slot": "goalVersionId",
+          "when": "sameSourceAsWork",
+          "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: activateWork takes only workId and activates that Work's current GoalVersion (WorkLifecycle.java:42,97); a goalVersionId read from the same draft response as the workId names that current version"
         }
       ]
     },
@@ -1075,6 +1101,18 @@
       "rule": "A slot whose value is a plain string equal to a fixture evidence alias names that evidence: it is written {\"$alias\": name} so the harness sends the installed document ID.",
       "contractRef": "docs/execution/s1-evidence/contracts.md (every evidence ID is a server UUID; DocumentVersions, Events, CanonicalOccurrences), backend QueryRequests: aliases are resolved by clients, never as server IDs; SettlementCommands.java:83 and the trade/receipt/regulatory evidence ports read the slot as a document ID. Round 12 applied the same rule to request evidenceRefs. T13/T14/T15/T19/V8 wrote evidence, receiptEvidence, externalReceiptEvidence and evidenceRef slots as bare alias strings (T19 recordInvoice refused FORBIDDEN in run-9d213f5a)."
     },
+    "typedRefRenames": [
+      {
+        "capabilities": [
+          "createDraft",
+          "createWork"
+        ],
+        "from": "destination",
+        "to": "destinationId",
+        "type": "Place",
+        "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: the public draft reads the destination Place ID from destinationId (WorkLifecycle.java:92); the cases wrote destination as a typed {type: Place, id} reference to the same place (T20)"
+      }
+    ],
     "basisSlot": {
       "capabilities": [
         "dispatchQuantity",
