@@ -11,6 +11,15 @@ revokedAt/revision을 확인한다. grant 발급자는 자기 권한 범위 안�
 위임하며 Agent 자기 확장은 거부한다. identity 관리, 업무 ADMIN,
 FDE 권한을 구별한다. 미설정 정책은 효과 없이 확인 대상으로 남긴다.
 
+여러 차원을 가진 grant는 대상이 **모든 차원**과 일치해야 허용한다.
+대상에 없는 차원도 불일치다. fixture는 이 all-of 아래 정상 대조가
+통과하도록 작성한다. 위임자도 동일 capability·대상의 현재 권한을
+가진다. scopeComposition=PER_DIMENSION의 차원별 분리는 probe 진단에만
+쓰고 기본 실행이나 인수에 쓰지 않는다. 근거는
+[AGENTS.md](../../../../AGENTS.md)의 2026-10-09 결정과
+[S5b](../../../../docs/execution/s5b-adapter/README.md)다. 이 결정은
+request-contracts.json과 round 12의 과거 분리 설치 요청보다 우선한다.
+
 구매 MANAGER, QC 결정, 회수 ADMIN, 정의/정책 CONFIG_APPROVER는 계획
 §7의 행동별 계약이다. 별도 승인 정책이 없는 예약·피킹·출고에
 새 인간 승인을 임의 추가하지 않는다. 승인은 immutable hash/revision,
@@ -75,8 +84,20 @@ loop process start 하나씩이다. CaseRunner가 수동 watcher 요청에
 직접 쓰지 않는다. extractor는 지속 제출 기록에서
 `[observeFrom, observeFrom+observationWindowSeconds]` 안의 행만 읽고
 앞선 sweep 행을 재사용하지 않는다. watcher command는 observeFrom 전에
-시작하거나 창 끝 뒤에 끝날 수 없다. 실제 host adapter의 전달값 처리와
-제품 인수는 Step 3 actual 소유, `NOT_RUN`이다.
+시작하거나 창 끝 뒤에 끝날 수 없다.
+
+harness는 fixture runtimeProfile.tickSeconds를 naturalTickSeconds로
+전달하며 case는 observeFrom·naturalTickSeconds를 직접 지정하지 않는다.
+NO_TASK는 제출 행0, 두 tick 이상 관찰, 종료 뒤 extractor read와
+scheduler가 직접 남긴 완료 주기 하나 이상을 모두 요구한다.
+rawRows.schedulerCycles에는 schedulerId·tickId/sweepId·startedAt·
+completedAt·startedBy가 있고, SCHEDULER_LOOP 주기가 observeFrom 이후
+시작해 watcher 종료까지 완료돼야 한다. 기록 부재는 미완료 관찰이다.
+SCHEDULER_CYCLE_RECORD gate를 해소할 실제 hook·extractor가 없으면
+NOT_RUN_GATED로 남긴다
+([host 계약](../../../../verification/host-observation-guide.md),
+[round 9](../../../../docs/execution/step2r-round9/README.md),
+[round 10](../../../../docs/execution/step2r-round10/README.md)).
 host await 뒤 DB 관찰은 `RUNTIME_TASK_SNAPSHOT`을 사용한다. observer의
 요청·보고·artifact 검증과 실제 adapter의 `NOT_RUN` 상태는 위 저장소
 harness의 runtimeProfile·snapshot 절을 따른다.

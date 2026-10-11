@@ -27,8 +27,9 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
   구별한다.
 - 적격성·fixture·정정/정산을 바꿀 때: implementation-contracts.md의
   "수량 원장과 실행 배분"과 "S4 정산 복원·면제와 정정 영향"을 읽는다.
-  Place.kind/내부 보관자, UNKNOWN과 외부 장소의 확정0, 복원 assignment
-  재발행·면제 잔여 부활 금지·IMPORTED 제외와 S5 잔여를 보존한다.
+  세 보관 판단·직접/운송 수령, pick/TRANSIT 출고·예약 이중 계상 금지,
+  정산 root 재발행·면제 coverage suffix와 IMPORTED 무효화만 제외하는
+  규칙을 보존한다. fixture 시계·준비 검사는 저장소 harness를 따른다.
 - 변경 범위·oracle·인수 증거:
   [case-routing.md](references/case-routing.md)에서 관련 D/T와 C/V/E를 찾고,
   계획 §13의 원문 fixture를 읽는다. 요약표만으로 fixture를 축소하지 않는다.
@@ -52,8 +53,9 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
 6. 같은 DB transaction에 도메인 효과·배분·의무·감사·outbox·멱등 결과를
    통합한다. blob와 외부 효과는 별도 대조한다. 관련 성공·실패·경합·재시작
    oracle를 실행하고 아래 증거를 남긴다.
-7. 모든 맡은 산출물을 Task branch에 통합한 뒤 합친 checks와 지정 review를
-   수행한다. worker commit이나 한 fixture의 성공만으로 Step를 닫지 않는다.
+7. 모든 맡은 산출물을 Task branch에 통합하고 scenarios --actual의
+   run inventory와 결합 checks로 중간 gate를 판정한다. review 시점은
+   AGENTS.md의 2026-10-09 결정을 따른다. 한 fixture로 Step를 닫지 않는다.
 
 ## 항상 보존할 판단 경계
 
@@ -82,9 +84,9 @@ authoritative 자료 유무 확인은 코드 재사용과 구별한다.
 따른다. PASS는 manifest item/profile `status`가 `PASS`이고 `validate.py`가 현재
 입력에 대해 exit0인 경우만 쓴다(`VALID`는 일관성). `--actual` profile 실행은
 엄격한 조건에서만
-coverage receipt를 만들고 현재 actual driver는 `api`·`fixture`·`db`만 공급하므로
-mcp·client·model 등 나머지 runtime 주장은 `NOT_RUN`이다. native `actual-sN` 결과는
-한정된 custody 증거로 따로 보고한다.
+coverage receipt를 만든다. 현재 route/fixture/observer 범위는 S5b 기록과
+새 run inventory에 대조한다. probe·partial fixture PASS는 전체 인수가
+아니다. native `actual-sN` 결과는 한정된 custody 증거로 따로 보고한다.
 requirement/case→assertion→artifact, commit, version, fixture hash, 정확한
 command, expected/observed와 `PASS|FAIL|NOT_RUN`을 그 산출물에서 인용한다.
 논리 review·문서/skill 검증·로컬 결정적 테스트·실모델·규제 검토·BTP/client

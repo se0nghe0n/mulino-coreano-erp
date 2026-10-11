@@ -26,11 +26,12 @@ class CommandTransactionTest {
  @DynamicPropertySource static void properties(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY::toString);r.add("JWT_ISSUER",()->"https://mulino.local.invalid");r.add("JWT_AUDIENCE",()->"mulino-platform");r.add("mulino.evidence.blob-root",BLOB::toString);}
  @MockitoBean com.mulino.application.identity.IdentityAuthorization auth;
 
- @Autowired ApplicationCommands commands;@Autowired JdbcTemplate jdbc;@Autowired CdsRuntime runtime;@Autowired Guard guard;@Autowired CommandLeasePort lease;
+ @Autowired ApplicationCommands commands;@Autowired JdbcTemplate jdbc;@Autowired CdsRuntime runtime;@Autowired Guard guard;@Autowired CommandLeasePort lease;@Autowired com.mulino.application.runtime.VerificationFaults faults;
  String org,actor;DomainContext context;
  @TestConfiguration static class Fixture {
   @Bean @Primary CommandLeasePort fixtureLease(){return mock(CommandLeasePort.class);}
   @Bean @Primary Guard guard(ReadAuthorizer auth){return new Guard(auth);}
+  @Bean com.mulino.application.runtime.VerificationFaults verificationFaults(){return new com.mulino.application.runtime.VerificationFaults();}
   @Bean CommandHandler fixtureHandler(JdbcTemplate jdbc){return new CommandHandler(){
    public Set<String> capabilities(){return Set.of("fixtureIncrement","fixtureClose");}
    public CommandPreparation prepare(DomainContext c,Map<String,Object> i){if("fixtureClose".equals(i.get("capabilityId"))&&jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId())>0)throw DomainError.invalid("Parent consumed");if(!((Map<?,?>)i.get("slots")).keySet().equals(Set.of("amount")))throw DomainError.invalid("Typed amount required");return CommandPreparation.ordinary(Map.of("ORGANIZATION",List.of(c.organizationId()),"WORK",List.of(c.actorId())),List.of("fixture-state"),"INTERNAL_MOVE",null,jdbc.queryForObject("SELECT revision FROM command_fixture WHERE organizationId=?",Integer.class,c.organizationId()));}
@@ -68,5 +69,23 @@ class CommandTransactionTest {
  @Test void currentGrantIsRequiredOnReplayAndCommit(){var original=intent("grant",0,"4");assertEquals("APPLIED",execute(original).get("outcome"));doThrow(DomainError.forbidden()).when(auth).authorizeScopes(any(),anyString(),anyMap());assertEquals("REJECTED",execute(original).get("outcome"));assertEquals(4,quantity());assertEquals(2,count("mulino_commands_CommandAudits"));assertEquals("COMMITTED",jdbc.queryForObject("SELECT state FROM mulino_commands_CommandRecords WHERE organizationId=?",String.class,org));}
  @Test void postEffectDenialRollsBackEffectAndPersistsOnlySafeDenial(){guard.after.set(true);assertEquals("REJECTED",execute(intent("revoked",0,"4")).get("outcome"));assertEquals(0,quantity());assertEquals(1,count("mulino_commands_CommandRecords"));assertEquals("REJECTED",jdbc.queryForObject("SELECT state FROM mulino_commands_CommandRecords WHERE organizationId=?",String.class,org));}
  @Test void auditFailureRollsBackEffectAndIdempotency(){jdbc.execute("CREATE OR REPLACE FUNCTION command_fixture_fail_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'audit failure fixture'; END $$");jdbc.execute("CREATE TRIGGER command_fixture_audit_failure BEFORE INSERT ON mulino_commands_CommandAudits FOR EACH ROW EXECUTE FUNCTION command_fixture_fail_audit()");try{assertThrows(RuntimeException.class,()->execute(intent("audit",0,"4")));assertEquals(0,quantity());assertEquals(0,count("mulino_commands_CommandRecords"));assertEquals(0,count("mulino_commands_CommandAudits"));}finally{jdbc.execute("DROP TRIGGER command_fixture_audit_failure ON mulino_commands_CommandAudits");}}
+
+ /** Verification fault points (plan section 10): an armed point fails only the matching command, once, and its rollback or lost response leaves exactly the committed state. */
+ @Test void armedBeforeCommitFaultRollsBackOnlyTheMatchingCommandOnce(){
+  assertThrows(com.mulino.application.runtime.VerificationFaults.UnsupportedPoint.class,()->faults.control(Map.of("operation","arm","organizationId",org,"point","intake.beforeLinkCommit")));
+  faults.control(Map.of("operation","arm","organizationId",UUID.randomUUID().toString(),"point","command.beforeCommit"));
+  assertEquals("APPLIED",execute(intent("other-org-fault",0,"1")).get("outcome"),"a fault of another organization never fires");
+  var armed=faults.control(Map.of("operation","arm","organizationId",org,"point","command.beforeCommit","commandKey","faulted"));
+  assertThrows(com.mulino.application.runtime.VerificationFaults.Injected.class,()->execute(intent("faulted",1,"4")));
+  assertEquals(1,quantity());assertEquals(1,count("mulino_commands_CommandRecords"),"the faulted command left no record");
+  assertEquals("FIRED",faults.control(Map.of("operation","disarm","faultId",armed.get("faultId"))).get("state"));
+  assertEquals("APPLIED",execute(intent("faulted",1,"4")).get("outcome"),"a once fault fires once");assertEquals(5,quantity());
+ }
+ @Test void afterCommitFaultLosesOnlyTheResponseAndReplayReturnsTheCommittedResult(){
+  faults.control(Map.of("operation","arm","organizationId",org,"point","AFTER_DB_COMMIT_BEFORE_RESPONSE","capabilityId","fixtureIncrement","commandKey","lost"));
+  assertThrows(com.mulino.application.runtime.VerificationFaults.Injected.class,()->execute(intent("lost",0,"4")));
+  assertEquals(4,quantity(),"the effect committed before the response was lost");
+  var replay=execute(intent("lost",0,"4"));assertEquals("APPLIED",replay.get("outcome"));assertEquals(4,quantity());assertEquals(1,count("mulino_commands_CommandRecords"));
+ }
  @AfterAll static void cleanup()throws Exception{PG.stop();Files.deleteIfExists(KEY);try(var paths=Files.walk(BLOB)){for(var p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}}
 }

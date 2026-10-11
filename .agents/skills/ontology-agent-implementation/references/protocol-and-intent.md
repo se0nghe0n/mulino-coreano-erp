@@ -27,6 +27,9 @@ JSON 또는 요청 범위 SSE response를 처리한다. S0/T20/V4 요청은
 보낸다. Origin 검증과 endpoint 인증을 구현한다. case의 Origin은
 `wire-bad-origin`의 허용 목록 밖 403 반례에만 보내고, Accept 누락은
 `wire-missing-accept`의 406 반례다. JSON-RPC 처리·업무 효과0을 검사한다.
+Accept는 두 media type을 모두 나열해야 한다. 순서·공백·대소문자·
+parameter는 무관하지만 q=0과 wildcard는 세지 않는다
+([round 7](../../../../docs/execution/step2r-round7/README.md)).
 prepare는 반례의 `/response/httpStatus` 고정값을 확인한다. 두 위반을
 함께 넣거나 adapter가 raw header를 보충하지 않는다.
 `MCP-Protocol-Version`, `Mcp-Method`, 필요한 `Mcp-Name`
@@ -64,7 +67,28 @@ PASS로 세지 않는다.
 
 `intentKind=QUERY|RECORD|COMMAND`, definitionVersion/capabilityId,
 typed subjectRefs/slots, 조건, evidenceRefs, 원문/문맥 참조와
-provenance `USER|CONTEXT|APPROVED_DEFAULT`를 검증한다. decimal은 단위
+provenance `USER|CONTEXT|APPROVED_DEFAULT`를
+[intent.schema.json](../../../../contracts/intent.schema.json)으로 검증한다.
+slot마다 case가 작성한 provenance 하나를 두며 그 key 집합은 slots와
+같다. 명시 provenance를 보존하고 fixture/앞 응답에서 고른 값은
+CONTEXT, 요청자가 직접 쓴 literal은 USER다. 사용자 보완 답변은
+참조 모양이어도 USER로 명시할 수 있다. APPROVED_DEFAULT는 case의
+명시 근거만 허용하고 adapter가 추론하지 않는다.
+
+api·mcp·worker·management·우회 route의 명령, batch operations,
+blob businessAction, wire tools/call arguments 모두 같은 intent 검사를
+받는다. 실행에는 commandIdempotencyKey도 필요하다. test barrier·환경·
+인증 변형·worker 문맥·MRTR 문맥은 action.harness에 두고 tool arguments에
+넣지 않는다. 일반 실행에서 adapter가 요청을 수선하지 않는다.
+조회는 intent field가 아니라 연산별 contracted key/selector만 쓴다.
+없는 selector는 owner 있는 KNOWN_OPEN product gap으로 기록하고
+새 key를 발명하지 않는다. 검사 원본은
+[request_contract.py](../../../../verification/cases/request_contract.py)와
+[request-contracts.json](../../../../contracts/request-contracts.json)이며
+prepare의 request-contracts check가 강제한다. 명시 계약 위반 반례는
+harness.intentionalViolation의 실제 위반 field·이유·고정 거부를 대조한다.
+
+decimal은 단위
 있는 문자열이다. 필수 단계·끝점·quantityMode를 명시한다. 날짜를
 장소로 받거나 같은 이름의 대상을 임의 선택하지 않는다.
 

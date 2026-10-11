@@ -32,7 +32,8 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 - MCP wire, MRTR, 입력 초안과 최종 효과를 구현할 때
   [protocol-and-intent.md](references/protocol-and-intent.md)를 읽는다.
   Accept 필수·Origin 반례 한정, envelope -32600과 params 내용 -32602,
-  mirrored header -32020을 구별하고 backend의 cross-owner gap을 보존한다.
+  mirrored header -32020을 구별한다. 모든 명령의 intent schema·slot별
+  provenance와 action.harness 분리, 조회 contracted key·KNOWN_OPEN을 지킨다.
 - MCP tool·worker handler로 쓰기/조회 면을 노출하거나 조회 schema를 바꿀 때
   [implementation-contracts.md](../ontology-implementation/references/implementation-contracts.md)의
   "쓰기 노출 면과 조회 계약"을 읽는다. tool 목록과 worker registry도 V4
@@ -43,8 +44,8 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 - grants·approval, worker/outbox, 정의 호환, runtime package 또는
   client 인수를 구현할 때
   [runtime-and-client.md](references/runtime-and-client.md)를 읽는다.
-  자율 loop의 group 전 기동 금지·watcher observeFrom, runtime snapshot과
-  V7 원행 primary를 실제 adapter 구현 완료와 구별한다.
+  grant 차원 all-of·probe 한정 분리, watcher observeFrom/naturalTickSeconds와
+  NO_TASK 완료 주기, runtime snapshot을 실제 adapter 범위와 구별한다.
 
 참고 자료는 해당 작업에 필요한 것만 읽는다. 명령 이름은 설계 계약이며
 구현된 공개 schema와 대조한 뒤 사용한다.
@@ -87,8 +88,8 @@ Adapter에서 물량·승인·목표 판정 규칙을 복제하지 않는다.
 따른다. PASS는 manifest item/profile `status`가 `PASS`이고 `validate.py`가 현재
 입력에 대해 exit0인 경우만 쓴다. `VALID`는 일관성이다. `--actual` profile
 실행만 엄격한 조건에서 coverage receipt를
-만들며 현재 actual driver에는 mcp·client·process adapter가 없어 해당 runtime 주장은
-`NOT_RUN`이다.
+만든다. S5b의 mcp/wire/direct/batch 연결과 남은 process/worker/blob·
+client/model 공백을 새 run inventory로 구별한다. probe PASS로 인수하지 않는다.
 `./verify mcp`와 `./verify skills`는 `--actual` 없이는 위반이 없어도 `NOT_RUN`(exit2)이고
 `--actual`로만 실제 driver를 쓴다. `./verify model`은 `--actual`을 받지 않으며 현재
 실행 가능한 actual 경로가 없다. 실제 command와 exit code를 확인한 결과만

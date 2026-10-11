@@ -13,6 +13,20 @@ public interface AcceptanceDriver {
     default StepResult wire(String actionId,JsonNode authenticatedActor,String protocolOperation,JsonNode rawRequest) {
         return StepResult.missing(actionId,"NOT_IMPLEMENTED: actual raw protocol transport adapter absent");
     }
+    /**
+     * Same call with the action's resolved {@code action.harness} (test barrier, environment, authentication variant,
+     * worker execution context, MCP protocol context). The harness block is never part of the product request; an
+     * adapter that does not consume it falls back to the five-argument call.
+     */
+    default StepResult invoke(String actionId, String route, JsonNode authenticatedActor, String capabilityId, JsonNode request, JsonNode harness) {
+        return invoke(actionId,route,authenticatedActor,capabilityId,request);
+    }
+    default StepResult query(String actionId, String route, JsonNode authenticatedActor, String queryName, JsonNode request, JsonNode harness) {
+        return query(actionId,route,authenticatedActor,queryName,request);
+    }
+    default StepResult start(String actionId, String route, JsonNode authenticatedActor, String capabilityId, JsonNode request, JsonNode harness) {
+        return start(actionId,route,authenticatedActor,capabilityId,request);
+    }
     StepResult observe(String actionId, JsonNode scopeSnapshotAndTimes);
     StepResult control(String actionId, JsonNode control);
     /** ACK only after a real asynchronous invocation is submitted. data.invocationHandle is opaque. */
