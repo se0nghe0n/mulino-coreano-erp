@@ -363,7 +363,7 @@
               "basisKind": "QC",
               "action": "SELL",
               "decision": "PASS",
-              "evidence": {
+              "evidenceId": {
                 "$alias": "qc-result"
               }
             },
@@ -381,7 +381,7 @@
               "basisKind": "USER",
               "action": "USER",
               "decision": "USER",
-              "evidence": "USER"
+              "evidenceId": "USER"
             }
           },
           "evidenceRefs": [
@@ -2340,12 +2340,12 @@
             ],
             "slots": {
               "kind": "REGULATORY",
-              "policyVersion": "unverified-v1",
               "applicableDate": "2026-10-07",
               "reviewerId": {
                 "$alias": "config"
               },
-              "synthetic": true
+              "version": "unverified-v1",
+              "fixtureOnly": true
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-missing-officialSource-policy-draft",
@@ -2356,10 +2356,10 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
               "applicableDate": "USER",
               "reviewerId": "CONTEXT",
-              "synthetic": "USER"
+              "version": "USER",
+              "fixtureOnly": "USER"
             }
           },
           "evidenceRefs": [
@@ -2443,7 +2443,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "policy-draft",
                   "pointer": "/response/policyId"
@@ -2463,7 +2463,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2898,12 +2898,12 @@
             ],
             "slots": {
               "kind": "REGULATORY",
-              "policyVersion": "unverified-v1",
-              "officialSource": "SYNTHETIC-NOT-OFFICIAL",
               "reviewerId": {
                 "$alias": "config"
               },
-              "synthetic": true
+              "version": "unverified-v1",
+              "fixtureOnly": true,
+              "source": "SYNTHETIC-NOT-OFFICIAL"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-missing-applicableDate-policy-draft",
@@ -2914,10 +2914,10 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
-              "officialSource": "USER",
               "reviewerId": "CONTEXT",
-              "synthetic": "USER"
+              "version": "USER",
+              "fixtureOnly": "USER",
+              "source": "USER"
             }
           },
           "evidenceRefs": [
@@ -3001,7 +3001,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "policy-draft",
                   "pointer": "/response/policyId"
@@ -3021,7 +3021,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3456,10 +3456,10 @@
             ],
             "slots": {
               "kind": "REGULATORY",
-              "policyVersion": "unverified-v1",
-              "officialSource": "SYNTHETIC-NOT-OFFICIAL",
               "applicableDate": "2026-10-07",
-              "synthetic": true
+              "version": "unverified-v1",
+              "fixtureOnly": true,
+              "source": "SYNTHETIC-NOT-OFFICIAL"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T15-missing-reviewer-policy-draft",
@@ -3470,10 +3470,10 @@
             ],
             "provenance": {
               "kind": "USER",
-              "policyVersion": "USER",
-              "officialSource": "USER",
               "applicableDate": "USER",
-              "synthetic": "USER"
+              "version": "USER",
+              "fixtureOnly": "USER",
+              "source": "USER"
             }
           },
           "evidenceRefs": [
@@ -3557,7 +3557,7 @@
               }
             ],
             "slots": {
-              "policyId": {
+              "id": {
                 "$result": {
                   "actionId": "policy-draft",
                   "pointer": "/response/policyId"
@@ -3577,7 +3577,7 @@
               }
             ],
             "provenance": {
-              "policyId": "CONTEXT"
+              "id": "CONTEXT"
             }
           },
           "evidenceRefs": [

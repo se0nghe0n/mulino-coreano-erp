@@ -149,13 +149,13 @@
               }
             ],
             "slots": {
-              "custodianId": {
-                "$alias": "warehouse"
-              },
               "quantity": "60",
               "unit": "BOX",
-              "confirmedLocationId": {
+              "placeId": {
                 "$alias": "W"
+              },
+              "toCustodianId": {
+                "$alias": "warehouse"
               }
             },
             "expectedRevision": 1,
@@ -166,10 +166,10 @@
               }
             ],
             "provenance": {
-              "custodianId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "confirmedLocationId": "CONTEXT"
+              "placeId": "CONTEXT",
+              "toCustodianId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -247,11 +247,7 @@
                   "pointer": "/response/restrictionId"
                 }
               },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
-              "qcDecisionEvidenceId": {
+              "evidenceId": {
                 "$alias": "qc-proof"
               }
             },
@@ -269,8 +265,7 @@
             ],
             "provenance": {
               "restrictionId": "CONTEXT",
-              "quantity": "USER",
-              "qcDecisionEvidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1323,13 +1318,6 @@
               "allocationId": {
                 "$alias": "ALLOC"
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -1352,8 +1340,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "quantity": "USER",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"

@@ -711,10 +711,6 @@
                   "actionId": "qc-hold",
                   "pointer": "/response/restrictionId"
                 }
-              },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -730,8 +726,7 @@
               }
             ],
             "provenance": {
-              "restrictionId": "CONTEXT",
-              "quantity": "USER"
+              "restrictionId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -843,11 +838,7 @@
                   "pointer": "/response/restrictionId"
                 }
               },
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
-              "decisionEvidenceId": {
+              "evidenceId": {
                 "$alias": "qc-proof"
               }
             },
@@ -865,8 +856,7 @@
             ],
             "provenance": {
               "restrictionId": "CONTEXT",
-              "quantity": "USER",
-              "decisionEvidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1928,9 +1918,6 @@
             "slots": {
               "observedQuantity": "98",
               "unit": "BOX",
-              "locationId": {
-                "$alias": "W"
-              },
               "evidenceId": {
                 "$alias": "stocktake-proof"
               },
@@ -1952,7 +1939,6 @@
             "provenance": {
               "observedQuantity": "USER",
               "unit": "USER",
-              "locationId": "CONTEXT",
               "evidenceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT",
@@ -3716,18 +3702,11 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
               },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
@@ -3750,9 +3729,7 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
               "allocationId": "CONTEXT",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -4880,18 +4857,11 @@
               }
             ],
             "slots": {
-              "quantity": {
-                "value": "20",
-                "unit": "BOX"
-              },
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
               },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
@@ -4914,9 +4884,7 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
               "allocationId": "CONTEXT",
-              "destinationId": "CONTEXT",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"

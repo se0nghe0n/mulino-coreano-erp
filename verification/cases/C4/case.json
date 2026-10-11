@@ -159,10 +159,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -178,8 +174,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -212,16 +207,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -244,9 +229,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -507,12 +489,6 @@
               }
             ],
             "slots": {
-              "returnAuthorizationId": {
-                "$result": {
-                  "actionId": "return-authorize",
-                  "pointer": "/response/id"
-                }
-              },
               "deliveryId": {
                 "$result": {
                   "actionId": "delivery",
@@ -535,7 +511,13 @@
               },
               "externalEventId": "return-not-correction-return-one",
               "sourceNamespace": "SYNTHETIC-RETURN",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "authorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -550,7 +532,6 @@
               }
             ],
             "provenance": {
-              "returnAuthorizationId": "CONTEXT",
               "deliveryId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
@@ -559,7 +540,8 @@
               "sourceEvidenceId": "CONTEXT",
               "externalEventId": "USER",
               "sourceNamespace": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "authorizationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -651,12 +633,6 @@
               }
             ],
             "slots": {
-              "returnAuthorizationId": {
-                "$result": {
-                  "actionId": "return-authorize",
-                  "pointer": "/response/id"
-                }
-              },
               "deliveryId": {
                 "$result": {
                   "actionId": "delivery",
@@ -679,7 +655,13 @@
               },
               "externalEventId": "return-not-correction-return-same-physical-other-source",
               "sourceNamespace": "SYNTHETIC-CARRIER-RETURN",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "authorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -694,7 +676,6 @@
               }
             ],
             "provenance": {
-              "returnAuthorizationId": "CONTEXT",
               "deliveryId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
@@ -703,7 +684,8 @@
               "sourceEvidenceId": "CONTEXT",
               "externalEventId": "USER",
               "sourceNamespace": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "authorizationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1591,10 +1573,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -1610,8 +1588,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1644,16 +1621,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -1676,9 +1643,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -2922,10 +2886,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -2941,8 +2901,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2975,16 +2934,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -3007,9 +2956,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -3374,12 +3320,6 @@
               }
             ],
             "slots": {
-              "obligationId": {
-                "$result": {
-                  "actionId": "duty",
-                  "pointer": "/response/data/obligations/0/id"
-                }
-              },
               "quantity": {
                 "value": "2",
                 "unit": "BOX"
@@ -3387,6 +3327,12 @@
               "reason": "CUSTOMER_ACCEPTED_FINAL_SCOPE",
               "evidenceId": {
                 "$alias": "resolution-proof"
+              },
+              "assignmentId": {
+                "$result": {
+                  "actionId": "duty",
+                  "pointer": "/response/data/obligations/0/id"
+                }
               }
             },
             "expectedRevision": {
@@ -3402,10 +3348,10 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
               "quantity": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "assignmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4457,10 +4403,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -4476,8 +4418,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4510,16 +4451,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -4542,9 +4473,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -4909,12 +4837,6 @@
               }
             ],
             "slots": {
-              "obligationId": {
-                "$result": {
-                  "actionId": "duty",
-                  "pointer": "/response/data/obligations/0/id"
-                }
-              },
               "quantity": {
                 "value": "2",
                 "unit": "BOX"
@@ -4922,6 +4844,12 @@
               "reason": "AUTHORIZED_SHORTFALL_WAIVER",
               "evidenceId": {
                 "$alias": "resolution-proof"
+              },
+              "assignmentId": {
+                "$result": {
+                  "actionId": "duty",
+                  "pointer": "/response/data/obligations/0/id"
+                }
               }
             },
             "expectedRevision": {
@@ -4937,10 +4865,10 @@
               }
             ],
             "provenance": {
-              "obligationId": "CONTEXT",
               "quantity": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "assignmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [

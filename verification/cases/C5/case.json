@@ -204,9 +204,6 @@
                   "pointer": "/response/occurrenceId"
                 }
               },
-              "parentWorkId": {
-                "$alias": "PARENT"
-              },
               "ownerId": {
                 "$alias": "A"
               },
@@ -214,7 +211,10 @@
                 "$alias": "supervisor"
               },
               "nextAction": "온도 이상 원자료 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "workId": {
+                "$alias": "PARENT"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C5-failed-link-followup",
@@ -225,11 +225,11 @@
             ],
             "provenance": {
               "sourceOccurrenceId": "CONTEXT",
-              "parentWorkId": "CONTEXT",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workId": "CONTEXT"
             }
           }
         },
@@ -2250,9 +2250,6 @@
                   "pointer": "/response/occurrenceId"
                 }
               },
-              "parentWorkId": {
-                "$alias": "PARENT"
-              },
               "ownerId": {
                 "$alias": "A"
               },
@@ -2260,7 +2257,10 @@
                 "$alias": "supervisor"
               },
               "nextAction": "온도 이상 원자료 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z"
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "workId": {
+                "$alias": "PARENT"
+              }
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C5-same-anomaly-three-retries-failed-followup",
@@ -2271,11 +2271,11 @@
             ],
             "provenance": {
               "sourceOccurrenceId": "CONTEXT",
-              "parentWorkId": "CONTEXT",
               "ownerId": "CONTEXT",
               "supervisorId": "CONTEXT",
               "nextAction": "USER",
-              "nextCheckAt": "USER"
+              "nextCheckAt": "USER",
+              "workId": "CONTEXT"
             }
           }
         },

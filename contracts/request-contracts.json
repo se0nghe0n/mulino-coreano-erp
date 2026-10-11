@@ -907,6 +907,265 @@
         "from": "salesOrderLineId",
         "to": "salesLineId",
         "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning (FulfillmentCommands.java:22 salesLineId; T20 domain-rejected names the same sales order line)"
+      },
+      {
+        "capabilities": [
+          "activatePolicy",
+          "approvePolicy"
+        ],
+        "from": "policyId",
+        "to": "id",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the policy draft the command names; PolicyCommands reads id; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "approvePolicy"
+        ],
+        "from": "policyHash",
+        "to": "contentHash",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the approved content hash of that draft (plan section 7.2: approval binds the immutable content hash); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "revokeGrant"
+        ],
+        "from": "grantId",
+        "to": "id",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the grant being revoked; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "createPolicyDraft"
+        ],
+        "from": "policyVersion",
+        "to": "version",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the draft policy version; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "createPolicyDraft"
+        ],
+        "from": "effectiveAt",
+        "to": "effectiveFrom",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the instant the policy takes effect (plan section 7.2 효력시점); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "createPolicyDraft"
+        ],
+        "from": "synthetic",
+        "to": "fixtureOnly",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): a synthetic fixture policy that is not an official rule; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "createPolicyDraft"
+        ],
+        "from": "officialSource",
+        "to": "source",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the official/internal basis statement (plan section 7.2 공식/내부 근거); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordLegEvent"
+        ],
+        "from": "eventKind",
+        "to": "kind",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the leg event kind (DEPARTED/ARRIVED/...); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "transferObligation",
+          "resolveObligation",
+          "waiveObligation"
+        ],
+        "from": "obligationId",
+        "to": "assignmentId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the current assignment of the obligation root (plan section 5.3: transfer closes the existing assignment); the same value the declared-only cases already map from the Obligation subject (SLOT_SOURCES assignmentId); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "transferObligation"
+        ],
+        "from": "acceptedById",
+        "to": "recipientId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the accepting target owner (plan section 5.3 대상 업무·담당의 수락); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "transferObligation"
+        ],
+        "from": "sourceWorkId",
+        "to": "workId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the Work whose assignment is transferred; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "resolveObligation"
+        ],
+        "from": "resolutionEvidenceId",
+        "to": "evidenceId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the fulfilment evidence (plan section 5.3 충족 증거); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "receiveReturn"
+        ],
+        "from": "returnAuthorizationId",
+        "to": "authorizationId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the return authorization the receipt answers; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "releaseHold"
+        ],
+        "from": "qcDecisionEvidenceId",
+        "to": "evidenceId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the QC decision evidence of the release (plan section 6 QC 담당 결정); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "releaseHold"
+        ],
+        "from": "decisionEvidenceId",
+        "to": "evidenceId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the decision evidence of the release; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordHandover"
+        ],
+        "from": "confirmedLocationId",
+        "to": "placeId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the place of the custody handover; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordHandover"
+        ],
+        "from": "custodianId",
+        "to": "toCustodianId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the custodian receiving custody; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "assignCapability"
+        ],
+        "from": "capability",
+        "to": "assignedCapability",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the capability assigned; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "assignCapability"
+        ],
+        "from": "subjectId",
+        "to": "actorId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the actor receiving the capability; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "replaceAllocation"
+        ],
+        "from": "sourceAllocationId",
+        "to": "allocationId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the allocation being replaced; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "replaceAllocation"
+        ],
+        "from": "replacementSegmentId",
+        "to": "segmentId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the replacement leaf; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordDispositionBasis"
+        ],
+        "from": "evidence",
+        "to": "evidenceId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the basis evidence; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "openInvestigation"
+        ],
+        "from": "evidenceId",
+        "to": "basisEvidenceId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the evidence the investigation is opened on (plan section 6 근거); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "linkExternalId"
+        ],
+        "from": "code",
+        "to": "value",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the external identifier value; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "disposeQuantity"
+        ],
+        "from": "evidenceId",
+        "to": "evidenceRef",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the disposal basis evidence (s2-inventory evidenceRef); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordStocktake"
+        ],
+        "from": "evidenceId",
+        "to": "evidenceRef",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the stocktake evidence (s2-inventory evidenceRef); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordSupplierReply"
+        ],
+        "from": "evidenceId",
+        "to": "evidence",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the supplier reply evidence; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordSupplierReply"
+        ],
+        "from": "quantity",
+        "to": "proposedQuantity",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the quantity the supplier states in its reply; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "recordSupplierReply"
+        ],
+        "from": "orderId",
+        "to": "purchaseId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the purchase order the reply answers (PurchaseCommands.target reads purchaseId as the order); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "reserveQuantity"
+        ],
+        "from": "saleLineId",
+        "to": "salesLineId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the sales order line; the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "proposePurchase"
+        ],
+        "from": "unitPrice",
+        "to": "price",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the unit purchase price (plan section 6 price); the value is unchanged"
+      },
+      {
+        "capabilities": [
+          "createFollowup"
+        ],
+        "from": "parentWorkId",
+        "to": "workId",
+        "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the Work the follow-up continues; the value is unchanged"
       }
     ],
     "waitContract": {
@@ -1040,6 +1299,157 @@
           "slot": "goalVersionId",
           "when": "sameSourceAsWork",
           "contractRef": "AGENTS.md 2026-10-11 decision 3: until the product publishes per-capability slot lists, the handler's accepted slots are the definition; the case takes the product name and keeps its meaning: activateWork takes only workId and activates that Work's current GoalVersion (WorkLifecycle.java:42,97); a goalVersionId read from the same draft response as the workId names that current version"
+        },
+        {
+          "capabilities": [
+            "dispatchQuantity",
+            "pickQuantity"
+          ],
+          "slot": "quantity",
+          "when": "allocationQuantity",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 6 pick/dispatch take the active executable allocation and consume it whole (FulfillmentCommands pick/dispatch read only the allocation); a quantity equal to that allocation restates it, any other value stays a finding"
+        },
+        {
+          "capabilities": [
+            "dispatchQuantity"
+          ],
+          "slot": "destinationId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 6 dispatch moves the allocation to a transport location (transitPlaceId); the customer destination is the sales line the allocation reserves (FulfillmentCommands reads the line)"
+        },
+        {
+          "capabilities": [
+            "dispatchQuantity"
+          ],
+          "slot": "originId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the origin of a dispatch is the place of the allocated leaf (plan section 6 출발 범위 = the allocation)"
+        },
+        {
+          "capabilities": [
+            "dispatchQuantity"
+          ],
+          "slot": "segmentId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the allocation names its leaf"
+        },
+        {
+          "capabilities": [
+            "dispatchQuantity"
+          ],
+          "slot": "workId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the allocation names its sales line and Work"
+        },
+        {
+          "capabilities": [
+            "proposePurchase"
+          ],
+          "slot": "ownerId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 6 proposePurchase inputs (need source, item/qty/unit/price/currency/due/destination, GoalVersion) do not include responsibility; the Work holds owner and supervisor (plan section 5.3). The purchase handler never read either slot before the published list (s5d README decision 3), so no case outcome depended on it and no oracle reads it"
+        },
+        {
+          "capabilities": [
+            "proposePurchase"
+          ],
+          "slot": "supervisorId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): as ownerId"
+        },
+        {
+          "capabilities": [
+            "approvePurchase",
+            "recordSettlementAdjustment"
+          ],
+          "slot": "decidedAt",
+          "when": "clock",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 7.1 stores the approval time; the product records the command time (PurchaseCommands approvePurchase decidedAt=clock), so a decidedAt equal to the subcase clock restates it"
+        },
+        {
+          "capabilities": [
+            "approvePurchase"
+          ],
+          "slot": "consumptionPolicy",
+          "when": {
+            "equals": "SINGLE_ORDER_REVISION"
+          },
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the product consumes an approval by dispatching one order revision once (PurchaseCommands dispatchPurchaseOrder ORDER_ALREADY_DISPATCHED); other consumption policies stay (plan section 7.1 stores the policy: Step 3 finding)"
+        },
+        {
+          "capabilities": [
+            "releaseHold"
+          ],
+          "slot": "quantity",
+          "when": "heldQuantity",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 6 releaseHold releases only the referenced restriction, whole; a quantity equal to the placed hold restates it"
+        },
+        {
+          "capabilities": [
+            "openInvestigation"
+          ],
+          "slot": "classification",
+          "when": {
+            "equals": "CANDIDATE"
+          },
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 6 an investigation scope is a candidate (후보≠오염 확정); CANDIDATE restates it"
+        },
+        {
+          "capabilities": [
+            "revokeGrant"
+          ],
+          "slot": "reason",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 7.2 revokeGrant records the grant revision, effective time and validity boundary, no reason; the identity handler never read it"
+        },
+        {
+          "capabilities": [
+            "recordStocktake"
+          ],
+          "slot": "locationId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): s2-inventory recordStocktake (segmentId, observedQuantity, unit, occurredAt, evidenceRef): the leaf names its place"
+        },
+        {
+          "capabilities": [
+            "moveQuantity"
+          ],
+          "slot": "sourceId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): s2-inventory moveQuantity: the origin is the moved leaf's place"
+        },
+        {
+          "capabilities": [
+            "moveQuantity"
+          ],
+          "slot": "reason",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): s2-inventory moveQuantity declares no reason; the basis is evidenceRef"
+        },
+        {
+          "capabilities": [
+            "transferObligation"
+          ],
+          "slot": "effectiveAt",
+          "when": "clock",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): plan section 5.3 transfer takes effect in the acceptance transaction; an effectiveAt equal to the subcase clock restates it"
+        },
+        {
+          "capabilities": [
+            "acceptHandover",
+            "rejectHandover"
+          ],
+          "slot": "workId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the handover names its Work"
+        },
+        {
+          "capabilities": [
+            "cancelPurchase"
+          ],
+          "slot": "workId",
+          "when": "always",
+          "contractRef": "step2r round 14 item 1: contracts/capability-slots.json (user decision 2026-10-11 (3): the published slot list is the definition): the purchase order line names its Work"
         }
       ]
     },

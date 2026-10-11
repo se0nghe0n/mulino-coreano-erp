@@ -157,10 +157,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -176,8 +172,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -210,16 +205,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -242,9 +227,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -415,12 +397,6 @@
               }
             ],
             "slots": {
-              "returnAuthorizationId": {
-                "$result": {
-                  "actionId": "return-authorize",
-                  "pointer": "/response/id"
-                }
-              },
               "deliveryId": {
                 "$result": {
                   "actionId": "delivery",
@@ -443,7 +419,13 @@
               },
               "externalEventId": "return-new-receipt-return-one",
               "sourceNamespace": "SYNTHETIC-RETURN",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "authorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -458,7 +440,6 @@
               }
             ],
             "provenance": {
-              "returnAuthorizationId": "CONTEXT",
               "deliveryId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
@@ -467,7 +448,8 @@
               "sourceEvidenceId": "CONTEXT",
               "externalEventId": "USER",
               "sourceNamespace": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "authorizationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -559,12 +541,6 @@
               }
             ],
             "slots": {
-              "returnAuthorizationId": {
-                "$result": {
-                  "actionId": "return-authorize",
-                  "pointer": "/response/id"
-                }
-              },
               "deliveryId": {
                 "$result": {
                   "actionId": "delivery",
@@ -587,7 +563,13 @@
               },
               "externalEventId": "return-new-receipt-return-same-physical-other-source",
               "sourceNamespace": "SYNTHETIC-CARRIER-RETURN",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "authorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
+              }
             },
             "expectedRevision": {
               "$result": {
@@ -602,7 +584,6 @@
               }
             ],
             "provenance": {
-              "returnAuthorizationId": "CONTEXT",
               "deliveryId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
@@ -611,7 +592,8 @@
               "sourceEvidenceId": "CONTEXT",
               "externalEventId": "USER",
               "sourceNamespace": "USER",
-              "sourceVersion": "USER"
+              "sourceVersion": "USER",
+              "authorizationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1554,10 +1536,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -1573,8 +1551,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -1607,16 +1584,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -1639,9 +1606,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -1802,12 +1766,6 @@
               }
             ],
             "slots": {
-              "returnAuthorizationId": {
-                "$result": {
-                  "actionId": "return-authorize",
-                  "pointer": "/response/id"
-                }
-              },
               "quantity": "20",
               "unit": "BOX",
               "destinationId": {
@@ -1816,6 +1774,12 @@
               "identityStatus": "UNKNOWN",
               "evidenceId": {
                 "$alias": "return-proof"
+              },
+              "authorizationId": {
+                "$result": {
+                  "actionId": "return-authorize",
+                  "pointer": "/response/id"
+                }
               }
             },
             "expectedRevision": {
@@ -1831,12 +1795,12 @@
               }
             ],
             "provenance": {
-              "returnAuthorizationId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
               "destinationId": "CONTEXT",
               "identityStatus": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "authorizationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2503,10 +2467,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -2522,8 +2482,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2556,16 +2515,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -2588,9 +2537,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -2706,12 +2652,11 @@
               },
               "quantity": "60",
               "unit": "BOX",
-              "classification": "CANDIDATE",
-              "evidenceId": {
-                "$alias": "recall-proof"
-              },
               "itemId": {
                 "$alias": "P"
+              },
+              "basisEvidenceId": {
+                "$alias": "recall-proof"
               }
             },
             "expectedRevision": 1,
@@ -2725,9 +2670,8 @@
               "lotId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "classification": "USER",
-              "evidenceId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "basisEvidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4123,10 +4067,6 @@
                   "actionId": "reserve",
                   "pointer": "/response/allocationId"
                 }
-              },
-              "quantity": {
-                "value": "50",
-                "unit": "BOX"
               }
             },
             "expectedRevision": {
@@ -4142,8 +4082,7 @@
               }
             ],
             "provenance": {
-              "allocationId": "CONTEXT",
-              "quantity": "USER"
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4176,16 +4115,6 @@
                   "pointer": "/response/allocationId"
                 }
               },
-              "originId": {
-                "$alias": "W"
-              },
-              "destinationId": {
-                "$alias": "CUSTOMER"
-              },
-              "quantity": {
-                "value": "50",
-                "unit": "BOX"
-              },
               "transitPlaceId": {
                 "$alias": "TRANSIT"
               },
@@ -4208,9 +4137,6 @@
             ],
             "provenance": {
               "allocationId": "CONTEXT",
-              "originId": "CONTEXT",
-              "destinationId": "CONTEXT",
-              "quantity": "USER",
               "transitPlaceId": "CONTEXT",
               "evidenceRef": "CONTEXT",
               "occurredAt": "CONTEXT"
@@ -4326,12 +4252,11 @@
               },
               "quantity": "50",
               "unit": "BOX",
-              "classification": "CANDIDATE",
-              "evidenceId": {
-                "$alias": "recall-proof"
-              },
               "itemId": {
                 "$alias": "P"
+              },
+              "basisEvidenceId": {
+                "$alias": "recall-proof"
               }
             },
             "expectedRevision": 1,
@@ -4345,9 +4270,8 @@
               "lotId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "classification": "USER",
-              "evidenceId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "basisEvidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [

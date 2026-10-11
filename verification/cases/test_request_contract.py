@@ -245,6 +245,32 @@ class Conformance(unittest.TestCase):
         grant = run('createGrant', {'actorId': A('reader')}, subjectRefs=[{'type': 'Grant', 'id': A('GRANT')}, {'type': 'Agent', 'id': A('reader')}])
         self.assertEqual([{'type': 'Agent', 'id': A('reader')}], grant['subjectRefs'], 'only the created noun is dropped')
 
+    def test_round14_drops_restate_the_named_fact(self):
+        # step2r round 14 item 1: a pick/dispatch quantity equal to its allocation, a release quantity equal to its hold and
+        # an approval time equal to the subcase clock restate the fact; any other value stays a finding.
+        world = RC.World(ROOT, None)
+        world.allocations = {'AL': {'alias': 'AL', 'quantity': '20', 'unit': 'BOX'}}
+        hold = invoke({'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'placeHold', 'subjectRefs': [],
+                       'slots': {'segmentId': A('Q20'), 'quantity': '20', 'unit': 'BOX'}, 'expectedRevision': 1, 'commandIdempotencyKey': 'h'},
+                      cap='placeHold', aid='hold')
+        def run(cap, slots):
+            action = invoke({'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': cap, 'subjectRefs': [], 'slots': slots,
+                             'expectedRevision': 1, 'commandIdempotencyKey': 'k'}, cap=cap)
+            C._world, C._prior, C._clock = world, [hold], '2026-10-07T09:00:00Z'
+            try:
+                C.conform_action(action, 'T99', 's', world)
+            finally:
+                C._world = C._prior = C._clock = None
+            return action['request']['slots']
+        self.assertEqual({'allocationId'}, set(run('pickQuantity', {'allocationId': A('AL'), 'quantity': {'value': '20', 'unit': 'BOX'}})))
+        self.assertIn('quantity', run('pickQuantity', {'allocationId': A('AL'), 'quantity': {'value': '5', 'unit': 'BOX'}}))
+        released = run('releaseHold', {'restrictionId': R('hold', '/response/restrictionId'), 'quantity': {'value': '20', 'unit': 'BOX'}})
+        self.assertNotIn('quantity', released)
+        approved = run('approvePurchase', {'proposalId': A('PR'), 'decidedAt': '2026-10-07T09:00:00Z', 'consumptionPolicy': 'SINGLE_GOAL_REVISION'})
+        self.assertNotIn('decidedAt', approved)
+        self.assertIn('consumptionPolicy', approved, 'only the product consumption rule is restated')
+        self.assertIn('decidedAt', run('approvePurchase', {'proposalId': A('PR'), 'decidedAt': '2026-10-08T00:00:00Z'}))
+
     def test_wait_slots_form_the_wait_contract(self):
         flat = {'intentKind': 'COMMAND', 'definitionVersion': 'd', 'capabilityId': 'waitWork', 'subjectRefs': [],
                 'slots': {'workId': A('W'), 'reason': 'r', 'targetId': A('PO'), 'resumePredicate': {'kind': 'x'}, 'verifierId': A('V'),

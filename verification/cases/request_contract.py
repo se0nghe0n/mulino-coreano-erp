@@ -637,6 +637,12 @@ class Contracts:
                 drop = isinstance(value, dict) and set(value) == {'value', 'unit'} and re.fullmatch(r'0(\.0+)?', str(value['value'])) is not None
             elif when == 'wholeLeaf':
                 drop = self.whole_leaf(slots)
+            elif when == 'allocationQuantity':
+                drop = self.same_quantity(slots, self.allocation_quantity(slots.get('allocationId')))
+            elif when == 'heldQuantity':
+                drop = self.same_quantity(slots, self.held_quantity(slots.get('restrictionId')))
+            elif when == 'clock':
+                drop = isinstance(value, str) and getattr(self, '_clock', None) is not None and self.same_instant(value, self._clock)
             elif when == 'sameSourceAsWork':
                 source = lambda v: (v.get('$result') or {}).get('actionId') if isinstance(v, dict) else None
                 drop = source(value) is not None and source(value) == source(slots.get('workId'))
@@ -645,7 +651,7 @@ class Contracts:
             if drop:
                 slots.pop(name)
                 provenance.pop(name, None)
-                if when == 'wholeLeaf' and 'unit' in slots:
+                if when in ('wholeLeaf', 'allocationQuantity', 'heldQuantity') and 'unit' in slots:
                     slots.pop('unit')  # the unit of the restated leaf quantity
                     provenance.pop('unit', None)
         for rule in spec['typedRefRenames']:
@@ -675,6 +681,63 @@ class Contracts:
             if len(typed) == 1 and typed[0].get('id') == value:
                 slots.pop(rule['slot'])
                 provenance.pop(rule['slot'], None)
+
+    @staticmethod
+    def same_instant(a, b):
+        try:
+            return datetime.fromisoformat(a.replace('Z', '+00:00')) == datetime.fromisoformat(b.replace('Z', '+00:00'))
+        except ValueError:
+            return False
+
+    @staticmethod
+    def same_quantity(slots, known):
+        """True when the slots' quantity (a {value, unit} or a decimal string beside unit) equals known (value, unit)."""
+        quantity = slots.get('quantity')
+        value, unit = (quantity['value'], quantity['unit']) if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'} else (quantity, slots.get('unit'))
+        try:
+            return known is not None and isinstance(value, str) and unit == known[1] and Decimal(value) == Decimal(str(known[0]))
+        except InvalidOperation:
+            return False
+
+    def prior_action(self, reference):
+        source = (reference or {}).get('$result') if isinstance(reference, dict) else None
+        for action in getattr(self, '_prior', None) or []:
+            if source and action.get('id') == source.get('actionId'):
+                return action, source.get('pointer')
+        return None, None
+
+    @staticmethod
+    def stated_quantity(slots):
+        quantity = slots.get('quantity')
+        if isinstance(quantity, dict) and set(quantity) == {'value', 'unit'}:
+            return quantity['value'], quantity['unit']
+        return (quantity, slots.get('unit')) if isinstance(quantity, str) else None
+
+    def allocation_quantity(self, allocation):
+        """(quantity, unit) of the allocation a pick/dispatch names: the reserve/replacement that returned it, the split child
+        it moved to (/response/allocations/<i>/id of a split: the i-th requested quantity), or a fixture allocation."""
+        world = getattr(self, '_world', None)
+        if isinstance(allocation, dict) and '$alias' in allocation and world is not None:
+            row = world.allocations.get(allocation['$alias']) or world.aliases.get(allocation['$alias']) or {}
+            return (str(row['quantity']), row.get('unit')) if row.get('quantity') is not None else None
+        action, pointer = self.prior_action(allocation)
+        if action is None:
+            return None
+        slots = (action.get('request') or {}).get('slots') or {}
+        if action.get('capabilityId') in ('reserveQuantity', 'replaceAllocation') and pointer == '/response/allocationId':
+            return self.stated_quantity(slots)
+        match = re.fullmatch(r'/response/allocations/(\d+)/id', pointer or '')
+        if action.get('capabilityId') == 'splitQuantity' and match and isinstance(slots.get('quantities'), list):
+            i = int(match.group(1))
+            return (slots['quantities'][i], slots.get('unit')) if i < len(slots['quantities']) else None
+        return None
+
+    def held_quantity(self, restriction):
+        """(quantity, unit) of the restriction a release names: the placeHold that returned it."""
+        action, pointer = self.prior_action(restriction)
+        if action is None or action.get('capabilityId') != 'placeHold' or pointer != '/response/restrictionId':
+            return None
+        return self.stated_quantity((action.get('request') or {}).get('slots') or {})
 
     def split_parent(self, segment):
         """(quantity, unit) of the leaf a split divides: a fixture segment, or the quantity an earlier action of the
