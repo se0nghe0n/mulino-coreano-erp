@@ -96,6 +96,19 @@ backlog의 ManagementCoverage 단일 차원 통과도 all-of로 고친다.
 3. 분할 결과의 자식은 응답 `children[]`의 `index`로 가리킨다. 자식에
    이름을 붙이는 slot은 두지 않는다.
 
+2026-10-12 사용자가 네 가지를 더 정했다.
+
+1. 외부 worker 제출 endpoint를 둔다. intent와 lease claim(claimId,
+   fencingToken)을 받아 `executeClaimed`로 보내는 얇은 endpoint다. claim이
+   없거나 위조·만료면 효과 없이 FORBIDDEN이다.
+2. case의 processId(api, scheduler, worker-a, worker-b, due-sweeper)는
+   계획 §2의 단일 배포 application 안의 role이다. 첫 start가 application을
+   띄우고 나머지 role start는 같은 instance를 확인한다. case를 그에 맞춘다.
+3. 제외 업무 거부는 제품의 HELD VERSION_UNSUPPORTED를 유지한다. T01
+   기대를 바꾼다.
+4. 판매 주문의 인도 끝점은 DELIVERED이고 qualityTerms는 필수다. case가
+   이에 맞춘다.
+
 2026-10-09 사용자가 review 시점을 바꿨다. Step 2 closure가 정적
 review 8회 동안 매번 새 P1·P2를 찾으며 수렴하지 않았고, 지적 대부분이
 제품에 한 번 실행하면 드러나는 동작 불일치였기 때문이다. 이 결정이
