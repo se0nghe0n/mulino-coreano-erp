@@ -441,78 +441,12 @@
                 "caseId": "V5",
                 "subcaseId": "waiting-full-restart"
               },
-              "processId": "api",
+              "processId": "application",
               "environmentId": "runtime-V5-waiting-full-restart-source"
             }
           },
           "evidenceRefs": [
             "stop-all-api:actual-artifact"
-          ]
-        },
-        {
-          "id": "stop-all-scheduler",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "V5",
-                "subcaseId": "waiting-full-restart"
-              },
-              "processId": "scheduler",
-              "environmentId": "runtime-V5-waiting-full-restart-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-all-scheduler:actual-artifact"
-          ]
-        },
-        {
-          "id": "stop-all-worker-a",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "V5",
-                "subcaseId": "waiting-full-restart"
-              },
-              "processId": "worker-a",
-              "environmentId": "runtime-V5-waiting-full-restart-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-all-worker-a:actual-artifact"
-          ]
-        },
-        {
-          "id": "stop-all-worker-b",
-          "kind": "control",
-          "control": {
-            "type": "process",
-            "operation": "stop",
-            "parameters": {
-              "scope": {
-                "organizationId": {
-                  "$alias": "ORG"
-                },
-                "caseId": "V5",
-                "subcaseId": "waiting-full-restart"
-              },
-              "processId": "worker-b",
-              "environmentId": "runtime-V5-waiting-full-restart-source"
-            }
-          },
-          "evidenceRefs": [
-            "stop-all-worker-b:actual-artifact"
           ]
         },
         {
@@ -543,7 +477,7 @@
           "kind": "control",
           "control": {
             "type": "process",
-            "operation": "restart",
+            "operation": "start",
             "parameters": {
               "scope": {
                 "organizationId": {
@@ -565,7 +499,7 @@
           "kind": "control",
           "control": {
             "type": "process",
-            "operation": "restart",
+            "operation": "start",
             "parameters": {
               "scope": {
                 "organizationId": {
@@ -587,7 +521,7 @@
           "kind": "control",
           "control": {
             "type": "process",
-            "operation": "restart",
+            "operation": "start",
             "parameters": {
               "scope": {
                 "organizationId": {
@@ -609,7 +543,7 @@
           "kind": "control",
           "control": {
             "type": "process",
-            "operation": "restart",
+            "operation": "start",
             "parameters": {
               "scope": {
                 "organizationId": {

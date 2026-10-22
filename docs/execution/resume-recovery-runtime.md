@@ -90,3 +90,26 @@ Java21을 PATH 앞에 두고 backend에서 npm ci를 실행했다.
 ## 실제 선택 실행
 
 아래에 clean commit 기준 V5/T26 결과와 첫 실패를 추가한다.
+
+### 첫 실행과 lifecycle 입력 보완
+
+`e2a16bf2c0efa48dd9758d914dd3d96e8aed9870` clean source로
+`./verify scenarios --actual verification/cases/V5/case.json
+verification/cases/T26/case.json`을 실행했다. exit1이며 29개 시작/종료,
+268 actions, PASS0 / FAIL25 / NOT_RUN4다. 첫 evidence는
+`verification/harness/target/evidence/actual-scenarios-run-ce3f67ef-bd5f-4c3e-93b8-b10d97a1da8e/`
+다. codeCommit/workingTreeDirty=false와 jar hash를 runner가 기록했다.
+
+실패한 process control의 ACK를 정직하게 false로 바꾸자 기존 case의
+반복 stop 오류가 먼저 드러났다. api stop이 한 JVM을 종료한 뒤 같은
+JVM의 scheduler/worker stop은 실제로 실패한다. 이전 ACK=true가 이
+실패를 숨겼다. 세 case의 여러 role stop을 한 application stop으로
+합친다. V5의 중지 뒤 restart 요청은 start로 고친다. 첫 start가 새
+JVM을 띄우고 후속 role start는 같은 instance에 붙는다. 의무·수량·
+owner·negative assertion은 하나도 제거하지 않는다. 삭제한 것은
+같은 JVM을 거듭 stop하던 중복 control actions뿐이다.
+
+첫 실행에서 복원 세 case는 split child 참조를 통과해 NOT_RUN까지
+진행했다. safe-retry 네 case는 예상대로 다음 계약 공백인
+`original/response/commandId` 부재에서 멈췄다. rollback 뒤 원행·ID를
+만드는 구현이나 safe retry handler는 이 수정 범위에 없다.

@@ -14,9 +14,6 @@
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-app-api" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-app-scheduler" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-app-worker-a" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-app-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "start-again-api" 행동을 수행한다
     만일 "시스템" 역할이 "start-again-scheduler" 행동을 수행한다
@@ -1114,8 +1111,6 @@
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-app-api" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-app-worker-a" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-app-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "start-again-api" 행동을 수행한다
     만일 "시스템" 역할이 "start-again-worker-a" 행동을 수행한다

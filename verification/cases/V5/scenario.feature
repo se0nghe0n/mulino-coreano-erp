@@ -17,9 +17,6 @@
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "시스템" 역할이 "stop-all-api" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-all-scheduler" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-all-worker-a" 행동을 수행한다
-    만일 "시스템" 역할이 "stop-all-worker-b" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "restart-all-api" 행동을 수행한다
     만일 "시스템" 역할이 "restart-all-scheduler" 행동을 수행한다
