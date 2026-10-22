@@ -152,6 +152,11 @@ S1 core/read, S2 업무·거래, S3 구매·수입·수령, S4 판매·반품·�
 catalog에서 `gpt-6.1-sol`의 `serviceTier=ultrafast` 지원을 확인했다.
 다른 provider나 실행 경로에서도 지원한다고 추정하지 않는다.
 
+같은 날 사용자가 현재 실행을 중단하고 시나리오 테스트를
+`Claude Haiku 5.5`의 `dynamic workflow`로 많이 병렬 실행하도록
+다시 지정했다. 이 시나리오 실행의 모델·작업 방식은 앞선 Sol 지시보다
+우선한다. 중단한 변경과 실행 증거는 보존하고 전체 인수 기준은 유지한다.
+
 ## 병렬 작업과 Git
 
 독립 작업은 native subagent로 병렬화한다. code writer마다 같은
