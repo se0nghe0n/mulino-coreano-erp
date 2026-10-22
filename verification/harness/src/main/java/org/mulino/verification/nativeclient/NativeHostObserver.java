@@ -12,6 +12,14 @@ final class NativeHostObserver {
         var out=Json.object().put("status","UNKNOWN").put("complete",false);var calls=Json.array();out.set("toolCalls",calls);
         try {
             JsonNode events=capture.path("events");require(events.isArray()&&!events.isEmpty(),"RAW_EVENTS_MISSING");
+            // Notifications may precede the turn/start reply; the native transport buffers them.
+            // Bind only replies present in this same complete capture, then validate event order below.
+            Map<String,JsonNode> replies=new HashMap<>();
+            for(JsonNode event:events) {
+                JsonNode message=event.path("message");
+                if(event.path("direction").asText().equals("received")&&!message.has("method")&&message.hasNonNull("id"))
+                    require(replies.putIfAbsent(message.path("id").toString(),message)==null,"DUPLICATE_RPC_REPLY");
+            }
             Instant began=Instant.parse(Json.required(capture,"startedAt")),end=Instant.parse(Json.required(capture,"finishedAt"));
             Instant previous=began;JsonNode start=null,turn=null,last=null,lifecycle=null;String startId=null,turnId=null,thread=null,model=null,tier=null;
             Map<String,JsonNode> pending=new HashMap<>();Set<String> callIds=new HashSet<>();boolean terminal=false;
@@ -29,6 +37,8 @@ final class NativeHostObserver {
                     start=message.path("result");thread=Json.required(start.path("thread"),"id");model=Json.required(start,"model");tier=Json.required(start,"serviceTier");
                 } else if(direction.equals("sent")&&method.equals("turn/start")) {
                     require(message.hasNonNull("id"),"TURN_REQUEST_ID_MISSING");require(start!=null&&params.path("threadId").asText().equals(thread)&&turnId==null,"TURN_START_SCOPE");turnId=message.path("id").toString();
+                    JsonNode reply=replies.get(turnId);require(reply!=null&&!reply.has("error"),"TURN_REPLY_MISSING");
+                    turn=reply.path("result").path("turn");require(turn.hasNonNull("id"),"TURN_REPLY_ID_MISSING");
                 } else if(direction.equals("received")&&turnId!=null&&!message.has("method")&&message.path("id").toString().equals(turnId)) {turn=message.path("result").path("turn");}
                 else if(direction.equals("received")&&method.equals("item/tool/call")) {
                     require(turn!=null&&!terminal&&params.path("threadId").asText().equals(thread)&&params.path("turnId").equals(turn.path("id")),"TOOL_EVENT_SCOPE");

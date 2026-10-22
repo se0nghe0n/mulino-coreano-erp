@@ -223,3 +223,20 @@ validator가 해석하지 못했다. 해당 진단 schema를 self-contained로
 수정하고 두 schema의 별도 검증을 유지한 뒤 위 최종 실행을 통과했다.
 초기 build가 생성한 ignored backend source 때문에 발생한 source inventory
 변화도 최종 실행에서는 없었다. 실패 evidence는 지우지 않았다.
+
+## Task branch 통합 검사
+
+`9734b5bb`를 `5cc75819`로 통합하고 집중 검사 95개와 실제 transport
+검사 27개를 다시 통과했다. 실행 원본은 Task branch의
+`verification/harness/target/native-integration-runs/8f2e364c-538c-426f-9d0f-edd512d30702/`
+에 있다. source hash는 실행 전후 같고 생성한 container는 정리했다.
+Task branch에는 보존 중인 untracked 파일이 있으므로 이 실행은
+clean checkout 전체 인수로 기록하지 않는다. `./verify prepare`도
+exit 0이다. 실제 model 호출은 0회로 유지했다.
+
+통합 검토에서 native transport가 이미 허용하는 early notification을
+host extractor도 처리하도록 보완했다. `turn/start` 응답 전에 도착한
+동일 turn 알림은 같은 capture 안의 실제 RPC 응답 ID와 대조한다.
+없는 응답이나 다른 turn ID를 추측하지 않는다. 이 수정 뒤
+NativeObservationTest·NativeClientContractTest·NativeProductIntegrationTest
+35개가 통과했다. 이는 전체 host acceptance 연결을 완료했다는 뜻은 아니다.

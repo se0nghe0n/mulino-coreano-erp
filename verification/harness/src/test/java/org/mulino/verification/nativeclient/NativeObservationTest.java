@@ -98,6 +98,15 @@ class NativeObservationTest {
     }
     private void add(ArrayNode events,String direction,JsonNode message) {events.add(Json.object().put("direction",direction).put("at","2026-10-22T08:00:01Z").set("message",message));}
     @Test void hostIdentityComesFromRawResponseNotConfig() {var o=NativeHostObserver.extract(host());assertTrue(o.path("complete").asBoolean(),o.toString());assertEquals("actual-model",o.path("model").asText());}
+    @Test void earlyTurnNotificationUsesTheCapturedReplyWithoutGuessingItsIdentity() {
+        var capture=host();var events=(ArrayNode)capture.path("events");
+        JsonNode reply=events.remove(3);events.insert(4,reply);
+        assertTrue(NativeHostObserver.extract(capture).path("complete").asBoolean());
+        ((ObjectNode)reply.path("message").path("result").path("turn")).put("id","different-turn");
+        assertFalse(NativeHostObserver.extract(capture).path("complete").asBoolean());
+        events.remove(4);
+        assertFalse(NativeHostObserver.extract(capture).path("complete").asBoolean());
+    }
     @Test void forgedFinalResponseMissingTerminationForeignScopeAndBadTimesFail() {
         for(String mutation:List.of("final","termination","scope","time")) {
             var c=host();switch(mutation){
