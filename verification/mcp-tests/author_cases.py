@@ -120,7 +120,7 @@ def fixture(cid):
   # Explicit synthetic sources. The installer publishes canonical facts through
   # the real matchSourceIdentity/linkCanonicalOccurrence commands.
   aliases['L']['expiresAt']='2027-10-01T00:00:00Z'
-  installer_caps=['getEvidence','getWork','attachEvidence','recordSubmission','recordRegulatoryDecision','recordActivity','matchSourceIdentity','linkCanonicalOccurrence']
+  installer_caps=['getEvidence','getWork','attachEvidence','recordSubmission','recordRegulatoryDecision','recordDispositionBasis','decideQuality','confirmCustomerConditions','confirmCommercialDisposition','recordActivity','matchSourceIdentity','linkCanonicalOccurrence']
   actors['sourceInstaller']={'issuer':'synthetic-fixture-issuer','subject':'synthetic-source-installer','audience':'isolated-ontology','organizationAlias':'ORG','roleCapabilities':installer_caps,'grant':{'delegatorAlias':'supervisor','actions':installer_caps,'scope':{'organizationAlias':'ORG'},'validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z','revision':1}}
   aliases['sourceInstaller']={'type':'Human'}
   f['baseline']['sourceProfiles']=[{'namespace':'synthetic-warehouse','policyVersion':'fixture-v1','intakeOwnerAlias':'sourceInstaller'}]

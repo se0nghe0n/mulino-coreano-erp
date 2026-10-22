@@ -51,7 +51,7 @@ final class T01SourceFacts {
         transaction(()->{installRelations();installRegulatoryProcedure();});
         setClock();
         for(JsonNode source:facts.path("sources"))publish(source);
-        transaction(()->{installPermissions();installReceipts();});
+        installPermissions();transaction(this::installReceipts);
         conventions.add("T01 sourceFacts: original documents and explicit source events were matched and linked by actual HTTP server commands; no VERIFIED row was seeded; receipt/permission history uses the returned canonical identities");
     }
     static void validate(JsonNode fixture){
@@ -91,7 +91,8 @@ final class T01SourceFacts {
     private void installReceiptObservation(JsonNode s,String eventId)throws Exception{
         {
             String segment=id(Json.required(s,"segmentAlias"));
-            insert("mulino_trade_receipt_Observations",base(uuid(),"eventId",eventId,"occurredAt",at,"rangeRootId",segment,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"itemId",id("P"),"lotId",id("L"),"placeId",id("W"),"workId",id("O1"),"identificationStatus","CONFIRMED","state","CONFIRMED","ownerId",actor,"supervisorId",id("supervisor"),"nextAction","T01 receipt source review","nextCheckAt",at.plusHours(1)));
+            String observation=uuid();aliases.put(Json.required(s,"documentAlias")+"Observation",observation);
+            insert("mulino_trade_receipt_Observations",base(observation,"eventId",eventId,"occurredAt",at,"rangeRootId",segment,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"itemId",id("P"),"lotId",id("L"),"placeId",id("W"),"workId",id("O1"),"identificationStatus","CLAIMED","state","PROVISIONAL","ownerId",actor,"supervisorId",id("supervisor"),"nextAction","T01 receipt source review","nextCheckAt",at.plusHours(1)));
         }
     }
     private void installRegulatoryProcedure()throws Exception{
@@ -133,23 +134,30 @@ final class T01SourceFacts {
         var response=http.send(request,HttpResponse.BodyHandlers.ofString());if(response.statusCode()!=200)throw new IllegalStateException("T01 source fixture clock rejected: "+response.statusCode());
     }
     private JsonNode invoke(String capability,ObjectNode slots,Integer revision)throws Exception{
-        var body=Json.object().put("intentKind",Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision").contains(capability)?"RECORD":"COMMAND").put("definitionVersion",fixture.path("versions").path("definition").asText()).put("capabilityId",capability).put("commandIdempotencyKey",uuid());
+        var body=Json.object().put("intentKind",Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision","recordDispositionBasis").contains(capability)?"RECORD":"COMMAND").put("definitionVersion",fixture.path("versions").path("definition").asText()).put("capabilityId",capability).put("commandIdempotencyKey",uuid());
         body.set("subjectRefs",Json.array());body.set("slots",slots);body.set("provenance",Json.object().put("sourceNamespace","USER"));if(revision!=null)body.put("expectedRevision",revision);
         var credential=(ObjectNode)fixture.path("actors").path(Json.required(facts,"actorAlias")).deepCopy();credential.put("organizationAlias",external);
-        String route=Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision").contains(capability)?"records":"commands";
+        String route=Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision","recordDispositionBasis").contains(capability)?"records":"commands";
         var request=HttpRequest.newBuilder(config.baseUri().resolve("/api/ontology/"+route+"/"+capability)).timeout(Duration.ofSeconds(60)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(credential)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
         var response=http.send(request,HttpResponse.BodyHandlers.ofString());JsonNode result=Json.parse(response.body());
         if(response.statusCode()!=200||!result.path("outcome").asText().equals("APPLIED"))throw new IllegalStateException("T01 source command "+capability+" rejected: HTTP "+response.statusCode()+" "+result);
-        return result.has("effects")?result.path("effects"):result;
+        var merged=(ObjectNode)result.deepCopy();if(result.path("effects").isObject())result.path("effects").fields().forEachRemaining(e->merged.set(e.getKey(),e.getValue()));return merged;
     }
     private void installPermissions()throws Exception{
-        for(var s:facts.path("sources")){
-            String doc=Json.required(s,"documentAlias");if(s.hasNonNull("category")){
-                String seg=id(Json.required(s,"segmentAlias"));boolean hold=doc.equals("hold40");
-                insert("mulino_inventory_"+(hold?"Restrictions":"DispositionBases"),base(uuid(),"controlScope",value("SELECT controlScope FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND ID=?",org,seg),"action","SELL","state","ACTIVE","validFrom",at,"validUntil",at.plusDays(24),"evidenceRef",id(doc),"segmentId",seg,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"category",Json.required(s,"category"),"workId",id("O1"),"nextCheckAt",at.plusHours(1)));
-            }
+        for(var s:facts.path("sources"))if(s.hasNonNull("category")){
+            String doc=Json.required(s,"documentAlias"),segment=id(Json.required(s,"segmentAlias"));
+            if(!doc.equals("hold40")){
+                var input=Json.object().put("segmentId",segment).put("operation","recordDispositionBasis").put("action","SELL").put("category",Json.required(s,"category")).put("startQuantity","0").put("quantity",Json.required(s,"quantity")).put("unit",Json.required(s,"unit")).put("validFrom",at.toInstant().toString()).put("validUntil","2026-10-31T23:59:59Z").put("workId",id("O1")).put("evidenceId",id(doc)).put("reason","Explicit synthetic historical allowance").put("nextCheckAt",at.plusHours(1).toInstant().toString());
+                input.remove("operation");invoke("recordDispositionBasis",input,1);
+            }else transaction(()->{
+                String decision=uuid(),importedCommand=uuid(),policy=value("SELECT p.contentHash FROM mulino_governance_PolicyVersions p JOIN mulino_governance_ActivePolicies a ON a.organizationId=p.organizationId AND a.policyId=p.ID WHERE a.organizationId=? AND a.kind='COMMAND'",org);
+                // Authored historical restriction: the existing work duty remains
+                // its owner/next-action obligation. This row is not command coverage.
+                insert("mulino_inventory_Restrictions",base(uuid(),"controlScope",value("SELECT controlScope FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND ID=?",org,segment),"action","SELL","state","ACTIVE","validFrom",at,"validUntil",OffsetDateTime.parse("2026-10-31T23:59:59Z"),"decisionId",decision,"commandId",importedCommand,"policyHash",policy,"evidenceRef",id(doc),"segmentId",segment,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"category",Json.required(s,"category"),"workId",id("O1"),"nextCheckAt",at.plusHours(1)));
+                insert("mulino_quality_Decisions",base(decision,"actorId",actor,"operation","placeHold","segmentId",segment,"evidenceId",id(doc),"policyHash",policy,"commandId",importedCommand,"reason","Authored historical hold with existing Work duty"));
+            });
         }
-        insert("mulino_trade_regulatory_DecisionVersions",base(uuid(),"recordedBy",actor,"procedureId",id("t01Procedure"),"procedureVersionId",id("t01SubmittedVersion"),"itemId",id("P"),"lotId",id("L"),"physicalScopeId",id("A60"),"policyId",id("t01RegPolicy"),"action","SELL","decision","ALLOWED","authority","SYNTHETIC_T01_AUTHORITY","startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal("60"),"unit","BOX","validFrom",at,"validUntil",at.plusDays(24),"occurrenceId",id("regulatory60Fact")));
+        invoke("recordRegulatoryDecision",Json.object().put("procedureId",id("t01Procedure")).put("decision","ALLOWED").put("action","SELL").put("startQuantity","0").put("quantity","60").put("unit","BOX").put("validFrom",at.toInstant().toString()).put("validUntil","2026-10-31T23:59:59Z").put("occurrenceId",id("regulatory60Fact")),2);
     }
     private void installReceipts()throws Exception{
         for(var s:facts.path("sources"))if(s.path("kind").asText().equals("PHYSICAL_RECEIPT")){
@@ -157,7 +165,8 @@ final class T01SourceFacts {
             // Replace only the authored opening balance with its explicit receipt
             // provenance: this is the same physical stock, not a second movement.
             update("UPDATE mulino_inventory_QuantityMovements SET kind='RECEIPT',evidenceRef=? WHERE organizationId=? AND targetId=? AND kind='INITIAL_BALANCE'",canonical,org,seg);
-            insert("mulino_trade_receipt_Receipts",base(uuid(),"occurredAt",at,"canonicalOccurrenceId",canonical,"rangeRootId",seg,"startQuantity",BigDecimal.ZERO,"quantity",q,"unit",Json.required(s,"unit"),"itemId",id("P"),"lotId",id("L"),"placeId",id("W"),"segmentId",seg,"workId",id("O1"),"contributedQuantity",q,"excessQuantity",BigDecimal.ZERO,"physicalEffect","CREATED"));
+            update("UPDATE mulino_trade_receipt_Observations SET state='CONFIRMED',revision=revision+1 WHERE organizationId=? AND ID=?",org,id(Json.required(s,"documentAlias")+"Observation"));
+            insert("mulino_trade_receipt_Receipts",base(uuid(),"observationId",id(Json.required(s,"documentAlias")+"Observation"),"occurredAt",at,"canonicalOccurrenceId",canonical,"rangeRootId",seg,"startQuantity",BigDecimal.ZERO,"quantity",q,"unit",Json.required(s,"unit"),"itemId",id("P"),"lotId",id("L"),"placeId",id("W"),"segmentId",seg,"workId",id("O1"),"contributedQuantity",q,"excessQuantity",BigDecimal.ZERO,"physicalEffect","NEW_STOCK"));
         }
     }
     private Map<String,Object> base(String id,Object... kv){var out=new LinkedHashMap<String,Object>();out.put("organizationId",org);out.put("ID",id);out.put("revision",1);out.put("createdAt",at);out.put("recordedAt",at);for(int i=0;i<kv.length;i+=2)out.put(kv[i].toString(),kv[i+1]);return out;}
