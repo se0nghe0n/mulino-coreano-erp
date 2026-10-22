@@ -191,3 +191,18 @@ fault를 단순 command fault로 바꾸거나 실제 crash/lease semantics를
   `c057ef7e197bf4dee9ee1b6fd33647835ecbe8082bb3e31be30e63e22dcc4b22`,
   T26
   `18c26bd8a1541b4e8ce3b81ffff17b30fba819c041ef65214ae2a4fa576a24de`다.
+
+## Task branch 통합 검사
+
+상위는 세 commit을 `be878a10`, `1ae5dde0`, `3cbc2b09`로 통합했다.
+변경한 모든 source와 case 차이를 검토하고 V5/T26의 assertion 801개가
+그대로임을 다시 비교했다. 통합 상태에서 backend 29개, harness 32개,
+Python process 9개와 fixture 3개가 모두 통과했다. harness에는 수정된
+T26 evaluator assertion 20개를 함께 포함했다. 로그는 Task branch의
+`.local/resume-20261022/recovery-runtime-*-integrated.log`와
+`recovery-process-integrated.log`, `recovery-fixture-integrated.log`다.
+
+`AssessmentService`의 검토된 변경 hash만 runtime skill manifest에
+반영했다. 실제 선택29개 결과와 미해결 원인은 위 기록을 유지하며,
+통합 단위 검사를 전체 복구 인수로 바꾸지 않는다. 후속 독립 관찰
+구현은 별도 worker에서 계속한다.
