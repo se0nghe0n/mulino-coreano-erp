@@ -113,3 +113,81 @@ owner·negative assertion은 하나도 제거하지 않는다. 삭제한 것은
 진행했다. safe-retry 네 case는 예상대로 다음 계약 공백인
 `original/response/commandId` 부재에서 멈췄다. rollback 뒤 원행·ID를
 만드는 구현이나 safe retry handler는 이 수정 범위에 없다.
+
+### 최종 실제 선택 실행
+
+제품/입력 source `4d85b1f4a1ecd3f402791d4b197a5b6c9a5bb41a`의
+clean snapshot에서 같은 V5/T26 명령을 다시 실행했다. exit1이며
+29개 시작/종료, skipped0, 실제290 actions다. 최종 집계는
+**PASS0 / FAIL25 / NOT_RUN4**이며 전체 gateComplete=false다.
+createWork17/17, waitWork11/11은 APPLIED를 유지했다.
+
+원본 evidence의 절대 경로는 다음과 같다.
+
+`/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-6b07740b/verification/harness/target/evidence/actual-scenarios-run-743e6ce8-e600-4766-9cfc-bf5258150352/`
+
+- `scenarios.json`: 각 action/response, assertion, fixture hash와 실패다.
+- `code-commit.txt`, `working-tree-status.txt`,
+  `executed-jar-sha256.txt`: clean source와 실행 jar를 고정한다.
+- `inventory.json`: 기존 inventory.py가 생성한 최초 실패 분류다.
+  ADAPTER/PRODUCT/TEST 표시는 heuristic이며 원인 확정이 아니다.
+  여기에 들어 있는 미선택773개는 이번29개의 NOT_RUN4와 구별한다.
+- `container-cleanup.txt`: 이 run이 만든 disposable PostgreSQL만
+  제거했다. 다른 worker의 container/process는 건드리지 않았다.
+- 실행 flags는 partialFixtures=true, relaxWire=false다.
+  전체 fixture 설치나 runtime 인수 완료를 주장하지 않는다.
+
+V5 waiting-full-restart, T26 due-wait-db-rediscovery와
+due-wait-autonomous-loop 세 case 모두 다음을 실제 관찰했다.
+
+1. application stop 뒤 advance가 PENDING_RESTART이고
+   authorityClockApplied=false, receipt의 httpExecuted=false다.
+2. 첫 start는 새 instance를 띄우고 후속 role start는 같은 instance에
+   ATTACHED_EXISTING으로 붙는다. clockReapplied는
+   `2026-10-07T09:00:10Z`이고 실제 server observation도 같은 instant,
+   profile=verification, authorityClock=true다.
+3. 이전 ConnectException은29개 결과 전체에서0건이다.
+   due-wait의 tick/terminal도 실제 실행됐다. 다만 독립 observer와
+   다른 복구 경로의 미구현이 남아 업무 PASS는 아니다.
+
+복원 세 case의 split은 APPLIED이고 후속 attachEvidence 요청에 실제
+index0 child ID가 전달됐다. 더 이상 `/response/segmentId` 오류는 없다.
+attachEvidence는 별도 VERSION_UNSUPPORTED로 HELD다. 미구현 backup/
+observer 등도 남아 복원 인수는 NOT_RUN이며 이를 성공으로 바꾸지 않는다.
+
+선택29개에서 inventory가 고른 첫 실패 묶음은 다음과 같다. 실제
+명령의 앞선 HELD 등은 위 원본 action에도 보존한다.
+
+| 묶음 | 수 | 남은 입력/구현 |
+|---|---:|---|
+| observer | 6 | queueMessages/operationalIssues/boundaryCauses/alerts/projections 매핑 |
+| 예약 scope | 5 | BASE_ORDER_LINE 등 선행 관계와 Unavailable scope |
+| 예약 slot | 5 | reserveQuantity의 workId 미지원 |
+| 안전 재시도 | 4 | rollback 응답 commandId 부재와 retrySafeCommand 미구현 |
+| orphan query | 2 | Unsupported query field |
+| 구매 | 2 | proposePurchase의 Missing workId |
+| worker | 3 | barrier transactionId 불일치, fault workerId/error 미지원 |
+| queue responder | 1 | ACK_AND_DELETE_MESSAGE 미지원 |
+| emergencyRepair | 1 | VERSION_UNSUPPORTED |
+
+위 미구현은 이번 소유 범위를 넘어 수정하지 않았다. 특히 worker
+fault를 단순 command fault로 바꾸거나 실제 crash/lease semantics를
+가짜로 만들어 통과시키지 않았다. restore의 evaluator/blob negative,
+수량·owner·효과 assertion도 유지했다.
+
+## 최종 변경과 검증 요약
+
+- `e2a16bf2`: 시간 경계, host desired clock와 실제 서버 검증,
+  rollback revision/split child 입력, 관련 tests를 수정했다.
+- `4d85b1f4`: 한 application의 중복 stop과 중지 뒤 start 입력을
+  바로잡았다. source 수정 이후 제품 코드는 바뀌지 않았다.
+- 후속 documentation commit은 이 실행 증거만 추가한다.
+- 최종 Python은 process9 + generator3 + 기존 resume13, 총25 tests다.
+  backend29 + harness12도 통과했다. prepare는 마지막 lifecycle 입력
+  변경 뒤 다시 exit0이며 로그는 `/tmp/recovery-runtime-prepare-final.log`다.
+- baseline과 최종 JSON의 assertion 배열을 직접 비교했다.
+  V5 91개, T26 710개 모두 내용까지 완전히 동일하다.
+- 최종 case hash: V5
+  `c057ef7e197bf4dee9ee1b6fd33647835ecbe8082bb3e31be30e63e22dcc4b22`,
+  T26
+  `18c26bd8a1541b4e8ce3b81ffff17b30fba819c041ef65214ae2a4fa576a24de`다.
