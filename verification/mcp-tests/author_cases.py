@@ -139,9 +139,9 @@ o='T01.excluded-effects'
 for excluded in ['manufacture','BOM','B2C','generalLedger','taxSubmit','bankTransfer']:
  a=[setup(),action('noun','getInventory'),obs('db-before'),action('unsupported','structureIntent',{'intentKind':'COMMAND','definitionVersion':'definition-v1','requestedEffect':excluded,'subjectRefs':[{'type':'TradeItem','id':alias('P')}],'conversationRequestId':'excluded-'+excluded,
                                                   # step2r round 14 (s5d finding 5): plan section 3.3 checks the envelope before capability support,
-                                                  # so only a valid envelope (with its idempotency key) can observe CAPABILITY_UNSUPPORTED.
+                                                  # so only a valid envelope (with its idempotency key) can observe HELD VERSION_UNSUPPORTED (Oct 12 user decision).
                                                   'commandIdempotencyKey':'T01-excluded-'+excluded},'invoke',actor='writer'),action('after','getInventory'),obs('db-after','after')]
- x=no_effect(o,'excluded-effects-created')+[eq('unsupported-outcome',o,'unsupported-result','unsupported','/response/outcome','REJECTED'),eq('unsupported-code',o,'unsupported-result','unsupported','/response/error/code','CAPABILITY_UNSUPPORTED'),eq('unsupported-effect',o,'unsupported-result','unsupported','/response/error/requestedEffect',excluded),assertion('no-substitute-command',o,'unsupported-result','count','db-after','/data/rawRows/commandResults',0,where={'requestId':'excluded-'+excluded,'status':'COMMITTED'})]
+ x=no_effect(o,'excluded-effects-created')+[eq('unsupported-outcome',o,'unsupported-result','unsupported','/response/outcome','HELD'),eq('unsupported-code',o,'unsupported-result','unsupported','/response/error/code','VERSION_UNSUPPORTED'),eq('unsupported-effect',o,'unsupported-result','unsupported','/response/error/requestedEffect',excluded),assertion('no-substitute-command',o,'unsupported-result','count','db-after','/data/rawRows/commandResults',0,where={'requestId':'excluded-'+excluded,'status':'COMMITTED'})]
  T01.append(sub('T01','excluded-'+excluded,'미지원 '+excluded+' 요청의 효과0',o,a,x))
 
 T20=[]

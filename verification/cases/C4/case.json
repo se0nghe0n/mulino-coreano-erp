@@ -55,12 +55,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "dueAt": "2026-10-07T10:00:00Z",
               "packageTerms": "sealed-box-v1",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-return-not-correction-order",
@@ -77,7 +78,8 @@
               "deliveryEndpoint": "USER",
               "dueAt": "USER",
               "packageTerms": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
@@ -1469,12 +1471,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "dueAt": "2026-10-07T10:00:00Z",
               "packageTerms": "sealed-box-v1",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-corrected-delivery-98-order",
@@ -1491,7 +1494,8 @@
               "deliveryEndpoint": "USER",
               "dueAt": "USER",
               "packageTerms": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
@@ -2782,12 +2786,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "dueAt": "2026-10-07T10:00:00Z",
               "packageTerms": "sealed-box-v1",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-resolved-no-resurrection-resolved-order",
@@ -2804,7 +2809,8 @@
               "deliveryEndpoint": "USER",
               "dueAt": "USER",
               "packageTerms": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
@@ -4299,12 +4305,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "dueAt": "2026-10-07T10:00:00Z",
               "packageTerms": "sealed-box-v1",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "C4-resolved-no-resurrection-waived-order",
@@ -4321,7 +4328,8 @@
               "deliveryEndpoint": "USER",
               "dueAt": "USER",
               "packageTerms": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [

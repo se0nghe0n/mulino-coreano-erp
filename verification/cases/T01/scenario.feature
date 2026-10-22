@@ -116,8 +116,8 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'CAPABILITY_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'manufacture'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
   시나리오: 미지원 BOM 요청의 효과0
@@ -134,8 +134,8 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'CAPABILITY_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'BOM'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
   시나리오: 미지원 B2C 요청의 효과0
@@ -152,8 +152,8 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'CAPABILITY_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'B2C'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
   시나리오: 미지원 generalLedger 요청의 효과0
@@ -170,8 +170,8 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'CAPABILITY_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'generalLedger'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
   시나리오: 미지원 taxSubmit 요청의 효과0
@@ -188,8 +188,8 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'CAPABILITY_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'taxSubmit'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
   시나리오: 미지원 bankTransfer 요청의 효과0
@@ -206,7 +206,7 @@
     그러면 "unchanged-approvals" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-works" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
     그러면 "unchanged-outbox" assertion으로 "승인·실물·배분·업무·외부효과의 전후 원행을 exact 대조한다. 허용 감사는 이 불변 대상에서 분리한다."를 확인한다
-    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'REJECTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'CAPABILITY_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'bankTransfer'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다

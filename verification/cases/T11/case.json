@@ -8638,10 +8638,11 @@
               "workId": {
                 "$alias": "SOURCE"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-cancel-after-shipment-sale",
@@ -8657,7 +8658,8 @@
               "dueAt": "USER",
               "workId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           }
         },

@@ -57,10 +57,11 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "E2-overlapping-holds-order",
@@ -75,7 +76,8 @@
               "unit": "USER",
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
@@ -2746,10 +2748,11 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "E2-qc-release-only-control-order",
@@ -2764,7 +2767,8 @@
               "unit": "USER",
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
@@ -3727,12 +3731,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "dueAt": "2026-10-07T10:00:00Z",
               "packageTerms": "sealed-box-v1",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "E2-same-25-not-50-order",
@@ -3749,7 +3754,8 @@
               "deliveryEndpoint": "USER",
               "dueAt": "USER",
               "packageTerms": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
@@ -6265,12 +6271,13 @@
               "destinationId": {
                 "$alias": "CUSTOMER"
               },
-              "deliveryEndpoint": "CUSTOMER_ACCEPTED",
+              "deliveryEndpoint": "DELIVERED",
               "dueAt": "2026-10-07T10:00:00Z",
               "packageTerms": "sealed-box-v1",
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "qualityTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "E2-exception-responsibility-order",
@@ -6287,7 +6294,8 @@
               "deliveryEndpoint": "USER",
               "dueAt": "USER",
               "packageTerms": "USER",
-              "itemId": "CONTEXT"
+              "itemId": "CONTEXT",
+              "qualityTerms": "USER"
             }
           },
           "evidenceRefs": [
