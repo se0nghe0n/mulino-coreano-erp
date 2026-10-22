@@ -103,3 +103,56 @@ V7 전체 인수에는 명시적 품질·규제 fixture와 실제 설치 지원�
 
 최종 clean source commit 뒤 selected actual run을 추가로 수행해 아래에
 결과를 기록한다. 전체 profile receipt·운영 인수는 발행하지 않는다.
+
+## 최종 clean commit 실행
+
+source commit은 `0ce1a7c9de4254e7105185ce0d0e7902e1f0d5fb`다.
+2026-10-22 17:19:52 KST의 runner preRun과 shell inventory 모두
+working tree가 깨끗했음을 기록한다. 선택 파일은 원본 case에서 해당
+subcase를 그대로 추출한 ignored artifact이며 새 oracle를 만들지 않는다.
+
+```sh
+export JAVA_HOME=$(/usr/libexec/java_home -v 21)
+export PATH="$JAVA_HOME/bin:$PATH"
+./verify scenarios --actual \
+  verification/harness/target/worker-claims-selected/C3.json \
+  verification/harness/target/worker-claims-selected/V4.json \
+  verification/harness/target/worker-claims-selected/V7.json
+```
+
+| Subcase | 실제 결과 | 관찰 |
+|---|---|---|
+| C3 worker-waitWork | PASS, 32 assertions | 유효 lease + READ는 FORBIDDEN/효과0, COMMAND는 APPLIED/COMMITTED 1회다. |
+| V4 worker-work | PASS, 31 assertions | COMMAND actor의 누락·위조·만료 claim은 FORBIDDEN/효과0, 유효 lease + READ도 거부하고 정상 대조는 APPLIED/COMMITTED 1회다. |
+| V7 authorization-revoke-first | FAIL | lease 발급과 실제 worker HTTP 호출은 실행했다. 판매 적격 근거가 없어 출고가 거부되어 barrier에 도달하지 못했다. |
+| V7 authorization-effect-first | FAIL | 같은 fixture 전제 부족으로 barrier에 도달하지 못했다. |
+
+전체 선택 run은 exit 1이다. V7은 `dispatch-ready`에서
+`Barrier ACK differs from requested state`로 중단되어 이후 인가 철회·
+commit 경합과 assertion이 실행되지 않았다. 실제 worker response는
+`INSUFFICIENT_ELIGIBLE_QUANTITY`, message는
+`Current exact sale permission denied`다. V7 성공으로 보고하지 않는다.
+
+최종 실행 artifact root는 다음과 같다.
+
+`verification/harness/target/evidence/actual-scenarios-run-5de46844-d7df-44d7-b59e-5bd3087f7bc4/`
+
+`scenarios.json`, `code-commit.txt`, `working-tree-status.txt`,
+`executed-jar-sha256.txt`, `container-cleanup.txt`를 남긴다. raw HTTP와
+독립 DB 관찰은 다음 디렉터리의 receipt에 연결된다.
+
+`verification/harness/target/evidence/actual/82546bdc-5091-42d4-be70-738982927bd7/`
+
+- 실행 JAR SHA-256:
+  `c2d96bd1cda8df12a6e8325981f0df5befe3289cd5662ded38b4b76332f70f6b`
+- C3/V4 Work fixture SHA-256:
+  `40db91477845763404ba5e67346a39cfa1953adfdabeb3e58925058fee2d4298`
+- V7 fixture SHA-256:
+  `96937bac4f22284cd241bc764c10b122867302846a94d632bccd9409d1956ebb`
+
+runner가 자신이 만든 backend process, PostgreSQL container와
+credential 임시 디렉터리를 정리했다. 전체 C3/V4/V7 또는 전체 profile
+인수와 coverage receipt는 이 부분 실행으로 닫지 않는다. baseline의
+모든 기존 assertion ID와 op/source/baseline/expected/unit 계약을
+비교했으며 삭제·변경은 0이다. V4의 Work 명령 변경에 맞춘 설명만
+수정하고, 새 claim assertions을 추가했다.
