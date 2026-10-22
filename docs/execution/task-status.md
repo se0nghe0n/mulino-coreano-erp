@@ -561,3 +561,28 @@ partial fixture의 한계는 유지하며 전체 profile gate는 닫지 않는�
 원본 SHA256·실행 jar·미설치 사실은
 [T01 통합 재검증](resume-t01-complete.md#2026-10-23-통합-source의-실제-재검증)에
 기록했다.
+
+## 2026-10-23 누적 목표 setup 입력 보완
+
+Sol Ultrafast worker의 `8452ea29`를 검토하고 `d3d4c2df`로 통합했다.
+T09·T11·T12·T13의 실제 실패28개에 속한 setup 요청38개만 보완했다.
+T13은 fixture 시작부터 원 구매 기한까지의 명시적 period와 수령 사건
+종류·기여 범위를 추가했다. 다른 세 case는 기존 period를 보존하고
+startInclusive=true를 추가했다. 기한/끝점 변경과 미지원 evaluator 등
+후속 probe는 수정하지 않았다.
+
+coordinator가 네 case 전체를 비교해 assertion392개와 선택 밖 action이
+동일함을 확인했다. 입력 계약·authoring 재현성·Java 목표 매핑/검증의
+Python 검사4개와 `./verify prepare`가 통과했다. 준비 수는 계속
+41 case·802 subcase·24,248 assertion이다. 이는 실제 scenario PASS가
+아니며 backend/harness 전체 검사를 불필요하게 반복하지 않았다.
+대조 artifact는 `.local/resume-20261023/cumulative-coordinator-diff.json`,
+검사 로그는 `cumulative-setup-contracts.log`와
+`prepare-cumulative-integrated.log`다.
+
+현재 Claude Haiku 5.5 native dynamic Workflow에 같은 통합 source의
+T09 9개·T11 12개·T12 5개·T13 17개, 총43개 subcase의 병렬 실제
+재검증을 맡겼다. case별 독립 실행 worktree 네 개에서 정상 source
+빌드를 수행하고, 모든 실행 종료 뒤 원행·hash·누락·중복·후속 실패를
+대조한다. 기존 assertion392개와 partial fixture 한계를 유지한다.
+전체 profile gate와 현재 통합 Step는 열려 있다.
