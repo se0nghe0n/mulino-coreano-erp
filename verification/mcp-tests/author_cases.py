@@ -131,7 +131,7 @@ def fixture(cid):
    payload={'itemAlias':'P','lotAlias':'L','workAlias':'O1','quantity':q,'unit':'BOX'}
    if category:
     payload.update({'segmentAlias':segment,'operation':'placeHold' if doc=='hold40' else 'recordDispositionBasis','category':category,'action':'SELL','sourceVersion':'1','startQuantity':'0','validFrom':TIME,'validUntil':'2026-10-31T23:59:59Z'})
-   else:payload.update({'receiptRangeAlias':segment,'placeAlias':'W','occurredAt':TIME,'startQuantity':'0'})
+   else:payload.update({'rangeRootAlias':segment,'placeAlias':'W','occurredAt':TIME,'startQuantity':'0'})
    aliases[doc]['fixtureContent']=payload
    sources.append({'documentAlias':doc,'segmentAlias':segment,'subjectAlias':subject,'subjectKind':'LOT' if kind=='PHYSICAL_RECEIPT' else 'SEGMENT','kind':kind,'quantity':q,'unit':'BOX','category':category})
   aliases['regulatory60']['fixtureContent']={'itemAlias':'P','lotAlias':'L','physicalScopeAlias':'A60','workAlias':'O1','decision':'ALLOWED','action':'SELL','startQuantity':'0','quantity':'60','unit':'BOX','validFrom':TIME,'validUntil':'2026-10-31T23:59:59Z','authority':'SYNTHETIC_T01_AUTHORITY','policyVersion':'fixture-v1'}

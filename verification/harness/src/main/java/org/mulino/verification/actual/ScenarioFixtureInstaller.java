@@ -339,7 +339,13 @@ final class ScenarioFixtureInstaller {
     private void publish(String org,String id,ObjectNode content,String state) throws Exception {
         RecoveryGoalDefinition.apply(content,fixture.path("baseline").path("definitionContract"));
         content.put("organizationId",org).put("id",id).put("state",state);
-        insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",id,"version",Json.required(content,"version"),"state",state,"contentHash",FixtureInstaller.contentHash(content),"content",content.toString(),"evaluatorVersion",Json.required(content,"evaluatorVersion"),"schemaVersion",Json.required(content,"schemaVersion"),"createdAt",asOf.toLocalDateTime()));
+        boolean sourceRelations=T01SourceFacts.enabled(fixture)&&state.equals("PUBLISHED");
+        if(sourceRelations)for(String[] relation:T01SourceFacts.RELATIONS)content.withArray("relations").add(Json.object().put("name",relation[0]).put("sourceType",relation[1]).put("targetType",relation[2]).put("minimumCount",0).put("maximumCount",100).put("cycleAllowed",false));
+        insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",id,"version",Json.required(content,"version"),"state",sourceRelations?"DRAFT":state,"contentHash",FixtureInstaller.contentHash(content),"content",content.toString(),"evaluatorVersion",Json.required(content,"evaluatorVersion"),"schemaVersion",Json.required(content,"schemaVersion"),"createdAt",asOf.toLocalDateTime()));
+        if(sourceRelations){
+            for(String[] relation:T01SourceFacts.RELATIONS)insert("mulino_definitions_RelationDefinitions",row("organizationId",org,"ID",id(relation[3]),"revision",1,"createdAt",asOf.toLocalDateTime(),"definitionVersionId",id,"name",relation[0],"sourceType",relation[1],"targetType",relation[2],"minimumCount",0,"maximumCount",100,"cycleAllowed",false));
+            update("UPDATE mulino_definitions_DefinitionVersions SET state='PUBLISHED' WHERE organizationId=? AND ID=?",org,id);
+        }
     }
     private void policy(String org,String id,String kind,String version,JsonNode content,OffsetDateTime from,OffsetDateTime until,boolean activate) throws Exception {
         insert("mulino_governance_PolicyVersions",row("organizationId",org,"ID",id,"version",version,"kind",kind,"content",content.toString(),"contentHash",FixtureInstaller.contentHash(content),"effectiveFrom",from,"effectiveUntil",until,"createdAt",asOf));

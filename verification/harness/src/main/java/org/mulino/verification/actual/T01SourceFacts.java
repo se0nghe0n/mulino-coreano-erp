@@ -12,6 +12,7 @@ import java.math.BigDecimal;
 /** Explicit T01 historical sources. Canonical verification is performed by the
  * running server, never installed as a true flag or inferred from a document hash. */
 final class T01SourceFacts {
+    static final List<String[]> RELATIONS=List.of(new String[]{"LOT_QUANTITY","ManufacturingLot","QuantitySegment","relationLotQuantity"},new String[]{"SUBJECT_OF","QuantitySegment","Work","relationSubjectOf"},new String[]{"CUSTOMER","Work","Customer","relationCustomer"});
     private final ActualConfiguration config;
     private final ObjectNode fixture, aliases;
     private final JsonNode facts;
@@ -48,6 +49,7 @@ final class T01SourceFacts {
         validate(fixture);
         if(!facts.path("legalComplianceClaimed").isBoolean()||facts.path("legalComplianceClaimed").asBoolean())throw new IllegalArgumentException("T01 must remain explicitly synthetic");
         transaction(()->{installRelations();installReceiptObservations();installRegulatoryProcedure();});
+        setClock();
         for(JsonNode source:facts.path("sources"))publish(source);
         transaction(()->{installPermissions();installReceipts();});
         conventions.add("T01 sourceFacts: original documents and explicit source events were matched and linked by actual HTTP server commands; no VERIFIED row was seeded; receipt/permission history uses the returned canonical identities");
@@ -75,9 +77,6 @@ final class T01SourceFacts {
     @FunctionalInterface private interface Checked{void run()throws Exception;}
     private void installRelations()throws Exception{
         String definition=value("SELECT definitionVersionId FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",org,id("O1"));
-        for(String[] r:List.of(new String[]{"LOT_QUANTITY","ManufacturingLot","QuantitySegment","relationLotQuantity"},new String[]{"SUBJECT_OF","QuantitySegment","Work","relationSubjectOf"},new String[]{"CUSTOMER","Work","Customer","relationCustomer"})){
-            insert("mulino_definitions_RelationDefinitions",base(id(r[3]),"definitionVersionId",definition,"name",r[0],"sourceType",r[1],"targetType",r[2],"minimumCount",0,"maximumCount",100,"cycleAllowed",false));
-        }
         for(var rel:fixture.path("baseline").path("relations")){
             String type=Json.required(rel,"type"),source=Json.required(rel,"sourceAlias"),target=Json.required(rel,"targetAlias");
             String sourceType=type.equals("LOT_QUANTITY")?"ManufacturingLot":type.equals("SUBJECT_OF")?"QuantitySegment":"Work";
@@ -126,6 +125,11 @@ final class T01SourceFacts {
         JsonNode linked=invoke("linkCanonicalOccurrence",Json.object().put("reconciliationId",Json.required(matched,"id")),1);
         String canonical=Json.required(linked,"id");aliases.put(docAlias+"Fact",canonical);
         if(kind.equals("REGULATORY_SUBMISSION")){var submitted=invoke("recordSubmission",Json.object().put("procedureId",id("t01Procedure")).put("occurredAt",at.toInstant().toString()).put("occurrenceId",canonical),1);aliases.put("t01SubmittedVersion",Json.required(submitted,"procedureVersionId"));}
+    }
+    private void setClock()throws Exception{
+        var credential=(ObjectNode)fixture.path("actors").path(Json.required(facts,"actorAlias")).deepCopy();credential.put("organizationAlias",external);
+        var request=HttpRequest.newBuilder(config.baseUri().resolve("/__verification/runtime/clock/fixture-start")).timeout(Duration.ofSeconds(10)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(credential)).POST(HttpRequest.BodyPublishers.ofString(Json.object().put("instant",at.toInstant().toString()).toString())).build();
+        var response=http.send(request,HttpResponse.BodyHandlers.ofString());if(response.statusCode()!=200)throw new IllegalStateException("T01 source fixture clock rejected: "+response.statusCode());
     }
     private JsonNode invoke(String capability,ObjectNode slots,Integer revision)throws Exception{
         var body=Json.object().put("intentKind",Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision").contains(capability)?"RECORD":"COMMAND").put("definitionVersion",fixture.path("versions").path("definition").asText()).put("capabilityId",capability).put("commandIdempotencyKey",uuid());
