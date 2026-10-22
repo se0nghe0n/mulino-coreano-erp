@@ -146,6 +146,12 @@ S1 core/read, S2 업무·거래, S3 구매·수입·수령, S4 판매·반품·�
 사용한다. 별도 API 과금이나 BTP 계정·배포 예산은 승인된 것으로
 추정하지 않는다. 해당 실행 근거와 미확정 운영 입력은 결정 기록에 남긴다.
 
+같은 날 사용자가 다음 작업부터 `GPT-6.1 Sol` + `Ultrafast`로
+전환하도록 지정했다. 이미 실행 중인 Astra 작업은 유지하고 이후 새로
+위임하는 구현·검증 작업에는 이 선택을 적용한다. 현재 `codex` runtime
+catalog에서 `gpt-6.1-sol`의 `serviceTier=ultrafast` 지원을 확인했다.
+다른 provider나 실행 경로에서도 지원한다고 추정하지 않는다.
+
 ## 병렬 작업과 Git
 
 독립 작업은 native subagent로 병렬화한다. code writer마다 같은
