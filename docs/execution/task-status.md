@@ -381,3 +381,48 @@ S4 cherry-pick 통합 중이었으므로 Git과 이 기록을 기준으로 판�
 `env.sh`가 Java21·Node24 PATH·임시 JWT 공개키로 고정한다. 이미 닫은
 사용자 Step 1·2는 Claude Opus xhigh와 Fable low로 다시 검토 중이다.
 S4는 ACTIVE이며 S5·S6은 NOT_RUN이다.
+
+## 2026-10-22 별도 문서 작업: 설계자 인터뷰와 SAP 연관성
+
+사용자는 설계 철학을 인터뷰하고 SAP 개발·BTP·Business AI와의 관계를
+조사해 저장소에 게시하도록 요청했다. 이 작업의 기준선은
+`c10ed6f876b22f731d7a176a37c7ebdd6ef3e9b9`이며 위 구현 Task의 Step나
+시스템 S0–S6 인수 상태를 변경하는 작업은 아니다.
+
+- [인터뷰](../interviews/2026-10-22-ontology-design.md)에 설계자와
+  별도 학생 지원자의 역할, 수량 기준의 대표 요청, 미정인 지표를 기록했다.
+- [설계 철학](../ontology-design-philosophy.md)에 통사구조를 선택한
+  이유와 Agent의 선제적 파이프라인 제안 의도를 반영했다.
+- [SAP 연관성](../ontology-sap-relevance.md)과
+  [공식 출처](../research/sap-relevance-sources.md)에 표준 업무와의
+  비교, CAP 로컬 채택, 제품별 범위·버전·미검증 연동을 구분했다.
+- README의 문서 진입점을 추가하고 초기 상태로 남아 있던 CAP 후보와
+  추적 미정 문구를 기존 S0·R2 근거에 맞췄다.
+
+변경 파일 6개를 검토했고, Python으로 상대 링크·anchor 71개와
+인용한 로컬 manifest 값을 대조해 오류 0건을 확인했다.
+`git diff --cached --check`도 exit 0이다. dependency의 버전과 기존
+S0·R2 판정은 원문을 대조했다. 문서만 변경하므로 backend·실모델·
+SAP tenant·BTP 실행은 재검증하지 않았다. 학생의 현재·향후 기여,
+단가·손실 산식은 미정이다.
+
+### 후속 정렬: 통사구조와 SAP 사례의 연결
+
+같은 날 사용자가 SAP 사례 검증과 통사구조 중심의 목표 정렬을 요청했다.
+시험 환경은 없으며 공식 문서·API 명세와 로컬 사례부터 대조하도록
+확인했다. 구현 기준선은 계속 `c10ed6f8`이며 제품 코드는 변경하지 않았다.
+
+- [사례 대조](../ontology-sap-case-validation.md)에 Public Edition 2608의
+  출고 조회·POD 차이·반품 검사 경로와 가상 사례 A–H를 연결했다.
+- `recordDelivery`의 물리량/목표 기여량, 반품 처리, 책임 인계 거절의
+  소스를 읽어 고객 인수 거부와 혼동하면 안 되는 지점을 기록했다.
+- README·설계 철학·SAP 연관성·구현 계획에 통사구조의 업무 표현과
+  조합을 중심 목적으로 반영했다. 논의 기록 §23에 사용자 선택과
+  기존 범위·미정 항목을 보존했다.
+- 출처 기록 S22–S26에 확인한 API 문서와 조회/입력 명세의 차이를
+  남겼다. 최초 조사와 합쳐 공식 출처 26개다.
+
+문서 상대 링크·anchor·fence와 diff whitespace를 검사하고, 사례 A의
+80/100·20/100 산술을 확인했다. 이는 가상 사례의 설명 검증이다.
+SAP API·backend·실모델을 실행하지 않았고, 거부 원천과 POD 읽기 경로,
+가격·손실 산식은 미해결로 남겼다. 전체 구현 Task의 gate는 변경하지 않았다.

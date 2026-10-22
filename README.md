@@ -1,14 +1,19 @@
 # Mulino Coreano — 새 온톨로지 시스템
 
-이탈리아 완제품의 구매·운송·수입·수령·QC·국내 B2B 인도부터
-반품·회수·정산 참조와 후속 책임까지를 지원하는 시스템을 새로
-구현한다. 명사와 동사 두 진입점이 같은 대상·업무·물량·증거·책임을
-읽는 것이 설계의 기준이다.
+업무의 대상·행동·조건을 통사구조로 표현하고 조합해, 사람과 Agent가
+같은 의미로 업무를 읽고 필요한 절차를 구성하는 시스템을 구현한다.
+명사와 동사 두 진입점은 같은 대상·업무·물량·증거·책임을 읽는다.
 
-현재는 사용자 Step 1의 skills와 실행 지침을 구성하는 개발 branch다.
-시작 baseline에는 문서만 있고 애플리케이션·DB·실행 검증은 없다.
-현재 진행과 남은 gate는 [작업 기록](docs/execution/task-status.md)을
-따른다. 계획 완결성 검토는 코드나 실환경 인수의 증거가 아니다.
+검증 도메인은 이탈리아 완제품의 구매·운송·수입·수령·QC·국내 B2B
+인도와 반품·회수·정산 참조·후속 책임이다. SAP 표준과 API는 이 업무
+언어의 의미와 외부 연결을 대조하는 기준이다. CAP 채택이나 SAP 객체와의
+이름 유사성만으로 온톨로지의 목표를 달성했다고 판단하지 않는다.
+
+이 branch는 구현과 실행 검증을 진행 중이다. 문서만 있었던 시작
+baseline과 달리 로컬 CAP 구현과 시나리오 실행 기록이 있다.
+진행 경위는 [작업 기록](docs/execution/task-status.md), 확인된 구현과
+검증 범위는 [SAP 연관성 문서](docs/ontology-sap-relevance.md)를 참고한다.
+설계 검토나 일부 fixture의 PASS는 전체 제품·실환경 인수의 증거가 아니다.
 
 ## 읽는 순서
 
@@ -19,10 +24,18 @@
 4. [작업 지침](AGENTS.md): 사용자 작업 순서·모델·review·통합 규칙.
 5. [작업 기록](docs/execution/task-status.md): 현재 Step와 실행 증거.
 
+설계의 출발점과 SAP 개발·BTP·Business AI와의 연결은
+[SAP 연관성](docs/ontology-sap-relevance.md),
+[설계자 인터뷰](docs/interviews/2026-10-22-ontology-design.md),
+[공식 출처와 판단 범위](docs/research/sap-relevance-sources.md)에서 다룬다.
+현재의 목표 정렬과 출고·인수·거부·반품의 구체적인 대응은
+[통사구조 중심의 SAP 사례 대조](docs/ontology-sap-case-validation.md)를 따른다.
+
 ## 구현과 검증
 
-Java21·CAP·Maven·CDS/CQN·PostgreSQL은 S0에서 검증할 기술 후보다.
-exact 버전과 지원 조합은 아직 고정하지 않았다. 구현 계획의
+Java21·CAP·Maven·CDS/CQN·PostgreSQL의 로컬 경로는
+[S0 판정](verification/platform/decision.md)에서 채택했다.
+현재 dependency는 [backend/pom.xml](backend/pom.xml)에 명시한다.
 `./verify`는 harness·준비 검사·actual-s1~s4 native 실행을 제공한다.
 `--actual` 없이 실행한 product profile은 NOT_RUN(exit 2)이다. 실행
 방법과 증거 분류는 `.agents/skills/ontology-scenario-testing/references/repository-harness.md`를
@@ -48,9 +61,9 @@ fast-forward했다. 원격 main 반영은 이 기록 시점에 미실행이다.
 테스트 방법론만 새 업무에 맞게 참고한다. 온톨로지 문서의 과거
 branch·hash·기술 조사는 각 검토 당시 기록이다.
 
-새 구현 Task의 추적 위치는 아직 확정하지 않았다.
-[구현 이슈 초안](docs/execution/implementation-issue.md)을 준비했으며
-원본 #57을 새 fork 전체 구현의 추적 이슈로 표시하지 않는다.
+새 구현 Task는 [R2 결정](docs/execution/decisions.md)에 따라 로컬
+기록으로 추적한다. [구현 이슈 초안](docs/execution/implementation-issue.md)은
+게시된 이슈가 아니며, 원본 #57은 새 fork 전체 구현의 추적 이슈가 아니다.
 
 ## 설계 검토 기록
 
