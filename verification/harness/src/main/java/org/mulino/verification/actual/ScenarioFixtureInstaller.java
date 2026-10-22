@@ -22,7 +22,7 @@ import org.mulino.verification.Json;
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
         "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
-        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage");
+        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage","SourceFact");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
     static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities","definitionContract");
     /**
@@ -93,11 +93,12 @@ final class ScenarioFixtureInstaller {
             c=connection;c.setAutoCommit(false);
             try {
                 for(String org:externals.keySet()) insert("mulino_identity_Organizations",row("ID",aliases.path(org).asText(),"externalAlias",externals.get(org),"createdAt",asOf,"recordedAt",asOf));
-                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();sourceProfiles();evidence();sales();allocations();tradeAliases();grants();
+                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();sourceProfiles();T01SourceFacts.prepare(fixture,aliases);evidence();sales();allocations();tradeAliases();grants();
                 if(!partial&&!omitted.isEmpty())throw new UnsupportedOperationException("scenario fixture facts not installable: "+String.join("; ",omitted.subList(0,Math.min(12,omitted.size()))));
                 c.commit();
             } catch(Exception failure){c.rollback();for(Path b:writtenBlobs)java.nio.file.Files.deleteIfExists(b);throw failure;}
         }
+        if(T01SourceFacts.enabled(fixture))new T01SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias),conventions).install();
         var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));
         if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));
         result.put("organizationExternalAlias",externals.get(defaultOrgAlias));result.set("organizationExternalAliases",Json.MAPPER.valueToTree(externals));
@@ -125,11 +126,11 @@ final class ScenarioFixtureInstaller {
         fixture.path("baseline").fields().forEachRemaining(e->{
             String k=e.getKey();JsonNode v=e.getValue();
             if(DESCRIPTIVE_BASELINE.contains(k)||v.isNull()||v.isBoolean()&&!v.asBoolean()||v.isContainerNode()&&v.isEmpty())return;
-            if(CONSUMED_BASELINE.contains(k))return;
+            if(CONSUMED_BASELINE.contains(k)||T01SourceFacts.consumes(fixture,k))return;
             omitted.add("baseline."+k);
         });
         responsibilitySurvey();
-        if(!fixture.path("evidence").isEmpty())notRepresented.add("evidence events/claims/verified chains: an authored evidence entry states hash, namespace and times only (no event kind, claim or canonical scope); the chain is built by the case's own evidence commands");
+        if(!fixture.path("evidence").isEmpty()&&!T01SourceFacts.enabled(fixture))notRepresented.add("evidence events/claims/verified chains: an authored evidence entry states hash, namespace and times only (no event kind, claim or canonical scope); the chain is built by the case's own evidence commands");
         for(var it=fixture.path("actors").fields();it.hasNext();) {var e=it.next();
             for(var s=e.getValue().path("grant").path("scope").fieldNames();s.hasNext();){String k=s.next();if(GRANT_METADATA.contains(k)||scopeKind(k)!=null)continue;
                 if(UNREPRESENTED_SCOPE.contains(k)){String note="grantScope "+k+" (no product grant scope kind; grant installed without it)";if(!notRepresented.contains(note))notRepresented.add(note);}omitted.add("grantScope "+k+" ("+e.getKey()+")");}
@@ -465,6 +466,7 @@ final class ScenarioFixtureInstaller {
         if(definition==null){omitted.add("Work "+alias+" definition "+version+" not installed");return;}
         var row=row("organizationId",org,"ID",id(alias),"revision",w.path("revision").asInt(1),"createdAt",asOf,"recordedAt",asOf,"effectiveAt",asOf,"itemId",id(item),"definitionVersionId",definition,
             "kind",w.path("kind").asText(guessKind(alias)),"status",status,"ownerId",id(owner),"supervisorId",id(supervisor),"lifecycleMode","COMMAND","pendingInvalidation",false);
+        if(w.hasNonNull("lotAlias"))row.put("lotId",id(w.path("lotAlias").asText()));
         if(w.hasNonNull("closeReason"))row.put("closeReason",w.path("closeReason").asText());
         // UD-2 (V34): the Work-scope responsibility's nextAction/nextCheckAt are the Work's declared next action. The
         // installed Work is not activated by a command, so no initial WORK_NEXT_ACTION duty row is opened here.
@@ -473,8 +475,9 @@ final class ScenarioFixtureInstaller {
             var wait=Json.object();JsonNode authored=w.path("wait");
             wait.put("reason",authored.path("reason").asText(w.path("waitReason").asText("authored fixture wait")));
             wait.put("target",authored.path("target").asText(alias));
-            wait.set("resumePredicate",authored.has("resumePredicate")?authored.path("resumePredicate"):w.has("resumePredicate")?w.path("resumePredicate"):Json.object());
-            wait.put("verifier",authored.has("verifier")?authored.path("verifier").asText():w.hasNonNull("verifierAlias")?id(w.path("verifierAlias").asText()):id(supervisor));
+            wait.set("resumePredicate",resolved((ObjectNode)(authored.has("resumePredicate")?authored.path("resumePredicate"):w.has("resumePredicate")?w.path("resumePredicate"):Json.object()).deepCopy()));
+            wait.put("verifier",authored.hasNonNull("verifierAlias")?id(authored.path("verifierAlias").asText()):w.hasNonNull("verifierAlias")?id(w.path("verifierAlias").asText()):id(supervisor));
+            if(T01SourceFacts.enabled(fixture))wait.put("verifierId",wait.path("verifier").asText());
             wait.put("nextCheckAt",authored.path("nextCheckAt").asText(w.path("nextCheckAt").asText(asOf.plusHours(1).toInstant().toString())));
             wait.put("overdueAction",authored.path("overdueAction").asText(w.path("overdueAction").asText("supervisor review")));
             row.put("waitJson",wait.toString());
@@ -953,6 +956,7 @@ final class ScenarioFixtureInstaller {
                 "sourceNamespace",namespace,"sourceProfileId",profile,"sourceReference",e.path("externalEventId").asText(a.path("fixtureContent").path("externalEventId").asText(null)),"availability",blob!=null?"AVAILABLE":"UNKNOWN",
                 "provenance",blob!=null?"{\"source\":\"scenario-installer-resolved-canonical-content\"}":"{\"source\":\"scenario-installer-authored-hash-only\"}");
             if(blob!=null)doc.put("blobId",blob);
+            T01SourceFacts.documentSubject(fixture,aliases,alias,doc);
             insert("mulino_evidence_DocumentVersions",doc);installedDocs.add(alias);
             if(recorded!=asOf)conventions.add("evidence "+alias+" recorded at its declared late-known instant "+recorded);
         }

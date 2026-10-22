@@ -35,7 +35,7 @@
     그러면 "answer-asOf" assertion으로 "answer-asOf: /response/asOf의 실제 equals 기대값은 '2026-10-07T09:00:00Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-knownAt" assertion으로 "answer-knownAt: /response/knownAt의 실제 equals 기대값은 '2026-10-07T09:00:01Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-scope" assertion으로 "answer-scope: /response/scope의 실제 equals 기대값은 {'organizationId': {'$alias': 'ORG'}, 'itemId': {'$alias': 'P'}, 'lotId': {'$alias': 'L'}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "human-duty" assertion으로 "human-duty: /data/rawRows/obligations의 실제 ['responsibleWorkId', 'ownerId', 'nextAction', 'nextCheckAt']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "held100" assertion으로 "held100: /response/data/heldQuantity의 실제 decimalEquals 기대값은 '100'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "leaf-location" assertion으로 "leaf-location: /data/rawRows/segments의 실제 ['id', 'locationId', 'quantity', 'unit']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
@@ -49,10 +49,10 @@
     그러면 "answer-asOf" assertion으로 "answer-asOf: /response/asOf의 실제 equals 기대값은 '2026-10-07T09:00:00Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-knownAt" assertion으로 "answer-knownAt: /response/knownAt의 실제 equals 기대값은 '2026-10-07T09:00:01Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-scope" assertion으로 "answer-scope: /response/scope의 실제 equals 기대값은 {'organizationId': {'$alias': 'ORG'}, 'itemId': {'$alias': 'P'}, 'lotId': {'$alias': 'L'}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "human-duty" assertion으로 "human-duty: /data/rawRows/obligations의 실제 ['responsibleWorkId', 'ownerId', 'nextAction', 'nextCheckAt']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "supply-action" assertion으로 "supply-action: /response/data/action의 실제 equals 기대값은 'SELL'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "supply-quantity-scope" assertion으로 "supply-quantity-scope: /response/data/segmentIds의 실제 equals 기대값은 [{'$alias': 'A60'}]다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
+    그러면 "supply-quantity-scope" assertion으로 "supply-quantity-scope: /response/data/eligibleSegmentIds의 실제 equals 기대값은 [{'$alias': 'A60'}]다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "basis-QC" assertion으로 "basis-QC: /response/data/conditions의 실제 ['kind', 'result', 'evidenceId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "basis-REGULATORY" assertion으로 "basis-REGULATORY: /response/data/conditions의 실제 ['kind', 'result', 'evidenceId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "basis-DISPOSITION" assertion으로 "basis-DISPOSITION: /response/data/conditions의 실제 ['kind', 'result', 'evidenceId']는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
@@ -67,7 +67,7 @@
     그러면 "answer-asOf" assertion으로 "answer-asOf: /response/asOf의 실제 equals 기대값은 '2026-10-07T09:00:00Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-knownAt" assertion으로 "answer-knownAt: /response/knownAt의 실제 equals 기대값은 '2026-10-07T09:00:01Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-scope" assertion으로 "answer-scope: /response/scope의 실제 equals 기대값은 {'organizationId': {'$alias': 'ORG'}, 'itemId': {'$alias': 'P'}, 'lotId': {'$alias': 'L'}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "human-duty" assertion으로 "human-duty: /data/rawRows/obligations의 실제 ['responsibleWorkId', 'ownerId', 'nextAction', 'nextCheckAt']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "wait-status" assertion으로 "wait-status: /response/data/status의 실제 equals 기대값은 'WAITING'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "wait-reason" assertion으로 "wait-reason: /response/data/wait/reason의 실제 equals 기대값은 'B40 품질 후속 근거 대기'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
@@ -84,7 +84,7 @@
     그러면 "answer-asOf" assertion으로 "answer-asOf: /response/asOf의 실제 equals 기대값은 '2026-10-07T09:00:00Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-knownAt" assertion으로 "answer-knownAt: /response/knownAt의 실제 equals 기대값은 '2026-10-07T09:00:01Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-scope" assertion으로 "answer-scope: /response/scope의 실제 equals 기대값은 {'organizationId': {'$alias': 'ORG'}, 'itemId': {'$alias': 'P'}, 'lotId': {'$alias': 'L'}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "human-duty" assertion으로 "human-duty: /data/rawRows/obligations의 실제 ['responsibleWorkId', 'ownerId', 'nextAction', 'nextCheckAt']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "answer-duty" assertion으로 "answer-duty: /response/data/obligations의 실제 ['responsibleWorkId', 'ownerId', 'nextAction', 'nextCheckAt']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
   시나리오: 어느 고객까지 영향이 있는가
@@ -97,11 +97,11 @@
     그러면 "answer-asOf" assertion으로 "answer-asOf: /response/asOf의 실제 equals 기대값은 '2026-10-07T09:00:00Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-knownAt" assertion으로 "answer-knownAt: /response/knownAt의 실제 equals 기대값은 '2026-10-07T09:00:01Z'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "answer-scope" assertion으로 "answer-scope: /response/scope의 실제 equals 기대값은 {'organizationId': {'$alias': 'ORG'}, 'itemId': {'$alias': 'P'}, 'lotId': {'$alias': 'L'}}다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "answer-evidence" assertion으로 "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "human-duty" assertion으로 "human-duty: /data/rawRows/obligations의 실제 ['responsibleWorkId', 'ownerId', 'nextAction', 'nextCheckAt']는 고정한 2개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "customers" assertion으로 "customers: /response/data/customerIds의 실제 값는 고정한 1개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
     그러면 "candidate-not-contamination" assertion으로 "candidate-not-contamination: /response/data/impactKind의 실제 equals 기대값은 'CANDIDATE'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "lot-delivery-customer" assertion으로 "lot-delivery-customer: /data/rawRows/relations의 실제 ['sourceId', 'targetId', 'type']는 고정한 4개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
+    그러면 "lot-delivery-customer" assertion으로 "lot-delivery-customer: /data/rawRows/relations의 실제 ['sourceId', 'targetId', 'relationDefinitionId']는 고정한 4개 identity/관계와 exact 일치하며 중복·누락을 거부한다."를 확인한다
   시나리오: 미지원 manufacture 요청의 효과0
     먼저 사례 파일 "verification/cases/T01/case.json"의 "excluded-manufacture"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다

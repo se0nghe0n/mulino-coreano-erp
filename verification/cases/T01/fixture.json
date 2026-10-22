@@ -290,6 +290,35 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "sourceInstaller": {
+      "issuer": "synthetic-fixture-issuer",
+      "subject": "synthetic-source-installer",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getEvidence",
+        "getWork",
+        "recordActivity",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "getEvidence",
+          "getWork",
+          "recordActivity",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG"
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -308,7 +337,8 @@
     "L": {
       "type": "ManufacturerLot",
       "itemAlias": "P",
-      "manufacturerAlias": "M"
+      "manufacturerAlias": "M",
+      "expiresAt": "2027-10-01T00:00:00Z"
     },
     "M": {
       "type": "Manufacturer"
@@ -361,25 +391,122 @@
       "physicalScope": "T01-B40"
     },
     "receipt60": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "workAlias": "O1",
+        "quantity": "60",
+        "unit": "BOX",
+        "receiptRangeAlias": "A60",
+        "placeAlias": "W",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "startQuantity": "0"
+      }
     },
     "receipt40": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "workAlias": "O1",
+        "quantity": "40",
+        "unit": "BOX",
+        "receiptRangeAlias": "B40",
+        "placeAlias": "W",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "startQuantity": "0"
+      }
     },
     "qc60": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "workAlias": "O1",
+        "quantity": "60",
+        "unit": "BOX",
+        "segmentAlias": "A60",
+        "operation": "recordDispositionBasis",
+        "category": "QC",
+        "action": "SELL",
+        "sourceVersion": "1",
+        "startQuantity": "0",
+        "validFrom": "2026-10-07T09:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z"
+      }
     },
     "hold40": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "workAlias": "O1",
+        "quantity": "40",
+        "unit": "BOX",
+        "segmentAlias": "B40",
+        "operation": "placeHold",
+        "category": "QC",
+        "action": "SELL",
+        "sourceVersion": "1",
+        "startQuantity": "0",
+        "validFrom": "2026-10-07T09:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z"
+      }
     },
     "regulatory60": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "physicalScopeAlias": "A60",
+        "workAlias": "O1",
+        "decision": "ALLOWED",
+        "action": "SELL",
+        "startQuantity": "0",
+        "quantity": "60",
+        "unit": "BOX",
+        "validFrom": "2026-10-07T09:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "authority": "SYNTHETIC_T01_AUTHORITY",
+        "policyVersion": "fixture-v1"
+      }
     },
     "disposition60": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "workAlias": "O1",
+        "quantity": "60",
+        "unit": "BOX",
+        "segmentAlias": "A60",
+        "operation": "recordDispositionBasis",
+        "category": "COMMERCIAL",
+        "action": "SELL",
+        "sourceVersion": "1",
+        "startQuantity": "0",
+        "validFrom": "2026-10-07T09:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z"
+      }
     },
     "customerConditions60": {
-      "type": "DocumentVersion"
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "workAlias": "O1",
+        "quantity": "60",
+        "unit": "BOX",
+        "segmentAlias": "A60",
+        "operation": "recordDispositionBasis",
+        "category": "CUSTOMER",
+        "action": "SELL",
+        "sourceVersion": "1",
+        "startQuantity": "0",
+        "validFrom": "2026-10-07T09:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z"
+      }
     },
     "delivery": {
       "type": "DocumentVersion"
@@ -441,6 +568,42 @@
       "status": "OPEN",
       "nextAction": "인도 증거 확인",
       "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    "sourceInstaller": {
+      "type": "Human"
+    },
+    "receipt60Fact": {
+      "type": "SourceFact"
+    },
+    "receipt40Fact": {
+      "type": "SourceFact"
+    },
+    "regulatory60Fact": {
+      "type": "SourceFact"
+    },
+    "eligibilityPolicy": {
+      "type": "SourceFact"
+    },
+    "relationLotQuantity": {
+      "type": "SourceFact"
+    },
+    "relationSubjectOf": {
+      "type": "SourceFact"
+    },
+    "relationCustomer": {
+      "type": "SourceFact"
+    },
+    "regulatorySubmission": {
+      "type": "DocumentVersion",
+      "fixtureContent": {
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "physicalScopeAlias": "A60",
+        "workAlias": "O1",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "authority": "SYNTHETIC_T01_AUTHORITY",
+        "policyVersion": "fixture-v1"
+      }
     }
   },
   "baseline": {
@@ -484,7 +647,19 @@
         "verifierAlias": "reader",
         "nextCheckAt": "2026-10-07T10:00:00Z",
         "overdueAction": "supervisor에게 품질 근거 확인 요청",
-        "itemAlias": "P"
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "wait": {
+          "reason": "B40 품질 후속 근거 대기",
+          "target": "B40",
+          "resumePredicate": {
+            "evidenceAlias": "hold40",
+            "decision": "RESOLVED"
+          },
+          "verifierAlias": "reader",
+          "nextCheckAt": "2026-10-07T10:00:00Z",
+          "overdueAction": "supervisor에게 품질 근거 확인 요청"
+        }
       },
       {
         "alias": "S1",
@@ -498,7 +673,8 @@
           "quantityMode": "CUMULATIVE_EVENT",
           "dueAt": "2026-10-09T09:00:00Z"
         },
-        "itemAlias": "P"
+        "itemAlias": "P",
+        "lotAlias": "L"
       }
     ],
     "restrictions": [
@@ -578,6 +754,108 @@
       "effectClass": "READ_CANDIDATE_ONLY",
       "quantity": "30",
       "unit": "BOX"
+    },
+    "sourceProfiles": [
+      {
+        "namespace": "synthetic-warehouse",
+        "policyVersion": "fixture-v1",
+        "intakeOwnerAlias": "sourceInstaller"
+      }
+    ],
+    "sourceFacts": {
+      "version": 1,
+      "actorAlias": "sourceInstaller",
+      "workAlias": "O1",
+      "placeAlias": "W",
+      "itemAlias": "P",
+      "lotAlias": "L",
+      "sources": [
+        {
+          "documentAlias": "receipt60",
+          "segmentAlias": "A60",
+          "subjectAlias": "L",
+          "subjectKind": "LOT",
+          "kind": "PHYSICAL_RECEIPT",
+          "quantity": "60",
+          "unit": "BOX",
+          "category": null
+        },
+        {
+          "documentAlias": "receipt40",
+          "segmentAlias": "B40",
+          "subjectAlias": "L",
+          "subjectKind": "LOT",
+          "kind": "PHYSICAL_RECEIPT",
+          "quantity": "40",
+          "unit": "BOX",
+          "category": null
+        },
+        {
+          "documentAlias": "qc60",
+          "segmentAlias": "A60",
+          "subjectAlias": "A60",
+          "subjectKind": "SEGMENT",
+          "kind": "QUALITY_DECISION_recordDispositionBasis_QC",
+          "quantity": "60",
+          "unit": "BOX",
+          "category": "QC"
+        },
+        {
+          "documentAlias": "hold40",
+          "segmentAlias": "B40",
+          "subjectAlias": "B40",
+          "subjectKind": "SEGMENT",
+          "kind": "QUALITY_DECISION_placeHold_QC",
+          "quantity": "40",
+          "unit": "BOX",
+          "category": "QC"
+        },
+        {
+          "documentAlias": "disposition60",
+          "segmentAlias": "A60",
+          "subjectAlias": "A60",
+          "subjectKind": "SEGMENT",
+          "kind": "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "quantity": "60",
+          "unit": "BOX",
+          "category": "COMMERCIAL"
+        },
+        {
+          "documentAlias": "customerConditions60",
+          "segmentAlias": "A60",
+          "subjectAlias": "A60",
+          "subjectKind": "SEGMENT",
+          "kind": "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "quantity": "60",
+          "unit": "BOX",
+          "category": "CUSTOMER"
+        },
+        {
+          "documentAlias": "regulatorySubmission",
+          "segmentAlias": "A60",
+          "subjectAlias": "A60",
+          "subjectKind": "SEGMENT",
+          "kind": "REGULATORY_SUBMISSION"
+        },
+        {
+          "documentAlias": "regulatory60",
+          "segmentAlias": "A60",
+          "subjectAlias": "A60",
+          "subjectKind": "SEGMENT",
+          "kind": "REGULATORY_DECISION",
+          "quantity": "60",
+          "unit": "BOX"
+        }
+      ],
+      "regulatoryPolicy": {
+        "authority": "SYNTHETIC_T01_AUTHORITY",
+        "version": "fixture-v1",
+        "sourceNamespace": "synthetic-warehouse",
+        "action": "SELL",
+        "requiresLabel": false,
+        "fictional": true
+      },
+      "legalComplianceClaimed": false
     }
   },
   "evidence": [
@@ -658,6 +936,15 @@
       "sha256": "9999999999999999999999999999999999999999999999999999999999999999",
       "sourceNamespace": "synthetic-warehouse",
       "externalEventId": "T01-temperature",
+      "sourceVersion": "1",
+      "occurredAt": "2026-10-07T09:00:00Z",
+      "recordedAt": "2026-10-07T09:00:01Z"
+    },
+    {
+      "alias": "regulatorySubmission",
+      "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "sourceNamespace": "synthetic-warehouse",
+      "externalEventId": "T01-regulatorySubmission",
       "sourceVersion": "1",
       "occurredAt": "2026-10-07T09:00:00Z",
       "recordedAt": "2026-10-07T09:00:01Z"

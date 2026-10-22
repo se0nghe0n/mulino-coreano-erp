@@ -116,6 +116,34 @@ def fixture(cid):
                   'ownerAlias':owner,'supervisorAlias':'supervisor','documentAlias':'hold40',
                   'scope':{'itemAlias':'P','workAlias':work},'status':'OPEN',
                   'nextAction':actionName,'nextCheckAt':NEXT}
+ if cid=='T01':
+  # Explicit synthetic sources. The installer publishes canonical facts through
+  # the real matchSourceIdentity/linkCanonicalOccurrence commands.
+  aliases['L']['expiresAt']='2027-10-01T00:00:00Z'
+  installer_caps=['getEvidence','getWork','recordActivity','matchSourceIdentity','linkCanonicalOccurrence']
+  actors['sourceInstaller']={'issuer':'synthetic-fixture-issuer','subject':'synthetic-source-installer','audience':'isolated-ontology','organizationAlias':'ORG','roleCapabilities':installer_caps,'grant':{'delegatorAlias':'supervisor','actions':installer_caps,'scope':{'organizationAlias':'ORG'},'validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z','revision':1}}
+  aliases['sourceInstaller']={'type':'Human'}
+  f['baseline']['sourceProfiles']=[{'namespace':'synthetic-warehouse','policyVersion':'fixture-v1','intakeOwnerAlias':'sourceInstaller'}]
+  sources=[]
+  for output in ['receipt60Fact','receipt40Fact','regulatory60Fact','eligibilityPolicy','relationLotQuantity','relationSubjectOf','relationCustomer']:aliases[output]={'type':'SourceFact'}
+  for doc,segment,kind,category in [('receipt60','A60','PHYSICAL_RECEIPT',None),('receipt40','B40','PHYSICAL_RECEIPT',None),('qc60','A60','QUALITY_DECISION_recordDispositionBasis_QC','QC'),('hold40','B40','QUALITY_DECISION_placeHold_QC','QC'),('disposition60','A60','QUALITY_DECISION_recordDispositionBasis_COMMERCIAL','COMMERCIAL'),('customerConditions60','A60','QUALITY_DECISION_recordDispositionBasis_CUSTOMER','CUSTOMER')]:
+   q=aliases[segment]['quantity'];subject='L' if kind=='PHYSICAL_RECEIPT' else segment
+   payload={'itemAlias':'P','lotAlias':'L','workAlias':'O1','quantity':q,'unit':'BOX'}
+   if category:
+    payload.update({'segmentAlias':segment,'operation':'placeHold' if doc=='hold40' else 'recordDispositionBasis','category':category,'action':'SELL','sourceVersion':'1','startQuantity':'0','validFrom':TIME,'validUntil':'2026-10-31T23:59:59Z'})
+   else:payload.update({'receiptRangeAlias':segment,'placeAlias':'W','occurredAt':TIME,'startQuantity':'0'})
+   aliases[doc]['fixtureContent']=payload
+   sources.append({'documentAlias':doc,'segmentAlias':segment,'subjectAlias':subject,'subjectKind':'LOT' if kind=='PHYSICAL_RECEIPT' else 'SEGMENT','kind':kind,'quantity':q,'unit':'BOX','category':category})
+  aliases['regulatory60']['fixtureContent']={'itemAlias':'P','lotAlias':'L','physicalScopeAlias':'A60','workAlias':'O1','decision':'ALLOWED','action':'SELL','startQuantity':'0','quantity':'60','unit':'BOX','validFrom':TIME,'validUntil':'2026-10-31T23:59:59Z','authority':'SYNTHETIC_T01_AUTHORITY','policyVersion':'fixture-v1'}
+  aliases['regulatorySubmission']={'type':'DocumentVersion','fixtureContent':{'itemAlias':'P','lotAlias':'L','physicalScopeAlias':'A60','workAlias':'O1','occurredAt':TIME,'authority':'SYNTHETIC_T01_AUTHORITY','policyVersion':'fixture-v1'}}
+  evidence.append({'alias':'regulatorySubmission','sha256':'a'*64,'sourceNamespace':'synthetic-warehouse','externalEventId':'T01-regulatorySubmission','sourceVersion':'1','occurredAt':TIME,'recordedAt':KNOWN})
+  sources.append({'documentAlias':'regulatorySubmission','segmentAlias':'A60','subjectAlias':'A60','subjectKind':'SEGMENT','kind':'REGULATORY_SUBMISSION'})
+  sources.append({'documentAlias':'regulatory60','segmentAlias':'A60','subjectAlias':'A60','subjectKind':'SEGMENT','kind':'REGULATORY_DECISION','quantity':'60','unit':'BOX'})
+  # Work/LOT subjects are explicit; customer impact remains a candidate relation.
+  for w in f['baseline']['works']:w['lotAlias']='L'
+  for w in f['baseline']['works']:
+   if w['alias']=='O1':w['wait']={'reason':w['waitReason'],'target':'B40','resumePredicate':{'evidenceAlias':'hold40','decision':'RESOLVED'},'verifierAlias':'reader','nextCheckAt':NEXT,'overdueAction':w['overdueAction']}
+  f['baseline']['sourceFacts']={'version':1,'actorAlias':'sourceInstaller','workAlias':'O1','placeAlias':'W','itemAlias':'P','lotAlias':'L','sources':sources,'regulatoryPolicy':{'authority':'SYNTHETIC_T01_AUTHORITY','version':'fixture-v1','sourceNamespace':'synthetic-warehouse','action':'SELL','requiresLabel':False,'fictional':True},'legalComplianceClaimed':False}
  if cid=='T20':
   # Synthetic versioned protocol config, not an operating SLA: MRTR TTL boundary pair.
   f['baseline']['mrtr']={'requestStateTtlSeconds':MRTR_TTL_SECONDS,'issuedAt':TIME,'source':'SYNTHETIC-policy-v1'}
@@ -139,15 +167,15 @@ T01.append(sub('T01','same-world','명사와 동사의 같은 snapshot·수량·
 o='T01.five-competency-questions';n='answers-grounded'
 questions=[('inventory','무엇이 어디에 얼마나 있는가','getInventory'),('supply-basis','왜 공급할 수 있는가','getAssessment'),('waiting','어떤 업무가 무엇을 기다리는가','getWork'),('responsibility','누가 언제까지 무엇을 해야 하는가','getObligations'),('customer-impact','어느 고객까지 영향이 있는가','traceLot')]
 for sid,title,cap in questions:
- a=[setup(),action('noun','getObject',{'id':alias('P'),'scope':SCOPE,'asOf':TIME,'knownAt':KNOWN}),action('answer',cap,{'scope':SCOPE,'workId':alias('O1'),'lotId':alias('L'),'action':'SELL','customerId':alias('C'),'snapshotRef':ref('noun','/response/snapshotRevision'),'asOf':TIME,'knownAt':KNOWN}),obs('db-after')]
- x=[same('answer-snapshot',o,n,'answer','/response/snapshotRevision','noun','/response/snapshotRevision'),eq('answer-asOf',o,n,'answer','/response/asOf',TIME),eq('answer-knownAt',o,n,'answer','/response/knownAt',KNOWN),eq('answer-scope',o,n,'answer','/response/scope',SCOPE),assertion('answer-evidence',o,n,'exactSet','answer','/response/evidenceRefs',[alias('receipt60'),alias('receipt40'),alias('hold40')]),rowset('human-duty',o,n,'db-after','obligations',['responsibleWorkId','ownerId','nextAction','nextCheckAt'],[[alias('O1'),alias('reader'),'검사 근거 확인',NEXT],[alias('S1'),alias('writer'),'인도 증거 확인',NEXT]])]
+ a=[setup(),action('noun','getObject',{'id':alias('P'),'scope':SCOPE,'asOf':TIME,'knownAt':KNOWN}),action('answer',cap,{'scope':SCOPE,**({'id':alias('L')} if sid=='customer-impact' else {'id':alias('O1')} if sid!='inventory' else {}),**({'filters':{'action':'SELL'}} if sid=='supply-basis' else {}),'snapshotRef':ref('noun','/response/snapshotRevision'),'asOf':TIME,'knownAt':KNOWN}),obs('db-after')]
+ x=[same('answer-snapshot',o,n,'answer','/response/snapshotRevision','noun','/response/snapshotRevision'),eq('answer-asOf',o,n,'answer','/response/asOf',TIME),eq('answer-knownAt',o,n,'answer','/response/knownAt',KNOWN),eq('answer-scope',o,n,'answer','/response/scope',SCOPE),assertion('answer-evidence',o,n,'exactSet','answer','/response/evidenceRefs',[alias(x) for x in ['receipt60Fact','receipt40Fact','qc60','hold40','disposition60','customerConditions60','regulatory60Fact','eligibilityPolicy']]),rowset('human-duty',o,n,'db-after','obligations',['responsibleWorkId','ownerId','nextAction','nextCheckAt'],[[alias('O1'),alias('reader'),'검사 근거 확인',NEXT],[alias('S1'),alias('writer'),'인도 증거 확인',NEXT]])]
  if sid=='inventory':x += [assertion('held100',o,n,'decimalEquals','answer','/response/data/heldQuantity','100',unit=True),rowset('leaf-location',o,n,'db-after','segments',['id','locationId','quantity','unit'],[[alias('A60'),alias('W'),'60','BOX'],[alias('B40'),alias('W'),'40','BOX']])]
  elif sid=='supply-basis':
-  x += [eq('supply-action',o,n,'answer','/response/data/action','SELL'),eq('supply-quantity-scope',o,n,'answer','/response/data/segmentIds',[alias('A60')])]
+  x += [eq('supply-action',o,n,'answer','/response/data/action','SELL'),eq('supply-quantity-scope',o,n,'answer','/response/data/eligibleSegmentIds',[alias('A60')])]
   for c,e in [('QC','qc60'),('REGULATORY','regulatory60'),('DISPOSITION','disposition60'),('CUSTOMER','customerConditions60')]:x.append(assertion('basis-'+c,o,n,'relationSet','answer','/response/data/conditions',[[c,'ALLOWED',alias(e)]],field=['kind','result','evidenceId'],where={'kind':c}))
  elif sid=='waiting':x += [eq('wait-status',o,n,'answer','/response/data/status','WAITING'),eq('wait-reason',o,n,'answer','/response/data/wait/reason','B40 품질 후속 근거 대기'),eq('resume-evidence',o,n,'answer','/response/data/wait/resumePredicate/evidenceId',alias('hold40')),eq('verifier',o,n,'answer','/response/data/wait/verifierId',alias('reader')),eq('check',o,n,'answer','/response/data/wait/nextCheckAt',NEXT)]
  elif sid=='responsibility':x.append(assertion('answer-duty',o,n,'relationSet','answer','/response/data/obligations',[[alias('O1'),alias('reader'),'검사 근거 확인',NEXT],[alias('S1'),alias('writer'),'인도 증거 확인',NEXT]],field=['responsibleWorkId','ownerId','nextAction','nextCheckAt']))
- else:x += [assertion('customers',o,n,'exactSet','answer','/response/data/customerIds',[alias('C')]),eq('candidate-not-contamination',o,n,'answer','/response/data/impactKind','CANDIDATE'),rowset('lot-delivery-customer',o,n,'db-after','relations',['sourceId','targetId','type'],[[alias('L'),alias('A60'),'LOT_QUANTITY'],[alias('L'),alias('B40'),'LOT_QUANTITY'],[alias('A60'),alias('S1'),'SUBJECT_OF'],[alias('S1'),alias('C'),'CUSTOMER']])]
+ else:x += [assertion('customers',o,n,'exactSet','answer','/response/data/customerIds',[alias('C')]),eq('candidate-not-contamination',o,n,'answer','/response/data/impactKind','CANDIDATE'),rowset('lot-delivery-customer',o,n,'db-after','relations',['sourceId','targetId','relationDefinitionId'],[[alias('L'),alias('A60'),alias('relationLotQuantity')],[alias('L'),alias('B40'),alias('relationLotQuantity')],[alias('A60'),alias('S1'),alias('relationSubjectOf')],[alias('S1'),alias('C'),alias('relationCustomer')]])]
  T01.append(sub('T01',sid,title,o,a,x))
 o='T01.excluded-effects'
 for excluded in ['manufacture','BOM','B2C','generalLedger','taxSubmit','bankTransfer']:

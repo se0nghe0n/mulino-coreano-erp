@@ -120,6 +120,24 @@ class S1ReadIntegrationTest {
     assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readType("getObject",id(),"Allocation")).code());
     assertEquals("TYPE_INVALID",assertThrows(DomainError.class,()->readType("getObject",root,"NotANoun")).code());
   }
+  @Test @SuppressWarnings("unchecked") void t01SubjectLinksSelectOnlyTheRequestedLotAndKeepTheSnapshot(){
+    jdbc.update("UPDATE mulino_work_read_Works SET lotId=NULL WHERE organizationId=? AND ID=?",org,work);
+    var link=workRow(id());link.putAll(row("workId",work,"itemId",item,"lotId",lot));insert("mulino_work_read_SubjectLinks",link);
+    var otherLot=id();var l=scoped(otherLot);l.putAll(row("manufacturerId",manufacturer,"itemId",item,"originalLot","LOT-OTHER"));insert("mulino_inventory_ManufacturingLots",l);
+    String otherWork=id();var w=workRow(otherWork);w.putAll(row("itemId",item,"lotId",otherLot,"definitionVersionId",definition,"kind","PURCHASE","status","ACTIVE","ownerId",actor,"supervisorId",actor));insert("mulino_work_read_Works",w);
+    var noun=read("getObject",item,null);var verb=read("getWork",work,(String)noun.get("snapshotRevision"));
+    assertEquals(noun.get("snapshotRevision"),verb.get("snapshotRevision"));
+    assertEquals(List.of(work),((Map<String,Object>)verb.get("data")).get("workIds"));
+    assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->read("getWork",otherWork,null)).code());
+    var absent=request("getWork",work,null);absent.put("scope",Map.of("organizationId",org,"itemId",item,"lotId",otherLot));
+    assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->runtime.requestContext().run(c->queries.query(QueryRequests.parse("getWork",absent)))).code());
+  }
+  @Test @SuppressWarnings("unchecked") void t01DutyTupleComesFromTheVisibleWorkAndPreservesSourceFacts(){
+    var data=(Map<String,Object>)read("getObligations",work,null).get("data");
+    var duties=(List<Map<String,Object>>)data.get("obligations");assertEquals(1,duties.size());
+    assertEquals(work,duties.getFirst().get("responsibleWorkId"));assertEquals(actor,duties.getFirst().get("ownerId"));
+    assertEquals("검사 근거 확인",duties.getFirst().get("nextAction"));assertEquals("100",data.get("heldQuantity"));assertEquals("0",data.get("cumulativeArrival"));
+  }
   @Test void wrongOrgAndReadProjectionChangesFailClosed(){
     var noun=read("getObject",item,null);
     assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->read("getWork",id(),null)).code());

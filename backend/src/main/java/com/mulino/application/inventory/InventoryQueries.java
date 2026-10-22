@@ -22,6 +22,8 @@ public class InventoryQueries implements QueryHandler {
     for(var provider:providers)for(String type:provider.objectTypes())if(TYPES.containsKey(type)||objects.put(type,provider)!=null)throw new IllegalStateException("Duplicate noun read provider "+type);
     var owned=new HashSet<String>();for(var provider:facts)for(String metric:provider.metrics())if(!Set.of("eligibleQuantity","reservedQuantity","unreservedEligibleQuantity","cumulativeArrival","eligibilityStatus","allocationShortageQuantity","reservationResponsibilityQuantity").contains(metric)||!owned.add(metric))throw new IllegalStateException("Invalid or duplicate inventory metric "+metric);
   }
+  @org.springframework.beans.factory.annotation.Autowired
+  private org.springframework.beans.factory.ObjectProvider<LotCustomerRead> customerRead;
   public Set<String> operations() { return Set.of("getObject","searchObjects","getInventory","getTrace","traceLot"); }
   public QueryResult query(DomainContext c, QueryRequest q) {
     if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId")))throw DomainError.forbidden();
@@ -36,7 +38,7 @@ public class InventoryQueries implements QueryHandler {
       case "searchObjects" -> search(c,q);
       case "getInventory" -> inventory(c,q);
       case "getTrace" -> trace(c,q);
-      case "traceLot" -> {var scope=new LinkedHashMap<String,Object>(q.scope()); scope.put("objectType","ManufacturingLot"); yield trace(c,new QueryRequest(q.operation(),q.id()==null?(String)scope.get("lotId"):q.id(),scope,q.filters(),q.limit(),q.cursor(),q.definitionVersion(),q.asOf(),q.knownAt(),q.snapshotRef()));}
+      case "traceLot" -> {var scope=new LinkedHashMap<String,Object>(q.scope()); scope.put("objectType","ManufacturingLot"); var traced=trace(c,new QueryRequest(q.operation(),q.id()==null?(String)scope.get("lotId"):q.id(),scope,q.filters(),q.limit(),q.cursor(),q.definitionVersion(),q.asOf(),q.knownAt(),q.snapshotRef()));yield new QueryResult(traced.data(),q.scope(),traced.unknowns(),traced.conflicts(),traced.evidenceRefs(),traced.nextCursor());}
       default -> throw DomainError.unsupported();
     };
   }
@@ -163,6 +165,7 @@ public class InventoryQueries implements QueryHandler {
     boolean uncertain=visible.stream().anyMatch(r -> Boolean.TRUE.equals(r.get("uncertain"))) || all.stream().map(segments::get).anyMatch(r -> "UNCERTAIN_MIXTURE".equals(r.get("mixtureStatus")));
     var leaves=all.stream().map(segments::get).filter(r -> active(r,c)).toList();
     Map<String,Object> data=new LinkedHashMap<>(); data.put("rootId",q.id()); data.put("segmentIds",List.copyOf(all)); data.put("segments",all.stream().map(segments::get).map(this::dto).toList()); data.put("edges",visible.stream().map(this::dto).toList()); data.put("activeLeafIds",leaves.stream().map(r -> r.get("ID")).toList());
+    if(customerRead!=null&&customerRead.getIfAvailable()!=null){data.put("customerIds",customerRead.getObject().customers(c,all));data.put("impactKind","CANDIDATE");}
     data.put("impactStatus",uncertain ? "CANDIDATE_UNCERTAIN_MIXTURE" : "LINEAGE_ONLY"); data.put("confirmedDefectImpact",null); data.put("cleanSubsetSelectable",false);
     return result(data,q,uncertain ? List.of("PHYSICAL_SUBSET_NOT_IDENTIFIABLE","DEFECT_IMPACT_REQUIRES_EVIDENCE") : List.of("DEFECT_IMPACT_REQUIRES_EVIDENCE"));
   }

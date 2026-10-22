@@ -919,10 +919,6 @@
                 "$alias": "L"
               }
             },
-            "action": "SELL",
-            "customerId": {
-              "$alias": "C"
-            },
             "snapshotRef": {
               "$result": {
                 "actionId": "noun",
@@ -1144,13 +1140,28 @@
           },
           "expected": [
             {
-              "$alias": "receipt60"
+              "$alias": "receipt60Fact"
             },
             {
-              "$alias": "receipt40"
+              "$alias": "receipt40Fact"
+            },
+            {
+              "$alias": "qc60"
             },
             {
               "$alias": "hold40"
+            },
+            {
+              "$alias": "disposition60"
+            },
+            {
+              "$alias": "customerConditions60"
+            },
+            {
+              "$alias": "regulatory60Fact"
+            },
+            {
+              "$alias": "eligibilityPolicy"
             }
           ],
           "requirementRefs": [
@@ -1171,7 +1182,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
@@ -1401,15 +1412,11 @@
                 "$alias": "ORG"
               }
             },
-            "workId": {
+            "id": {
               "$alias": "O1"
             },
-            "lotId": {
-              "$alias": "L"
-            },
-            "action": "SELL",
-            "customerId": {
-              "$alias": "C"
+            "filters": {
+              "action": "SELL"
             },
             "snapshotRef": {
               "$result": {
@@ -1632,13 +1639,28 @@
           },
           "expected": [
             {
-              "$alias": "receipt60"
+              "$alias": "receipt60Fact"
             },
             {
-              "$alias": "receipt40"
+              "$alias": "receipt40Fact"
+            },
+            {
+              "$alias": "qc60"
             },
             {
               "$alias": "hold40"
+            },
+            {
+              "$alias": "disposition60"
+            },
+            {
+              "$alias": "customerConditions60"
+            },
+            {
+              "$alias": "regulatory60Fact"
+            },
+            {
+              "$alias": "eligibilityPolicy"
             }
           ],
           "requirementRefs": [
@@ -1659,7 +1681,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
@@ -1767,7 +1789,7 @@
           "op": "equals",
           "source": {
             "actionId": "answer",
-            "pointer": "/response/data/segmentIds"
+            "pointer": "/response/data/eligibleSegmentIds"
           },
           "expected": [
             {
@@ -1792,7 +1814,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "supply-quantity-scope: /response/data/segmentIds의 실제 equals 기대값은 [{\"$alias\": \"A60\"}]다. 미관찰·UNKNOWN은 정상값이 아니다.",
+          "oracleExplanation": "supply-quantity-scope: /response/data/eligibleSegmentIds의 실제 equals 기대값은 [{\"$alias\": \"A60\"}]다. 미관찰·UNKNOWN은 정상값이 아니다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
@@ -2067,15 +2089,8 @@
                 "$alias": "L"
               }
             },
-            "workId": {
+            "id": {
               "$alias": "O1"
-            },
-            "lotId": {
-              "$alias": "L"
-            },
-            "action": "SELL",
-            "customerId": {
-              "$alias": "C"
             },
             "snapshotRef": {
               "$result": {
@@ -2298,13 +2313,28 @@
           },
           "expected": [
             {
-              "$alias": "receipt60"
+              "$alias": "receipt60Fact"
             },
             {
-              "$alias": "receipt40"
+              "$alias": "receipt40Fact"
+            },
+            {
+              "$alias": "qc60"
             },
             {
               "$alias": "hold40"
+            },
+            {
+              "$alias": "disposition60"
+            },
+            {
+              "$alias": "customerConditions60"
+            },
+            {
+              "$alias": "regulatory60Fact"
+            },
+            {
+              "$alias": "eligibilityPolicy"
             }
           ],
           "requirementRefs": [
@@ -2325,7 +2355,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
@@ -2635,15 +2665,8 @@
                 "$alias": "L"
               }
             },
-            "workId": {
+            "id": {
               "$alias": "O1"
-            },
-            "lotId": {
-              "$alias": "L"
-            },
-            "action": "SELL",
-            "customerId": {
-              "$alias": "C"
             },
             "snapshotRef": {
               "$result": {
@@ -2866,13 +2889,28 @@
           },
           "expected": [
             {
-              "$alias": "receipt60"
+              "$alias": "receipt60Fact"
             },
             {
-              "$alias": "receipt40"
+              "$alias": "receipt40Fact"
+            },
+            {
+              "$alias": "qc60"
             },
             {
               "$alias": "hold40"
+            },
+            {
+              "$alias": "disposition60"
+            },
+            {
+              "$alias": "customerConditions60"
+            },
+            {
+              "$alias": "regulatory60Fact"
+            },
+            {
+              "$alias": "eligibilityPolicy"
             }
           ],
           "requirementRefs": [
@@ -2893,7 +2931,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
@@ -3090,9 +3128,8 @@
                 "$alias": "L"
               }
             },
-            "action": "SELL",
-            "customerId": {
-              "$alias": "C"
+            "id": {
+              "$alias": "L"
             },
             "snapshotRef": {
               "$result": {
@@ -3315,13 +3352,28 @@
           },
           "expected": [
             {
-              "$alias": "receipt60"
+              "$alias": "receipt60Fact"
             },
             {
-              "$alias": "receipt40"
+              "$alias": "receipt40Fact"
+            },
+            {
+              "$alias": "qc60"
             },
             {
               "$alias": "hold40"
+            },
+            {
+              "$alias": "disposition60"
+            },
+            {
+              "$alias": "customerConditions60"
+            },
+            {
+              "$alias": "regulatory60Fact"
+            },
+            {
+              "$alias": "eligibilityPolicy"
             }
           ],
           "requirementRefs": [
@@ -3342,7 +3394,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 3개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "answer-evidence: /response/evidenceRefs의 실제 값는 고정한 8개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
@@ -3492,7 +3544,7 @@
             "field": [
               "sourceId",
               "targetId",
-              "type"
+              "relationDefinitionId"
             ]
           },
           "expected": [
@@ -3503,7 +3555,9 @@
               {
                 "$alias": "A60"
               },
-              "LOT_QUANTITY"
+              {
+                "$alias": "relationLotQuantity"
+              }
             ],
             [
               {
@@ -3512,7 +3566,9 @@
               {
                 "$alias": "B40"
               },
-              "LOT_QUANTITY"
+              {
+                "$alias": "relationLotQuantity"
+              }
             ],
             [
               {
@@ -3521,7 +3577,9 @@
               {
                 "$alias": "S1"
               },
-              "SUBJECT_OF"
+              {
+                "$alias": "relationSubjectOf"
+              }
             ],
             [
               {
@@ -3530,7 +3588,9 @@
               {
                 "$alias": "C"
               },
-              "CUSTOMER"
+              {
+                "$alias": "relationCustomer"
+              }
             ]
           ],
           "requirementRefs": [
@@ -3551,7 +3611,7 @@
               "$alias": "L"
             }
           },
-          "oracleExplanation": "lot-delivery-customer: /data/rawRows/relations의 실제 ['sourceId', 'targetId', 'type']는 고정한 4개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
+          "oracleExplanation": "lot-delivery-customer: /data/rawRows/relations의 실제 ['sourceId', 'targetId', 'relationDefinitionId']는 고정한 4개 identity/관계와 exact 일치하며 중복·누락을 거부한다.",
           "oracleRef": {
             "oracleId": "T01.five-competency-questions",
             "observationNames": [
