@@ -54,6 +54,56 @@ class ResumeContracts(unittest.TestCase):
         self.assertEqual({'goal': {'quantityMode': 'STATE_AT'}, 'kind': 'check'}, case['request']['slots'])
         self.assertNotIn('workType', case['request']['provenance'])
 
+    def test_goal_storage_names_preserve_unresolved_evidence_and_time_contract(self):
+        goal = {'quantity': '20', 'unit': 'BOX', 'destinationId': {'$alias': 'W'},
+                'quantityMode': 'STATE_AT', 'endpoint': 'VERIFIED',
+                'dueAt': '2026-10-07T09:00:10Z', 'deadlineInclusive': True,
+                'timezone': 'Asia/Seoul', 'evidencePolicyVersion': 'synthetic-evidence-v1'}
+        for cid in ('V5', 'T26'):
+            with self.subTest(case=cid):
+                case = {'caseId': cid, 'request': {'capabilityId': 'createWork',
+                    'slots': {'kind': 'check', 'goal': copy.deepcopy(goal),
+                              'ownerId': {'$alias': 'owner'}}, 'provenance': {'goal': 'USER'}}}
+                expected = copy.deepcopy(case)
+                mapped = expected['request']['slots']['goal']
+                mapped['targetQuantity'] = mapped.pop('quantity')
+                mapped['placeId'] = mapped.pop('destinationId')
+                self.assertEqual({'goalStorageName': 2}, dict(apply(case)))
+                self.assertEqual(expected, case)
+                self.assertFalse(apply(case))
+
+    def test_conflicting_goal_names_are_not_silently_overwritten(self):
+        case = {'caseId': 'V5', 'request': {'capabilityId': 'createWork',
+            'slots': {'goal': {'quantity': '20', 'targetQuantity': '10'}}, 'provenance': {}}}
+        with self.assertRaisesRegex(ValueError, 'conflicting goal'):
+            apply(case)
+
+    def test_t17_only_changes_the_two_endpoint_oracles(self):
+        assertions = [
+            {'id': 'eligibility-response-5', 'op': 'exactSet', 'source': {
+                'pointer': '/data/rawRows/orders', 'field': 'deliveryEndpoint'},
+             'expected': ['CUSTOMER_ACCEPTED'], 'scope': {'itemId': {'$alias': 'P'}}},
+            {'id': 'eligibility-response-6', 'op': 'equals', 'source': {
+                'pointer': '/response/data/deliveryEndpoint'}, 'expected': 'CUSTOMER_ACCEPTED'},
+            {'id': 'other', 'expected': 'CUSTOMER_ACCEPTED'},
+            {'id': 'eligibility-response-5', 'source': {'field': 'quantity'}, 'expected': ['20']},
+        ]
+        case = {'caseId': 'T17', 'subcases': [{'assertions': assertions}]}
+        expected = copy.deepcopy(case)
+        expected['subcases'][0]['assertions'][0]['expected'] = ['DELIVERED']
+        expected['subcases'][0]['assertions'][1]['expected'] = 'DELIVERED'
+        self.assertEqual({'salesEndpointAssertion': 2}, dict(apply(case)))
+        self.assertEqual(expected, case)
+        self.assertFalse(apply(case))
+
+    def test_committed_scoped_cases_are_fixed_points(self):
+        for cid in ('T17', 'V5', 'T26'):
+            with self.subTest(case=cid):
+                case = json.loads((ROOT / f'verification/cases/{cid}/case.json').read_text())
+                before = copy.deepcopy(case)
+                self.assertFalse(apply(case))
+                self.assertEqual(before, case)
+
     def test_scoped_definition_grants_retain_other_constraints(self):
         for name in ('explicit-authorized-migration', 'pinned-meaning-current-policy'):
             fixture = json.loads((ROOT / 'verification/cases/T21/fixtures' / (name + '.json')).read_text())

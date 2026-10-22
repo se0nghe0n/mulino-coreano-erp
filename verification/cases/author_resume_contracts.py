@@ -36,12 +36,38 @@ def apply(case):
                     slots['kind'] = slots.pop('workType')
                     provenance['kind'] = provenance.pop('workType')
                     counts['goalKind'] += 1
+                if cid in ('V5', 'T26') and cap == 'createWork' and isinstance(slots.get('goal'), dict):
+                    # Only lossless storage-name mappings. STATE_AT timing,
+                    # evidence predicates and evaluator selection need their
+                    # own explicit contract; do not invent activation defaults.
+                    goal = slots['goal']
+                    for old, new in (('quantity', 'targetQuantity'), ('destinationId', 'placeId')):
+                        if old in goal:
+                            if new in goal and goal[new] != goal[old]:
+                                raise ValueError(f'{cid}: conflicting goal {old}/{new}')
+                            goal[new] = goal.pop(old)
+                            counts['goalStorageName'] += 1
                 if cid in ('C3', 'V4') and cap in ('createWork', 'createDraft') and slots.get('quantityMode') == 'CUMULATIVE_EVENT' and 'period' not in slots:
                     slots['period'] = {'start': '2026-10-07T09:00:00Z', 'end': slots['dueAt'], 'startInclusive': True, 'endInclusive': True}
                     provenance['period'] = 'USER'
                     counts['authorizationPeriod'] += 1
             for child in list(node.values()): visit(child)
     visit(case)
+    if cid == 'T17':
+        for sub in case.get('subcases', []):
+            for assertion in sub.get('assertions', []):
+                source = assertion.get('source', {})
+                if (assertion.get('id') == 'eligibility-response-5'
+                        and source.get('pointer') == '/data/rawRows/orders'
+                        and source.get('field') == 'deliveryEndpoint'
+                        and assertion.get('expected') == ['CUSTOMER_ACCEPTED']):
+                    assertion['expected'] = ['DELIVERED']
+                    counts['salesEndpointAssertion'] += 1
+                elif (assertion.get('id') == 'eligibility-response-6'
+                        and source.get('pointer') == '/response/data/deliveryEndpoint'
+                        and assertion.get('expected') == 'CUSTOMER_ACCEPTED'):
+                    assertion['expected'] = 'DELIVERED'
+                    counts['salesEndpointAssertion'] += 1
     return counts
 
 
