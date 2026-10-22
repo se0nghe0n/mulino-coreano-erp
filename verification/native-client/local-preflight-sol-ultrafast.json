@@ -1,0 +1,98 @@
+{
+  "authentication": "chatgpt",
+  "requestedModel": "gpt-6.1-sol",
+  "requestedServiceTier": "ultrafast",
+  "planType": "promax",
+  "creditFallbackAvailable": false,
+  "catalogModel": {
+    "id": "gpt-6.1-sol",
+    "model": "gpt-6.1-sol",
+    "upgrade": null,
+    "upgradeInfo": null,
+    "availabilityNux": {
+      "message": "Maximize usage with GPT-6.1 Sol. Try it on complex work for near-Astra performance at a lower cost."
+    },
+    "displayName": "GPT-6.1-Sol",
+    "description": "Latest workhorse model for coding and everyday work.",
+    "modelSpecialty": null,
+    "hidden": false,
+    "supportedReasoningEfforts": [
+      {
+        "reasoningEffort": "low",
+        "description": "Fast responses with lighter reasoning"
+      },
+      {
+        "reasoningEffort": "medium",
+        "description": "Balances speed and reasoning depth for everyday tasks"
+      },
+      {
+        "reasoningEffort": "high",
+        "description": "Greater reasoning depth for complex problems"
+      },
+      {
+        "reasoningEffort": "xhigh",
+        "description": "Extra high reasoning depth for complex problems"
+      },
+      {
+        "reasoningEffort": "max",
+        "description": "Maximum reasoning depth for the hardest problems"
+      },
+      {
+        "reasoningEffort": "ultra",
+        "description": "Maximum reasoning with automatic task delegation"
+      }
+    ],
+    "defaultReasoningEffort": "low",
+    "inputModalities": [
+      "text",
+      "image"
+    ],
+    "supportsPersonality": false,
+    "multiAgentVersion": "v2",
+    "additionalSpeedTiers": [
+      "fast",
+      "ultrafast"
+    ],
+    "serviceTiers": [
+      {
+        "id": "priority",
+        "name": "Fast",
+        "description": "2x speed, increased usage"
+      },
+      {
+        "id": "ultrafast",
+        "name": "Ultrafast",
+        "description": "The fastest available responses for latency-sensitive work."
+      }
+    ],
+    "defaultServiceTier": null,
+    "availableAccessPrograms": {
+      "cyber": [
+        "standard"
+      ]
+    },
+    "isDefault": true
+  },
+  "actualModelCalls": 0,
+  "resolvedConfiguration": {
+    "model": "gpt-6.1-sol",
+    "modelProvider": "openai",
+    "serviceTier": "ultrafast",
+    "reasoningEffort": "high",
+    "dynamicToolSchemaAccepted": true,
+    "turnStarted": false
+  },
+  "observedAt": "2026-10-22T08:23:18.501472Z",
+  "clientExactVersion": "codex-cli 0.163.0",
+  "clientBinarySha256": "8813367285524ac798dd96d1b071aea30d58708c7226fd236cd275cf1cfdee31",
+  "configSha256": "3d0a0b549f00acc659f2df7641a2d143df089c3a626dee383e45ded429664fe9",
+  "status": "CLIENT_PREFLIGHT_ONLY",
+  "runtimeStatus": "NOT_RUN",
+  "approvalSha256": "602fba5373d4121b84896e387bff66ef3a1530a9721353acd331308376615f5e",
+  "config": "model = \"gpt-6.1-sol\"\nmodel_provider = \"openai\"\nservice_tier = \"ultrafast\"\nmodel_reasoning_effort = \"high\"\nforced_login_method = \"chatgpt\"\ncli_auth_credentials_store = \"file\"\napproval_policy = \"never\"\nsandbox_mode = \"read-only\"\nweb_search = \"disabled\"\nproject_doc_max_bytes = 0\n[analytics]\nenabled = false\n[features]\nshell_tool = false\nunified_exec = false\napps = false\nplugins = false\nhooks = false\nmulti_agent = false\nmulti_agent_v2 = false\nmemories = false\nskill_search = false\nskip_host_skill_discovery = true\nskill_mcp_dependency_install = false\ncode_mode = false\ncode_mode_host = false\nbrowser_use = false\nbrowser_use_external = false\ncomputer_use = false\nimage_generation = false\nin_app_browser = false\nin_app_local_automation = false\ndaemon_auto_start = false\nunbounded_connection_retries = false\nultrafast_mode = true\n",
+  "command": [
+    "/opt/homebrew/Caskroom/codex/0.163.0/bin/codex",
+    "app-server",
+    "--stdio"
+  ]
+}

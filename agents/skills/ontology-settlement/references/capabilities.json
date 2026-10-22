@@ -1,0 +1,123 @@
+{
+  "source": "contracts/capability-slots.json",
+  "schemaVersion": "1.0.0",
+  "queries": {
+    "getObject": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "searchObjects": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "getWork": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "searchWorks": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getSettlement": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementQueries.java"
+    },
+    "getPurchase": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/purchase/PurchaseQueries.java"
+    },
+    "getReceipt": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptQueries.java"
+    },
+    "getSalesOrder": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java"
+    },
+    "getDelivery": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java"
+    },
+    "getEvidence": {
+      "provider": "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java"
+    },
+    "getObligations": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getAssessment": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    }
+  },
+  "commands": {
+    "recordInvoice": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java",
+      "slots": [
+        "canonicalOccurrenceId",
+        "currency",
+        "deliveryId",
+        "evidence",
+        "fxSnapshot",
+        "invoiceKind",
+        "line",
+        "originalAmount",
+        "purchaseLineId",
+        "quantity",
+        "receiptOccurrenceId",
+        "receiptOccurrenceKey",
+        "relatedInvoiceId",
+        "saleLineId",
+        "scopeKind",
+        "sourceKey",
+        "unit",
+        "unitPrice"
+      ]
+    },
+    "recordCharge": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java",
+      "slots": [
+        "amount",
+        "canonicalOccurrenceId",
+        "currency",
+        "evidence",
+        "invoiceId",
+        "kind"
+      ]
+    },
+    "matchInvoice": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java",
+      "slots": [
+        "canonicalOccurrenceId",
+        "currency",
+        "deliveryId",
+        "evidence",
+        "invoiceId",
+        "matchQuantity",
+        "orderedAmount",
+        "purchaseLineId",
+        "receiptOccurrenceId",
+        "receiptOccurrenceKey",
+        "saleLineId"
+      ]
+    },
+    "recordSettlementAdjustment": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java",
+      "slots": [
+        "amount",
+        "canonicalOccurrenceId",
+        "currency",
+        "dutyRootId",
+        "evidence",
+        "invoiceId",
+        "mode",
+        "policyVersion",
+        "proposalHash",
+        "proposalId",
+        "reason"
+      ]
+    },
+    "recordPaymentReference": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/settlement/SettlementCommands.java",
+      "slots": [
+        "amount",
+        "canonicalOccurrenceId",
+        "currency",
+        "evidence",
+        "externalPaymentReference",
+        "invoiceId",
+        "observedAt"
+      ]
+    }
+  },
+  "usage": "Allowed slot names are not a guarantee that all are optional. Read live tools/list and server validation; keep returned outcome and unknowns."
+}

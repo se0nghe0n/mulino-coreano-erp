@@ -1,0 +1,481 @@
+{
+  "source": "contracts/capability-slots.json",
+  "schemaVersion": "1.0.0",
+  "queries": {
+    "getObject": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "searchObjects": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "getWork": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "searchWorks": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getSalesOrder": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java"
+    },
+    "getSalesOrders": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java"
+    },
+    "getDelivery": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java"
+    },
+    "getDeliveries": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java"
+    },
+    "getInventory": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "evaluateEligibility": {
+      "provider": "backend/src/main/java/com/mulino/application/quality/QualityEligibility.java"
+    },
+    "getReturn": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/returns/ReturnQueries.java"
+    },
+    "getReturns": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/returns/ReturnQueries.java"
+    },
+    "getRecall": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallQueries.java"
+    },
+    "getRecalls": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallQueries.java"
+    },
+    "traceLot": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "traceRecall": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallQueries.java"
+    },
+    "getObligations": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getAssessment": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getEvidence": {
+      "provider": "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java"
+    }
+  },
+  "commands": {
+    "createSalesOrder": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java",
+      "slots": [
+        "currency",
+        "customerId",
+        "deliveryEndpoint",
+        "destinationId",
+        "dueAt",
+        "itemId",
+        "orderId",
+        "ownerId",
+        "packageTerms",
+        "price",
+        "qualityTerms",
+        "quantity",
+        "reason",
+        "supervisorId",
+        "unit",
+        "workId"
+      ],
+      "note": "UD-1 (2026-10-11, plan §6): workId is optional. Without it the order creates its own DRAFT delivery Work owned by ownerId (default: the requesting human) and supervised by supervisorId (default: the owner). price and currency are optional and stated together.",
+      "response": {
+        "workId": "the order's delivery Work (created or named)",
+        "orderId": "order root",
+        "line": {
+          "id": "order line ID (= effects.lineId)",
+          "revisionId": "order revision",
+          "orderId": "order root"
+        }
+      }
+    },
+    "reviseSalesOrder": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java",
+      "slots": [
+        "currency",
+        "customerId",
+        "deliveryEndpoint",
+        "destinationId",
+        "dueAt",
+        "itemId",
+        "orderId",
+        "packageTerms",
+        "price",
+        "qualityTerms",
+        "quantity",
+        "reason",
+        "unit",
+        "workId"
+      ],
+      "note": "workId is optional and must equal the order's Work when stated; price and currency are optional and stated together."
+    },
+    "reserveQuantity": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+      "slots": [
+        "quantity",
+        "salesLineId",
+        "segmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "replaceAllocation": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+      "slots": [
+        "allocationId",
+        "quantity",
+        "segmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "releaseAllocation": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+      "slots": [
+        "allocationId"
+      ]
+    },
+    "pickQuantity": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+      "slots": [
+        "allocationId"
+      ]
+    },
+    "dispatchQuantity": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
+      "slots": [
+        "allocationId",
+        "evidenceRef",
+        "occurredAt",
+        "transitPlaceId"
+      ]
+    },
+    "recordDelivery": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java",
+      "slots": [
+        "allocationId",
+        "canonicalOccurrenceId",
+        "cargoScopeId",
+        "customerId",
+        "dispatchId",
+        "eventId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "observationId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "rangeRootId",
+        "salesLineId",
+        "startQuantity",
+        "unit",
+        "workId"
+      ],
+      "forms": {
+        "confirmation": [
+          "canonicalOccurrenceId",
+          "observationId"
+        ],
+        "observation": [
+          "allocationId",
+          "cargoScopeId",
+          "customerId",
+          "dispatchId",
+          "eventId",
+          "itemId",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "observationId",
+          "occurredAt",
+          "placeId",
+          "quantity",
+          "rangeRootId",
+          "salesLineId",
+          "startQuantity",
+          "unit",
+          "workId"
+        ]
+      },
+      "note": "confirmation form when canonicalOccurrenceId confirms an observation. allocationId (plan §6 '이미 소비된 배분 참조', optional) must be the CONSUMED allocation of the named dispatchId."
+    },
+    "recordObservedMovement": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java",
+      "slots": [
+        "cargoScopeId",
+        "customerId",
+        "dispatchId",
+        "eventId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "observationId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "rangeRootId",
+        "salesLineId",
+        "startQuantity",
+        "unit",
+        "workId"
+      ],
+      "forms": {
+        "observation": [
+          "cargoScopeId",
+          "customerId",
+          "dispatchId",
+          "eventId",
+          "itemId",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "observationId",
+          "occurredAt",
+          "placeId",
+          "quantity",
+          "rangeRootId",
+          "salesLineId",
+          "startQuantity",
+          "unit",
+          "workId"
+        ]
+      }
+    },
+    "authorizeReturn": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java",
+      "slots": [
+        "deliveryId",
+        "destinationId",
+        "quantity",
+        "reason",
+        "startQuantity",
+        "unit",
+        "validUntil"
+      ]
+    },
+    "receiveReturn": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java",
+      "slots": [
+        "authorizationId",
+        "canonicalOccurrenceId",
+        "eventId",
+        "nextCheckAt",
+        "occurredAt",
+        "quantity",
+        "receivingCustodianId",
+        "returnId",
+        "startQuantity",
+        "unit"
+      ],
+      "forms": {
+        "confirmation": [
+          "authorizationId",
+          "canonicalOccurrenceId",
+          "nextCheckAt",
+          "receivingCustodianId",
+          "returnId"
+        ],
+        "observation": [
+          "authorizationId",
+          "eventId",
+          "nextCheckAt",
+          "occurredAt",
+          "quantity",
+          "startQuantity",
+          "unit"
+        ]
+      },
+      "note": "confirmation form when returnId is present"
+    },
+    "decideReturnDisposition": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/returns/ReturnCommands.java",
+      "slots": [
+        "decision",
+        "evidenceId",
+        "nextCheckAt",
+        "reason",
+        "returnId"
+      ]
+    },
+    "correctEvidence": {
+      "provider": "backend/src/main/java/com/mulino/application/evidence/EvidenceRecordCommands.java",
+      "slots": [
+        "assertion",
+        "contentBase64",
+        "documentId",
+        "effectiveFrom",
+        "effectiveUntil",
+        "eventId",
+        "evidenceType",
+        "expectedHash",
+        "externalEventId",
+        "invalidatesId",
+        "kind",
+        "mediaType",
+        "payload",
+        "provenance",
+        "quantity",
+        "sourceNamespace",
+        "sourceReference",
+        "sourceVersion",
+        "subject",
+        "supersedesId",
+        "timePrecision",
+        "timeZone",
+        "unit",
+        "valueState"
+      ],
+      "forms": {
+        "EVENT": [
+          "assertion",
+          "documentId",
+          "effectiveFrom",
+          "effectiveUntil",
+          "evidenceType",
+          "externalEventId",
+          "invalidatesId",
+          "kind",
+          "payload",
+          "quantity",
+          "sourceNamespace",
+          "sourceVersion",
+          "subject",
+          "supersedesId",
+          "timePrecision",
+          "timeZone",
+          "unit",
+          "valueState"
+        ],
+        "DOCUMENT": [
+          "contentBase64",
+          "evidenceType",
+          "expectedHash",
+          "mediaType",
+          "provenance",
+          "sourceNamespace",
+          "sourceReference",
+          "subject",
+          "supersedesId"
+        ],
+        "CLAIM": [
+          "assertion",
+          "documentId",
+          "eventId",
+          "evidenceType",
+          "quantity",
+          "sourceNamespace",
+          "subject",
+          "supersedesId",
+          "unit",
+          "valueState"
+        ]
+      },
+      "note": "evidenceType selects the form (default EVENT)"
+    },
+    "openInvestigation": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+      "slots": [
+        "basisEvidenceId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "occurredAt",
+        "quantity",
+        "segmentId",
+        "startQuantity",
+        "unit",
+        "workId"
+      ]
+    },
+    "proposeRecall": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+      "slots": [
+        "investigationId",
+        "quantity",
+        "reason",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "approveRecall": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+      "slots": [
+        "decision",
+        "scopeHash",
+        "scopeId",
+        "validUntil"
+      ]
+    },
+    "recordRecallNotice": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+      "slots": [
+        "actualEventId",
+        "approvalId",
+        "canonicalOccurrenceId",
+        "currentPlaceId",
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "returnId",
+        "rootSegmentId",
+        "scopeHash",
+        "scopeId",
+        "sourceSegmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "recordRecovery": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+      "slots": [
+        "actualEventId",
+        "approvalId",
+        "canonicalOccurrenceId",
+        "currentPlaceId",
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "returnId",
+        "rootSegmentId",
+        "scopeHash",
+        "scopeId",
+        "sourceSegmentId",
+        "startQuantity",
+        "unit"
+      ]
+    },
+    "closeRecall": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/recall/RecallCommands.java",
+      "slots": [
+        "approvalId",
+        "canonicalOccurrenceId",
+        "partitionHash",
+        "scopeHash",
+        "scopeId"
+      ]
+    },
+    "disposeQuantity": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java",
+      "slots": [
+        "evidenceRef",
+        "occurredAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "unit"
+      ]
+    }
+  },
+  "usage": "Allowed slot names are not a guarantee that all are optional. Read live tools/list and server validation; keep returned outcome and unknowns."
+}

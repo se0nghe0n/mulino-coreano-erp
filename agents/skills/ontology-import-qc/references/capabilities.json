@@ -1,0 +1,185 @@
+{
+  "source": "contracts/capability-slots.json",
+  "schemaVersion": "1.0.0",
+  "queries": {
+    "getObject": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "searchObjects": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "getWork": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "searchWorks": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getRegulatoryProcedure": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryQueries.java"
+    },
+    "getPolicy": {
+      "provider": "backend/src/main/java/com/mulino/application/policy/PolicyQueries.java"
+    },
+    "getReceipt": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptQueries.java"
+    },
+    "getReceipts": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptQueries.java"
+    },
+    "getInventory": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "evaluateEligibility": {
+      "provider": "backend/src/main/java/com/mulino/application/quality/QualityEligibility.java"
+    },
+    "getEvidence": {
+      "provider": "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java"
+    },
+    "getReconciliation": {
+      "provider": "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java"
+    },
+    "getObligations": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    }
+  },
+  "commands": {
+    "prepareRegulatoryProcedure": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java",
+      "slots": [
+        "documentVersionId",
+        "itemId",
+        "lotId",
+        "physicalScopeId",
+        "policyId",
+        "procedureId",
+        "workId"
+      ]
+    },
+    "recordSubmission": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java",
+      "slots": [
+        "occurredAt",
+        "occurrenceId",
+        "procedureId"
+      ]
+    },
+    "recordRegulatoryDecision": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java",
+      "slots": [
+        "action",
+        "decision",
+        "occurrenceId",
+        "previousVersionId",
+        "procedureId",
+        "quantity",
+        "startQuantity",
+        "unit",
+        "validFrom",
+        "validUntil"
+      ]
+    },
+    "verifyLabel": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryCommands.java",
+      "slots": [
+        "decision",
+        "occurrenceId",
+        "packagingVersionId",
+        "procedureId",
+        "specificationVersionId",
+        "validFrom",
+        "validUntil"
+      ]
+    },
+    "receiveProvisional": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java",
+      "slots": [
+        "eventId",
+        "itemId",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "occurredAt",
+        "ownerId",
+        "placeId",
+        "purchaseLineId",
+        "quantity",
+        "rangeRootId",
+        "startQuantity",
+        "supervisorId",
+        "transitSegmentId",
+        "unit",
+        "workId"
+      ]
+    },
+    "confirmReceipt": {
+      "provider": "backend/src/main/java/com/mulino/application/trade/receipt/ReceiptCommands.java",
+      "slots": [
+        "canonicalOccurrenceId",
+        "lotId",
+        "receiptId",
+        "receivingCustodianId"
+      ]
+    },
+    "placeHold": {
+      "provider": "backend/src/main/java/com/mulino/application/quality/QualityCommands.java",
+      "slots": [
+        "action",
+        "category",
+        "customerId",
+        "evidenceId",
+        "nextCheckAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "startQuantity",
+        "unit",
+        "validFrom",
+        "validUntil",
+        "workId"
+      ]
+    },
+    "releaseHold": {
+      "provider": "backend/src/main/java/com/mulino/application/quality/QualityCommands.java",
+      "slots": [
+        "evidenceId",
+        "reason",
+        "restrictionId"
+      ]
+    },
+    "recordStocktake": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java",
+      "slots": [
+        "evidenceRef",
+        "observedQuantity",
+        "occurredAt",
+        "segmentId",
+        "unit"
+      ]
+    },
+    "adjustQuantity": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java",
+      "slots": [
+        "direction",
+        "evidenceRef",
+        "occurredAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "stocktakeId",
+        "unit"
+      ]
+    },
+    "disposeQuantity": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryCommands.java",
+      "slots": [
+        "evidenceRef",
+        "occurredAt",
+        "quantity",
+        "reason",
+        "segmentId",
+        "unit"
+      ]
+    }
+  },
+  "usage": "Allowed slot names are not a guarantee that all are optional. Read live tools/list and server validation; keep returned outcome and unknowns."
+}

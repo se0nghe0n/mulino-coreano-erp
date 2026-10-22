@@ -135,7 +135,7 @@ public final class NativeCodexClient implements AgentRunner.ActualClientPort {
     /** No raw credentials are read or copied by this harness; only Codex follows this link. */
     static final class RuntimeHome implements AutoCloseable {
         static final String CONFIG="""
-            model = "gpt-6-astra"
+            model = "gpt-6.1-sol"
             model_provider = "openai"
             service_tier = "ultrafast"
             model_reasoning_effort = "high"

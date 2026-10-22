@@ -1,13 +1,15 @@
 {
-  "baselineCommit": "082c703e9cb8198c91ff1507b7bcaef442d31a3a",
-  "evidenceClass": "CONTRACT_TEST_AND_NATIVE_NON_MODEL_PREFLIGHT",
+  "baselineCommit": "d6288006df3b17b9294c844fcea2270cf69a69c5",
+  "observedAt": "2026-10-22T08:23:58.707572+00:00",
+  "evidenceClass": "CONTRACT_TEST_STATIC_DISCOVERY_AND_NATIVE_NON_MODEL_PREFLIGHT",
   "javaVersion": "21.0.12.1",
+  "mavenVersion": "3.9.16",
   "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=NativeClientContractTest,ModelBindingContractTest,ModelBindingResponseEvidenceTest,ModelBindingEvaluatorTest test",
   "exitCode": 0,
   "suites": [
     {
       "name": "org.mulino.verification.nativeclient.NativeClientContractTest",
-      "tests": "13",
+      "tests": "15",
       "failures": "0",
       "errors": "0",
       "skipped": "0"
@@ -34,14 +36,64 @@
       "skipped": "0"
     }
   ],
-  "actualModelCalls": 0,
-  "runtimeAcceptance": "NOT_RUN",
+  "uniqueTests": 76,
+  "finalPackageCheck": {
+    "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=NativeClientContractTest test",
+    "exitCode": 0,
+    "tests": 15
+  },
+  "packageValidation": {
+    "command": "python3 verification/native-client/validate-runtime-skills.py",
+    "exitCode": 0,
+    "artifactRef": "verification/native-client/runtime-skills-discovery.json"
+  },
+  "quickValidation": {
+    "artifactRef": "verification/native-client/runtime-skills-quick-validate.json",
+    "packages": 6,
+    "exitCode": 0,
+    "environment": "Temporary /tmp venv with PyYAML; no personal configuration changed"
+  },
+  "preparation": {
+    "command": "./verify prepare",
+    "exitCode": 0,
+    "preparedCases": 41,
+    "status": "PREPARED",
+    "artifactRef": "verification/native-client/checks/runtime-skills-prepare-summary.json"
+  },
   "preflightCommand": "verification/model-binding/run native-preflight",
   "preflightExitCode": 0,
-  "preflightSha256": "27157a677be6fc0390acb0506134047878e71f19ca28f3bc725f22776679db5e",
+  "preflightRef": "verification/native-client/local-preflight-sol-ultrafast.json",
+  "preflightSha256": "c5770d13ebed5d3a256123351c708cea0cebec3ac07b8e89ddd74b7858cb227d",
+  "historicalEvidence": [
+    "verification/native-client/local-preflight.json",
+    "verification/native-client/checks-astra-20261022.json",
+    "verification/native-client/subscription-approval-astra-20261022.json"
+  ],
+  "actualModelCalls": 0,
+  "runtimeAcceptance": "NOT_RUN",
+  "resolvedBlockers": [
+    "Six product skill packages absent"
+  ],
   "remainingBlockers": [
-    "Six product skill packages absent",
-    "NativeClientIntegration product transport and independent observations absent",
+    "NativeClientIntegration product transport and independent observations are separate work",
+    "Native body/reference loading and actual tool execution require a permitted real model turn",
     "Deterministic prerequisite and R8 business acceptance integration pending"
-  ]
+  ],
+  "artifactHashes": {
+    "verification/native-client/checks/runtime-skills-contract.txt": "a4eb01f697dbab9c1784b19b90ada445c617aa020ff40604dee8b416c1530b3d",
+    "verification/native-client/checks/runtime-skills-final-contract.txt": "c6cd8bafdb2bf2f2a7d764718ea4d32ef79094262cc54c1f6b28cf2189ce0e3f",
+    "verification/native-client/checks/runtime-skills-prepare-commands.json": "4bd72c978ff5f5a6285bbf69a5c5511ccd4a9a9dd177810a8debee53c008e3cc",
+    "verification/native-client/checks/runtime-skills-prepare-summary.json": "cae064dc77082ea9daadfcc384f73cb7ac460df1b159e0ee942d6d48bb435250"
+  },
+  "rawLogSha256": {
+    "verification/native-client/checks/runtime-skills-final-contract.txt": "9df0711806c1359056d091e2b2afe29959a1266e51b001bda92ebbc21af45a32",
+    "verification/native-client/checks/runtime-skills-contract.txt": "a68363b02a98047c82b969a260abd6ee695bebc8a73a115270462232ed17585b"
+  },
+  "logNormalization": "Trailing whitespace removed from saved Maven text logs; raw hashes retained.",
+  "implementationSourceHashes": {
+    "verification/harness/src/main/java/org/mulino/verification/nativeclient/NativeClientPolicy.java": "5dc4d99ddba02c45c85db3d5efcf39ce37d7b3ea21ed98dce8c1d9acda4ac7f4",
+    "verification/harness/src/main/java/org/mulino/verification/nativeclient/NativeCodexClient.java": "8ce408e7181c7212276a043f8d6ca012d08122ec29e74e37fe9ba9e7db9e4f5e",
+    "verification/harness/src/test/java/org/mulino/verification/nativeclient/NativeClientContractTest.java": "dd2a69a940bdcde7cb67811ef237f4eb716f5346c0571ecb154920214d19b1d6",
+    "verification/native-client/validate-runtime-skills.py": "15486623f4952f552f0f91d4f7a4d03835aabd21e30e5b6bd3a2af4ca3ed45af"
+  }
 }

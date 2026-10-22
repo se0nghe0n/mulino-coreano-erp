@@ -1,0 +1,357 @@
+{
+  "source": "contracts/capability-slots.json",
+  "schemaVersion": "1.0.0",
+  "queries": {
+    "getObject": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "searchObjects": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "getWork": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "searchWorks": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getInventory": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "getObligations": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getAssessment": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionQueries.java"
+    },
+    "getEvidence": {
+      "provider": "backend/src/main/java/com/mulino/application/evidence/EvidenceQueries.java"
+    },
+    "getAccessContext": {
+      "provider": "backend/src/main/java/com/mulino/application/identity/IdentityQueries.java"
+    },
+    "getGrant": {
+      "provider": "backend/src/main/java/com/mulino/application/identity/IdentityQueries.java"
+    },
+    "searchOperationalIssues": {
+      "provider": "backend/src/main/java/com/mulino/application/runtime/RuntimeQueries.java"
+    }
+  },
+  "commands": {
+    "createDraft": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "conditions",
+        "conversationRequestId",
+        "definitionVersionId",
+        "destinationId",
+        "distinctContributionScope",
+        "dueAt",
+        "eligibilityAction",
+        "endpoint",
+        "evaluationTime",
+        "evaluatorVersion",
+        "eventKinds",
+        "evidencePolicyVersion",
+        "goal",
+        "includeReservations",
+        "itemId",
+        "kind",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "observationPolicy",
+        "originalText",
+        "ownerId",
+        "period",
+        "placeId",
+        "quantity",
+        "quantityMode",
+        "supervisorId",
+        "timezone",
+        "workType"
+      ],
+      "forms": {
+        "public": [
+          "conditions",
+          "destinationId",
+          "distinctContributionScope",
+          "dueAt",
+          "eligibilityAction",
+          "endpoint",
+          "evaluationTime",
+          "evaluatorVersion",
+          "eventKinds",
+          "evidencePolicyVersion",
+          "includeReservations",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "observationPolicy",
+          "originalText",
+          "ownerId",
+          "period",
+          "placeId",
+          "quantity",
+          "quantityMode",
+          "supervisorId",
+          "timezone",
+          "workType"
+        ],
+        "goal": [
+          "conversationRequestId",
+          "definitionVersionId",
+          "goal",
+          "itemId",
+          "kind",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "originalText",
+          "ownerId",
+          "supervisorId"
+        ]
+      },
+      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject. UD-2 (2026-10-11, plan §5.2): nextAction (text ≤320) and nextCheckAt (instant) are stated together; activation opens the Work-sourced initial duty WORK_NEXT_ACTION and closeWork discharges it."
+    },
+    "createWork": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "conditions",
+        "conversationRequestId",
+        "definitionVersionId",
+        "destinationId",
+        "distinctContributionScope",
+        "dueAt",
+        "eligibilityAction",
+        "endpoint",
+        "evaluationTime",
+        "evaluatorVersion",
+        "eventKinds",
+        "evidencePolicyVersion",
+        "goal",
+        "includeReservations",
+        "itemId",
+        "kind",
+        "lotId",
+        "nextAction",
+        "nextCheckAt",
+        "observationPolicy",
+        "originalText",
+        "ownerId",
+        "period",
+        "placeId",
+        "quantity",
+        "quantityMode",
+        "supervisorId",
+        "timezone",
+        "workType"
+      ],
+      "forms": {
+        "public": [
+          "conditions",
+          "destinationId",
+          "distinctContributionScope",
+          "dueAt",
+          "eligibilityAction",
+          "endpoint",
+          "evaluationTime",
+          "evaluatorVersion",
+          "eventKinds",
+          "evidencePolicyVersion",
+          "includeReservations",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "observationPolicy",
+          "originalText",
+          "ownerId",
+          "period",
+          "placeId",
+          "quantity",
+          "quantityMode",
+          "supervisorId",
+          "timezone",
+          "workType"
+        ],
+        "goal": [
+          "conversationRequestId",
+          "definitionVersionId",
+          "goal",
+          "itemId",
+          "kind",
+          "lotId",
+          "nextAction",
+          "nextCheckAt",
+          "originalText",
+          "ownerId",
+          "supervisorId"
+        ]
+      },
+      "note": "goal form when the goal aggregate slot is present; otherwise the public flat form and the item is the TradeItem subject. UD-2 (2026-10-11, plan §5.2): nextAction (text ≤320) and nextCheckAt (instant) are stated together; activation opens the Work-sourced initial duty WORK_NEXT_ACTION and closeWork discharges it."
+    },
+    "cancelDraft": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "reason",
+        "workId"
+      ]
+    },
+    "activateWork": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "workId"
+      ]
+    },
+    "waitWork": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "wait",
+        "workId"
+      ]
+    },
+    "resumeWork": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "evidence",
+        "workId"
+      ]
+    },
+    "reviseGoal": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "goal",
+        "newDueAt",
+        "previousGoalVersion",
+        "reason",
+        "workId"
+      ],
+      "forms": {
+        "goal": [
+          "goal",
+          "reason",
+          "workId"
+        ],
+        "dueAt": [
+          "newDueAt",
+          "previousGoalVersion",
+          "reason",
+          "workId"
+        ]
+      }
+    },
+    "closeWork": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "reason",
+        "workId"
+      ]
+    },
+    "createFollowup": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "draft",
+        "obligationIds",
+        "reason",
+        "workId"
+      ]
+    },
+    "createWorkLink": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "activityId",
+        "conditionId",
+        "kind",
+        "linkKind",
+        "occurrenceId",
+        "physicalScope",
+        "quantity",
+        "quantityUnit",
+        "quantityValue",
+        "sourceWorkId",
+        "startQuantity",
+        "targetWorkId",
+        "workId"
+      ],
+      "note": "physicalScope is accepted only to answer NEEDS_INPUT VERIFIED_RANGE_REQUIRED (a disjoint range needs startQuantity)"
+    },
+    "assessGoal": {
+      "provider": "backend/src/main/java/com/mulino/application/evaluation/AssessmentService.java",
+      "slots": [
+        "workId"
+      ]
+    },
+    "openObligation": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "kind",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "scopeJson",
+        "sourceId",
+        "sourceKind",
+        "sourceVersion",
+        "unit",
+        "workId"
+      ]
+    },
+    "resolveObligation": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "assignmentId",
+        "evidenceId"
+      ]
+    },
+    "transferObligation": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "assignmentId",
+        "expiresAt",
+        "nextAction",
+        "nextCheckAt",
+        "quantity",
+        "recipientId",
+        "targetWorkId",
+        "workId"
+      ]
+    },
+    "proposeHandover": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "expiresAt",
+        "nextAction",
+        "nextCheckAt",
+        "recipientId",
+        "workId"
+      ]
+    },
+    "acceptHandover": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "handoverId"
+      ]
+    },
+    "rejectHandover": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "handoverId"
+      ]
+    },
+    "emergencyReassign": {
+      "provider": "backend/src/main/java/com/mulino/application/responsibility/ResponsibilityCommands.java",
+      "slots": [
+        "effectiveAt",
+        "newOwnerId",
+        "nextAction",
+        "nextCheckAt",
+        "obligationId",
+        "reason",
+        "workId"
+      ]
+    }
+  },
+  "usage": "Allowed slot names are not a guarantee that all are optional. Read live tools/list and server validation; keep returned outcome and unknowns."
+}

@@ -11,8 +11,8 @@ import java.util.*;
 /** Checked-in user decision is pinned, not an arbitrary runtime approval JSON. */
 public final class NativeClientPolicy {
     public static final String APPROVAL = "verification/native-client/subscription-approval.json";
-    public static final String APPROVAL_HASH = "ac321d0f5d7e9cf393881fa01047b2b25c23b67424db31cbdfb0656147857258";
-    public static final String MODEL = "gpt-6-astra", TIER = "ultrafast";
+    public static final String APPROVAL_HASH = "602fba5373d4121b84896e387bff66ef3a1530a9721353acd331308376615f5e";
+    public static final String MODEL = "gpt-6.1-sol", TIER = "ultrafast";
     public static final String VERSION = "codex-cli 0.163.0";
     public static final List<String> PACKAGES = List.of("ontology-work-coordinator", "ontology-procurement-transport",
         "ontology-import-qc", "ontology-sales-returns-recall", "ontology-settlement", "ontology-definition-authoring");

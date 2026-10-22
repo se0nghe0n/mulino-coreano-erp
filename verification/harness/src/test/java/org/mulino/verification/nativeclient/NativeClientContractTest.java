@@ -86,6 +86,52 @@ class NativeClientContractTest {
         AgentRunner runner=AgentRunner.fromProperty("actual");assertTrue(runner.providedAdapters().isEmpty());
         var client=new NativeCodexClient(policy,null);assertNotEquals(StepResult.DriverStatus.EXECUTED,client.execute("a","MCP",Json.object(),"읽어줘",Json.object()).driverStatus());
     }
+    @Test void runtimePackagesHaveDirectDiscoveryLinksAndMatchingContentHashes()throws Exception {
+        Path root=Path.of(System.getProperty("repo.root")).toRealPath();
+        var policy=new NativeClientPolicy(root);
+        var manifest=Json.read(root.resolve("agents/runtime-package-manifest.json"));
+        assertEquals(NativeClientPolicy.PACKAGES.size(),manifest.path("packages").size());
+        assertEquals(manifest.path("skillSha256").asText(),policy.skillHash());
+        var files=policy.skillFiles();
+        assertEquals(13,files.size());
+        for(var entry:manifest.path("packages")) {
+            String name=entry.path("name").asText();
+            assertTrue(NativeClientPolicy.PACKAGES.contains(name));
+            Path base=root.resolve(entry.path("path").asText());
+            assertFalse(Files.isSymbolicLink(base));
+            for(String directory:List.of(".agents/skills/", ".claude/skills/")) {
+                Path link=root.resolve(directory+name);
+                assertTrue(Files.isSymbolicLink(link));
+                assertEquals(Path.of("../../agents/skills/"+name),Files.readSymbolicLink(link));
+                assertEquals(base.toRealPath(),link.toRealPath());
+            }
+            var hashes=Json.object();
+            var fields=entry.path("files").fields();
+            while(fields.hasNext()) {
+                var file=fields.next();Path path=root.resolve(file.getKey());
+                assertTrue(files.contains(path));
+                assertEquals(file.getValue().asText(),Json.sha256(path));
+                hashes.put(file.getKey(),Json.sha256(path));
+            }
+            assertEquals(entry.path("sha256").asText(),NativeClientPolicy.sha(hashes.toString()));
+        }
+        var approval=policy.approval();
+        assertEquals("gpt-6.1-sol",approval.path("modelExactId").asText());
+        assertEquals("ultrafast",approval.path("serviceTier").asText());
+        assertFalse(approval.path("implementationModelCallsAllowed").asBoolean());
+        assertEquals("0",approval.path("approvedCostCap").asText());
+    }
+    @Test void missingOrEscapedRuntimePackageFailsClosed()throws Exception {
+        var policy=new NativeClientPolicy(tmp);
+        assertEquals("RUNTIME_SKILL_MISSING",assertThrows(IllegalStateException.class,policy::skillFiles).getMessage());
+        Path outside=Files.createTempDirectory("mulino-skill-contract-");
+        try {
+            Files.writeString(outside.resolve("SKILL.md"),"unapproved");
+            Path parent=Files.createDirectories(tmp.resolve("agents/skills"));
+            Files.createSymbolicLink(parent.resolve(NativeClientPolicy.PACKAGES.getFirst()),outside);
+            assertEquals("SKILL_ROOT_ESCAPE",assertThrows(IllegalStateException.class,policy::skillFiles).getMessage());
+        } finally {Files.deleteIfExists(outside.resolve("SKILL.md"));Files.deleteIfExists(outside);}
+    }
     private static final String FAKE="""
         import json,sys,time
         scenario=sys.argv[1]
@@ -105,8 +151,8 @@ class NativeClientContractTest {
                 notice('turn/completed',{'threadId':'thread','turn':{'id':'turn','status':'completed'}});continue
             if m=='account/read':r={'account':{'type':'apiKey' if scenario=='api' else 'chatgpt','planType':'pro'}}
             if m=='account/rateLimits/read':r={'rateLimits':{'credits':{'hasCredits':scenario=='credits','unlimited':False}}}
-            if m=='model/list':r={'data':[{'model':'gpt-6-astra','supportedReasoningEfforts':[{'reasoningEffort':'high'}],'serviceTiers':[] if scenario=='no-tier' else [{'id':'ultrafast'}]}]}
-            if m=='thread/start':r={'model':'gpt-6-astra','modelProvider':'openai','serviceTier':'priority' if scenario=='wrong-tier' else 'ultrafast','instructionSources':[],'thread':{'id':'thread'}}
+            if m=='model/list':r={'data':[{'model':'gpt-6.1-sol','supportedReasoningEfforts':[{'reasoningEffort':'high'}],'serviceTiers':[] if scenario=='no-tier' else [{'id':'ultrafast'}]}]}
+            if m=='thread/start':r={'model':'gpt-6.1-sol','modelProvider':'openai','serviceTier':'priority' if scenario=='wrong-tier' else 'ultrafast','instructionSources':[],'thread':{'id':'thread'}}
             if m=='turn/start':
                 r={'turn':{'id':'turn'}}
                 if scenario=='early':tool()

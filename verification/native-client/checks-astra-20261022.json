@@ -1,0 +1,47 @@
+{
+  "baselineCommit": "082c703e9cb8198c91ff1507b7bcaef442d31a3a",
+  "evidenceClass": "CONTRACT_TEST_AND_NATIVE_NON_MODEL_PREFLIGHT",
+  "javaVersion": "21.0.12.1",
+  "command": "./mvnw -B -ntp -f verification/harness/pom.xml -Dtest=NativeClientContractTest,ModelBindingContractTest,ModelBindingResponseEvidenceTest,ModelBindingEvaluatorTest test",
+  "exitCode": 0,
+  "suites": [
+    {
+      "name": "org.mulino.verification.nativeclient.NativeClientContractTest",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "org.mulino.verification.modelbinding.ModelBindingContractTest",
+      "tests": "17",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "org.mulino.verification.modelbinding.ModelBindingResponseEvidenceTest",
+      "tests": "29",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    },
+    {
+      "name": "org.mulino.verification.modelbinding.ModelBindingEvaluatorTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0"
+    }
+  ],
+  "actualModelCalls": 0,
+  "runtimeAcceptance": "NOT_RUN",
+  "preflightCommand": "verification/model-binding/run native-preflight",
+  "preflightExitCode": 0,
+  "preflightSha256": "27157a677be6fc0390acb0506134047878e71f19ca28f3bc725f22776679db5e",
+  "remainingBlockers": [
+    "Six product skill packages absent",
+    "NativeClientIntegration product transport and independent observations absent",
+    "Deterministic prerequisite and R8 business acceptance integration pending"
+  ]
+}

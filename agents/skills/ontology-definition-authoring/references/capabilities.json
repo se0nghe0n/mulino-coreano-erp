@@ -1,0 +1,225 @@
+{
+  "source": "contracts/capability-slots.json",
+  "schemaVersion": "1.0.0",
+  "queries": {
+    "getDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionQueries.java"
+    },
+    "getObject": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "searchObjects": {
+      "provider": "backend/src/main/java/com/mulino/application/inventory/InventoryQueries.java"
+    },
+    "getWork": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "searchWorks": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getObligations": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    },
+    "getAssessment": {
+      "provider": "backend/src/main/java/com/mulino/domain/work/read/WorkReadHandler.java"
+    }
+  },
+  "commands": {
+    "createDefinitionDraft": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "definitionId",
+        "package",
+        "parentDefinitionId",
+        "parentDraftRevision",
+        "regressionFixtureRefs",
+        "version"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. A new draft names package (+ version, parentDefinitionId, regressionFixtureRefs); a revised draft names definitionId and parentDraftRevision (= the lifecycle revision) and keeps the version. organizationId is optional, id/state/contentHash are server-assigned, unknown fields are TYPE_INVALID.",
+      "response": {
+        "definitionId": "package ID",
+        "hash": "SHA-256 of the stored content",
+        "revision": "lifecycle revision (expectedRevision of the next lifecycle command)",
+        "state": "DRAFT|IN_REVIEW|PUBLISHED|ACTIVE|RETIRED_FOR_NEW_WORK",
+        "version": "package version"
+      }
+    },
+    "validateDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "definitionId",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. Records a validation; APPLIED even when not publishable.",
+      "response": {
+        "validationId": "validation ID",
+        "publishable": "boolean",
+        "regressionRunIds": "[] (regression NOT_RUN, deferred)",
+        "data": "{validationId, publishable, outcome, problems[{path,code}], diffClasses[], regression{fixtureRefs,status}}"
+      }
+    },
+    "submitDefinitionReview": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "affectedDataIds",
+        "affectedWorkIds",
+        "definitionId",
+        "hash",
+        "mapping",
+        "migrationId",
+        "regressionRunIds",
+        "reviewKind",
+        "unsupportedValues",
+        "validationId"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. reviewKind DEFINITION (default; DRAFT→IN_REVIEW, needs a publishable validationId of the same hash) or WORK_MIGRATION (on a PUBLISHED package; migrationId, affectedWorkIds, mapping).",
+      "response": {
+        "reviewId": "review ID",
+        "data": "review payload"
+      }
+    },
+    "approveDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "affectedWorkIds",
+        "consumptionPolicy",
+        "decision",
+        "definitionId",
+        "goalChanges",
+        "hash",
+        "reason",
+        "reviewId",
+        "reviewKind",
+        "validFrom",
+        "validUntil"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. A human other than the drafter and the submitter decides APPROVED or REJECTED (reason required); REJECTED returns the package to DRAFT. consumptionPolicy ONE_PACKAGE_PUBLISH (DEFINITION) or ONE_MIGRATION (WORK_MIGRATION).",
+      "response": {
+        "approvalId": "approval ID",
+        "decision": "APPROVED|REJECTED"
+      }
+    },
+    "publishDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "approvalId",
+        "definitionId",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. IN_REVIEW→PUBLISHED with a current unconsumed APPROVED approval of the hash; without one WAITING_APPROVAL. Published content cannot be resubmitted (no package slot).",
+      "response": {
+        "hash": "unchanged package hash",
+        "approvalId": "consumed approval"
+      }
+    },
+    "activateDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "definitionId",
+        "effectiveAt",
+        "hash"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. Moves the organization's single ACTIVE pointer to a PUBLISHED, not retired package (also a rollback to a prior package).",
+      "response": {
+        "state": "ACTIVE"
+      }
+    },
+    "retireDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/definitions/DefinitionLifecycle.java",
+      "slots": [
+        "definitionId",
+        "reason"
+      ],
+      "note": "Plan §8 package lifecycle; user decision 2026-10-11 (2): package is the stored Definition shape. RETIRED_FOR_NEW_WORK: no new Work may pin it; the ACTIVE pointer to it is removed; existing Work keeps its pinned meaning.",
+      "response": {
+        "state": "RETIRED_FOR_NEW_WORK"
+      }
+    },
+    "migrateWorkDefinition": {
+      "provider": "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java",
+      "slots": [
+        "approvalId",
+        "endpoint",
+        "migrationId",
+        "quantity",
+        "reason",
+        "targetDefinitionId",
+        "workId"
+      ],
+      "note": "Plan §8 explicit Work migration. The Work's human owner applies a current WORK_MIGRATION approval of the PUBLISHED, not retired target whose capability manifest lists migrationId in supportedWorkMigration and whose review names the Work. quantity {value,unit} and endpoint must equal the approved goalChanges. A new GoalVersion keeps previousGoalId; the approval is consumed (ONE_MIGRATION).",
+      "response": {
+        "goalVersionId": "new GoalVersion",
+        "workId": "migrated Work"
+      }
+    }
+  },
+  "usage": "Allowed slot names are not a guarantee that all are optional. Read live tools/list and server validation; keep returned outcome and unknowns.",
+  "definitionPackageShape": {
+    "source": "backend/src/main/java/com/mulino/domain/definitions/Definition.java",
+    "serverAssigned": [
+      "id",
+      "state",
+      "contentHash"
+    ],
+    "root": {
+      "organizationId": "optional; must match authenticated organization",
+      "version": "string",
+      "parentVersionId": "string or null",
+      "evaluatorVersion": "string",
+      "schemaVersion": "string",
+      "nouns": "NounType[]",
+      "attributes": "Attribute[]",
+      "verbs": "Verb[]",
+      "relations": "Relation[]",
+      "goals": "Goal[]",
+      "capabilities": "Capability[]"
+    },
+    "NounType": {
+      "name": "string",
+      "core": "boolean"
+    },
+    "Attribute": {
+      "nounType": "string",
+      "name": "string",
+      "type": "STRING|BOOLEAN|DECIMAL|INSTANT|DATE|REFERENCE",
+      "referenceType": "string or null",
+      "unit": "string or null",
+      "decimalPlaces": "integer",
+      "minimumCount": "integer",
+      "maximumCount": "integer",
+      "requiredStage": "string",
+      "core": "boolean"
+    },
+    "Verb": {
+      "name": "string",
+      "intentKind": "string",
+      "capabilityId": "string",
+      "stage": "string",
+      "slots": "object mapping slot names to declared types"
+    },
+    "Relation": {
+      "name": "string",
+      "sourceType": "string",
+      "targetType": "string",
+      "minimumCount": "integer",
+      "maximumCount": "integer",
+      "cycleAllowed": "boolean"
+    },
+    "Goal": {
+      "name": "string",
+      "quantityMode": "string",
+      "endpoint": "string",
+      "evaluatorVersion": "string",
+      "predicate": "bounded typed predicate; unsupported operator is rejected"
+    },
+    "Capability": {
+      "capabilityId": "string",
+      "semanticVersion": "string",
+      "evaluatorVersion": "string",
+      "inputSchemaVersion": "string",
+      "outputSchemaVersion": "string",
+      "supportedWorkMigration": "string[]"
+    },
+    "notice": "Use the current published definition as the typed input reference. These shapes do not grant support to arbitrary values; validateDefinition checks the installed capability/evaluator and returns problems. Regression execution remains NOT_RUN."
+  }
+}
