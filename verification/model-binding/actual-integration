@@ -1,0 +1,162 @@
+#!/usr/bin/env python3
+"""Native product integration checks only. Never starts a model or changes native model config."""
+import hashlib
+import json
+import os
+import pathlib
+import re
+import secrets
+import shutil
+import subprocess
+import sys
+import tempfile
+import time
+import uuid
+
+ROOT = pathlib.Path(__file__).resolve().parents[2]
+MODE = sys.argv[1] if len(sys.argv) == 2 else 'readiness'
+if MODE not in ('readiness', 'transport-sit'):
+    sys.exit('readiness|transport-sit only; actual model evaluation belongs to coordinator')
+RUN = ROOT / 'verification/harness/target/native-integration-runs' / str(uuid.uuid4())
+RUN.mkdir(parents=True)
+os.chmod(RUN, 0o700)
+
+
+def run(argv, *, env=None, log=None):
+    if log:
+        with log.open('w') as output:
+            subprocess.run(argv, cwd=ROOT, env=env, stdout=output, stderr=subprocess.STDOUT, check=True)
+    else:
+        subprocess.run(argv, cwd=ROOT, env=env, check=True)
+
+
+def output(argv):
+    return subprocess.check_output(argv, cwd=ROOT, text=True).strip()
+
+
+def digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def source_snapshot():
+    paths = []
+    for directory in ('backend/src', 'backend/db', 'backend/srv', 'verification/harness/src', 'contracts'):
+        paths.extend(path for path in (ROOT / directory).rglob('*') if path.is_file())
+    paths.extend((ROOT / 'verification/model-binding').glob('*.json'))
+    paths.extend(ROOT / name for name in ('backend/pom.xml', 'backend/package-lock.json',
+                 'verification/harness/pom.xml', 'verification/model-binding/actual-integration'))
+    return {str(path.relative_to(ROOT)): {'sha256': digest(path), 'sizeBytes': path.stat().st_size}
+            for path in sorted(set(paths))}
+
+
+inputs = source_snapshot()
+receipt = {'mode': MODE, 'actualModelCalls': 0, 'incrementalApiCostCap': '0',
+           'modelBindingAcceptance': 'NOT_RUN', 'status': 'NOT_RUN', 'sourceArtifacts': [], 'inputs': inputs}
+code = 1
+container = 'mulino-native-integration-' + str(uuid.uuid4())
+created = False
+backend = None
+backend_log = None
+try:
+    receipt['baselineCommit'] = output(['git', 'rev-parse', 'HEAD'])
+    receipt['workingTreeDirty'] = bool(output(['git', 'status', '--porcelain']))
+    run([str(ROOT / 'mvnw'), '-B', '-ntp', '-f', 'verification/harness/pom.xml',
+         '-Dmaven.test.skip=true', 'package', 'dependency:build-classpath',
+         '-Dmdep.outputFile=target/native-integration-classpath.txt'], log=RUN / 'harness-build.log')
+    cp = str(ROOT / 'verification/harness/target/classes') + os.pathsep + (
+        ROOT / 'verification/harness/target/native-integration-classpath.txt').read_text().strip()
+    command = ['java', '-Drepo.root=' + str(ROOT), '-cp', cp,
+               'org.mulino.verification.nativeclient.NativeIntegrationMain', MODE]
+    if MODE == 'readiness':
+        with (RUN / 'readiness.json').open('w') as stdout:
+            code = subprocess.call(command, cwd=ROOT, stdout=stdout)
+        receipt['status'] = 'NOT_RUN'
+    else:
+        run(['npm', 'ci', '--prefix', 'backend'], log=RUN / 'npm-ci.log')
+        run([str(ROOT / 'mvnw'), '-B', '-ntp', '-f', 'backend/pom.xml', '-DskipTests', 'package'],
+            log=RUN / 'backend-build.log')
+        with tempfile.TemporaryDirectory(prefix='mulino-native-integration-') as temporary:
+            tmp = pathlib.Path(temporary)
+            os.chmod(tmp, 0o700)
+            jar = ROOT / 'backend/target/ontology-0.1.0-SNAPSHOT.jar'
+            shutil.copy2(jar, tmp / 'ontology.jar')
+            receipt['executedJarSha256'] = digest(tmp / 'ontology.jar')
+            run(['openssl', 'genpkey', '-algorithm', 'RSA', '-pkeyopt', 'rsa_keygen_bits:2048',
+                 '-out', str(tmp / 'private.pem')], log=tmp / 'keygen.log')
+            run(['openssl', 'pkey', '-in', str(tmp / 'private.pem'), '-pubout', '-out', str(tmp / 'public.pem')], log=tmp / 'pubkey.log')
+            env = dict(os.environ, JWT_PRIVATE_KEY=str(tmp / 'private.pem'), JWT_PUBLIC_KEY=str(tmp / 'public.pem'),
+                       JWT_ISSUER='https://mulino-native.invalid', JWT_AUDIENCE='isolated-ontology',
+                       DB_USERNAME='postgres', DB_PASSWORD=secrets.token_urlsafe(24),
+                       ACTUAL_DISPOSABLE_DATABASE='true', ACTUAL_BUILD_COMMIT=receipt['baselineCommit'])
+            image = json.loads((ROOT / 'verification/platform/versions.json').read_text())['postgresImage']['reference']
+            if not re.fullmatch(r'postgres@sha256:[0-9a-f]{64}', image):
+                raise RuntimeError('UNPINNED_POSTGRES_IMAGE')
+            docker_env = dict(env, POSTGRES_PASSWORD=env['DB_PASSWORD'])
+            run(['docker', 'run', '-d', '--name', container, '-e', 'POSTGRES_PASSWORD', '-e', 'POSTGRES_DB=ontology',
+                 '-p', '127.0.0.1::5432', image], env=docker_env, log=RUN / 'container-id.txt')
+            created = True
+            receipt['postgresImage'] = image
+            deadline = time.monotonic() + 60
+            while subprocess.call(['docker', 'exec', container, 'pg_isready', '-h', '127.0.0.1', '-U', 'postgres', '-d', 'ontology'],
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL):
+                if time.monotonic() >= deadline:
+                    raise RuntimeError('POSTGRES_TIMEOUT')
+                time.sleep(0.25)
+            port = output(['docker', 'port', container, '5432/tcp']).rsplit(':', 1)[1]
+            env['DB_URL'] = 'jdbc:postgresql://127.0.0.1:' + port + '/ontology'
+            backend_log = (RUN / 'backend-runtime.log').open('w')
+            backend = subprocess.Popen(['java', '-jar', str(tmp / 'ontology.jar'), '--spring.profiles.active=local',
+                                        '--server.address=127.0.0.1', '--server.port=0',
+                                        '--mulino.evidence.blob-root=' + str(tmp / 'blobs')], cwd=ROOT,
+                                       env=env, stdout=backend_log, stderr=subprocess.STDOUT)
+            deadline = time.monotonic() + 120
+            while True:
+                if backend.poll() is not None:
+                    raise RuntimeError('BACKEND_EXITED')
+                ports = re.findall(r'Tomcat started on port (\d+)', (RUN / 'backend-runtime.log').read_text())
+                if ports:
+                    env['ACTUAL_BASE_URL'] = 'http://127.0.0.1:' + ports[-1]
+                    break
+                if time.monotonic() >= deadline:
+                    raise RuntimeError('BACKEND_TIMEOUT')
+                time.sleep(0.25)
+            with (RUN / 'transport-sit.json').open('w') as stdout, (RUN / 'harness-stderr.txt').open('w') as stderr:
+                code = subprocess.call(command, cwd=ROOT, env=env, stdout=stdout, stderr=stderr)
+            receipt['status'] = 'TRANSPORT_SIT_PASS' if code == 0 else 'TRANSPORT_SIT_FAIL'
+            backend.terminate()
+            try:
+                backend.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                backend.kill()
+                backend.wait(timeout=10)
+            backend = None
+except Exception as error:
+    receipt['failureType'] = type(error).__name__
+    message = str(error)
+    if re.fullmatch(r'[A-Z0-9_]{1,100}', message):
+        receipt['failureCode'] = message
+    receipt['status'] = 'NOT_RUN' if MODE == 'readiness' else 'TRANSPORT_SIT_FAIL'
+finally:
+    if backend is not None and backend.poll() is None:
+        backend.terminate()
+        try:
+            backend.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            backend.kill()
+            backend.wait(timeout=10)
+    if backend_log is not None:
+        backend_log.close()
+    if created:
+        cleanup = subprocess.run(['docker', 'rm', '-f', '-v', container], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        receipt['containerRemoved'] = cleanup.returncode == 0
+        if cleanup.returncode:
+            code = 1
+    if source_snapshot() != inputs:
+        receipt['status'] = 'SOURCE_CHANGED_DURING_RUN'
+        code = 1
+    for path in sorted((ROOT / 'verification/harness/src/main/java/org/mulino/verification/nativeclient').glob('*.java')):
+        receipt['sourceArtifacts'].append({'path': str(path.relative_to(ROOT)), 'sha256': digest(path), 'sizeBytes': path.stat().st_size})
+    receipt['exitCode'] = code
+    (RUN / 'execution.json').write_text(json.dumps(receipt, ensure_ascii=False, indent=2) + '\n')
+    print(str(RUN / 'execution.json'))
+sys.exit(code)

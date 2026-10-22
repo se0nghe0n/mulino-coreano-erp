@@ -139,8 +139,22 @@ public final class ModelBindingRunner {
             String branch=profile.equals("SIT")?"SIT_DIRECT_COMMAND":selected;JsonNode refs=turn.path("oracleAssertions").path(branch);if(refs.isMissingNode())refs=turn.path("oracleAssertions").path("SIT_DIRECT_COMMAND");ai=0;for(JsonNode a:path.path("assertions"))checkAssertion(a,refs.get(ai++).path("assertionId").asText(),exec,after,effects,ars,source,api);
             evaluator.effectWhitelist(oracle,path,effects,aliasMap);evaluator.preserveObligations(before.path("data").path("data").path("obligations"),after.path("data").path("data").path("obligations"),effects);evaluator.obligations(oracle,path,after.path("data").path("data").path("obligations"),aliasMap);verifyHumanOwners(after.path("data").path("data").path("obligations"));
             // input-required is structural, not fixed response text. User answers never approve.
-            JsonNode clarification=oracle.path("clarification");BindingContract.require(exec.path("response").path("clarification").path("required").asBoolean(false)==clarification.path("required").asBoolean(),"Clarification requirement differs");
-            if(clarification.path("required").asBoolean()){BindingContract.require(exec.path("response").path("clarification").path("slots").equals(clarification.path("slots")),"Clarification slots differ");BindingContract.require(effects.stream().noneMatch(BindingEvaluator::business),"Write before user clarification");}
+            JsonNode clarification=oracle.path("clarification");
+            if(profile.equals("UAT")) {
+                // Native finalResponse is text. Only independent full-response semantics may classify it.
+                JsonNode semantics=finalResponseObservation(exec,transcript,prefix);
+                FinalResponseClarification.checkRequirement(semantics,exec.path("response"),clarification.path("required").asBoolean());
+                if(clarification.path("required").asBoolean()) {
+                    BindingContract.require(effects.stream().noneMatch(BindingEvaluator::business),"Write before user clarification");
+                    // The current semantic schema carries execution but no observed missing-slot set.
+                    // Do not promote the model's structuredIntent/self-label or the oracle into that observation.
+                    report.put("status","NOT_RUN").put("reason","NOT_IMPLEMENTED: independent final-response clarification slots absent");
+                    return;
+                }
+            } else {
+                BindingContract.require(exec.path("response").path("clarification").path("required").asBoolean(false)==clarification.path("required").asBoolean(),"Clarification requirement differs");
+                if(clarification.path("required").asBoolean()){BindingContract.require(exec.path("response").path("clarification").path("slots").equals(clarification.path("slots")),"Clarification slots differ");BindingContract.require(effects.stream().noneMatch(BindingEvaluator::business),"Write before user clarification");}
+            }
             report.put("status","PASS");
         } catch(AssertionError|IllegalArgumentException e){report.put("status","FAIL").put("reason",e.getMessage());}
     }

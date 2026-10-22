@@ -22,7 +22,7 @@ public final class NativeCodexClient implements AgentRunner.ActualClientPort {
         var all=ServiceLoader.load(NativeClientIntegration.class).stream().toList();
         require(all.size()<=1,"AMBIGUOUS_NATIVE_INTEGRATION");return all.isEmpty()?null:all.getFirst().get();
     }
-    @Override public Set<String> providedAdapters() { return integration==null?Set.of():Set.of("client","model","skills"); }
+    @Override public Set<String> providedAdapters() { return integration==null||!Boolean.getBoolean("verification.nativeClient.enabled")?Set.of():Set.of("client","model","skills"); }
     @Override public StepResult execute(String id,String route,JsonNode actor,String utterance,JsonNode context) {
         if(!Boolean.getBoolean("verification.nativeClient.enabled"))return StepResult.missing(id,"NATIVE_CLIENT_DISABLED: explicit coordinator execution required");
         if(integration==null)return StepResult.missing(id,"NATIVE_INTEGRATION_ABSENT: authenticated transport, DB/host/final-response extractors required before model call");
