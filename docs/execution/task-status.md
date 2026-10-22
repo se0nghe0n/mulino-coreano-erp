@@ -551,3 +551,13 @@ PASS122개는 모두 partial fixture다. workflow agent 종료 때 초기
 실제 action/assertion·artifact pointer에 연결한 뒤 수정 순서를 정한다.
 전체 Task와 현재 통합 Step는 열려 있다. 실모델 호출과 BTP 배포는
 아직 실행하지 않았다.
+
+통합 source `9a2e3df7`의 T01 실제 재실행도 완료했다. clean 별도
+worktree에서 12개 subcase·125개 assertion·원천 연결96개가 모두
+통과했고 actual action60개를 수행했다. native Workflow
+`wf_c50cb2c6-a3e`의 4개 agent가 Haiku 5.5임을 runtime metadata에서
+확인했다. 모든 subcase의 missingAdapters=[]다. 명시적 T01 선택과
+partial fixture의 한계는 유지하며 전체 profile gate는 닫지 않는다.
+원본 SHA256·실행 jar·미설치 사실은
+[T01 통합 재검증](resume-t01-complete.md#2026-10-23-통합-source의-실제-재검증)에
+기록했다.

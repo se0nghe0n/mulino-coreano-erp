@@ -104,3 +104,37 @@ profile gateComplete=false는 별도 선행 profile 인수가 없다는 뜻이�
 재위임·모델 호출·push·PR·외부 메시지는 실행하지 않았다. live catalog에서
 codex/gpt-6.1-sol의 Ultrafast 지원을 확인했으나 이 worker의 effective tier를
 별도 증명하는 telemetry는 노출되지 않았다.
+
+## 2026-10-23 통합 source의 실제 재검증
+
+clean source `9a2e3df763ad5817f03bb9d0a197ec6482a7275a`를 별도
+worktree `t3-690c7777`에서 빌드·실행했다. native dynamic Workflow
+`wf_c50cb2c6-a3e`의 prepare·execute·contract-review·validate agent
+4개는 각각의 runtime metadata에서 `claude-haiku-5-5`임을 확인했다.
+execute와 contract-review를 병렬 수행하고 execute 완료 뒤 validate를
+시작했다. 실제 command는 위와 같은 `./verify scenarios --actual`의
+T01 선택이며 foreground에서 한 번 실행하고 exit0으로 끝났다.
+
+12개 고유 subcase와 125개 assertion이 모두 PASS다. 실제 action60개,
+각 runtimeComplete=true와 missingAdapters=[]를 coordinator가 전부
+확인했다. 원천 verifier도 12개 fixture의 96개 연결을 통과했다.
+worker의 정적 review가 주장한 attachEvidence·Fact alias 누락은
+실제 command와 runtime aliasMap·원천 연결 증거에 대조해 기각했다.
+
+원본 report는 해당 worktree의
+`verification/harness/target/evidence/actual-scenarios-run-9e8db30a-ab5b-4e5c-83ff-c498ca75a385/scenarios.json`이다.
+SHA256은
+`7c7dc2248e1cc4a68f827e1be4fe86827ef3ba0c0800c0590564b058ac390ef8`이다.
+실행 jar SHA256은
+`92b01495e3a16b1f9be77fed1ad1c32c4e7f42746e86e3f50af6a54ff5247612`다.
+coordinator 대조 결과와 agent metadata hash는 root의
+`.local/resume-20261023/t01-integration-proof.json`에 보존했다.
+실행 전후 source는 clean이고 변경이 없다. runner가 만든 application과
+container만 정리했으며 기존 container는 보존했다.
+
+gateComplete=false는 명시적 case 선택으로 802개 중 12개를 실행한
+현재 profile 조건에 따른다. report의 공통 reason 문구만으로 adapter
+누락이 있다고 해석하지 않는다. partialFixtures=true·relaxWire=false이고
+모든 fixture에 SL1 미설치와 delivery·temperature 원천 미발행이 남았다.
+T01 선택의 실행 성공을 전체 profile·규제·실모델·BTP 인수로 확대하지
+않는다. 실제 모델 인수 호출은 0회다.
