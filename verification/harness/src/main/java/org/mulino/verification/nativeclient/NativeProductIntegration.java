@@ -72,10 +72,10 @@ public final class NativeProductIntegration implements NativeClientIntegration {
             .add("Model fixture aliases are UUID values and baseline.domainFacts/principalFacts/grantFacts have no strict complete installer")
             .add("getObject does not support view=ACTOR_PERMITTED_BUSINESS_CONTEXT or case/installation/turn scope")
             .add("MCP has no server-authenticated principal/grant capture hook")
-            .add("API projection revision is a SHA-256; independent PostgreSQL snapshot is an MVCC token")
-            .add("Common observation schema requires rawRows object; model-binding requires rawRows array")
+            .add("World/context projection needs independent row recipe; simple-object SHA proof and MVCC separation implemented")
+            .add("Physical rawRows/cells contract resolved; semantic selectors and effect attribution still incomplete")
             .add("Full immutable effect/obligation/physical-scope model-binding mapping")
-            .add("Independent host/final-response/clarification-slot semantic extractor"));
+            .add("Raw host and bounded Korean semantic extraction exist; full host process contract and arbitrary prose remain unavailable"));
         var sources=Json.array();for(String path:List.of(
             "backend/src/main/java/com/mulino/adapters/OntologyMcp.java",
             "backend/src/main/java/com/mulino/application/core/QueryRequests.java",
@@ -122,7 +122,11 @@ public final class NativeProductIntegration implements NativeClientIntegration {
             try {
                 if(installedScope==null||!request.path("scope").path("organizationId").equals(installedScope.path("organizationId")))
                     return StepResult.missing(id,"NATIVE_INSTALLATION_SCOPE_MISMATCH");
-                var capture=observer.capture(request.path("scope"),Json.required(request,"asOf"),Json.required(request,"knownAt"));
+                if(!request.path("scope").path("installationId").equals(installedScope.path("installationId")))
+                    return StepResult.missing(id,"NATIVE_INSTALLATION_SCOPE_MISMATCH");
+                var capture=request.has("projectionRequest")
+                    ?observer.capture(request.path("scope"),Json.required(request,"asOf"),Json.required(request,"knownAt"),request.path("projectionRequest"),Json.required(request,"projectionActorId"))
+                    :observer.capture(request.path("scope"),Json.required(request,"asOf"),Json.required(request,"knownAt"));
                 return missing(id,"MODEL_BINDING_OBSERVATION_NOT_IMPLEMENTED",capture);
             }catch(Exception failure){return StepResult.missing(id,"NATIVE_POSTGRESQL_OBSERVATION_UNAVAILABLE");}
         }

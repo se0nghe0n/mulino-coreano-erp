@@ -138,6 +138,20 @@
           "items": {
             "type": "object"
           }
+        },
+        "missingSlots": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "uncertainty": {
+          "enum": [
+            "NOT_CLAIMED",
+            "EXPLICIT_UNKNOWN"
+          ]
         }
       }
     }

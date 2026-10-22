@@ -51,7 +51,28 @@ public final class ModelBindingRunner {
             if(executed(step)){JsonNode context=results.get(step).path("data").path("permittedContext");BindingContract.require(context.isObject(),"Authenticated business context absent");checkContext(context);}
         } else if(parts[1].equals("before")||parts[1].equals("after")) {
             String prior=prefix+(parts[1].equals("before")?"/context":"/agent");JsonNode revision=results.get(prior).path("data").path("snapshotRevision");BindingContract.require(!revision.isMissingNode()&&!revision.isNull(),"Actual source snapshot revision absent");
+            JsonNode previous=results.get(prior);
+            if(!previous.path("data").hasNonNull("projectionReadRef")) {
+                save(step,StepResult.missing(step,"INDEPENDENT_PROJECTION_READ_REFERENCE_NOT_IMPLEMENTED"),"observe");return;
+            }
+            JsonNode wire=linkedArtifact(previous,Json.required(previous.path("data"),"projectionReadRef"),profile.equals("UAT")&&parts[1].equals("after"));
+            contract.validator.schema("verification/model-binding/captured-api.schema.json",wire);
+            String expectedClass=profile.equals("UAT")&&parts[1].equals("after")?"ACTUAL_HOST":"ACTUAL_API_CAPTURE";
+            BindingContract.require(wire.path("evidenceClass").asText().equals(expectedClass),"Projection source is not an actual captured read");
+            String operation=wire.path("request").path("params").path("name").asText();
+            BindingContract.require("QUERY".equals(capabilityKinds.get(operation)),"Projection source must be an authenticated read");
+            CapturedApiObservation.checkCaptureContext(wire,scope(prefix),previous.path("actionId"),null);
+            var captured=CapturedApiObservation.decode(wire.path("toolCall"),wire);
+            BindingContract.require(captured.response().path("snapshotRevision").equals(revision),"Projection read revision differs");
+            for(String time:List.of("asOf","knownAt"))BindingContract.require(captured.response().path(time).equals(fixture.path("clock").path(time)),"Projection source time differs");
+            if(!wire.path("authenticatedActor").hasNonNull("actorId")) {
+                save(step,StepResult.missing(step,"SERVER_PROJECTION_ACTOR_NOT_IMPLEMENTED"),"observe");return;
+            }
+            JsonNode args=wire.path("request").path("params").path("arguments");
+            var projection=Json.object().put("operation",operation);projection.set("id",args.path("id"));projection.set("scope",args.path("scope"));
+            if(args.has("filters")&&!args.path("filters").isEmpty())projection.set("filters",args.path("filters"));
             ObjectNode request=Json.object();request.set("scope",scope(prefix));request.set("snapshotRef",revision);request.set("asOf",fixture.path("clock").path("asOf"));request.set("knownAt",fixture.path("clock").path("knownAt"));request.put("mappingVersion","model-binding-v1");
+            request.set("projectionRequest",projection);request.put("projectionActorId",Json.required(wire.path("authenticatedActor"),"actorId"));
             save(step,driver.observe(step,request),"observe");if(executed(step))validateSnapshot(results.get(step),request);
         } else {
             ObjectNode action=Json.object();action.put("userUtterance",source.path("input").path("utterance").asText());
@@ -91,11 +112,12 @@ public final class ModelBindingRunner {
     private void validateSnapshot(JsonNode result,JsonNode requested) throws IOException {
         JsonNode d=result.path("data");contract.validator.schema("contracts/acceptance-observation.schema.json",d);
         for(String k:List.of("scope","asOf","knownAt"))BindingContract.require(d.path(k).equals(requested.path(k)),"Independent snapshot scope/time mismatch "+k);
-        BindingContract.require(d.path("snapshotRevision").equals(requested.path("snapshotRef"))&&d.path("snapshot").path("id").equals(requested.path("snapshotRef")),"Independent snapshot token mismatch");
+        BindingContract.require(d.path("snapshotRevision").equals(requested.path("snapshotRef")),"Independent snapshot token mismatch");
         BindingContract.require(result.path("provenance").path("independent").asBoolean(false),"Observation not independent");
         BindingContract.require(d.path("sourceQuery").equals(result.path("provenance").path("sourceQuery"))&&d.path("snapshot").equals(result.path("provenance").path("snapshot")),"Observation provenance mismatch");
         BindingContract.require(d.path("sourceQuery").path("mappingVersion").asText().equals("model-binding-v1"),"Unknown physical row mapping");
-        contract.validator.schema("verification/model-binding/physical-columns.schema.json",d.path("rawRows"));
+        PhysicalObservation.validate(contract.validator,d);
+        ProjectionRevisionObservation.validateArtifact(contract.validator,d,requested);
         contract.validator.schema("verification/model-binding/observer-rows.schema.json",d.path("data"));
         BindingContract.require(d.path("data").path("effects").isArray()&&d.path("data").path("obligations").isArray(),"Effects/obligations scope unobserved");
     }
@@ -126,7 +148,7 @@ public final class ModelBindingRunner {
             if(binding.path("caseId").asText().equals("M50")&&prefix.equals("turn-1")){JsonNode replayPayload=fixture.path("baseline").path("domainFacts").path("receipt").path("canonicalPayload");api.requireReplay(replayPayload,aliasMap,"confirmReceipt");api.requireReplayReferences(before,after,BindingEvaluator.aliases(replayPayload,aliasMap),"confirmReceipt");}
             report.put("selectedPathId",selected).put("selectedPath",selected);report.set("capturedApiCallIds",Json.MAPPER.valueToTree(api.ids()));report.set("apiAssertionSources",api.sources());
             for(JsonNode effect:effects){BindingContract.require(effect.path("organizationRef").equals(aliasMap.path("org"))&&effect.path("installationId").equals(results.get("install").path("data").path("installationId"))&&effect.path("turnId").asText().equals(prefix),"Effect delta scope mismatch");}
-            if(selected.equals("EVIDENCED_PREFLIGHT_STOP")){verifyGroundedRead(completionWitness(agentTranscript(exec),prefix),after,turn,source);BindingContract.require(rowSet(before.path("data").path("rawRows")).equals(rowSet(after.path("data").path("rawRows"))),"Preflight changed observed business rows");}
+            if(selected.equals("EVIDENCED_PREFLIGHT_STOP")){verifyGroundedRead(completionWitness(agentTranscript(exec),prefix),after,turn,source);BindingContract.require(rowSet(before.path("data").path("rawRows")).equals(rowSet(after.path("data").path("rawRows")))&&before.path("data").path("physicalCells").equals(after.path("data").path("physicalCells")),"Preflight changed observed business rows");}
             if(!selected.equals("EVIDENCED_PREFLIGHT_STOP")) {
                 String cap=turn.path("capabilityMapping").path("public").asText(),original=source.path("expectedIntent").path("slots").path("originalCapability").path("value").asText();
                 boolean finalOnly=source.path("expectedIntent").path("status").asText().equals("NEEDS_INPUT")||profile.equals("UAT")&&source.path("expectedIntent").path("intentKind").asText().equals("QUERY");
@@ -146,10 +168,7 @@ public final class ModelBindingRunner {
                 FinalResponseClarification.checkRequirement(semantics,exec.path("response"),clarification.path("required").asBoolean());
                 if(clarification.path("required").asBoolean()) {
                     BindingContract.require(effects.stream().noneMatch(BindingEvaluator::business),"Write before user clarification");
-                    // The current semantic schema carries execution but no observed missing-slot set.
-                    // Do not promote the model's structuredIntent/self-label or the oracle into that observation.
-                    report.put("status","NOT_RUN").put("reason","NOT_IMPLEMENTED: independent final-response clarification slots absent");
-                    return;
+                    FinalResponseClarification.checkSlots(semantics,clarification.path("slots"));
                 }
             } else {
                 BindingContract.require(exec.path("response").path("clarification").path("required").asBoolean(false)==clarification.path("required").asBoolean(),"Clarification requirement differs");
@@ -217,12 +236,22 @@ public final class ModelBindingRunner {
         if(read.isObject()){String ref=Json.required(read,"wireArtifactRef");BindingContract.require(strings(context.path("artifactRefs")).contains(ref),"Context read wire is unlinked");Path file=contract.validator.path(ref);BindingContract.require(file.toRealPath().startsWith(contract.validator.root().toRealPath()),"Context wire escapes repository");CapturedApiObservation.Call actual=capturedCall(context,read,prefix,false);BindingContract.require(actual.response().equals(context.path("response")),"Context response differs from actual authenticated captured wire");BindingContract.require(read.path("constraintFacts").equals(actual.response().path("constraintFacts")),"Context blocking facts differ from actual captured server response");reads.add(read);}
         witness.set("contextReads",reads);return witness;
     }
-    private static Set<JsonNode> rowSet(JsonNode rows){BindingContract.require(rows.isArray(),"Business row scope unobserved");Set<JsonNode> set=new HashSet<>();rows.forEach(r->BindingContract.require(set.add(r),"Duplicate physical observation row"));return set;}
+    private static Set<JsonNode> rowSet(JsonNode rows){
+        BindingContract.require(rows.isObject(),"Business row scope unobserved");Set<JsonNode> result=new HashSet<>();
+        rows.fields().forEachRemaining(e->{
+            BindingContract.require(e.getValue().isArray(),"Raw table rows missing");
+            // Include empty table presence; row ordering is immaterial, field/row content is not.
+            result.add(Json.object().put("table",e.getKey()));Set<JsonNode> seen=new HashSet<>();
+            e.getValue().forEach(row->{BindingContract.require(seen.add(row),"Duplicate physical observation row");
+                var value=Json.object().put("table",e.getKey());value.set("row",row);result.add(value);});
+        });return result;
+    }
+
     private void verifyGroundedRead(JsonNode transcript,JsonNode snapshot,JsonNode turn,JsonNode source){
         boolean grounded=false;Set<String> requested=new HashSet<>();requested.add(turn.path("capabilityMapping").path("public").asText());String original=source.path("expectedIntent").path("slots").path("originalCapability").path("value").asText();if(!original.isBlank())requested.add(original);
         List<JsonNode> reads=new ArrayList<>();transcript.path("toolCalls").forEach(reads::add);transcript.path("contextReads").forEach(reads::add);for(JsonNode call:reads)if(call.path("kind").asText().equals("READ"))for(JsonNode fact:call.path("constraintFacts")){
             BindingContract.require(requested.contains(fact.path("blocksCapability").asText())&&fact.path("decision").asText().equals("BLOCKED"),"Read fact does not block requested execution");boolean matched=false;
-            for(JsonNode row:snapshot.path("data").path("rawRows"))if(row.path("dataset").equals(fact.path("dataset"))&&row.path("attribute").equals(fact.path("attribute"))&&row.path("value").equals(fact.path("value")))matched=true;
+            for(JsonNode row:snapshot.path("data").path("physicalCells"))if(row.path("dataset").equals(fact.path("dataset"))&&row.path("attribute").equals(fact.path("attribute"))&&row.path("value").equals(fact.path("value")))matched=true;
             BindingContract.require(matched,"Constraint fact differs from independent persisted rows");grounded=true;
         }
         BindingContract.require(grounded,"Preflight lacks independently grounded blocking facts");

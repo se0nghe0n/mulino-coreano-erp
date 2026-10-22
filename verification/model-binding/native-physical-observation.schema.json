@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "scope",
+    "rawRows",
+    "physicalCells",
+    "sourceQueries",
+    "sourceEvidence",
+    "snapshot",
+    "mappingComplete",
+    "obligationObservation",
+    "effectObservation",
+    "semanticCoverage"
+  ],
+  "properties": {
+    "mappingComplete": {
+      "const": false
+    },
+    "rawRows": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    },
+    "physicalCells": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "sourceQueries": {
+      "type": "array",
+      "minItems": 1
+    },
+    "sourceEvidence": {
+      "type": "object"
+    },
+    "snapshot": {
+      "type": "object",
+      "required": [
+        "id",
+        "readMode",
+        "isolation",
+        "capturedAt"
+      ]
+    },
+    "semanticCoverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "semanticPath",
+          "status",
+          "reason"
+        ],
+        "properties": {
+          "status": {
+            "const": "UNKNOWN"
+          }
+        }
+      }
+    }
+  }
+}

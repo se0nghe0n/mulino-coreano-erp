@@ -325,6 +325,13 @@
         },
         "additionalProperties": false
       }
+    },
+    "physicalCells": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "description": "Explicit physical cells with rawRowPointer lineage. rawRows remains the original table-to-row object; model-binding validates this array separately."
     }
   },
   "required": [

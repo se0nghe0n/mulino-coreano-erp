@@ -17,6 +17,19 @@ final class NativeFinalResponseObserver {
         var report=store.base(evidenceClass,scope).put("actionId",action)
             .put("status","NOT_IMPLEMENTED").put("reason","Independent complete final-response semantic extractor unavailable");
         report.set("sourceCapture",store.descriptor(capture));report.set("sourceResponse",response.deepCopy());
+        var host=NativeHostObserver.extract(recorded);report.set("rawHostObservation",host);
+        var parsed=NativeResponseSemantics.extract(response.asText());report.set("semanticExtraction",parsed);
+        if(parsed.path("complete").asBoolean()) {
+            var semantic=Json.object().put("evidenceClass",evidenceClass.equals("ACTUAL_NATIVE_RESPONSE_CAPTURE")&&host.path("complete").asBoolean()?"ACTUAL_HOST":"CAPTURED_CONTRACT_SELFTEST")
+                .put("sourceTranscriptRef",store.descriptor(capture).path("path").asText()).put("complete",true);
+            semantic.set("scope",scope.deepCopy());semantic.set("sourceResponse",response.deepCopy());semantic.set("claims",parsed.path("claims"));
+            semantic.set("coverage",Json.array().add("CLAIMED_EFFECTS").add("COMPLETION").add("RESIDUAL_RESPONSIBILITY"));
+            semantic.set("extractor",Json.object().put("independent",true).put("source","INDEPENDENT_FINAL_RESPONSE_SEMANTICS")
+                .put("name","bounded-korean-clauses").put("version","1").set("command",Json.object().put("implementation","NativeResponseSemantics.extract")));
+            // Still a diagnostic until actual extractor process custody/host contract is wired.
+            report.set("semanticObservation",semantic);
+        }
+        report.put("reason","Host acceptance extractor command/custody not integrated; arbitrary text semantics remain UNKNOWN");
         report.set("implementationSource",store.source("verification/harness/src/main/java/org/mulino/verification/nativeclient/NativeFinalResponseObserver.java"));
         var artifact=store.save("final-response",report);
         StepResult missing=StepResult.missing(action,"NATIVE_FINAL_RESPONSE_SEMANTICS_NOT_IMPLEMENTED");

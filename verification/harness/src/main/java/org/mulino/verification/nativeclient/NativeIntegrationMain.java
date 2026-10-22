@@ -65,7 +65,7 @@ public final class NativeIntegrationMain {
             check(snapshot.path("rawRows").path("segments").size()==2,"RAW_SEGMENT_COUNT_MISMATCH");
             check(before.path("rawRows").equals(snapshot.path("rawRows")),"OBSERVED_PHYSICAL_ROWS_CHANGED_DURING_READS");
             check(!snapshot.path("snapshot").path("id").equals(read.businessResponse().path("snapshotRevision")),"API_HASH_REUSED_AS_MVCC_TOKEN");
-            new ContractValidator(root).schema("verification/model-binding/physical-columns.schema.json",snapshot.path("physicalColumns"));
+            new ContractValidator(root).schema("verification/model-binding/physical-columns.schema.json",snapshot.path("physicalCells"));
             var driverContext=integration.driver().query("context-diagnostic","MCP",actor,"getObject",contextRequest);
             check(driverContext.driverStatus()==StepResult.DriverStatus.NOT_IMPLEMENTED&&!driverContext.artifactRefs().isEmpty(),"MISSING_SERVER_IDENTITY_WAS_FABRICATED");
             var observeRequest=Json.object();observeRequest.set("scope",scope);observeRequest.put("asOf",query.path("asOf").asText()).put("knownAt",query.path("knownAt").asText());
@@ -77,7 +77,8 @@ public final class NativeIntegrationMain {
             check(integration.driver().installFixture("model-fixture-refusal",modelFixture).driverStatus()==StepResult.DriverStatus.NOT_IMPLEMENTED,"INCOMPLETE_MODEL_FIXTURE_ACCEPTED");
             boolean blocked=false;try{integration.requireReady("M01","turn-1");}catch(IllegalStateException missing){blocked=true;report.put("modelGate",missing.getMessage());}
             check(blocked,"MODEL_GATE_DID_NOT_REFUSE");
-            report.put("runtimeStatus","TRANSPORT_SIT_PASS").put("assertions",14);exit=0;
+            int observerChecks=NativeObserverTransportChecks.verify(config,evidence,transport,actor,aliases,scope,query.path("asOf").asText(),query.path("knownAt").asText(),snapshot,artifacts);
+            report.put("runtimeStatus","TRANSPORT_SIT_PASS").put("assertions",14+observerChecks);exit=0;
         } catch(Exception|AssertionError failure) {
             report.put("runtimeStatus","TRANSPORT_SIT_FAIL").put("failureType",failure.getClass().getSimpleName());
             String message=failure.getMessage();if(message!=null&&message.matches("[A-Z0-9_]{1,100}"))report.put("failureCode",message);
