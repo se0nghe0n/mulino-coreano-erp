@@ -426,3 +426,47 @@ SAP tenant·BTP 실행은 재검증하지 않았다. 학생의 현재·향후 �
 80/100·20/100 산술을 확인했다. 이는 가상 사례의 설명 검증이다.
 SAP API·backend·실모델을 실행하지 않았고, 거부 원천과 POD 읽기 경로,
 가격·손실 산식은 미해결로 남겼다. 전체 구현 Task의 gate는 변경하지 않았다.
+
+## 2026-10-22 구현 재개: 확정 계약 통합
+
+재개 기준선은 `79a0cb6e`이고 첫 통합 milestone은 `082c703e`다.
+해당 commit을 `fork/feat/ontology-implementation`에 push했다.
+모든 새 worker는 `codex/gpt-6-astra`와 명시적인
+`serviceTier=ultrafast`로 실행했다. 실모델 평가는 기존 Codex 또는
+Claude 구독 인증만 사용하며 별도 API 과금은 승인하지 않았다.
+
+- 외부 worker의 인증된 claim 제출 endpoint와 실제 HTTP adapter를
+  연결했다. 정상 claim/replay, 위조·만료·타 주체·철회·READ grant를
+  별도 PostgreSQL 검사로 확인했다.
+- process role의 첫 start는 application을 시작하고 후속 start는
+  같은 PID를 확인한다. process/host 관찰 계약과 검사를 함께 수정했다.
+- T01 제외 업무는 `HELD VERSION_UNSUPPORTED`, 판매 인도 끝점은
+  `DELIVERED`, `qualityTerms`는 필수라는 기존 결정을 반영했다.
+- goal 필드·기간·grant fixture를 정합화하고 문서 hash를 갱신했다.
+  normative 관찰과 인수 oracle는 삭제하거나 완화하지 않았다.
+
+| 실행 | 결과와 범위 |
+|---|---|
+| 기존 backend 전체 검사 | 556개 중 354개 통과, 202개는 테스트 공개키 누락으로 context 오류 |
+| 공개키 지정 재검사 | Platform 11개와 나머지 191개 모두 통과; 기존 556개 검사 전체의 성공을 확인 |
+| worker endpoint/runtime/Platform 결합 검사 | `6f88fd06`에서 24개 통과; 새 endpoint 7개 포함 |
+| harness 전체 검사 | `6f88fd06`에서 컴파일한 535개 통과 |
+| worker adapter/process/host 결합 검사 | `33c27a80`에서 22개 통과 |
+| fixture 검사 | `082c703e`에서 10개 통과 |
+| 최종 `./verify prepare` | `082c703e`, 41 case·802 subcase·24,034 assertion, 준비 오류0 |
+
+이는 서로 다른 통합 시점의 검사 기록이며 최신 전체 runtime 인수를
+뜻하지 않는다. 기본 전체 검사 로그는
+`.local/resume-20261022/backend-test-baseline.log`, 재검사는
+`backend-retry.log`, 결합 검사는 `adapter-integrated-test.log`, 준비
+검사는 `prepare-final-integrated.log`에 보존했다. 임시 키는 commit하지
+않았다. 실행용 별도 worktree에서는 과거 구현의 untracked 파일을
+포함하지 않는다.
+
+T01/C3/V4 414개 subcase는 `64d5ccbd`의 격리 PostgreSQL에서 실행 중이다.
+partial fixture 실행이므로 통과하더라도 전체 인수로 계산하지 않는다.
+다음 Step의 공통 baseline은 `082c703e`이며 복구 목표의 증거 검증,
+실제 worker claim의 case 연결, 구독 client runner를 독립 worktree에서
+구현한다. 정의 회귀 실행과 나머지 운영·관찰 공백도 남아 있다.
+실모델·BTP·규제 인수와 전체 S4–S6 완료는 아직 주장하지 않는다.
+BTP 계정·region·entitlement·배포 예산은 미확정이다.
