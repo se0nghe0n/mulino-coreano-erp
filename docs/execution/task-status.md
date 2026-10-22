@@ -463,8 +463,17 @@ Claude 구독 인증만 사용하며 별도 API 과금은 승인하지 않았다
 않았다. 실행용 별도 worktree에서는 과거 구현의 untracked 파일을
 포함하지 않는다.
 
-T01/C3/V4 414개 subcase는 `64d5ccbd`의 격리 PostgreSQL에서 실행 중이다.
-partial fixture 실행이므로 통과하더라도 전체 인수로 계산하지 않는다.
+T01/C3/V4 414개 subcase를 `64d5ccbd`의 격리 PostgreSQL에서 실행했다.
+4,688개 실제 동작을 수행했고, 83개 PASS·301개 FAIL·30개 NOT_RUN이다.
+PASS는 모두 partial fixture 실행이므로 전체 인수로 계산하지 않는다.
+inventory가 추가한 미선택 388개는 이번에 실행한 실패가 아니다.
+원본 결과는 격리 worktree의
+`verification/harness/target/evidence/actual-scenarios-run-01d3c3d1-d857-430d-b3c7-50a4cc7c955f/`
+에 있고 원인 목록은 `.local/resume-20261022/actual-contracts-inventory.json`이다.
+T01은 조회 권한·fixture 전제와 제외 업무의 requestedEffect 관찰이
+부족했다. C3/V4는 명령별 입력·정의 전제·관찰 공백과 실제 client 부재가
+남았다. 실패 분류기의 ADAPTER/TEST 표시는 확정 판정이 아니다.
+
 다음 Step의 공통 baseline은 `082c703e`이며 복구 목표의 증거 검증,
 실제 worker claim의 case 연결, 구독 client runner를 독립 worktree에서
 구현한다. 정의 회귀 실행과 나머지 운영·관찰 공백도 남아 있다.
