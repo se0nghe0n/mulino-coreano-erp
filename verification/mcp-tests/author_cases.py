@@ -126,6 +126,8 @@ def fixture(cid):
   f['baseline']['sourceProfiles']=[{'namespace':'synthetic-warehouse','policyVersion':'fixture-v1','intakeOwnerAlias':'sourceInstaller'}]
   sources=[]
   for output in ['receipt60Fact','receipt40Fact','regulatory60Fact','eligibilityPolicy','relationLotQuantity','relationSubjectOf','relationCustomer']:aliases[output]={'type':'SourceFact'}
+  f['versions']['policy']='T01-eligibility-v1'
+  aliases['eligibilityPolicy']={'type':'PolicyVersion','kind':'ELIGIBILITY','version':'T01-eligibility-v1','state':'ACTIVE','activate':True,'effectiveFrom':TIME,'effectiveUntil':'2026-10-31T23:59:59Z','content':{'synthetic':True,'source':'T01 explicit action eligibility contract','actions':{'SELL':{'requiredCategories':['QC','CUSTOMER','COMMERCIAL']}}}}
   for doc,segment,kind,category in [('receipt60','A60','PHYSICAL_RECEIPT',None),('receipt40','B40','PHYSICAL_RECEIPT',None),('qc60','A60','QUALITY_DECISION_recordDispositionBasis_QC','QC'),('hold40','B40','QUALITY_DECISION_placeHold_QC','QC'),('disposition60','A60','QUALITY_DECISION_recordDispositionBasis_COMMERCIAL','COMMERCIAL'),('customerConditions60','A60','QUALITY_DECISION_recordDispositionBasis_CUSTOMER','CUSTOMER')]:
    q=aliases[segment]['quantity'];subject='L' if kind=='PHYSICAL_RECEIPT' else segment
    payload={'itemAlias':'P','lotAlias':'L','workAlias':'O1','quantity':q,'unit':'BOX'}

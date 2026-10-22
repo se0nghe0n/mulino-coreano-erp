@@ -54,3 +54,8 @@ SUBJECT_OF/CUSTOMER를 따라가며 다른 LOT와 item의 정보를 합치지 �
 원문→canonical 연결, 대조·발행 응답, LOT 물량, 의무 tuple을 독립 재검사한다.
 새로 추가한 고객 영향 회귀는 다른 LOT의 고객을 제외하고, 실제 Work 관계가
 있는 QuantitySegment 명사 조회와 존재하지 않는 고객 끝점 거부를 검증한다.
+
+마지막 범위 검토에서는 SELL 적격성 정책도 T01 fixture의 명시적
+PolicyVersion으로 고정했다. 공통 installer의 wait 변환은 T01에만
+적용하며 다른 fixture의 기존 표현을 유지한다. 고객별 공급 근거 조회는
+custody와 적격성 양쪽에 같은 customer selector를 전달한다.

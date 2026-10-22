@@ -13,7 +13,7 @@
   "versions": {
     "definition": "definition-v1",
     "evaluator": "evaluator-v1",
-    "policy": "SYNTHETIC-policy-v1"
+    "policy": "T01-eligibility-v1"
   },
   "actors": {
     "reader": {
@@ -596,7 +596,26 @@
       "type": "SourceFact"
     },
     "eligibilityPolicy": {
-      "type": "SourceFact"
+      "type": "PolicyVersion",
+      "kind": "ELIGIBILITY",
+      "version": "T01-eligibility-v1",
+      "state": "ACTIVE",
+      "activate": true,
+      "effectiveFrom": "2026-10-07T09:00:00Z",
+      "effectiveUntil": "2026-10-31T23:59:59Z",
+      "content": {
+        "synthetic": true,
+        "source": "T01 explicit action eligibility contract",
+        "actions": {
+          "SELL": {
+            "requiredCategories": [
+              "QC",
+              "CUSTOMER",
+              "COMMERCIAL"
+            ]
+          }
+        }
+      }
     },
     "relationLotQuantity": {
       "type": "SourceFact"

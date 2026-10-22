@@ -487,9 +487,10 @@ final class ScenarioFixtureInstaller {
             var wait=Json.object();JsonNode authored=w.path("wait");
             wait.put("reason",authored.path("reason").asText(w.path("waitReason").asText("authored fixture wait")));
             wait.put("target",authored.path("target").asText(alias));
-            wait.set("resumePredicate",resolved((ObjectNode)(authored.has("resumePredicate")?authored.path("resumePredicate"):w.has("resumePredicate")?w.path("resumePredicate"):Json.object()).deepCopy()));
-            wait.put("verifier",authored.hasNonNull("verifierAlias")?id(authored.path("verifierAlias").asText()):w.hasNonNull("verifierAlias")?id(w.path("verifierAlias").asText()):id(supervisor));
-            if(T01SourceFacts.enabled(fixture))wait.put("verifierId",wait.path("verifier").asText());
+            JsonNode predicate=authored.has("resumePredicate")?authored.path("resumePredicate"):w.has("resumePredicate")?w.path("resumePredicate"):Json.object();
+            wait.set("resumePredicate",T01SourceFacts.enabled(fixture)?resolved((ObjectNode)predicate.deepCopy()):predicate);
+            wait.put("verifier",authored.has("verifier")?authored.path("verifier").asText():w.hasNonNull("verifierAlias")?id(w.path("verifierAlias").asText()):id(supervisor));
+            if(T01SourceFacts.enabled(fixture))wait.put("verifierId",authored.hasNonNull("verifierAlias")?id(authored.path("verifierAlias").asText()):wait.path("verifier").asText());
             wait.put("nextCheckAt",authored.path("nextCheckAt").asText(w.path("nextCheckAt").asText(asOf.plusHours(1).toInstant().toString())));
             wait.put("overdueAction",authored.path("overdueAction").asText(w.path("overdueAction").asText("supervisor review")));
             row.put("waitJson",wait.toString());

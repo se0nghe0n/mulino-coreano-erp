@@ -23,7 +23,8 @@ public final class WorkSupplyRead {
     for(var segment:inventory.rows(c,"QuantitySegments")){
       if(!List.of("itemId","lotId","placeId").stream().allMatch(k->scope.get(k)==null||Objects.equals(scope.get(k),segment.get(k))))continue;
       if(!auth.permittedScopes(c,"getAssessment",Map.of("TARGET",List.of(segment.get("ID").toString()),"ITEM",List.of(segment.get("itemId").toString()),"PLACE",List.of(segment.get("placeId").toString()))))continue;
-      var per=eligibility.read(c,"getAssessment",segment.get("itemId").toString(),Map.of("action",action),List.of(segment));
+      var eligibilityScope=new LinkedHashMap<String,Object>();eligibilityScope.put("action",action);if(customer!=null)eligibilityScope.put("customerId",customer);
+      var per=eligibility.read(c,"getAssessment",segment.get("itemId").toString(),eligibilityScope,List.of(segment));
       Object eligible=per.values().get("eligibleQuantity");if(eligible==null||new BigDecimal(eligible.toString()).signum()==0)continue;
       var result=eligibility.assess(c,segment,action,customer);if(result.eligibleQuantity().signum()==0)continue;
       selected.add(segment.get("ID").toString());
