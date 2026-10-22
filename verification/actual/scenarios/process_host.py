@@ -7,11 +7,12 @@ Usage: process_host.py --op start|stop|restart --process-id ID --pid-file F --ar
 The scenario suite runs one backend JVM (run.sh) that hosts every case role (api, scheduler, worker-*, application) on one
 disposable database. This command acts on that JVM: stop sends SIGTERM (SIGKILL after 20 s) and waits until the port is
 free; start relaunches the exported command on the same port and waits until it answers HTTP. It records the observed
-process state before and after (instanceId = OS pid) and an honest terminal status: start of a running JVM and stop of a
-stopped one are FAILED (exit 3) without acting, because a co-hosted role cannot start or stop on its own. --quiet-ensure
+process state before and after (instanceId = OS pid) and an honest terminal status. Start of a running JVM confirms
+attachment to that same instance without launching it; stop of a stopped one is FAILED (exit 3). All roles share the
+application lifecycle. --quiet-ensure
 starts a stopped JVM before a fixture installation and writes no report.
 """
-import argparse, datetime, json, os, signal, subprocess, sys, time, urllib.error, urllib.request
+import argparse, datetime, fcntl, json, os, signal, subprocess, sys, time, urllib.error, urllib.request
 
 
 def now():
@@ -20,7 +21,8 @@ def now():
 
 def pid_of(path):
     try:
-        text = open(path).read().strip()
+        with open(path) as source:
+            text = source.read().strip()
         return int(text) if text else None
     except FileNotFoundError:
         return None
@@ -52,9 +54,10 @@ def state(process_id, pid_file):
 
 def answers(port):
     try:
-        urllib.request.urlopen(f'http://127.0.0.1:{port}/api/ontology/queries/getInventory', timeout=2)
-        return True
-    except urllib.error.HTTPError:
+        with urllib.request.urlopen(f'http://127.0.0.1:{port}/api/ontology/queries/getInventory', timeout=2):
+            return True
+    except urllib.error.HTTPError as response:
+        response.close()
         return True
     except (urllib.error.URLError, OSError):
         return False
@@ -72,28 +75,32 @@ def stop(pid_file, port):
         while alive(pid) and time.time() < deadline:
             time.sleep(0.1)
     if alive(pid):
-        raise SystemExit('backend did not terminate')
+        raise RuntimeError('backend did not terminate')
     deadline = time.time() + 10
     while answers(port) and time.time() < deadline:
         time.sleep(0.1)
+    if answers(port):
+        raise RuntimeError('backend port still answers after termination')
 
 
 def start(argv, port, log, pid_file):
+    if answers(port):
+        raise RuntimeError('backend port already answers without the tracked process')
     argv = [a for a in argv if not a.startswith('--server.port=')] + [f'--server.port={port}']
-    out = open(log, 'ab')
-    out.write(f'\n# process_host.py start {now()}\n'.encode())
-    out.flush()
-    child = subprocess.Popen(argv, stdout=out, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
+    with open(log, 'ab') as out:
+        out.write(f'\n# process_host.py start {now()}\n'.encode())
+        out.flush()
+        child = subprocess.Popen(argv, stdout=out, stderr=subprocess.STDOUT, stdin=subprocess.DEVNULL, start_new_session=True)
     with open(pid_file, 'w') as f:
         f.write(str(child.pid))
     deadline = time.time() + 120
     while time.time() < deadline:
         if child.poll() is not None:
-            raise SystemExit(f'backend exited during start ({child.returncode})')
+            raise RuntimeError(f'backend exited during start ({child.returncode})')
         if answers(port):
             return
         time.sleep(0.25)
-    raise SystemExit('backend did not answer within 120 s')
+    raise RuntimeError('backend did not answer within 120 s')
 
 
 def main():
@@ -102,38 +109,59 @@ def main():
         p.add_argument(name, required=name not in ('--out', '--scope-json', '--process-id', '--before-json'))
     p.add_argument('--quiet-ensure', action='store_true')
     a = p.parse_args()
+    # Parallel role controls share one application. Keep the real transition serialized.
+    with open(a.pid_file + '.lock', 'a') as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        return execute(a)
+
+
+def execute(a):
     argv = json.loads(a.argv_json)
+    if a.op not in ('start', 'stop', 'restart'):
+        raise ValueError('unsupported process operation')
     if a.quiet_ensure:
         if not alive(pid_of(a.pid_file)):
             start(argv, a.port, a.log, a.pid_file)
             print('started')
+        elif not answers(a.port):
+            raise RuntimeError('tracked backend is running but does not answer')
         return 0
-    # The adapter observed the state before this command started (host-observation-guide.md); act on the real state.
+    # Preserve the adapter's pre-command observation; never substitute a fabricated STOPPED state.
     before = json.loads(a.before_json) if a.before_json else state(a.process_id, a.pid_file)
-    if state(a.process_id, a.pid_file)['status'] != before['status']:
-        raise SystemExit('process state changed between observation and command')
-    terminal, reason = 'SUCCEEDED', None
-    if a.op == 'start' and before['status'] == 'RUNNING':
-        terminal, reason = 'FAILED', 'the backend JVM that hosts this role is already running; a co-hosted role cannot start on its own'
-    elif a.op == 'stop' and before['status'] != 'RUNNING':
-        terminal, reason = 'FAILED', 'the backend JVM that hosts this role is not running'
-    else:
-        if a.op in ('stop', 'restart') and before['status'] == 'RUNNING':
-            stop(a.pid_file, a.port)
-        if a.op in ('start', 'restart'):
-            start(argv, a.port, a.log, a.pid_file)
+    terminal, reason, action = 'SUCCEEDED', None, None
+    try:
+        current = state(a.process_id, a.pid_file)
+        if any(current[key] != before.get(key) for key in ('processId', 'status', 'instanceId')):
+            raise RuntimeError('process identity or state changed between observation and command')
+        if a.op == 'start' and before['status'] == 'RUNNING':
+            if not answers(a.port):
+                raise RuntimeError('tracked backend is running but does not answer')
+            action = 'ATTACHED_EXISTING'
+        else:
+            if a.op in ('stop', 'restart'):
+                if before['status'] != 'RUNNING':
+                    raise RuntimeError('the backend application is not running')
+                stop(a.pid_file, a.port)
+            if a.op in ('start', 'restart'):
+                start(argv, a.port, a.log, a.pid_file)
+            action = {'start': 'STARTED', 'stop': 'STOPPED', 'restart': 'RESTARTED'}[a.op]
+    except (OSError, RuntimeError) as failure:
+        terminal, reason, action = 'FAILED', str(failure), 'FAILED'
     completed = now()
     after = state(a.process_id, a.pid_file)
     if terminal == 'SUCCEEDED' and (after['status'] != ('STOPPED' if a.op == 'stop' else 'RUNNING')
-                                    or a.op == 'restart' and after['instanceId'] == before['instanceId']):
-        terminal, reason = 'FAILED', 'observed final process state differs from the requested operation'
+            or a.op == 'restart' and after['instanceId'] == before['instanceId']
+            or action == 'ATTACHED_EXISTING' and after['instanceId'] != before['instanceId']):
+        terminal, reason, action = 'FAILED', 'observed final process state differs from the requested operation', 'FAILED'
     observation = {'requestedProcessId': a.process_id, 'before': before, 'after': after, 'terminalStatus': terminal,
                    'completedAt': completed, 'artifactRef': a.out}
     report = {'evidenceClass': 'ACTUAL_HOST', 'scope': json.loads(a.scope_json), 'operation': a.op,
-              'processObservation': observation, 'rows': {'processObservation': observation, 'reason': reason}}
+              'processObservation': observation,
+              'rows': {'processObservation': observation, 'processAction': action, 'reason': reason}}
     with open(a.out, 'w') as f:
         f.write(json.dumps(report, ensure_ascii=False, sort_keys=True) + '\n')
-    print(json.dumps({'terminalStatus': terminal, 'reason': reason, 'before': before['status'], 'after': after['status']}))
+    print(json.dumps({'terminalStatus': terminal, 'processAction': action, 'reason': reason,
+                      'before': before['status'], 'after': after['status']}))
     return 0 if terminal == 'SUCCEEDED' else 3
 
 

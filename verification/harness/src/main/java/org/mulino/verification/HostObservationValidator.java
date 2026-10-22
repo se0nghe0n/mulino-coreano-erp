@@ -418,7 +418,10 @@ public final class HostObservationValidator {
             ContractValidator.require(host.path("command").path("exitCode").asInt()==0,"Lifecycle success conflicts with actual command exit");
             String operation=host.path("operation").asText();
             ContractValidator.require(operation.equals("stop")?!after.path("status").asText().equals("RUNNING"):after.path("status").asText().equals("RUNNING"),"Lifecycle successful terminal status has wrong final process state");
-            if(operation.equals("start")) ContractValidator.require(!before.path("status").asText().equals("RUNNING"),"start cannot claim to start an already-running process");
+            if(operation.equals("start") && before.path("status").asText().equals("RUNNING")) {
+                ContractValidator.require(before.path("instanceId").equals(after.path("instanceId")),"start role confirmation requires the same running application instance");
+                ContractValidator.require(!result.data().path("launched").asBoolean(),"start role confirmation cannot claim an application launch");
+            }
             if(operation.equals("stop")) ContractValidator.require(before.path("status").asText().equals("RUNNING"),"stop cannot claim to stop an already-stopped process");
             if(operation.equals("restart")) ContractValidator.require(before.hasNonNull("instanceId") && !before.path("status").asText().equals("NOT_PRESENT") && !before.path("instanceId").equals(after.path("instanceId")),"restart requires a previous instance and a different new process instance identity");
         }

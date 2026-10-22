@@ -96,7 +96,7 @@ driverProvenance는 각각 선언한 host metadata와 StepResult provenance의
 
 | operation | 독립 identity / 입력 의미 | 실제 output·terminal 인수 |
 |---|---|---|
-| start | processId, environmentId / 명시한 parameters.processId | 실제 미기동→RUNNING instance와 terminal snapshot |
+| start | processId, environmentId / 명시한 parameters.processId | 미기동→RUNNING 또는 같은 RUNNING instance의 role 확인과 terminal snapshot |
 | stop | processId, environmentId / 명시한 parameters.processId | 실제 전후 process instance/status와 정지 terminal snapshot |
 | restart | processId, environmentId / 명시한 parameters.processId | 실제 새 instance의 RUNNING과 전후 terminal snapshot |
 | tickScheduler | schedulerId, tickId, submissionStatus / due scope와 고정 clock. 수동 관찰이면 trigger·observationWindowSeconds·triggeredBy | SUBMITTED의 실제 taskId/handle 또는 관찰된 NO_TASK; 완료 업무와 구별한다 |
@@ -141,7 +141,14 @@ status(RUNNING/STOPPED/NOT_PRESENT), observedAt을 기록한다. RUNNING은
 non-null instanceId가 필요하다. before는 command 시작 전, after는
 terminal 완료 후 command 종료까지 관찰한다. 성공 start/restart는
 RUNNING, 성공 stop은 STOPPED/NOT_PRESENT이고 성공 restart의 새 instance는
-이전 instance와 달라야 한다. 실패 terminal도 실제 상태를 보존한다.
+이전 instance와 달라야 한다. 이미 RUNNING인 application의 start는
+같은 instanceId를 유지하는 role 확인으로 성공한다. 이 경우
+`data.launched=false`, `data.processAction=ATTACHED_EXISTING`이다.
+첫 실제 기동은 `STARTED`, 실제 재기동은 `RESTARTED`와 launched=true다.
+fixture 설치가 application을 먼저 필요로 하므로 case의 첫 start도 기존
+instance 연결일 수 있다. before를 STOPPED로 바꾸어 기동을 꾸미지 않는다.
+stop/restart는 실행 중인 application 전체에 적용하며 멈춘 application의
+stop/restart는 실패다. 실패 terminal도 실제 상태를 보존한다.
 
 artifactRef의 실제 JSON은 evidenceClass/scope/operation/processObservation을
 exact 반환한다. 해당 파일은 generatedOutputs, extractor input hash와
@@ -387,9 +394,10 @@ schema가 거부한다. runtimeProfile이 없는 fixture는 harness tick fixture
   관찰·clock 전진)에서 loop process가 멈춰 있어야 한다. 다른 process의
   start/stop만 예외다. 자율 fixture의 loop는 1초마다 스스로 돌므로, 장애나
   seed 단계에 떠 있으면 미연결 intake 같은 seed 상태를 before-db나 watcher
-  전에 처리해 버린다(step2r round 5, opus[1]). process는 case가 start하기
-  전에는 실행 중이 아니다. 실행 중이던 process를 start하면 lifecycle 검사가
-  거부한다.
+  전에 처리해 버린다(step2r round 5, opus[1]). 여기서 process 실행 여부는
+  application JVM의 생존과 별개인 loop role의 활성 상태다. JVM에 대한 start 확인이 scheduler 활성화나
+  자연 제출 증거를 대신하지 않는다. 실제 role gating은 watcher 이전의
+  자동 제출을 막아야 하며, 이 host lifecycle 확인은 그 gate를 바꾸지 않는다.
 
 api·worker처럼 스스로 제출하지 않는 process는 group 밖에서 순서대로
 시작한다. group 안에서는 loop process 기동과 첫 tick만 관찰 창을 쓴다.

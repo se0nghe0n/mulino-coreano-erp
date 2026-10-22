@@ -16,8 +16,8 @@ import org.mulino.verification.StepResult;
  * suite runs one backend JVM on one disposable database (run.sh); every processId (api, scheduler, worker-*, application)
  * and environmentId of a case is a role co-hosted by that JVM, because the product is a single deployable (plan §2). The
  * host command verification/actual/scenarios/process_host.py really terminates or relaunches that JVM on the same port,
- * so memory is lost and only the database survives; start of a running JVM and stop of a stopped one are reported as a
- * FAILED terminal without acting (a co-hosted role cannot start or stop on its own). The adapter observes the state
+ * so memory is lost and only the database survives. A start of a running JVM confirms the role on that same instance
+ * without a launch; stop or restart of a stopped JVM fails honestly. The adapter observes the state
  * before the command (OS pid, RUNNING/STOPPED), the command records the after state and terminal snapshot, and the
  * read-only extractor host_extract.py re-reads that snapshot (host-observation-guide.md start/stop/restart).
  */
@@ -29,10 +29,10 @@ final class BackendProcessControls {
     boolean available(){return pidFile!=null&&argv!=null&&log!=null&&Files.isRegularFile(Path.of(pidFile));}
 
     /** Before a fixture installation: a subcase that stopped the backend must not leave the next one without it. */
-    void ensureRunning() throws IOException,InterruptedException{
+    synchronized void ensureRunning() throws IOException,InterruptedException{
         if(!available())return;var o=exec(base(List.of("--op","start","--quiet-ensure")));if(o.code!=0)throw new IllegalStateException("Backend ensure-start failed: "+o.output.strip());
     }
-    StepResult control(String id,JsonNode request,HostProcessControls.Evidence evidence) throws IOException,InterruptedException {
+    synchronized StepResult control(String id,JsonNode request,HostProcessControls.Evidence evidence) throws IOException,InterruptedException {
         String operation=request.path("operation").asText();JsonNode parameters=request.path("parameters");ObjectNode provenance=evidence.provenance();
         String processId=Json.required(parameters,"processId");String environmentId=parameters.path("environmentId").asText("suite");
         String dir="verification/harness/target/evidence/actual/"+run+"/process-"+UUID.randomUUID();Files.createDirectories(root.resolve(dir));
@@ -68,7 +68,10 @@ final class BackendProcessControls {
         host.set("environment",environment);host.set("inputArtifacts",Json.array());host.set("generatedOutputs",generated);host.set("observedArtifacts",Json.array());
         host.set("extractor",extractor);host.set("operationEvidence",identity);host.put("evidenceClass","ACTUAL_HOST");host.set("processObservation",Json.read(root.resolve(report)).path("processObservation"));
         var data=Json.object();data.put("acknowledged",true).put("controlType","process").put("operation",operation).put("acknowledgedAt",completed.toString());
-        data.put("launched",outcome.code==0&&!operation.equals("stop"));data.set("hostObservation",host);
+        JsonNode terminal=Json.read(root.resolve(report));
+        String processAction=terminal.path("rows").path("processAction").asText();
+        data.put("processAction",processAction).put("roleConfirmed",outcome.code==0&&operation.equals("start"));
+        data.put("launched",outcome.code==0&&Set.of("STARTED","RESTARTED").contains(processAction));data.set("hostObservation",host);
         return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,null,null,provenance,refs);
     }
     private List<String> base(List<String> extra){var out=new ArrayList<>(List.of("python3","-I",COMMAND,"--pid-file",pidFile,"--argv-json",argv,"--port",Integer.toString(base.getPort()),"--log",log));out.addAll(extra);return out;}
