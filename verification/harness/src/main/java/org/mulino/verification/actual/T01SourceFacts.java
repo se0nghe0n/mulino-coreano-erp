@@ -19,6 +19,7 @@ final class T01SourceFacts {
     private final String external, org, actor;
     private final OffsetDateTime at;
     private final List<String> conventions;
+    private final com.fasterxml.jackson.databind.node.ArrayNode sourceCommands=Json.array();
     private final HttpClient http=HttpClient.newHttpClient();
     private final JwtSigner signer;
     private Connection connection;
@@ -45,7 +46,7 @@ final class T01SourceFacts {
         this.config=config;this.fixture=fixture;this.aliases=aliases;this.external=external;this.facts=fixture.path("baseline").path("sourceFacts");
         this.org=id("ORG");this.actor=id(Json.required(facts,"actorAlias"));this.at=OffsetDateTime.parse(Json.required(fixture.path("clock"),"asOf"));this.conventions=conventions;this.signer=new JwtSigner(config);
     }
-    void install() throws Exception {
+    ObjectNode install() throws Exception {
         validate(fixture);
         if(!facts.path("legalComplianceClaimed").isBoolean()||facts.path("legalComplianceClaimed").asBoolean())throw new IllegalArgumentException("T01 must remain explicitly synthetic");
         transaction(()->{installRelations();installRegulatoryProcedure();});
@@ -53,6 +54,8 @@ final class T01SourceFacts {
         for(JsonNode source:facts.path("sources"))publish(source);
         installPermissions();transaction(this::installReceipts);
         conventions.add("T01 sourceFacts: original documents and explicit source events were matched and linked by actual HTTP server commands; no VERIFIED row was seeded; receipt/permission history uses the returned canonical identities");
+        var evidence=Json.object().put("verificationPath","ACTUAL_HTTP_SERVER").put("seededVerificationRows",0).put("historicalReceiptRows",2).put("historicalHoldRows",1).put("historyIsCommandCoverage",false);
+        evidence.set("commands",sourceCommands);return evidence;
     }
     static void validate(JsonNode fixture){
         JsonNode f=fixture.path("baseline").path("sourceFacts");
@@ -141,7 +144,9 @@ final class T01SourceFacts {
         var request=HttpRequest.newBuilder(config.baseUri().resolve("/api/ontology/"+route+"/"+capability)).timeout(Duration.ofSeconds(60)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(credential)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
         var response=http.send(request,HttpResponse.BodyHandlers.ofString());JsonNode result=Json.parse(response.body());
         if(response.statusCode()!=200||!result.path("outcome").asText().equals("APPLIED"))throw new IllegalStateException("T01 source command "+capability+" rejected: HTTP "+response.statusCode()+" "+result);
-        var merged=(ObjectNode)result.deepCopy();if(result.path("effects").isObject())result.path("effects").fields().forEachRemaining(e->merged.set(e.getKey(),e.getValue()));return merged;
+        var merged=(ObjectNode)result.deepCopy();if(result.path("effects").isObject())result.path("effects").fields().forEachRemaining(e->merged.set(e.getKey(),e.getValue()));
+        var receipt=Json.object().put("capabilityId",capability).put("httpStatus",response.statusCode()).put("outcome",result.path("outcome").asText());
+        for(String field:List.of("id","claimId","evidenceStatus","procedureId","procedureVersionId","dispositionBasisId","decisionId"))if(merged.has(field))receipt.set(field,merged.path(field));sourceCommands.add(receipt);return merged;
     }
     private void installPermissions()throws Exception{
         for(var s:facts.path("sources"))if(s.hasNonNull("category")){

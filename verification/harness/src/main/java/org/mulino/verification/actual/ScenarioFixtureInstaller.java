@@ -22,7 +22,7 @@ import org.mulino.verification.Json;
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
         "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
-        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage","SourceFact");
+        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
     static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities","definitionContract");
     /**
@@ -98,12 +98,13 @@ final class ScenarioFixtureInstaller {
                 c.commit();
             } catch(Exception failure){c.rollback();for(Path b:writtenBlobs)java.nio.file.Files.deleteIfExists(b);throw failure;}
         }
-        if(T01SourceFacts.enabled(fixture))new T01SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias),conventions).install();
+        ObjectNode sourceFactEvidence=T01SourceFacts.enabled(fixture)?new T01SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias),conventions).install():null;
         var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));
         if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));
         result.put("organizationExternalAlias",externals.get(defaultOrgAlias));result.set("organizationExternalAliases",Json.MAPPER.valueToTree(externals));
         result.put("installer","scenario-fixture-installer-v2").put("recordedAtRule","every installed row recordedAt=createdAt=fixture clock asOf (starting clock); evidence declared recordedAt later than the fixture knownAt is recorded at that declared instant (late-known)");
         result.put("fixtureComplete",omitted.isEmpty());result.set("omittedFacts",Json.MAPPER.valueToTree(omitted));result.set("notRepresentedFacts",Json.MAPPER.valueToTree(notRepresented));var types=Json.object();fixture.path("aliases").fields().forEachRemaining(e->{if(aliases.has(e.getKey()))types.put(aliases.path(e.getKey()).asText(),e.getValue().path("type").asText());});result.set("idTypes",types);result.set("installerConventions",Json.MAPPER.valueToTree(conventions));
+        if(sourceFactEvidence!=null)result.set("sourceFactEvidence",sourceFactEvidence);
         result.put("committed",true).put("businessExecutionClaimed",false);return result;
     }
 
@@ -122,7 +123,7 @@ final class ScenarioFixtureInstaller {
         for(JsonNode actor:fixture.path("actors")){String d=actor.path("grant").path("delegatorAlias").asText(null);if(d!=null&&!orgOf.containsKey(d))orgOf.put(d,aliases.path(externals.containsKey(actor.path("organizationAlias").asText())?actor.path("organizationAlias").asText():defaultOrgAlias).asText());}
     }
     private void survey() {
-        fixture.path("aliases").fields().forEachRemaining(e->{String t=e.getValue().path("type").asText();if(!SUPPORTED_TYPES.contains(t))omitted.add("aliasType "+t+" ("+e.getKey()+")");});
+        fixture.path("aliases").fields().forEachRemaining(e->{String t=e.getValue().path("type").asText();if(!SUPPORTED_TYPES.contains(t)&&!(t.equals("SourceFact")&&T01SourceFacts.enabled(fixture)))omitted.add("aliasType "+t+" ("+e.getKey()+")");});
         fixture.path("baseline").fields().forEachRemaining(e->{
             String k=e.getKey();JsonNode v=e.getValue();
             if(DESCRIPTIVE_BASELINE.contains(k)||v.isNull()||v.isBoolean()&&!v.asBoolean()||v.isContainerNode()&&v.isEmpty())return;
@@ -131,6 +132,11 @@ final class ScenarioFixtureInstaller {
         });
         responsibilitySurvey();
         if(!fixture.path("evidence").isEmpty()&&!T01SourceFacts.enabled(fixture))notRepresented.add("evidence events/claims/verified chains: an authored evidence entry states hash, namespace and times only (no event kind, claim or canonical scope); the chain is built by the case's own evidence commands");
+        if(T01SourceFacts.enabled(fixture)){
+            var typedDocuments=new HashSet<String>();fixture.path("baseline").path("sourceFacts").path("sources").forEach(source->typedDocuments.add(source.path("documentAlias").asText()));
+            var unverified=new ArrayList<String>();fixture.path("evidence").forEach(entry->{if(!typedDocuments.contains(entry.path("alias").asText()))unverified.add(entry.path("alias").asText());});
+            if(!unverified.isEmpty())notRepresented.add("hash/time-only documents without canonical publication: "+String.join(",",unverified));
+        }
         for(var it=fixture.path("actors").fields();it.hasNext();) {var e=it.next();
             for(var s=e.getValue().path("grant").path("scope").fieldNames();s.hasNext();){String k=s.next();if(GRANT_METADATA.contains(k)||scopeKind(k)!=null)continue;
                 if(UNREPRESENTED_SCOPE.contains(k)){String note="grantScope "+k+" (no product grant scope kind; grant installed without it)";if(!notRepresented.contains(note))notRepresented.add(note);}omitted.add("grantScope "+k+" ("+e.getKey()+")");}

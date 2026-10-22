@@ -138,6 +138,26 @@ class S1ReadIntegrationTest {
     assertEquals(work,duties.getFirst().get("responsibleWorkId"));assertEquals(actor,duties.getFirst().get("ownerId"));
     assertEquals("검사 근거 확인",duties.getFirst().get("nextAction"));assertEquals("100",data.get("heldQuantity"));assertEquals("0",data.get("cumulativeArrival"));
   }
+  @Test @SuppressWarnings("unchecked") void t01CustomerCandidatesFollowOnlyVisibleLotSubjects(){
+    String customer=id(),otherCustomer=id(),otherSegment=id(),otherLot=id();
+    for(String id:List.of(customer,otherCustomer)){var customerRow=workRow(id);customerRow.put("name","candidate");insert("mulino_trade_sales_Customers",customerRow);}
+    var l=scoped(otherLot);l.putAll(row("manufacturerId",manufacturer,"itemId",item,"originalLot","OTHER"));insert("mulino_inventory_ManufacturingLots",l);
+    var s=scoped(otherSegment);s.putAll(row("itemId",item,"lotId",otherLot,"identificationStatus","CONFIRMED","quantity",new java.math.BigDecimal("1"),"unit","BOX","placeId",place,"controlScope","other","validFrom",Timestamp.from(AS_OF),"mixtureStatus","IDENTIFIED"));insert("mulino_inventory_QuantitySegments",s);
+    String otherWork=id();var w=workRow(otherWork);w.putAll(row("itemId",item,"lotId",otherLot,"definitionVersionId",definition,"kind","SALES","status","ACTIVE","ownerId",actor,"supervisorId",actor));insert("mulino_work_read_Works",w);
+    String relationsDefinition=id();insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",relationsDefinition,"version","relations-v1","state","DRAFT","createdAt",java.time.LocalDateTime.ofInstant(AS_OF,java.time.ZoneOffset.UTC),"contentHash","a".repeat(64),"content","{}","evaluatorVersion","read-v1","schemaVersion","1"));
+    String subject=id(),destination=id();
+    for(String[] d:List.of(new String[]{subject,"SUBJECT_OF","QuantitySegment","Work"},new String[]{destination,"CUSTOMER","Work","Customer"}))insert("mulino_definitions_RelationDefinitions",row("organizationId",org,"ID",d[0],"createdAt",java.time.LocalDateTime.ofInstant(AS_OF,java.time.ZoneOffset.UTC),"definitionVersionId",relationsDefinition,"name",d[1],"sourceType",d[2],"targetType",d[3],"minimumCount",0,"maximumCount",100,"cycleAllowed",false));
+    jdbc.update("UPDATE mulino_definitions_DefinitionVersions SET state='PUBLISHED' WHERE organizationId=? AND ID=?",org,relationsDefinition);
+    for(String[] r:List.of(new String[]{subject,"QuantitySegment",segment,"Work",work},new String[]{destination,"Work",work,"Customer",customer},new String[]{subject,"QuantitySegment",otherSegment,"Work",otherWork},new String[]{destination,"Work",otherWork,"Customer",otherCustomer})){var rel=scoped(id());rel.putAll(row("definitionVersionId",relationsDefinition,"relationDefinitionId",r[0],"sourceType",r[1],"sourceId",r[2],"targetType",r[3],"targetId",r[4],"validFrom",Timestamp.from(AS_OF)));insert("mulino_inventory_ObjectRelations",rel);}
+    String grant=jdbc.queryForObject("SELECT ID FROM mulino_identity_Grants WHERE organizationId=? AND actorId=?",String.class,org,actor);
+    insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId","traceLot"));
+    insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","traceLot","scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(Instant.now().minusSeconds(3600)),"validUntil",Timestamp.from(Instant.now().plusSeconds(3600))));
+    var segmentNoun=(Map<String,Object>)readType("getObject",segment,"QuantitySegment").get("data");
+    assertEquals(1,((List<?>)segmentNoun.get("relations")).size());
+    var answer=(Map<String,Object>)read("traceLot",lot,null).get("data");assertEquals(List.of(customer),answer.get("customerIds"));assertEquals("CANDIDATE",answer.get("impactKind"));
+    assertFalse(((List<?>)answer.get("segmentIds")).contains(otherSegment));assertNull(answer.get("confirmedDefectImpact"));
+    var bad=scoped(id());bad.putAll(row("definitionVersionId",relationsDefinition,"relationDefinitionId",destination,"sourceType","Work","sourceId",work,"targetType","Customer","targetId",id(),"validFrom",Timestamp.from(AS_OF)));assertThrows(org.springframework.dao.DataAccessException.class,()->insert("mulino_inventory_ObjectRelations",bad));
+  }
   @Test void wrongOrgAndReadProjectionChangesFailClosed(){
     var noun=read("getObject",item,null);
     assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->read("getWork",id(),null)).code());

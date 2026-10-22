@@ -67,7 +67,7 @@ public class InventoryQueries implements QueryHandler {
       var members=repository.rows(c,"LogisticsMemberships").stream().filter(r -> q.id().equals(r.get("logisticsUnitId")) && interval(r,c)).toList();
       data.put("memberships",members.stream().filter(r -> permitted(c,q.operation(),repository.object(c,"QuantitySegments",(String)r.get("segmentId")))).map(this::dto).toList());
     }
-    data.put("relations",repository.rows(c,"ObjectRelations").stream().filter(r -> q.id().equals(r.get("sourceId")) && interval(r,c)).filter(r -> permitted(c,q.operation(),repository.object(c,TYPES.get((String)r.get("targetType")),(String)r.get("targetId")))).map(this::dto).toList());
+    data.put("relations",repository.rows(c,"ObjectRelations").stream().filter(r -> q.id().equals(r.get("sourceId")) && interval(r,c)).filter(r -> permittedRelationTarget(c,q.operation(),row,r)).map(this::dto).toList());
     return result(data,q,List.of());
   }
   private QueryResult search(DomainContext c, QueryRequest q) {
@@ -187,6 +187,11 @@ public class InventoryQueries implements QueryHandler {
     return candidates;
   }
   private void authorize(DomainContext c,String operation,Map<String,Object> row) {authorizer.authorizeScopes(c,operation,scopes(row));}
+  private boolean permittedRelationTarget(DomainContext c,String operation,Map<String,Object> source,Map<String,Object> relation){
+    String type=Objects.toString(relation.get("targetType"),"");
+    if(TYPES.containsKey(type))return permitted(c,operation,repository.object(c,TYPES.get(type),relation.get("targetId").toString()));
+    return customerRead!=null&&customerRead.getIfAvailable()!=null&&customerRead.getObject().permittedEndpoint(c,operation,type,relation.get("targetId").toString(),Objects.toString(source.get("itemId"),null));
+  }
   private boolean permitted(DomainContext c,String operation,Map<String,Object> row) {return authorizer.permittedScopes(c,operation,scopes(row));}
   private Map<String,Object> dto(Map<String,Object> row) {Map<String,Object> result=new LinkedHashMap<>(); row.forEach((k,v)->result.put(k,v instanceof BigDecimal ? InventoryQuantity.text(v) : v)); return result;}
   private QueryResult result(Object data,QueryRequest q,List<String> unknowns) {var scope=new LinkedHashMap<String,Object>(q.scope());if(data instanceof Map<?,?> map&&map.get("itemId")!=null)scope.put("itemId",map.get("itemId"));return new QueryResult(data,scope,unknowns,List.of(),List.of(),null);}
