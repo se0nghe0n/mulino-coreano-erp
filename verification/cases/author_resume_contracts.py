@@ -138,6 +138,17 @@ def apply_recovery_fixture(fixture):
     if not contract:
         return False
     pins_changed = False
+    runtime_queries = ['traceLot', 'getDefinition', 'searchObjects', 'searchWorks', 'getInbox',
+                       'searchOperationalIssues', 'getSettlement', 'traceRecall']
+    if contract.get('omitUnimplementedVerbs') != ['getCommandResult']:
+        contract['omitUnimplementedVerbs'] = ['getCommandResult']
+        pins_changed = True
+    capabilities = [{'capabilityId': name, 'semanticVersion': '1.0.0', 'evaluatorVersion': 'core-v1',
+                     'inputSchemaVersion': '1.0.0', 'outputSchemaVersion': '1.0.0',
+                     'supportedWorkMigration': []} for name in runtime_queries]
+    if contract.get('capabilities') != capabilities:
+        contract['capabilities'] = capabilities
+        pins_changed = True
     if 'RECOVERY_DEFINITION_V1' not in fixture['aliases']:
         fixture['aliases']['RECOVERY_DEFINITION_V1'] = {
             'type': 'DefinitionVersion', 'version': 'definition-v1', 'state': 'PUBLISHED'}
@@ -152,7 +163,8 @@ def apply_recovery_fixture(fixture):
         raise ValueError('Unknown recovery definition contract')
     # These are authored test contracts, not expected assessment results.
     fixture['baseline']['definitionContract'] = {
-        'definitionVersion': 'definition-v1', 'evaluatorVersion': 'core-v1',
+        'definitionVersion': 'definition-v1', 'evaluatorVersion': 'core-v1', 'capabilities': capabilities,
+        'omitUnimplementedVerbs': ['getCommandResult'],
         'goalTemplate': {'name': 'verified-ready', 'quantityMode': 'STATE_AT',
                          'endpoint': 'VERIFIED', 'evaluatorVersion': 'core-v1',
                          'predicate': recovery_predicate()},

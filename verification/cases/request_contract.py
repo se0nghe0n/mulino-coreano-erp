@@ -682,7 +682,8 @@ class Contracts:
             if not typed:
                 refs.append({'type': rule['type'], 'id': value})
                 typed = refs[-1:]
-            if len(typed) == 1 and typed[0].get('id') == value:
+            # The nested goal form requires itemId even when the subject repeats it.
+            if len(typed) == 1 and typed[0].get('id') == value and not (capability in ('createWork', 'createDraft') and 'goal' in slots):
                 slots.pop(rule['slot'])
                 provenance.pop(rule['slot'], None)
 

@@ -130,6 +130,15 @@ class ResumeContracts(unittest.TestCase):
                 self.assertFalse(apply_recovery_fixture(fixture))
                 self.assertEqual('synthetic-evidence-v1', fixture['aliases']['RECOVERY_EVIDENCE_POLICY']['version'])
 
+    def test_shared_author_preserves_nested_goal_identity(self):
+        from request_contract import Contracts
+        case = json.loads((ROOT / 'verification/cases/T26/case.json').read_text())
+        Contracts(ROOT).conform_case(case)
+        for sub in case['subcases']:
+            for action in sub['actions']:
+                if action.get('id') == 'create' and action.get('capabilityId') == 'createWork':
+                    self.assertEqual({'$alias': 'P'}, action['request']['slots']['itemId'])
+
     def test_recovery_does_not_rewrite_quantity_or_responsibility_oracles(self):
         sub = {'id': 'test', 'actions': [{'id': 'create', 'capabilityId': 'createWork',
             'request': {'capabilityId': 'createWork', 'slots': {'goal': {

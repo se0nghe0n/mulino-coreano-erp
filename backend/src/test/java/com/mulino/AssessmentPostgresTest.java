@@ -33,6 +33,7 @@ class AssessmentPostgresTest {
  static final Path KEY,BLOBS;
  static {try{PG.start();var g=java.security.KeyPairGenerator.getInstance("RSA");g.initialize(2048);KEY=Files.createTempFile("eval-public-",".pem");Files.writeString(KEY,"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(g.generateKeyPair().getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");BLOBS=Files.createTempDirectory("eval-blobs-");}catch(Exception e){throw new ExceptionInInitializerError(e);}}
  @DynamicPropertySource static void props(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY::toString);r.add("JWT_ISSUER",()->"https://evaluation.invalid");r.add("JWT_AUDIENCE",()->"evaluation");r.add("mulino.evidence.blob-root",BLOBS::toString);}
+ @Autowired DefinitionValidator definitionValidator;
  @Autowired com.mulino.application.evidence.EvidenceRecords records;
  @Autowired com.mulino.application.evidence.EvidenceReconciliation reconciliation;
  @Autowired com.mulino.application.identity.IdentityAuthorization auth;
@@ -194,6 +195,19 @@ class AssessmentPostgresTest {
    assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",Integer.class,org));
    assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=?",Integer.class,org));
   }finally{SecurityContextHolder.clearContext();}
+ }
+
+ @Test void recoveryFixturePublishesEveryVerbAndSupportedTypedGoal()throws Exception{
+  var content=(com.fasterxml.jackson.databind.node.ObjectNode)json.readTree(Path.of("../verification/actual/scenarios/installer-conventions.json").toFile()).path("definition");
+  var contract=json.readTree(Path.of("../verification/cases/V5/fixtures/waiting-full-restart.json").toFile()).path("baseline").path("definitionContract");
+  ((com.fasterxml.jackson.databind.node.ArrayNode)content.path("goals")).add(contract.path("goalTemplate"));
+  for(var capability:contract.path("capabilities"))((com.fasterxml.jackson.databind.node.ArrayNode)content.path("capabilities")).add(capability);
+  var verbs=json.createArrayNode();for(var verb:content.path("verbs"))if(!verb.path("capabilityId").asText().equals("getCommandResult"))verbs.add(verb);content.set("verbs",verbs);
+  content.put("organizationId",org).put("id",id());
+  Definition published=json.treeToValue(content,Definition.class);
+  // This fixture-only handler is registered by the actual run's verification profile, absent in this local-profile test.
+  assertTrue(definitionValidator.validate(published).problems().stream().allMatch(p->p.path().equals("fixtureExternalEffect")&&p.code().equals("UNSUPPORTED_CAPABILITY")),()->definitionValidator.validate(published).toString());
+  assertEquals("VALID",definitionValidator.validatePredicate(published,published.goals().getLast().predicate()).outcome());
  }
 
 }

@@ -20,6 +20,21 @@ final class RecoveryGoalDefinition {
                 throw new IllegalArgumentException("definitionContract duplicates a published endpoint/mode");
             goals.add(goal);
         }
+        var verbs = Json.array();
+        for (JsonNode verb : content.path("verbs")) {
+            boolean omitted = false;
+            for (JsonNode name : contract.path("omitUnimplementedVerbs"))
+                if (name.asText().equals(verb.path("capabilityId").asText())) omitted = true;
+            if (!omitted) verbs.add(verb);
+        }
+        content.set("verbs", verbs);
+        var capabilities = (com.fasterxml.jackson.databind.node.ArrayNode)content.path("capabilities");
+        for (JsonNode declared : contract.path("capabilities")) {
+            for (JsonNode existing : capabilities)
+                if (existing.path("capabilityId").equals(declared.path("capabilityId")))
+                    throw new IllegalArgumentException("definitionContract duplicates a capability");
+            capabilities.add(declared.deepCopy());
+        }
         goals.add(template.deepCopy());
         content.set("goals", goals);
     }

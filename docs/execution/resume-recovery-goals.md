@@ -105,3 +105,27 @@ flat form과 달리 itemId와 definitionVersionId를 명시해야 한다.
 이다. disposable DB는 runner가 종료했다. 설치가 지원하지 않는 나머지
 baseline 및 runtime/관찰 경로도 있어 전체 fixtureComplete는 false다.
 이를 목표 기능의 성공이나 전체 복구 PASS로 세지 않는다.
+
+두 번째 clean snapshot `df2f61b9` 실행도 선택29개가 FAIL이다.
+V5 createWork 4개는 `VERSION_UNSUPPORTED: Pinned predicate unsupported`,
+T26 13개는 `TYPE_INVALID: Invalid itemId`다. 원본은
+`verification/harness/target/evidence/actual-scenarios-run-5e497b39-6ac4-4790-8aba-c539979305d5/`
+이다.
+
+원인은 두 가지다. 공통 request author가 flat form의 subjectSlots 규칙을
+중첩 goal form에도 적용해 itemId를 삭제했다. 해당 form만 삭제에서
+제외한다. 다른 form과 C3/V4/T21 산출물은 바꾸지 않는다. 또한 installer
+기본 정의에는 조회 verb 9개에 대응하는 capability 선언이 빠져 있어
+전체 발행 정의 검사가 거부된다. 그중 8개는 기존 조회 capability와 실제 runtime 버전을 복구
+definitionContract에 명시해 설치한다. 나머지 getCommandResult는
+제품 handler가 없고 V5/T26도 사용하지 않으므로 이 테스트 정의의
+미구현 verb에서 제외한다. 존재하지 않는 capability를 발행하지 않는다.
+권한 부여가 아니며 실제 grant 검사는 그대로다. backend 검사는 이
+발행 정의 전체와 typed predicate를 현재 validator로 대조한다.
+
+후속 검사에서 nested goal identity selftest를 포함한 Python 13 tests,
+installer 2 tests, 전체 `./verify prepare`가 통과했다. 발행 정의를
+현재 backend validator로 읽는 추가 PostgreSQL 검사 1개도 통과했다.
+local profile에서만 없는 fixtureExternalEffect는 실제 실행의
+verification profile이 제공한다. 그 외 미지원 capability는 없다.
+기존 backend 25 tests와 합쳐 관련 결정적 검사는 26개다.
