@@ -1,6 +1,9 @@
 package com.mulino;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mulino.application.core.*;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import com.mulino.application.evaluation.AssessmentService;
 import com.mulino.domain.definitions.*;
 import com.mulino.adapters.blob.LocalBlobStore;
@@ -30,6 +33,9 @@ class AssessmentPostgresTest {
  static final Path KEY,BLOBS;
  static {try{PG.start();var g=java.security.KeyPairGenerator.getInstance("RSA");g.initialize(2048);KEY=Files.createTempFile("eval-public-",".pem");Files.writeString(KEY,"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(g.generateKeyPair().getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");BLOBS=Files.createTempDirectory("eval-blobs-");}catch(Exception e){throw new ExceptionInInitializerError(e);}}
  @DynamicPropertySource static void props(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY::toString);r.add("JWT_ISSUER",()->"https://evaluation.invalid");r.add("JWT_AUDIENCE",()->"evaluation");r.add("mulino.evidence.blob-root",BLOBS::toString);}
+ @Autowired com.mulino.application.evidence.EvidenceRecords records;
+ @Autowired com.mulino.application.evidence.EvidenceReconciliation reconciliation;
+ @Autowired com.mulino.application.identity.IdentityAuthorization auth;
  @Autowired JdbcTemplate jdbc;@Autowired AssessmentService service;@Autowired LocalBlobStore blobs;@Autowired CdsRuntime runtime;@Autowired PlatformTransactionManager tx;
  final ObjectMapper json=new ObjectMapper();final Instant t=Instant.parse("2026-10-08T00:00:00Z");String org,actor,item,definition,work,goal,profile,policy;
  String id(){return UUID.randomUUID().toString();}
@@ -53,13 +59,14 @@ class AssessmentPostgresTest {
   if(Boolean.TRUE.equals(jdbc.queryForObject("SELECT to_regclass('mulino_governance_activepolicies') IS NOT NULL",Boolean.class)))jdbc.update("INSERT INTO mulino_governance_ActivePolicies(organizationId,kind,policyId,revision) VALUES(?,'EVIDENCE',?,0)",org,policy);
   var s=evidence(profile);s.putAll(row("namespace","fixture","policyVersion","fixture-evidence-v1","intakeOwnerId",actor,"supervisorId",actor,"nextAction","compare","nextCheckAt",Timestamp.from(t.plusSeconds(3600))));insert("mulino_evidence_SourceProfiles",s);
  }
- void occurrence(String physical,String quantity,Instant occurred,String source){
+ void occurrence(String physical,String quantity,Instant occurred,String source){occurrence(physical,quantity,occurred,source,null,null);}
+ void occurrence(String physical,String quantity,Instant occurred,String source,String place,Instant until){
   String event=id(),claim=id(),canonical=id(),doc=id();byte[] content=(source+quantity).getBytes();var blob=blobs.stage(content,LocalBlobStore.hash(content));blobs.commit(blob);
   var document=evidence(doc);document.putAll(row("subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"sha256",blob.sha256(),"blobId",blob.id().toString(),"byteLength",blob.size(),"mediaType","text/plain","sourceNamespace","fixture","sourceProfileId",profile,"availability","AVAILABLE","provenance","{}"));insert("mulino_evidence_DocumentVersions",document);
   var e=evidence(event);e.putAll(row("subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"effectiveFrom",Timestamp.from(occurred),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","kind","RECEIPT","sourceNamespace","fixture","sourceProfileId",profile,"externalEventId",source,"sourceVersion","1","payloadHash",LocalBlobStore.hash(content),"payload","{}"));insert("mulino_evidence_Events",e);
   var in=evidence(id());in.putAll(row("subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"eventId",event,"sourceNamespace","fixture","sourceProfileId",profile,"externalEventId",source,"sourceVersion","1","payloadHash",LocalBlobStore.hash(content),"state","RECEIVED","intakeOwnerId",actor,"supervisorId",actor,"nextAction","compare","nextCheckAt",Timestamp.from(t.plusSeconds(3600))));insert("mulino_evidence_InboxRecords",in);
   var c=evidence(claim);c.putAll(row("sourceProfileId",profile,"subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"effectiveFrom",Timestamp.from(occurred),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","eventId",event,"documentVersionId",doc,"assertion","receipt","quantity",new BigDecimal(quantity),"unit","BOX"));insert("mulino_evidence_Claims",c);
-  var o=evidence(canonical);o.putAll(row("sourceProfileId",profile,"subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"effectiveFrom",Timestamp.from(occurred),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","kind","RECEIPT","physicalScopeId",physical,"quantity",new BigDecimal(quantity),"unit","BOX","reassessmentState","PENDING"));var existing=jdbc.queryForList("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=? AND physicalScopeId=? AND kind='RECEIPT'",String.class,org,physical);if(existing.isEmpty())insert("mulino_evidence_CanonicalOccurrences",o);else canonical=existing.getFirst();
+  var o=evidence(canonical);o.putAll(row("sourceProfileId",profile,"subjectKind","WORK","subjectId",work,"itemId",item,"workId",work,"effectiveFrom",Timestamp.from(occurred),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","kind","RECEIPT","physicalScopeId",physical,"quantity",new BigDecimal(quantity),"unit","BOX","reassessmentState","PENDING"));if(place!=null)o.put("placeId",place);if(until!=null)o.put("effectiveUntil",Timestamp.from(until));var existing=jdbc.queryForList("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=? AND physicalScopeId=? AND kind='RECEIPT'",String.class,org,physical);if(existing.isEmpty())insert("mulino_evidence_CanonicalOccurrences",o);else canonical=existing.getFirst();
   var v=evidence(id());v.putAll(row("claimId",claim,"canonicalOccurrenceId",canonical,"basisDocumentId",doc,"policyVersion","fixture-evidence-v1","sourceMatched",true,"identityMatched",true,"quantityMatched",true,"timeMatched",true,"duplicateChecked",true,"verdict","VERIFIED","reason","fixture"));insert("mulino_evidence_Verifications",v);
  }
  Map<String,Object> assess(Instant at){return runtime.requestContext().run(c->{return new TransactionTemplate(tx).execute(s->service.assess(new DomainContext(org,actor,actor,at,t.plusSeconds(1000)),work));});}
@@ -93,6 +100,100 @@ class AssessmentPostgresTest {
     return null;});
   String previous=goal;revisePeriod(true,false);
   runtime.requestContext().run(request->{var c=new DomainContext(org,actor,actor,t,t.plusSeconds(1000));var bindings=service.subjectBindings(c,intent,service.prepare(c,intent));assertEquals(Set.of(goal),bindings.get(1).targetIds());assertFalse(bindings.get(1).targetIds().contains(previous));return null;});
+ }
+
+ String physicalTwenty(){
+  String place=id(),manufacturer=id(),lot=id(),segment=id();
+  var p=scoped(place);p.putAll(row("name","W","kind","INTERNAL_STORAGE"));insert("mulino_inventory_Places",p);
+  var m=scoped(manufacturer);m.put("name","fixture");insert("mulino_inventory_Manufacturers",m);
+  var l=scoped(lot);l.putAll(row("manufacturerId",manufacturer,"itemId",item,"originalLot","L"));insert("mulino_inventory_ManufacturingLots",l);
+  var q=scoped(segment);q.putAll(row("itemId",item,"lotId",lot,"identificationStatus","CONFIRMED","quantity",new BigDecimal("20"),"unit","BOX","placeId",place,"custodianId",actor,"ownerId",actor,"controlScope","PHYSICAL","validFrom",Timestamp.from(t.minusSeconds(100)),"mixtureStatus","IDENTIFIED"));insert("mulino_inventory_QuantitySegments",q);
+  return place;
+ }
+ Map<String,Object> canonicalStateGoal(String place,Instant evaluationAt,boolean inclusive)throws Exception{
+  var content=json.readValue(jdbc.queryForObject("SELECT content FROM mulino_definitions_DefinitionVersions WHERE ID=?",String.class,definition),Map.class);
+  definition=id();content.put("id",definition);content.put("version","state-v1");
+  var predicate=Map.<String,Object>of("operator","quantitySum","property","Receipt.quantity","minimum",Map.of("value","1","unit","BOX"),"unit","BOX","evidenceSelector","VERIFIED_DISTINCT");
+  content.put("goals",List.of(Map.of("name","Verified","quantityMode","STATE_AT","endpoint","VERIFIED","evaluatorVersion","core-v1","predicate",predicate)));
+  String encoded=json.writeValueAsString(content);
+  insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",definition,"version","state-v1","state","PUBLISHED","contentHash",DefinitionRepository.sha256(encoded),"content",encoded,"evaluatorVersion","core-v1","schemaVersion","1.0.0","createdAt",Timestamp.from(t.minusSeconds(100))));
+  work=id();var w=scoped(work);w.putAll(row("effectiveAt",Timestamp.from(t.minusSeconds(100)),"itemId",item,"definitionVersionId",definition,"kind","CHECK","status","ACTIVE","ownerId",actor,"supervisorId",actor,"lifecycleMode","COMMAND"));insert("mulino_work_read_Works",w);
+  var slots=row("quantityMode","STATE_AT","targetQuantity","20","unit","BOX","endpoint","VERIFIED","scope",Map.of("workId",work),"timezone","UTC","evidencePolicyVersion","fixture-evidence-v1","evaluationAt",evaluationAt.toString(),"placeId",place,"action","PHYSICAL","includeReserved",true,"conditions",List.of("Verified"),"evaluatorVersion","core-v1","dueAt",t.toString(),"deadlineInclusive",inclusive,"evidenceSource",Map.of("sourceNamespace","fixture","externalEventId","EV-READY","sourceVersion","1"));
+  com.mulino.domain.work.GoalInput.validate(slots,true);
+  String next=id();var g=scoped(next);g.putAll(row("effectiveAt",Timestamp.from(t.minusSeconds(1)),"workId",work,"definitionVersionId",definition,"quantityMode","STATE_AT","targetQuantity",new BigDecimal("20"),"unit","BOX","endpoint","VERIFIED","scopeJson","{}","slotsJson",json.writeValueAsString(slots),"goalVersion",1));insert("mulino_work_read_GoalReferences",g);
+  jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE ID=?",next,work);goal=next;return slots;
+ }
+ @Test void stateAtRequiresExactCanonicalEvidenceNotPhysicalTwentyAndPreservesHistory()throws Exception{
+  String place=physicalTwenty();var slots=canonicalStateGoal(place,t,true);
+  var before=(Map<?,?>)assess(t).get("assessment");assertEquals("UNVERIFIED",before.get("outcome"));assertEquals(false,before.get("held"));
+  occurrence(id(),"20",t.minusSeconds(1),"OTHER-EVENT",place,null);
+  assertEquals("UNVERIFIED",((Map<?,?>)assess(t).get("assessment")).get("outcome"));
+  String physical=id();occurrence(physical,"20",t,"EV-READY",place,null);
+  // Another report of the same physical scope cannot double the target quantity.
+  occurrence(physical,"20",t,"OTHER-REPORT",place,null);
+  var verified=(Map<?,?>)assess(t.plusSeconds(1)).get("assessment");assertEquals("SATISFIED",verified.get("outcome"));assertEquals(false,verified.get("deadlineViolated"));
+  assertEquals("UNVERIFIED",jdbc.queryForObject("SELECT outcome FROM mulino_work_read_AssessmentReferences WHERE ID=?",String.class,before.get("ID")));
+  String snapshot=jdbc.queryForObject("SELECT contentJson FROM mulino_evaluation_InputSnapshots WHERE assessmentId=?",String.class,verified.get("ID"));assertTrue(snapshot.contains("EV-READY"),"source identity");assertTrue(jdbc.queryForObject("SELECT content FROM mulino_definitions_DefinitionVersions WHERE ID=?",String.class,definition).contains("VERIFIED_DISTINCT"),"published predicate selector");assertTrue(snapshot.contains(definition),"pinned definition ID");
+  assertEquals(new BigDecimal("20.000000000000"),jdbc.queryForObject("SELECT SUM(quantity) FROM mulino_inventory_QuantitySegments WHERE organizationId=?",BigDecimal.class,org));
+  runtime.requestContext().run(c->{service.requireResume(new DomainContext(org,actor,actor,t.plusSeconds(1),t.plusSeconds(1000)),Map.of("ID",work,"itemId",item),Map.of("resumePredicate",Map.of("operator","quantitySum","property","Receipt.quantity","minimum",Map.of("value","20","unit","BOX"),"unit","BOX","evidenceSelector","VERIFIED_DISTINCT")),Map.of());return null;});
+ }
+ @Test void canonicalStateHonorsEvaluationTimeAndExclusiveValidityEnd()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t,false);
+  occurrence(id(),"20",t.minusSeconds(1),"EV-READY",place,t);
+  assertEquals("UNVERIFIED",((Map<?,?>)assess(t.plusSeconds(1)).get("assessment")).get("outcome"));
+ }
+ @Test void canonicalStateCannotPredictFutureOrIgnoreMissingBlob()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t.plusSeconds(10),true);
+  occurrence(id(),"20",t,"EV-READY",place,null);
+  assertEquals("UNVERIFIED",((Map<?,?>)assess(t).get("assessment")).get("outcome"));
+  assertEquals("SATISFIED",((Map<?,?>)assess(t.plusSeconds(10)).get("assessment")).get("outcome"));
+  String blob=jdbc.queryForObject("SELECT blobId FROM mulino_evidence_DocumentVersions WHERE organizationId=?",String.class,org);Files.delete(BLOBS.resolve("objects").resolve(blob));
+  assertEquals("UNVERIFIED",((Map<?,?>)assess(t.plusSeconds(11)).get("assessment")).get("outcome"));
+ }
+
+ Map<String,Object> evidenceCall(java.util.function.Supplier<Map<String,Object>> call){return runtime.requestContext().run(c->{return call.get();});}
+ @Test void stateTargetAndInclusiveDeadlineAreIndependent()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t,true);
+  occurrence(id(),"10",t,"EV-READY",place,null);
+  var boundary=(Map<?,?>)assess(t).get("assessment");assertEquals("UNSATISFIED",boundary.get("outcome"));assertEquals(false,boundary.get("deadlineViolated"));
+  var overdue=(Map<?,?>)assess(t.plusSeconds(1)).get("assessment");assertEquals("UNSATISFIED",overdue.get("outcome"));assertEquals(true,overdue.get("deadlineViolated"));
+ }
+ @Test void canonicalEvidenceDoesNotProveEligibilityOrUnreservedQuantity()throws Exception{
+  String place=physicalTwenty();var slots=canonicalStateGoal(place,t,true);
+  for(var change:List.of(Map.<String,Object>of("action","SELL"),Map.<String,Object>of("includeReserved",false))){
+   var invalid=new LinkedHashMap<>(slots);invalid.putAll(change);var pinned=Map.<String,Object>of("definitionVersionId",definition,"slotsJson",json.writeValueAsString(invalid));
+   runtime.requestContext().run(c->{assertEquals("VERSION_UNSUPPORTED",assertThrows(DomainError.class,()->service.requireSupportedGoal(new DomainContext(org,actor,actor,t,t.plusSeconds(1000)),pinned)).code());return null;});
+  }
+ }
+ @Test void actualEvidenceReviewAndCanonicalLinkFulfilStateGoalWithoutInventoryEffect()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t,true);
+  String segment=jdbc.queryForObject("SELECT ID FROM mulino_inventory_QuantitySegments WHERE organizationId=?",String.class,org);
+  String grant=id();Timestamp from=Timestamp.from(t.minusSeconds(3600)),until=Timestamp.from(t.plusSeconds(3600));
+  insert("mulino_identity_ExternalIdentities",row("organizationId",org,"ID",id(),"actorId",actor,"issuer","https://evaluation.invalid","subject",actor,"organizationAlias",org));
+  insert("mulino_identity_Memberships",row("organizationId",org,"ID",id(),"actorId",actor,"validFrom",from,"validUntil",until));
+  insert("mulino_identity_Grants",row("organizationId",org,"ID",grant,"actorId",actor,"delegatorId",actor,"validFrom",from,"validUntil",until));
+  insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grant,"scopeKind","ORGANIZATION","scopeId",org));
+  insert("mulino_identity_AuthorityFences",row("organizationId",org,"actorId",actor,"revision",1));
+  for(String capability:List.of("recordActivity","attachEvidence","getEvidence","matchSourceIdentity","linkCanonicalOccurrence")){
+   insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId",capability,"scopeKind","ORGANIZATION","scopeId",org,"validFrom",from,"validUntil",until));
+   insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId",capability));
+  }
+  var jwt=Jwt.withTokenValue("local-test-context").header("alg","RS256").issuer("https://evaluation.invalid").subject(actor).claim("organizationId",org).build();
+  SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt,List.of()));
+  try{
+   var subject=new com.mulino.domain.evidence.EvidenceTypes.Subject(com.mulino.domain.evidence.EvidenceTypes.SubjectKind.SEGMENT,segment);
+   byte[] original="Independent warehouse observation: 20 BOX, EV-READY".getBytes();
+   String doc=evidenceCall(()->records.attachDocument(new com.mulino.application.evidence.EvidenceRecords.DocumentInput(subject,"fixture","EV-READY","text/plain",LocalBlobStore.hash(original),"local scenario original",null),original)).get("id").toString();
+   String event=evidenceCall(()->records.recordActivity(new com.mulino.application.evidence.EvidenceRecords.EventInput(subject,"STOCK_OBSERVATION","fixture","EV-READY","1",new com.mulino.domain.evidence.EvidenceTypes.EffectiveTime(t,null,"UTC","SECOND"),com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,"20 BOX observed",null,null))).get("id").toString();
+   String claim=evidenceCall(()->records.recordClaim(new com.mulino.application.evidence.EvidenceRecords.ClaimInput(event,doc,"Warehouse observation","20","BOX",com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,null))).get("id").toString();
+   assertEquals("UNVERIFIED",((Map<?,?>)assess(t.plusSeconds(601)).get("assessment")).get("outcome"));
+   var review=evidenceCall(()->reconciliation.match(auth.context(t.plusSeconds(600),t.plusSeconds(600)),new com.mulino.application.evidence.EvidenceReconciliation.Review(claim,doc,segment,null,"fixture-evidence-v1","fixture:EV-READY:1","20","BOX",t,"Exact source, time, physical range and quantity reviewed"),"matchSourceIdentity"));
+   assertEquals("MATCHED",review.get("outcome"));
+   evidenceCall(()->reconciliation.link(auth.context(t.plusSeconds(600),t.plusSeconds(600)),review.get("id").toString()));
+   assertEquals("SATISFIED",((Map<?,?>)assess(t.plusSeconds(601)).get("assessment")).get("outcome"));
+   assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",Integer.class,org));
+   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=?",Integer.class,org));
+  }finally{SecurityContextHolder.clearContext();}
  }
 
 }

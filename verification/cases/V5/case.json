@@ -154,6 +154,26 @@
                 "targetQuantity": "20",
                 "placeId": {
                   "$alias": "W"
+                },
+                "evaluationAt": "2026-10-07T09:00:10Z",
+                "action": "PHYSICAL",
+                "includeReserved": true,
+                "scope": {
+                  "itemId": {
+                    "$alias": "P"
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  }
+                },
+                "evaluatorVersion": "core-v1",
+                "conditions": [
+                  "verified-ready"
+                ],
+                "evidenceSource": {
+                  "sourceNamespace": "synthetic-warehouse",
+                  "externalEventId": "EV-READY",
+                  "sourceVersion": "1"
                 }
               },
               "ownerId": {
@@ -180,40 +200,6 @@
           ]
         },
         {
-          "id": "create-activate",
-          "kind": "invoke",
-          "actorRef": "owner",
-          "route": "api",
-          "capabilityId": "activateWork",
-          "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "definition-v1",
-            "capabilityId": "activateWork",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/revision"
-              }
-            },
-            "commandIdempotencyKey": "V5-waiting-full-restart-create-activate",
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "create",
-                  "pointer": "/response/workId"
-                }
-              }
-            },
-            "subjectRefs": [],
-            "provenance": {
-              "workId": "CONTEXT"
-            }
-          },
-          "evidenceRefs": [
-            "create-activate:actual-artifact"
-          ]
-        },
-        {
           "id": "wait",
           "kind": "invoke",
           "actorRef": "owner",
@@ -225,7 +211,7 @@
             "capabilityId": "waitWork",
             "expectedRevision": {
               "$result": {
-                "actionId": "create-activate",
+                "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
@@ -243,9 +229,14 @@
                   "$alias": "Q20"
                 },
                 "resumePredicate": {
-                  "kind": "evidenceAvailable",
-                  "eventId": "EV-READY",
-                  "expectedRevision": 1
+                  "operator": "quantitySum",
+                  "property": "Receipt.quantity",
+                  "minimum": {
+                    "value": "20",
+                    "unit": "BOX"
+                  },
+                  "unit": "BOX",
+                  "evidenceSelector": "VERIFIED_DISTINCT"
                 },
                 "verifier": {
                   "$alias": "owner"
@@ -1638,6 +1629,26 @@
                 "targetQuantity": "20",
                 "placeId": {
                   "$alias": "W"
+                },
+                "evaluationAt": "2026-10-07T09:00:10Z",
+                "action": "PHYSICAL",
+                "includeReserved": true,
+                "scope": {
+                  "itemId": {
+                    "$alias": "P"
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  }
+                },
+                "evaluatorVersion": "core-v1",
+                "conditions": [
+                  "verified-ready"
+                ],
+                "evidenceSource": {
+                  "sourceNamespace": "synthetic-warehouse",
+                  "externalEventId": "EV-READY",
+                  "sourceVersion": "1"
                 }
               },
               "ownerId": {
@@ -1664,40 +1675,6 @@
           ]
         },
         {
-          "id": "create-activate",
-          "kind": "invoke",
-          "actorRef": "owner",
-          "route": "api",
-          "capabilityId": "activateWork",
-          "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "definition-v1",
-            "capabilityId": "activateWork",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/revision"
-              }
-            },
-            "commandIdempotencyKey": "V5-two-workers-expired-fence-create-activate",
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "create",
-                  "pointer": "/response/workId"
-                }
-              }
-            },
-            "subjectRefs": [],
-            "provenance": {
-              "workId": "CONTEXT"
-            }
-          },
-          "evidenceRefs": [
-            "create-activate:actual-artifact"
-          ]
-        },
-        {
           "id": "wait",
           "kind": "invoke",
           "actorRef": "owner",
@@ -1709,7 +1686,7 @@
             "capabilityId": "waitWork",
             "expectedRevision": {
               "$result": {
-                "actionId": "create-activate",
+                "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
@@ -1727,9 +1704,14 @@
                   "$alias": "Q20"
                 },
                 "resumePredicate": {
-                  "kind": "evidenceAvailable",
-                  "eventId": "EV-READY",
-                  "expectedRevision": 1
+                  "operator": "quantitySum",
+                  "property": "Receipt.quantity",
+                  "minimum": {
+                    "value": "20",
+                    "unit": "BOX"
+                  },
+                  "unit": "BOX",
+                  "evidenceSelector": "VERIFIED_DISTINCT"
                 },
                 "verifier": {
                   "$alias": "owner"
@@ -3538,6 +3520,26 @@
                 "targetQuantity": "20",
                 "placeId": {
                   "$alias": "W"
+                },
+                "evaluationAt": "2026-10-07T09:00:10Z",
+                "action": "PHYSICAL",
+                "includeReserved": true,
+                "scope": {
+                  "itemId": {
+                    "$alias": "P"
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  }
+                },
+                "evaluatorVersion": "core-v1",
+                "conditions": [
+                  "verified-ready"
+                ],
+                "evidenceSource": {
+                  "sourceNamespace": "synthetic-warehouse",
+                  "externalEventId": "EV-READY",
+                  "sourceVersion": "1"
                 }
               },
               "ownerId": {
@@ -3564,40 +3566,6 @@
           ]
         },
         {
-          "id": "create-activate",
-          "kind": "invoke",
-          "actorRef": "owner",
-          "route": "api",
-          "capabilityId": "activateWork",
-          "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "definition-v1",
-            "capabilityId": "activateWork",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/revision"
-              }
-            },
-            "commandIdempotencyKey": "V5-repeated-crash-no-duplicate-create-activate",
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "create",
-                  "pointer": "/response/workId"
-                }
-              }
-            },
-            "subjectRefs": [],
-            "provenance": {
-              "workId": "CONTEXT"
-            }
-          },
-          "evidenceRefs": [
-            "create-activate:actual-artifact"
-          ]
-        },
-        {
           "id": "wait",
           "kind": "invoke",
           "actorRef": "owner",
@@ -3609,7 +3577,7 @@
             "capabilityId": "waitWork",
             "expectedRevision": {
               "$result": {
-                "actionId": "create-activate",
+                "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
@@ -3627,9 +3595,14 @@
                   "$alias": "Q20"
                 },
                 "resumePredicate": {
-                  "kind": "evidenceAvailable",
-                  "eventId": "EV-READY",
-                  "expectedRevision": 1
+                  "operator": "quantitySum",
+                  "property": "Receipt.quantity",
+                  "minimum": {
+                    "value": "20",
+                    "unit": "BOX"
+                  },
+                  "unit": "BOX",
+                  "evidenceSelector": "VERIFIED_DISTINCT"
                 },
                 "verifier": {
                   "$alias": "owner"
@@ -5172,6 +5145,26 @@
                 "targetQuantity": "20",
                 "placeId": {
                   "$alias": "W"
+                },
+                "evaluationAt": "2026-10-07T09:00:10Z",
+                "action": "PHYSICAL",
+                "includeReserved": true,
+                "scope": {
+                  "itemId": {
+                    "$alias": "P"
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  }
+                },
+                "evaluatorVersion": "core-v1",
+                "conditions": [
+                  "verified-ready"
+                ],
+                "evidenceSource": {
+                  "sourceNamespace": "synthetic-warehouse",
+                  "externalEventId": "EV-READY",
+                  "sourceVersion": "1"
                 }
               },
               "ownerId": {
@@ -5198,40 +5191,6 @@
           ]
         },
         {
-          "id": "create-activate",
-          "kind": "invoke",
-          "actorRef": "owner",
-          "route": "api",
-          "capabilityId": "activateWork",
-          "request": {
-            "intentKind": "COMMAND",
-            "definitionVersion": "definition-v1",
-            "capabilityId": "activateWork",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "create",
-                "pointer": "/response/revision"
-              }
-            },
-            "commandIdempotencyKey": "V5-bounded-retry-exhausted-owner-create-activate",
-            "slots": {
-              "workId": {
-                "$result": {
-                  "actionId": "create",
-                  "pointer": "/response/workId"
-                }
-              }
-            },
-            "subjectRefs": [],
-            "provenance": {
-              "workId": "CONTEXT"
-            }
-          },
-          "evidenceRefs": [
-            "create-activate:actual-artifact"
-          ]
-        },
-        {
           "id": "wait",
           "kind": "invoke",
           "actorRef": "owner",
@@ -5243,7 +5202,7 @@
             "capabilityId": "waitWork",
             "expectedRevision": {
               "$result": {
-                "actionId": "create-activate",
+                "actionId": "create",
                 "pointer": "/response/revision"
               }
             },
@@ -5261,9 +5220,14 @@
                   "$alias": "Q20"
                 },
                 "resumePredicate": {
-                  "kind": "evidenceAvailable",
-                  "eventId": "EV-READY",
-                  "expectedRevision": 1
+                  "operator": "quantitySum",
+                  "property": "Receipt.quantity",
+                  "minimum": {
+                    "value": "20",
+                    "unit": "BOX"
+                  },
+                  "unit": "BOX",
+                  "evidenceSelector": "VERIFIED_DISTINCT"
                 },
                 "verifier": {
                   "$alias": "owner"

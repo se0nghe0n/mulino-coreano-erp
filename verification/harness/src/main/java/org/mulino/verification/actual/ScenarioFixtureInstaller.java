@@ -24,7 +24,7 @@ final class ScenarioFixtureInstaller {
         "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
         "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
-    static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities");
+    static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities","definitionContract");
     /**
      * Grant scope keys with no installable product dimension: mulino_identity_GrantScopes.scopeKind is CHECKed to
      * ORGANIZATION, TARGET, WORK, ITEM, PLACE, SOURCE. The grant is installed without them (broader than authored), so the
@@ -336,6 +336,7 @@ final class ScenarioFixtureInstaller {
         conventions.add("activated convention policies for kinds without an authored PolicyVersion");
     }
     private void publish(String org,String id,ObjectNode content,String state) throws Exception {
+        RecoveryGoalDefinition.apply(content,fixture.path("baseline").path("definitionContract"));
         content.put("organizationId",org).put("id",id).put("state",state);
         insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",id,"version",Json.required(content,"version"),"state",state,"contentHash",FixtureInstaller.contentHash(content),"content",content.toString(),"evaluatorVersion",Json.required(content,"evaluatorVersion"),"schemaVersion",Json.required(content,"schemaVersion"),"createdAt",asOf.toLocalDateTime()));
     }

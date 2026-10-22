@@ -10,7 +10,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
@@ -148,7 +147,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "qc" 역할이 "hold" 행동을 수행한다
@@ -362,7 +360,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
@@ -502,7 +499,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
@@ -642,7 +638,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
@@ -782,7 +777,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
@@ -922,7 +916,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
@@ -944,7 +937,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "시스템" 역할이 "damage" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
@@ -994,7 +986,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "warehouse" 역할이 "split" 행동을 수행한다
     만일 "receiver" 역할이 "evidence" 행동을 수행한다
@@ -1036,7 +1027,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "warehouse" 역할이 "split" 행동을 수행한다
     만일 "receiver" 역할이 "evidence" 행동을 수행한다
@@ -1079,7 +1069,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "warehouse" 역할이 "split" 행동을 수행한다
     만일 "receiver" 역할이 "evidence" 행동을 수행한다
@@ -1121,7 +1110,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
@@ -1166,7 +1154,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve" 행동을 수행한다
     만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "operations" 역할이 "before" 행동을 수행한다

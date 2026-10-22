@@ -14,6 +14,15 @@ public final class GoalQuantityProperty {
   }
   if(quantities.size()!=1)throw held();return quantities.getFirst();
  }
+ public static String operator(Map<String,Object> predicate,String property,String mode){
+  var operators=new HashSet<String>();collectOperators(predicate,property,operators);
+  if(operators.size()>1)throw held();
+  return operators.isEmpty()?("CUMULATIVE_EVENT".equals(mode)?"quantitySum":"stateQuantity"):operators.iterator().next();
+ }
+ private static void collectOperators(Map<?,?> node,String property,Set<String> operators){
+  if(property.equals(node.get("property"))&&Set.of("quantitySum","stateQuantity").contains(node.get("operator")))operators.add(node.get("operator").toString());
+  if(node.get("children") instanceof List<?> children)for(Object child:children)if(child instanceof Map<?,?> map)collectOperators(map,property,operators);
+ }
  private static void collect(Map<?,?> node,Set<String> properties){
   if(Set.of("quantitySum","stateQuantity").contains(node.get("operator"))){if(!(node.get("property") instanceof String p))throw held();properties.add(p);}
   if(node.get("children") instanceof List<?> children)for(Object child:children)if(child instanceof Map<?,?> map)collect(map,properties);else throw held();

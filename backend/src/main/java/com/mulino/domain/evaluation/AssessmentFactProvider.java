@@ -22,7 +22,10 @@ public class AssessmentFactProvider {
     Object lotScope=scope.get("lotId")!=null?scope.get("lotId"):work.get("lotId");
     Object placeScope=scope.get("placeId")!=null?scope.get("placeId"):slots.get("placeId");
     var segments=r.rows(c,"mulino.inventory.QuantitySegments");
-    boolean stateGoal="STATE_AT".equals(slots.get("quantityMode"))||definition.goals().stream().filter(g->Objects.equals(slots.get("endpoint"),g.endpoint())&&Objects.equals(slots.get("quantityMode"),g.quantityMode())).anyMatch(g->usesCurrentState(g.predicate()));
+    var templates=definition.goals().stream().filter(g->Objects.equals(slots.get("endpoint"),g.endpoint())&&Objects.equals(slots.get("quantityMode"),g.quantityMode())).toList();
+    boolean canonicalState="STATE_AT".equals(slots.get("quantityMode"))&&templates.stream().anyMatch(g->usesCanonicalQuantity(g.predicate()));
+    boolean stateGoal=!canonicalState&&("STATE_AT".equals(slots.get("quantityMode"))||templates.stream().anyMatch(g->usesCurrentState(g.predicate())));
+    Instant evaluationAt=canonicalState?instant(slots.get("evaluationAt")):c.asOf();
     var properties=new TreeMap<String,List<Fact>>();var relations=new TreeMap<String,List<Fact>>();
     var occurrences=r.rows(c,"mulino.evidence.CanonicalOccurrences");var verifications=r.rows(c,"mulino.evidence.Verifications");
     var claims=r.rows(c,"mulino.evidence.Claims");var events=r.rows(c,"mulino.evidence.Events");var inbox=r.rows(c,"mulino.evidence.InboxRecords");
@@ -31,7 +34,7 @@ public class AssessmentFactProvider {
       String property=attribute.nounType()+"."+attribute.name();var facts=new ArrayList<Fact>();
       if(!stateGoal&&(attribute.name().equals("quantity")||attribute.name().equals("occurredAt")))for(var occurrence:occurrences) {
         var allocations=credits.stream().filter(x->Objects.equals(occurrence.get("ID"),x.get("occurrenceId"))).toList();
-        if((!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
+        if((!canonicalState&&!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
         var domainProviders=admissions.stream().filter(p->p.eventKinds().contains(occurrence.get("kind"))).toList();
         var admission=domainProviders.size()==1?domainProviders.getFirst().admit(c,work.get("ID").toString(),goalId,occurrence):new CanonicalFactAdmission.Admission(!Set.of("PHYSICAL_RECEIPT","PHYSICAL_DELIVERY","RETURN_RECEIPT").contains(occurrence.get("kind"))&&domainProviders.isEmpty(),(java.math.BigDecimal)occurrence.get("quantity"),null,List.of());
         Object factLot=admission.lotId()!=null?admission.lotId():"LOT".equals(occurrence.get("subjectKind"))?occurrence.get("subjectId"):segments.stream().filter(x->Objects.equals(x.get("ID"),occurrence.get("physicalScopeId"))).map(x->x.get("lotId")).findFirst().orElse(null);
@@ -43,7 +46,10 @@ public class AssessmentFactProvider {
         if(slots.get("periodStart")!=null){Instant start=instant(slots.get("periodStart"));if(effective.isBefore(start)||effective.equals(start)&&Boolean.FALSE.equals(slots.get("periodStartInclusive")))continue;}
         if(slots.get("periodEnd")!=null){Instant end=instant(slots.get("periodEnd"));if(effective.isAfter(end)||effective.equals(end)&&Boolean.FALSE.equals(slots.get("periodEndInclusive")))continue;}
         if(effective.isAfter(c.asOf()))continue;
-        var verification=verifications.stream().filter(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&Objects.equals(slots.get("evidencePolicyVersion"),v.get("policyVersion"))&&"VERIFIED".equals(v.get("verdict"))&&List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))).findFirst();
+        // STATE_AT observes canonical evidence valid at this point, never current inventory.
+        if(canonicalState&&(evaluationAt.isAfter(c.asOf())||effective.isAfter(evaluationAt)||occurrence.get("effectiveUntil")!=null&&!evaluationAt.isBefore(instant(occurrence.get("effectiveUntil")))))continue;
+        if(slots.containsKey("evidenceSource")&&verifications.stream().noneMatch(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&matchesSource(v,slots,claims,events)))continue;
+        var verification=verifications.stream().filter(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&Objects.equals(slots.get("evidencePolicyVersion"),v.get("policyVersion"))&&matchesSource(v,slots,claims,events)&&"VERIFIED".equals(v.get("verdict"))&&List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))).findFirst();
         boolean verified=verification.isPresent();boolean sourceConflict=false;var refs=new ArrayList<String>();
         if(verified) {
           var v=verification.get();refs.add(v.get("ID").toString());
@@ -108,6 +114,15 @@ public class AssessmentFactProvider {
     sources.put("work.Contributions",credits);
     sources.put("inventory.UnitConversions",r.rows(c,"mulino.inventory.UnitConversions").stream().filter(x->referenced.contains(Objects.toString(x.get("ID")))).toList());
     return new EvaluationFacts(properties,relations,sources);
+  }
+  private boolean matchesSource(Map<String,Object> verification,Map<String,Object> slots,List<Map<String,Object>> claims,List<Map<String,Object>> events){
+    if(!(slots.get("evidenceSource") instanceof Map<?,?> source))return true;
+    return claims.stream().filter(claim->Objects.equals(claim.get("ID"),verification.get("claimId")))
+      .anyMatch(claim->events.stream().anyMatch(event->Objects.equals(event.get("ID"),claim.get("eventId"))&&source.entrySet().stream().allMatch(e->Objects.equals(e.getValue(),event.get(e.getKey())))));
+  }
+  private boolean usesCanonicalQuantity(Map<String,Object> node){
+    if("quantitySum".equals(node.get("operator")))return true;
+    return node.get("children") instanceof List<?> children&&children.stream().anyMatch(x->x instanceof Map<?,?> m&&usesCanonicalQuantity((Map<String,Object>)m));
   }
   private boolean usesCurrentState(Map<String,Object> node){
     if("CURRENT_STATE".equals(node.get("evidenceSelector"))||"stateQuantity".equals(node.get("operator")))return true;

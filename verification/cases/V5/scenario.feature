@@ -10,7 +10,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "시스템" 역할이 "queue-success" 행동을 수행한다
     만일 "시스템" 역할이 "initial-tick" 행동을 수행한다
@@ -60,7 +59,6 @@
     만일 "시스템" 역할이 "start-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "pause-a" 행동을 수행한다
@@ -119,7 +117,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "crash-0" 행동을 수행한다
@@ -175,7 +172,6 @@
     만일 "시스템" 역할이 "start-app-worker-a" 행동을 수행한다
     만일 "시스템" 역할이 "start-app-worker-b" 행동을 수행한다
     만일 "owner" 역할이 "create" 행동을 수행한다
-    만일 "owner" 역할이 "create-activate" 행동을 수행한다
     만일 "owner" 역할이 "wait" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "permanent-failure" 행동을 수행한다

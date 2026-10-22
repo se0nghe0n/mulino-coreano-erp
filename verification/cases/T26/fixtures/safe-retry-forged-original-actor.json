@@ -12,7 +12,7 @@
   },
   "versions": {
     "definition": "definition-v1",
-    "evaluator": "evaluator-v1",
+    "evaluator": "core-v1",
     "policy": "synthetic-policy-v1",
     "capability": "PLAN-1.0",
     "config": "synthetic-runtime-v1",
@@ -599,6 +599,16 @@
       "type": "Human",
       "organizationAlias": "OTHER_ORG"
     },
+    "RECOVERY_EVIDENCE_POLICY": {
+      "type": "PolicyVersion",
+      "kind": "EVIDENCE",
+      "version": "synthetic-evidence-v1",
+      "state": "ACTIVE",
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "content": {
+        "source": "synthetic recovery evidence policy"
+      }
+    },
     "warehouseLead": {
       "type": "Human",
       "organizationAlias": "ORG"
@@ -686,41 +696,35 @@
       "dueAction": "ESCALATE_EXISTING_DUTY"
     },
     "definitionContract": {
-      "workKind": "check",
-      "requiredSlots": [
-        "itemId",
-        "quantity",
-        "unit",
-        "destinationId",
-        "dueAt",
-        "endpoint",
-        "quantityMode",
-        "ownerId"
-      ],
-      "quantityMode": "STATE_AT",
-      "evaluator": "evaluator-v1",
-      "predicate": {
-        "operator": "verifiedDistinctQuantity",
-        "scope": {
-          "itemAlias": "P",
-          "placeAlias": "W"
-        },
-        "eventId": "EV-READY",
-        "quantity": "20",
-        "unit": "BOX"
+      "definitionVersion": "definition-v1",
+      "evaluatorVersion": "core-v1",
+      "goalTemplate": {
+        "name": "verified-ready",
+        "quantityMode": "STATE_AT",
+        "endpoint": "VERIFIED",
+        "evaluatorVersion": "core-v1",
+        "predicate": {
+          "operator": "quantitySum",
+          "property": "Receipt.quantity",
+          "minimum": {
+            "value": "20",
+            "unit": "BOX"
+          },
+          "unit": "BOX",
+          "evidenceSelector": "VERIFIED_DISTINCT"
+        }
       },
-      "missingEvidenceResult": "UNVERIFIED",
-      "supportManifest": {
-        "createWork": "PLAN-1.0",
-        "waitWork": "PLAN-1.0",
-        "continuation": "PLAN-1.0"
+      "evidenceSource": {
+        "sourceNamespace": "synthetic-warehouse",
+        "externalEventId": "EV-READY",
+        "sourceVersion": "1"
       }
     },
     "definitionArtifacts": [
       {
         "definitionVersion": "definition-v1",
         "capabilityVersion": "PLAN-1.0",
-        "evaluatorVersion": "evaluator-v1",
+        "evaluatorVersion": "core-v1",
         "supported": true
       },
       {

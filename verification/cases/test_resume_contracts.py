@@ -3,7 +3,7 @@ import copy
 import json
 import unittest
 from pathlib import Path
-from author_resume_contracts import apply
+from author_resume_contracts import apply, apply_recovery_fixture, recovery_predicate
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -103,6 +103,44 @@ class ResumeContracts(unittest.TestCase):
                 before = copy.deepcopy(case)
                 self.assertFalse(apply(case))
                 self.assertEqual(before, case)
+
+    def test_recovery_uses_published_evidence_contract_and_one_activation(self):
+        for cid in ('V5', 'T26'):
+            case = json.loads((ROOT / f'verification/cases/{cid}/case.json').read_text())
+            for sub in case['subcases']:
+                create = next((a for a in sub['actions'] if a['id'] == 'create' and a.get('capabilityId') == 'createWork'), None)
+                if create is None:
+                    continue
+                goal = create['request']['slots']['goal']
+                self.assertEqual('STATE_AT', goal['quantityMode'])
+                self.assertEqual('VERIFIED', goal['endpoint'])
+                self.assertEqual('20', goal['targetQuantity'])
+                self.assertTrue(goal['deadlineInclusive'])
+                self.assertEqual(goal['dueAt'], goal['evaluationAt'])
+                self.assertEqual('EV-READY', goal['evidenceSource']['externalEventId'])
+                self.assertEqual(['verified-ready'], goal['conditions'])
+                self.assertNotIn('create-activate', json.dumps(sub))
+                fixture = json.loads((ROOT / sub['fixtureRef']).read_text())
+                contract = fixture['baseline']['definitionContract']
+                self.assertEqual(recovery_predicate(), contract['goalTemplate']['predicate'])
+                self.assertEqual(goal['evaluatorVersion'], contract['evaluatorVersion'])
+                self.assertEqual(goal['evidenceSource'], contract['evidenceSource'])
+                self.assertFalse(apply_recovery_fixture(fixture))
+                self.assertEqual('synthetic-evidence-v1', fixture['aliases']['RECOVERY_EVIDENCE_POLICY']['version'])
+
+    def test_recovery_does_not_rewrite_quantity_or_responsibility_oracles(self):
+        sub = {'id': 'test', 'actions': [{'id': 'create', 'capabilityId': 'createWork',
+            'request': {'capabilityId': 'createWork', 'slots': {'goal': {
+                'quantityMode': 'STATE_AT', 'endpoint': 'VERIFIED', 'targetQuantity': '20',
+                'dueAt': '2026-10-07T09:00:10Z', 'unit': 'BOX', 'deadlineInclusive': True}}}}],
+            'assertions': [{'id': 'physical20', 'expected': '20'}, {'id': 'one-duty', 'expected': 1}]}
+        before = copy.deepcopy(sub['assertions'])
+        case = {'caseId': 'V5', 'subcases': [sub]}
+        apply(case)
+        self.assertEqual(before, sub['assertions'])
+        sub['actions'][0]['request']['slots']['goal']['evidenceSource']['externalEventId'] = 'OTHER'
+        with self.assertRaisesRegex(ValueError, 'conflicting recovery evidenceSource'):
+            apply(case)
 
     def test_scoped_definition_grants_retain_other_constraints(self):
         for name in ('explicit-authorized-migration', 'pinned-meaning-current-policy'):
