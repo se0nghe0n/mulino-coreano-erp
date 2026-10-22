@@ -44,6 +44,16 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
     var rows=db.queryForList("SELECT * FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=?",claim.get("organizationId"),claim.get("attemptId"));
     if(rows.size()!=1)throw conflict();var a=rows.getFirst();var c=new DomainContext((String)a.get("organizationid"),(String)a.get("actorid"),(String)a.get("stablerequestowner"),now,now);fenceAndVerify(c,claim);return c;
   }
+  /** Public references are resolved only within the authenticated actor's organization. */
+  public Map<String,Object> externalClaim(DomainContext caller,String claimId,long token){
+    transaction();
+    var rows=db.queryForList("SELECT * FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=? AND actorId=? AND stableRequestOwner=?",caller.organizationId(),claimId,caller.actorId(),caller.stableRequestOwner());
+    if(rows.size()!=1)throw DomainError.forbidden();
+    var row=rows.getFirst();
+    var claim=Map.<String,Object>of("organizationId",caller.organizationId(),"attemptId",claimId,"leaseToken",token,"leaseOwner",row.get("leaseowner"),"workId",row.get("workid"),"capabilityId",row.get("capabilityid"),"commandId",row.get("commandid"));
+    fenceAndVerify(caller,claim);
+    return claim;
+  }
   @Override public void fenceAndVerify(DomainContext c,Map<String,Object> claim){
     transaction();if(claim==null||claim.isEmpty())return;
     if("INTAKE".equals(claim.get("scopeKind"))){
