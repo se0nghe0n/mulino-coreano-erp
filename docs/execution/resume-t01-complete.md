@@ -1,8 +1,8 @@
-# T01 실제 인수 완료
+# T01 실제 실행 결과와 남은 인수 범위
 
 T01의 12개 subcase와 125개 assertion이 모두 PASS다. 모든 subcase의
-runtimeComplete=true이며 실제 action60개를 실행했다. 전체 ontology Task나
-S1–S6 선행 profile 인수 완료를 뜻하지 않는다.
+runtimeComplete=true이며 실제 action60개를 실행했다. partial fixture 실행이므로
+전체 ontology Task나 S1–S6 선행 profile 인수 완료를 뜻하지 않는다.
 
 ## 범위와 결과
 

@@ -24,8 +24,12 @@ class RuntimeContract(unittest.TestCase):
 
     def test_read_fixture_scope_and_real_duties_are_explicit(self):
         fixture = json.loads((ROOT / 'fixture.json').read_text())
-        for actor in fixture['actors'].values():
+        for name, actor in fixture['actors'].items():
             scope = actor['grant']['scope']
+            if name == 'sourceInstaller':
+                self.assertEqual({'organizationAlias': 'ORG'}, scope)
+                self.assertEqual('synthetic-source-installer', actor['subject'])
+                continue
             self.assertEqual(['P'], scope['itemAliases'])
             self.assertNotIn('workAliases', scope)
             self.assertNotIn('segmentAliases', scope)

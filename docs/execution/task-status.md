@@ -507,3 +507,47 @@ capture·관찰 계약은 `resume-model-integration.md`에 기록했다.
 profile PASS를 요구하므로 순환 의존성을 해소해야 한다. 결정적
 부분의 누락·실패를 감추지 않는 별도 gate가 필요하다. 정의 발행에서
 regression `NOT_RUN`을 허용하는 기존 공백도 미해결이다.
+
+## 2026-10-23 T01 통합과 병렬 실행 원행 대조
+
+`1e6a6a52`에서 재개했다. T01 worker의 `f91536aa`부터 `cbe7bd94`까지
+9개 commit을 검토하고 Task branch의 `e0eebfab`부터 `3eb56f2c`까지
+통합했다. T01 원문·claim·canonical 연결과 LOT 범위, 공급 근거,
+고객 후보 조회를 보완했다. 상세 증거는
+[T01 실행 기록](resume-t01-complete.md)을 따른다.
+
+- 통합 source의 전체 harness 586개가 한 실행에서 모두 통과했다.
+  backend 조회·품질·목표 검사 36개도 통과했다.
+- T01 Python 계약 2개와 generator 재현성 3개가 통과했다.
+  새 sourceInstaller는 조직 범위의 fixture 전용 actor로 명시하고,
+  업무 actor의 item 범위 제한은 유지했다.
+- `./verify prepare`는 41 case·802 subcase·24,248 assertion을
+  준비했고 exit0이다. 제품 runtime 인수 결과가 아니다.
+- 기존 worker의 clean source `7754cd87` 실제 T01 결과는
+  12개 subcase·125개 assertion PASS다. coordinator가 report의
+  원천 연결 96개를 재검사했다. partialFixtures=true이므로 전체
+  profile 인수로 승격하지 않는다. 통합 source의 실제 재실행은 별도다.
+- 검토한 조회 provider 두 파일의 runtime package source hash를
+  갱신했다. 정적 package6개·discovery link12개가 통과했다.
+
+검사 로그는 `.local/resume-20261023/`의
+`harness-t01-integrated.log`, `backend-t01-integrated.log`,
+`prepare-t01-integrated.log`다. root의 보존된 untracked 파일 때문에
+workingTreeDirty=true이며 clean source 실행으로 표시하지 않는다.
+
+이전 Haiku 실행의 원본 10개 report를 계획과 독립 대조했다.
+802개는 중복·누락 없이 일치했고 원행 상태는 PASS122·FAIL592·
+NOT_RUN88이다. inventory/aggregate의 NOT_IMPLEMENTED88개는 이
+NOT_RUN88개를 재분류한 표시다. 실행 실패 88개가 추가된 것이 아니다.
+PASS122개는 모두 partial fixture다. workflow agent 종료 때 초기
+백그라운드 실행이 함께 끝난 뒤 셸 재실행으로 얻은 결과이므로
+정상 dynamic workflow 전체 실행의 증거로 표시하지 않는다.
+원본은 `t3-b11bf8e4/.local/scenario-run-20261022/`에 보존했다.
+독립 대조의 절대 경로·SHA256은
+`.local/resume-20261023/raw-inventory-check.json`에 남겼다.
+
+현재 Claude Haiku 5.5 native dynamic workflow가 이 680개 non-PASS의
+원행을 병렬 분류한다. PRODUCT·TEST_INPUT·ADAPTER·ENV·EXTERNAL_GATE를
+실제 action/assertion·artifact pointer에 연결한 뒤 수정 순서를 정한다.
+전체 Task와 현재 통합 Step는 열려 있다. 실모델 호출과 BTP 배포는
+아직 실행하지 않았다.
