@@ -48,7 +48,7 @@ final class T01SourceFacts {
     void install() throws Exception {
         validate(fixture);
         if(!facts.path("legalComplianceClaimed").isBoolean()||facts.path("legalComplianceClaimed").asBoolean())throw new IllegalArgumentException("T01 must remain explicitly synthetic");
-        transaction(()->{installRelations();installReceiptObservations();installRegulatoryProcedure();});
+        transaction(()->{installRelations();installRegulatoryProcedure();});
         setClock();
         for(JsonNode source:facts.path("sources"))publish(source);
         transaction(()->{installPermissions();installReceipts();});
@@ -88,10 +88,10 @@ final class T01SourceFacts {
         for(String doc:List.of("hold40"))insert("mulino_work_read_EvidenceReferences",base(uuid(),"effectiveAt",at,"workId",id("O1"),"documentVersionId",id(doc),"role","SOURCE"));
         String policy=value("SELECT policyId FROM mulino_governance_ActivePolicies WHERE organizationId=? AND kind='ELIGIBILITY'",org);aliases.put("eligibilityPolicy",policy);
     }
-    private void installReceiptObservations()throws Exception{
-        for(var s:facts.path("sources"))if(s.path("kind").asText().equals("PHYSICAL_RECEIPT")){
+    private void installReceiptObservation(JsonNode s,String eventId)throws Exception{
+        {
             String segment=id(Json.required(s,"segmentAlias"));
-            insert("mulino_trade_receipt_Observations",base(uuid(),"occurredAt",at,"rangeRootId",segment,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"itemId",id("P"),"lotId",id("L"),"placeId",id("W"),"workId",id("O1"),"identificationStatus","CONFIRMED","state","CONFIRMED","ownerId",actor,"supervisorId",id("supervisor"),"nextAction","T01 receipt source review","nextCheckAt",at.plusHours(1)));
+            insert("mulino_trade_receipt_Observations",base(uuid(),"eventId",eventId,"occurredAt",at,"rangeRootId",segment,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"itemId",id("P"),"lotId",id("L"),"placeId",id("W"),"workId",id("O1"),"identificationStatus","CONFIRMED","state","CONFIRMED","ownerId",actor,"supervisorId",id("supervisor"),"nextAction","T01 receipt source review","nextCheckAt",at.plusHours(1)));
         }
     }
     private void installRegulatoryProcedure()throws Exception{
@@ -119,6 +119,7 @@ final class T01SourceFacts {
         slots.put("kind",kind).put("sourceNamespace","synthetic-warehouse").put("externalEventId",kind.startsWith("QUALITY_")?payload.path("sourceDecisionId").asText():"T01-"+docAlias).put("sourceVersion","1").put("effectiveFrom",at.toInstant().toString()).put("timeZone","UTC").put("timePrecision","SECOND").put("valueState","KNOWN").put("payload",payload.toString()).put("documentId",id(docAlias)).put("assertion","Explicit synthetic T01 historical source");
         if(s.hasNonNull("quantity"))slots.put("quantity",Json.required(s,"quantity")).put("unit",Json.required(s,"unit"));
         JsonNode event=invoke("recordActivity",slots,null);
+        if(kind.equals("PHYSICAL_RECEIPT"))transaction(()->installReceiptObservation(s,Json.required(event,"id")));
         var review=Json.object().put("claimId",Json.required(event,"claimId")).put("basisDocumentId",id(docAlias)).put("physicalScopeId",id(Json.required(s,"segmentAlias"))).put("policyVersion","fixture-v1").put("sourceIdentity","synthetic-warehouse:"+slots.path("externalEventId").asText()+":1").put("effectiveFrom",at.toInstant().toString()).put("reason","Verify explicit original and exact historical source range");
         if(s.hasNonNull("quantity"))review.put("quantity",Json.required(s,"quantity")).put("unit",Json.required(s,"unit"));
         JsonNode matched=invoke("matchSourceIdentity",review,1);if(!matched.path("evidenceStatus").asText().equals("MATCHED"))throw new IllegalStateException("T01 source did not match: "+docAlias+" "+matched);
