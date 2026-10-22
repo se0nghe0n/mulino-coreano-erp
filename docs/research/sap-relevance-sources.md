@@ -227,6 +227,58 @@ rolling 문서와 `latest` PDF는 이후 내용이 바뀔 수 있다.
   구별한다. 이 프로젝트의 도구 사용을 Joule Studio 개발 경험이라고
   부르지 않으며, 이 문서만으로 지원자의 기여를 판단하지 않는다.
 
+## 통사구조 사례 대조를 위한 API 근거 — 2026-10-22 추가
+
+사용자는 시험 tenant가 없으며 공식 문서·API 명세와 로컬 사례부터
+대조하도록 했다. S22–S26은 Public Edition 2608을 비교 기준으로
+삼는다. [사례 대조](../ontology-sap-case-validation.md)의 V01–V05와
+순서대로 대응한다. 직접 열기가 빈 본문 또는 접근 불가여서 공식 URL의
+검색 본문을 확인했다. 실행 환경의 metadata·응답을 검증한 것은 아니다.
+
+### S22 — Retrieve Outbound Delivery
+
+- [SAP Help](https://help.sap.com/docs/PRODUCT_ID/588780cab2774a7ab9fffca3a7f919fe/364944fb5b1246c7b4de26401b5f1f82.html)
+- 범위: APIs for Delivery and Transportation, 2608 Latest.
+- 근거: `API_OUTBOUND_DELIVERY_SRV;v=2`의 header GET과
+  `to_DeliveryDocumentItem` 확장 조회, 직접 접근 가능한 entity를 설명한다.
+- 한계: 이 조회가 고객 거부·손실 지표를 완성한다는 뜻은 아니다.
+
+### S23 — Outbound Delivery Items
+
+- [SAP Help](https://help.sap.com/docs/SAP_S4HANA_CLOUD/588780cab2774a7ab9fffca3a7f919fe/3719380e965045c1a7ec98002a33ae83.html)
+- 범위: 같은 API 문서의 2608 Latest, `A_OutbDeliveryItem`.
+- 근거: 문서/item 식별자, Material·Batch, 문서 수량과 기준 단위 수량,
+  단위, POD 관련 상태가 별도 필드로 제공된다.
+- 한계: 필드 이름의 Actual을 고객의 인수 수락으로 해석하지 않는다.
+  수량 필드 둘을 독립 물량으로 합산하지 않는다.
+
+### S24 — ProofOfDeliveryRequest_In – ProofOfDeliveryDifferences
+
+- [SAP Help](https://help.sap.com/docs/SAP_S4HANA_CLOUD/588780cab2774a7ab9fffca3a7f919fe/7d550d418b1848f5a03ea8fc7787a4ff.html)
+- 범위: 같은 Public Edition API 문서, 2608 Latest.
+- 근거: POD 수량 또는 차이를 입력하고 다른 수량을 계산할 수 있다.
+  판매 단위·기준 단위와 차이 사유를 구분하며 사유 자동 결정에는
+  설정된 기본 사유가 필요하다.
+- 한계: 입력 node 명세다. 조회 endpoint가 아니며 수량 차이가 곧
+  고객 인수 거부라는 뜻도 아니다. 실제 차이 사유·근거가 필요하다.
+
+### S25 — Delivery Management API catalog
+
+- [SAP Help](https://help.sap.com/docs/SAP_S4HANA_CLOUD/588780cab2774a7ab9fffca3a7f919fe/946a4b3ae6ec400ab56d71f92fa64b46.html)
+- 범위: 같은 Public Edition API catalog, 2608 Latest.
+- 근거: Proof of Delivery – Update (B2B)를 SOAP로 분류한다.
+- 한계: OData 출고 조회와 같은 protocol·읽기 기능으로 취급하지 않는다.
+  이번 작업에서 SOAP 쓰기를 수행하거나 채택하지 않았다.
+
+### S26 — Operations for Returns Inspection (A2X)
+
+- [SAP Help](https://help.sap.com/docs/SAP_S4HANA_CLOUD/03c04db2a7434731b7fe21dca77440da/97e1c03f7d3646eaac0b3eec3be207da.html?locale=en-US&version=2608.500)
+- 범위: Public Edition, URL version `2608.500`.
+- 근거: `api_returnsinspection_2`의 OData v4 경로에 대해
+  `ReturnsInspection` GET과 create/update 등 operations를 설명한다.
+- 한계: 반품 검사 데이터의 API다. 원래 납품 시 고객이 거부한 수량,
+  환급액, 최종 손실을 같은 값으로 해석할 수 없다.
+
 ## 저장소 내부 근거
 
 ### L01 — CAP 로컬 채택과 실행 기록
