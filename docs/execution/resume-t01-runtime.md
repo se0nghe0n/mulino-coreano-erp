@@ -64,3 +64,72 @@
 
 ScenarioFixtureInstaller를 직접 변경하지 않았다. 원천 정책·수량·의무를
 oracle값으로 설치하거나 누락 관찰을0으로 만드는 변경을 하지 않는다.
+
+## 2026-10-22 clean source 실행 결과
+
+실행 command:
+
+```sh
+JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home \
+PATH=/Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home/bin:$PATH \
+./verify scenarios --actual verification/cases/T01/case.json
+```
+
+- 실행 source commit: `deb0e15ea989dcd65643420d98d40edb7f1c51b2`.
+- `workingTreeDirty=false`, selected/started/completed 모두 12다.
+- 실제 실행 action 60개, assertion 70 PASS / 55 FAIL이다.
+- 여섯 excluded subcase는 runtimeComplete=true, PASS다.
+- 정상 여섯 subcase는 FAIL, 전체 profile exit1이다. T01 완료가 아니다.
+- evidence 경로:
+  `verification/harness/target/evidence/actual-scenarios-run-9121be50-8178-444e-9374-07ae52623738/scenarios.json`.
+- fixture SHA256:
+  `b9bf0239af65ae40f972cc4a4a6ba9de9ec7960e4efd8a9886b539f5ace5961c`.
+- case SHA256:
+  `6847cc327cf745cc2bb7a5b58c6655b1add831ac88365b543bd49f5b1ddb7499`.
+- 실행 jar SHA256:
+  `b9ba191ccf808dca93796dda9612f2c696b63bb9b94b6fc90855f2c3dc79b56f`.
+- focused backend tests 7 PASS, generator 재현성 3 PASS,
+  T01 authoring invariant 2 PASS다. `./verify validate`는 exit0이다. 로그는 같은 evidence 디렉터리에 있다.
+- 격리 PostgreSQL container와 임시 서버는 runner가 정리했다.
+
+| subcase | 실제 남은 첫 원인 | 소유 경계 |
+|---|---|---|
+| same-world | getWork FORBIDDEN, 직접 lotId 매칭 | PRODUCT + fixture relation |
+| inventory | customerId scope가 달라 SNAPSHOT_CHANGED | TEST query scope |
+| supply-basis | Work lot 필터 FORBIDDEN, 이후 조건 projection 부재 | PRODUCT + ADAPTER |
+| waiting | Work lot 필터 FORBIDDEN, wait 필드 명칭도 원천과 다름 | PRODUCT + ADAPTER |
+| responsibility | Work lot 필터 FORBIDDEN | PRODUCT |
+| customer-impact | traceLot action/customer filter TYPE_INVALID, 관계 원행 없음 | TEST + ADAPTER |
+
+의무 alias 수정으로 모든 정상 subcase의 DB human-duty tuple 검증은
+통과했다. same-world의 responsibility assertion도 통과했다.
+반면 적격60과 누적100은 아직 원천 사실이 없어 실제0이다. 이0을 정상
+oracle로 바꾸지 않았다.
+
+coordinator가 연결해야 할 구체 경계는 다음과 같다.
+
+- `ScenarioFixtureInstaller.run()`의 동일 JDBC transaction에서 master/Work/
+  evidence 설치 뒤 독립 원천 사실 helper를 호출한다. 현재 `works()`는
+  COMMAND snapshot까지 저장하므로 Work의 LOT scope를 추가할 때에는
+  WorkTransitions snapshot도 같은 source로 만들어야 한다.
+- helper는 baseline의 원천 event kind, claim, canonical scope, receipt
+  identity, policy와 허용 범위를 명시적으로 받아야 한다. 현재 hash/time만
+  있는 evidence로 VERIFIED를 추론하지 않는다. 필요한 원천 입력을 T01
+  generator에 추가하고 그 fixture hash로 검증한다.
+- `WorkReadHandler.matches/workScopes/world`는 실제 SubjectLinks 등으로
+  확인한 LOT 관계를 사용한다. 단순히 lot 필터를 무시하면 다른 LOT 정보가
+  새어 나가므로 금지한다. ITEM grant와 현재 auth는 유지한다.
+- getAssessment 공급 가능 근거 조회는 QualityEligibility가 계산한 현재
+  SELL 결과와 근거에 연결한다. 기존 Assessment owner와 contract를 정한
+  뒤 합친다. `conditions`와 `conditionResults`를 이름만 바꾸지 않는다.
+- T01 query generator는 필요 없는 selector를 지우되 assertion은 유지한다.
+  같은 snapshot의 scope를 전달하고, getWork wait의 원천 JSON과 공개
+  verifierId/evidenceId 응답을 일치시킨다. 원천 원행이 설치된 다음에
+  snapshot·권한 회귀와 함께 수정해야 한다.
+
+위 연결은 이번 commit에 구현하지 않았다. ScenarioFixtureInstaller와
+Assessment 담당자의 병렬 소유 범위를 침범하지 않기 위해 남긴 통합점이다.
+
+현재 live catalog에서 codex/gpt-6.1-sol의 ultrafast 지원을 확인했다.
+현재 turn의 실제 tier를 증명하는 telemetry는 제공되지 않아 실행 tier를
+별도 검증했다고 주장하지 않는다. 재위임은 하지 않았다.
