@@ -36,7 +36,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         processes=new BackendProcessControls(root,run,configuration.baseUri(),System.getenv());
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","management","blob","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","worker","management","blob","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
         if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;lastClock=null;
@@ -159,7 +159,10 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         if(suiteIsolation&&externalOrganization==null)return StepResult.missing(id,"NOT_IMPLEMENTED: no fixture organization installed for this subcase");
         try {
             java.net.URI uri=configuration.baseUri().resolve(category.equals("evidence-upload")?"/api/evidence/uploads":"/api/ontology/"+category+"/"+operation);
-            JsonNode wireRequest=request.deepCopy();
+            // Worker callers may supply an explicit endpoint envelope with a real resolved claim.
+            // Legacy bare intents deliberately omit claim and must be rejected by the product.
+            boolean workerEnvelope=route.equals("worker")&&request.has("intent");
+            JsonNode wireRequest=(workerEnvelope?request.path("intent"):request).deepCopy();
             var translated=Json.array();
             if(relaxWire&&category.equals("queries")&&wireRequest.has("objectId")&&!wireRequest.has("id")){((ObjectNode)wireRequest).set("id",wireRequest.path("objectId"));((ObjectNode)wireRequest).remove("objectId");translated.add("objectId->id");}
             // Probe only: an untyped getObject reads TradeItem in the product; name the installed alias type instead.
@@ -185,6 +188,12 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
                 if(!w.has("provenance")&&w.path("valueProvenance").isObject()){w.set("provenance",w.path("valueProvenance"));translated.add("valueProvenance->provenance");}
                 w.remove("valueProvenance");
                 if(!w.has("provenance")&&w.path("slots").isObject()){var prov=Json.object();w.path("slots").fieldNames().forEachRemaining(k->prov.put(k,"USER"));w.set("provenance",prov);translated.add("provenance:USER-default");}
+            }
+            if(route.equals("worker")) {
+                uri=configuration.baseUri().resolve("/api/runtime/worker/commands");
+                ObjectNode envelope=workerEnvelope?((ObjectNode)request).deepCopy():Json.object();
+                envelope.set("intent",wireRequest);
+                wireRequest=envelope;
             }
             String credential=credential(actor);
             String digestBefore=category.equals("queries")&&suiteIsolation?ScenarioRevisionBinding.digest(configuration):null;
@@ -286,7 +295,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             return send(id,actor,"evidence-upload",capability,request.path("businessAction"),"blob");
         }
         if(suiteIsolation&&route.equals("worker"))
-            return StepResult.missing(id,"NOT_IMPLEMENTED: no product surface for route worker: the product exposes no external worker submission endpoint; durable workers execute only server-claimed intake/recovery commands (ApplicationCommands.executeClaimed)");
+            return send(id,actor,"commands",capability,request,"worker");
         if(suiteIsolation&&Set.of("nested","projection").contains(route))
             return StepResult.missing(id,"NOT_IMPLEMENTED: no product surface for route "+route+": OntologyService exposes only the query/command/validateCommand actions, no entity set or navigation to write through");
         if(suiteIsolation&&route.equals("direct"))return odataCommand(id,actor,capability,request);
