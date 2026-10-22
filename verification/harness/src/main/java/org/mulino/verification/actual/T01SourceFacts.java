@@ -98,8 +98,9 @@ final class T01SourceFacts {
     private void installRegulatoryProcedure()throws Exception{
         JsonNode p=facts.path("regulatoryPolicy");if(!p.path("fictional").asBoolean())throw new IllegalArgumentException("Fictional regulatory policy required");
         insert("mulino_trade_regulatory_Policies",base(id("t01RegPolicy"),"recordedBy",actor,"version",Json.required(p,"version"),"authority",Json.required(p,"authority"),"sourceNamespace",Json.required(p,"sourceNamespace"),"action",Json.required(p,"action"),"validFrom",at,"validUntil",at.plusDays(24),"fictional",true,"status","ACTIVE","requiresLabel",p.path("requiresLabel").asBoolean()));
-        insert("mulino_trade_regulatory_Procedures",base(id("t01Procedure"),"recordedBy",actor,"itemId",id("P"),"lotId",id("L"),"physicalScopeId",id("A60"),"workId",id("O1"),"policyId",id("t01RegPolicy"),"currentVersionId",id("t01ProcedureVersion")));
+        insert("mulino_trade_regulatory_Procedures",base(id("t01Procedure"),"recordedBy",actor,"itemId",id("P"),"lotId",id("L"),"physicalScopeId",id("A60"),"workId",id("O1"),"policyId",id("t01RegPolicy")));
         insert("mulino_trade_regulatory_ProcedureVersions",base(id("t01ProcedureVersion"),"recordedBy",actor,"procedureId",id("t01Procedure"),"itemId",id("P"),"lotId",id("L"),"physicalScopeId",id("A60"),"workId",id("O1"),"policyId",id("t01RegPolicy"),"status","PREPARED","documentVersionId",id("regulatorySubmission"),"occurredAt",at));
+        update("UPDATE mulino_trade_regulatory_Procedures SET currentVersionId=? WHERE organizationId=? AND ID=?",id("t01ProcedureVersion"),org,id("t01Procedure"));
     }
     private void publish(JsonNode s)throws Exception{
         String docAlias=Json.required(s,"documentAlias"),kind=Json.required(s,"kind");
@@ -107,22 +108,30 @@ final class T01SourceFacts {
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());var st=c.prepareStatement("SELECT blobId FROM mulino_evidence_DocumentVersions WHERE ID=?")){
             st.setString(1,id(docAlias));try(var rows=st.executeQuery()){if(!rows.next())throw new IllegalStateException("Missing source original");var root=java.nio.file.Path.of(System.getProperty("verification.actual.blobRoot"));payload=Json.read(root.resolve("objects").resolve(rows.getString(1)));}
         }
+        if(kind.equals("REGULATORY_DECISION")){
+            ((ObjectNode)payload).put("procedureVersionId",id("t01SubmittedVersion"));
+            byte[] bytes=payload.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8);
+            String hash=java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));
+            var upload=Json.object().put("sourceNamespace","synthetic-warehouse").put("sourceReference","T01-regulatory-current-version").put("mediaType","application/json").put("expectedHash",hash).put("provenance","SYNTHETIC_T01_EXACT_SUBMITTED_VERSION").put("contentBase64",Base64.getEncoder().encodeToString(bytes));
+            upload.set("subject",Json.object().put("kind","SEGMENT").put("id",id("A60")));
+            aliases.put(docAlias,Json.required(invoke("attachEvidence",upload,null),"id"));
+        }
         var slots=Json.object();slots.set("subject",Json.object().put("kind",Json.required(s,"subjectKind")).put("id",id(Json.required(s,"subjectAlias"))));
         slots.put("kind",kind).put("sourceNamespace","synthetic-warehouse").put("externalEventId",kind.startsWith("QUALITY_")?payload.path("sourceDecisionId").asText():"T01-"+docAlias).put("sourceVersion","1").put("effectiveFrom",at.toInstant().toString()).put("timeZone","UTC").put("timePrecision","SECOND").put("valueState","KNOWN").put("payload",payload.toString()).put("documentId",id(docAlias)).put("assertion","Explicit synthetic T01 historical source");
         if(s.hasNonNull("quantity"))slots.put("quantity",Json.required(s,"quantity")).put("unit",Json.required(s,"unit"));
         JsonNode event=invoke("recordActivity",slots,null);
         var review=Json.object().put("claimId",Json.required(event,"claimId")).put("basisDocumentId",id(docAlias)).put("physicalScopeId",id(Json.required(s,"segmentAlias"))).put("policyVersion","fixture-v1").put("sourceIdentity","synthetic-warehouse:"+slots.path("externalEventId").asText()+":1").put("effectiveFrom",at.toInstant().toString()).put("reason","Verify explicit original and exact historical source range");
         if(s.hasNonNull("quantity"))review.put("quantity",Json.required(s,"quantity")).put("unit",Json.required(s,"unit"));
-        JsonNode matched=invoke("matchSourceIdentity",review,1);if(!matched.path("outcome").asText().equals("MATCHED"))throw new IllegalStateException("T01 source did not match: "+docAlias+" "+matched);
+        JsonNode matched=invoke("matchSourceIdentity",review,1);if(!matched.path("evidenceStatus").asText().equals("MATCHED"))throw new IllegalStateException("T01 source did not match: "+docAlias+" "+matched);
         JsonNode linked=invoke("linkCanonicalOccurrence",Json.object().put("reconciliationId",Json.required(matched,"id")),1);
         String canonical=Json.required(linked,"id");aliases.put(docAlias+"Fact",canonical);
-        if(kind.equals("REGULATORY_SUBMISSION"))transaction(()->update("UPDATE mulino_trade_regulatory_ProcedureVersions SET status='SUBMITTED',occurrenceId=? WHERE organizationId=? AND ID=?",canonical,org,id("t01ProcedureVersion")));
+        if(kind.equals("REGULATORY_SUBMISSION")){var submitted=invoke("recordSubmission",Json.object().put("procedureId",id("t01Procedure")).put("occurredAt",at.toInstant().toString()).put("occurrenceId",canonical),1);aliases.put("t01SubmittedVersion",Json.required(submitted,"procedureVersionId"));}
     }
     private JsonNode invoke(String capability,ObjectNode slots,Integer revision)throws Exception{
-        var body=Json.object().put("intentKind",capability.equals("recordActivity")?"RECORD":"COMMAND").put("definitionVersion",fixture.path("versions").path("definition").asText()).put("capabilityId",capability).put("commandIdempotencyKey",uuid());
+        var body=Json.object().put("intentKind",Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision").contains(capability)?"RECORD":"COMMAND").put("definitionVersion",fixture.path("versions").path("definition").asText()).put("capabilityId",capability).put("commandIdempotencyKey",uuid());
         body.set("subjectRefs",Json.array());body.set("slots",slots);body.set("provenance",Json.object().put("sourceNamespace","USER"));if(revision!=null)body.put("expectedRevision",revision);
         var credential=(ObjectNode)fixture.path("actors").path(Json.required(facts,"actorAlias")).deepCopy();credential.put("organizationAlias",external);
-        String route=capability.equals("recordActivity")?"records":"commands";
+        String route=Set.of("recordActivity","attachEvidence","recordSubmission","recordRegulatoryDecision").contains(capability)?"records":"commands";
         var request=HttpRequest.newBuilder(config.baseUri().resolve("/api/ontology/"+route+"/"+capability)).timeout(Duration.ofSeconds(60)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(credential)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
         var response=http.send(request,HttpResponse.BodyHandlers.ofString());JsonNode result=Json.parse(response.body());
         if(response.statusCode()!=200||!result.path("outcome").asText().equals("APPLIED"))throw new IllegalStateException("T01 source command "+capability+" rejected: HTTP "+response.statusCode()+" "+result);
@@ -135,7 +144,7 @@ final class T01SourceFacts {
                 insert("mulino_inventory_"+(hold?"Restrictions":"DispositionBases"),base(uuid(),"controlScope",value("SELECT controlScope FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND ID=?",org,seg),"action","SELL","state","ACTIVE","validFrom",at,"validUntil",at.plusDays(24),"evidenceRef",id(doc),"segmentId",seg,"startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal(Json.required(s,"quantity")),"unit",Json.required(s,"unit"),"category",Json.required(s,"category"),"workId",id("O1"),"nextCheckAt",at.plusHours(1)));
             }
         }
-        insert("mulino_trade_regulatory_DecisionVersions",base(uuid(),"recordedBy",actor,"procedureId",id("t01Procedure"),"procedureVersionId",id("t01ProcedureVersion"),"itemId",id("P"),"lotId",id("L"),"physicalScopeId",id("A60"),"policyId",id("t01RegPolicy"),"action","SELL","decision","ALLOWED","authority","SYNTHETIC_T01_AUTHORITY","startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal("60"),"unit","BOX","validFrom",at,"validUntil",at.plusDays(24),"occurrenceId",id("regulatory60Fact")));
+        insert("mulino_trade_regulatory_DecisionVersions",base(uuid(),"recordedBy",actor,"procedureId",id("t01Procedure"),"procedureVersionId",id("t01SubmittedVersion"),"itemId",id("P"),"lotId",id("L"),"physicalScopeId",id("A60"),"policyId",id("t01RegPolicy"),"action","SELL","decision","ALLOWED","authority","SYNTHETIC_T01_AUTHORITY","startQuantity",BigDecimal.ZERO,"quantity",new BigDecimal("60"),"unit","BOX","validFrom",at,"validUntil",at.plusDays(24),"occurrenceId",id("regulatory60Fact")));
     }
     private void installReceipts()throws Exception{
         for(var s:facts.path("sources"))if(s.path("kind").asText().equals("PHYSICAL_RECEIPT")){
