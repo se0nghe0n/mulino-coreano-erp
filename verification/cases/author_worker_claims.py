@@ -17,6 +17,12 @@ def patch(case):
     for sub in case['subcases']:
         sub['actions']=[a for a in sub['actions'] if not a['id'].startswith(('worker-claim-','worker-negative-'))]
         sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith(('worker-claim-','worker-negative-'))]
+        if case['caseId']=='C3' and sub['id'] in ('api-waitWork','mcp-waitWork','worker-waitWork'):
+            # The same valid business input must exercise every route's authorization gate.
+            for action in sub['actions']:
+                call=action.get('call',action)
+                if call.get('capabilityId')=='waitWork':
+                    call['request']['slots']['wait']['target']={'$alias':'WORK'}
         if case['caseId']=='V4' and sub['id']=='worker-work':
             # This route-family probe requires an existing Work-scoped command; createDraft has no WORK scope.
             sub['fixtureRef']='verification/cases/C3/fixture-waitWork.json'
@@ -38,8 +44,6 @@ def patch(case):
             if call.get('route')!='worker':continue
             name='worker-claim-'+action['id']
             intent=call['request']
-            if case['caseId']=='C3' and sub['id']=='worker-waitWork':
-                intent['slots']['wait']['target']={'$alias':'WORK'}
             claims.append({'id':name,'kind':'control','control':{'type':'workerClaim','operation':'issue','parameters':{
                 'actorRef':call['actorRef'],'workId':{'$alias':'WORK'},'capabilityId':call['capabilityId'],
                 'commandId':intent['commandIdempotencyKey'],'workerId':'case-worker','ttlSeconds':300}},'evidenceRefs':[name+':actual-artifact']})

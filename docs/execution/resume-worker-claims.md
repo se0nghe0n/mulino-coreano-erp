@@ -156,3 +156,28 @@ credential 임시 디렉터리를 정리했다. 전체 C3/V4/V7 또는 전체 pr
 모든 기존 assertion ID와 op/source/baseline/expected/unit 계약을
 비교했으며 삭제·변경은 0이다. V4의 Work 명령 변경에 맞춘 설명만
 수정하고, 새 claim assertions을 추가했다.
+
+## C3 동일 입력의 세 경로 대조
+
+worker의 `waitWork`에만 있던 필수 `wait.target`을 API·MCP 입력에도
+명시했다. 세 경로에서 같은 유효 업무 입력으로 READ 거부와 COMMAND
+허용을 대조하기 위한 수정이다. 기존 assertion은 모두 유지했다.
+
+`2c0e84b3`와 이 fixture 수정 상태에서 다음을 실행했다.
+
+```sh
+./verify scenarios --actual .local/resume-20261022/c3-wait-subset.json
+```
+
+원본 C3에서 세 subcase만 그대로 추출한 선택 실행이다. 실제 동작 44회,
+API 30·MCP 30·worker 32개 assertion이 모두 통과했다. 각 READ 호출은
+`FORBIDDEN`이고 업무 효과가 없으며, 허용된 동일 입력은 `APPLIED`와
+COMMITTED 한 행을 남겼다. `gateComplete=false`이며 전체 C3 인수가 아니다.
+fixture가 수정된 작업 트리에서 실행했고 기존 partial fixture 모드를
+사용했으므로 정식 전체 profile receipt로 승격하지 않는다.
+
+실행 산출물은
+`verification/harness/target/evidence/actual-scenarios-run-8151c45a-cc41-4adf-bdb5-0eec9cec836c/`
+에 있다. 실제 결과는 `scenarios.json`, 실행 JAR와 작업 트리 정보는
+같은 디렉터리의 hash·status 파일로 대조한다. 원본 assertion의
+ID·op·source·expected·단위는 이전 commit과 동일하다.
