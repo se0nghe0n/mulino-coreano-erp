@@ -237,8 +237,8 @@ public final class RuntimeAssertionTest {
     }
     @Test void v1EvaluatorAndDefinitionCannotBeSilentlyReplaced() throws Exception {
         JsonNode a = assertion("T26", "restore-complete", "v1-evaluator");
-        var rows = sample("{\"assessments\":[{\"evaluatorVersion\":\"evaluator-v1\"}]}"); accepts(a, rows);
-        ((ObjectNode) rows.get("db").at("/data/rawRows/assessments/0")).put("evaluatorVersion", "evaluator-v2"); rejects(a, rows);
+        var rows = sample("{\"assessments\":[{\"evaluatorVersion\":\"core-v1\"}]}"); accepts(a, rows);
+        ((ObjectNode) rows.get("db").at("/data/rawRows/assessments/0")).put("evaluatorVersion", "core-v2"); rejects(a, rows);
     }
     @Test void realBackupBlobHashIsRequiredRatherThanPresence() throws Exception {
         JsonNode a = assertion("T26", "restore-complete", "blob-hash");

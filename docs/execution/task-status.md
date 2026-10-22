@@ -479,3 +479,31 @@ T01은 조회 권한·fixture 전제와 제외 업무의 requestedEffect 관찰�
 구현한다. 정의 회귀 실행과 나머지 운영·관찰 공백도 남아 있다.
 실모델·BTP·규제 인수와 전체 S4–S6 완료는 아직 주장하지 않는다.
 BTP 계정·region·entitlement·배포 예산은 미확정이다.
+
+## 2026-10-22 구독 client 통합과 후속 실행
+
+`2c0e84b3`에서 실제 MCP 전송, native client service 등록, 독립 DB의
+물리 행 capture와 final response 원문 보존을 통합했다.
+`06a13663`에서는 C3 `waitWork`의 API·MCP·worker 입력을 맞췄다.
+두 commit은 fork에 push했다. 전체 Step 2는 아직 열려 있다.
+
+- native 계약 20개가 통과했다. 전체 harness는 564개 중 563개가
+  통과했고, T26의 변경된 evaluator 이름을 반영하지 않은 selftest
+  하나가 실패했다. 해당 literal을 `core-v1`로 고친 뒤
+  `RuntimeAssertionTest` 20개가 모두 통과했다. 서로 다른 실행의
+  결과이며 단일 실행 전체 통과로 기록하지 않는다.
+- C3 대기 명령 세 경로는 실제 동작 44회와 assertion 92개를
+  통과했다. 선택·partial fixture 실행이며 전체 profile 인수는 아니다.
+- 깨끗한 별도 worktree의 `2c0e84b3`에서 802개 전체 scenario
+  기준 실행을 시작했다. 실행 로그는
+  `/tmp/ontology-actual-all-20261022.log`에 남긴다. 완료 전에는
+  실행한 subcase 수나 PASS 수를 확정하지 않는다.
+- T01 전체 흐름, 복구 runtime, 실모델 독립 관찰 연결은 별도
+  `gpt-6.1-sol` / `serviceTier=ultrafast` worker가 진행한다.
+
+실모델 호출은 여전히 0회다. native 연결의 누락된 fixture·서버 인증
+capture·관찰 계약은 `resume-model-integration.md`에 기록했다.
+또한 현재 model prerequisite가 C3의 model subcase를 포함한 전체
+profile PASS를 요구하므로 순환 의존성을 해소해야 한다. 결정적
+부분의 누락·실패를 감추지 않는 별도 gate가 필요하다. 정의 발행에서
+regression `NOT_RUN`을 허용하는 기존 공백도 미해결이다.
