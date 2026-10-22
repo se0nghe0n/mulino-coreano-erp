@@ -6323,12 +6323,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "original",
-                "pointer": "/response/revision"
-              }
-            },
             "commandIdempotencyKey": "T26-safe-retry-canonical-current-grant-retry",
             "subjectRefs": [
               {
@@ -7134,12 +7128,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "original",
-                "pointer": "/response/revision"
-              }
-            },
             "commandIdempotencyKey": "T26-safe-retry-revoked-blocked-retry",
             "subjectRefs": [
               {
@@ -8198,12 +8186,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "original",
-                "pointer": "/response/revision"
-              }
-            },
             "commandIdempotencyKey": "T26-safe-retry-forged-original-actor-retry",
             "subjectRefs": [
               {
@@ -9150,12 +9132,6 @@
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
             "capabilityId": "retrySafeCommand",
-            "expectedRevision": {
-              "$result": {
-                "actionId": "original",
-                "pointer": "/response/revision"
-              }
-            },
             "commandIdempotencyKey": "T26-safe-retry-forged-request-hash-retry",
             "subjectRefs": [
               {
@@ -32646,7 +32622,7 @@
                 "id": {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 }
               }
@@ -34003,7 +33979,7 @@
                 "id": {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 }
               }
@@ -35390,7 +35366,7 @@
                 "id": {
                   "$result": {
                     "actionId": "split",
-                    "pointer": "/response/segmentId"
+                    "pointer": "/response/children/0/segmentId"
                   }
                 }
               }

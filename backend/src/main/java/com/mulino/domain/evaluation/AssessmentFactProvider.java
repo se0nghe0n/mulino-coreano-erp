@@ -17,6 +17,11 @@ public class AssessmentFactProvider {
   public AssessmentFactProvider(AssessmentRepository r,LocalBlobStore blobs,ObjectProvider<WorkContributionRead> contributionPort,ObjectProvider<CanonicalFactAdmission> admissions){this.r=r;this.blobs=blobs;this.contributionPort=contributionPort;this.admissions=admissions;}
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition){return load(c,work,slots,definition,null);}
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId) {
+    return load(c,work,slots,definition,goalId,c.asOf());
+  }
+  /** The evidence cutoff can precede the real assessment horizon at an exclusive deadline.
+   * STATE_AT keeps its fixed evaluationAt; only a genuinely future state is unknown. */
+  public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId,Instant evaluationHorizon) {
     var port=contributionPort.getIfAvailable();var credits=goalId==null||port==null?List.<Map<String,Object>>of():port.contributions(c,work.get("ID").toString(),goalId);
     Map<?,?> scope=slots.get("scope") instanceof Map<?,?> m?m:Map.of();
     Object lotScope=scope.get("lotId")!=null?scope.get("lotId"):work.get("lotId");
@@ -47,7 +52,7 @@ public class AssessmentFactProvider {
         if(slots.get("periodEnd")!=null){Instant end=instant(slots.get("periodEnd"));if(effective.isAfter(end)||effective.equals(end)&&Boolean.FALSE.equals(slots.get("periodEndInclusive")))continue;}
         if(effective.isAfter(c.asOf()))continue;
         // STATE_AT observes canonical evidence valid at this point, never current inventory.
-        if(canonicalState&&(evaluationAt.isAfter(c.asOf())||effective.isAfter(evaluationAt)||occurrence.get("effectiveUntil")!=null&&!evaluationAt.isBefore(instant(occurrence.get("effectiveUntil")))))continue;
+        if(canonicalState&&(evaluationAt.isAfter(evaluationHorizon)||effective.isAfter(evaluationAt)||occurrence.get("effectiveUntil")!=null&&!evaluationAt.isBefore(instant(occurrence.get("effectiveUntil")))))continue;
         if(slots.containsKey("evidenceSource")&&verifications.stream().noneMatch(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&matchesSource(v,slots,claims,events)))continue;
         var verification=verifications.stream().filter(v->Objects.equals(occurrence.get("ID"),v.get("canonicalOccurrenceId"))&&Objects.equals(slots.get("evidencePolicyVersion"),v.get("policyVersion"))&&matchesSource(v,slots,claims,events)&&"VERIFIED".equals(v.get("verdict"))&&List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))).findFirst();
         boolean verified=verification.isPresent();boolean sourceConflict=false;var refs=new ArrayList<String>();

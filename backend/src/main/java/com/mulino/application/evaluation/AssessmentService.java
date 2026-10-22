@@ -56,6 +56,9 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   public void invalidate(DomainContext c,String workId){work.require(c,workId,true);work.markInvalidation(c,workId,true);}
   private record Calculation(TypedPredicateEvaluator.Result result,String hash,String snapshot,String policy,boolean held){}
   private Calculation calculate(DomainContext c,Map<String,Object> w,Map<String,Object> goal){
+    return calculate(c,w,goal,c.asOf());
+  }
+  private Calculation calculate(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Instant evaluationHorizon){
     var slots=decode(goal.get("slotsJson"));
     if(!(slots.get("scope") instanceof Map<?,?> scope)||!Set.of("itemId","lotId","placeId","workId").containsAll(scope.keySet()))throw DomainError.invalid("Typed bounded goal scope required");
     if(scope.get("itemId")!=null&&!Objects.equals(scope.get("itemId"),w.get("itemId"))||scope.get("workId")!=null&&!Objects.equals(scope.get("workId"),w.get("ID")))throw DomainError.forbidden();
@@ -63,7 +66,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     try{d=definition(goal,c);}catch(DomainError|NoSuchElementException|IllegalStateException e){return held(goal,slots,"PINNED_CONTRACT_UNAVAILABLE");}
     var policy=policies.current(c.organizationId(),"EVIDENCE",c.asOf()).stream().filter(p->p.get("createdAt")!=null&&!instant(p.get("createdAt")).isAfter(c.knownAt())&&Objects.equals(slots.get("evidencePolicyVersion"),p.get("version"))).toList();
     if(policy.size()!=1)return held(goal,slots,"EVIDENCE_POLICY_UNRESOLVED");
-    var facts=provider.load(c,w,slots,d,goal.get("ID").toString());Map<String,Object> predicate=goalPredicate(d,slots);
+    var facts=provider.load(c,w,slots,d,goal.get("ID").toString(),evaluationHorizon);Map<String,Object> predicate=goalPredicate(d,slots);
     TypedPredicateEvaluator.Result result;
     String mode=slots.get("quantityMode").toString();
     if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"),!Boolean.FALSE.equals(slots.get("periodStartInclusive")),!Boolean.FALSE.equals(slots.get("periodEndInclusive")));
@@ -96,7 +99,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   }
   private Definition.Goal template(Definition d,Map<String,Object> slots){var candidates=d.goals().stream().filter(g->Objects.equals(g.endpoint(),slots.get("endpoint"))&&Objects.equals(g.quantityMode(),slots.get("quantityMode"))).toList();if(candidates.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique pinned goal template required");return candidates.getFirst();}
   private Calculation held(Map<String,Object> goal,Map<String,Object> slots,String reason){String payload=encode(Map.of("goalId",goal.get("ID"),"goal",goal,"slots",slots,"unknown",reason));return new Calculation(new TypedPredicateEvaluator.Result(new PredicateTruth(PredicateTruth.State.UNVERIFIED,false),List.of()),DefinitionRepository.sha256(payload),payload,null,true);}
-  private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;if(c.asOf().equals(instant(slots.get("dueAt")))&&Boolean.TRUE.equals(slots.get("deadlineInclusive")))return false;Instant boundary=instant(slots.get("dueAt"));if(Boolean.FALSE.equals(slots.get("deadlineInclusive")))boundary=boundary.minusNanos(1);var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),boundary,c.knownAt());var atDeadline=calculate(deadlineContext,w,goal);return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}
+  private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;if(c.asOf().equals(instant(slots.get("dueAt")))&&Boolean.TRUE.equals(slots.get("deadlineInclusive")))return false;Instant boundary=instant(slots.get("dueAt"));if(Boolean.FALSE.equals(slots.get("deadlineInclusive")))boundary=boundary.minusNanos(1);var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),boundary,c.knownAt());var atDeadline=calculate(deadlineContext,w,goal,c.asOf());return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}
   private Map<String,Object> latest(DomainContext c,String workId,String goalId){
     var all=repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(a->workId.equals(a.get("workId"))).toList();
     var previousIds=new HashSet<Object>();all.forEach(a->{if(a.get("previousAssessmentId")!=null)previousIds.add(a.get("previousAssessmentId"));});

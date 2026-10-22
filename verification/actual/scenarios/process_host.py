@@ -11,8 +11,12 @@ process state before and after (instanceId = OS pid) and an honest terminal stat
 attachment to that same instance without launching it; stop of a stopped one is FAILED (exit 3). All roles share the
 application lifecycle. --quiet-ensure
 starts a stopped JVM before a fixture installation and writes no report.
+--op stage-clock --instant ISO stores desired time in <pid-file>.clock.json only
+while stopped. It reports PENDING_RESTART, never a server-applied clock. A launch
+uses that instant before any runtime role starts; the Java adapter must verify
+the actual server authority-clock response after launch.
 """
-import argparse, datetime, fcntl, json, os, signal, subprocess, sys, time, urllib.error, urllib.request
+import argparse, datetime, fcntl, json, os, signal, subprocess, sys, tempfile, time, urllib.error, urllib.request
 
 
 def now():
@@ -87,6 +91,13 @@ def start(argv, port, log, pid_file):
     if answers(port):
         raise RuntimeError('backend port already answers without the tracked process')
     argv = [a for a in argv if not a.startswith('--server.port=')] + [f'--server.port={port}']
+    clock_file = pid_file + '.clock.json'
+    if os.path.isfile(clock_file):
+        with open(clock_file) as source:
+            desired = json.load(source)['instant']
+        validate_instant(desired)
+        argv = [a for a in argv if not a.startswith('--mulino.verification.instant=')]
+        argv.append('--mulino.verification.instant=' + desired)
     with open(log, 'ab') as out:
         out.write(f'\n# process_host.py start {now()}\n'.encode())
         out.flush()
@@ -108,6 +119,7 @@ def main():
     for name in ('--op', '--process-id', '--pid-file', '--argv-json', '--port', '--log', '--scope-json', '--out', '--before-json'):
         p.add_argument(name, required=name not in ('--out', '--scope-json', '--process-id', '--before-json'))
     p.add_argument('--quiet-ensure', action='store_true')
+    p.add_argument('--instant')
     a = p.parse_args()
     # Parallel role controls share one application. Keep the real transition serialized.
     with open(a.pid_file + '.lock', 'a') as lock:
@@ -115,8 +127,34 @@ def main():
         return execute(a)
 
 
+def validate_instant(value):
+    parsed = datetime.datetime.fromisoformat(value.replace('Z', '+00:00'))
+    if parsed.tzinfo is None:
+        raise ValueError('clock instant must have an offset')
+
+
+def stage_clock(a):
+    """Persist intent only while stopped; never claim an HTTP clock was applied."""
+    validate_instant(a.instant)
+    before = state('application', a.pid_file)
+    if before['status'] != 'STOPPED':
+        print(json.dumps({'status': 'RUNNING', 'processObservation': before}))
+        return 4
+    report = {'instant': a.instant, 'status': 'PENDING_RESTART', 'authorityClockApplied': False,
+              'processObservation': before, 'recordedAt': now()}
+    clock_file = a.pid_file + '.clock.json'
+    with tempfile.NamedTemporaryFile('w', dir=os.path.dirname(clock_file), delete=False) as target:
+        json.dump(report, target)
+        name = target.name
+    os.replace(name, clock_file)
+    print(json.dumps(report))
+    return 0
+
+
 def execute(a):
     argv = json.loads(a.argv_json)
+    if a.op == 'stage-clock':
+        return stage_clock(a)
     if a.op not in ('start', 'stop', 'restart'):
         raise ValueError('unsupported process operation')
     if a.quiet_ensure:

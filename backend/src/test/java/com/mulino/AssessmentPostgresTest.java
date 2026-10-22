@@ -112,6 +112,9 @@ class AssessmentPostgresTest {
   return place;
  }
  Map<String,Object> canonicalStateGoal(String place,Instant evaluationAt,boolean inclusive)throws Exception{
+  return canonicalStateGoal(place,evaluationAt,inclusive,true);
+ }
+ Map<String,Object> canonicalStateGoal(String place,Instant evaluationAt,boolean inclusive,boolean exactSource)throws Exception{
   var content=json.readValue(jdbc.queryForObject("SELECT content FROM mulino_definitions_DefinitionVersions WHERE ID=?",String.class,definition),Map.class);
   definition=id();content.put("id",definition);content.put("version","state-v1");
   var predicate=Map.<String,Object>of("operator","quantitySum","property","Receipt.quantity","minimum",Map.of("value","1","unit","BOX"),"unit","BOX","evidenceSelector","VERIFIED_DISTINCT");
@@ -120,6 +123,7 @@ class AssessmentPostgresTest {
   insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",definition,"version","state-v1","state","PUBLISHED","contentHash",DefinitionRepository.sha256(encoded),"content",encoded,"evaluatorVersion","core-v1","schemaVersion","1.0.0","createdAt",Timestamp.from(t.minusSeconds(100))));
   work=id();var w=scoped(work);w.putAll(row("effectiveAt",Timestamp.from(t.minusSeconds(100)),"itemId",item,"definitionVersionId",definition,"kind","CHECK","status","ACTIVE","ownerId",actor,"supervisorId",actor,"lifecycleMode","COMMAND"));insert("mulino_work_read_Works",w);
   var slots=row("quantityMode","STATE_AT","targetQuantity","20","unit","BOX","endpoint","VERIFIED","scope",Map.of("workId",work),"timezone","UTC","evidencePolicyVersion","fixture-evidence-v1","evaluationAt",evaluationAt.toString(),"placeId",place,"action","PHYSICAL","includeReserved",true,"conditions",List.of("Verified"),"evaluatorVersion","core-v1","dueAt",t.toString(),"deadlineInclusive",inclusive,"evidenceSource",Map.of("sourceNamespace","fixture","externalEventId","EV-READY","sourceVersion","1"));
+  if(!exactSource)slots.remove("evidenceSource");
   com.mulino.domain.work.GoalInput.validate(slots,true);
   String next=id();var g=scoped(next);g.putAll(row("effectiveAt",Timestamp.from(t.minusSeconds(1)),"workId",work,"definitionVersionId",definition,"quantityMode","STATE_AT","targetQuantity",new BigDecimal("20"),"unit","BOX","endpoint","VERIFIED","scopeJson","{}","slotsJson",json.writeValueAsString(slots),"goalVersion",1));insert("mulino_work_read_GoalReferences",g);
   jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE ID=?",next,work);goal=next;return slots;
@@ -158,6 +162,27 @@ class AssessmentPostgresTest {
   occurrence(id(),"10",t,"EV-READY",place,null);
   var boundary=(Map<?,?>)assess(t).get("assessment");assertEquals("UNSATISFIED",boundary.get("outcome"));assertEquals(false,boundary.get("deadlineViolated"));
   var overdue=(Map<?,?>)assess(t.plusSeconds(1)).get("assessment");assertEquals("UNSATISFIED",overdue.get("outcome"));assertEquals(true,overdue.get("deadlineViolated"));
+ }
+ @Test void exclusiveDeadlineUsesCutoffWithoutMovingFixedStateEvaluationIntoFuture()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t,false);
+  occurrence(id(),"10",t.minusSeconds(1),"EV-READY",place,null);
+  var boundary=(Map<?,?>)assess(t).get("assessment");
+  assertEquals("UNSATISFIED",boundary.get("outcome"));
+  assertEquals(true,boundary.get("deadlineViolated"),"known shortage before the exclusive deadline must survive the fixed evaluationAt guard");
+ }
+ @Test void exclusiveDeadlineExcludesEvidenceAtDueAndNeverPredictsFutureState()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t,false,false);
+  occurrence(id(),"10",t.minusSeconds(1),"BEFORE-DUE",place,null);
+  occurrence(id(),"10",t,"EV-READY",place,null);
+  var boundary=(Map<?,?>)assess(t).get("assessment");
+  assertEquals("SATISFIED",boundary.get("outcome"));
+  assertEquals(true,boundary.get("deadlineViolated"),"the second 10 is late for an exclusive deadline");
+ }
+ @Test void exclusiveDeadlineCannotAssessFutureState()throws Exception{
+  String place=physicalTwenty();canonicalStateGoal(place,t.plusSeconds(10),false);
+  occurrence(id(),"10",t.minusSeconds(1),"EV-READY",place,null);
+  var future=(Map<?,?>)assess(t).get("assessment");
+  assertEquals("UNVERIFIED",future.get("outcome"));assertEquals(false,future.get("deadlineViolated"));
  }
  @Test void canonicalEvidenceDoesNotProveEligibilityOrUnreservedQuantity()throws Exception{
   String place=physicalTwenty();var slots=canonicalStateGoal(place,t,true);

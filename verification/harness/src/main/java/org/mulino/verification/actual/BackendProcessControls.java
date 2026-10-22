@@ -28,6 +28,27 @@ final class BackendProcessControls {
     BackendProcessControls(Path root,String run,URI base,Map<String,String> env){this.root=root;this.run=run;this.base=base;pidFile=env.get("ACTUAL_BACKEND_PID_FILE");argv=env.get("ACTUAL_BACKEND_ARGV");log=env.get("ACTUAL_BACKEND_LOG");}
     boolean available(){return pidFile!=null&&argv!=null&&log!=null&&Files.isRegularFile(Path.of(pidFile));}
 
+    /** Persist a verified running clock for the next launch; this is host state, never server proof. */
+    synchronized void rememberAppliedClock(String instant) throws IOException {
+        if(!available())return;
+        Instant.parse(instant);
+        Path target=Path.of(pidFile+".clock.json"),temporary=Files.createTempFile(target.getParent(),"clock-",".json");
+        try {Json.write(temporary,Json.object().put("instant",instant).put("status","SERVER_VERIFIED").put("authorityClockApplied",true));
+            Files.move(temporary,target,StandardCopyOption.ATOMIC_MOVE,StandardCopyOption.REPLACE_EXISTING);
+        } finally {Files.deleteIfExists(temporary);}
+    }
+    /** Null means the tracked process is running. A stopped process records only desired clock intent. */
+    synchronized ObjectNode stageClockWhenStopped(String instant) throws IOException,InterruptedException {
+        if(!available())return null;
+        Instant.parse(instant);
+        var outcome=exec(base(List.of("--op","stage-clock","--instant",instant)));
+        if(outcome.code==4)return null;
+        if(outcome.code!=0)throw new IllegalStateException("Cannot stage stopped clock: "+outcome.output.strip());
+        var observation=(ObjectNode)Json.parse(outcome.output);
+        if(!"PENDING_RESTART".equals(observation.path("status").asText())||observation.path("authorityClockApplied").asBoolean(true)
+            ||!"STOPPED".equals(observation.path("processObservation").path("status").asText()))throw new IllegalStateException("Invalid stopped clock observation");
+        return observation;
+    }
     /** Before a fixture installation: a subcase that stopped the backend must not leave the next one without it. */
     synchronized void ensureRunning() throws IOException,InterruptedException{
         if(!available())return;var o=exec(base(List.of("--op","start","--quiet-ensure")));if(o.code!=0)throw new IllegalStateException("Backend ensure-start failed: "+o.output.strip());
@@ -67,7 +88,7 @@ final class BackendProcessControls {
         var tools=host.putArray("toolVersions");tools.add(Json.object().put("name","python3").put("version",version("python3","--version")));tools.add(Json.object().put("name","java").put("version",System.getProperty("java.version")));
         host.set("environment",environment);host.set("inputArtifacts",Json.array());host.set("generatedOutputs",generated);host.set("observedArtifacts",Json.array());
         host.set("extractor",extractor);host.set("operationEvidence",identity);host.put("evidenceClass","ACTUAL_HOST");host.set("processObservation",Json.read(root.resolve(report)).path("processObservation"));
-        var data=Json.object();data.put("acknowledged",true).put("controlType","process").put("operation",operation).put("acknowledgedAt",completed.toString());
+        var data=Json.object();data.put("acknowledged",outcome.code==0).put("controlType","process").put("operation",operation).put("acknowledgedAt",completed.toString());
         JsonNode terminal=Json.read(root.resolve(report));
         String processAction=terminal.path("rows").path("processAction").asText();
         data.put("processAction",processAction).put("roleConfirmed",outcome.code==0&&operation.equals("start"));

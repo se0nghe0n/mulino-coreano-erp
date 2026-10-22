@@ -121,6 +121,29 @@ class ProcessHostTest(unittest.TestCase):
         self.assertEqual('RUNNING', failed['processObservation']['after']['status'])
         self.assertEqual('stale-pid', failed['processObservation']['before']['instanceId'])
 
+    def test_stopped_clock_is_intent_only_and_launch_uses_it(self):
+        self.args.instant = '2026-10-07T09:00:11Z'
+        self.args.op = 'stage-clock'
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(0, host.execute(self.args))
+        pending = json.loads(out.getvalue())
+        self.assertEqual('PENDING_RESTART', pending['status'])
+        self.assertFalse(pending['authorityClockApplied'])
+        self.assertFalse(host.answers(self.port))
+        # Capture the real launch arguments; the generic HTTP smoke app need not interpret a clock.
+        with patch.object(host.subprocess, 'Popen', side_effect=RuntimeError('captured')) as spawn:
+            with self.assertRaisesRegex(RuntimeError, 'captured'):
+                host.start(json.loads(self.args.argv_json), self.port, self.args.log, self.args.pid_file)
+        self.assertIn('--mulino.verification.instant=' + self.args.instant, spawn.call_args.args[0])
+
+    def test_running_clock_cannot_be_staged_as_applied(self):
+        self.run_control('start')
+        self.args.op, self.args.instant = 'stage-clock', '2026-10-07T09:00:11Z'
+        with contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(4, host.execute(self.args))
+        self.assertEqual('RUNNING', json.loads(out.getvalue())['status'])
+        self.assertFalse(pathlib.Path(self.args.pid_file + '.clock.json').exists())
+
     def test_start_failure_keeps_terminal_evidence(self):
         self.args.argv_json = json.dumps([sys.executable, '-c', 'raise SystemExit(7)'])
         code, failed = self.run_control('start')

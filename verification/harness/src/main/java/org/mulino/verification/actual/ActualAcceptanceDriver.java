@@ -28,12 +28,15 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private final SchedulerHostControls schedulerControls;
     private final JdbcObservation observer;
     private final BackendProcessControls processes;
-    /** Last instant this harness set on the verification clock; re-applied after a process start (test infrastructure). */
+    /** Desired instant: server-verified while running, or host-staged while stopped. Verified again after launch. */
     private volatile String lastClock;
     public ActualAcceptanceDriver(Path root,ActualConfiguration configuration) {
+        this(root,configuration,System.getenv());
+    }
+    ActualAcceptanceDriver(Path root,ActualConfiguration configuration,Map<String,String> processEnvironment) {
         this.root=root;this.configuration=configuration;signer=new JwtSigner(configuration);
         fixtures=new FixtureInstaller(configuration);observer=new JdbcObservation(configuration);hostControls=new HostProcessControls(root,run);schedulerControls=new SchedulerHostControls(root,run);
-        processes=new BackendProcessControls(root,run,configuration.baseUri(),System.getenv());
+        processes=new BackendProcessControls(root,run,configuration.baseUri(),processEnvironment);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
     @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","worker","management","blob","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
@@ -78,7 +81,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         if(result.statusCode()!=200)throw new IllegalStateException("Fixture-start clock HTTP "+result.statusCode());
         var response=Json.parse(result.body());
         if(!response.path("authorityClock").asBoolean()||!Instant.parse(start).equals(Instant.parse(response.path("instant").asText())))throw new IllegalStateException("Fixture-start clock not applied");
-        lastClock=start;
+        lastClock=start;processes.rememberAppliedClock(start);
     }
     /** Credential identity: binding manifest applied, organization claim set to this suite installation's external alias. */
     private JsonNode credentialActor(JsonNode actor) throws Exception {
@@ -331,7 +334,11 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
                 // The verification clock is test infrastructure held in backend memory: re-apply the last instant after a launch.
                 if(result.data() instanceof ObjectNode data&&data.path("launched").asBoolean()&&lastClock!=null&&controlActor!=null){
                     var call=HttpRequest.newBuilder(configuration.baseUri().resolve("/__verification/runtime/clock")).timeout(Duration.ofSeconds(10)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(controlActor)).POST(HttpRequest.BodyPublishers.ofString(Json.object().put("instant",lastClock).toString())).build();
-                    var response=http.send(call,HttpResponse.BodyHandlers.ofString());data.put("clockReapplied",lastClock).put("clockReapplyHttpStatus",response.statusCode());}
+                    var response=http.send(call,HttpResponse.BodyHandlers.ofString());
+                    var verified=clockAcknowledgment(response.statusCode(),lastClock,Json.parse(response.body()));
+                    data.put("clockReapplied",lastClock).put("clockReapplyHttpStatus",response.statusCode());
+                    data.set("clockServerObservation",verified.path("serverObservation"));
+                    processes.rememberAppliedClock(lastClock);}
                 return result;}
             catch(InterruptedException interrupted){Thread.currentThread().interrupt();throw new IllegalStateException("Process control interrupted",interrupted);}
             catch(Exception failure){throw new IllegalStateException("Process control failure: "+failure.getMessage(),failure);}
@@ -345,6 +352,17 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         String instant=null;for(String key:List.of("instant","asOf","knownAt"))if(request.path("parameters").hasNonNull(key)){instant=request.path("parameters").path(key).asText();break;}
         if(instant==null)throw new IllegalArgumentException("Clock control requires instant, asOf or knownAt");
         try {
+            if(lastClock!=null&&Instant.parse(instant).isBefore(Instant.parse(lastClock)))throw new IllegalArgumentException("Clock cannot go backwards");
+            var staged=processes.stageClockWhenStopped(instant);
+            if(staged!=null){
+                lastClock=instant;
+                var data=Json.object().put("acknowledged",true).put("controlType","clock")
+                    .put("operation",request.path("operation").asText()).put("acknowledgedAt",Instant.now().toString())
+                    .put("instant",instant).put("status","PENDING_RESTART").put("authorityClockApplied",false);
+                data.set("hostObservation",staged);
+                var receipt=Json.object().put("httpExecuted",false).put("desiredInstant",instant);receipt.set("requestedControl",request);receipt.set("hostObservation",staged);
+                return executed(id,data,null,provenance(null,"HOST_DESIRED_CLOCK",false,null,null),receipt);
+            }
             var body=Json.object();body.put("instant",instant);
             var uri=configuration.baseUri().resolve("/__verification/runtime/clock");
             var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(10)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(controlActor)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
@@ -352,7 +370,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification clock profile not installed");
             var response=Json.parse(result.body());
             var data=clockAcknowledgment(result.statusCode(),body.path("instant").asText(),response);data.put("operation",request.path("operation").asText());
-            if(result.statusCode()==200)lastClock=body.path("instant").asText();
+            lastClock=body.path("instant").asText();processes.rememberAppliedClock(lastClock);
             var receipt=Json.object();receipt.put("httpStatus",result.statusCode()).put("path",uri.getPath());receipt.set("requestedControl",request);receipt.set("wireRequest",body);receipt.set("serverResponse",response);
             return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_CLOCK",false,null,null),receipt);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual clock interrupted",failure);}
@@ -527,7 +545,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     }
     static ObjectNode clockAcknowledgment(int httpStatus,String requestedInstant,JsonNode serverResponse) {
         if(httpStatus!=200||!serverResponse.path("authorityClock").asBoolean()||!"verification".equals(serverResponse.path("profile").asText())||!Instant.parse(requestedInstant).equals(Instant.parse(serverResponse.path("instant").asText())))throw new IllegalStateException("Verification clock control did not prove applied authority clock");
-        var data=Json.object();data.put("acknowledged",true).put("controlType","clock").put("operation","advanceTo").put("acknowledgedAt",Instant.now().toString());data.set("instant",serverResponse.path("instant"));data.set("serverObservation",serverResponse);return data;
+        var data=Json.object();data.put("acknowledged",true).put("controlType","clock").put("operation","advanceTo").put("acknowledgedAt",Instant.now().toString());data.put("status","SERVER_VERIFIED").put("authorityClockApplied",true);data.set("instant",serverResponse.path("instant"));data.set("serverObservation",serverResponse);return data;
     }
     /** route=direct: the product's exposed generic write action, CAP OData OntologyService.command(requestJson) at /odata/v4/ontology/command. */
     private StepResult odataCommand(String id,JsonNode actor,String capability,JsonNode request) {
