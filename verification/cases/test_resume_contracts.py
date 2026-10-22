@@ -111,6 +111,8 @@ class ResumeContracts(unittest.TestCase):
                 create = next((a for a in sub['actions'] if a['id'] == 'create' and a.get('capabilityId') == 'createWork'), None)
                 if create is None:
                     continue
+                self.assertEqual({'$alias': 'P'}, create['request']['slots']['itemId'])
+                self.assertEqual({'$alias': 'RECOVERY_DEFINITION_V1'}, create['request']['slots']['definitionVersionId'])
                 goal = create['request']['slots']['goal']
                 self.assertEqual('STATE_AT', goal['quantityMode'])
                 self.assertEqual('VERIFIED', goal['endpoint'])

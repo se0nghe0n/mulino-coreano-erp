@@ -88,3 +88,20 @@ Astra의 Ultrafast 지원은 live catalog에서 확인했다. child 실행의
 새 Work/Goal 생성으로 고쳤다. snapshot에 predicate 문자열 전체가
 들어 있다고 가정한 test도 실제 immutable definition ID/hash와
 발행 내용의 selector를 대조하도록 고쳤다. 제품 guard를 완화하지 않았다.
+
+### 첫 실제 실행과 입력 보완
+
+`f6e0f8e02107700de758407218be28b9e8564af8` clean snapshot에서
+`./verify scenarios --actual verification/cases/V5/case.json
+verification/cases/T26/case.json`을 실행했다. 선택29개를 모두 시작/종료했고
+198 actions를 실행했다. PASS0 / FAIL29다. createWork 17개는
+`TYPE_INVALID: Invalid definitionVersionId`로 거부됐다. 중첩 goal form은
+flat form과 달리 itemId와 definitionVersionId를 명시해야 한다.
+따라서 RECOVERY_DEFINITION_V1 alias를 실제 PUBLISHED definition-v1에
+연결하고 두 slot을 명시한다. 서버의 누락 입력 검사는 유지한다.
+
+첫 run 원본은
+`verification/harness/target/evidence/actual-scenarios-run-9a01e43d-0d84-413c-b69f-b63171cd7add/`
+이다. disposable DB는 runner가 종료했다. 설치가 지원하지 않는 나머지
+baseline 및 runtime/관찰 경로도 있어 전체 fixtureComplete는 false다.
+이를 목표 기능의 성공이나 전체 복구 PASS로 세지 않는다.

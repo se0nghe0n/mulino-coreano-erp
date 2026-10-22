@@ -88,6 +88,14 @@ def apply_recovery(case, counts):
         if not creates:
             continue
         goal = creates[0]['request']['slots']['goal']
+        for key, value in {'itemId': {'$alias': 'P'}, 'definitionVersionId': {'$alias': 'RECOVERY_DEFINITION_V1'}}.items():
+            slots = creates[0]['request']['slots']
+            if key not in slots:
+                slots[key] = value
+                creates[0]['request'].setdefault('provenance', {})[key] = 'CONTEXT'
+                counts['explicitRecoveryIdentity'] += 1
+            elif slots[key] != value:
+                raise ValueError(f"conflicting recovery {key}")
         if goal.get('quantityMode') != 'STATE_AT' or goal.get('endpoint') != 'VERIFIED':
             continue
         additions = {'evaluationAt': goal['dueAt'], 'action': 'PHYSICAL', 'includeReserved': True,
@@ -130,6 +138,10 @@ def apply_recovery_fixture(fixture):
     if not contract:
         return False
     pins_changed = False
+    if 'RECOVERY_DEFINITION_V1' not in fixture['aliases']:
+        fixture['aliases']['RECOVERY_DEFINITION_V1'] = {
+            'type': 'DefinitionVersion', 'version': 'definition-v1', 'state': 'PUBLISHED'}
+        pins_changed = True
     for artifact in fixture['baseline'].get('definitionArtifacts', []):
         if artifact.get('definitionVersion') == 'definition-v1' and artifact.get('evaluatorVersion') == 'evaluator-v1':
             artifact['evaluatorVersion'] = 'core-v1'
