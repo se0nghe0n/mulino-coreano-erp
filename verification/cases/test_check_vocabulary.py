@@ -35,6 +35,15 @@ class VocabularyMutants(unittest.TestCase):
         found = self.problems(case([eq('o', 'cmd', '/response/outcome', 'PENDING_EXTERNAL'), eq('c', 'cmd', '/response/error/code', 'MADE_UP_CODE')]))
         self.assertTrue(any('PENDING_EXTERNAL' in p for p in found) and any('MADE_UP_CODE' in p for p in found))
 
+    def test_retired_exclusion_pair_fails(self):
+        found = self.problems(case([eq('o', 'cmd', '/response/outcome', 'REJECTED'),
+                                    eq('c', 'cmd', '/response/error/code', 'CAPABILITY_UNSUPPORTED')]))
+        self.assertTrue(any('CAPABILITY_UNSUPPORTED is asserted with outcome REJECTED' in p for p in found))
+
+    def test_current_exclusion_pair_passes(self):
+        self.assertEqual([], self.problems(case([eq('o', 'cmd', '/response/outcome', 'HELD'),
+                                                eq('c', 'cmd', '/response/error/code', 'VERSION_UNSUPPORTED')])))
+
     def test_retired_audit_names_fail(self):
         found = self.problems(case([{'id': 'a', 'op': 'count', 'source': {'actionId': 'db', 'pointer': '/data/rawRows/audit', 'where': {'commandKey': 'k', 'result': 'FORBIDDEN'}}, 'expected': 1},
             {'id': 'b', 'op': 'equals', 'source': {'actionId': 'db', 'pointer': '/data/rawRows/denialAudit'}, 'expected': 'FORBIDDEN'},

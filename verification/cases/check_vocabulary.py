@@ -68,7 +68,6 @@ PENDING = {
     ('code', 'ORGANIZATION_SCOPE_INVALID'): ('T21', '§8 발행 검사', 'definition validation finding code'),
     ('code', 'REGRESSION_FAILED'): ('T21', '§8 발행 검사', 'definition validation finding code'),
     ('code', 'AUDIT_PERSISTENCE_FAILED'): ('T24', '§7.4', 'audit write failure rolls back the business effect; the backend has no structured code for it'),
-    ('pair', 'CAPABILITY_UNSUPPORTED/REJECTED'): ('T01', '§1 제외 범위·D01', 'an excluded capability (manufacture, BOM, B2C, GL, tax, bank transfer) is a permanent rejection, not a HELD responsibility; the vocabulary allows only HELD'),
     ('outcome', 'STRUCTURED'): ('T20', '§3.3', 'structureIntent effect-free structuring result; the vocabulary lists only VALIDATED for validateCommand'),
     ('kind', 'SALES_PROMISE'): ('C1,V2', '§4.2·§13.2 V2', 'customer sales promise obligation; ALLOCATION_SHORTAGE covers only the shortage part'),
     ('kind', 'RECONCILIATION'): ('T17', '§6 판매·§13.1 D17', 'source claim intake reconciliation; candidates DELIVERY_RECONCILIATION or UNVERIFIED_SOURCE_REVIEW'),
