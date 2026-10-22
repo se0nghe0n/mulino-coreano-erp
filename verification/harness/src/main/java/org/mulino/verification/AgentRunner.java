@@ -25,13 +25,14 @@ public interface AgentRunner {
     }
     /** Actual host receives raw user input plus permitted context, never oracle or scripted intent. */
     interface ActualClientPort {
+        default Set<String> providedAdapters() { return Set.of("client","model","skills"); }
         StepResult execute(String actionId, String route, JsonNode actor, String userUtterance, JsonNode permittedContext);
     }
     final class Actual implements AgentRunner {
         private final ActualClientPort client;
         public Actual(ActualClientPort client) { this.client=Objects.requireNonNull(client); }
         public String kind() { return "ACTUAL_UAT"; }
-        public Set<String> providedAdapters() { return Set.of("client","model","skills"); }
+        public Set<String> providedAdapters() { return client.providedAdapters(); }
         public boolean actualClient() { return true; }
         public StepResult run(String id,String route,JsonNode actor,JsonNode action,AcceptanceDriver ignored) {
             return client.execute(id,route,actor,Json.required(action,"userUtterance"),action.get("permittedContext"));

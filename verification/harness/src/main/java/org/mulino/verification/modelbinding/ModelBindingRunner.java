@@ -55,10 +55,19 @@ public final class ModelBindingRunner {
             save(step,driver.observe(step,request),"observe");if(executed(step))validateSnapshot(results.get(step),request);
         } else {
             ObjectNode action=Json.object();action.put("userUtterance",source.path("input").path("utterance").asText());
-            ObjectNode context=results.get(prefix+"/context").path("data").path("permittedContext").deepCopy();ArrayNode prior=Json.array();
+            ObjectNode context=results.get(prefix+"/context").path("data").path("permittedContext").deepCopy();ArrayNode prior=Json.array(), conversation=Json.array();
             int ordinal=Integer.parseInt(prefix.substring(5));JsonNode sourceCase=contract.sourceCase(binding);
-            for(int i=0;i<ordinal-1;i++) {prior.add(sourceCase.path("turns").get(i).path("input").path("utterance"));String earlier="turn-"+(i+1)+"/agent";if(results.containsKey(earlier)&&executed(earlier)) {context.set("previousClientResult",results.get(earlier).path("response"));}}
-            context.set("priorUserTurns",prior);checkContext(context);action.set("permittedContext",context);
+            for(int i=0;i<ordinal-1;i++) {
+                String earlier="turn-"+(i+1)+"/agent";
+                if(results.containsKey(earlier)&&executed(earlier)) {
+                    JsonNode user=sourceCase.path("turns").get(i).path("input").path("utterance");
+                    JsonNode response=results.get(earlier).path("response");
+                    prior.add(user);context.set("previousClientResult",response);
+                    conversation.add(Json.object().put("role","user").set("content",user));
+                    conversation.add(Json.object().put("role","assistant").set("content",response));
+                }
+            }
+            context.set("priorUserTurns",prior);context.set("priorConversation",conversation);checkContext(context);action.set("permittedContext",context);
             // Only scripted runner is given typed intent. Actual action has no expected fields.
             if(profile.equals("SIT")) {JsonNode intent=source.path("expectedIntent").deepCopy();((ObjectNode)intent).put("capabilityId",turn.path("capabilityMapping").path("public").asText());((ObjectNode)intent).set("slots",resolveSlotValues(intent.path("slots")));action.set("intent",intent);}
             if(profile.equals("UAT")) {
@@ -77,7 +86,7 @@ public final class ModelBindingRunner {
     private void save(String step,StepResult result,String kind) throws IOException {BindingContract.require(result.actionId().equals(step),"Driver action identity mismatch");contract.validator.result(result,kind);if(result.driverStatus()==StepResult.DriverStatus.EXECUTED&&Set.of("query","agent").contains(kind)){JsonNode observed=result.provenance().path("authenticatedActor");String profile=kind.equals("query")?"read-probe-actor":"command-actor";JsonNode requested=fixture.path("actors").path(profile);for(String k:List.of("issuer","subject","audience"))BindingContract.require(observed.path(k).equals(requested.path(k)),"Actual authenticated principal mismatch "+k);BindingContract.require(observed.path("organizationId").equals(aliasMap.path("org")),"Actual authenticated organization mismatch");if(kind.equals("query")||this.profile.equals("SIT"))BindingContract.require(observed.path("grantId").equals(aliasMap.path(requested.path("grant").path("scope").path("grantAlias").asText())),"Actual authenticated grant mismatch");}results.put(step,result.toJson());}
     private boolean executed(String id){return results.containsKey(id)&&results.get(id).path("driverStatus").asText().equals("EXECUTED");}
     public static void checkContext(JsonNode n){
-        if(n.isObject())n.fields().forEachRemaining(e->{BindingContract.require(!Set.of("expectedIntent","expected","oracle","oracleRef","assertions","acceptanceProposal","requirementRefs","semanticFocus","plannedFixtureAssertionLabels","corpusCasePointer","corpusTurnPointer","corpusSha256","assertionId","bindingRef","plannedCaseTitle").contains(e.getKey()),"Oracle leaked to actual prompt: "+e.getKey());checkContext(e.getValue());});else if(n.isArray())n.forEach(ModelBindingRunner::checkContext);
+        if(n.isObject())n.fields().forEachRemaining(e->{BindingContract.require(!Set.of("title","fixture","fixtureBundle","expectedIntent","expected","oracle","oracleRef","assertions","acceptanceProposal","requirementRefs","semanticFocus","plannedFixtureAssertionLabels","corpusCasePointer","corpusTurnPointer","corpusSha256","assertionId","bindingRef","plannedCaseTitle").contains(e.getKey()),"Oracle leaked to actual prompt: "+e.getKey());checkContext(e.getValue());});else if(n.isArray())n.forEach(ModelBindingRunner::checkContext);
     }
     private void validateSnapshot(JsonNode result,JsonNode requested) throws IOException {
         JsonNode d=result.path("data");contract.validator.schema("contracts/acceptance-observation.schema.json",d);

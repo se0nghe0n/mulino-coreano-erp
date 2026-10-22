@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dedicated entry point. Does not change root verify or invoke actual models."""
+"""Dedicated entry point. Only explicit actual UAT may invoke the gated native model."""
 import pathlib,subprocess,sys,os
 root=pathlib.Path(__file__).resolve().parents[2]
 mode=sys.argv[1] if len(sys.argv)>1 else 'prepare'
@@ -9,11 +9,15 @@ base=[str(root/'mvnw'),'-B','-ntp','-f',str(root/'verification/harness/pom.xml')
 if mode in ('selftest','gherkin-red'):
  tests='ModelBindingContractTest,ModelBindingEvaluatorTest,ModelBindingResponseEvidenceTest' if mode=='selftest' else 'ModelBindingFeatureRed'
  raise SystemExit(subprocess.call(base+['-Dtest='+tests,'-Dverification.command=verification/model-binding/run '+mode+' '+profile,'-Dmodel.binding.profile='+profile,'test'],cwd=root))
-if mode not in ('prepare','red'): sys.exit('prepare|red|selftest|gherkin-red required')
+if mode not in ('prepare','red','native-preflight','actual'): sys.exit('prepare|red|selftest|gherkin-red|native-preflight|actual UAT required')
+if mode=='actual' and profile!='UAT': sys.exit('actual requires UAT profile')
 # Bindings only repeat corpus hashes; the reviewed lock pin and the corpus validator are the fence.
 corpus_check=subprocess.call([sys.executable,'-I',str(root/'verification/model-corpus/validate.py')],cwd=root)
 if corpus_check: raise SystemExit(corpus_check)
 code=subprocess.call(base+['-Dmaven.test.skip=true','package','dependency:build-classpath','-Dmdep.outputFile=target/model-binding-classpath.txt'],cwd=root)
 if code: raise SystemExit(code)
 cp=str(root/'verification/harness/target/classes')+os.pathsep+(root/'verification/harness/target/model-binding-classpath.txt').read_text().strip()
-raise SystemExit(subprocess.call(['java','-Drepo.root='+str(root),'-Dverification.command=verification/model-binding/run '+mode,'-cp',cp,'org.mulino.verification.modelbinding.ModelBindingMain',mode,profile],cwd=root))
+if mode=='native-preflight':
+ raise SystemExit(subprocess.call(['java','-Drepo.root='+str(root),'-cp',cp,'org.mulino.verification.nativeclient.NativeClientMain','preflight'],cwd=root))
+native=['-Dverification.nativeClient.enabled=true'] if mode=='actual' else []
+raise SystemExit(subprocess.call(['java']+native+['-Drepo.root='+str(root),'-Dverification.command=verification/model-binding/run '+mode,'-cp',cp,'org.mulino.verification.modelbinding.ModelBindingMain',mode,profile],cwd=root))
