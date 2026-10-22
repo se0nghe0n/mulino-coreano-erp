@@ -1379,6 +1379,12 @@ class Contracts:
                     continue
                 if code == 'FORBIDDEN' and key in declared:
                     continue
+                if code == 'FORBIDDEN' and action.get('route') == 'worker':
+                    import importlib.util
+                    spec = importlib.util.spec_from_file_location('worker_claim_contract', Path(__file__).with_name('worker_claim_contract.py'))
+                    module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+                    if module.explicit_lease_denial(action, actions, world.clock):
+                        continue
                 calls = self.authorized_calls(action)
                 verdicts = [self.covered(world, action['actorRef'], cap, request, action, clock) + (cap,) for cap, request in calls]
                 where = f"{case.get('caseId')}/{sub.get('id')}/{action.get('id')}"

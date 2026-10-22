@@ -403,6 +403,7 @@ def main():
     old_case, old_feature = case_path.read_text(), feature_path.read_text()
     old_bindings = (DIR / 'observation-bindings.json').read_text()
     case = build()
+    case = _load("worker_claim_author", ROOT / "verification/cases/author_worker_claims.py").patch(case)
     case_text = C3.render_case(case)
     feature_text = render_feature(case, old_feature.split('\n')[:3], previous_texts(old_feature))
     case_path.write_text(case_text)

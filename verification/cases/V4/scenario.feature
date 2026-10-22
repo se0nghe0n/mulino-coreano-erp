@@ -2066,6 +2066,8 @@
   시나리오: 대체 경로 worker의 inventory 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-inventory"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2103,11 +2105,15 @@
     그러면 "unchanged-effect-logisticsMemberships" assertion으로 "moveQuantity의 주 효과 원천 logisticsMemberships 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "unchanged-effect-custodyHandovers" assertion으로 "moveQuantity의 주 효과 원천 custodyHandovers 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 allocation 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-allocation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2144,14 +2150,23 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "reserveQuantity의 주 효과 원천 orders 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 work 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-work"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-negative-expired-issue" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-negative-expire-clock" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
+    만일 "delegator" 역할이 "worker-negative-missing" 행동을 수행한다
+    만일 "delegator" 역할이 "worker-negative-forged" 행동을 수행한다
+    만일 "delegator" 역할이 "worker-negative-expired" 행동을 수행한다
     만일 "reader" 역할이 "attempt" 행동을 수행한다
     만일 "delegator" 역할이 "after-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after" 행동을 수행한다
@@ -2183,13 +2198,20 @@
     그러면 "outbox-effects-rows0" assertion으로 "outbox-effects outbox-effects-rows0"를 확인한다
     그러면 "authorized-route-committed" assertion으로 "same-auth-path authorized-route-committed"를 확인한다
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
-    그러면 "unchanged-effect-goalVersions" assertion으로 "createDraft의 주 효과 원천 goalVersions 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
+    그러면 "unchanged-effect-goalVersions" assertion으로 "waitWork의 주 효과 원천 goalVersions 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-negative-missing-denied" assertion으로 "COMMAND 권한이 있는 actor라도 누락·위조·만료 claim은 실제 worker endpoint에서 효과 없이 거부한다."를 확인한다
+    그러면 "worker-negative-forged-denied" assertion으로 "COMMAND 권한이 있는 actor라도 누락·위조·만료 claim은 실제 worker endpoint에서 효과 없이 거부한다."를 확인한다
+    그러면 "worker-negative-expired-denied" assertion으로 "COMMAND 권한이 있는 actor라도 누락·위조·만료 claim은 실제 worker endpoint에서 효과 없이 거부한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 approval 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-approval"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2226,11 +2248,15 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-proposals" assertion으로 "approvePurchase의 주 효과 원천 proposals 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 trade 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-trade"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2267,11 +2293,15 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "createSalesOrder의 주 효과 원천 orders 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 evidence 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-evidence"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2308,11 +2338,15 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-stocktakes" assertion으로 "recordStocktake의 주 효과 원천 stocktakes 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 identity 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-identity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2349,11 +2383,15 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-validityBoundaries" assertion으로 "createGrant의 주 효과 원천 validityBoundaries 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 definition 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-definition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2390,11 +2428,15 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-definitionPackages" assertion으로 "createDefinitionDraft의 주 효과 원천 definitionPackages 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 policy 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-policy"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2431,11 +2473,15 @@
     그러면 "authorized-route-reaches-command" assertion으로 "same-auth-path authorized-route-reaches-command"를 확인한다
     그러면 "unchanged-effect-policyDrafts" assertion으로 "createPolicyDraft의 주 효과 원천 policyDrafts 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 worker의 operations 쓰기는 현재 READ 위임을 넘지 못한다
     먼저 사례 파일 "verification/cases/V4/case.json"의 "worker-operations"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-route" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -2473,6 +2519,8 @@
     그러면 "unchanged-effect-retryAttempts" assertion으로 "retrySafeCommand의 주 효과 원천 retryAttempts 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "unchanged-effect-executionAttempts" assertion으로 "retrySafeCommand의 주 효과 원천 executionAttempts 원행 전체를 조직 범위에서 거부 전후 exact 대조한다. 공용20개 원천에 없는 실제 업무 효과를 놓치지 않는다(C3 CAP_EFFECTS와 같은 표)."를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "거부된 reader 자신의 command record는 COMMITTED가 아니다. REJECTED record와 거부 감사는 허용된 별도 기록이다."를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-authorized-same-route-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 대체 경로 blob의 inventory 쓰기는 현재 READ 위임을 넘지 못한다

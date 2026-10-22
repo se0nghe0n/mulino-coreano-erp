@@ -213,7 +213,8 @@
                 "barrier",
                 "fault",
                 "process",
-                "externalResponder"
+                "externalResponder",
+                "workerClaim"
               ]
             },
             "operation": {
@@ -229,7 +230,81 @@
             "operation",
             "parameters"
           ],
-          "additionalProperties": false
+          "additionalProperties": false,
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "type": {
+                    "const": "workerClaim"
+                  }
+                }
+              },
+              "then": {
+                "properties": {
+                  "operation": {
+                    "const": "issue"
+                  },
+                  "parameters": {
+                    "type": "object",
+                    "required": [
+                      "actorRef",
+                      "workId",
+                      "capabilityId",
+                      "commandId",
+                      "workerId",
+                      "ttlSeconds"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                      "actorRef": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "workId": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "format": "uuid"
+                          },
+                          {
+                            "type": "object",
+                            "required": [
+                              "$alias"
+                            ],
+                            "properties": {
+                              "$alias": {
+                                "type": "string",
+                                "minLength": 1
+                              }
+                            },
+                            "additionalProperties": false
+                          }
+                        ]
+                      },
+                      "capabilityId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "commandId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "workerId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "ttlSeconds": {
+                        "type": "integer",
+                        "minimum": 1,
+                        "maximum": 300
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          ]
         },
         "intent": {
           "type": "object"
@@ -387,6 +462,53 @@
                   "minLength": 1
                 }
               }
+            },
+            "workerClaim": {
+              "description": "Explicit server-issued claim reference, resolved from a workerClaim issue control. Never implicitly issued by the adapter.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "required": [
+                    "$result"
+                  ],
+                  "properties": {
+                    "$result": {
+                      "type": "object",
+                      "required": [
+                        "actionId",
+                        "pointer"
+                      ],
+                      "properties": {
+                        "actionId": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "pointer": {
+                          "const": "/response/claim"
+                        }
+                      },
+                      "additionalProperties": false
+                    }
+                  },
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "claimId": {
+                      "type": "string"
+                    },
+                    "fencingToken": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "claimId",
+                    "fencingToken"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
             }
           }
         }

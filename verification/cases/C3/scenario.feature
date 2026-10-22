@@ -9156,6 +9156,8 @@
   시나리오: WRITE 역할·READ 위임에서 worker/splitQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-splitQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9199,11 +9201,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/mergeQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-mergeQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9247,11 +9253,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-genealogy" assertion으로 "inventory-effects unchanged-effect-genealogy"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/moveQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-moveQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9296,11 +9306,15 @@
     그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
     그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/adjustQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-adjustQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9345,11 +9359,15 @@
     그러면 "unchanged-effect-adjustmentProposals" assertion으로 "inventory-effects unchanged-effect-adjustmentProposals"를 확인한다
     그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/reserveQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-reserveQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9393,11 +9411,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/replaceAllocation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-replaceAllocation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9441,11 +9463,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/pickQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-pickQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9489,11 +9515,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-logisticsMemberships" assertion으로 "inventory-effects unchanged-effect-logisticsMemberships"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/dispatchQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-dispatchQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9538,11 +9568,15 @@
     그러면 "unchanged-effect-shipments" assertion으로 "followup-effects unchanged-effect-shipments"를 확인한다
     그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/confirmReceipt 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-confirmReceipt"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9587,11 +9621,15 @@
     그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
     그러면 "unchanged-effect-receiptContributions" assertion으로 "inventory-effects unchanged-effect-receiptContributions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/disposeQuantity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-disposeQuantity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9635,11 +9673,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createDraft 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createDraft"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9683,11 +9725,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/cancelDraft 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-cancelDraft"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9732,11 +9778,15 @@
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/activateWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-activateWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9780,11 +9830,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/waitWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-waitWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9828,11 +9882,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/resumeWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-resumeWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9876,11 +9934,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/reviseGoal 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-reviseGoal"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9924,11 +9986,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/closeWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-closeWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -9972,11 +10038,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-workClosures" assertion으로 "work-effects unchanged-effect-workClosures"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createFollowup 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createFollowup"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10020,11 +10090,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/resolveObligation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-resolveObligation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10069,11 +10143,15 @@
     그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
     그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/waiveObligation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-waiveObligation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10118,11 +10196,15 @@
     그러면 "unchanged-effect-obligationResolutions" assertion으로 "work-effects unchanged-effect-obligationResolutions"를 확인한다
     그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/transferObligation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-transferObligation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10172,11 +10254,15 @@
     그러면 "unchanged-effect-obligationTransfers" assertion으로 "work-effects unchanged-effect-obligationTransfers"를 확인한다
     그러면 "unchanged-effect-dutyTransitions" assertion으로 "work-effects unchanged-effect-dutyTransitions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/registerItem 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-registerItem"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10222,11 +10308,15 @@
     그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
     그러면 "unchanged-effect-unitConversions" assertion으로 "inventory-effects unchanged-effect-unitConversions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/linkExternalId 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-linkExternalId"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10270,11 +10360,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-externalIdentifiers" assertion으로 "inventory-effects unchanged-effect-externalIdentifiers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/attachEvidence 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-attachEvidence"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10320,11 +10414,15 @@
     그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/correctEvidence 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-correctEvidence"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10371,11 +10469,15 @@
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "unchanged-effect-evidence_revisions" assertion으로 "followup-effects unchanged-effect-evidence_revisions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/proposePurchase 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-proposePurchase"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10420,11 +10522,15 @@
     그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
     그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revisePurchase 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-revisePurchase"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10469,11 +10575,15 @@
     그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
     그러면 "unchanged-effect-purchaseRevisions" assertion으로 "followup-effects unchanged-effect-purchaseRevisions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approvePurchase 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-approvePurchase"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10517,11 +10627,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/dispatchPurchaseOrder 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-dispatchPurchaseOrder"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-proposal" 행동을 수행한다
     만일 "manager" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
@@ -10571,11 +10685,15 @@
     그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
     그러면 "unchanged-effect-proposals" assertion으로 "followup-effects unchanged-effect-proposals"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSupplierReply 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordSupplierReply"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10619,11 +10737,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-supplierCommitments" assertion으로 "followup-effects unchanged-effect-supplierCommitments"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/cancelPurchase 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-cancelPurchase"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10668,11 +10790,15 @@
     그러면 "unchanged-effect-cancellationRequests" assertion으로 "followup-effects unchanged-effect-cancellationRequests"를 확인한다
     그러면 "unchanged-effect-purchaseOrders" assertion으로 "external-outbox-effects unchanged-effect-purchaseOrders"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createShipment 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createShipment"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10718,11 +10844,15 @@
     그러면 "unchanged-effect-cargoAllocations" assertion으로 "followup-effects unchanged-effect-cargoAllocations"를 확인한다
     그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordLegEvent 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordLegEvent"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10767,11 +10897,15 @@
     그러면 "unchanged-effect-legs" assertion으로 "followup-effects unchanged-effect-legs"를 확인한다
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordHandover 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordHandover"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10816,11 +10950,15 @@
     그러면 "unchanged-effect-custodyHandovers" assertion으로 "inventory-effects unchanged-effect-custodyHandovers"를 확인한다
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/prepareRegulatoryProcedure 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-prepareRegulatoryProcedure"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10864,11 +11002,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-procedures" assertion으로 "followup-effects unchanged-effect-procedures"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSubmission 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordSubmission"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10912,11 +11054,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-submissions" assertion으로 "followup-effects unchanged-effect-submissions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRegulatoryDecision 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordRegulatoryDecision"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -10961,11 +11107,15 @@
     그러면 "unchanged-effect-regulatoryDecisions" assertion으로 "followup-effects unchanged-effect-regulatoryDecisions"를 확인한다
     그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/verifyLabel 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-verifyLabel"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11009,11 +11159,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-labels" assertion으로 "inventory-effects unchanged-effect-labels"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/receiveProvisional 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-receiveProvisional"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11058,11 +11212,15 @@
     그러면 "unchanged-effect-receipts" assertion으로 "inventory-effects unchanged-effect-receipts"를 확인한다
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/placeHold 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-placeHold"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11106,11 +11264,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/releaseHold 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-releaseHold"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11154,11 +11316,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordDispositionBasis 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordDispositionBasis"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11202,11 +11368,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revokeDispositionBasis 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-revokeDispositionBasis"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11250,11 +11420,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-dispositionBases" assertion으로 "inventory-effects unchanged-effect-dispositionBases"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordStocktake 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordStocktake"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11298,11 +11472,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-stocktakes" assertion으로 "inventory-effects unchanged-effect-stocktakes"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createSalesOrder 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createSalesOrder"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11346,11 +11524,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/reviseSalesOrder 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-reviseSalesOrder"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11394,11 +11576,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/releaseAllocation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-releaseAllocation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11442,11 +11628,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-orders" assertion으로 "followup-effects unchanged-effect-orders"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordDelivery 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordDelivery"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11491,11 +11681,15 @@
     그러면 "unchanged-effect-deliveries" assertion으로 "followup-effects unchanged-effect-deliveries"를 확인한다
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordObservedMovement 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordObservedMovement"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11540,11 +11734,15 @@
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/authorizeReturn 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-authorizeReturn"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11588,11 +11786,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/receiveReturn 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-receiveReturn"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11637,11 +11839,15 @@
     그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
     그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/decideReturnDisposition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-decideReturnDisposition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11686,11 +11892,15 @@
     그러면 "unchanged-effect-returns" assertion으로 "inventory-effects unchanged-effect-returns"를 확인한다
     그러면 "unchanged-effect-dispositions" assertion으로 "inventory-effects unchanged-effect-dispositions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/openInvestigation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-openInvestigation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11735,11 +11945,15 @@
     그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
     그러면 "unchanged-effect-restrictions" assertion으로 "inventory-effects unchanged-effect-restrictions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/proposeRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-proposeRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -11784,11 +11998,15 @@
     그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
     그러면 "unchanged-effect-investigations" assertion으로 "followup-effects unchanged-effect-investigations"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approveRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-approveRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
@@ -11834,11 +12052,15 @@
     그러면 "authorized-business-recall-approval" assertion으로 "approval-effects authorized-business-recall-approval"를 확인한다
     그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRecallNotice 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordRecallNotice"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
@@ -11888,11 +12110,15 @@
     그러면 "unchanged-effect-notices" assertion으로 "followup-effects unchanged-effect-notices"를 확인한다
     그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRecovery 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordRecovery"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
@@ -11942,11 +12168,15 @@
     그러면 "unchanged-effect-recoveries" assertion으로 "inventory-effects unchanged-effect-recoveries"를 확인한다
     그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/closeRecall 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-closeRecall"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall" 행동을 수행한다
     만일 "admin" 역할이 "precondition-approval" 행동을 수행한다
     만일 "delegator" 역할이 "precondition-recall-after-approval" 행동을 수행한다
@@ -12006,11 +12236,15 @@
     그러면 "unchanged-effect-recallScopes" assertion으로 "followup-effects unchanged-effect-recallScopes"를 확인한다
     그러면 "unchanged-effect-recallClosures" assertion으로 "followup-effects unchanged-effect-recallClosures"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordInvoice 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordInvoice"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12054,11 +12288,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordCharge 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordCharge"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12103,11 +12341,15 @@
     그러면 "unchanged-effect-charges" assertion으로 "followup-effects unchanged-effect-charges"를 확인한다
     그러면 "unchanged-effect-invoices" assertion으로 "followup-effects unchanged-effect-invoices"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/matchInvoice 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-matchInvoice"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12153,11 +12395,15 @@
     그러면 "unchanged-effect-saleMatches" assertion으로 "followup-effects unchanged-effect-saleMatches"를 확인한다
     그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordSettlementAdjustment 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordSettlementAdjustment"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12202,11 +12448,15 @@
     그러면 "unchanged-effect-settlementAdjustments" assertion으로 "followup-effects unchanged-effect-settlementAdjustments"를 확인한다
     그러면 "unchanged-effect-invoiceDifferences" assertion으로 "followup-effects unchanged-effect-invoiceDifferences"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordPaymentReference 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordPaymentReference"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12251,11 +12501,15 @@
     그러면 "unchanged-effect-paymentReferences" assertion으로 "followup-effects unchanged-effect-paymentReferences"를 확인한다
     그러면 "unchanged-effect-bankTransfers" assertion으로 "external-outbox-effects unchanged-effect-bankTransfers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createGrant 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createGrant"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12299,11 +12553,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revokeGrant 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-revokeGrant"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12347,11 +12605,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-validityBoundaries" assertion으로 "work-effects unchanged-effect-validityBoundaries"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/assignCapability 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-assignCapability"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12395,11 +12657,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/revokeCapability 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-revokeCapability"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12443,11 +12709,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-managementAuthorities" assertion으로 "work-effects unchanged-effect-managementAuthorities"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/proposeHandover 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-proposeHandover"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12491,11 +12761,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/acceptHandover 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-acceptHandover"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12539,11 +12813,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/rejectHandover 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-rejectHandover"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12587,11 +12865,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/emergencyReassign 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-emergencyReassign"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12638,11 +12920,15 @@
     그러면 "authorized-business-emergency-audit" assertion으로 "work-effects authorized-business-emergency-audit"를 확인한다
     그러면 "unchanged-effect-handovers" assertion으로 "work-effects unchanged-effect-handovers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createPolicyDraft 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createPolicyDraft"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12686,11 +12972,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-policyDrafts" assertion으로 "work-effects unchanged-effect-policyDrafts"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approvePolicy 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-approvePolicy"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12734,11 +13024,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-policyApprovals" assertion으로 "approval-effects unchanged-effect-policyApprovals"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/activatePolicy 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-activatePolicy"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12782,11 +13076,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/retirePolicy 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-retirePolicy"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12830,11 +13128,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-activePolicies" assertion으로 "work-effects unchanged-effect-activePolicies"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/matchSourceIdentity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-matchSourceIdentity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12878,11 +13180,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-identity_matches" assertion으로 "followup-effects unchanged-effect-identity_matches"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/linkCanonicalOccurrence 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-linkCanonicalOccurrence"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12927,11 +13233,15 @@
     그러면 "unchanged-effect-canonical_links" assertion으로 "followup-effects unchanged-effect-canonical_links"를 확인한다
     그러면 "unchanged-effect-canonicalOccurrences" assertion으로 "followup-effects unchanged-effect-canonicalOccurrences"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/resolveEvidenceConflict 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-resolveEvidenceConflict"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -12976,11 +13286,15 @@
     그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
     그러면 "unchanged-effect-evidenceLinks" assertion으로 "followup-effects unchanged-effect-evidenceLinks"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordExternalReconciliation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordExternalReconciliation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13025,11 +13339,15 @@
     그러면 "unchanged-effect-reconciliations" assertion으로 "followup-effects unchanged-effect-reconciliations"를 확인한다
     그러면 "unchanged-effect-externalOperationResults" assertion으로 "external-outbox-effects unchanged-effect-externalOperationResults"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createDefinitionDraft 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createDefinitionDraft"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13073,11 +13391,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/validateDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-validateDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13122,11 +13444,15 @@
     그러면 "unchanged-effect-regressionRuns" assertion으로 "work-effects unchanged-effect-regressionRuns"를 확인한다
     그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/submitDefinitionReview 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-submitDefinitionReview"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13170,11 +13496,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/approveDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-approveDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13218,11 +13548,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-definitionApprovals" assertion으로 "approval-effects unchanged-effect-definitionApprovals"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/publishDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-publishDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13266,11 +13600,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-definitionPackages" assertion으로 "work-effects unchanged-effect-definitionPackages"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/activateDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-activateDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13314,11 +13652,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/retireDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-retireDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13362,11 +13704,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-activeDefinitionPointers" assertion으로 "work-effects unchanged-effect-activeDefinitionPointers"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/migrateWorkDefinition 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-migrateWorkDefinition"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "fde" 역할이 "precondition-draft" 행동을 수행한다
     만일 "fde" 역할이 "precondition-validate" 행동을 수행한다
     만일 "fde" 역할이 "precondition-review" 행동을 수행한다
@@ -13435,11 +13781,15 @@
     그러면 "unchanged-effect-workDefinitionMigrations" assertion으로 "work-effects unchanged-effect-workDefinitionMigrations"를 확인한다
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createWork 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createWork"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13484,11 +13834,15 @@
     그러면 "unchanged-effect-goalVersions" assertion으로 "work-effects unchanged-effect-goalVersions"를 확인한다
     그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordActivity 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordActivity"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13533,11 +13887,15 @@
     그러면 "unchanged-effect-activities" assertion으로 "followup-effects unchanged-effect-activities"를 확인한다
     그러면 "unchanged-effect-events" assertion으로 "followup-effects unchanged-effect-events"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/retrySafeCommand 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-retrySafeCommand"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13582,11 +13940,15 @@
     그러면 "unchanged-effect-retryAttempts" assertion으로 "work-effects unchanged-effect-retryAttempts"를 확인한다
     그러면 "unchanged-effect-executionAttempts" assertion으로 "work-effects unchanged-effect-executionAttempts"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/recordRelation 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-recordRelation"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13630,11 +13992,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/createWorkLink 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-createWorkLink"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13678,11 +14044,15 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-workLinks" assertion으로 "work-effects unchanged-effect-workLinks"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @sit
   시나리오: WRITE 역할·READ 위임에서 worker/emergencyRepair 업무 효과0
     먼저 사례 파일 "verification/cases/C3/case.json"의 "worker-emergencyRepair"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-attempt" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-authorized-same-input" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "effect-before" 행동을 수행한다
@@ -13726,6 +14096,8 @@
     그러면 "authorized-enters-domain" assertion으로 "read-audit-permitted authorized-enters-domain"를 확인한다
     그러면 "unchanged-effect-projections" assertion으로 "work-effects unchanged-effect-projections"를 확인한다
     그러면 "reader-command-not-committed" assertion으로 "work-effects reader-command-not-committed"를 확인한다
+    그러면 "worker-claim-attempt-issued" assertion으로 "work-effects worker-claim-attempt-issued"를 확인한다
+    그러면 "worker-claim-authorized-same-input-issued" assertion으로 "work-effects worker-claim-authorized-same-input-issued"를 확인한다
 
   @uat @model
   시나리오: 실제 모델의 조회 문장이 쓰기 도구 실행으로 바뀌지 않는다 1/1

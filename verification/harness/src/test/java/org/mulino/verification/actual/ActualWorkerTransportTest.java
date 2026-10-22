@@ -86,6 +86,28 @@ final class ActualWorkerTransportTest {
         assertNotEquals(StepResult.DriverStatus.EXECUTED,result.driverStatus());
         assertTrue(result.reason().contains("/api/runtime/worker/commands"));
     }
+    @Test void explicitSetupAndResolvedReferenceTravelToServerWithoutImplicitIssuance() throws Exception {
+        var field=ActualAcceptanceDriver.class.getDeclaredField("installedActors");field.setAccessible(true);field.set(driver,Json.object().set("actor",actor));
+        status=200;response="{\"issued\":true,\"claim\":{\"claimId\":\"server-issued\",\"fencingToken\":7}}";
+        var control=Json.parse("{\"type\":\"workerClaim\",\"operation\":\"issue\",\"parameters\":{\"actorRef\":\"actor\",\"workId\":\"work\",\"capabilityId\":\"createWork\",\"commandId\":\"worker-key\",\"workerId\":\"case-worker\",\"ttlSeconds\":10}}");
+        var issued=driver.control("issue",control);
+        assertEquals("/__verification/runtime/worker-claims",path.get());
+        assertFalse(received.get().has("actorRef"));assertEquals("worker-key",received.get().path("commandId").asText());
+        var declaration=Json.object().set("workerClaim",issued.response().path("claim"));
+        status=403;response="{\"outcome\":\"REJECTED\",\"error\":{\"code\":\"FORBIDDEN\"}}";
+        var denied=driver.invoke("with-issued-claim","worker",actor,"createWork",intent,declaration);
+        assertEquals(issued.response().path("claim"),received.get().path("claim"));assertEquals(intent,received.get().path("intent"));assertReceipt(denied);
+        driver.invoke("without-reference","worker",actor,"createWork",intent);
+        assertFalse(received.get().has("claim"));
+    }
+    @Test void asynchronousWorkerPreservesDeclaredClaim() throws Exception {
+        var declared=Json.object().set("workerClaim",Json.parse("{\"claimId\":\"async-reference\",\"fencingToken\":2}"));
+        var submitted=driver.start("submitted","worker",actor,"createWork",intent,declared);
+        assertEquals(StepResult.DriverStatus.EXECUTED,submitted.driverStatus());
+        var result=driver.await("terminal",submitted.data().path("invocationHandle"),5);
+        assertEquals("FORBIDDEN",result.response().at("/error/code").asText());
+        assertEquals(declared.path("workerClaim"),received.get().path("claim"));assertReceipt(result);
+    }
     private void assertReceipt(StepResult result) throws Exception {
         assertEquals("/api/runtime/worker/commands",path.get());assertEquals("POST",method.get());
         assertTrue(authorization.get().startsWith("Bearer "));

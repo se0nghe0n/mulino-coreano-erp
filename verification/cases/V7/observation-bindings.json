@@ -1,7 +1,7 @@
 {
   "recordType": "PREPARED_NORMATIVE_OBSERVATION_BINDINGS",
   "caseId": "V7",
-  "caseHash": "daeadc91cf452604527e025ed36d536e24c1662b26b111bbc66bc9398cf3907e",
+  "caseHash": "a0da4b34aab03d2d264701997e51cbebd44e6dcfc9a7e1a7cb1fe2db772c01fe",
   "catalogSha256": "1f056056e67c1b720e30336e7a0af05493e4ded61914009ae681f7244bac5338",
   "productRuntimeClaimed": false,
   "runtimeStatus": "NOT_RUN",
@@ -49,7 +49,8 @@
         {"subcaseId":"enqueue-then-revoke","assertionId":"new-dispatch-rows0","pointer":"/subcases/0/assertions/9","actionId":"after","op":"count"},
         {"subcaseId":"enqueue-then-revoke","assertionId":"new20-command-not-committed","pointer":"/subcases/0/assertions/10","actionId":"after","op":"count"},
         {"subcaseId":"enqueue-then-revoke","assertionId":"revoked-current-grant","pointer":"/subcases/0/assertions/16","actionId":"after","op":"relationSet"},
-        {"subcaseId":"enqueue-then-revoke","assertionId":"common-scope-fence","pointer":"/subcases/0/assertions/17","actionId":"after","op":"relationSet"}
+        {"subcaseId":"enqueue-then-revoke","assertionId":"common-scope-fence","pointer":"/subcases/0/assertions/17","actionId":"after","op":"relationSet"},
+        {"subcaseId":"enqueue-then-revoke","assertionId":"worker-claim-dispatch-start-issued","pointer":"/subcases/0/assertions/18","actionId":"worker-claim-dispatch-start","op":"equals"}
       ]
     },
     {
@@ -126,6 +127,7 @@
         {"subcaseId":"authorization-revoke-first","assertionId":"blocked-or-post-revoke-duty-assignment1","pointer":"/subcases/1/assertions/14","actionId":"after","op":"count"},
         {"subcaseId":"authorization-revoke-first","assertionId":"blocked-or-post-revoke-duty-owner","pointer":"/subcases/1/assertions/15","actionId":"after","op":"relationSet"},
         {"subcaseId":"authorization-revoke-first","assertionId":"blocked-or-post-revoke-duty-assignment-scope","pointer":"/subcases/1/assertions/16","actionId":"after","op":"relationSet"},
+        {"subcaseId":"authorization-revoke-first","assertionId":"worker-claim-dispatch-start-issued","pointer":"/subcases/1/assertions/19","actionId":"worker-claim-dispatch-start","op":"equals"},
         {"subcaseId":"authorization-effect-first","assertionId":"dispatch-ready-point","pointer":"/subcases/2/assertions/0","actionId":"dispatch-ready","op":"equals"},
         {"subcaseId":"authorization-effect-first","assertionId":"dispatch-ready-state","pointer":"/subcases/2/assertions/1","actionId":"dispatch-ready","op":"equals"},
         {"subcaseId":"authorization-effect-first","assertionId":"revoke-blocked-point","pointer":"/subcases/2/assertions/2","actionId":"revoke-blocked","op":"equals"},
@@ -141,7 +143,9 @@
         {"subcaseId":"authorization-effect-first","assertionId":"revoke-result-same-handle","pointer":"/subcases/2/assertions/12","actionId":"revoke-result","op":"equals"},
         {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment1","pointer":"/subcases/2/assertions/21","actionId":"after","op":"count"},
         {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-owner","pointer":"/subcases/2/assertions/22","actionId":"after","op":"relationSet"},
-        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment-scope","pointer":"/subcases/2/assertions/23","actionId":"after","op":"relationSet"}
+        {"subcaseId":"authorization-effect-first","assertionId":"blocked-or-post-revoke-duty-assignment-scope","pointer":"/subcases/2/assertions/23","actionId":"after","op":"relationSet"},
+        {"subcaseId":"authorization-effect-first","assertionId":"worker-claim-dispatch-start-issued","pointer":"/subcases/2/assertions/26","actionId":"worker-claim-dispatch-start","op":"equals"},
+        {"subcaseId":"authorization-effect-first","assertionId":"worker-claim-post-revoke-issued","pointer":"/subcases/2/assertions/27","actionId":"worker-claim-post-revoke","op":"equals"}
       ]
     },
     {
@@ -201,7 +205,8 @@
         {"subcaseId":"restart-after-revoke","assertionId":"new20-command-not-committed","pointer":"/subcases/3/assertions/12","actionId":"after","op":"count"},
         {"subcaseId":"restart-after-revoke","assertionId":"prior20-raw-preserved","pointer":"/subcases/3/assertions/15","actionId":"after","op":"sameAs"},
         {"subcaseId":"restart-after-revoke","assertionId":"revoked-current-grant","pointer":"/subcases/3/assertions/20","actionId":"after","op":"relationSet"},
-        {"subcaseId":"restart-after-revoke","assertionId":"common-scope-fence","pointer":"/subcases/3/assertions/21","actionId":"after","op":"relationSet"}
+        {"subcaseId":"restart-after-revoke","assertionId":"common-scope-fence","pointer":"/subcases/3/assertions/21","actionId":"after","op":"relationSet"},
+        {"subcaseId":"restart-after-revoke","assertionId":"worker-claim-dispatch-start-issued","pointer":"/subcases/3/assertions/22","actionId":"worker-claim-dispatch-start","op":"equals"}
       ]
     }
   ]

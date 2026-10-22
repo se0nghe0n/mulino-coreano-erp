@@ -193,6 +193,11 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
                 uri=configuration.baseUri().resolve("/api/runtime/worker/commands");
                 ObjectNode envelope=workerEnvelope?((ObjectNode)request).deepCopy():Json.object();
                 envelope.set("intent",wireRequest);
+                JsonNode declaredClaim=harness.get()==null?null:harness.get().get("workerClaim");
+                if(declaredClaim!=null){
+                    if(envelope.has("claim"))throw new IllegalArgumentException("Claim declared twice");
+                    envelope.set("claim",declaredClaim.deepCopy());
+                }
                 wireRequest=envelope;
             }
             String credential=credential(actor);
@@ -307,6 +312,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         return send(id,actor,request.path("intentKind").asText().equals("RECORD")?"records":"commands",capability,request,transport);
     }
     @Override public StepResult control(String id,JsonNode request) {
+        if(suiteIsolation&&request.path("type").asText().equals("workerClaim"))return workerClaimControl(id,request);
         if(suiteIsolation&&request.path("type").asText().equals("barrier")&&Set.of("waitReached","resume").contains(request.path("operation").asText()))return barrierControl(id,request);
         if(suiteIsolation&&request.path("type").asText().equals("process")&&HostProcessControls.OPERATIONS.contains(request.path("operation").asText())) {
             try{return hostControls.control(id,request,()->provenance(null,"ACTUAL_HOST_PROCESS",true,null,null));}
@@ -351,6 +357,28 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             return executed(id,data,response,provenance(null,"HTTP_VERIFICATION_CLOCK",false,null,null),receipt);
         }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Actual clock interrupted",failure);}
         catch(Exception failure){throw new IllegalStateException("Actual clock environment/response failure",failure);}
+    }
+    /** Explicit setup action; never inferred from an expected outcome or automatically attached to a call. */
+    private StepResult workerClaimControl(String id,JsonNode request) {
+        if(!request.path("operation").asText().equals("issue"))throw new IllegalArgumentException("Unsupported worker claim operation");
+        JsonNode parameters=request.path("parameters");
+        String actorRef=Json.required(parameters,"actorRef");
+        if(installedActors==null||!installedActors.has(actorRef))throw new IllegalArgumentException("Worker claim actor absent from installed fixture");
+        JsonNode actor=installedActors.path(actorRef);
+        ObjectNode body=((ObjectNode)parameters).deepCopy();body.remove("actorRef");
+        try {
+            var uri=configuration.baseUri().resolve("/__verification/runtime/worker-claims");
+            var call=HttpRequest.newBuilder(uri).timeout(Duration.ofSeconds(10)).header("Content-Type","application/json").header("Authorization","Bearer "+signer.sign(credentialActor(actor))).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build();
+            var result=http.send(call,HttpResponse.BodyHandlers.ofString());
+            if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification worker claim control absent");
+            JsonNode response=Json.parse(result.body());
+            var receipt=Json.object().put("httpStatus",result.statusCode()).put("path",uri.getPath());receipt.set("requestedControl",request);receipt.set("wireRequest",body);receipt.set("serverResponse",response);
+            var data=Json.object().put("acknowledged",result.statusCode()==200&&response.path("issued").asBoolean(false))
+                .put("controlType","workerClaim").put("operation","issue").put("acknowledgedAt",Instant.now().toString());
+            data.set("serverResponse",response);
+            return executed(id,data,response,provenance(actor,"HTTP_VERIFICATION_WORKER_CLAIM",false,null,null),receipt);
+        }catch(InterruptedException failure){Thread.currentThread().interrupt();throw new IllegalStateException("Worker claim control interrupted",failure);}
+        catch(Exception failure){throw new IllegalStateException("Worker claim control failed",failure);}
     }
     /**
      * Barrier control: waitReached and resume on the verification-profile barrier registry. The ACK carries the state the
@@ -594,7 +622,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
     private volatile JsonNode installedActors,idTypes;
     @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request) {return start(id,route,actor,capability,request,Json.object());}
     @Override public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request,JsonNode declared) {
-        if(!route.equals("api"))return StepResult.missing(id,"NOT_IMPLEMENTED: actual async route "+route);
+        if(!route.equals("api")&&!(suiteIsolation&&route.equals("worker")))return StepResult.missing(id,"NOT_IMPLEMENTED: actual async route "+route);
         StepResult refused=refuseHarness(id,route,declared);if(refused!=null)return refused;
         String handle=UUID.randomUUID().toString();
         pending.put(handle,CompletableFuture.supplyAsync(()->invoke(id,route,actor,capability,request,declared),asyncCalls));

@@ -6,6 +6,7 @@
   시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: enqueue-then-revoke
     먼저 사례 파일 "verification/cases/V7/case.json"의 "enqueue-then-revoke"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-dispatch-start" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다
@@ -33,11 +34,13 @@
     그러면 "blocked-duty-assignment-scope" assertion으로 "blocked-duty blocked-duty-assignment-scope"를 확인한다
     그러면 "revoked-current-grant" assertion으로 "worker-auth revoked-current-grant"를 확인한다
     그러면 "common-scope-fence" assertion으로 "worker-auth common-scope-fence"를 확인한다
+    그러면 "worker-claim-dispatch-start-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: authorization-revoke-first
     먼저 사례 파일 "verification/cases/V7/case.json"의 "authorization-revoke-first"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-dispatch-start" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다
@@ -66,11 +69,14 @@
     그러면 "blocked-or-post-revoke-duty-assignment-scope" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment-scope"를 확인한다
     그러면 "revoked-current-grant" assertion으로 "linearization-evidence revoked-current-grant"를 확인한다
     그러면 "common-scope-fence" assertion으로 "linearization-evidence common-scope-fence"를 확인한다
+    그러면 "worker-claim-dispatch-start-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: authorization-effect-first
     먼저 사례 파일 "verification/cases/V7/case.json"의 "authorization-effect-first"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-dispatch-start" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-post-revoke" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "시스템" 역할이 "dispatch-start" 행동을 수행한다
@@ -110,11 +116,14 @@
     그러면 "blocked-or-post-revoke-duty-assignment-scope" assertion으로 "blocked-or-post-revoke-duty blocked-or-post-revoke-duty-assignment-scope"를 확인한다
     그러면 "revoked-current-grant" assertion으로 "linearization-evidence revoked-current-grant"를 확인한다
     그러면 "common-scope-fence" assertion으로 "linearization-evidence common-scope-fence"를 확인한다
+    그러면 "worker-claim-dispatch-start-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
+    그러면 "worker-claim-post-revoke-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다
 
   @sit
   시나리오: 현재 grant 철회와 출고 commit의 실제 순서를 대조한다: restart-after-revoke
     먼저 사례 파일 "verification/cases/V7/case.json"의 "restart-after-revoke"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "worker-claim-dispatch-start" 행동을 수행한다
     만일 "delegator" 역할이 "before-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before" 행동을 수행한다
     만일 "warehouse" 역할이 "prior-dispatch" 행동을 수행한다
@@ -157,3 +166,4 @@
     그러면 "blocked-duty-after-restart-assignment-scope" assertion으로 "blocked-duty-after-restart blocked-duty-after-restart-assignment-scope"를 확인한다
     그러면 "revoked-current-grant" assertion으로 "safe-retry revoked-current-grant"를 확인한다
     그러면 "common-scope-fence" assertion으로 "safe-retry common-scope-fence"를 확인한다
+    그러면 "worker-claim-dispatch-start-issued" assertion으로 "인증된 actor로 production RuntimeRepository가 실제 lease를 저장하고 반환했는지 확인한다."를 확인한다

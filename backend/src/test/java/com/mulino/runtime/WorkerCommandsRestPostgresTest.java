@@ -146,4 +146,57 @@ class WorkerCommandsRestPostgresTest {
   forbidden(map("intent",intent,"claim",reference()),token(actor,org));
  }
  @AfterAll static void cleanup()throws Exception{PG.stop();Files.deleteIfExists(KEY);try(var paths=Files.walk(BLOBS)){for(var path:paths.sorted(Comparator.reverseOrder()).toList())Files.delete(path);}}
+ @Test void verificationIssueReturnsPersistedLeaseAndValidWorkerCommits()throws Exception{
+  String key="http-issued";var issued=issueClaim(key,5,token(actor,org));assertEquals(200,issued.statusCode(),issued.body());
+  var response=json.readValue(issued.body(),Map.class);var ref=(Map<String,Object>)response.get("claim");
+  assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_runtime_ExecutionAttempts WHERE organizationId=? AND ID=? AND commandId=? AND actorId=? AND status='ACTIVE'",Integer.class,org,ref.get("claimId"),key,actor));
+  var request=new LinkedHashMap<>(intent);request.put("commandIdempotencyKey",key);
+  assertEquals(200,post(map("intent",request,"claim",ref),token(actor,org)).statusCode());assertEquals(1,outbox());assertEquals(1,committed());
+ }
+ @Test void verificationIssueDoesNotGrantCommandAuthorityAndExpiryFailsClosed()throws Exception{
+  String key="http-read";db.update("DELETE FROM mulino_identity_GrantActions WHERE organizationId=? AND grantId=? AND capabilityId='fixtureExternalEffect'",org,grant);
+  var issued=issueClaim(key,5,token(actor,org));assertEquals(200,issued.statusCode(),issued.body());
+  var ref=(Map<String,Object>)json.readValue(issued.body(),Map.class).get("claim");
+  var request=new LinkedHashMap<>(intent);request.put("commandIdempotencyKey",key);forbidden(map("intent",request,"claim",ref),token(actor,org));
+  insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","fixtureExternalEffect"));
+  clock.advance(T.plusSeconds(5));forbidden(map("intent",request,"claim",ref),token(actor,org));
+ }
+ @Autowired VerificationBarriers barriers;
+ @Test void httpIssuedClaimExpiringAtCommitFenceRollsBackEffects()throws Exception{
+  String key="commit-expiry",barrierId=id(),participant="worker";
+  var issued=issueClaim(key,5,token(actor,org));assertEquals(200,issued.statusCode());
+  var ref=(Map<String,Object>)json.readValue(issued.body(),Map.class).get("claim");
+  var request=new LinkedHashMap<>(intent);request.put("commandIdempotencyKey",key);
+  var http=java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://localhost:"+port+"/api/runtime/worker/commands"))
+      .header("Content-Type","application/json").header("Authorization","Bearer "+token(actor,org))
+      .header(VerificationBarriers.HEADER,json.writeValueAsString(map("barrierId",barrierId,"participantId",participant,"transactionId","worker-tx","point","AFTER_AUTH_SCOPE_FENCE_ACQUIRED_BEFORE_EFFECT_COMMIT")))
+      .POST(java.net.http.HttpRequest.BodyPublishers.ofString(json.writeValueAsString(map("intent",request,"claim",ref)))).build();
+  var pending=java.net.http.HttpClient.newHttpClient().sendAsync(http,java.net.http.HttpResponse.BodyHandlers.ofString());
+  try{
+   assertEquals("REACHED",barriers.waitFor(barrierId,participant,Set.of("REACHED"),Duration.ofSeconds(10)).get("state"));
+   clock.advance(T.plusSeconds(5));
+  }finally{barriers.resume(barrierId,participant);}
+  var response=pending.get(10,java.util.concurrent.TimeUnit.SECONDS);assertEquals(403,response.statusCode(),response.body());
+  assertEquals("FORBIDDEN",((Map<?,?>)json.readValue(response.body(),Map.class).get("error")).get("code"));
+  assertEquals(0,outbox());assertEquals(0,committed());
+ }
+ @Test void verificationIssueRejectsAnonymousUnknownIdentityForeignWorkAndInvalidDuration()throws Exception{
+  assertEquals(401,issueClaim("anonymous",5,null).statusCode());
+  assertEquals(403,issueClaim("unknown",5,token(id(),org)).statusCode());
+  int before=db.queryForObject("SELECT count(*) FROM mulino_runtime_ExecutionAttempts WHERE organizationId=?",Integer.class,org);
+  for(Object ttl:List.of(0,301,1.5,"5"))assertNotEquals(200,issueClaim("bad-duration",ttl,token(actor,org)).statusCode());
+  String prior=(String)claim.get("workId");var copy=new HashMap<>(claim);copy.put("workId",id());claim=copy;
+  assertEquals(403,issueClaim("foreign",5,token(actor,org)).statusCode());copy.put("workId",prior);
+  assertEquals(before,db.queryForObject("SELECT count(*) FROM mulino_runtime_ExecutionAttempts WHERE organizationId=?",Integer.class,org));
+  var controller=new VerificationWorkerClaims(null,null,null);var remote=new org.springframework.mock.web.MockHttpServletRequest();remote.setRemoteAddr("192.0.2.1");
+  assertThrows(org.springframework.security.access.AccessDeniedException.class,()->controller.claim(Map.of(),remote));
+  assertEquals(List.of("verification"),List.of(VerificationWorkerClaims.class.getAnnotation(org.springframework.context.annotation.Profile.class).value()));
+ }
+ java.net.http.HttpResponse<String> issueClaim(String key,Object ttl,String bearer)throws Exception{
+  var body=map("workId",claim.get("workId"),"capabilityId","fixtureExternalEffect","commandId",key,"workerId","http-fixture-worker","ttlSeconds",ttl);
+  var request=java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://localhost:"+port+"/__verification/runtime/worker-claims")).header("Content-Type","application/json");
+  if(bearer!=null)request.header("Authorization","Bearer "+bearer);
+  return java.net.http.HttpClient.newHttpClient().send(request.POST(java.net.http.HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body))).build(),java.net.http.HttpResponse.BodyHandlers.ofString());
+ }
+
 }

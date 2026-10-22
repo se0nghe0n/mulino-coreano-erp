@@ -416,6 +416,10 @@ def main():
         if cap in PREREQUISITE_CAPS:patch_sub(s,cap)
         finish_route_sub(s,cap)
     REQUEST_CONTRACT.conform_case(n)
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('worker_claim_author',ROOT/'verification/cases/author_worker_claims.py')
+    worker=importlib.util.module_from_spec(spec);spec.loader.exec_module(worker)
+    worker.patch(n)
     self_check(n)
     path.write_text(render_case(n))
     feature=DIR/'scenario.feature';header=feature.read_text().split('\n')[:3]
