@@ -1,6 +1,10 @@
 """Author fixed channel contracts. No product, host, DB or model implementation."""
 import json
 from pathlib import Path
+import argparse
+parser=argparse.ArgumentParser()
+parser.add_argument('--case', choices=['T01','T20','T25'])
+SELECTED_CASE=parser.parse_args().case
 ROOT=Path(__file__).resolve().parents[2]
 def _request_contract():
  import importlib.util
@@ -102,6 +106,16 @@ def fixture(cid):
  for i,kind in enumerate(['receipt60','receipt40','qc60','hold40','regulatory60','disposition60','customerConditions60','delivery','temperature']):
   evidence.append({'alias':kind,'sha256':str(i+1)*64,'sourceNamespace':'synthetic-warehouse','externalEventId':cid+'-'+kind,'sourceVersion':'1','occurredAt':TIME,'recordedAt':KNOWN})
  f={'schemaVersion':'1.0.0','fixtureId':cid+'-CHANNEL-BASELINE','synthetic':True,'baseRefs':[],'clock':{'asOf':TIME,'knownAt':KNOWN,'timezone':'Asia/Seoul','precision':'SECOND','deadlineInclusive':True},'versions':{'definition':'definition-v1','evaluator':'evaluator-v1','policy':'SYNTHETIC-policy-v1'},'actors':actors,'aliases':aliases,'baseline':{'setupIsExecutionCoverage':False,'segments':[{'alias':'A60','quantity':'60','unit':'BOX','locationAlias':'W','custodianAlias':'warehouse','lotAlias':'L'},{'alias':'B40','quantity':'40','unit':'BOX','locationAlias':'W','custodianAlias':'warehouse','lotAlias':'L'}],'works':[{'alias':'O1','kind':'PURCHASE','status':'WAITING','goal':{'quantity':'100','unit':'BOX','endpoint':'ARRIVED','quantityMode':'CUMULATIVE_EVENT','destinationAlias':'W','dueAt':'2026-10-09T09:00:00Z'},'waitReason':'B40 품질 후속 근거 대기','resumePredicate':{'evidenceAlias':'hold40','decision':'RESOLVED'},'verifierAlias':'reader','nextCheckAt':NEXT,'overdueAction':'supervisor에게 품질 근거 확인 요청'},{'alias':'S1','kind':'SALES','status':'ACTIVE','customerAlias':'C','goal':{'quantity':'30','unit':'BOX','endpoint':'DELIVERED','quantityMode':'CUMULATIVE_EVENT','dueAt':'2026-10-09T09:00:00Z'}}],'restrictions':[{'segmentAlias':'B40','quantity':'40','unit':'BOX','kind':'QC','status':'ACTIVE','evidenceAlias':'hold40'}],'eligibilityBases':[{'segmentAlias':'A60','action':'SELL','quantity':'60','unit':'BOX','qcEvidenceAlias':'qc60','regulatoryEvidenceAlias':'regulatory60','dispositionEvidenceAlias':'disposition60','customerEvidenceAlias':'customerConditions60'}],'relations':[{'sourceAlias':'L','targetAlias':'A60','type':'LOT_QUANTITY'},{'sourceAlias':'L','targetAlias':'B40','type':'LOT_QUANTITY'},{'sourceAlias':'A60','targetAlias':'S1','type':'SUBJECT_OF'},{'sourceAlias':'S1','targetAlias':'C','type':'CUSTOMER'}],'policy':{'synthetic':True,'actions':['READ','RECORD','COMMAND'],'purchaseDecisionRole':'MANAGER','allowanceEvidenceRequired':['qc','regulatory','disposition','customer'],'actualLegalComplianceClaimed':False,'deletionEnabled':False},'identitySources':{'ambiguousItemNames':['P','P2'],'approvedDefaultUnit':'BOX','defaultSource':'SYNTHETIC-policy-v1'},'traceabilitySeed':{'workAlias':'S1','customerAlias':'C','segmentAlias':'A60','relationType':'SUBJECT_OF','effectClass':'READ_CANDIDATE_ONLY','quantity':'30','unit':'BOX'}},'evidence':evidence,'responsibilities':[{'scope':{'workAlias':'O1','segments':['B40']},'ownerAlias':'reader','supervisorAlias':'supervisor','nextAction':'검사 근거 확인','nextCheckAt':NEXT},{'scope':{'workAlias':'S1'},'ownerAlias':'writer','supervisorAlias':'supervisor','nextAction':'인도 증거 확인','nextCheckAt':NEXT}]}
+ if cid=='T01':
+  # Explicit subject identity survives request-contract normalization; no scope
+  # or current authorization checks are changed by this fixture.
+  for work in f['baseline']['works']:work['itemAlias']='P'
+  # A declared responsibility is a real OPEN duty, not merely Work metadata.
+  for name,work,owner,actionName in [('purchaseDuty','O1','reader','검사 근거 확인'),('salesDuty','S1','writer','인도 증거 확인')]:
+   aliases[name]={'type':'Obligation','kind':'WORK_NEXT_ACTION','workAlias':work,
+                  'ownerAlias':owner,'supervisorAlias':'supervisor','documentAlias':'hold40',
+                  'scope':{'itemAlias':'P','workAlias':work},'status':'OPEN',
+                  'nextAction':actionName,'nextCheckAt':NEXT}
  if cid=='T20':
   # Synthetic versioned protocol config, not an operating SLA: MRTR TTL boundary pair.
   f['baseline']['mrtr']={'requestStateTtlSeconds':MRTR_TTL_SECONDS,'issuedAt':TIME,'source':'SYNTHETIC-policy-v1'}
@@ -141,7 +155,7 @@ for excluded in ['manufacture','BOM','B2C','generalLedger','taxSubmit','bankTran
                                                   # step2r round 14 (s5d finding 5): plan section 3.3 checks the envelope before capability support,
                                                   # so only a valid envelope (with its idempotency key) can observe HELD VERSION_UNSUPPORTED (Oct 12 user decision).
                                                   'commandIdempotencyKey':'T01-excluded-'+excluded},'invoke',actor='writer'),action('after','getInventory'),obs('db-after','after')]
- x=no_effect(o,'excluded-effects-created')+[eq('unsupported-outcome',o,'unsupported-result','unsupported','/response/outcome','HELD'),eq('unsupported-code',o,'unsupported-result','unsupported','/response/error/code','VERSION_UNSUPPORTED'),eq('unsupported-effect',o,'unsupported-result','unsupported','/response/error/requestedEffect',excluded),assertion('no-substitute-command',o,'unsupported-result','count','db-after','/data/rawRows/commandResults',0,where={'requestId':'excluded-'+excluded,'status':'COMMITTED'})]
+ x=no_effect(o,'excluded-effects-created')+[eq('unsupported-outcome',o,'unsupported-result','unsupported','/response/outcome','HELD'),eq('unsupported-code',o,'unsupported-result','unsupported','/response/error/code','VERSION_UNSUPPORTED'),eq('unsupported-effect',o,'unsupported-result','unsupported','/response/error/requestedEffect',excluded),assertion('no-substitute-command',o,'unsupported-result','count','db-after','/data/rawRows/commandResults',0,where={'commandIdempotencyKey':'T01-excluded-'+excluded,'status':'COMMITTED'},explain='해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다.')]
  T01.append(sub('T01','excluded-'+excluded,'미지원 '+excluded+' 요청의 효과0',o,a,x))
 
 T20=[]
@@ -585,6 +599,7 @@ for sc in T20:
   else:sc['assertions'].append(assertion(a['id']+'-raw-no-meta',o,n,'absent',a['id'],base+'body/params/_meta',None))
 
 for cid,subs in [('T01',T01),('T20',T20),('T25',T25)]:
+ if SELECTED_CASE and cid!=SELECTED_CASE:continue
  d=ROOT/'verification/cases'/cid
  c={'schemaVersion':'1.0.0','caseId':cid,'title':{'T01':'같은 업무 세계의 역량 질문과 범위','T20':'구조화 intent·실제 wire·host skill 경계','T25':'독립 traceability와 증거 gate'}[cid],'requirementRefs':['D'+cid[1:]],'profiles':['contracts','scenarios']+(['mcp','skills','model'] if cid=='T20' else ['mcp','skills','model','deployment'] if cid=='T25' else []),'subcases':subs}
  # step2r round 12: fixture first (the request contract reads its aliases), then the case in contracts/request-contracts.json form.

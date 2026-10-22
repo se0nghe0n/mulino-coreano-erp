@@ -411,6 +411,36 @@
     "warehouse": {
       "type": "Human",
       "name": "내부 창고 보관 담당"
+    },
+    "purchaseDuty": {
+      "type": "Obligation",
+      "kind": "WORK_NEXT_ACTION",
+      "workAlias": "O1",
+      "ownerAlias": "reader",
+      "supervisorAlias": "supervisor",
+      "documentAlias": "hold40",
+      "scope": {
+        "itemAlias": "P",
+        "workAlias": "O1"
+      },
+      "status": "OPEN",
+      "nextAction": "검사 근거 확인",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
+    },
+    "salesDuty": {
+      "type": "Obligation",
+      "kind": "WORK_NEXT_ACTION",
+      "workAlias": "S1",
+      "ownerAlias": "writer",
+      "supervisorAlias": "supervisor",
+      "documentAlias": "hold40",
+      "scope": {
+        "itemAlias": "P",
+        "workAlias": "S1"
+      },
+      "status": "OPEN",
+      "nextAction": "인도 증거 확인",
+      "nextCheckAt": "2026-10-07T10:00:00Z"
     }
   },
   "baseline": {
@@ -436,7 +466,6 @@
     "works": [
       {
         "alias": "O1",
-        "itemAlias": "P",
         "kind": "PURCHASE",
         "status": "WAITING",
         "goal": {
@@ -454,11 +483,11 @@
         },
         "verifierAlias": "reader",
         "nextCheckAt": "2026-10-07T10:00:00Z",
-        "overdueAction": "supervisor에게 품질 근거 확인 요청"
+        "overdueAction": "supervisor에게 품질 근거 확인 요청",
+        "itemAlias": "P"
       },
       {
         "alias": "S1",
-        "itemAlias": "P",
         "kind": "SALES",
         "status": "ACTIVE",
         "customerAlias": "C",
@@ -468,7 +497,8 @@
           "endpoint": "DELIVERED",
           "quantityMode": "CUMULATIVE_EVENT",
           "dueAt": "2026-10-09T09:00:00Z"
-        }
+        },
+        "itemAlias": "P"
       }
     ],
     "restrictions": [

@@ -119,7 +119,7 @@
     그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'manufacture'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-substitute-command" assertion으로 "해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다."를 확인한다
   시나리오: 미지원 BOM 요청의 효과0
     먼저 사례 파일 "verification/cases/T01/case.json"의 "excluded-BOM"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -137,7 +137,7 @@
     그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'BOM'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-substitute-command" assertion으로 "해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다."를 확인한다
   시나리오: 미지원 B2C 요청의 효과0
     먼저 사례 파일 "verification/cases/T01/case.json"의 "excluded-B2C"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -155,7 +155,7 @@
     그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'B2C'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-substitute-command" assertion으로 "해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다."를 확인한다
   시나리오: 미지원 generalLedger 요청의 효과0
     먼저 사례 파일 "verification/cases/T01/case.json"의 "excluded-generalLedger"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -173,7 +173,7 @@
     그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'generalLedger'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-substitute-command" assertion으로 "해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다."를 확인한다
   시나리오: 미지원 taxSubmit 요청의 효과0
     먼저 사례 파일 "verification/cases/T01/case.json"의 "excluded-taxSubmit"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -191,7 +191,7 @@
     그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'taxSubmit'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-substitute-command" assertion으로 "해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다."를 확인한다
   시나리오: 미지원 bankTransfer 요청의 효과0
     먼저 사례 파일 "verification/cases/T01/case.json"의 "excluded-bankTransfer"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
@@ -209,4 +209,4 @@
     그러면 "unsupported-outcome" assertion으로 "unsupported-outcome: /response/outcome의 실제 equals 기대값은 'HELD'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-code" assertion으로 "unsupported-code: /response/error/code의 실제 equals 기대값은 'VERSION_UNSUPPORTED'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
     그러면 "unsupported-effect" assertion으로 "unsupported-effect: /response/error/requestedEffect의 실제 equals 기대값은 'bankTransfer'다. 미관찰·UNKNOWN은 정상값이 아니다."를 확인한다
-    그러면 "no-substitute-command" assertion으로 "no-substitute-command: /data/rawRows/commandResults의 scope·filter를 만족하는 실제 원행은 정확히 0개다."를 확인한다
+    그러면 "no-substitute-command" assertion으로 "해당 요청의 서버 저장 멱등키에 연결된 COMMITTED command는 0개다. 거부 metadata는 업무 효과가 아니다."를 확인한다

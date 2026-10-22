@@ -71,7 +71,7 @@ public class ApplicationCommands {
     throw new IllegalStateException("Unreachable retry state");
   }
   private Map<String,Object> typed(Map<String,Object> input,boolean executing){Map<String,Object> intent=new LinkedHashMap<>(CommandRequests.parse(input,executing));CommandHandler h=handlers.get(intent.get("capabilityId"));if(h!=null)intent.putIfAbsent("capabilityVersion",h.semanticVersion());else intent.putIfAbsent("capabilityVersion","UNKNOWN");return Map.copyOf(intent);}
-  private CommandHandler handler(Map<String,Object> intent){CommandHandler h=handlers.get(intent.get("capabilityId"));if(h==null||!h.semanticVersion().equals(intent.get("capabilityVersion"))||!h.intentKinds().contains(intent.get("intentKind")))throw DomainError.unsupported();return h;}
+  private CommandHandler handler(Map<String,Object> intent){CommandHandler h=handlers.get(intent.get("capabilityId"));if(h==null||!h.semanticVersion().equals(intent.get("capabilityVersion"))||!h.intentKinds().contains(intent.get("intentKind")))throw DomainError.unsupportedIntent(intent);return h;}
   private Map<String,Object> apply(Map<String,Object> intent,String hash,Map<String,Object> claim,boolean claimed){
     DomainContext c=claimed?leases.getObject().resolveContext(claim,clock.instant()):auth.context(clock.instant(),clock.instant());String cap=(String)intent.get("capabilityId"),key=(String)intent.get("commandIdempotencyKey");
     barrier("AFTER_AUTH_BEFORE_IDEMPOTENCY_FENCE");
