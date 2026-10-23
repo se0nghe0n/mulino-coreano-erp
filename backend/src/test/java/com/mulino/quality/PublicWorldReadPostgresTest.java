@@ -31,6 +31,7 @@ class PublicWorldReadPostgresTest {
  @org.springframework.test.context.bean.override.mockito.MockitoSpyBean com.mulino.application.evaluation.AssessmentService assessmentService;
  @Autowired com.mulino.application.trade.sales.DeliveryAdmission deliveryAdmission;
  @Autowired com.mulino.domain.evidence.EvidenceRepository evidenceRepository;
+ @Autowired ReadAuthorizer authorizer;
 
  @BeforeEach void seed(TestInfo info)throws Exception{
   context.getAutowireCapableBeanFactory().autowireBean(fixture);
@@ -153,13 +154,20 @@ class PublicWorldReadPostgresTest {
   fixture.salesLine=fixture.effects(fixture.run("createSalesOrder",fixture.map("workId",fixture.work,"customerId",fixture.customer,"itemId",fixture.item,"quantity","30","unit","EA","dueAt",fixture.now.plusSeconds(90).toString(),"destinationId",fixture.destination,"deliveryEndpoint","DELIVERED","qualityTerms","fixture","packageTerms","fixture"),null)).get("salesLineId").toString();
   String dispatch=fixture.dispatched("0","30");var report=fixture.deliveryReport(dispatch,"0","30",fixture.destination);String intake=fixture.intakeDelivery(report);var review=fixture.matchDelivery(report,intake);assertEquals("APPLIED",review.get("outcome"));fixture.run("linkCanonicalOccurrence",fixture.map("reconciliationId",review.get("id")),1);
   String canonical=fixture.jdbc.queryForObject("SELECT canonicalOccurrenceId FROM mulino_evidence_Verifications WHERE claimId=?",String.class,intake.split("\\|")[0]);
+  var originalScopes=grantScopes();
   var calls=new java.util.concurrent.atomic.AtomicInteger();
   org.mockito.Mockito.doAnswer(call->{
    calls.incrementAndGet();var c=(DomainContext)call.getArgument(0);assertEquals(fixture.work,call.getArgument(1));var fact=evidenceRepository.require("CanonicalOccurrences",fixture.org,canonical);
+   var commandScopes=fixture.json.readValue(fixture.jdbc.queryForObject("SELECT authorizationScopeJson FROM mulino_commands_CommandRecords WHERE organizationId=? AND ID=?",String.class,fixture.org,CommandExecution.commandId()),new com.fasterxml.jackson.core.type.TypeReference<Map<String,List<String>>>(){});
+   assertTrue(commandScopes.get("TARGET").contains(dispatch));
+   var dispatchScope=new LinkedHashMap<>(commandScopes);dispatchScope.put("TARGET",List.of(dispatch));
+   assertTrue(authorizer.permittedScopes(c,"recordDelivery",dispatchScope));
    fixture.jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE organizationId=? AND actorId=? AND capabilityId='getEvidence'",Timestamp.from(fixture.now),fixture.org,fixture.actor);
+   try {
    var dimensions=fixture.map("TARGET",report.get("physicalScopeId"),"WORK",fixture.work,"ITEM",fixture.item,"PLACE",fixture.destination,"SOURCE",fact.get("sourceProfileId"));
    for(var entry:dimensions.entrySet())fixture.insert("mulino_identity_GrantScopes",fixture.map("organizationId",fixture.org,"grantId",fixture.grant,"scopeKind",entry.getKey(),"scopeId",entry.getValue()));
    fixture.insert("mulino_identity_GrantScopes",fixture.map("organizationId",fixture.org,"grantId",fixture.grant,"scopeKind","PLACE","scopeId",fixture.transit));
+   assertFalse(authorizer.permittedScopes(c,"recordDelivery",dispatchScope),"The diagnostic observation TARGET excludes the persisted command's Dispatch TARGET");
    var purpose=com.mulino.domain.evaluation.CanonicalFactAdmission.Purpose.RECORD_DELIVERY;
    assertTrue(deliveryAdmission.admit(c,fixture.work,"goal",fact,purpose).admitted());
    for(String dimension:List.of("SOURCE","TARGET","WORK","ITEM","PLACE")){
@@ -176,12 +184,23 @@ class PublicWorldReadPostgresTest {
    // The integration suite owns persisted assessment truth. This test isolates
    // the real command-bound source gate and deliberately leaves the goal pending.
    return Map.of("outcome","HELD");
+   } finally {
+    // The gateway reauthorizes every persisted command target at commit. Restore
+    // exact grant rows after probing narrower source scopes in this transaction.
+    fixture.jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=?",fixture.org,fixture.grant);
+    for(var scope:originalScopes)fixture.insert("mulino_identity_GrantScopes",scope);
+    assertEquals(originalScopes,grantScopes());
+    assertTrue(authorizer.permittedScopes(c,"recordDelivery",dispatchScope));
+   }
   }).when(assessmentService).assessCreated(org.mockito.ArgumentMatchers.any(),org.mockito.ArgumentMatchers.eq(fixture.work));
-  fixture.run("recordDelivery",fixture.map("observationId",report.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1);assertEquals(1,calls.get());
+  var confirmed=fixture.run("recordDelivery",fixture.map("observationId",report.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1);assertEquals(1,calls.get());
+  assertEquals(originalScopes,grantScopes());
+  assertEquals("COMMITTED",fixture.jdbc.queryForObject("SELECT state FROM mulino_commands_CommandRecords WHERE organizationId=? AND ID=?",String.class,fixture.org,confirmed.get("commandId")));
   assertEquals("30",fixture.customerQuantity().stripTrailingZeros().toPlainString());
   var c=fixture.c();assertFalse(fixture.runtime.requestContext().run(ctx->{return deliveryAdmission.admit(c,fixture.work,"goal",evidenceRepository.require("CanonicalOccurrences",fixture.org,canonical),com.mulino.domain.evaluation.CanonicalFactAdmission.Purpose.RECORD_DELIVERY);}).admitted());
   assertEquals(0,fixture.jdbc.queryForObject("SELECT count(*) FROM mulino_identity_CapabilityAssignments WHERE organizationId=? AND actorId=? AND capabilityId='assessGoal'",Integer.class,fixture.org,fixture.actor));
  }
+ List<Map<String,Object>> grantScopes(){return fixture.jdbc.queryForList("SELECT * FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=? ORDER BY scopeKind,scopeId",fixture.org,fixture.grant);}
  @Test void publicWorldFefoAndPackagingDenialsHaveNoLedgerEffect(){
   fixture.allow("100");fixture.earlierStock(true);var before=world(Map.of());
   assertEquals("REJECTED",fixture.apply(fixture.envelope("reserveQuantity",fixture.reserveSlots(fixture.segment),0)).get("outcome"));assertEquals(ledger(before),ledger(world(Map.of())));
