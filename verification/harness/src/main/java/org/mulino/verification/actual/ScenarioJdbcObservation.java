@@ -14,8 +14,7 @@ import org.mulino.verification.Json;
  * verification/actual/scenarios/observation-sources.json inside one read-only REPEATABLE READ transaction.
  *
  * Scope: organizationId/organizationIds restrict every table; itemId(s), workId(s), lotId restrict tables having that
- * column (Works: workId restricts ID). includeDescendants=true widens the work restriction to the organization/item
- * scope (a superset that contains descendant works). Case namespace keys (caseId, subcaseId, ...) are test metadata.
+ * column (Works: workId restricts ID). includeDescendants=true with a work restriction is refused until a descendant relation is supported. Case namespace keys (caseId, subcaseId, ...) are test metadata.
  *
  * RESULT_REVISION: the observer recomputes an organization row digest in its own snapshot and reports the product
  * revision only when it equals the digest bound around the issuing query (ScenarioRevisionBinding). The product API is
@@ -32,7 +31,7 @@ final class ScenarioJdbcObservation {
         return mapping;
     }
     /** CSN element names by lower-case column, per lower-case table: PostgreSQL folds the CDS identifiers. */
-    private static Map<String,String> names(Path root,String table) throws Exception {
+    static Map<String,String> names(Path root,String table) throws Exception {
         if(csnNames==null) {
             JsonNode csn=Json.read(root.resolve("backend/src/main/resources/edmx/csn.json"));Map<String,Map<String,String>> out=new HashMap<>();
             for(var it=csn.path("definitions").fields();it.hasNext();){var e=it.next();if(!e.getKey().startsWith("mulino."))continue;Map<String,String> cols=new HashMap<>();
@@ -55,7 +54,7 @@ final class ScenarioJdbcObservation {
         if(orgs.isEmpty())throw new IllegalArgumentException("Observer scope requires organizationId");
         for(var it=scope.fieldNames();it.hasNext();){String k=it.next();if(!CASE_METADATA.contains(k)&&!Set.of("organizationId","organizationIds","itemId","itemIds","workId","workIds","lotId","lotIds").contains(k))throw new UnsupportedOperationException("observer scope key "+k+" not implemented");}
         boolean descendants=scope.path("includeDescendants").asBoolean(false);
-        if(descendants)works=List.of();
+        if(descendants&&!works.isEmpty())throw new UnsupportedOperationException("Scoped descendants require an explicit descendant relation, not an organization-wide superset");
         String revision=null;ObjectNode revisionQuery=null;ScenarioRevisionBinding.Binding binding=null;JsonNode source=null;
         if(readMode.equals("RESULT_REVISION")) {
             source=request.path("snapshotSource");
@@ -78,36 +77,41 @@ final class ScenarioJdbcObservation {
                 revisionQuery.set("parameters",p);revisionQuery.put("mappingVersion","2.0.0");
             }
             Map<String,ArrayNode> cache=new HashMap<>();Map<String,JsonNode> commandCache=new HashMap<>();
+            Map<String,ObjectNode> statements=new HashMap<>();
+            var projection=new ScenarioObservationProjection(c,root,orgs,items,works,lots,knownAt);
             for(JsonNode requested:request.path("sources")) {
                 String name=requested.asText();JsonNode tables=sources.path(name);var rows=Json.array();var queries=Json.array();
                 for(JsonNode t:tables) {
                     String table=t.asText();String key=table;
                     ArrayNode tableRows=cache.get(key);
-                    if(table.startsWith("@")){var statement=Json.object();if(tableRows==null){tableRows=virtual(c,table,orgs,statement);cache.put(key,tableRows);}else statement.put("sql","(same statement as an earlier source in this observation)");
-                        statement.put("table",table);queries.add(statement);for(JsonNode row:tableRows){ObjectNode copy=(ObjectNode)row.deepCopy();if(tables.size()>1)copy.put("_table",table);rows.add(copy);}continue;}
-                    var columns=columns(c,table);var statement=Json.object();
+                    if(table.startsWith("@")) {
+                        ObjectNode statement=statements.get(key);
+                        if(tableRows==null) {
+                            statement=Json.object().put("table",table);
+                            if(Set.of("@conditionResults","@observationCoverage","@assessmentInputs").contains(table)) {
+                                tableRows=projection.virtual(table);statement.set("queries",projection.drainQueries());
+                            } else {
+                                if(!items.isEmpty()||!works.isEmpty()||!lots.isEmpty())throw new UnsupportedOperationException("No item/work/lot binding for virtual source "+table);
+                                tableRows=virtual(c,table,orgs,knownAt,statement);
+                            }
+                            cache.put(key,tableRows);statements.put(key,statement);
+                        }
+                        queries.add(statement.deepCopy());
+                        for(JsonNode row:tableRows){ObjectNode copy=(ObjectNode)row.deepCopy();if(tables.size()>1)copy.put("_table",table);rows.add(copy);}continue;
+                    }
+                    ObjectNode statement=statements.get(key);
                     if(tableRows==null) {
-                        List<Object> params=new ArrayList<>();StringBuilder sql=new StringBuilder("SELECT * FROM "+table+" r WHERE ");
-                        if(columns.contains("organizationid")){sql.append("r.organizationId IN (").append(String.join(",",Collections.nCopies(orgs.size(),"?"))).append(")");params.addAll(orgs);}
-                        else sql.append("FALSE");
-                        if(!items.isEmpty()&&columns.contains("itemid")){sql.append(" AND r.itemId IN (").append(String.join(",",Collections.nCopies(items.size(),"?"))).append(")");params.addAll(items);}
-                        String workColumn=table.equalsIgnoreCase("mulino_work_read_Works")?"id":columns.contains("workid")?"workid":null;
-                        if(!works.isEmpty()&&workColumn!=null){sql.append(" AND r.").append(workColumn).append(" IN (").append(String.join(",",Collections.nCopies(works.size(),"?"))).append(")");params.addAll(works);}
-                        if(!lots.isEmpty()&&columns.contains("lotid")){sql.append(" AND r.lotId IN (").append(String.join(",",Collections.nCopies(lots.size(),"?"))).append(")");params.addAll(lots);}
-                        if(columns.contains("recordedat")){sql.append(" AND r.recordedAt<=?");params.add(knownAt);}
-                        sql.append(columns.contains("id")?" ORDER BY r.ID":"");
-                        tableRows=Json.array();
-                        try(var s=c.prepareStatement(sql.toString())){for(int i=0;i<params.size();i++)s.setObject(i+1,params.get(i));
-                            try(var r=s.executeQuery()){var md=r.getMetaData();var names=names(root,table);while(r.next()){var row=Json.object();for(int col=1;col<=md.getColumnCount();col++){String label=md.getColumnLabel(col);String n=names.getOrDefault(label,label);if(n.equals("ID"))n="id";put(row,n,r.getObject(col));}tableRows.add(row);}}}
-                        derive(c,table,tableRows,commandCache);
+                        tableRows=projection.read(table);
+                        derive(projection,table,tableRows,commandCache);
+                        projection.enrich(table,tableRows);
                         cache.put(key,tableRows);
-                        statement.put("sql",sql.toString());statement.set("boundValues",Json.MAPPER.valueToTree(params.stream().map(Object::toString).toList()));
-                    } else statement.put("sql","(same statement as an earlier source in this observation)");
-                    statement.put("table",table);queries.add(statement);
+                        statement=Json.object().put("table",table);statement.set("queries",projection.drainQueries());statements.put(key,statement);
+                    }
+                    queries.add(statement.deepCopy());
                     for(JsonNode row:tableRows){ObjectNode copy=(ObjectNode)row.deepCopy();if(tables.size()>1)copy.put("_table",table);rows.add(copy);}
                 }
                 raw.set(name,rows);
-                var query=Json.object();query.put("statementId","s5a-"+name+"-v1").put("sql",queries.toString()).put("mappingVersion","1.0.0");var p=Json.object();p.set("scope",scope);p.put("knownAt",knownAt.toString());query.set("parameters",p);
+                var query=Json.object();query.put("statementId","s5a-"+name+"-v1").put("sql",queries.toString()).put("mappingVersion","1.2.0");var p=Json.object();p.set("scope",scope);p.put("knownAt",knownAt.toString());query.set("parameters",p);
                 var e=Json.object();e.put("complete",true).put("rowPointer","/rawRows/"+name.replace("~","~0").replace("/","~1"));e.set("sourceQuery",query);
                 if(mapping(root).path("approximate").toString().contains("\""+name+"\""))e.put("approximateMapping",true);
                 evidence.set(name,e);
@@ -121,24 +125,14 @@ final class ScenarioJdbcObservation {
         result.set("snapshot",snapshot);
         return result;
     }
-    /**
-     * Virtual sources read from the same snapshot, never from the product API:
-     * @transactions  one row per PostgreSQL transaction (xmin) that last wrote an organization CommandRecords row
-     *                (id = that xid, capabilityId, commandIds); a later update of the record moves it (approximate).
-     * @dbPrivileges  information_schema.role_table_grants of every mulino_* table (roleId = grantee, table = CDS entity
-     *                name without the trailing plural s, entity = full CDS entity name, privilege).
-     * @conditionResults  each element of AssessmentReferences.conditionsJson, with assessmentId, workId and the
-     *                assessment's evaluatorVersion added when the element does not state them.
-     * @supervisionIssues  open supervisor hand-offs: RecoverySchedules HELD_MANUAL (kind = lastOutcome) and
-     *                IntakeRecoveries HELD_* (kind = lastCode); status OPEN, the recorded state kept as recordedState.
-     */
-    private static ArrayNode virtual(Connection c,String source,List<String> orgs,ObjectNode statement) throws SQLException {
+    /** Organization-only technical observations; missing business/time bindings are refused. */
+    private static ArrayNode virtual(Connection c,String source,List<String> orgs,OffsetDateTime knownAt,ObjectNode statement) throws SQLException {
         var out=Json.array();String in=String.join(",",Collections.nCopies(orgs.size(),"?"));
         switch(source) {
             case "@transactions" -> {
-                String sql="SELECT xmin::text AS xid,capabilityId,ID FROM mulino_commands_CommandRecords WHERE organizationId IN ("+in+") ORDER BY xmin::text,ID";
+                String sql="SELECT xmin::text AS xid,capabilityId,ID FROM mulino_commands_CommandRecords WHERE organizationId IN ("+in+") AND createdAt<=? ORDER BY xmin::text,ID";
                 Map<String,ObjectNode> byXid=new LinkedHashMap<>();
-                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){var row=byXid.computeIfAbsent(r.getString(1),x->{var o=Json.object();o.put("id",x).put("transactionId",x);o.putArray("commandIds");return o;});
+                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));st.setObject(orgs.size()+1,knownAt);try(var r=st.executeQuery()){while(r.next()){var row=byXid.computeIfAbsent(r.getString(1),x->{var o=Json.object();o.put("id",x).put("transactionId",x);o.putArray("commandIds");return o;});
                     if(!row.has("capabilityId"))row.put("capabilityId",r.getString(2));else if(!row.path("capabilityId").asText().equals(r.getString(2)))row.put("capabilityId","MIXED");((ArrayNode)row.path("commandIds")).add(r.getString(3));}}}
                 byXid.values().forEach(out::add);statement.put("sql",sql);
             }
@@ -150,38 +144,11 @@ final class ScenarioJdbcObservation {
                 for(JsonNode n:out){ObjectNode row=(ObjectNode)n;String cds=cdsEntity(row.path("tableName").asText());if(cds!=null){row.put("entity",cds);row.put("table",cds.endsWith("s")?cds.substring(0,cds.length()-1):cds);}}
                 statement.put("sql",sql);
             }
-            case "@conditionResults" -> {
-                String sql="SELECT ID,workId,evaluatorVersion,conditionsJson FROM mulino_work_read_AssessmentReferences WHERE organizationId IN ("+in+") ORDER BY ID";
-                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++)st.setString(i+1,orgs.get(i));try(var r=st.executeQuery()){while(r.next()){JsonNode conditions;try{conditions=Json.parse(r.getString(4));}catch(Exception invalid){continue;}
-                    if(conditions.isObject()&&conditions.has("conditions"))conditions=conditions.path("conditions");
-                    for(JsonNode cond:conditions)if(cond.isObject()){var row=(ObjectNode)cond.deepCopy();if(!row.has("assessmentId"))row.put("assessmentId",r.getString(1));if(!row.has("workId"))row.put("workId",r.getString(2));if(!row.has("evaluatorVersion"))row.put("evaluatorVersion",r.getString(3));out.add(row);}}}}
-                statement.put("sql",sql);
-            }
-            case "@supervisionIssues" -> {
-                // A runtime recovery the scheduler could not complete by itself and handed to the supervisor (HELD_MANUAL),
-                // and an intake recovery held for its owner/supervisor. kind is the recorded hold outcome/code.
-                String sql="SELECT 'RecoverySchedules' AS src,ID,workId,ownerId,supervisorId,lastOutcome AS kind,recoveryStatus AS state,nextAction,nextCheckAt FROM mulino_runtime_RecoverySchedules WHERE organizationId IN ("+in+") AND recoveryStatus='HELD_MANUAL'"
-                    +" UNION ALL SELECT 'IntakeRecoveries',ID,COALESCE(linkedWorkId,createdWorkId),intakeOwnerId,supervisorId,lastCode,state,nextAction,nextCheckAt FROM mulino_runtime_IntakeRecoveries WHERE organizationId IN ("+in+") AND state LIKE 'HELD%' ORDER BY 2";
-                try(var st=c.prepareStatement(sql)){for(int i=0;i<orgs.size();i++){st.setString(i+1,orgs.get(i));st.setString(orgs.size()+i+1,orgs.get(i));}
-                    try(var r=st.executeQuery()){while(r.next()){var row=Json.object();row.put("source",r.getString(1)).put("id",r.getString(2));put(row,"workId",r.getObject(3));put(row,"ownerId",r.getObject(4));put(row,"supervisorId",r.getObject(5));
-                        put(row,"kind",r.getObject(6));put(row,"recordedState",r.getObject(7));row.put("status","OPEN");put(row,"nextAction",r.getObject(8));put(row,"nextCheckAt",r.getObject(9));out.add(row);}}}
-                statement.put("sql",sql);
-            }
-            case "@domainRecords" -> {
-                // One row per organization-scoped business table (not mulino_commands_*/mulino_runtime_*: a denial writes its
-                // own command record and audit): row count and md5 of the organization's rows in this snapshot. A sameAs over
-                // these rows says no business row of any table changed; it does not name a domain record state.
-                List<String> tables=new ArrayList<>();
-                try(var st=c.prepareStatement("SELECT c.table_name FROM information_schema.columns c JOIN information_schema.tables t ON t.table_schema=c.table_schema AND t.table_name=c.table_name AND t.table_type='BASE TABLE' WHERE c.table_schema=current_schema() AND c.column_name='organizationid' AND c.table_name LIKE 'mulino\\_%' AND c.table_name NOT LIKE 'mulino\\_runtime\\_%' AND c.table_name NOT LIKE 'mulino\\_commands\\_%' ORDER BY c.table_name");var r=st.executeQuery()){while(r.next())if(r.getString(1).matches("[a-z0-9_]+"))tables.add(r.getString(1));}
-                var parts=new ArrayList<String>();for(String t:tables)parts.add("SELECT '"+t+"' AS t,count(*) AS n,md5(coalesce(string_agg(x::text,'|' ORDER BY x::text),'')) AS d FROM "+t+" x WHERE x.organizationid::text = ANY(?)");
-                String sql=String.join(" UNION ALL ",parts)+" ORDER BY 1";
-                try(var st=c.prepareStatement(sql)){var array=c.createArrayOf("text",orgs.toArray());for(int i=1;i<=parts.size();i++)st.setArray(i,array);
-                    try(var r=st.executeQuery()){while(r.next()){var row=Json.object();row.put("id",r.getString(1)).put("table",r.getString(1)).put("rowCount",r.getLong(2)).put("digest",r.getString(3));out.add(row);}}}
-                statement.put("sql","per-table count and md5 over "+tables.size()+" organization-scoped business tables");
-            }
+            case "@supervisionIssues" -> throw new UnsupportedOperationException("Recovery rows have no recordedAt history for the requested knownAt");
+            case "@domainRecords" -> throw new UnsupportedOperationException("Domain digest has no complete per-table scope/time binding");
             default -> throw new UnsupportedOperationException("virtual observation source "+source+" not implemented");
         }
-        statement.set("boundValues",Json.MAPPER.valueToTree(orgs));
+        var values=Json.array();if(source.equals("@transactions")){orgs.forEach(values::add);values.add(knownAt.toString());}statement.set("boundValues",values);
         return out;
     }
     private static volatile Map<String,String> cdsEntities;
@@ -190,22 +157,22 @@ final class ScenarioJdbcObservation {
         return cdsEntities.get(table.toLowerCase(Locale.ROOT));
     }
     private static final Map<String,Set<String>> COLUMNS=new java.util.concurrent.ConcurrentHashMap<>();
-    private static Set<String> columns(Connection c,String table) throws SQLException {
-        Set<String> cached=COLUMNS.get(table);if(cached!=null)return cached;
+    static Set<String> columns(Connection c,String table) throws SQLException {
+        String cacheKey=c.getMetaData().getURL()+"|"+c.getSchema()+"|"+table;
+        Set<String> cached=COLUMNS.get(cacheKey);if(cached!=null)return cached;
         Set<String> out=new HashSet<>();
-        try(var s=c.prepareStatement("SELECT column_name FROM information_schema.columns WHERE table_name=?")){s.setString(1,table.toLowerCase(Locale.ROOT));try(var r=s.executeQuery()){while(r.next())out.add(r.getString(1));}}
+        try(var s=c.prepareStatement("SELECT column_name FROM information_schema.columns WHERE table_schema=current_schema() AND table_name=?")){s.setString(1,table.toLowerCase(Locale.ROOT));try(var r=s.executeQuery()){while(r.next())out.add(r.getString(1));}}
         if(out.isEmpty())throw new UnsupportedOperationException("observation table "+table+" absent from the product schema");
-        COLUMNS.put(table,out);return out;
+        COLUMNS.put(cacheKey,out);return out;
     }
     /** Observation conveniences computed only from the same transaction's rows; never from the product API. */
     static final String NO_COMMAND_RECORD="NO_COMMAND_RECORD";
-    private static void derive(Connection c,String table,ArrayNode rows,Map<String,JsonNode> commands) throws SQLException {
-        Map<String,JsonNode> roots=new HashMap<>();
+    private static void derive(ScenarioObservationProjection projection,String table,ArrayNode rows,Map<String,JsonNode> commands) throws Exception {
         for(JsonNode n:rows) {
             ObjectNode row=(ObjectNode)n;
             String commandId=row.path("commandId").asText(null);
             if(commandId!=null&&!row.has("commandIdempotencyKey")) {
-                JsonNode cmd=commands.computeIfAbsent(commandId,id->command(c,id));
+                JsonNode cmd=projection.linked("mulino_commands_CommandRecords",row,commandId);
                 if(cmd!=null){row.set("commandIdempotencyKey",cmd.path("commandIdempotencyKey"));if(!row.has("capabilityId"))row.set("capabilityId",cmd.path("capabilityId"));if(!row.has("stableRequestOwnerId"))row.set("stableRequestOwnerId",cmd.path("stableRequestOwner"));}
             }
             // A row of a command-attributed table that no CommandRecord produced (fixture-installed opening balance,
@@ -215,7 +182,7 @@ final class ScenarioJdbcObservation {
             // A table without a commandId column (Works, CapabilityAssignments, ...) is attributed to the earliest COMMITTED
             // command whose result names the row id (approximate: the creating command); otherwise to NO_COMMAND_RECORD.
             if(!row.has("commandId")&&!row.has("commandIdempotencyKey")&&row.hasNonNull("id")&&row.hasNonNull("organizationId")&&!table.equals("mulino_commands_CommandRecords")) {
-                JsonNode cmd=effectCommands(c,row.path("organizationId").asText(),commands).get(row.path("id").asText());
+                JsonNode cmd=effectCommands(projection,row.path("organizationId").asText(),commands).get(row.path("id").asText());
                 if(cmd!=null){row.set("commandIdempotencyKey",cmd.path("commandIdempotencyKey"));if(!row.has("capabilityId"))row.set("capabilityId",cmd.path("capabilityId"));if(!row.has("stableRequestOwnerId"))row.set("stableRequestOwnerId",cmd.path("stableRequestOwner"));}
                 else row.put("commandIdempotencyKey",NO_COMMAND_RECORD);
             }
@@ -225,7 +192,7 @@ final class ScenarioJdbcObservation {
                 case "mulino_inventory_SegmentAllocations","mulino_inventory_Restrictions","mulino_inventory_DispositionBases" -> {if(!row.has("status"))row.set("status",row.path("state"));}
                 case "mulino_work_read_Works" -> row.set("state",row.path("status"));
                 case "mulino_work_read_ObligationReferences" -> {row.set("current",row.path("valid"));row.set("responsibleWorkId",row.path("workId"));row.set("obligationId",row.path("rootId"));
-                    JsonNode root=row.hasNonNull("rootId")?roots.computeIfAbsent(row.path("rootId").asText(),id->root(c,id)):null;
+                    JsonNode root=row.hasNonNull("rootId")?projection.linked("mulino_responsibility_Roots",row,row.path("rootId").asText()):null;
                     if(root!=null){if(!row.has("sourceKind"))row.set("sourceKind",root.path("sourceKind"));if(!row.has("sourceId"))row.set("sourceId",root.path("sourceId"));}}
                 case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));}
                 case "mulino_runtime_Outbox" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));}
@@ -235,30 +202,20 @@ final class ScenarioJdbcObservation {
         }
     }
     /** Row id -> the earliest COMMITTED command of the organization whose result (effects and *Id fields) names it. */
-    private static JsonNode effectCommands(Connection c,String org,Map<String,JsonNode> cache) {
-        return cache.computeIfAbsent("effects:"+org,k->{
-            var out=Json.object();
-            try(var s=c.prepareStatement("SELECT commandIdempotencyKey,capabilityId,stableRequestOwner,resultJson FROM mulino_commands_CommandRecords WHERE organizationId=? AND state='COMMITTED' ORDER BY createdAt,ID")){s.setString(1,org);
-                try(var r=s.executeQuery()){while(r.next()){var cmd=Json.object();cmd.put("commandIdempotencyKey",r.getString(1));cmd.put("capabilityId",r.getString(2));cmd.put("stableRequestOwner",r.getString(3));
-                    String result=r.getString(4);if(result==null)continue;Set<String> named=new HashSet<>();JsonNode parsed;try{parsed=Json.parse(result);}catch(IllegalArgumentException bad){continue;}
-                    named(parsed.path("effects"),named);parsed.fields().forEachRemaining(f->{if((f.getKey().endsWith("Id")||f.getKey().equals("id"))&&f.getValue().isTextual())named.add(f.getValue().asText());});
-                    for(String id:named)if(!out.has(id))out.set(id,cmd);}}}
-            catch(SQLException failure){throw new IllegalStateException(failure);}
-            return out;
-        });
+    private static JsonNode effectCommands(ScenarioObservationProjection projection,String org,Map<String,JsonNode> cache) throws Exception {
+        var rows=projection.commands(org);
+        String key="effects:"+org;if(cache.containsKey(key))return cache.get(key);
+        var out=Json.object();
+        for(var cmd:rows) {
+            if(!cmd.hasNonNull("resultJson"))continue;
+            JsonNode parsed=ScenarioObservationProjection.parse(cmd,"resultJson");Set<String> named=new HashSet<>();
+            named(parsed.path("effects"),named);parsed.fields().forEachRemaining(f->{if((f.getKey().endsWith("Id")||f.getKey().equals("id"))&&f.getValue().isTextual())named.add(f.getValue().asText());});
+            for(String id:named)if(!out.has(id))out.set(id,cmd);
+        }
+        cache.put(key,out);return out;
     }
     private static void named(JsonNode node,Set<String> out){if(node.isTextual()&&node.asText().matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"))out.add(node.asText());else if(node.isContainerNode())node.elements().forEachRemaining(v->named(v,out));}
-    private static JsonNode root(Connection c,String id) {
-        try(var s=c.prepareStatement("SELECT sourceKind,sourceId FROM mulino_responsibility_Roots WHERE ID=?")){s.setString(1,id);
-            try(var r=s.executeQuery()){if(!r.next())return null;var o=Json.object();o.put("sourceKind",r.getString(1));o.put("sourceId",r.getString(2));return o;}}
-        catch(SQLException failure){throw new IllegalStateException(failure);}
-    }
-    private static JsonNode command(Connection c,String id) {
-        try(var s=c.prepareStatement("SELECT commandIdempotencyKey,capabilityId,stableRequestOwner FROM mulino_commands_CommandRecords WHERE ID=?")){s.setString(1,id);
-            try(var r=s.executeQuery()){if(!r.next())return null;var o=Json.object();o.put("commandIdempotencyKey",r.getString(1));o.put("capabilityId",r.getString(2));o.put("stableRequestOwner",r.getString(3));return o;}}
-        catch(SQLException failure){throw new IllegalStateException(failure);}
-    }
-    private static void put(ObjectNode row,String name,Object value) {
+    static void put(ObjectNode row,String name,Object value) {
         if(value==null)row.putNull(name);
         else if(value instanceof java.math.BigDecimal d)row.put(name,d.stripTrailingZeros().toPlainString());
         else if(value instanceof Number number)row.set(name,Json.MAPPER.valueToTree(number));

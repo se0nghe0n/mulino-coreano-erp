@@ -1,6 +1,6 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.1.0",
+  "schemaVersion": "1.2.0",
   "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED.",
   "sources": {
     "segments": [
@@ -40,7 +40,7 @@
       "mulino_work_read_AssessmentReferences"
     ],
     "assessmentInputs": [
-      "mulino_evaluation_InputSnapshots"
+      "@assessmentInputs"
     ],
     "outbox": [
       "mulino_runtime_Outbox"
@@ -107,7 +107,7 @@
       "mulino_evidence_EvidenceLinks"
     ],
     "observationCoverage": [
-      "mulino_evidence_CompletionCoverages"
+      "@observationCoverage"
     ],
     "grants": [
       "mulino_identity_Grants"
@@ -369,6 +369,13 @@
     ],
     "regressionRuns": [
       "mulino_definitions_DefinitionValidations"
+    ],
+    "conditions": [
+      "mulino_inventory_Restrictions",
+      "mulino_inventory_DispositionBases",
+      "mulino_quality_Decisions",
+      "mulino_trade_regulatory_DecisionVersions",
+      "mulino_trade_regulatory_LabelVerifications"
     ]
   },
   "approximate": [
@@ -384,7 +391,6 @@
     "externalEffects",
     "transactions",
     "dbPrivileges",
-    "conditionResults",
     "workClosures",
     "obligationResolutions",
     "supervisionIssues",
@@ -403,7 +409,7 @@
     "intakes": "InboxRecords is the source intake ledger",
     "newAllocations": "SegmentAllocations; assertions select the new rows by commandIdempotencyKey/where",
     "canonical_links": "EvidenceLinks links document/event/claim to canonicalOccurrenceId",
-    "observationCoverage": "CompletionCoverages is the observation coverage record",
+    "observationCoverage": "STATE_OBSERVATION Events joined to their actual Claims, VERIFIED Verifications, CanonicalOccurrences and available DocumentVersions. Closed coverage endpoints come from the matching persisted payload; this is not responsibility CompletionCoverages.",
     "receiptContributions": "ReceiptCredits holds contributedQuantity/excessQuantity per receipt and PO line",
     "supplierCommitments": "SupplierReplies holds the supplier ACCEPT/REJECT/CHANGE commitment",
     "saleMatches": "settlement Matches",
@@ -418,7 +424,9 @@
     "constraints": "Restrictions and DispositionBases are the eligibility constraints (rows carry _table)",
     "notices": "recall Actions rows; kind distinguishes notices",
     "recoveries": "recall Actions rows; kind distinguishes recoveries",
-    "dutyTransitions": "responsibility Handovers (OWNER/TRANSFER, status)"
+    "dutyTransitions": "responsibility Handovers (OWNER/TRANSFER, status)",
+    "conditions": "Raw typed restriction/disposition/quality/regulatory/label rows, retaining table identity and stored states. No unified ALLOWED or eligibility conclusion is inferred.",
+    "conditionResults": "Scoped AssessmentReferences.conditionsJson entries, preserving original conditionId/evaluatorVersion/inputs; result/conflict from truth and evidenceIds from evidenceRefs. No identity aliases or default quantities."
   },
   "derived": {
     "mulino_inventory_QuantitySegments": "active (retiredAt null), locationId=placeId, physicalScope=controlScope",
@@ -428,14 +436,21 @@
     "mulino_inventory_SegmentAllocations": "status=state",
     "mulino_work_read_Works": "state=status",
     "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row; a row whose commandId is null or names no CommandRecords row (fixture-installed) carries commandIdempotencyKey NO_COMMAND_RECORD",
-    "any row without a commandId column": "commandIdempotencyKey, capabilityId, stableRequestOwnerId of the earliest COMMITTED CommandRecords row whose resultJson (effects, *Id fields) names the row id (approximate creating command); otherwise commandIdempotencyKey NO_COMMAND_RECORD"
+    "any row without a commandId column": "commandIdempotencyKey, capabilityId, stableRequestOwnerId of the earliest COMMITTED CommandRecords row whose resultJson (effects, *Id fields) names the row id (approximate creating command); otherwise commandIdempotencyKey NO_COMMAND_RECORD",
+    "mulino_work_read_GoalReferences": "intervalStart/intervalEnd/startInclusive/endInclusive from immutable slotsJson period fields; no default endpoints or policy versions",
+    "mulino_work_read_AssessmentReferences": "result=outcome, goalVersionId=goalId; definitionVersion/policyVersion from exact stored version IDs; conditionResults from conditionsJson; inputSnapshotIds from exact assessment/work/goal/hash binding",
+    "mulino_evaluation_InputSnapshots": "inputSnapshot from contentJson, conditionResults from its immutable conditions, goalVersionId=goalId; no missing input or quantity is invented",
+    "mulino_trade_purchase_Approvals": "conditions from conditionsJson; consumptionPolicy is not stored and remains absent",
+    "mulino_evidence_Events": "Only a verified, matching persisted STATE_OBSERVATION chain can supply canonical quantity/unit; payload alone is not verified evidence"
   },
   "virtual": {
     "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",
     "@dbPrivileges": "information_schema.role_table_grants of mulino_* tables",
-    "@conditionResults": "elements of AssessmentReferences.conditionsJson",
-    "@supervisionIssues": "open supervisor hand-offs: RecoverySchedules HELD_MANUAL (kind=lastOutcome) and IntakeRecoveries HELD_* (kind=lastCode), status OPEN",
-    "@domainRecords": "per organization-scoped business table (mulino_* except commands/runtime): table, rowCount, md5 digest of the organization's rows"
+    "@conditionResults": "Scoped AssessmentReferences.conditionsJson entries, preserving original conditionId/evaluatorVersion/inputs; result/conflict from truth and evidenceIds from evidenceRefs. No identity aliases or default quantities.",
+    "@supervisionIssues": "Refused: recovery rows do not store the recordedAt history required by knownAt.",
+    "@domainRecords": "Refused: no complete per-table item/work/lot/time binding is available.",
+    "@observationCoverage": "STATE_OBSERVATION Events joined to their actual Claims, VERIFIED Verifications, CanonicalOccurrences and available DocumentVersions. Closed coverage endpoints come from the matching persisted payload; this is not responsibility CompletionCoverages.",
+    "@assessmentInputs": "One row per stored input snapshot condition (or unchanged snapshot if no conditions), with original contentJson/hash/ID and conditionId/inputs/evidenceIds from that snapshot. Missing facts stay absent."
   },
   "unmapped": {
     "locks": "the product keeps no durable record of fence/lock acquisitions (advisory locks are transaction-scoped); T04/T16/V3 read acquisitionOrdinal, lockedRevision, scopeFenceId of each acquisition",
@@ -443,6 +458,8 @@
     "tombstones": "the product implements no retention deletion (plan §7.4 retention policy, tombstone/redaction and blob deletion reconciliation are not built); T24 reads document tombstones",
     "deletion_log": "no deletion reconciliation log exists for the same reason (plan §7.4 not implemented); T24 reads documentId, originalHash, blobState, policyVersion, reviewerId",
     "migrationMappings": "the migration mapping is kept in the WORK_MIGRATION review payload (DefinitionReviews.payloadJson), not as one row per field",
-    "migrationRegressions": "the product does not execute regression fixtures (plan §8 regression results deferred)"
+    "migrationRegressions": "the product does not execute regression fixtures (plan §8 regression results deferred)",
+    "timeBoundSupervisionIssues": "RecoverySchedules and IntakeRecoveries have no recordedAt history; knownAt observation is refused.",
+    "scopedDomainRecords": "The legacy all-table digest cannot prove every requested scope/time boundary and is refused."
   }
 }
