@@ -729,7 +729,8 @@
             "fieldsPresent",
             "timeEquals",
             "timeBefore",
-            "timeAtMostSeconds"
+            "timeAtMostSeconds",
+            "countAdded"
           ]
         },
         "source": {
@@ -1030,6 +1031,40 @@
         },
         {
           "$ref": "#/$defs/noInputEncoding"
+        },
+        {
+          "if": {
+            "properties": {
+              "op": {
+                "const": "countAdded"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "baseline"
+            ],
+            "properties": {
+              "expected": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "source": {
+                "not": {
+                  "required": [
+                    "field"
+                  ]
+                }
+              },
+              "baseline": {
+                "not": {
+                  "required": [
+                    "field"
+                  ]
+                }
+              }
+            }
+          }
         }
       ]
     },

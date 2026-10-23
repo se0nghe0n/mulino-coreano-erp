@@ -5958,7 +5958,8 @@
               "contracts",
               "claims",
               "observationCoverage",
-              "supervisionIssues"
+              "supervisionIssues",
+              "receipts"
             ]
           }
         }
@@ -6005,7 +6006,7 @@
           "op": "sumEquals",
           "source": {
             "actionId": "after-db",
-            "pointer": "/data/rawRows/contributions",
+            "pointer": "/data/rawRows/receipts",
             "where": {
               "workId": {
                 "$result": {
@@ -6042,7 +6043,7 @@
           "unit": "BOX",
           "unitSource": {
             "actionId": "after-db",
-            "pointer": "/data/rawRows/contributions",
+            "pointer": "/data/rawRows/receipts",
             "where": {
               "workId": {
                 "$result": {
@@ -6145,7 +6146,7 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-db",
-            "pointer": "/data/rawRows/contributions",
+            "pointer": "/data/rawRows/receipts",
             "where": {
               "workId": {
                 "$result": {
@@ -6154,7 +6155,7 @@
                 }
               }
             },
-            "field": "occurrenceId"
+            "field": "canonicalOccurrenceId"
           },
           "expected": [
             {
@@ -11149,6 +11150,30 @@
           "fixtureRef": "verification/cases/T09/fixtures/throughout-complete.json"
         },
         {
+          "id": "movement-baseline",
+          "kind": "observe",
+          "evidenceRefs": [
+            "movement-baseline:actual-artifact"
+          ],
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T09",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "snapshotRef": "CURRENT_COMMITTED",
+            "sources": [
+              "movements"
+            ]
+          }
+        },
+        {
           "id": "work",
           "kind": "invoke",
           "evidenceRefs": [
@@ -12222,7 +12247,7 @@
         },
         {
           "id": "no-quantity-changing-events",
-          "op": "count",
+          "op": "countAdded",
           "source": {
             "actionId": "after-db",
             "pointer": "/data/rawRows/movements"
@@ -12232,7 +12257,8 @@
             "D09"
           ],
           "evidenceRefs": [
-            "after-db:actual-artifact"
+            "after-db:actual-artifact",
+            "movement-baseline:actual-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -12249,6 +12275,10 @@
             "observationNames": [
               "sufficient-continuity-evidence"
             ]
+          },
+          "baseline": {
+            "actionId": "movement-baseline",
+            "pointer": "/data/rawRows/movements"
           }
         },
         {

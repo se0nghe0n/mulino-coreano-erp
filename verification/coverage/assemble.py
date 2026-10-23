@@ -102,7 +102,7 @@ def flatten(actions):
 
 
 RECHECK_OPS = {'equals', 'notEquals', 'present', 'absent', 'decimalEquals', 'decimalAtMost', 'decimalAtLeast', 'sumEquals',
-               'decimalDelta', 'count', 'exactSet', 'relationSet', 'sameAs', 'fieldsPresent'}
+               'decimalDelta', 'count', 'countAdded', 'exactSet', 'relationSet', 'sameAs', 'fieldsPresent'}
 DECIMAL = re.compile(r'-?(0|[1-9][0-9]*)(\.[0-9]+)?')
 
 
@@ -235,6 +235,18 @@ def evaluate(declared, expected, value, unit=None, base=None, base_unit=None):
         return None not in parts and right is not None and sum(parts, decimal.Decimal(0)) == right
     if op == 'count':
         return isinstance(value, list) and type(expected) is int and len(value) == expected
+    if op == 'countAdded':
+        if not isinstance(value, list) or not isinstance(base, list) or type(expected) is not int or expected < 0:
+            return False
+        def identified(rows):
+            if any(not isinstance(r, dict) or not isinstance(r.get('id'), str) or not r['id'].strip() for r in rows):
+                return None
+            result = {r['id']: r for r in rows}
+            return result if len(result) == len(rows) else None
+        previous, current = identified(base), identified(value)
+        return (previous is not None and current is not None
+                and all(k in current and same_json(v, current[k]) for k, v in previous.items())
+                and len(current) - len(previous) == expected)
     if op in ('exactSet', 'relationSet'):
         if not isinstance(value, list) or not isinstance(expected, list):
             return False
@@ -266,7 +278,7 @@ def independent_verdict(declared, results, aliases=None):
                 return True
         value = recheck_select(results, declared.get('source'), aliases)
         unit = recheck_select(results, declared.get('unitSource'), aliases) if 'unit' in declared else None
-        base = recheck_select(results, declared.get('baseline'), aliases) if op in ('decimalDelta', 'sameAs') else None
+        base = recheck_select(results, declared.get('baseline'), aliases) if op in ('decimalDelta', 'sameAs', 'countAdded') else None
         base_unit = recheck_select(results, declared.get('baselineUnitSource'), aliases) if op == 'decimalDelta' and 'unit' in declared else None
         return evaluate(declared, expected, value, unit, base, base_unit)
     except NotRecheckable:
@@ -276,7 +288,7 @@ def independent_verdict(declared, results, aliases=None):
 
 
 RECORD_KEYS = ('unit', 'baseline', 'unitSource', 'baselineUnitSource')
-BASELINE_OPS = ('decimalDelta', 'sameAs', 'timeAtMostSeconds')
+BASELINE_OPS = ('decimalDelta', 'sameAs', 'countAdded', 'timeAtMostSeconds')
 
 
 def record_problem(declared, record, results, aliases=None):

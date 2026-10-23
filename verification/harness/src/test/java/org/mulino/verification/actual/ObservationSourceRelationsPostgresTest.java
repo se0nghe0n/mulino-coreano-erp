@@ -117,7 +117,8 @@ class ObservationSourceRelationsPostgresTest {
     @Test void unassessedPendingWorkHasATransitionMarkerAndNoInventedAssessmentOrCapture()throws Exception {
         pendingTransition(2,true);var rows=capture("assessmentInputs").at("/rawRows/assessmentInputs");assertEquals(1,rows.size());var marker=rows.get(0);
         assertEquals(f.work,marker.path("workId").asText());assertEquals("PENDING",marker.path("status").asText());assertEquals("UNASSESSED",marker.path("assessmentBinding").asText());assertEquals(f.goal,marker.path("goalVersionId").asText());
-        for(String key:List.of("assessmentId","snapshotId","inputEnvelopeId","conditionId"))assertFalse(marker.has(key),key);
+        assertTrue(marker.has("assessmentId"));assertTrue(marker.path("assessmentId").isNull());
+        for(String key:List.of("snapshotId","inputEnvelopeId","conditionId"))assertFalse(marker.has(key),key);
         pendingTransition(3,false);assertTrue(capture("assessmentInputs").at("/rawRows/assessmentInputs").isEmpty());
     }
     @Test void pendingMarkerRequiresTheActualGoalAndEffectiveTime()throws Exception {

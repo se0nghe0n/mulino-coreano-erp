@@ -8,6 +8,11 @@ import re
 import subprocess
 import unittest
 from author_sale_sources import *
+import observer_selectors
+_original_authored = authored
+def authored(*args, **kwargs):
+    kwargs["observers"] = False
+    return _original_authored(*args, **kwargs)
 
 
 class SaleSources(unittest.TestCase):
@@ -15,11 +20,12 @@ class SaleSources(unittest.TestCase):
         current=json.loads((HERE/'case.json').read_text())
         old=json.loads(baseline('verification/cases/T09/case.json'))
         self.assertEqual(old,restore(current))
+        current=observer_selectors.restore(current)
         def blocks(text):
             return [json.JSONDecoder().raw_decode(text[m.end():])[0] for m in re.finditer(r'"assertions":\s*',text)]
         def raw(text):
             return [text[m.end():m.end()+json.JSONDecoder().raw_decode(text[m.end():])[1]] for m in re.finditer(r'"assertions":\s*',text)]
-        self.assertEqual(raw(baseline('verification/cases/T09/case.json')),raw((HERE/'case.json').read_text()))
+        self.assertEqual(raw(baseline('verification/cases/T09/case.json')),raw(json.dumps(current,ensure_ascii=False,indent=2)+'\n'))
         self.assertEqual(94,sum(map(len,blocks((HERE/'case.json').read_text()))))
         for before,after in zip(old['subcases'],current['subcases']):
             original_ids={a['id'] for a in before['actions']}
@@ -106,7 +112,7 @@ class SaleSources(unittest.TestCase):
             self.assertEqual(change['sourceActionId'],pointer['actionId'])
             self.assertEqual(change['after'],pointer['pointer'])
             pointer['pointer']=change['before']
-            altered=copy.deepcopy(authored()[0])
+            altered=copy.deepcopy(_original_authored()[0])
             target=next(s for s in altered['subcases'] if s['id']==change['subcase'])
             next(a for a in target['actions'] if a['id']==change['actionId'])['request']['slots']['allocationId']['$result']['pointer']='/response/effects/counterfeitId'
             with self.assertRaises(ValueError):restore(altered)
@@ -158,7 +164,7 @@ class SaleSources(unittest.TestCase):
             with self.assertRaises(ValueError):verify_ledger(altered)
 
     def test_generator_reproduces_without_reading_oracles(self):
-        case,fixtures=authored()
+        case,fixtures=_original_authored()
         self.assertEqual(case,json.loads((HERE/'case.json').read_text()))
         self.assertEqual(case,apply(case))
         for path,f in fixtures.items():self.assertEqual(f,json.loads((ROOT/path).read_text()))
@@ -208,7 +214,7 @@ class SaleSources(unittest.TestCase):
         from assessment_contracts import reverse
         for name in ('T11','T12'):
             path=f'verification/cases/{name}/case.json'
-            before=json.loads(baseline(path));current=json.loads((ROOT/path).read_text())
+            before=json.loads(subprocess.check_output(["git","show","b4772eb6:"+path],cwd=ROOT));current=json.loads((ROOT/path).read_text())
             self.assertEqual(before,current)
             self.assertEqual(reverse(name,before),reverse(name,current))
         subprocess.run(['python3','-m','unittest','test_source_contracts'],cwd=HERE,check=True)

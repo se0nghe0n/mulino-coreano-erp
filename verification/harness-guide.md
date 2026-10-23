@@ -869,3 +869,21 @@ contract RED에서 NOT_IMPLEMENTED/UNAVAILABLE AssertionError, 일반 profile에
 NOT_RUN이며 alias·값을 만들어 채우지 않는다. EXECUTED source의 실제
 missing alias/pointer/type는 진짜 contract 오류로 남긴다. 별도 실행된
 fixed assertion의 확인된 FAIL은 다른 미실행 source가 덮지 않는다.
+
+### 독립 사전 관찰과 추가 원행 수
+
+`countAdded`는 별도 실행한 `baseline`과 `source`의 원행 배열을 비교한다.
+`expected`는 추가된 행의 독립적인 정수 기대값이며0 이상이다. 각 배열은
+중복 없는 nonempty `id`를 가진 원행만 받는다. baseline의 모든 ID가
+후속 관찰에 동일한 전체 원행으로 남아 있어야 하며, 삭제·변조·중복·
+누락 ID는 실패다. 그 뒤 후속 배열의 새 ID 수를 expected와 대조한다.
+단순 행 수 차이나 특정 kind 제외와 다르다. `field` 투영은 받지 않으며
+관찰의 scope/시점/source가 같은지 사례가 명시한다. 실행 불가·누락
+필드는 다른 assertion처럼 실패한다. coverage assembler도 원본
+관찰 artifact에서 baseline과 원행 identity를 독립적으로 다시 계산한다.
+
+T09 `no-quantity-changing-events`는 초기 설치 직후의 movement-baseline과
+기존 after-db를 대조해 추가0을 요구한다. INITIAL_BALANCE는 두 관찰에
+그대로 남고 source 전역에서 제외하지 않는다. direct receipt 누적량은
+실제 `receipts` 원행의 quantity/unit/canonicalOccurrenceId로 읽는다.
+WorkLink 기반 `contributions`와 구매 ReceiptCredits는 별개다.

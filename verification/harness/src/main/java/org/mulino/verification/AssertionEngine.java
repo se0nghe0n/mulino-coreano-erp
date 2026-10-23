@@ -56,6 +56,15 @@ public final class AssertionEngine {
                 require(value.isArray() && expected.isIntegralNumber(),"count requires observed array and integer expected");
                 require(value.size()==expected.intValue(),"count mismatch: "+value.size()+" != "+expected);
             }
+            case "countAdded" -> {
+                JsonNode before=select(assertion.get("baseline"),results,false);
+                require(value.isArray() && before.isArray() && expected.isIntegralNumber() && expected.intValue()>=0,
+                    "countAdded requires two row arrays and a nonnegative integer expected");
+                var original=identifiedRows(before);var current=identifiedRows(value);
+                for(var entry:original.entrySet())require(entry.getValue().equals(current.get(entry.getKey())),
+                    "baseline row removed or changed: "+entry.getKey());
+                require(current.size()-original.size()==expected.intValue(),"added row count mismatch");
+            }
             case "exactSet", "relationSet" -> require(set(value).equals(set(expected)),"set or relation mismatch: "+value+" != "+expected);
             case "unique" -> set(value);
             case "sameAs" -> require(value.equals(select(assertion.get("baseline"),results,false)),"two observations differ");
@@ -75,6 +84,15 @@ public final class AssertionEngine {
             }
             default -> fail("Unsupported assertion operator "+op);
         }
+    }
+    private Map<String,JsonNode> identifiedRows(JsonNode rows) {
+        var identified=new LinkedHashMap<String,JsonNode>();
+        for(var row:rows) {
+            require(row.isObject() && row.path("id").isTextual() && !row.path("id").asText().isBlank(),"row identity missing");
+            String key=row.path("id").asText();
+            require(identified.putIfAbsent(key,row)==null,"duplicate row identity: "+key);
+        }
+        return identified;
     }
     void requireSourcesAvailable(JsonNode assertion,Map<String,JsonNode> results) {
         for(String field:List.of("source","baseline","unitSource","baselineUnitSource")) if(assertion.has(field)) requireExecuted(Json.required(assertion.path(field),"actionId"),results);

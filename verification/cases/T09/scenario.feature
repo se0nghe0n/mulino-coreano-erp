@@ -247,6 +247,7 @@
   시나리오: 기간 내내100의 관측 throughout-complete
     먼저 사례 파일 "verification/cases/T09/case.json"의 "throughout-complete"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "시스템" 역할이 "movement-baseline" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
     만일 "observationSource" 역할이 "initial-observation-document" 행동을 수행한다
     만일 "observationSource" 역할이 "initial-observation" 행동을 수행한다

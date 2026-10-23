@@ -104,7 +104,7 @@ final class ScenarioObservationProjection {
         String time=columns.contains("recordedat")?"recordedAt":columns.contains("createdat")?"createdAt":null;
         if(time!=null){sql.append(" AND r.").append(time).append("<=?");params.add(knownAt);}
         if(!items.isEmpty()&&columns.contains("itemid")){sql.append(" AND ");in(sql,"r.itemId",items,params);}
-        String workColumn=table.equals("mulino_work_read_Works")?"ID":columns.contains("workid")?"workId":null;
+        String workColumn=table.equals("mulino_work_read_Works")?"ID":table.equals("mulino_work_WorkContributions")?"targetWorkId":columns.contains("workid")?"workId":null;
         if(!works.isEmpty()&&workColumn!=null){sql.append(" AND ");in(sql,"r."+workColumn,works,params);}
         if(!lots.isEmpty()&&columns.contains("lotid")){sql.append(" AND ");in(sql,"r.lotId",lots,params);}
         if(workColumn!=null&&((!items.isEmpty()&&!columns.contains("itemid"))||(!lots.isEmpty()&&!columns.contains("lotid")))) {
@@ -230,6 +230,7 @@ final class ScenarioObservationProjection {
                 }
                 case "mulino_inventory_SegmentAllocations" -> { allocationBasis(row); allocationAttribution(row); }
                 case "mulino_trade_sales_Orders" -> salesOrderLines(row);
+                case "mulino_work_WorkContributions" -> contributionRange(row);
                 case "mulino_work_read_GoalReferences" -> {
                     var slots=parse(row,"slotsJson");field(row,"slots",slots);
                     goalFields(row,slots);
@@ -238,6 +239,7 @@ final class ScenarioObservationProjection {
                     copy(row,"evidencePolicyVersion",slots,"evidencePolicyVersion");
                 }
                 case "mulino_trade_sales_Deliveries" -> canonicalDelivery(row);
+                case "mulino_trade_sales_Observations" -> deliveryObservation(row);
                 case "mulino_trade_purchase_Approvals" -> field(row,"conditions",parse(row,"conditionsJson"));
                 case "mulino_work_read_Works" -> {
                     var wait=parse(row,"waitJson");copy(row,"waitReason",wait,"reason");
@@ -259,6 +261,7 @@ final class ScenarioObservationProjection {
                 }
                 case "mulino_work_read_AssessmentReferences" -> {
                     copy(row,"result",row,"outcome");copy(row,"goalVersionId",row,"goalId");
+                    assessmentGoal(row);
                     version(row,"definitionVersion","mulino_definitions_DefinitionVersions","definitionVersionId");
                     version(row,"policyVersion","mulino_governance_PolicyVersions","policyVersionId");
                     field(row,"conditionResults",assessmentConditions(row));
@@ -276,6 +279,52 @@ final class ScenarioObservationProjection {
                 default -> {}
             }
         }
+    }
+
+    private void assessmentGoal(ObjectNode row) throws Exception {
+        var goal=linked("mulino_work_read_GoalReferences",row,row.path("goalId").asText(null));
+        var work=linked("mulino_work_read_Works",row,row.path("workId").asText(null));
+        if(goal==null||work==null||!requiredSame(row,goal,"workId")||!row.path("workId").equals(work.path("id")))return;
+        if("DELIVERED".equals(goal.path("endpoint").asText()))row.put("goalKind","DELIVERY");
+        var candidates=query("mulino_work_read_AssessmentReferences","r.organizationId=? AND r.workId=? AND r.goalId=? AND r.recordedAt<=?",
+            List.of(row.path("organizationId").asText(),row.path("workId").asText(),row.path("goalId").asText(),knownAt));
+        var predecessors=new HashSet<String>();for(var candidate:candidates)if(candidate.hasNonNull("previousAssessmentId"))predecessors.add(candidate.path("previousAssessmentId").asText());
+        var heads=new ArrayList<JsonNode>();for(var candidate:candidates)if(!predecessors.contains(candidate.path("id").asText()))heads.add(candidate);
+        // A current goal link alone is insufficient for historical effective-time state.
+        if(asOf!=null&&row.hasNonNull("asOf")&&!java.time.Instant.parse(row.path("asOf").asText()).isAfter(asOf.toInstant())&&heads.size()==1)
+            row.put("current",row.path("id").equals(heads.getFirst().path("id"))&&row.path("goalId").equals(work.path("currentGoalVersionId")));
+    }
+
+    /** A delivery report is a different entity from the general evidence Claim ledger. */
+    private void deliveryObservation(ObjectNode row) throws Exception {
+        row.remove(List.of("canonical","status"));
+        var deliveries=query("mulino_trade_sales_Deliveries","r.organizationId=? AND r.observationId=? AND r.recordedAt<=?",
+            List.of(row.path("organizationId").asText(),row.path("id").asText(),knownAt));
+        if(deliveries.isEmpty()&&Set.of("PROVISIONAL","CONFIRMED").contains(row.path("state").asText())) {
+            row.put("canonical",false).put("status","PENDING_RECONCILIATION");
+        } else if(deliveries.size()==1) {
+            var delivery=(ObjectNode)deliveries.get(0).deepCopy();canonicalDelivery(delivery);
+            if(delivery.path("canonical").asBoolean(false)&&requiredSame(row,delivery,"workId","itemId","unit","placeId")) {
+                row.put("canonical",true).put("status","CONFIRMED");copy(row,"deliveryId",delivery,"id");
+                copy(row,"canonicalOccurrenceId",delivery,"canonicalOccurrenceId");
+            }
+        }
+    }
+
+    /** Target attribution is a stored identity; physical coordinates never imply serial labels. */
+    private void contributionRange(ObjectNode row) throws Exception {
+        copy(row,"workId",row,"targetWorkId");
+        var occurrence=linked("mulino_evidence_CanonicalOccurrences",row,row.path("occurrenceId").asText(null));
+        if(occurrence==null||!occurrence.hasNonNull("physicalScopeId")||!row.hasNonNull("startQuantity")||!row.hasNonNull("quantity"))return;
+        try {
+            var start=new java.math.BigDecimal(row.path("startQuantity").asText());
+            var amount=new java.math.BigDecimal(row.path("quantity").asText());
+            var available=new java.math.BigDecimal(occurrence.path("quantity").asText());
+            if(start.signum()<0||amount.signum()<=0||start.add(amount).compareTo(available)>0||!requiredSame(row,occurrence,"unit"))return;
+            var range=Json.object();copy(range,"physicalScopeId",occurrence,"physicalScopeId");copy(range,"occurrenceId",row,"occurrenceId");
+            range.put("startQuantity",start.stripTrailingZeros().toPlainString()).put("endQuantity",start.add(amount).stripTrailingZeros().toPlainString());
+            copy(range,"unit",row,"unit");field(row,"physicalRange",range);
+        }catch(NumberFormatException invalid){throw new UnsupportedOperationException("Invalid stored contribution coordinates",invalid);}
     }
 
     /** The header has no delivery endpoint column. A flat endpoint requires one actual current scoped line. */
@@ -619,7 +668,9 @@ final class ScenarioObservationProjection {
                     if(goal==null||!work.path("id").equals(goal.path("workId")))throw new UnsupportedOperationException("Pending Work goal binding missing or mismatched");
                     copy(marker,"goalVersionId",goal,"id");
                 }
-                marker.put("assessmentBinding","UNASSESSED");
+                // This tagged union has no assessment. SQL NULL lets strict identity filters
+                // exclude it without fabricating an ID or hiding the pending Work.
+                marker.put("assessmentBinding","UNASSESSED").putNull("assessmentId");
             } else {
                 if(heads.size()!=1)throw new UnsupportedOperationException("Ambiguous pending assessment chain");
                 var named=assessmentConditions(heads.getFirst());if(named.size()!=1)continue;

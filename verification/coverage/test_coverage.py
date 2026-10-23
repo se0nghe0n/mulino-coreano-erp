@@ -57,6 +57,26 @@ class CoverageSelftest(unittest.TestCase):
         self.write('receipt.json', receipt)
         return self.a.receipt(report, 'receipt.json', profile, 'report.json')
 
+    def test_count_added_rechecks_full_baseline_identities_and_rejects_mutations(self):
+        row = dict(id='opening', kind='INITIAL_BALANCE', quantity='100')
+        def result(rows):
+            return dict(driverStatus='EXECUTED', provenance=dict(scopeComplete=True), data=dict(rows=rows))
+        before = result([row])
+        assertion = dict(op='countAdded', expected=0,
+                         source=dict(actionId='after', pointer='/data/rows'),
+                         baseline=dict(actionId='before', pointer='/data/rows'))
+        results = dict(before=before, after=copy.deepcopy(before))
+        self.assertIs(True, m.independent_verdict(assertion, results))
+        for rows in ([], [dict(row, id='other')], [dict(row, quantity='99')],
+                     [row, row], [dict(kind='INITIAL_BALANCE')],
+                     [row, dict(id='new', kind='DISPATCH', quantity='1')]):
+            results['after'] = result(rows)
+            self.assertIs(False, m.independent_verdict(assertion, results))
+        results['after'] = result([row, dict(id='new', kind='DISPATCH', quantity='1')])
+        self.assertIs(True, m.independent_verdict(dict(assertion, expected=1), results))
+        results['before'] = dict(driverStatus='NOT_IMPLEMENTED')
+        self.assertIs(False, m.independent_verdict(assertion, results))
+
     def test_status_failure_dominates_missing(self):
         self.assertEqual('FAIL', m.status_of(['FAIL', 'NOT_RUN', 'PASS']))
         self.assertEqual('NOT_RUN', m.status_of([]))

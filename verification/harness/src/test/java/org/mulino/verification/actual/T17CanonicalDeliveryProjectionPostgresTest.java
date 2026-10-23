@@ -114,6 +114,23 @@ class T17CanonicalDeliveryProjectionPostgresTest {
         try(var s=writer.createStatement();var r=s.executeQuery("SELECT count(*) FROM mulino_trade_sales_Deliveries")){assertTrue(r.next());assertEquals(1,r.getInt(1));}
     }
 
+    @ParameterizedTest @ValueSource(strings={"unverified","competing"})
+    void deliveryReportUsesItsActualCanonicalProofAndNeverBorrowsGeneralClaimState(String variant)throws Exception {
+        sourceGraph("20","0");installGraph();
+        var scope=scope();scope.remove("lotId"); // This general Claim has a DISPATCH subject, no direct LOT column.
+        var raw=ScenarioJdbcObservation.capture(config,root,request(scope,"deliveries","deliveryObservations","claims")).path("rawRows");
+        assertEquals(1,raw.path("deliveryObservations").size());assertEquals(1,raw.path("claims").size());
+        var report=raw.path("deliveryObservations").get(0);assertEquals("observation",report.path("id").asText());
+        assertTrue(report.path("canonical").asBoolean());assertEquals("CONFIRMED",report.path("status").asText());
+        assertEquals("canonical",report.path("canonicalOccurrenceId").asText());
+        assertEquals("20",new java.math.BigDecimal(report.path("quantity").asText()).stripTrailingZeros().toPlainString());
+        assertFalse(report.has("eligibilityStatus"));assertFalse(report.has("legitimateQuantity"));
+        if(variant.equals("unverified")){try(var s=writer.createStatement()){s.executeUpdate("UPDATE mulino_evidence_Verifications SET verdict='REJECTED'");}}
+        else insert("mulino_trade_sales_Deliveries",source("Deliveries").deepCopy().put("ID","competing-delivery"));
+        raw=ScenarioJdbcObservation.capture(config,root,request(scope,"deliveryObservations","claims")).path("rawRows");assertEquals(1,raw.path("claims").size());
+        report=raw.path("deliveryObservations").get(0);assertFalse(report.has("canonical"));assertFalse(report.has("status"));
+    }
+
     @Test void reverificationOfTheSameCanonicalSourceKeepsOnePhysicalDeliveryAndEveryProof() throws Exception {
         sourceGraph("20","0");
         insert("mulino_evidence_Verifications",source("Verifications").deepCopy().put("ID","second"));

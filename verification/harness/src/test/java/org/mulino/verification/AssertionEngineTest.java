@@ -44,4 +44,31 @@ public class AssertionEngineTest {
         assertDoesNotThrow(()->engine.check(a,results));
         parent.put("unit","KG");assertThrows(AssertionError.class,()->engine.check(a,results));
     }
+    @Test void countAddedKeepsFullOpeningRowsAndRejectsEveryUnobservedOrChangedBaseline() {
+        var a=Json.object().put("op","countAdded").put("expected",0);
+        a.set("source",Json.object().put("actionId","db-after").put("pointer","/data/rawRows/movements"));
+        a.set("baseline",Json.object().put("actionId","db-before").put("pointer","/data/rawRows/movements"));
+        var opening=Json.object().put("id","actual-opening").put("kind","INITIAL_BALANCE").put("quantity","100");
+        var before=Json.object().put("driverStatus","EXECUTED");before.set("provenance",Json.object().put("scopeComplete",true));
+        before.set("data",Json.object().set("rawRows",Json.object().set("movements",Json.array().add(opening))));
+        results.put("db-before",before);results.put("db-after",before.deepCopy());
+        assertDoesNotThrow(()->engine.check(a,results));
+        for(String mutation:List.of("add","replace","delete","change","duplicate","missingId","missingField","notExecuted")) {
+            var after=before.deepCopy();var rows=(com.fasterxml.jackson.databind.node.ArrayNode)after.at("/data/rawRows/movements");
+            switch(mutation) {
+                case "add" -> rows.add(opening.deepCopy().put("id","new-dispatch").put("kind","DISPATCH"));
+                case "replace" -> ((ObjectNode)rows.get(0)).put("id","other-opening");
+                case "delete" -> rows.removeAll();
+                case "change" -> ((ObjectNode)rows.get(0)).put("quantity","99");
+                case "duplicate" -> rows.add(rows.get(0).deepCopy());
+                case "missingId" -> ((ObjectNode)rows.get(0)).remove("id");
+                case "missingField" -> ((ObjectNode)after.at("/data/rawRows")).remove("movements");
+                case "notExecuted" -> after.put("driverStatus","NOT_IMPLEMENTED");
+            }
+            results.put("db-after",after);assertThrows(AssertionError.class,()->engine.check(a,results),mutation);
+        }
+        results.put("db-after",before.deepCopy());((ObjectNode)before.at("/data/rawRows/movements/0")).remove("id");
+        assertThrows(AssertionError.class,()->engine.check(a,results));
+    }
+
 }

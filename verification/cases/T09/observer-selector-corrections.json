@@ -1,0 +1,323 @@
+{
+  "recordType": "T09_OBSERVATION_SELECTOR_CORRECTION",
+  "baseline": "b4772eb6b33929f6ce524523c40df06c98641b2e",
+  "productSource": "f8bb11e9a6da84fb11678c74e80201621a05a986",
+  "originalAssertions": 94,
+  "changes": [
+    {
+      "subcase": "cumulative-versus-state",
+      "assertionId": "raw-receipt-sum100",
+      "before": {
+        "id": "raw-receipt-sum100",
+        "op": "sumEquals",
+        "source": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/contributions",
+          "where": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "field": "quantity"
+        },
+        "expected": "100",
+        "requirementRefs": [
+          "D09"
+        ],
+        "evidenceRefs": [
+          "after-db:actual-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "caseId": "T09",
+          "itemId": {
+            "$alias": "P"
+          }
+        },
+        "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. cumulative-arrived의 독립 고정 기대값을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T09.quantity-modes",
+          "observationNames": [
+            "cumulative-arrived"
+          ]
+        },
+        "unit": "BOX",
+        "unitSource": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/contributions",
+          "where": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "field": "unit"
+        }
+      },
+      "after": {
+        "id": "raw-receipt-sum100",
+        "op": "sumEquals",
+        "source": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/receipts",
+          "where": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "field": "quantity"
+        },
+        "expected": "100",
+        "requirementRefs": [
+          "D09"
+        ],
+        "evidenceRefs": [
+          "after-db:actual-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "caseId": "T09",
+          "itemId": {
+            "$alias": "P"
+          }
+        },
+        "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. cumulative-arrived의 독립 고정 기대값을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T09.quantity-modes",
+          "observationNames": [
+            "cumulative-arrived"
+          ]
+        },
+        "unit": "BOX",
+        "unitSource": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/receipts",
+          "where": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "field": "unit"
+        }
+      }
+    },
+    {
+      "subcase": "cumulative-versus-state",
+      "assertionId": "arrival-distinct-identities",
+      "before": {
+        "id": "arrival-distinct-identities",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/contributions",
+          "where": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "field": "occurrenceId"
+        },
+        "expected": [
+          {
+            "$result": {
+              "actionId": "receive60",
+              "pointer": "/response/occurrenceId"
+            }
+          },
+          {
+            "$result": {
+              "actionId": "receive40",
+              "pointer": "/response/occurrenceId"
+            }
+          }
+        ],
+        "requirementRefs": [
+          "D09"
+        ],
+        "evidenceRefs": [
+          "after-db:actual-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "caseId": "T09",
+          "itemId": {
+            "$alias": "P"
+          }
+        },
+        "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. goal-mode-fields의 독립 고정 기대값을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T09.quantity-modes",
+          "observationNames": [
+            "goal-mode-fields"
+          ]
+        }
+      },
+      "after": {
+        "id": "arrival-distinct-identities",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/receipts",
+          "where": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "field": "canonicalOccurrenceId"
+        },
+        "expected": [
+          {
+            "$result": {
+              "actionId": "receive60",
+              "pointer": "/response/occurrenceId"
+            }
+          },
+          {
+            "$result": {
+              "actionId": "receive40",
+              "pointer": "/response/occurrenceId"
+            }
+          }
+        ],
+        "requirementRefs": [
+          "D09"
+        ],
+        "evidenceRefs": [
+          "after-db:actual-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "caseId": "T09",
+          "itemId": {
+            "$alias": "P"
+          }
+        },
+        "oracleExplanation": "월60 수령·화60 출고·수40 수령의 누적100과 현재40을 구별한다. goal-mode-fields의 독립 고정 기대값을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T09.quantity-modes",
+          "observationNames": [
+            "goal-mode-fields"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "throughout-complete",
+      "assertionId": "no-quantity-changing-events",
+      "before": {
+        "id": "no-quantity-changing-events",
+        "op": "count",
+        "source": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        "expected": 0,
+        "requirementRefs": [
+          "D09"
+        ],
+        "evidenceRefs": [
+          "after-db:actual-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "caseId": "T09",
+          "itemId": {
+            "$alias": "P"
+          }
+        },
+        "oracleExplanation": "기간 내내100의 관측 throughout-complete. sufficient-continuity-evidence의 독립 고정 기대값을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T09.throughout-fully-observed",
+          "observationNames": [
+            "sufficient-continuity-evidence"
+          ]
+        }
+      },
+      "after": {
+        "id": "no-quantity-changing-events",
+        "op": "countAdded",
+        "source": {
+          "actionId": "after-db",
+          "pointer": "/data/rawRows/movements"
+        },
+        "expected": 0,
+        "requirementRefs": [
+          "D09"
+        ],
+        "evidenceRefs": [
+          "after-db:actual-artifact",
+          "movement-baseline:actual-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "caseId": "T09",
+          "itemId": {
+            "$alias": "P"
+          }
+        },
+        "oracleExplanation": "기간 내내100의 관측 throughout-complete. sufficient-continuity-evidence의 독립 고정 기대값을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T09.throughout-fully-observed",
+          "observationNames": [
+            "sufficient-continuity-evidence"
+          ]
+        },
+        "baseline": {
+          "actionId": "movement-baseline",
+          "pointer": "/data/rawRows/movements"
+        }
+      }
+    }
+  ],
+  "unchanged": [
+    "assertion IDs/count/order",
+    "independent expected values",
+    "units",
+    "business fixtures/grants/clocks",
+    "all existing invoke/query/control requests"
+  ],
+  "rationale": [
+    "Actual receipt source is mulino_trade_receipt_Receipts.workId/quantity/unit/canonicalOccurrenceId; no purchase line/WorkLink exists and ReceiptCredits contributes0/excess100 remains correct.",
+    "INITIAL_BALANCE is captured before business actions and remains in both raw arrays. countAdded expected0 compares full ID-bearing baselines and rejects deletion/mutation/duplication. No kind is hidden."
+  ],
+  "sourceProofs": [
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/scenario-semantic-f8bb11e9-20261024/T09-S01/.local/native-scenario-shard/scenarios.json",
+      "sha256": "218f0e3ce7ecf24386b97afa6fa5dc74867782afcdf9793cd8005c9e49a58187"
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/scenario-semantic-f8bb11e9-20261024/T09-S03/.local/native-scenario-shard/scenarios.json",
+      "sha256": "5f5d1f20e0f08ed71d9fab7c6834341603853419eaf0c6e913b07b95003e5d0e"
+    }
+  ],
+  "runtimeStatus": "NOT_RUN; Haiku dynamic Workflow owns actual scenario execution"
+}

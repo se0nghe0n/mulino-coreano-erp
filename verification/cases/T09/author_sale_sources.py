@@ -217,7 +217,7 @@ def inventory_scope_selectors(case):
     return records
 
 
-def authored(protocol=True, envelopes=True, inventory_scopes=True):
+def authored(protocol=True, envelopes=True, inventory_scopes=True, observers=True):
     case=json.loads(baseline('verification/cases/T09/case.json'))
     scope_changes=inventory_scope_selectors(case)
     fixtures={}
@@ -250,6 +250,9 @@ def authored(protocol=True, envelopes=True, inventory_scopes=True):
                 if change['subcase'] == sub['id']:
                     action=next(a for a in sub['actions'] if a['id']==change['actionId'])
                     action['request']['scope']=copy.deepcopy(change['after'])
+    if observers:
+        from observer_selectors import apply as observe
+        case = observe(case)
     return case,fixtures
 
 
@@ -279,7 +282,8 @@ def apply(value):
     previous,_=authored(protocol=False, envelopes=False, inventory_scopes=False)
     prior_revision,_=authored(envelopes=False, inventory_scopes=False)
     prior_scopes,_=authored(inventory_scopes=False)
-    if value not in (old,new,previous,prior_revision,prior_scopes): raise ValueError('T09 sale-source authoring baseline drift')
+    prior_observers,_=authored(observers=False)
+    if value not in (old,new,previous,prior_revision,prior_scopes,prior_observers): raise ValueError('T09 sale-source authoring baseline drift')
     return new
 
 
@@ -299,6 +303,12 @@ def authored_feature(protocol=True):
         assert block.count(anchor)==1
         extra=''.join(f'    만일 "{ACTOR}" 역할이 "{a["id"]}" 행동을 수행한다\n' for a in sub['actions'] if a['id'] not in old_ids)
         text=text[:start]+block.replace(anchor,anchor+extra)+text[end:]
+    anchor='    만일 "A" 역할이 "work" 행동을 수행한다\n'
+    start=text.index('"throughout-complete"를 준비한다')
+    end=text.find('\n  시나리오:',start)
+    if end<0:end=len(text)
+    block=text[start:end]
+    text=text[:start]+block.replace(anchor,'    만일 "시스템" 역할이 "movement-baseline" 행동을 수행한다\n'+anchor)+text[end:]
     return text
 
 
@@ -355,12 +365,14 @@ def main():
         previous=json.dumps(authored(protocol=False,envelopes=False,inventory_scopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
         prior_revision=json.dumps(authored(envelopes=False,inventory_scopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
         prior_scopes=json.dumps(authored(inventory_scopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
-        if current not in (before,after,previous,prior_revision,prior_scopes): raise ValueError('Undeclared file drift: '+path)
+        prior_observers=json.dumps(authored(observers=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        if current not in (before,after,previous,prior_revision,prior_scopes,prior_observers): raise ValueError('Undeclared file drift: '+path)
         records.append(dict(path=path,beforeSha256=hashlib.sha256(before.encode()).hexdigest(),
                             afterSha256=hashlib.sha256(after.encode()).hexdigest()))
         (ROOT/path).write_text(after)
     feature=HERE/'scenario.feature';before=baseline(str(feature.relative_to(ROOT)));after=authored_feature()
-    if feature.read_text() not in (before,after,authored_feature(protocol=False)):raise ValueError('Undeclared feature drift')
+    previous_feature=after.replace('    만일 "시스템" 역할이 "movement-baseline" 행동을 수행한다\n','')
+    if feature.read_text() not in (before,after,authored_feature(protocol=False),previous_feature):raise ValueError('Undeclared feature drift')
     feature.write_text(after)
     records.append(dict(path=str(feature.relative_to(ROOT)),beforeSha256=hashlib.sha256(before.encode()).hexdigest(),afterSha256=hashlib.sha256(after.encode()).hexdigest()))
     ledger=expected_ledger()
