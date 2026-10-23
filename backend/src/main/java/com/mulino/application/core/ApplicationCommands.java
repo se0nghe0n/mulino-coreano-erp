@@ -107,6 +107,8 @@ public class ApplicationCommands {
     if(!h.mutatesAuthorization(cap))auth.authorizeScopes(c,cap,prep.scopes());current.verifyCommit(c,cap,hash,prep,intent,h.mutatesAuthorization(cap));if(!claim.isEmpty())leases.getObject().fenceAndVerify(c,claim);
     current.consume(c,prep,intent,id);
     result.put("commandId",id);result.put("canonicalIntentHash",hash);result.put("proposalRevision",prep.proposalRevision()>0?prep.proposalRevision():1);
+    // Persist once with the original result; a replay must never substitute its retry transaction.
+    result.put("transactionId",repository.transactionId());
     result.putIfAbsent("effects",Map.of());if(result.get("revision") instanceof Number)facts.put("afterRevision",result.get("revision"));
     fault(c.organizationId(),cap,key,"command.beforeCommit","AFTER_IN_PROGRESS_BEFORE_EFFECT_COMMIT","AUDIT_INSERT");appliedOrganization.set(c.organizationId());
     repository.finish(c,id,intent,hash,result,clock.instant(),facts);return result;

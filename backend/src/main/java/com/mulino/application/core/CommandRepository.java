@@ -10,6 +10,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 public class CommandRepository {
   private final PersistenceService db;private final JdbcTemplate jdbc;private final ObjectMapper json=new ObjectMapper();
   public CommandRepository(PersistenceService db,JdbcTemplate jdbc){this.db=db;this.jdbc=jdbc;}
+  /** Database-local top-level PostgreSQL XID (32-bit); not a durable or globally unique identifier. */
+  public String transactionId(){
+    if(!TransactionSynchronizationManager.isActualTransactionActive())throw new IllegalStateException("Command transaction identity requires transaction");
+    return jdbc.queryForObject("SELECT pg_current_xact_id()::xid::text",String.class);
+  }
   public void fence(DomainContext c,Collection<String> keys){
     if(!TransactionSynchronizationManager.isActualTransactionActive())throw new IllegalStateException("Command fence requires transaction");
     jdbc.queryForList("SELECT set_config('lock_timeout', ?, true)","2000ms");

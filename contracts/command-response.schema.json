@@ -23,6 +23,11 @@
       "type": "string",
       "format": "uuid"
     },
+    "transactionId": {
+      "type": "string",
+      "pattern": "^[1-9][0-9]{0,9}$",
+      "description": "Actual database-local PostgreSQL top-level 32-bit XID of the effect transaction, retained from the original command result on replay. Not globally unique, epoch-qualified, durable business identity or proof of commit by itself. A caller-owned changeset must commit before its results can be published; subtransaction tuple xmin can differ. Historical stored results may omit this field."
+    },
     "canonicalIntentHash": {
       "type": "string",
       "pattern": "^[a-f0-9]{64}$"
@@ -66,6 +71,16 @@
     ]
   },
   "allOf": [
+    {
+      "if": {
+        "required": ["transactionId"]
+      },
+      "then": {
+        "properties": {
+          "outcome": {"enum": ["APPLIED", "ACCEPTED_PENDING_EXTERNAL"]}
+        }
+      }
+    },
     {
       "if": {
         "required": [
