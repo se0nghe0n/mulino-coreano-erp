@@ -140,3 +140,11 @@ key와 이 실행이 생성한 DB container는 정리했으며 부재를 확인�
 원래 assertion·fixture·source ledger와 recovery section의 보존을
 재확인했다. root가 supplier observer alias 및 recovery 변경을 통합하고
 결합 인수를 수행해야 하므로 Task/current Step은 OPEN이다.
+
+## 후속 lease 경계와 승인된 source 동기화
+
+위 표와 observer FAIL은 84dd8025 당시의 보존 기록이다. 마지막 권한
+검사 중 lease가 만료되는 후속 회귀와 수정, root 승인 recovery/observer
+4개 commit의 동기화 및 그 소스의 재검증은
+[lease 경계 인계](LEASE-BOUNDARY.md)에 별도로 기록한다. 원래 oracle와
+source ledger는 이 후속 작업에서도 변경하지 않는다.
