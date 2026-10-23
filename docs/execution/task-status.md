@@ -1120,3 +1120,13 @@ primary가 원래 ID 합집합과7개 실제 Haiku node·실행 JAR·소스·정
 새 native Workflow wf_8af75b88-62f가 같은 소스의 T09 전체9개와
 수정된 T11 세 subcase, 합계12개·107 assertions를 실행 중이다.
 아직 실제 결과를 PASS로 표시하지 않으며 Task와 현재 Step은 OPEN이다.
+
+## 2026-10-23 공통 캡처 부분 인수의 실제 결과
+
+`5bcb46b5`의 native Haiku Workflow `wf_8af75b88-62f`는 원본 T09 전체와
+T11 영향 범위 12개 subcase·107개 assertion을 실행했다. assertion은
+100 PASS / 7 FAIL / 미관찰0, subcase는 7 PASS / 5 FAIL이다. 6개 node의
+실제 모델, 동일 제품 class324개, tree별 source3175개 보존과 생성 DB
+정리를 coordinator가 직접 확인했다. [실행 기록](capture-case-acceptance.md)에
+raw complete flags와 잔여 실패·HTTP500을 기록했다. 전체 인수는 OPEN이며
+수정된 backend 전체 검증, T17 공개 조회와 T11 재평가 제어 구현을 계속한다.
