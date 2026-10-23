@@ -46,3 +46,6 @@ selector RED는 준비 증거이며 runtime PASS가 아니다. `SupplyAssertionT
 assertion과 고정 관찰 입력의 mutant를 검사하며 제품 service나 효과를 흉내 내지 않는다. 정확한 실행
 명령·exit·발견 수·fixture hash는 evidence/preparation/에 기록한다. 실모델·유료 호출·외부
 제출·은행 이체를 실행하지 않는다.
+
+현재 세 supplier 공개 입력의 한정 수정과 실제 HTTP/PG 실패 경계는
+[공급자 원천 인계](SUPPLIER-SOURCES.md)에 기록한다. 전체 Task/Step은 OPEN이다.

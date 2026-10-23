@@ -9323,7 +9323,7 @@
             "type": "externalResponder",
             "operation": "setResponse",
             "parameters": {
-              "externalOperationId": "T13-supplier-accept-external",
+              "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a",
               "response": {
                 "delivered": true,
                 "receipt": "supplier-transmission-receipt"
@@ -9332,6 +9332,294 @@
           },
           "evidenceRefs": [
             "delivery-ack:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-delivery-tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "T13-supplier-accept",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            }
+          },
+          "evidenceRefs": [
+            "source-delivery-tick:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-document",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "sourceReference": "d4f6c99a-1e25-516d-a4a1-c41aa8610983",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_SOURCE_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-transmission-document"
+          },
+          "evidenceRefs": [
+            "source-transmission-document:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-event",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "kind": "EXTERNAL_RESULT",
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "externalEventId": "d4f6c99a-1e25-516d-a4a1-c41aa8610983",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "새 synthetic 원문 주장이다. 현재 source/identity/quantity/time 대조로 검증한다."
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-transmission-event"
+          },
+          "evidenceRefs": [
+            "source-transmission-event:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-match",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "source-transmission-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a",
+              "policyVersion": "t13-synthetic-v1",
+              "sourceIdentity": "synthetic-t13-supplier-source:d4f6c99a-1e25-516d-a4a1-c41aa8610983:1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "명시한 synthetic 원문과 현재 typed 대상/수량/시간을 대조한다."
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-transmission-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-transmission-match:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-canonical",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "source-transmission-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-transmission-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-transmission-canonical:actual-adapter-artifact"
           ]
         },
         {
@@ -9344,22 +9632,22 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordExternalReconciliation",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
+            "subjectRefs": [],
+            "slots": {
+              "outboxId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/outboxId"
+                }
+              },
+              "decision": "CONFIRMED_SUCCESS",
+              "evidenceId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
                 }
               }
-            ],
-            "slots": {
-              "externalOperationId": "T13-supplier-accept-external",
-              "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": {
-                "$alias": "supplier-ship"
-              }
             },
-            "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-accept-transmission",
             "evidenceRefs": [
               {
@@ -9367,9 +9655,9 @@
               }
             ],
             "provenance": {
-              "externalOperationId": "USER",
-              "outcome": "USER",
-              "receiptEvidence": "USER"
+              "outboxId": "CONTEXT",
+              "decision": "CONTEXT",
+              "evidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -9434,6 +9722,294 @@
           ]
         },
         {
+          "id": "source-reply-document",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "PURCHASE_ORDER",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "sourceReference": "5b87ffe0-ecea-5bdf-bbfd-3e5800643edd",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "ACCEPT",
+                    "quantity": "100",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "ACCEPT",
+                    "quantity": "100",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_SOURCE_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-reply-document"
+          },
+          "evidenceRefs": [
+            "source-reply-document:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-event",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "PURCHASE_ORDER",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                }
+              },
+              "kind": "SUPPLIER_ACCEPT",
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "externalEventId": "5b87ffe0-ecea-5bdf-bbfd-3e5800643edd",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "ACCEPT",
+                    "quantity": "100",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "새 synthetic 원문 주장이다. 현재 source/identity/quantity/time 대조로 검증한다.",
+              "quantity": "100",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-reply-event"
+          },
+          "evidenceRefs": [
+            "source-reply-event:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-match",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "source-reply-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "policyVersion": "t13-synthetic-v1",
+              "sourceIdentity": "synthetic-t13-supplier-source:5b87ffe0-ecea-5bdf-bbfd-3e5800643edd:1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "명시한 synthetic 원문과 현재 typed 대상/수량/시간을 대조한다.",
+              "quantity": "100",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-reply-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-reply-match:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-canonical",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "source-reply-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-accept-source-reply-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-reply-canonical:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "supplier-reply",
           "kind": "invoke",
           "actorRef": "source",
@@ -9464,7 +10040,16 @@
                 "unit": "BOX"
               },
               "evidence": {
-                "$alias": "supplier-ship"
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "source-reply-canonical",
+                  "pointer": "/response/id"
+                }
               }
             },
             "expectedRevision": {
@@ -9483,7 +10068,8 @@
               "purchaseId": "CONTEXT",
               "reply": "USER",
               "proposedQuantity": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "canonicalOccurrenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10125,7 +10711,7 @@
             "type": "externalResponder",
             "operation": "setResponse",
             "parameters": {
-              "externalOperationId": "T13-supplier-reject-external",
+              "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790",
               "response": {
                 "delivered": true,
                 "receipt": "supplier-transmission-receipt"
@@ -10134,6 +10720,294 @@
           },
           "evidenceRefs": [
             "delivery-ack:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-delivery-tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "T13-supplier-reject",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            }
+          },
+          "evidenceRefs": [
+            "source-delivery-tick:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-document",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "sourceReference": "4dd219c3-c309-54f8-a65d-8c27a1a80417",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_SOURCE_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-transmission-document"
+          },
+          "evidenceRefs": [
+            "source-transmission-document:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-event",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "kind": "EXTERNAL_RESULT",
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "externalEventId": "4dd219c3-c309-54f8-a65d-8c27a1a80417",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "새 synthetic 원문 주장이다. 현재 source/identity/quantity/time 대조로 검증한다."
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-transmission-event"
+          },
+          "evidenceRefs": [
+            "source-transmission-event:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-match",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "source-transmission-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790",
+              "policyVersion": "t13-synthetic-v1",
+              "sourceIdentity": "synthetic-t13-supplier-source:4dd219c3-c309-54f8-a65d-8c27a1a80417:1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "명시한 synthetic 원문과 현재 typed 대상/수량/시간을 대조한다."
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-transmission-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-transmission-match:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-canonical",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "source-transmission-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-transmission-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-transmission-canonical:actual-adapter-artifact"
           ]
         },
         {
@@ -10146,22 +11020,22 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordExternalReconciliation",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
+            "subjectRefs": [],
+            "slots": {
+              "outboxId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/outboxId"
+                }
+              },
+              "decision": "CONFIRMED_SUCCESS",
+              "evidenceId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
                 }
               }
-            ],
-            "slots": {
-              "externalOperationId": "T13-supplier-reject-external",
-              "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": {
-                "$alias": "supplier-ship"
-              }
             },
-            "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-reject-transmission",
             "evidenceRefs": [
               {
@@ -10169,9 +11043,9 @@
               }
             ],
             "provenance": {
-              "externalOperationId": "USER",
-              "outcome": "USER",
-              "receiptEvidence": "USER"
+              "outboxId": "CONTEXT",
+              "decision": "CONTEXT",
+              "evidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10236,6 +11110,294 @@
           ]
         },
         {
+          "id": "source-reply-document",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "PURCHASE_ORDER",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "sourceReference": "2c7d79b6-dbac-5737-b5ac-0f6ad24d4a59",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "REJECT",
+                    "quantity": "100",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "REJECT",
+                    "quantity": "100",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_SOURCE_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-reply-document"
+          },
+          "evidenceRefs": [
+            "source-reply-document:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-event",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "PURCHASE_ORDER",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                }
+              },
+              "kind": "SUPPLIER_REJECT",
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "externalEventId": "2c7d79b6-dbac-5737-b5ac-0f6ad24d4a59",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "REJECT",
+                    "quantity": "100",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "새 synthetic 원문 주장이다. 현재 source/identity/quantity/time 대조로 검증한다.",
+              "quantity": "100",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-reply-event"
+          },
+          "evidenceRefs": [
+            "source-reply-event:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-match",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "source-reply-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "policyVersion": "t13-synthetic-v1",
+              "sourceIdentity": "synthetic-t13-supplier-source:2c7d79b6-dbac-5737-b5ac-0f6ad24d4a59:1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "명시한 synthetic 원문과 현재 typed 대상/수량/시간을 대조한다.",
+              "quantity": "100",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-reply-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-reply-match:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-canonical",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "source-reply-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-reject-source-reply-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-reply-canonical:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "supplier-reply",
           "kind": "invoke",
           "actorRef": "source",
@@ -10266,7 +11428,16 @@
                 "unit": "BOX"
               },
               "evidence": {
-                "$alias": "supplier-ship"
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "source-reply-canonical",
+                  "pointer": "/response/id"
+                }
               }
             },
             "expectedRevision": {
@@ -10285,7 +11456,8 @@
               "purchaseId": "CONTEXT",
               "reply": "USER",
               "proposedQuantity": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "canonicalOccurrenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10927,7 +12099,7 @@
             "type": "externalResponder",
             "operation": "setResponse",
             "parameters": {
-              "externalOperationId": "T13-supplier-change-external",
+              "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d",
               "response": {
                 "delivered": true,
                 "receipt": "supplier-transmission-receipt"
@@ -10936,6 +12108,294 @@
           },
           "evidenceRefs": [
             "delivery-ack:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-delivery-tick",
+          "kind": "control",
+          "control": {
+            "type": "process",
+            "operation": "tickScheduler",
+            "parameters": {
+              "schedulerId": "T13-supplier-change",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            }
+          },
+          "evidenceRefs": [
+            "source-delivery-tick:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-document",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "sourceReference": "0adf46af-0a19-5309-b742-f0698c12cd5b",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_SOURCE_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-transmission-document"
+          },
+          "evidenceRefs": [
+            "source-transmission-document:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-event",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "kind": "EXTERNAL_RESULT",
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "externalEventId": "0adf46af-0a19-5309-b742-f0698c12cd5b",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d",
+                    "outcome": "CONFIRMED_SUCCESS",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "work",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "commandId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/commandId"
+                      }
+                    },
+                    "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "새 synthetic 원문 주장이다. 현재 source/identity/quantity/time 대조로 검증한다."
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-transmission-event"
+          },
+          "evidenceRefs": [
+            "source-transmission-event:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-match",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "source-transmission-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": "b71565fb-e784-51ae-89fc-5f46e754b56d",
+              "policyVersion": "t13-synthetic-v1",
+              "sourceIdentity": "synthetic-t13-supplier-source:0adf46af-0a19-5309-b742-f0698c12cd5b:1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "명시한 synthetic 원문과 현재 typed 대상/수량/시간을 대조한다."
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-transmission-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-transmission-match:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-transmission-canonical",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "source-transmission-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-transmission-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-transmission-canonical:actual-adapter-artifact"
           ]
         },
         {
@@ -10948,22 +12408,22 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordExternalReconciliation",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
+            "subjectRefs": [],
+            "slots": {
+              "outboxId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/outboxId"
+                }
+              },
+              "decision": "CONFIRMED_SUCCESS",
+              "evidenceId": {
+                "$result": {
+                  "actionId": "source-transmission-document",
+                  "pointer": "/response/id"
                 }
               }
-            ],
-            "slots": {
-              "externalOperationId": "T13-supplier-change-external",
-              "outcome": "CONFIRMED_SUCCESS",
-              "receiptEvidence": {
-                "$alias": "supplier-ship"
-              }
             },
-            "expectedRevision": 1,
             "commandIdempotencyKey": "T13-supplier-change-transmission",
             "evidenceRefs": [
               {
@@ -10971,9 +12431,9 @@
               }
             ],
             "provenance": {
-              "externalOperationId": "USER",
-              "outcome": "USER",
-              "receiptEvidence": "USER"
+              "outboxId": "CONTEXT",
+              "decision": "CONTEXT",
+              "evidenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -11038,6 +12498,294 @@
           ]
         },
         {
+          "id": "source-reply-document",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "PURCHASE_ORDER",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "sourceReference": "a91df49c-307f-5509-9fec-efdc5c3d79df",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "CHANGE",
+                    "quantity": "80",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "CHANGE",
+                    "quantity": "80",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_SOURCE_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-reply-document"
+          },
+          "evidenceRefs": [
+            "source-reply-document:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-event",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "PURCHASE_ORDER",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                }
+              },
+              "kind": "SUPPLIER_CHANGE",
+              "sourceNamespace": "synthetic-t13-supplier-source",
+              "externalEventId": "a91df49c-307f-5509-9fec-efdc5c3d79df",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "newSynthetic": true,
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "orderId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/objectId"
+                      }
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "supplierId": {
+                      "$alias": "SUP"
+                    },
+                    "proposalRevision": {
+                      "$result": {
+                        "actionId": "proposal",
+                        "pointer": "/response/proposalRevision"
+                      }
+                    },
+                    "reply": "CHANGE",
+                    "quantity": "80",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "sourceMeaning": "synthetic supplier reply; not arrival"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "새 synthetic 원문 주장이다. 현재 source/identity/quantity/time 대조로 검증한다.",
+              "quantity": "80",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-reply-event"
+          },
+          "evidenceRefs": [
+            "source-reply-event:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-match",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "source-reply-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/objectId"
+                }
+              },
+              "policyVersion": "t13-synthetic-v1",
+              "sourceIdentity": "synthetic-t13-supplier-source:a91df49c-307f-5509-9fec-efdc5c3d79df:1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "명시한 synthetic 원문과 현재 typed 대상/수량/시간을 대조한다.",
+              "quantity": "80",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-reply-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-reply-match:actual-adapter-artifact"
+          ]
+        },
+        {
+          "id": "source-reply-canonical",
+          "kind": "invoke",
+          "actorRef": "t13Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "source-reply-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T13-supplier-change-source-reply-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "source-reply-canonical:actual-adapter-artifact"
+          ]
+        },
+        {
           "id": "supplier-reply",
           "kind": "invoke",
           "actorRef": "source",
@@ -11068,7 +12816,16 @@
                 "unit": "BOX"
               },
               "evidence": {
-                "$alias": "supplier-ship"
+                "$result": {
+                  "actionId": "source-reply-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "source-reply-canonical",
+                  "pointer": "/response/id"
+                }
               }
             },
             "expectedRevision": {
@@ -11087,7 +12844,8 @@
               "purchaseId": "CONTEXT",
               "reply": "USER",
               "proposedQuantity": "USER",
-              "evidence": "USER"
+              "evidence": "USER",
+              "canonicalOccurrenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [

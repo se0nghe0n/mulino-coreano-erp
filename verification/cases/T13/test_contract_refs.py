@@ -23,6 +23,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from author_supplier_sources import restore_case
 from author_contract_refs import BASELINE, DIRECTORY, SUPPLIER_CASES, repair, result
 from author_input_contracts import repair as repair_inputs
 
@@ -58,7 +59,7 @@ class PurchaseContractRefs(unittest.TestCase):
         # Exercise the earlier reference layer independently, then verify the
         # current input layer composes over it without erasing its guarantees.
         cls.current = repair(copy.deepcopy(cls.before))
-        assert repair_inputs(copy.deepcopy(cls.current)) == json.loads(cls.current_bytes)
+        assert repair_inputs(copy.deepcopy(cls.current)) == restore_case(json.loads(cls.current_bytes))
 
     def test_prior_layer_keeps_all_123_assertions(self):
         self.assertEqual(123, sum(len(s['assertions']) for s in self.current['subcases']))

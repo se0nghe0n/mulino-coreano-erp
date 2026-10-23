@@ -254,9 +254,18 @@
     만일 "manager" 역할이 "approval" 행동을 수행한다
     만일 "procurement" 역할이 "dispatch" 행동을 수행한다
     만일 "시스템" 역할이 "delivery-ack" 행동을 수행한다
+    만일 "시스템" 역할이 "source-delivery-tick" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-document" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-event" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-match" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-canonical" 행동을 수행한다
     만일 "source" 역할이 "transmission" 행동을 수행한다
     만일 "procurement" 역할이 "transmission-view" 행동을 수행한다
     만일 "시스템" 역할이 "transmission-db" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-document" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-event" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-match" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-canonical" 행동을 수행한다
     만일 "source" 역할이 "supplier-reply" 행동을 수행한다
     만일 "procurement" 역할이 "reply-view" 행동을 수행한다
     만일 "시스템" 역할이 "reply-db" 행동을 수행한다
@@ -277,9 +286,18 @@
     만일 "manager" 역할이 "approval" 행동을 수행한다
     만일 "procurement" 역할이 "dispatch" 행동을 수행한다
     만일 "시스템" 역할이 "delivery-ack" 행동을 수행한다
+    만일 "시스템" 역할이 "source-delivery-tick" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-document" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-event" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-match" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-canonical" 행동을 수행한다
     만일 "source" 역할이 "transmission" 행동을 수행한다
     만일 "procurement" 역할이 "transmission-view" 행동을 수행한다
     만일 "시스템" 역할이 "transmission-db" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-document" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-event" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-match" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-canonical" 행동을 수행한다
     만일 "source" 역할이 "supplier-reply" 행동을 수행한다
     만일 "procurement" 역할이 "reply-view" 행동을 수행한다
     만일 "시스템" 역할이 "reply-db" 행동을 수행한다
@@ -300,9 +318,18 @@
     만일 "manager" 역할이 "approval" 행동을 수행한다
     만일 "procurement" 역할이 "dispatch" 행동을 수행한다
     만일 "시스템" 역할이 "delivery-ack" 행동을 수행한다
+    만일 "시스템" 역할이 "source-delivery-tick" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-document" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-event" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-match" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-transmission-canonical" 행동을 수행한다
     만일 "source" 역할이 "transmission" 행동을 수행한다
     만일 "procurement" 역할이 "transmission-view" 행동을 수행한다
     만일 "시스템" 역할이 "transmission-db" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-document" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-event" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-match" 행동을 수행한다
+    만일 "t13Source" 역할이 "source-reply-canonical" 행동을 수행한다
     만일 "source" 역할이 "supplier-reply" 행동을 수행한다
     만일 "procurement" 역할이 "reply-view" 행동을 수행한다
     만일 "시스템" 역할이 "reply-db" 행동을 수행한다

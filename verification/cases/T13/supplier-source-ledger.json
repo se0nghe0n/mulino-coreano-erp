@@ -1,0 +1,2628 @@
+{
+  "newSynthetic": true,
+  "originalAuthorityClaimed": false,
+  "operatingApprovalClaimed": false,
+  "authoredBy": "coordinator-selected-fixture",
+  "baseline": "bcac964ced0d5cf47a990afabba5eddefb66b2c8",
+  "changes": [
+    {
+      "subcaseId": "supplier-accept",
+      "originalSubcase": {
+        "id": "supplier-accept",
+        "title": "발주 전달과 공급자 ACCEPT는 도착을 만들지 않는다",
+        "fixtureRef": "verification/cases/T13/fixtures/supplier-accept.json",
+        "requiredAdapters": [
+          "api",
+          "independent-db-observer",
+          "process-control"
+        ],
+        "actions": [
+          {
+            "id": "setup",
+            "kind": "installFixture",
+            "fixtureRef": "verification/cases/T13/fixtures/supplier-accept.json",
+            "evidenceRefs": [
+              "setup:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "work",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-09T09:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "ownerId": {
+                  "$alias": "procurement"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "workType": "PURCHASE",
+                "period": {
+                  "start": "2026-10-07T09:00:00Z",
+                  "end": "2026-10-09T09:00:00Z",
+                  "startInclusive": true,
+                  "endInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "T13-supplier-accept-work",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "evidencePolicyVersion": "APPROVED_DEFAULT",
+                "workType": "USER",
+                "period": "CONTEXT",
+                "eventKinds": "CONTEXT",
+                "distinctContributionScope": "CONTEXT"
+              }
+            },
+            "evidenceRefs": [
+              "work:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "proposePurchase",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "proposePurchase",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "price": {
+                  "value": "1",
+                  "currency": "EUR"
+                },
+                "supplierId": {
+                  "$alias": "SUP"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-09T09:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "workId": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "goalVersionId": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/goalVersionId"
+                  }
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-accept-proposal",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "quantity": "USER",
+                "price": "USER",
+                "supplierId": "CONTEXT",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "workId": "CONTEXT",
+                "goalVersionId": "CONTEXT",
+                "itemId": "CONTEXT"
+              }
+            },
+            "evidenceRefs": [
+              "proposal:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "proposal-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-accept",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "proposal-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions"
+              ]
+            },
+            "evidenceRefs": [
+              "proposal-db:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "approval",
+            "kind": "invoke",
+            "actorRef": "manager",
+            "route": "api",
+            "capabilityId": "approvePurchase",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "approvePurchase",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "proposalId": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "proposalHash": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "decision": "APPROVE",
+                "validUntil": "2026-10-08T09:00:00Z",
+                "conditions": []
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-accept-approval",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "proposalId": "CONTEXT",
+                "proposalHash": "CONTEXT",
+                "decision": "USER",
+                "validUntil": "USER",
+                "conditions": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "approval:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "dispatch",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "dispatchPurchaseOrder",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "dispatchPurchaseOrder",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "proposalId": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "proposalHash": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "approvalId": {
+                  "$result": {
+                    "actionId": "approval",
+                    "pointer": "/response/approvalId"
+                  }
+                },
+                "channel": "SYNTHETIC_SUPPLIER",
+                "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-accept-dispatch",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "proposalId": "CONTEXT",
+                "proposalHash": "CONTEXT",
+                "approvalId": "CONTEXT",
+                "channel": "USER",
+                "externalOperationId": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "dispatch:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "delivery-ack",
+            "kind": "control",
+            "control": {
+              "type": "externalResponder",
+              "operation": "setResponse",
+              "parameters": {
+                "externalOperationId": "T13-supplier-accept-external",
+                "response": {
+                  "delivered": true,
+                  "receipt": "supplier-transmission-receipt"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "delivery-ack:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission",
+            "kind": "invoke",
+            "actorRef": "source",
+            "route": "api",
+            "capabilityId": "recordExternalReconciliation",
+            "request": {
+              "intentKind": "RECORD",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "recordExternalReconciliation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "externalOperationId": "T13-supplier-accept-external",
+                "outcome": "CONFIRMED_SUCCESS",
+                "receiptEvidence": {
+                  "$alias": "supplier-ship"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T13-supplier-accept-transmission",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "externalOperationId": "USER",
+                "outcome": "USER",
+                "receiptEvidence": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "transmission:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "transmission-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-accept",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "transmission-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions",
+                "purchaseOrders"
+              ]
+            },
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "supplier-reply",
+            "kind": "invoke",
+            "actorRef": "source",
+            "route": "api",
+            "capabilityId": "recordSupplierReply",
+            "request": {
+              "intentKind": "RECORD",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "recordSupplierReply",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "purchaseId": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/orderId"
+                  }
+                },
+                "reply": "ACCEPT",
+                "proposedQuantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "evidence": {
+                  "$alias": "supplier-ship"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-accept-supplier-reply",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "purchaseId": "CONTEXT",
+                "reply": "USER",
+                "proposedQuantity": "USER",
+                "evidence": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "supplier-reply:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "reply-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "reply-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "reply-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-accept",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "reply-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions",
+                "supplierCommitments"
+              ]
+            },
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ]
+          }
+        ],
+        "assertions": [
+          {
+            "id": "proposal-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "proposal-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "proposal-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-accept",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle purchase-created-held-inventory의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "purchase-created-held-inventory"
+              ]
+            }
+          },
+          {
+            "id": "transmission-arrival-zero",
+            "op": "count",
+            "source": {
+              "actionId": "transmission-db",
+              "pointer": "/data/rawRows/receiptContributions"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-accept",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle transmission-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "transmission-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "transmission-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "transmission-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-accept",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle transmission-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "transmission-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "supplier-arrival-zero",
+            "op": "count",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/receiptContributions"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-accept",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "supplier-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-accept",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "reply-distinct",
+            "op": "relationSet",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/supplierCommitments",
+              "field": [
+                "purchaseId",
+                "reply",
+                "itemId",
+                "quantity",
+                "unit"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "ACCEPT",
+                {
+                  "$alias": "P"
+                },
+                "100",
+                "BOX"
+              ]
+            ],
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-accept",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          }
+        ],
+        "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+      },
+      "generatedSha256": "55230d4b157a033106e2ce00def0e544007966b77f1b89ac9f99dde812e7ca00",
+      "syntheticTransmissionInput": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a",
+        "outcome": "CONFIRMED_SUCCESS",
+        "orderId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/objectId"
+          }
+        },
+        "workId": {
+          "$result": {
+            "actionId": "work",
+            "pointer": "/response/workId"
+          }
+        },
+        "commandId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/commandId"
+          }
+        },
+        "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+      },
+      "syntheticReplyInput": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "orderId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/objectId"
+          }
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "supplierId": {
+          "$alias": "SUP"
+        },
+        "proposalRevision": {
+          "$result": {
+            "actionId": "proposal",
+            "pointer": "/response/proposalRevision"
+          }
+        },
+        "reply": "ACCEPT",
+        "quantity": "100",
+        "unit": "BOX",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "sourceMeaning": "synthetic supplier reply; not arrival"
+      },
+      "addedActionIds": [
+        "source-delivery-tick",
+        "source-transmission-document",
+        "source-transmission-event",
+        "source-transmission-match",
+        "source-transmission-canonical",
+        "source-reply-document",
+        "source-reply-event",
+        "source-reply-match",
+        "source-reply-canonical"
+      ]
+    },
+    {
+      "subcaseId": "supplier-reject",
+      "originalSubcase": {
+        "id": "supplier-reject",
+        "title": "발주 전달과 공급자 REJECT는 도착을 만들지 않는다",
+        "fixtureRef": "verification/cases/T13/fixtures/supplier-reject.json",
+        "requiredAdapters": [
+          "api",
+          "independent-db-observer",
+          "process-control"
+        ],
+        "actions": [
+          {
+            "id": "setup",
+            "kind": "installFixture",
+            "fixtureRef": "verification/cases/T13/fixtures/supplier-reject.json",
+            "evidenceRefs": [
+              "setup:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "work",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-09T09:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "ownerId": {
+                  "$alias": "procurement"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "workType": "PURCHASE",
+                "period": {
+                  "start": "2026-10-07T09:00:00Z",
+                  "end": "2026-10-09T09:00:00Z",
+                  "startInclusive": true,
+                  "endInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "T13-supplier-reject-work",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "evidencePolicyVersion": "APPROVED_DEFAULT",
+                "workType": "USER",
+                "period": "CONTEXT",
+                "eventKinds": "CONTEXT",
+                "distinctContributionScope": "CONTEXT"
+              }
+            },
+            "evidenceRefs": [
+              "work:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "proposePurchase",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "proposePurchase",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "price": {
+                  "value": "1",
+                  "currency": "EUR"
+                },
+                "supplierId": {
+                  "$alias": "SUP"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-09T09:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "workId": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "goalVersionId": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/goalVersionId"
+                  }
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-reject-proposal",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "quantity": "USER",
+                "price": "USER",
+                "supplierId": "CONTEXT",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "workId": "CONTEXT",
+                "goalVersionId": "CONTEXT",
+                "itemId": "CONTEXT"
+              }
+            },
+            "evidenceRefs": [
+              "proposal:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "proposal-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-reject",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "proposal-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions"
+              ]
+            },
+            "evidenceRefs": [
+              "proposal-db:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "approval",
+            "kind": "invoke",
+            "actorRef": "manager",
+            "route": "api",
+            "capabilityId": "approvePurchase",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "approvePurchase",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "proposalId": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "proposalHash": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "decision": "APPROVE",
+                "validUntil": "2026-10-08T09:00:00Z",
+                "conditions": []
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-reject-approval",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "proposalId": "CONTEXT",
+                "proposalHash": "CONTEXT",
+                "decision": "USER",
+                "validUntil": "USER",
+                "conditions": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "approval:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "dispatch",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "dispatchPurchaseOrder",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "dispatchPurchaseOrder",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "proposalId": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "proposalHash": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "approvalId": {
+                  "$result": {
+                    "actionId": "approval",
+                    "pointer": "/response/approvalId"
+                  }
+                },
+                "channel": "SYNTHETIC_SUPPLIER",
+                "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-reject-dispatch",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "proposalId": "CONTEXT",
+                "proposalHash": "CONTEXT",
+                "approvalId": "CONTEXT",
+                "channel": "USER",
+                "externalOperationId": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "dispatch:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "delivery-ack",
+            "kind": "control",
+            "control": {
+              "type": "externalResponder",
+              "operation": "setResponse",
+              "parameters": {
+                "externalOperationId": "T13-supplier-reject-external",
+                "response": {
+                  "delivered": true,
+                  "receipt": "supplier-transmission-receipt"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "delivery-ack:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission",
+            "kind": "invoke",
+            "actorRef": "source",
+            "route": "api",
+            "capabilityId": "recordExternalReconciliation",
+            "request": {
+              "intentKind": "RECORD",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "recordExternalReconciliation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "externalOperationId": "T13-supplier-reject-external",
+                "outcome": "CONFIRMED_SUCCESS",
+                "receiptEvidence": {
+                  "$alias": "supplier-ship"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T13-supplier-reject-transmission",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "externalOperationId": "USER",
+                "outcome": "USER",
+                "receiptEvidence": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "transmission:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "transmission-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-reject",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "transmission-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions",
+                "purchaseOrders"
+              ]
+            },
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "supplier-reply",
+            "kind": "invoke",
+            "actorRef": "source",
+            "route": "api",
+            "capabilityId": "recordSupplierReply",
+            "request": {
+              "intentKind": "RECORD",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "recordSupplierReply",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "purchaseId": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/orderId"
+                  }
+                },
+                "reply": "REJECT",
+                "proposedQuantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "evidence": {
+                  "$alias": "supplier-ship"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-reject-supplier-reply",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "purchaseId": "CONTEXT",
+                "reply": "USER",
+                "proposedQuantity": "USER",
+                "evidence": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "supplier-reply:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "reply-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "reply-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "reply-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-reject",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "reply-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions",
+                "supplierCommitments"
+              ]
+            },
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ]
+          }
+        ],
+        "assertions": [
+          {
+            "id": "proposal-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "proposal-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "proposal-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-reject",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle purchase-created-held-inventory의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "purchase-created-held-inventory"
+              ]
+            }
+          },
+          {
+            "id": "transmission-arrival-zero",
+            "op": "count",
+            "source": {
+              "actionId": "transmission-db",
+              "pointer": "/data/rawRows/receiptContributions"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-reject",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle transmission-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "transmission-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "transmission-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "transmission-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-reject",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle transmission-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "transmission-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "supplier-arrival-zero",
+            "op": "count",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/receiptContributions"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-reject",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "supplier-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-reject",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "reply-distinct",
+            "op": "relationSet",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/supplierCommitments",
+              "field": [
+                "purchaseId",
+                "reply",
+                "itemId",
+                "quantity",
+                "unit"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "REJECT",
+                {
+                  "$alias": "P"
+                },
+                "100",
+                "BOX"
+              ]
+            ],
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-reject",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          }
+        ],
+        "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+      },
+      "generatedSha256": "7f100d09961a474e2151ee428c17e099e497d3f209afa5b82aa24d001519f234",
+      "syntheticTransmissionInput": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790",
+        "outcome": "CONFIRMED_SUCCESS",
+        "orderId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/objectId"
+          }
+        },
+        "workId": {
+          "$result": {
+            "actionId": "work",
+            "pointer": "/response/workId"
+          }
+        },
+        "commandId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/commandId"
+          }
+        },
+        "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+      },
+      "syntheticReplyInput": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "orderId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/objectId"
+          }
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "supplierId": {
+          "$alias": "SUP"
+        },
+        "proposalRevision": {
+          "$result": {
+            "actionId": "proposal",
+            "pointer": "/response/proposalRevision"
+          }
+        },
+        "reply": "REJECT",
+        "quantity": "100",
+        "unit": "BOX",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "sourceMeaning": "synthetic supplier reply; not arrival"
+      },
+      "addedActionIds": [
+        "source-delivery-tick",
+        "source-transmission-document",
+        "source-transmission-event",
+        "source-transmission-match",
+        "source-transmission-canonical",
+        "source-reply-document",
+        "source-reply-event",
+        "source-reply-match",
+        "source-reply-canonical"
+      ]
+    },
+    {
+      "subcaseId": "supplier-change",
+      "originalSubcase": {
+        "id": "supplier-change",
+        "title": "발주 전달과 공급자 CHANGE는 도착을 만들지 않는다",
+        "fixtureRef": "verification/cases/T13/fixtures/supplier-change.json",
+        "requiredAdapters": [
+          "api",
+          "independent-db-observer",
+          "process-control"
+        ],
+        "actions": [
+          {
+            "id": "setup",
+            "kind": "installFixture",
+            "fixtureRef": "verification/cases/T13/fixtures/supplier-change.json",
+            "evidenceRefs": [
+              "setup:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "work",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-09T09:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "ownerId": {
+                  "$alias": "procurement"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "workType": "PURCHASE",
+                "period": {
+                  "start": "2026-10-07T09:00:00Z",
+                  "end": "2026-10-09T09:00:00Z",
+                  "startInclusive": true,
+                  "endInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "T13-supplier-change-work",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "evidencePolicyVersion": "APPROVED_DEFAULT",
+                "workType": "USER",
+                "period": "CONTEXT",
+                "eventKinds": "CONTEXT",
+                "distinctContributionScope": "CONTEXT"
+              }
+            },
+            "evidenceRefs": [
+              "work:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "proposePurchase",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "proposePurchase",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "price": {
+                  "value": "1",
+                  "currency": "EUR"
+                },
+                "supplierId": {
+                  "$alias": "SUP"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-09T09:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "workId": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "goalVersionId": {
+                  "$result": {
+                    "actionId": "work",
+                    "pointer": "/response/goalVersionId"
+                  }
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-change-proposal",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "quantity": "USER",
+                "price": "USER",
+                "supplierId": "CONTEXT",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "workId": "CONTEXT",
+                "goalVersionId": "CONTEXT",
+                "itemId": "CONTEXT"
+              }
+            },
+            "evidenceRefs": [
+              "proposal:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "proposal-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "proposal-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-change",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "proposal-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions"
+              ]
+            },
+            "evidenceRefs": [
+              "proposal-db:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "approval",
+            "kind": "invoke",
+            "actorRef": "manager",
+            "route": "api",
+            "capabilityId": "approvePurchase",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "approvePurchase",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "proposalId": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "proposalHash": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "decision": "APPROVE",
+                "validUntil": "2026-10-08T09:00:00Z",
+                "conditions": []
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-change-approval",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "proposalId": "CONTEXT",
+                "proposalHash": "CONTEXT",
+                "decision": "USER",
+                "validUntil": "USER",
+                "conditions": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "approval:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "dispatch",
+            "kind": "invoke",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "dispatchPurchaseOrder",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "dispatchPurchaseOrder",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "proposalId": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalId"
+                  }
+                },
+                "proposalHash": {
+                  "$result": {
+                    "actionId": "proposal",
+                    "pointer": "/response/proposalHash"
+                  }
+                },
+                "approvalId": {
+                  "$result": {
+                    "actionId": "approval",
+                    "pointer": "/response/approvalId"
+                  }
+                },
+                "channel": "SYNTHETIC_SUPPLIER",
+                "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "proposal",
+                  "pointer": "/response/proposalRevision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-change-dispatch",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "proposalId": "CONTEXT",
+                "proposalHash": "CONTEXT",
+                "approvalId": "CONTEXT",
+                "channel": "USER",
+                "externalOperationId": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "dispatch:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "delivery-ack",
+            "kind": "control",
+            "control": {
+              "type": "externalResponder",
+              "operation": "setResponse",
+              "parameters": {
+                "externalOperationId": "T13-supplier-change-external",
+                "response": {
+                  "delivered": true,
+                  "receipt": "supplier-transmission-receipt"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "delivery-ack:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission",
+            "kind": "invoke",
+            "actorRef": "source",
+            "route": "api",
+            "capabilityId": "recordExternalReconciliation",
+            "request": {
+              "intentKind": "RECORD",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "recordExternalReconciliation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "externalOperationId": "T13-supplier-change-external",
+                "outcome": "CONFIRMED_SUCCESS",
+                "receiptEvidence": {
+                  "$alias": "supplier-ship"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T13-supplier-change-transmission",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "externalOperationId": "USER",
+                "outcome": "USER",
+                "receiptEvidence": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "transmission:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "transmission-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "transmission-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-change",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "transmission-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions",
+                "purchaseOrders"
+              ]
+            },
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "supplier-reply",
+            "kind": "invoke",
+            "actorRef": "source",
+            "route": "api",
+            "capabilityId": "recordSupplierReply",
+            "request": {
+              "intentKind": "RECORD",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "recordSupplierReply",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "purchaseId": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/orderId"
+                  }
+                },
+                "reply": "CHANGE",
+                "proposedQuantity": {
+                  "value": "80",
+                  "unit": "BOX"
+                },
+                "evidence": {
+                  "$alias": "supplier-ship"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T13-supplier-change-supplier-reply",
+              "evidenceRefs": [
+                {
+                  "$alias": "need"
+                }
+              ],
+              "provenance": {
+                "purchaseId": "CONTEXT",
+                "reply": "USER",
+                "proposedQuantity": "USER",
+                "evidence": "USER"
+              }
+            },
+            "evidenceRefs": [
+              "supplier-reply:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "reply-view",
+            "kind": "query",
+            "actorRef": "procurement",
+            "route": "api",
+            "capabilityId": "getObject",
+            "request": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            "evidenceRefs": [
+              "reply-view:actual-adapter-artifact"
+            ]
+          },
+          {
+            "id": "reply-db",
+            "kind": "observe",
+            "observation": {
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T13",
+                "subcaseId": "supplier-change",
+                "itemId": {
+                  "$alias": "P"
+                }
+              },
+              "snapshotRef": {
+                "$result": {
+                  "actionId": "reply-view",
+                  "pointer": "/response/snapshotRevision"
+                }
+              },
+              "asOf": "2026-10-07T09:00:00Z",
+              "knownAt": "2026-10-07T09:00:01Z",
+              "sources": [
+                "segments",
+                "receiptContributions",
+                "supplierCommitments"
+              ]
+            },
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ]
+          }
+        ],
+        "assertions": [
+          {
+            "id": "proposal-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "proposal-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "proposal-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-change",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle purchase-created-held-inventory의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "purchase-created-held-inventory"
+              ]
+            }
+          },
+          {
+            "id": "transmission-arrival-zero",
+            "op": "count",
+            "source": {
+              "actionId": "transmission-db",
+              "pointer": "/data/rawRows/receiptContributions"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-change",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle transmission-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "transmission-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "transmission-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "transmission-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "transmission-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-change",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle transmission-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "transmission-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "supplier-arrival-zero",
+            "op": "count",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/receiptContributions"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-change",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "supplier-inventory-zero",
+            "op": "count",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/segments"
+            },
+            "expected": 0,
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-change",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          },
+          {
+            "id": "reply-distinct",
+            "op": "relationSet",
+            "source": {
+              "actionId": "reply-db",
+              "pointer": "/data/rawRows/supplierCommitments",
+              "field": [
+                "purchaseId",
+                "reply",
+                "itemId",
+                "quantity",
+                "unit"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/objectId"
+                  }
+                },
+                "CHANGE",
+                {
+                  "$alias": "P"
+                },
+                "80",
+                "BOX"
+              ]
+            ],
+            "requirementRefs": [
+              "D13"
+            ],
+            "evidenceRefs": [
+              "reply-db:actual-adapter-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T13",
+              "subcaseId": "supplier-change",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "고정 oracle supplier-acceptance-created-arrival의 실제 값과 범위를 확인한다",
+            "oracleRef": {
+              "oracleId": "T13.delivery-commitment-arrival-separate",
+              "observationNames": [
+                "supplier-acceptance-created-arrival"
+              ]
+            }
+          }
+        ],
+        "oracleExplanation": "가상 입력 fixture에서 모든 명령을 실제 서버에 전달하고 원행·단위·증거·인간 책임을 독립 대조한다. 미구현은 NOT_RUN이며 표본 검사는 제품 PASS가 아니다."
+      },
+      "generatedSha256": "f4880f5a4c3b2bd69b17c4f1a7fe61cb6fa65a4638cb8a377c396b12894108db",
+      "syntheticTransmissionInput": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d",
+        "outcome": "CONFIRMED_SUCCESS",
+        "orderId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/objectId"
+          }
+        },
+        "workId": {
+          "$result": {
+            "actionId": "work",
+            "pointer": "/response/workId"
+          }
+        },
+        "commandId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/commandId"
+          }
+        },
+        "sourceMeaning": "synthetic transport acknowledgement; not supplier acceptance or arrival"
+      },
+      "syntheticReplyInput": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "orderId": {
+          "$result": {
+            "actionId": "dispatch",
+            "pointer": "/response/objectId"
+          }
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "supplierId": {
+          "$alias": "SUP"
+        },
+        "proposalRevision": {
+          "$result": {
+            "actionId": "proposal",
+            "pointer": "/response/proposalRevision"
+          }
+        },
+        "reply": "CHANGE",
+        "quantity": "80",
+        "unit": "BOX",
+        "occurredAt": "2026-10-07T09:00:00Z",
+        "sourceMeaning": "synthetic supplier reply; not arrival"
+      },
+      "addedActionIds": [
+        "source-delivery-tick",
+        "source-transmission-document",
+        "source-transmission-event",
+        "source-transmission-match",
+        "source-transmission-canonical",
+        "source-reply-document",
+        "source-reply-event",
+        "source-reply-match",
+        "source-reply-canonical"
+      ]
+    }
+  ]
+}

@@ -25,6 +25,7 @@ import tempfile
 import unittest
 import uuid
 
+from author_supplier_sources import restore_case, restore_fixture, restore_feature
 from author_input_contracts import BASELINE, DIRECTORY, APPROVAL_CODES, external_operation_id, repair, repair_feature
 from test_contract_refs import request_contract
 
@@ -38,7 +39,7 @@ class InputContracts(unittest.TestCase):
         cls.original = subprocess.check_output(['git', 'show', f'{BASELINE}:{CASE}'], cwd=ROOT)
         cls.before = json.loads(cls.original)
         cls.raw = (ROOT / CASE).read_bytes()
-        cls.current = json.loads(cls.raw)
+        cls.current = restore_case(json.loads(cls.raw))
 
     def test_only_bounded_input_changes_and_all_oracles_preserved(self):
         self.assertEqual(self.current, repair(copy.deepcopy(self.before)))
@@ -68,10 +69,16 @@ class InputContracts(unittest.TestCase):
         for path in (DIRECTORY / 'fixtures').rglob('*'):
             if path.is_file():
                 rel = str(path.relative_to(ROOT))
-                self.assertEqual(subprocess.check_output(['git','show',f'{BASELINE}:{rel}'],cwd=ROOT),path.read_bytes(),rel)
+                actual = path.read_bytes()
+                if path.parent.name == 'fixtures' and path.stem in (
+                        'supplier-accept', 'supplier-reject', 'supplier-change'):
+                    actual = (json.dumps(restore_fixture(json.loads(actual)),
+                                         ensure_ascii=False, indent=2) + '\n').encode()
+                self.assertEqual(subprocess.check_output(
+                    ['git', 'show', f'{BASELINE}:{rel}'], cwd=ROOT), actual, rel)
         feature='verification/cases/T13/scenario.feature'
         original_feature=subprocess.check_output(['git','show',f'{BASELINE}:{feature}'],cwd=ROOT).decode()
-        actual_feature=(ROOT/feature).read_text()
+        actual_feature=restore_feature((ROOT/feature).read_text())
         self.assertEqual(repair_feature(original_feature,self.current),actual_feature)
         restored=''.join(line for line in actual_feature.splitlines(keepends=True)
                          if not any('"'+key+'" assertion' in line for key in

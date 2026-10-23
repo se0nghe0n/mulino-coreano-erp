@@ -54,7 +54,7 @@ public class PurchaseInputProbe {
       if(field.equals("itemId"))check(!binding.targetIds().contains(id("P")),"old P cannot bind changed proposal");
       var method=PurchaseCommands.class.getDeclaredMethod("approveForDispatch",DomainContext.class,Map.class,Map.class,Map.class);method.setAccessible(true);
       root.put("currentApprovalId","new-approval");
-      try {method.invoke(commands,C,intent,current,Map.of("ID","old-approval"));throw new AssertionError("old approval accepted");}
+      try {method.invoke(commands,C,intent,current,Map.of("ID","old-approval","consumptionPolicy","SINGLE_ORDER_REVISION"));throw new AssertionError("old approval accepted");}
       catch(java.lang.reflect.InvocationTargetException e){var d=(DomainError)e.getCause();check(d.outcome().equals("HELD")&&d.code().equals("APPROVAL_NOT_CURRENT"),d.toString());guards++;}
     }
     check(fields==9&&guards==7,"projection and guard coverage");

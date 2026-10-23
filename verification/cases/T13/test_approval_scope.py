@@ -18,6 +18,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from author_supplier_sources import restore_case, restore_fixture
 from author_approval_scope import BASELINE, DIRECTORY, repair, selected_fixtures
 from test_contract_refs import request_contract
 from author_input_contracts import repair as repair_inputs
@@ -34,7 +35,7 @@ class ApprovalFixtureScope(unittest.TestCase):
         case_path = 'verification/cases/T13/case.json'
         before = original(case_path)
         after = (ROOT / case_path).read_bytes()
-        self.assertEqual(repair_inputs(json.loads(before)), json.loads(after))
+        self.assertEqual(repair_inputs(json.loads(before)), restore_case(json.loads(after)))
         case = json.loads(after)
         self.assertEqual(135, sum(len(s['assertions']) for s in case['subcases']))
         selected = selected_fixtures(case)
@@ -43,7 +44,7 @@ class ApprovalFixtureScope(unittest.TestCase):
             path = sub['fixtureRef']
             raw = original(path)
             old = json.loads(raw)
-            new = json.loads((ROOT / path).read_text())
+            new = restore_fixture(json.loads((ROOT / path).read_text()))
             if path not in selected:
                 self.assertEqual(raw, (ROOT / path).read_bytes())
                 continue

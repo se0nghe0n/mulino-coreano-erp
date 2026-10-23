@@ -217,7 +217,8 @@
         "getAssessment",
         "getInventory",
         "getObligations",
-        "recordExternalReconciliation"
+        "recordExternalReconciliation",
+        "getEvidence"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -233,7 +234,8 @@
           "getAssessment",
           "getInventory",
           "getObligations",
-          "recordExternalReconciliation"
+          "recordExternalReconciliation",
+          "getEvidence"
         ],
         "scope": {
           "organizationAlias": "ORG",
@@ -474,6 +476,40 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "t13Source": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "t13-synthetic-source-human",
+      "audience": "isolated-ontology-test",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "attachEvidence",
+        "recordActivity",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "attachEvidence",
+          "recordActivity",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "caseId": "T13",
+          "subcaseId": "supplier-accept",
+          "items": [
+            "P"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -564,6 +600,9 @@
       "type": "Human"
     },
     "unauthorized": {
+      "type": "Human"
+    },
+    "t13Source": {
       "type": "Human"
     }
   },
@@ -823,7 +862,80 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revokedAt": null
       }
-    ]
+    ],
+    "sourceProfiles": [
+      {
+        "namespace": "synthetic-t13-supplier-source",
+        "reconciliationOwnerAlias": "t13Source",
+        "recordActorAlias": "t13Source",
+        "policyVersion": "t13-synthetic-v1"
+      }
+    ],
+    "policy": {
+      "supplierSourceAuthoring": {
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "authoredBy": "coordinator-selected-fixture",
+        "version": 1,
+        "originalSourceActor": {
+          "issuer": "synthetic-test-issuer",
+          "subject": "source-human",
+          "audience": "isolated-ontology-test",
+          "organizationAlias": "ORG",
+          "roleCapabilities": [
+            "recordSupplierReply",
+            "recordActivity",
+            "recordLegEvent",
+            "recordHandover",
+            "recordDelivery",
+            "getInbox",
+            "getObject",
+            "getWork",
+            "getAssessment",
+            "getInventory",
+            "getObligations",
+            "recordExternalReconciliation"
+          ],
+          "grant": {
+            "delegatorAlias": "supervisor",
+            "actions": [
+              "recordSupplierReply",
+              "recordActivity",
+              "recordLegEvent",
+              "recordHandover",
+              "recordDelivery",
+              "getInbox",
+              "getObject",
+              "getWork",
+              "getAssessment",
+              "getInventory",
+              "getObligations",
+              "recordExternalReconciliation"
+            ],
+            "scope": {
+              "organizationAlias": "ORG",
+              "caseId": "T13",
+              "subcaseId": "supplier-accept"
+            },
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "revision": 1
+          }
+        },
+        "originalSourceDescriptor": {
+          "alias": "supplier-ship",
+          "sha256": "f32e426e8045394481edcf8275c555f904e544dece2ffcba40bf21d0d0da716c",
+          "sourceNamespace": "synthetic-supplier-ship",
+          "externalEventId": "T13-supplier-accept-supplier-ship",
+          "sourceVersion": "1",
+          "occurredAt": "2026-10-07T09:00:00Z",
+          "recordedAt": "2026-10-07T09:00:01Z"
+        },
+        "addedActor": "t13Source",
+        "sourceReadReason": "공개 reconciliation 및 canonical guard가 현재 getEvidence를 요구한다. 기존 source 전용 synthetic actor에 읽기만 추가한다."
+      }
+    }
   },
   "evidence": [
     {
