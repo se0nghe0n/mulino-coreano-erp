@@ -1,5 +1,18 @@
 # 실행 결정 기록
 
+## 2026-10-24 잔여 실패 해소의 실행 설정
+
+사용자가 완료까지 계속 수정하도록 지시했다. 수정은 T3 provider
+`codex_2`, model `gpt-6.1-sol`, `reasoningEffort=xhigh`,
+`serviceTier=priority`로 실행한다. 현재 runtime catalog에서 해당
+provider의 xhigh와 Fast(priority) 지원을 확인하고 세 writer의 실제
+위임 인자에 적용했다. 이전 provider의 지원을 근거로 추정하지 않았다.
+
+테스트 swarm은 `claude-haiku-5-5`의 native dynamic Workflow를
+사용한다. 기존 구독 인증과 전체 oracle을 유지한다. 별도 API 과금,
+BTP 운영 계정·배포 예산은 새로 승인된 것으로 해석하지 않는다.
+실행 전후의 원문·모델·source·JAR·자원 정리를 각각 대조한다.
+
 ## 2026-10-22 재개: 실행 모델과 구독 인증
 
 - 사용자는 전체 잔여 구현의 완료를 요청하고 구현 진행 모델을 모두

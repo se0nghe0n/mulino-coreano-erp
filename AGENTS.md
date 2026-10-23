@@ -168,6 +168,12 @@ Workflow 방식은 유지한다. 종료된 실행의 실제 tier 기록은 바�
 우선한다. 현재 catalog의 Fast 값은 priority이며 Ultrafast와 구별한다.
 다른 모델의 tier와 Haiku dynamic Workflow 방식은 이 지시로 바꾸지 않는다.
 
+2026-10-24 사용자가 실패가 해소될 때까지 계속 수정하도록 지정했다.
+이후 수정 worker는 T3 `delegate_task`의 provider `codex_2`, model
+`gpt-6.1-sol`, `reasoningEffort=xhigh`, `serviceTier=priority`를 명시한다.
+테스트 swarm은 `Claude Haiku 5.5`의 native dynamic Workflow를 유지한다.
+이 선택은 수정 작업의 이전 provider·effort 지정보다 우선한다.
+
 ## 병렬 작업과 Git
 
 독립 작업은 native subagent로 병렬화한다. code writer마다 같은
