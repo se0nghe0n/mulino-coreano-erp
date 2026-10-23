@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""명시 승인된 T17 합성 LOT 만료 convention과 참조 교정을 재현한다.
+"""coordinator가 선택한 T17 합성 LOT 만료 convention을 재현한다.
 
 기존 업무/관측 oracle을 읽지 않는다. 원래 segment의 명시 만료일 또는
-사용자가 승인한 given 유효창만 쓰며, 모든 변경의 역변환을 기록한다.
+coordinator가 합성 값으로 정한 given 유효창만 쓴다.
+모든 변경의 역변환을 기록한다.
 """
 import copy
 import json
