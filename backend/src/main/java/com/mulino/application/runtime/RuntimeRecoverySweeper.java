@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 /** Due time triggers current commands; it never invents approval or arrival. */
 @Service
 public class RuntimeRecoverySweeper {
+ @org.springframework.beans.factory.annotation.Autowired(required=false) private List<ReassessmentDeferral> deferrals=List.of();
  private final RuntimeService runtime;private final WorkAccess works;private final ExecutionClock clock;private final IdentityRepository identities;private final RuntimeRecoveryExecution execution;private final List<ValidityBoundarySweep> validity;
  public RuntimeRecoverySweeper(RuntimeService runtime,WorkAccess works,ExecutionClock clock,IdentityRepository identities,RuntimeRecoveryExecution execution){this(runtime,works,clock,identities,execution,List.of());}
  @org.springframework.beans.factory.annotation.Autowired
@@ -18,6 +19,7 @@ public class RuntimeRecoverySweeper {
   var due=runtime.dueSchedules(100);int changed=0;for(var boundary:validity)changed+=boundary.sweep();
   for(var schedule:due){
    String org=(String)schedule.get("organizationid"),owner=(String)schedule.get("ownerid"),workId=(String)schedule.get("workid");
+   if(deferrals.stream().anyMatch(port->port.held(org,workId)))continue;
    var actor=identities.actor(org,owner).orElse(null);
    if(actor==null){hold(schedule,"OWNER_UNAVAILABLE","Supervisor must restore a human owner or authorize reassignment",null);continue;}
    var c=new DomainContext(org,owner,(String)actor.get("stableRequestOwner"),clock.instant(),clock.instant());

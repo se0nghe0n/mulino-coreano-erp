@@ -50,6 +50,7 @@ public class VerificationRuntimeControl {
   loopback(request);
   try{var view=new java.util.LinkedHashMap<String,Object>(faults.control(body));view.put("operation",body.get("operation"));view.put("profile","verification");view.put("observedAt",Instant.now().toString());return org.springframework.http.ResponseEntity.ok(view);}
   catch(VerificationFaults.UnsupportedPoint unsupported){return org.springframework.http.ResponseEntity.status(422).body(Map.of("supported",false,"point",unsupported.getMessage(),"points",new java.util.TreeSet<>(VerificationFaults.POINTS)));}
+  catch(IllegalArgumentException invalid){return org.springframework.http.ResponseEntity.status(422).body(Map.of("accepted",false,"reason",String.valueOf(invalid.getMessage())));}
  }
  /** One scheduler cycle (tick or due sweep) as one submitted task; the reply is the submission, not the terminal. */
  @PostMapping("/scheduler/tick") public org.springframework.http.ResponseEntity<Map<String,Object>> tick(@RequestBody Map<String,Object> body,HttpServletRequest request){

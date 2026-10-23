@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 /** Exact persisted input matches and typed target scopes. All changes share the evidence transaction. */
 @Component
 public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
+ @org.springframework.beans.factory.annotation.Autowired(required=false) private List<ReassessmentDeferral> deferrals=List.of();
  private final AssessmentService service;private final AssessmentRepository repository;private final ObjectProvider<ResponsibilityService> duties;private final ObjectMapper json=new ObjectMapper();private final ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections;private final com.mulino.domain.evidence.EvidenceRepository evidence;private final ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements;
  public AssessmentCorrectionImpact(AssessmentService service,AssessmentRepository repository,ObjectProvider<ResponsibilityService> duties,ObjectProvider<com.mulino.application.trade.DeliveryCorrectionPort> deliveryCorrections,com.mulino.domain.evidence.EvidenceRepository evidence,ObjectProvider<com.mulino.application.trade.SettlementContributionPort> settlements){this.settlements=settlements;this.service=service;this.repository=repository;this.duties=duties;this.deliveryCorrections=deliveryCorrections;this.evidence=evidence;}
  public void apply(DomainContext request,Correction correction){
@@ -48,6 +49,16 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
    var settlement=settlements.stream().toList();if(settlement.size()>1)throw new DomainError("HELD","FOLLOWUP_UNAVAILABLE","Exact settlement contribution provider required");
    if(settlement.size()==1)settlement.getFirst().contributionChanged(c,occurrence.get("ID").toString());
   }
+  String command=null;
+  if(!deferrals.isEmpty())try{command=CommandExecution.commandId();}catch(IllegalStateException notACommand){/* Internal non-command corrections cannot reach this verification point. */}
+  var pendingIds=new HashSet<>(ids);pendingIds.removeAll(imported.keySet());
+  if(!deferrals.isEmpty()&&command!=null&&!pendingIds.isEmpty()){
+    final String commandId=command;
+    var record=evidence.db().run(com.sap.cds.ql.Select.from("mulino.commands.CommandRecords").where(r->r.get("organizationId").eq(c.organizationId()).and(r.get("ID").eq(commandId)))).first().orElseThrow();
+    if("correctEvidence".equals(record.get("capabilityId"))&&"IN_PROGRESS".equals(record.get("state")))
+      for(var port:deferrals)port.checkpoint(c.organizationId(),record.get("capabilityId").toString(),record.get("commandIdempotencyKey").toString(),command,pendingIds);
+  }
+
  }
  /** recordedAt of the exact correcting evidence row and the claims this correction recorded on it (no knownAt filter). */
  private Instant recordedAt(DomainContext c,String id){

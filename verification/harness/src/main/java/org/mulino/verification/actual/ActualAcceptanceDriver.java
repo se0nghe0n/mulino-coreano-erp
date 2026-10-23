@@ -344,7 +344,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             catch(Exception failure){throw new IllegalStateException("Process control failure: "+failure.getMessage(),failure);}
         }
         if(suiteIsolation&&request.path("type").asText().equals("externalResponder"))return responderControl(id,request);
-        if(suiteIsolation&&request.path("type").asText().equals("fault")&&Set.of("arm","inject","install","disarm","remove").contains(request.path("operation").asText()))return faultControl(id,request);
+        if(suiteIsolation&&request.path("type").asText().equals("fault")&&Set.of("arm","inject","install","disarm","remove","release").contains(request.path("operation").asText()))return faultControl(id,request);
         if(!request.path("type").asText().equals("clock")||!Set.of("advanceTo","set","advance").contains(request.path("operation").asText()))
             return StepResult.missing(id,"NOT_IMPLEMENTED: actual "+request.path("type").asText()+"/"+request.path("operation").asText()+" host control absent");
         if(controlActor==null)return StepResult.missing(id,"NOT_IMPLEMENTED: installed control identity absent");
@@ -533,8 +533,9 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
             var result=http.send(call,HttpResponse.BodyHandlers.ofString());
             if(result.statusCode()==404)return StepResult.missing(id,"NOT_IMPLEMENTED: verification fault profile not installed");
             var response=Json.parse(result.body());
-            if(result.statusCode()==422)return StepResult.missing(id,"NOT_IMPLEMENTED: product pipeline reports no fault point "+response.path("point").asText());
+            if(result.statusCode()==422)return StepResult.missing(id,response.hasNonNull("reason")?"NOT_IMPLEMENTED: verification fault control refused: "+response.path("reason").asText():"NOT_IMPLEMENTED: product pipeline reports no fault point "+response.path("point").asText());
             if(result.statusCode()!=200)throw new IllegalStateException("Fault control HTTP "+result.statusCode());
+            if(operation.equals("release")&&(!response.path("state").asText().equals("RELEASED")||!response.path("committed").asBoolean()||!body.path("organizationId").equals(response.path("organizationId"))||!body.path("point").equals(response.path("point"))))throw new IllegalStateException("Release response has no exact committed checkpoint");
             var data=Json.object();data.put("acknowledged",true).put("controlType","fault").put("operation",operation).put("acknowledgedAt",Instant.now().toString());
             for(String k:List.of("faultId","point","state"))data.set(k,response.path(k));
             data.set("serverObservation",response);
