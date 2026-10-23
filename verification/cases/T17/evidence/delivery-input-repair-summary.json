@@ -1,0 +1,1036 @@
+{
+  "recordType": "T17_DELIVERY_INPUT_REPAIR",
+  "baseline": "bcac964ced0d5cf47a990afabba5eddefb66b2c8",
+  "branch": "fix/t17-delivery-source-chain",
+  "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3",
+  "wholeTask": "OPEN",
+  "wholeStep": "OPEN",
+  "subtaskAcceptance": "NOT_COMPLETE",
+  "actualScenarioRuns": 0,
+  "actualModelClientCalls": 0,
+  "businessOracleAcceptance": false,
+  "implementationRuntime": "codex/gpt-6.1-sol high, requested serviceTier=ultrafast; no new delegation",
+  "newFixtureProvenance": {
+    "synthetic": true,
+    "authoredBy": "coordinator-selected-fixture",
+    "originalAuthorityClaimed": false,
+    "operatingApprovalClaimed": false,
+    "baseline": "bcac964ced0d5cf47a990afabba5eddefb66b2c8",
+    "businessAssertionsChanged": false,
+    "actionChanges": "see delivery-input-delta.json",
+    "fixtureChanges": "see delivery-input-delta.json"
+  },
+  "preservation": {
+    "assertionCount": 257,
+    "rawAssertionsAndOriginalFeatureRestoration": "28 Python tests PASS",
+    "previousLedgersAndRootRunner": {
+      "verification/cases/T17/run_source_pg_test.py": {
+        "unchanged": true,
+        "sha256": "b415b93321b1baa2c22b8a5069b553291b0cf6fadf44eb3253c34baf3a32c99c"
+      },
+      "verification/cases/T17/public-contract-delta.json": {
+        "unchanged": true,
+        "sha256": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76"
+      },
+      "verification/cases/T17/first-failure-input-delta.json": {
+        "unchanged": true,
+        "sha256": "d3c39b4b52aed6df92ed1dcfa927ad3fc751c9e7bd3af3512ad4e02d74869ef5"
+      },
+      "verification/cases/T17/completion-input-delta.json": {
+        "unchanged": true,
+        "sha256": "bc83efd47acc2ec3ff4e537edc61c66804db6f3e9f6582758d8fc7eee9bf4f5f"
+      }
+    },
+    "generator": {
+      "command": [
+        "python3",
+        "verification/cases/T17/author_public_contracts.py"
+      ],
+      "exitCode": 0,
+      "stdout": "T17 public input authoring: 61 exact action deltas; business assertions unchanged\n",
+      "stderr": "",
+      "identical": true,
+      "files": {
+        "verification/cases/T17/case.json": "e09e3abed2045e9f72b75c94cb91da6bd4753c2d727a702bf3f416a7730f3ac1",
+        "verification/cases/T17/scenario.feature": "d86dbb5b952a2e952ae9aa6aeb002528e330087b61e27f42f8be631a1769df2e",
+        "verification/cases/T17/public-contract-delta.json": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76",
+        "verification/cases/T17/fixtures/claim-conflictingquantity.json": "bb9f58939775af5504a260365073cd4b8c726a4673ff351319e30294095a8bed",
+        "verification/cases/T17/fixtures/claim-falseclaim.json": "d3ab08702884262be61b6f1dc7e210906f28b0b1ccdc1ae4aee7d364b1475285",
+        "verification/cases/T17/fixtures/claim-nopriordispatch.json": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d",
+        "verification/cases/T17/fixtures/claim-scopeoverflow.json": "284cc1af48ffc75b33e21f046e6b8bfab2476813e13d6ca7b45c534d33678f16",
+        "verification/cases/T17/fixtures/claim-unidentifiedscope.json": "856aff8432c76ecf19ef2ee3ff3b51dc68f519cf866759d9e8eb2b9889f4bb05",
+        "verification/cases/T17/fixtures/eligibility-conflict.json": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+        "verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+        "verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+        "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+        "verification/cases/T17/fixtures/eligibility-unknown.json": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+        "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "9a21dd679f8021409c0ea4489d0cfc1c3326849f5cb4b42866a9fd114b47b91e",
+        "verification/cases/T17/fixtures/normal-consumed-delivery.json": "030264c1b989c6d22106d3a8f7235b385d5556c740be2aa47dd843c70fec34f0",
+        "verification/cases/T17/fixtures/post-dispatch-expiry.json": "a6e7654fdabb1a11f6712a88dd03cfba4a521d3f3daaa85f714b6d6179aee5e6",
+        "verification/cases/T17/fixtures/replacement-no-revival.json": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+        "verification/cases/T17/fixtures/reserve-pick-dispatch.json": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52"
+      }
+    },
+    "executedInputSnapshotDrift": []
+  },
+  "changes": {
+    "newActions": 31,
+    "changedActions": 24,
+    "newMinimalActivationGrants": 7
+  },
+  "checks": [
+    {
+      "command": "python3 -m unittest discover -s verification/cases/T17 -p 'test_*.py'",
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-delivery-chain/python.log",
+      "sha256": "b9b8b446cfd9e915944baba56bae5241e45ab7b05f87f842b530c2abcc73ddd0"
+    },
+    {
+      "command": "./mvnw -B -ntp -f verification/harness/pom.xml test",
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-delivery-chain/harness-final.log",
+      "sha256": "705a4b56faa2f30224c253240a2089d0909c80b1f98e1cd8de64f0256ca38e55"
+    },
+    {
+      "command": "./verify prepare",
+      "status": "PREPARED",
+      "exitCode": 0,
+      "log": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-delivery-chain/prepare.log",
+      "sha256": "54c73745e59275fefa123cd57a487836feeafabfc9122e75dbfb0bba7ece0c2e"
+    },
+    {
+      "command": "npm ci --prefix backend",
+      "status": "PASS",
+      "exitCode": 0,
+      "log": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-delivery-chain/npm-ci.log",
+      "sha256": "ca3da2c3426e7bcd1786506dd0c749cfc1dbfc60f85dc79c519b09ce9d5ac666"
+    },
+    {
+      "command": "python3 verification/cases/T17/run_source_pg_test.py",
+      "status": "FAIL",
+      "exitCode": 1,
+      "passed": 24,
+      "failed": 8,
+      "errors": 0,
+      "skipped": 0,
+      "log": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/test.log",
+      "sha256": "228039f97d540d59443aada6c17c8b610d32d28e3339e2635a5fdb12c11c012b"
+    }
+  ],
+  "counts": {
+    "python": {
+      "passed": 28,
+      "failed": 0
+    },
+    "harness": {
+      "passed": 616,
+      "failed": 0,
+      "skipped": 45
+    },
+    "prepare": {
+      "cases": 41,
+      "subcases": 802,
+      "assertions": 24260,
+      "problems": 0
+    },
+    "sourcePostgres": {
+      "passed": 24,
+      "failed": 8,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "sourceSnapshot": {
+    "baseline": "bcac964ced0d5cf47a990afabba5eddefb66b2c8",
+    "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3",
+    "files": {
+      "verification/cases/T17/author_public_contracts.py": "9ba9ab74c3c49a5be4ee4d36c61b0047b225bb40a697d4065c27004a4652adfb",
+      "verification/cases/T17/case.json": "e09e3abed2045e9f72b75c94cb91da6bd4753c2d727a702bf3f416a7730f3ac1",
+      "verification/cases/T17/fixtures/claim-conflictingquantity.json": "bb9f58939775af5504a260365073cd4b8c726a4673ff351319e30294095a8bed",
+      "verification/cases/T17/fixtures/claim-falseclaim.json": "d3ab08702884262be61b6f1dc7e210906f28b0b1ccdc1ae4aee7d364b1475285",
+      "verification/cases/T17/fixtures/claim-scopeoverflow.json": "284cc1af48ffc75b33e21f046e6b8bfab2476813e13d6ca7b45c534d33678f16",
+      "verification/cases/T17/fixtures/claim-unidentifiedscope.json": "856aff8432c76ecf19ef2ee3ff3b51dc68f519cf866759d9e8eb2b9889f4bb05",
+      "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "9a21dd679f8021409c0ea4489d0cfc1c3326849f5cb4b42866a9fd114b47b91e",
+      "verification/cases/T17/fixtures/normal-consumed-delivery.json": "030264c1b989c6d22106d3a8f7235b385d5556c740be2aa47dd843c70fec34f0",
+      "verification/cases/T17/fixtures/post-dispatch-expiry.json": "a6e7654fdabb1a11f6712a88dd03cfba4a521d3f3daaa85f714b6d6179aee5e6",
+      "verification/cases/T17/scenario.feature": "d86dbb5b952a2e952ae9aa6aeb002528e330087b61e27f42f8be631a1769df2e",
+      "verification/cases/T17/test_completion_inputs.py": "b5944ce6882b08c7662fe6e189a97dd0e67a9d01c1f4dca1b2cd8055bece6c00",
+      "verification/cases/T17/test_first_failure_inputs.py": "f4d09a055d20fe9645254bb5a6aa46acd0516818d9b86e5ba1f1b20d9ba73eda",
+      "verification/cases/T17/test_public_contracts.py": "b7f2eb9fec2244ffec6b94b2199b03fe70849d928df3b0ebbdc8de374c86f097",
+      "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java": "5ffd4a28e78da4945be58686b86ab2a4b435dbb720a35d68b76bf22581492285",
+      "verification/cases/T17/DELIVERY_INPUTS.md": "cab8523292e53fa708c994acadcc6dfd6f74111dcd4f2137f3553687e460b4de",
+      "verification/cases/T17/author_delivery_inputs.py": "7f552ae518e9fac7aaf6042a5892341a3db62ec6e154aed36301d6987382b8c1",
+      "verification/cases/T17/delivery-input-delta.json": "90e9fd616372e502123605b5147fcc5fcd2457e7ec65b7fba505ddca411c338a",
+      "verification/cases/T17/test_delivery_inputs.py": "57efff46d844e4adca8c194e29970e86830796a0fcdc1bf381fb95f8aa9f329f"
+    }
+  },
+  "sourceSnapshotSha256": "367e1886f5f81af199804c9aa4b4f7a130e0c1a4545f8387b384b2582e6a1f0c",
+  "changedFiles": [
+    "verification/cases/T17/DELIVERY_INPUTS.md",
+    "verification/cases/T17/author_delivery_inputs.py",
+    "verification/cases/T17/author_public_contracts.py",
+    "verification/cases/T17/case.json",
+    "verification/cases/T17/delivery-input-delta.json",
+    "verification/cases/T17/evidence/delivery-input-repair-summary.json",
+    "verification/cases/T17/fixtures/claim-conflictingquantity.json",
+    "verification/cases/T17/fixtures/claim-falseclaim.json",
+    "verification/cases/T17/fixtures/claim-scopeoverflow.json",
+    "verification/cases/T17/fixtures/claim-unidentifiedscope.json",
+    "verification/cases/T17/fixtures/late-restriction-actual-delivery.json",
+    "verification/cases/T17/fixtures/normal-consumed-delivery.json",
+    "verification/cases/T17/fixtures/post-dispatch-expiry.json",
+    "verification/cases/T17/scenario.feature",
+    "verification/cases/T17/test_completion_inputs.py",
+    "verification/cases/T17/test_delivery_inputs.py",
+    "verification/cases/T17/test_first_failure_inputs.py",
+    "verification/cases/T17/test_public_contracts.py",
+    "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java"
+  ],
+  "sourcePostgres": {
+    "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213",
+    "buildIdentity": {
+      "sourceCommit": "bcac964ced0d5cf47a990afabba5eddefb66b2c8",
+      "productJar": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/backend/target/ontology-0.1.0-SNAPSHOT.jar",
+      "productJarSha256": "c0cba02621c5c49cd9b2f1f88a8e8c1535e3377636b10205e57ad7504adb44ef"
+    },
+    "junitSha256": "36c598e861e682ed5d4251ab6d27c266e14a7051edeb57015442e6d361b9ecd3",
+    "ledgerArtifacts": {
+      "authoredNoDispatchObservationUsesRealGateway-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/authoredNoDispatchObservationUsesRealGateway-ledger.json",
+        "sha256": "c4f70cf2cd2de226655a358797d6daded97ece8335101336b01e482ad5539c97",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "completedReplacementUsesRealWitnessAndReleaseSource-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/completedReplacementUsesRealWitnessAndReleaseSource-ledger.json",
+        "sha256": "7678bd8d93abc8cedb156a9dbfbab9bed3bc879ffbe0e88f2972b5c9f4258fc7",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 2,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "declaredExpiryGroupsMapToDistinctLots-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/declaredExpiryGroupsMapToDistinctLots-ledger.json",
+        "sha256": "72cb5117b92f8206c23d26ff0d28a6f907d4623aa692f14b3aadb681567583f2",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 4,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 4,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "explicitDispatchCONFLICTRemainsBlocked-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchCONFLICTRemainsBlocked-ledger.json",
+        "sha256": "01f7fcbf774b89a6c37b1c5756940fc0a5984b9c949710dd2890976d268ee01e",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "explicitDispatchConflictingClaim-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchConflictingClaim-ledger.json",
+        "sha256": "4eff1c4d0e54a2bf067d59f3a004a8a82e2c9f617d4f79e3d584a64072876e44",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchDENIEDRemainsBlocked-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchDENIEDRemainsBlocked-ledger.json",
+        "sha256": "5d3b83966bb5f6a7c9540743c9d8a9072247bb0e6fce0307b53ea1fa29827ec1",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "explicitDispatchDeliverySourceBoundaries-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchDeliverySourceBoundaries-ledger.json",
+        "sha256": "be31d2bc9beed12a530adea24fad335158f02e25c0538c1924428eb2e44d755b",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchExpiredDelivery-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchExpiredDelivery-ledger.json",
+        "sha256": "4ed10304b8947a00993ef58dd6b34e9086da6e5d203a86de33f385aa565c6bff",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchFalseClaim-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchFalseClaim-ledger.json",
+        "sha256": "6c43d3cee4aba70ba43e2354deb0417800058cc0586ef7ee0d6748d271f7d35f",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchLateDelivery-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchLateDelivery-ledger.json",
+        "sha256": "c5d86bf059aa4a0b5059bb71e2b6b9642db0f8a0955f02c56de1e2c66230c69d",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchLateHoldSourceStopsAtRecallAuthority-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchLateHoldSourceStopsAtRecallAuthority-ledger.json",
+        "sha256": "1ecc4b878f8a4b96250d7935f053d66119e0beca5bf3e962665d1e941feb24d3",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchMissingActivationGrant-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchMissingActivationGrant-ledger.json",
+        "sha256": "c76bba4c26b9b71a131490c38e219081c7e82b3a79eed957f33511de99639053",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "explicitDispatchNewRecallHoldApplies-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchNewRecallHoldApplies-ledger.json",
+        "sha256": "42c69272e62495fe246b39c0489a9efbdaf0286e74f5417d10f7587ecbfd29e8",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchNormalDelivery-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchNormalDelivery-ledger.json",
+        "sha256": "a61384092ce655e327bb1a71adb5e85b6f7f845d6723737461c622aa7b025a5c",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchOverflowClaim-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchOverflowClaim-ledger.json",
+        "sha256": "fe688f009eef9c29729e77d384c5a4c2c6ec28c2e0759ecdc130679085cdf1bb",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchRejectsCrossOrganizationEvidence-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchRejectsCrossOrganizationEvidence-ledger.json",
+        "sha256": "769404f2fe5a3f0f5c4a024f8b009460a3e801daec1e345ad0eda071b6d386f9",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "explicitDispatchSupportsOriginalRangeAndRejectsFakeEvidence-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchSupportsOriginalRangeAndRejectsFakeEvidence-ledger.json",
+        "sha256": "b6a628a5d1102204477234cc3b1b8742ef5d097c91b7ff1fade7a2d1e86f3dc5",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchUNKNOWNRemainsBlocked-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchUNKNOWNRemainsBlocked-ledger.json",
+        "sha256": "481fe5ed7418cc6e3922093f419098be51185be8afea980d87dc0789e2b1bb13",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "explicitDispatchUnactivatedWorkRemainsRejected-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchUnactivatedWorkRemainsRejected-ledger.json",
+        "sha256": "46c7815d8e7b0c66cf0ec4cb49c5e50ef8fbf290ceb31fda1fa7717a9dd47492",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "explicitDispatchUnidentifiedClaim-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchUnidentifiedClaim-ledger.json",
+        "sha256": "4663b3f99011f7795fcc79e0bcd64e2be48e75ae1de779887df818b48932b9ed",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        }
+      },
+      "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/holdSourceReachesCategoryAuthorizationWithoutGrantExpansion-ledger.json",
+        "sha256": "7fdf2c4b1037403cb252ed626171c3db083e8e74c3a5c2639ad5ec74fc828dfb",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "missingExpiryCopyRemainsUnknown-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/missingExpiryCopyRemainsUnknown-ledger.json",
+        "sha256": "dbb0b82fc277705143a0e226a5c8cdcbd3dd0168314c5d781f6aef8139b7350f",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "missingOriginalDueAtRemainsRejectedWithoutOrderEffects-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/missingOriginalDueAtRemainsRejectedWithoutOrderEffects-ledger.json",
+        "sha256": "1d3ff0d823b12930fff6b7f78c393585c0ed94253df2924f3a8f5645bb8ed41b",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "newCategoryEarlyHoldApplies-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/newCategoryEarlyHoldApplies-ledger.json",
+        "sha256": "10edbb0bf4a22eee7a120b1de41676b62d3726e0e3dfc75d4c189a0d34287a0a",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 4,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 4,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "newCategoryHoldAppliesWithinOriginalScope-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/newCategoryHoldAppliesWithinOriginalScope-ledger.json",
+        "sha256": "176bdea9e229a8eeb805437947aca366b687ea8136c723f840d76c48a7e4c82c",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "newSyntheticDueDatesReachAppliedForEveryPreviouslyMissingOrder-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/newSyntheticDueDatesReachAppliedForEveryPreviouslyMissingOrder-ledger.json",
+        "sha256": "ab13d52a0a0bdf593da338d8f10e860ea346d4f6c7080383a8b9516062eae077",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "otherpackUsesItsOwnTypedLot-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/otherpackUsesItsOwnTypedLot-ledger.json",
+        "sha256": "fe6091ab78fa3c7a7caaac11ac8d3eab80c1c35576e30f599e4ff6cd5dc5e0fa",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 5,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 5,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "postDispatchExpiryBoundaryIsExplicit-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/postDispatchExpiryBoundaryIsExplicit-ledger.json",
+        "sha256": "8e3d66cb4a9226e88947c70c00bca6d0aca2ba4b28c7779445b88d2856825d33",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "sellOnlyDoesNotAuthorizeDispatch-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/sellOnlyDoesNotAuthorizeDispatch-ledger.json",
+        "sha256": "10a9b13fd51b0620d79247f9a32a93dfb763f6f1b122cee046a90ce9217d553f",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "sourceChainsUseRealCurrentAuthorityWithDeclaredExpiry-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/sourceChainsUseRealCurrentAuthorityWithDeclaredExpiry-ledger.json",
+        "sha256": "bea35cc6a58d85b0dd108f3a5ed5e093c3fea498043b12ec24db00b61cfe1519",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "unknownConditionRemainsOmittedWithoutInventedPermission-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/unknownConditionRemainsOmittedWithoutInventedPermission-ledger.json",
+        "sha256": "30d533cf848169bb9191f12a0e842cce83b3cfa9662b16b05a5c3d06afc77579",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      },
+      "unsupportedSlotsAreNotBusinessGuardAcceptance-ledger": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/unsupportedSlotsAreNotBusinessGuardAcceptance-ledger.json",
+        "sha256": "ac15d61eff3992c8b2246fdc842fcf970a980f96396a0f4c7f418ef931f721df",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        }
+      }
+    }
+  },
+  "firstFailure": {
+    "classification": "GENERATED_DRAFT_GOAL_COMPLETION_GAP",
+    "activationEvidence": [
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchConflictingClaim-T17-claim-conflictingquantity-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "3ecd6092a0982f07399851f6124fe7340ec181f5b7f1a433069a6b7aa7a7bea4",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "2b8ef6ac-00b9-47bc-a6e1-d38c4521a4ec"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-claim-conflictingquantity-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchDeliverySourceBoundaries-T17-normal-consumed-delivery-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "0ac7dcab47fc1f81f3d84de3e6284fe25de05a710e1dd4bdfc79b5eef5994f46",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "074c7a93-28e9-4c01-8344-57ccd17f2e99"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-normal-consumed-delivery-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchExpiredDelivery-T17-post-dispatch-expiry-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "27c9a047239a2acf9796bcee02e783e0974e31bc8b4918734168727ea3741fab",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "89e75ff8-6615-489d-b910-96ec11a1067f"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-post-dispatch-expiry-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchFalseClaim-T17-claim-falseclaim-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "6bcb47d1384dec67454fdb80fb0d29b9008a44542c8aa23156e7b0d34717ed98",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "1de36baa-031a-4604-b074-59cbd4f517eb"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-claim-falseclaim-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchLateDelivery-T17-late-restriction-actual-delivery-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "ad12baf5f2b5402c613f706985f67ba3333a3c702d8753d77569032737f82f8d",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "c7909bd3-375a-4eec-846c-dc70fd14cb9a"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-late-restriction-actual-delivery-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchMissingActivationGrant-T17-normal-consumed-delivery-activate-order-delivery-work.json",
+        "expectedNegative": true,
+        "sha256": "a3911fe3feeddc69afbbb94596446f3c2e5a259061dce20ac1b145b4db27a6e3",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "de53c58f-8e4e-4192-9edb-82bff015630c"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-normal-consumed-delivery-activate-order-delivery-work",
+          "expectedRevision": 1
+        },
+        "response": {
+          "outcome": "REJECTED",
+          "error": {
+            "code": "FORBIDDEN",
+            "message": "Unavailable scope"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchNormalDelivery-T17-normal-consumed-delivery-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "0001ebdabd20b11164e04c3f828eefbf558080ba7f3e104edd74a4b48b0232ca",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "4440c9bd-1948-4093-ae10-37c9dda6c9c5"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-normal-consumed-delivery-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchOverflowClaim-T17-claim-scopeoverflow-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "6a91e5675c9486bc0cfa508be13268d17174147aabad757f815a7af727ef8d24",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "dc868f32-c141-47f6-8362-58fd1f51ae8d"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-claim-scopeoverflow-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchUnidentifiedClaim-T17-claim-unidentifiedscope-activate-order-delivery-work.json",
+        "expectedNegative": false,
+        "sha256": "afc5404325ed63dc2f068dd926965f363e5482e892e5ea1c167fc48ce81b722d",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "activateWork",
+          "subjectRefs": [],
+          "slots": {
+            "workId": "939b7fa4-cbdc-4dcc-bb41-69d655555374"
+          },
+          "provenance": {
+            "workId": "CONTEXT"
+          },
+          "commandIdempotencyKey": "T17-claim-unidentifiedscope-activate-order-delivery-work",
+          "expectedRevision": 4
+        },
+        "response": {
+          "outcome": "NEEDS_INPUT",
+          "error": {
+            "code": "GOAL_SLOT_MISSING",
+            "message": "Missing goal slot: timezone"
+          },
+          "effects": {}
+        }
+      }
+    ],
+    "goals": [
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchConflictingClaim-getWork-2b8ef6ac-00b9-47bc-a6e1-d38c4521a4ec.json",
+        "workId": "2b8ef6ac-00b9-47bc-a6e1-d38c4521a4ec",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchDeliverySourceBoundaries-getWork-074c7a93-28e9-4c01-8344-57ccd17f2e99.json",
+        "workId": "074c7a93-28e9-4c01-8344-57ccd17f2e99",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchExpiredDelivery-getWork-89e75ff8-6615-489d-b910-96ec11a1067f.json",
+        "workId": "89e75ff8-6615-489d-b910-96ec11a1067f",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchFalseClaim-getWork-1de36baa-031a-4604-b074-59cbd4f517eb.json",
+        "workId": "1de36baa-031a-4604-b074-59cbd4f517eb",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchLateDelivery-getWork-c7909bd3-375a-4eec-846c-dc70fd14cb9a.json",
+        "workId": "c7909bd3-375a-4eec-846c-dc70fd14cb9a",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchMissingActivationGrant-getWork-de53c58f-8e4e-4192-9edb-82bff015630c.json",
+        "workId": "de53c58f-8e4e-4192-9edb-82bff015630c",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchNormalDelivery-getWork-4440c9bd-1948-4093-ae10-37c9dda6c9c5.json",
+        "workId": "4440c9bd-1948-4093-ae10-37c9dda6c9c5",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchOverflowClaim-getWork-dc868f32-c141-47f6-8362-58fd1f51ae8d.json",
+        "workId": "dc868f32-c141-47f6-8362-58fd1f51ae8d",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchUnactivatedWorkRemainsRejected-getWork-dd44a923-0476-40fe-8ece-8563d7ebf66c.json",
+        "workId": "dd44a923-0476-40fe-8ece-8563d7ebf66c",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      },
+      {
+        "artifact": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-83990aab-7ea5-41f9-b5dc-8ab475bc0213/explicitDispatchUnidentifiedClaim-getWork-939b7fa4-cbdc-4dcc-bb41-69d655555374.json",
+        "workId": "939b7fa4-cbdc-4dcc-bb41-69d655555374",
+        "status": "DRAFT",
+        "missingActivationFields": [
+          "timezone",
+          "evidencePolicyVersion",
+          "conditions",
+          "evaluatorVersion",
+          "periodStart",
+          "periodEnd",
+          "periodStartInclusive",
+          "periodEndInclusive"
+        ]
+      }
+    ],
+    "ownerFiles": [
+      "backend/src/main/java/com/mulino/application/trade/sales/SalesCommands.java:37",
+      "backend/src/main/java/com/mulino/application/work/WorkLifecycle.java:43",
+      "backend/src/main/java/com/mulino/domain/work/GoalInput.java:26"
+    ],
+    "rootDecisionNeeded": "Complete the original delivery Work through approved goal inputs/public preparation and scoped authority, or repair the generated goal contract. Do not auto-activate or replace the original Work. No reviseGoal capability or missing period/policy/condition was invented in this subtask."
+  },
+  "notRunDueToFirstFailure": [
+    "normal/late-recall/post-expiry delivery confirmation",
+    "four dispatched claim intakes",
+    "source identity boundary/canonical duplicate checks after activation",
+    "whole original 257 business oracle"
+  ],
+  "outOfScopeUnchanged": [
+    "product backend",
+    "DB migrations",
+    "public query/API",
+    "observer",
+    "ReferenceResolver",
+    "common installer",
+    "other cases",
+    "root run_source_pg_test.py"
+  ],
+  "originalActualEvidence": {
+    "assertionStatuses": {
+      "PASS": 58,
+      "FAIL": 144
+    },
+    "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-20d8c824/.local/source-observer-policy-wave-20261023/results/T17/scenarios.json",
+    "sha256": "afbdf241bb301d88cb064d200bace759ab8d6d1ac80c198760efa23e570515b3",
+    "status": "FAIL, 15 subcases; retained untouched",
+    "executionTree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/scenario-haiku-20261023/T17-run2"
+  },
+  "earlierAttempts": [
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-efefe7ae-ee7e-4f87-8b73-491b3c05ebb7",
+      "classification": "23 PASS/9 FAIL: 8 generated goal completion failures and 1 incorrect zero-total movement expectation; corrected to compare the existing INITIAL_BALANCE baseline"
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-328bbd2f-3050-43e8-b817-857eaef294a5",
+      "classification": "exploratory 22 PASS/7 FAIL before getWork and final test corrections; not final acceptance"
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-d80b6fa1-e362-4ac7-87de-995af51f7d8d",
+      "classification": "interrupted to finish raw ledger capture; not final acceptance"
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-aece107d-f9f1-4e52-9a8b-7ed2c2df9ab3",
+      "classification": "ENV/DISCOVERY no tests matching pattern during concurrent Maven test compilation; rerun sequentially"
+    }
+  ]
+}

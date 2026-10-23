@@ -2158,6 +2158,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-normal-consumed-delivery-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "before-delivery",
           "kind": "query",
           "actorRef": "observer",
@@ -2223,6 +2285,64 @@
           ]
         },
         {
+          "id": "delivery-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "delivery-source-document",
           "kind": "invoke",
           "actorRef": "t17Source",
@@ -2238,8 +2358,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "delivery-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -2270,8 +2390,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -2282,8 +2402,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
@@ -2318,7 +2438,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-proof",
+                      "sha256": "b4584ec025546e554e94fcde2501890ead65b083d943f51834e74f540add20b8",
+                      "sourceNamespace": "SYNTHETIC-delivery-proof",
+                      "externalEventId": "T17-normal-consumed-delivery-delivery-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -2347,8 +2478,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -2359,8 +2490,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
@@ -2395,7 +2526,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-proof",
+                      "sha256": "b4584ec025546e554e94fcde2501890ead65b083d943f51834e74f540add20b8",
+                      "sourceNamespace": "SYNTHETIC-delivery-proof",
+                      "externalEventId": "T17-normal-consumed-delivery-delivery-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -2433,8 +2575,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "delivery-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -2470,8 +2612,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -2482,8 +2624,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
@@ -2518,7 +2660,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-proof",
+                      "sha256": "b4584ec025546e554e94fcde2501890ead65b083d943f51834e74f540add20b8",
+                      "sourceNamespace": "SYNTHETIC-delivery-proof",
+                      "externalEventId": "T17-normal-consumed-delivery-delivery-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -2588,8 +2741,8 @@
               "occurredAt": "2026-10-07T09:00:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "delivery-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -2600,8 +2753,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "delivery-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
@@ -2613,8 +2766,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
@@ -2653,6 +2806,35 @@
           ]
         },
         {
+          "id": "delivery-source-observation",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "delivery-provisional",
+                "pointer": "/response/effects/observationId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "DeliveryObservation"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-observation:actual-query-artifact"
+          ]
+        },
+        {
           "id": "delivery-source-match",
           "kind": "invoke",
           "actorRef": "t17Source",
@@ -2676,7 +2858,12 @@
                   "pointer": "/response/id"
                 }
               },
-              "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "delivery-source-observation",
+                  "pointer": "/response/data/ID"
+                }
+              },
               "policyVersion": "t17-synthetic-v1",
               "sourceIdentity": "synthetic-t17-eligibility:T17-normal-consumed-delivery-delivery-source:1",
               "quantity": "30",
@@ -3531,6 +3718,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "late-hold-source-scope",
           "kind": "query",
           "actorRef": "observer",
@@ -4116,6 +4365,64 @@
           ]
         },
         {
+          "id": "delivery-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "delivery-source-document",
           "kind": "invoke",
           "actorRef": "t17Source",
@@ -4131,8 +4438,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "delivery-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -4163,8 +4470,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -4175,8 +4482,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
@@ -4211,7 +4518,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-20",
+                      "sha256": "3b55c6239fcfedc44716330c8b0abc771e85178f18032538325778c824f388ad",
+                      "sourceNamespace": "SYNTHETIC-delivery-20",
+                      "externalEventId": "T17-late-restriction-actual-delivery-delivery-20",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -4240,8 +4558,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -4252,8 +4570,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
@@ -4288,7 +4606,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-20",
+                      "sha256": "3b55c6239fcfedc44716330c8b0abc771e85178f18032538325778c824f388ad",
+                      "sourceNamespace": "SYNTHETIC-delivery-20",
+                      "externalEventId": "T17-late-restriction-actual-delivery-delivery-20",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -4326,8 +4655,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "delivery-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -4363,8 +4692,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -4375,8 +4704,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
@@ -4411,7 +4740,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-20",
+                      "sha256": "3b55c6239fcfedc44716330c8b0abc771e85178f18032538325778c824f388ad",
+                      "sourceNamespace": "SYNTHETIC-delivery-20",
+                      "externalEventId": "T17-late-restriction-actual-delivery-delivery-20",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -4481,8 +4821,8 @@
               "occurredAt": "2026-10-07T09:00:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "delivery-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -4493,8 +4833,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "delivery-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
@@ -4506,8 +4846,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
@@ -4546,6 +4886,35 @@
           ]
         },
         {
+          "id": "delivery-source-observation",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "delivery-provisional",
+                "pointer": "/response/effects/observationId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "DeliveryObservation"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-observation:actual-query-artifact"
+          ]
+        },
+        {
           "id": "delivery-source-match",
           "kind": "invoke",
           "actorRef": "t17Source",
@@ -4569,7 +4938,12 @@
                   "pointer": "/response/id"
                 }
               },
-              "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "delivery-source-observation",
+                  "pointer": "/response/data/ID"
+                }
+              },
               "policyVersion": "t17-synthetic-v1",
               "sourceIdentity": "synthetic-t17-eligibility:T17-late-restriction-actual-delivery-delivery-source:1",
               "quantity": "20",
@@ -6079,6 +6453,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "expiry-advance",
           "kind": "control",
           "control": {
@@ -6171,6 +6607,64 @@
           ]
         },
         {
+          "id": "delivery-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "delivery-source-document",
           "kind": "invoke",
           "actorRef": "t17Source",
@@ -6186,8 +6680,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "delivery-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -6218,8 +6712,8 @@
                     "occurredAt": "2026-10-07T09:06:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -6230,8 +6724,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
@@ -6266,7 +6760,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-20",
+                      "sha256": "d77db9d3cfe3d9de0a0d5c13aee80790dce2e32bd74beffed3750e3268952bfa",
+                      "sourceNamespace": "SYNTHETIC-delivery-20",
+                      "externalEventId": "T17-post-dispatch-expiry-delivery-20",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:06:00Z",
+                      "recordedAt": "2026-10-07T09:06:00Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -6295,8 +6800,8 @@
                     "occurredAt": "2026-10-07T09:06:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -6307,8 +6812,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
@@ -6343,7 +6848,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-20",
+                      "sha256": "d77db9d3cfe3d9de0a0d5c13aee80790dce2e32bd74beffed3750e3268952bfa",
+                      "sourceNamespace": "SYNTHETIC-delivery-20",
+                      "externalEventId": "T17-post-dispatch-expiry-delivery-20",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:06:00Z",
+                      "recordedAt": "2026-10-07T09:06:00Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -6381,8 +6897,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "delivery-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -6418,8 +6934,8 @@
                     "occurredAt": "2026-10-07T09:06:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "delivery-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -6430,8 +6946,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "delivery-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
@@ -6466,7 +6982,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "delivery-20",
+                      "sha256": "d77db9d3cfe3d9de0a0d5c13aee80790dce2e32bd74beffed3750e3268952bfa",
+                      "sourceNamespace": "SYNTHETIC-delivery-20",
+                      "externalEventId": "T17-post-dispatch-expiry-delivery-20",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:06:00Z",
+                      "recordedAt": "2026-10-07T09:06:00Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -6536,8 +7063,8 @@
               "occurredAt": "2026-10-07T09:06:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "delivery-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -6548,8 +7075,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "delivery-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "eebd95f9-9c05-5217-86aa-d988773f22be",
@@ -6561,8 +7088,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
@@ -6601,6 +7128,35 @@
           ]
         },
         {
+          "id": "delivery-source-observation",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "delivery-provisional",
+                "pointer": "/response/effects/observationId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "DeliveryObservation"
+            },
+            "asOf": "2026-10-07T09:06:00Z",
+            "knownAt": "2026-10-07T09:06:00Z"
+          },
+          "evidenceRefs": [
+            "delivery-source-observation:actual-query-artifact"
+          ]
+        },
+        {
           "id": "delivery-source-match",
           "kind": "invoke",
           "actorRef": "t17Source",
@@ -6624,7 +7180,12 @@
                   "pointer": "/response/id"
                 }
               },
-              "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "delivery-source-observation",
+                  "pointer": "/response/data/ID"
+                }
+              },
               "policyVersion": "t17-synthetic-v1",
               "sourceIdentity": "synthetic-t17-eligibility:T17-post-dispatch-expiry-delivery-source:1",
               "quantity": "20",
@@ -7796,6 +8357,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-falseclaim-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "before-claim",
           "kind": "query",
           "actorRef": "observer",
@@ -7862,6 +8485,64 @@
           ]
         },
         {
+          "id": "claim-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "claim-source-document",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -7877,8 +8558,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -7904,8 +8585,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -7916,8 +8597,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
@@ -7963,7 +8644,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "e3a63a119051375dc227be5bd7ddfecdb762eb768434d8f7d3d92477ccfb4ac8",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-falseclaim-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -7987,8 +8679,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -7999,8 +8691,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
@@ -8046,7 +8738,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "e3a63a119051375dc227be5bd7ddfecdb762eb768434d8f7d3d92477ccfb4ac8",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-falseclaim-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -8084,8 +8787,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -8116,8 +8819,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -8128,8 +8831,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
@@ -8175,7 +8878,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "e3a63a119051375dc227be5bd7ddfecdb762eb768434d8f7d3d92477ccfb4ac8",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-falseclaim-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -8247,8 +8961,8 @@
               "occurredAt": "2026-10-07T09:00:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "claim-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -8259,8 +8973,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "claim-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
@@ -8272,8 +8986,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
@@ -9463,6 +10177,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-unidentifiedscope-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "before-claim",
           "kind": "query",
           "actorRef": "observer",
@@ -9529,6 +10305,64 @@
           ]
         },
         {
+          "id": "claim-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "claim-source-document",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -9544,8 +10378,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -9571,8 +10405,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -9583,8 +10417,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
@@ -9630,7 +10464,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "8fa2a26f422584b0ed463e20b873bd865b7d0abbe0222bfeeab8b20cd27d0eaf",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-unidentifiedscope-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -9654,8 +10499,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -9666,8 +10511,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
@@ -9713,7 +10558,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "8fa2a26f422584b0ed463e20b873bd865b7d0abbe0222bfeeab8b20cd27d0eaf",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-unidentifiedscope-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -9751,8 +10607,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -9783,8 +10639,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -9795,8 +10651,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
@@ -9842,7 +10698,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "8fa2a26f422584b0ed463e20b873bd865b7d0abbe0222bfeeab8b20cd27d0eaf",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-unidentifiedscope-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -9914,8 +10781,8 @@
               "occurredAt": "2026-10-07T09:00:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "claim-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -9926,8 +10793,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "claim-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
@@ -9939,8 +10806,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
@@ -11130,6 +11997,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-conflictingquantity-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "before-claim",
           "kind": "query",
           "actorRef": "observer",
@@ -11196,6 +12125,64 @@
           ]
         },
         {
+          "id": "claim-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "claim-source-document",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -11211,8 +12198,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -11243,8 +12230,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -11255,8 +12242,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
@@ -11302,7 +12289,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "5513a3313d51102c834ab5ce1937875f6c3e217c2828aa7c4e42ec3d5d70657f",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-conflictingquantity-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -11331,8 +12329,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -11343,8 +12341,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
@@ -11390,7 +12388,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "5513a3313d51102c834ab5ce1937875f6c3e217c2828aa7c4e42ec3d5d70657f",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-conflictingquantity-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -11428,8 +12437,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -11465,8 +12474,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -11477,8 +12486,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
@@ -11524,7 +12533,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "5513a3313d51102c834ab5ce1937875f6c3e217c2828aa7c4e42ec3d5d70657f",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-conflictingquantity-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -11601,8 +12621,8 @@
               "occurredAt": "2026-10-07T09:00:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "claim-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -11613,8 +12633,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "claim-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
@@ -11626,8 +12646,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
@@ -14267,6 +15287,68 @@
           ]
         },
         {
+          "id": "order-delivery-work",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "order-delivery-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "activate-order-delivery-work",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "activateWork",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "activateWork",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-scopeoverflow-activate-order-delivery-work",
+            "expectedRevision": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/revision"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "activate-order-delivery-work:actual-command-artifact"
+          ]
+        },
+        {
           "id": "before-claim",
           "kind": "query",
           "actorRef": "observer",
@@ -14333,6 +15415,64 @@
           ]
         },
         {
+          "id": "claim-source-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/dispatchId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Dispatch"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-dispatch:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-sales-line",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "order",
+                "pointer": "/response/line/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "SalesOrderLine"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "claim-source-sales-line:actual-query-artifact"
+          ]
+        },
+        {
           "id": "claim-source-document",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -14348,8 +15488,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -14380,8 +15520,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -14392,8 +15532,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "68face08-adcf-5b05-bf00-e43c91932bb1",
@@ -14439,7 +15579,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "f1c78c680513f1f1dd3d271906af72245b4d9156d355bc741da5be1fe6d9566b",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-scopeoverflow-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "sha256"
                 }
@@ -14468,8 +15619,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -14480,8 +15631,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "68face08-adcf-5b05-bf00-e43c91932bb1",
@@ -14527,7 +15678,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "f1c78c680513f1f1dd3d271906af72245b4d9156d355bc741da5be1fe6d9566b",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-scopeoverflow-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "base64"
                 }
@@ -14565,8 +15727,8 @@
                 "kind": "DISPATCH",
                 "id": {
                   "$result": {
-                    "actionId": "dispatch",
-                    "pointer": "/response/effects/dispatchId"
+                    "actionId": "claim-source-dispatch",
+                    "pointer": "/response/data/ID"
                   }
                 }
               },
@@ -14602,8 +15764,8 @@
                     "occurredAt": "2026-10-07T09:00:00Z",
                     "dispatchId": {
                       "$result": {
-                        "actionId": "dispatch",
-                        "pointer": "/response/effects/dispatchId"
+                        "actionId": "claim-source-dispatch",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "cargoScopeId": {
@@ -14614,8 +15776,8 @@
                     },
                     "salesLineId": {
                       "$result": {
-                        "actionId": "order",
-                        "pointer": "/response/line/id"
+                        "actionId": "claim-source-sales-line",
+                        "pointer": "/response/data/ID"
                       }
                     },
                     "physicalScopeId": "68face08-adcf-5b05-bf00-e43c91932bb1",
@@ -14661,7 +15823,18 @@
                       }
                     },
                     "synthetic": true,
-                    "operatingApprovalClaimed": false
+                    "operatingApprovalClaimed": false,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "originalEvidenceDescriptor": {
+                      "alias": "claim-proof",
+                      "sha256": "f1c78c680513f1f1dd3d271906af72245b4d9156d355bc741da5be1fe6d9566b",
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-scopeoverflow-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    }
                   },
                   "encoding": "json"
                 }
@@ -14738,8 +15911,8 @@
               "occurredAt": "2026-10-07T09:00:00Z",
               "dispatchId": {
                 "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/effects/dispatchId"
+                  "actionId": "claim-source-dispatch",
+                  "pointer": "/response/data/ID"
                 }
               },
               "cargoScopeId": {
@@ -14750,8 +15923,8 @@
               },
               "salesLineId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/line/id"
+                  "actionId": "claim-source-sales-line",
+                  "pointer": "/response/data/ID"
                 }
               },
               "observationId": "68face08-adcf-5b05-bf00-e43c91932bb1",
@@ -14763,8 +15936,8 @@
               },
               "workId": {
                 "$result": {
-                  "actionId": "order",
-                  "pointer": "/response/workId"
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
                 }
               },
               "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",

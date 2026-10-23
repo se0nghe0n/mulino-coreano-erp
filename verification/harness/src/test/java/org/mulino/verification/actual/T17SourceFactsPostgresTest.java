@@ -21,7 +21,7 @@ class T17SourceFactsPostgresTest {
     @BeforeEach void install(TestInfo info)throws Exception {
         testName=info.getTestMethod().orElseThrow().getName();
         config=ActualConfiguration.environment(System.getenv());
-        String fixtureName=switch(testName){case "completedReplacementUsesRealWitnessAndReleaseSource"->"replacement-no-revival";case "newCategoryHoldAppliesWithinOriginalScope"->"reserve-pick-dispatch";case "newCategoryEarlyHoldApplies"->"eligibility-fefo-with-reason";case "explicitDispatchNewRecallHoldApplies"->"late-restriction-actual-delivery";case "explicitDispatchLateHoldSourceStopsAtRecallAuthority"->"late-restriction-actual-delivery";case "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion"->"reserve-pick-dispatch";case "declaredExpiryGroupsMapToDistinctLots"->"eligibility-fefo-with-reason";case "postDispatchExpiryBoundaryIsExplicit"->"post-dispatch-expiry";case "otherpackUsesItsOwnTypedLot"->"eligibility-packaging-unapproved";case "authoredNoDispatchObservationUsesRealGateway"->"claim-nopriordispatch";default->"normal-consumed-delivery";};
+        String fixtureName=switch(testName){case "completedReplacementUsesRealWitnessAndReleaseSource"->"replacement-no-revival";case "newCategoryHoldAppliesWithinOriginalScope"->"reserve-pick-dispatch";case "newCategoryEarlyHoldApplies"->"eligibility-fefo-with-reason";case "explicitDispatchNewRecallHoldApplies"->"late-restriction-actual-delivery";case "explicitDispatchLateHoldSourceStopsAtRecallAuthority"->"late-restriction-actual-delivery";case "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion"->"reserve-pick-dispatch";case "declaredExpiryGroupsMapToDistinctLots"->"eligibility-fefo-with-reason";case "postDispatchExpiryBoundaryIsExplicit","explicitDispatchExpiredDelivery"->"post-dispatch-expiry";case "explicitDispatchLateDelivery"->"late-restriction-actual-delivery";case "explicitDispatchFalseClaim"->"claim-falseclaim";case "explicitDispatchConflictingClaim"->"claim-conflictingquantity";case "explicitDispatchUnidentifiedClaim"->"claim-unidentifiedscope";case "explicitDispatchOverflowClaim"->"claim-scopeoverflow";case "otherpackUsesItsOwnTypedLot"->"eligibility-packaging-unapproved";case "authoredNoDispatchObservationUsesRealGateway"->"claim-nopriordispatch";default->"normal-consumed-delivery";};
         Path fixturePath=root.resolve("verification/cases/T17/fixtures/"+fixtureName+".json");
         fixture=(ObjectNode)Json.read(fixturePath);
         if(Set.of("holdSourceReachesCategoryAuthorizationWithoutGrantExpansion","explicitDispatchLateHoldSourceStopsAtRecallAuthority").contains(testName)) {
@@ -35,6 +35,11 @@ class T17SourceFactsPostgresTest {
             // coordinator-authored DISPATCH inputs. No grants are changed.
             ((ObjectNode)fixture.path("baseline").path("t17SourceFacts")).remove(List.of("dispatchInputs","dispatchPolicyAlias","dispatchSegmentAliases"));
             ((ObjectNode)fixture.path("aliases")).remove("t17DispatchRegulatoryPolicy");
+        }
+        if(testName.equals("explicitDispatchMissingActivationGrant")) {
+            var source=(ObjectNode)fixture.path("actors").path("t17Source");
+            var caps=Json.array();for(var cap:source.path("roleCapabilities"))if(!cap.asText().equals("activateWork"))caps.add(cap);
+            source.set("roleCapabilities",caps);((ObjectNode)source.path("grant")).set("actions",caps.deepCopy());
         }
         for(String state:List.of("UNKNOWN","DENIED","CONFLICT"))if(testName.equals("explicitDispatch"+state+"RemainsBlocked")) {
             ((ObjectNode)fixture.path("baseline").path("conditions").get(0)).put("status",state);
@@ -54,7 +59,7 @@ class T17SourceFactsPostgresTest {
         connection=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());
         Path artifacts=Path.of(System.getenv("T17_TEST_EVIDENCE"));Files.createDirectories(artifacts);Files.writeString(artifacts.resolve(testName+"-installer-source-results.json"),Json.MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(installed));
     }
-    @AfterEach void close()throws Exception {if(sources!=null)Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-negative-command-results.json"),sources.commandEvidence().toPrettyString());if(connection!=null)connection.close();}
+    @AfterEach void close()throws Exception {if(sources!=null)Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-negative-command-results.json"),sources.commandEvidence().toPrettyString());if(connection!=null){try{ledgerEvidence();}finally{connection.close();}}}
     int count(String table)throws Exception {try(var s=connection.prepareStatement("SELECT count(*) FROM "+table+" WHERE organizationId=?")){s.setString(1,org);try(var r=s.executeQuery()){r.next();return r.getInt(1);}}}
     String id(String alias){return aliases.path(alias).asText();}
     void sql(String sql,Object...args)throws Exception {try(var s=connection.prepareStatement(sql)){for(int i=0;i<args.length;i++)s.setObject(i+1,args[i]);s.executeUpdate();}}
@@ -142,10 +147,10 @@ class T17SourceFactsPostgresTest {
     }
     JsonNode gateway(String actor,String capability,ObjectNode request)throws Exception {
         var credential=(ObjectNode)fixture.path("actors").path(actor).deepCopy();credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
-        String category=capability.equals("getObject")?"queries":"RECORD".equals(request.path("intentKind").asText())?"records":"commands";
+        String category=Set.of("getObject","getWork").contains(capability)?"queries":"RECORD".equals(request.path("intentKind").asText())?"records":"commands";
         var response=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/api/ontology/"+category+"/"+capability)).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString(request.toString())).build(),HttpResponse.BodyHandlers.ofString());
         var result=Json.parse(response.body());var artifact=Json.object().put("httpStatus",response.statusCode()).put("actor",actor).put("capability",capability);artifact.set("request",request);artifact.set("response",result);
-        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-"+request.path("commandIdempotencyKey").asText()+".json"),artifact.toPrettyString());return result;
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-"+request.path("commandIdempotencyKey").asText(capability+"-"+request.path("id").asText())+".json"),artifact.toPrettyString());return result;
     }
     @Test void authoredNoDispatchObservationUsesRealGateway()throws Exception {
         var cases=Json.read(root.resolve("verification/cases/T17/case.json"));JsonNode selected=null;for(var s:cases.path("subcases"))if("claim-nopriordispatch".equals(s.path("id").asText()))selected=s;
@@ -177,6 +182,11 @@ class T17SourceFactsPostgresTest {
         JsonNode selected=null;for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if(subcase.equals(sub.path("id").asText()))selected=sub;
         assertNotNull(selected);var results=actionResults;var resolver=new org.mulino.verification.ReferenceResolver(results,aliases);JsonNode last=null;
         for(var action:selected.path("actions"))if(names.contains(action.path("id").asText())) {
+            if(action.path("kind").asText().equals("control")){
+                var credential=(ObjectNode)fixture.path("actors").path("observer").deepCopy();credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
+                var clockRequest=Json.object().put("instant",action.at("/control/parameters/asOf").asText());
+                var changed=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/__verification/runtime/clock")).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString(clockRequest.toString())).build(),HttpResponse.BodyHandlers.ofString());assertEquals(200,changed.statusCode(),changed.body());continue;
+            }
             last=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),(ObjectNode)resolver.resolve(action.path("request")));
             var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",last);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
             if(action.path("kind").asText().equals("query"))assertTrue(last.path("data").hasNonNull("ID"),last.toPrettyString());
@@ -184,6 +194,76 @@ class T17SourceFactsPostgresTest {
         }
         return last;
     }
+    JsonNode allCommands(String sid)throws Exception {
+        JsonNode selected=null;for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if(sid.equals(sub.path("id").asText()))selected=sub;
+        assertNotNull(selected);var names=new HashSet<String>();
+        for(var a:selected.path("actions"))if(a.path("kind").asText().equals("invoke")||a.path("kind").asText().equals("control")||a.path("kind").asText().equals("query")&&Set.of("order-delivery-work","delivery-source-dispatch","delivery-source-sales-line","delivery-source-observation","claim-source-dispatch","claim-source-sales-line","late-hold-source-scope").contains(a.path("id").asText()))names.add(a.path("id").asText());
+        return runActions(sid,names);
+    }
+    void ledgerEvidence()throws Exception {
+        var snapshot=Json.object().put("organizationId",org).put("test",testName);
+        for(String table:List.of("mulino_inventory_QuantityMovements","mulino_inventory_SegmentAllocations","mulino_inventory_QuantitySegments","mulino_trade_sales_Deliveries","mulino_trade_sales_Observations","mulino_trade_sales_ExecutionEffects")) {
+            var rows=snapshot.putArray(table);
+            try(var q=connection.prepareStatement("SELECT * FROM "+table+" WHERE organizationId=? ORDER BY ID")){q.setString(1,org);try(var r=q.executeQuery()){var meta=r.getMetaData();while(r.next()){var row=rows.addObject();for(int col=1;col<=meta.getColumnCount();col++){Object value=r.getObject(col);if(value==null)row.putNull(meta.getColumnLabel(col));else row.put(meta.getColumnLabel(col),value.toString());}}}}
+        }
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-ledger.json"),snapshot.toPrettyString());
+    }
+    void actualDelivery(String sid,String expected,String legitimate)throws Exception {
+        var result=allCommands(sid);assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());
+        var delivery=actionResults.get("delivery").path("response");assertEquals(expected,delivery.path("effects").path("physicalQuantity").asText());assertEquals(legitimate,delivery.path("effects").path("contributedQuantity").asText());
+        assertEquals(1,count("mulino_trade_sales_Deliveries"));assertEquals(1,count("mulino_inventory_Dispatches"));
+        try(var q=connection.prepareStatement("SELECT quantity,legitimateQuantity,workId,salesLineId,dispatchId FROM mulino_trade_sales_Deliveries WHERE organizationId=?")){q.setString(1,org);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals(0,new BigDecimal(expected).compareTo(r.getBigDecimal(1)));assertEquals(0,new BigDecimal(legitimate).compareTo(r.getBigDecimal(2)));assertEquals(actionResults.get("order").at("/response/workId").asText(),r.getString(3));assertEquals(actionResults.get("order").at("/response/line/id").asText(),r.getString(4));assertEquals(actionResults.get("dispatch").at("/response/effects/dispatchId").asText(),r.getString(5));}}
+        try(var q=connection.prepareStatement("SELECT state,quantity FROM mulino_inventory_SegmentAllocations WHERE organizationId=?")){q.setString(1,org);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals("CONSUMED",r.getString(1));assertEquals(0,new BigDecimal("30").compareTo(r.getBigDecimal(2)));}}
+        assertEquals(3,count("mulino_inventory_QuantityMovements"));ledgerEvidence();
+    }
+    @Test void explicitDispatchUnactivatedWorkRemainsRejected()throws Exception {
+        runActions("normal-consumed-delivery",Set.of("order","order-delivery-work","reserve","pick","dispatch","delivery-source-dispatch","delivery-source-sales-line","delivery-source-document","delivery-source-event"));
+        assertEquals("DRAFT",actionResults.get("order-delivery-work").at("/response/data/status").asText());
+        var request=actionRequest("normal-consumed-delivery","delivery-provisional");
+        var denied=gateway("receiver","recordDelivery",request);
+        assertEquals("TYPE_INVALID",denied.at("/error/code").asText());assertEquals("Duty needs active work",denied.at("/error/message").asText());
+        assertEquals(0,count("mulino_trade_sales_Observations"));assertEquals(0,count("mulino_trade_sales_Deliveries"));assertEquals(2,count("mulino_inventory_QuantityMovements"));ledgerEvidence();
+    }
+    @Test void explicitDispatchMissingActivationGrant()throws Exception {
+        int originalMovements=count("mulino_inventory_QuantityMovements");
+        runActions("normal-consumed-delivery",Set.of("order","order-delivery-work"));
+        var denied=gateway("t17Source","activateWork",actionRequest("normal-consumed-delivery","activate-order-delivery-work"));
+        assertEquals("FORBIDDEN",denied.at("/error/code").asText());
+        assertEquals(0,count("mulino_trade_sales_Observations"));assertEquals(originalMovements,count("mulino_inventory_QuantityMovements"));
+    }
+    @Test void explicitDispatchDeliverySourceBoundaries()throws Exception {
+        String sid="normal-consumed-delivery";
+        runActions(sid,Set.of("order","order-delivery-work","activate-order-delivery-work","reserve","pick","dispatch","delivery-source-dispatch","delivery-source-sales-line","delivery-source-document","delivery-source-event","delivery-provisional","delivery-source-observation"));
+        assertEquals(1,count("mulino_trade_sales_Observations"));int canonicalBefore=count("mulino_evidence_CanonicalOccurrences");
+        for(String field:List.of("physicalScopeId","basisDocumentId","claimId","sourceIdentity","quantity")) {
+            var request=actionRequest(sid,"delivery-source-match");request.put("commandIdempotencyKey",UUID.randomUUID().toString());
+            ((ObjectNode)request.path("slots")).put(field,field.equals("quantity")?"31":field.equals("sourceIdentity")?"wrong-source:unverified:1":UUID.randomUUID().toString());
+            var denied=gateway("t17Source","matchSourceIdentity",request);
+            assertFalse(denied.path("outcome").asText().equals("APPLIED")&&denied.path("evidenceStatus").asText().equals("MATCHED"),denied.toPrettyString());
+            assertEquals(canonicalBefore,count("mulino_evidence_CanonicalOccurrences"));assertEquals(0,count("mulino_trade_sales_Deliveries"));assertEquals(2,count("mulino_inventory_QuantityMovements"));
+        }
+        var wrongWork=actionRequest(sid,"delivery-provisional");wrongWork.put("commandIdempotencyKey",UUID.randomUUID().toString());((ObjectNode)wrongWork.path("slots")).put("observationId",UUID.randomUUID().toString()).put("workId",id("t17SourceWork-A"));
+        assertNotEquals("APPLIED",gateway("receiver","recordDelivery",wrongWork).path("outcome").asText());
+        var missingWork=actionRequest(sid,"delivery-provisional");missingWork.put("commandIdempotencyKey",UUID.randomUUID().toString());((ObjectNode)missingWork.path("slots")).put("observationId",UUID.randomUUID().toString()).put("workId",UUID.randomUUID().toString());
+        assertNotEquals("APPLIED",gateway("receiver","recordDelivery",missingWork).path("outcome").asText());
+        runActions(sid,Set.of("delivery-source-match","delivery-source-canonical","delivery"));
+        var duplicate=actionRequest(sid,"delivery");
+        assertEquals("APPLIED",gateway("receiver","recordDelivery",duplicate).path("outcome").asText());
+        assertEquals(1,count("mulino_trade_sales_Deliveries"));assertEquals(3,count("mulino_inventory_QuantityMovements"));ledgerEvidence();
+    }
+    @Test void explicitDispatchNormalDelivery()throws Exception {actualDelivery("normal-consumed-delivery","30","30");}
+    @Test void explicitDispatchLateDelivery()throws Exception {actualDelivery("late-restriction-actual-delivery","20","0");}
+    @Test void explicitDispatchExpiredDelivery()throws Exception {actualDelivery("post-dispatch-expiry","20","0");}
+    void actualClaim(String sid)throws Exception {
+        var result=allCommands(sid);assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());
+        assertEquals("0",result.path("effects").path("physicalQuantity").asText());assertEquals("0",result.path("effects").path("contributedQuantity").asText());
+        assertEquals(1,count("mulino_trade_sales_Observations"));assertEquals(0,count("mulino_trade_sales_Deliveries"));assertEquals(1,count("mulino_inventory_Dispatches"));assertEquals(2,count("mulino_inventory_QuantityMovements"));
+        try(var q=connection.prepareStatement("SELECT state FROM mulino_inventory_SegmentAllocations WHERE organizationId=?")){q.setString(1,org);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals("CONSUMED",r.getString(1));}}ledgerEvidence();
+    }
+    @Test void explicitDispatchFalseClaim()throws Exception {actualClaim("claim-falseclaim");}
+    @Test void explicitDispatchConflictingClaim()throws Exception {actualClaim("claim-conflictingquantity");}
+    @Test void explicitDispatchUnidentifiedClaim()throws Exception {actualClaim("claim-unidentifiedscope");}
+    @Test void explicitDispatchOverflowClaim()throws Exception {actualClaim("claim-scopeoverflow");}
     @Test void sellOnlyDoesNotAuthorizeDispatch()throws Exception {
         assertEquals("30",queryEligibility().path("data").path("eligibleQuantity").asText());
         assertEquals("0",queryEligibility("2026-10-07T09:00:00Z","DISPATCH").path("data").path("eligibleQuantity").asText());

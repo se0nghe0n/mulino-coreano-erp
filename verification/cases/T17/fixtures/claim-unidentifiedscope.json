@@ -540,7 +540,8 @@
         "prepareRegulatoryProcedure",
         "recordSubmission",
         "recordRegulatoryDecision",
-        "verifyLabel"
+        "verifyLabel",
+        "activateWork"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -557,7 +558,8 @@
           "prepareRegulatoryProcedure",
           "recordSubmission",
           "recordRegulatoryDecision",
-          "verifyLabel"
+          "verifyLabel",
+          "activateWork"
         ],
         "scope": {
           "organizationAlias": "ORG",
@@ -1269,6 +1271,61 @@
         "originalAuthorityClaimed": false,
         "selection": "NEW_ACTION_SPECIFIC_DISPATCH_SOURCE_INPUTS",
         "preserved": "original condition scope, quantity, unit, status, evidence and interval"
+      },
+      "deliveryInputAuthoring": {
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "originalActor": {
+          "issuer": "synthetic-issuer",
+          "audience": "isolated-ontology",
+          "organizationAlias": "ORG",
+          "subject": "T17-claim-unidentifiedscope-source",
+          "roleCapabilities": [
+            "attachEvidence",
+            "recordActivity",
+            "matchSourceIdentity",
+            "linkCanonicalOccurrence",
+            "getEvidence",
+            "recordDispositionBasis",
+            "decideQuality",
+            "confirmCustomerConditions",
+            "confirmCommercialDisposition",
+            "prepareRegulatoryProcedure",
+            "recordSubmission",
+            "recordRegulatoryDecision",
+            "verifyLabel"
+          ],
+          "grant": {
+            "delegatorAlias": "supervisor",
+            "actions": [
+              "attachEvidence",
+              "recordActivity",
+              "matchSourceIdentity",
+              "linkCanonicalOccurrence",
+              "getEvidence",
+              "recordDispositionBasis",
+              "decideQuality",
+              "confirmCustomerConditions",
+              "confirmCommercialDisposition",
+              "prepareRegulatoryProcedure",
+              "recordSubmission",
+              "recordRegulatoryDecision",
+              "verifyLabel"
+            ],
+            "scope": {
+              "organizationAlias": "ORG",
+              "itemAliases": [
+                "P"
+              ]
+            },
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "revision": 1
+          }
+        },
+        "selection": "Public activation of the original order delivery Work; original ITEM/org all-of scope and validity retained"
       }
     },
     "segments": [
