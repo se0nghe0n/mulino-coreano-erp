@@ -32,3 +32,46 @@ oracleExplanation과 oracleRef에 보존한다. 서버 의미 Boolean을 답안�
 
 fixture의 DocumentVersion.content는 UTF-8 원문이다. sha256는 해당
 원문의 실제 bytes에서 계산했으며 토큰이나 credential을 담지 않는다.
+
+## 2026-10-23 parent90 입력 후속 검증
+
+`author_parent_ranges.py`는 `4f01e111`의 source graph·누적 기간·assessment
+입력 위에 적용하는 T11 전용 가역 layer다. 세 `parent90-*`의 원래
+`receive90` 원문은 `rangeRootId=Q`, `startQuantity=0`, `quantity=90 BOX`다.
+원래 serial label `001-030`과 `031-090`을 각각 `[0,30)`, `[30,90)`으로
+표현한다. 원래 label·provenance·요청은 `parent-range-input-ledger.json`에
+그대로 남긴다. Work link 방향과 canonical occurrence는 바꾸지 않는다.
+
+link/close 직전에 공개 `getWork`로 현재 revision을 읽는다. `closeWork`의
+지원 입력인 Work·reason을 유지하고, 서버가 직접 확인하는 최신 assessment
+대신 보내던 오래된 `assessmentId`와 미지원 설명 slot은 ledger에 보존한다.
+110개 assertion 원문, 다른 9개 subcase, 모든 fixture bytes와 business
+권한·수량·시각은 보존한다. `scenario.feature`에는 조회 행동만 추가한다.
+
+재생성은 `python3 verification/cases/T11/author_parent_ranges.py`, 정적
+보존 검사는 `python3 -m unittest discover -s verification/cases/T11`로 한다.
+`restore()`는 결과 전체를 검증하여 입력·권한·oracle의 미기록 변이를 거부한다.
+기존 source/cumulative/assessment authoring의 fixed point도 검사한다.
+
+결정적 실검증은 `python3 verification/actual/t11/run.py <새 evidence 경로>`다.
+현재 tree에서 npm/CDS/backend를 빌드하고 전용 PostgreSQL·Spring HTTP를
+시작하여 원래 세 흐름과 구간/권한 음성 입력을 실행한다. 모델이나
+`./verify scenarios --actual`을 호출하지 않는다. SQL은 별도 read-only
+REPEATABLE_READ transaction에서 원래 receipt·canonical·link·credit·판정을
+읽는다. 생성한 server/container/key는 종료 때 정리한다.
+
+현재 range 명령은 APPLIED지만 원래 child→parent 방향의 credit은 부모에게
+귀속된다. 자식의 실제 판정은 UNVERIFIED이고 FULFILLED 종료는
+HELD/ASSESSMENT_NOT_CURRENT다. `getAssessment`에는 원래 후속 입력이
+가리키던 `obligationId`도 없다. 자식 원천을 만들거나 방향을 뒤집어 PASS로
+바꾸지 않는다. 기존 oracle를 지원할 제품 계약/구현 검토와 부족10의 실제
+assignment·인계 근거 결정은 coordinator에게 남긴다. 전체 Task/Step과
+원래 scenario 인수는 OPEN이다. 실행별 세부 결과는 `.local/t11-parent-followup`
+원로그와 인계 artifact에 보존한다.
+
+기존 `T09/test_assessment_contracts.py`의 T11 역변환은 이 새 layer보다
+이전 형태를 전제한다. 공용 `assessment_contracts.reverse`의 T11 분기에
+이 layer의 역변환을 먼저 연결하고, 해당 test의 T11 feature 복원에도
+추가 조회를 제거하는 순서를 연결해야 한다. 이 두 공용 파일은 현재
+소유 경계 밖이라 변경하지 않았다. 그 검사에서 확인한 1 FAIL/1 ERROR는
+별도로 보존하며, 새 T11 검사로 대체하거나 숨기지 않는다.

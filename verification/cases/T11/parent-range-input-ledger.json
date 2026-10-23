@@ -1,0 +1,2534 @@
+{
+  "recordType": "T11_PARENT_RANGE_INPUT_AUTHORING",
+  "baseline": "4f01e111ba9c0a6b4c18c266b5101289f2f1f0c9",
+  "selectedSubcases": [
+    "parent90-cancelled",
+    "parent90-impossible",
+    "parent90-superseded"
+  ],
+  "assertionsUnchanged": 110,
+  "beforeSha256": "b8999241d3affe18dfffdab68b15d1e9b7eb547ff690516c9440dc0d433524bb",
+  "afterSha256": "19d04b6e6e284cee63e654a818985d6a00d58730bc12d93a842736b24295ab2c",
+  "changes": [
+    {
+      "subcaseId": "parent90-cancelled",
+      "actionId": "child30-link",
+      "before": {
+        "id": "child30-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-001-030"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-parent90-cancelled-child30-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "child30-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "startQuantity": "0"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-child30-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child30-link-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child30",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child30-link-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-cancelled",
+      "actionId": "child30-close",
+      "before": {
+        "id": "child30-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED",
+            "assessmentId": {
+              "$result": {
+                "actionId": "child30-assessment",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-assessment",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-child30-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "assessmentId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "child30-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-child30-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child30-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child30",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child30-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-cancelled",
+      "actionId": "child60-link",
+      "before": {
+        "id": "child60-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "60",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-031-090"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-parent90-cancelled-child60-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "child60-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "60",
+              "unit": "BOX"
+            },
+            "startQuantity": "30"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-child60-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child60-link-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child60",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child60-link-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-cancelled",
+      "actionId": "child60-close",
+      "before": {
+        "id": "child60-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED",
+            "assessmentId": {
+              "$result": {
+                "actionId": "child60-assessment",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-assessment",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-child60-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "assessmentId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "child60-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-child60-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child60-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child60",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child60-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-cancelled",
+      "actionId": "false-close",
+      "before": {
+        "id": "false-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "false-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "deficit-transfer",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-false-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "false-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "false-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "false-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-false-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "false-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "parent",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "false-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-cancelled",
+      "actionId": "alternative-close",
+      "before": {
+        "id": "alternative-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "alternative-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "CANCELLED",
+            "decisionEvidenceId": {
+              "$alias": "DOC"
+            },
+            "reasonText": "부족 물량의 승인된 후속 책임으로 이전",
+            "successorWorkId": {
+              "$result": {
+                "actionId": "followup",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "deficit-transfer",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-alternative-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "decisionEvidenceId": "CONTEXT",
+            "reasonText": "USER",
+            "successorWorkId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "alternative-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "alternative-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "CANCELLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "alternative-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-cancelled-alternative-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "alternative-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "parent",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "alternative-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "actionId": "child30-link",
+      "before": {
+        "id": "child30-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-001-030"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-parent90-impossible-child30-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "child30-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "startQuantity": "0"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-child30-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child30-link-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child30",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child30-link-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "actionId": "child30-close",
+      "before": {
+        "id": "child30-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED",
+            "assessmentId": {
+              "$result": {
+                "actionId": "child30-assessment",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-assessment",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-child30-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "assessmentId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "child30-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-child30-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child30-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child30",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child30-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "actionId": "child60-link",
+      "before": {
+        "id": "child60-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "60",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-031-090"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-parent90-impossible-child60-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "child60-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "60",
+              "unit": "BOX"
+            },
+            "startQuantity": "30"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-child60-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child60-link-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child60",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child60-link-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "actionId": "child60-close",
+      "before": {
+        "id": "child60-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED",
+            "assessmentId": {
+              "$result": {
+                "actionId": "child60-assessment",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-assessment",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-child60-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "assessmentId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "child60-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-child60-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child60-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child60",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child60-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "actionId": "false-close",
+      "before": {
+        "id": "false-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "false-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "deficit-transfer",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-false-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "false-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "false-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "false-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-false-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "false-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "parent",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "false-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "actionId": "alternative-close",
+      "before": {
+        "id": "alternative-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "alternative-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "IMPOSSIBLE",
+            "decisionEvidenceId": {
+              "$alias": "DOC"
+            },
+            "reasonText": "부족 물량의 승인된 후속 책임으로 이전",
+            "successorWorkId": {
+              "$result": {
+                "actionId": "followup",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "deficit-transfer",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-alternative-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "decisionEvidenceId": "CONTEXT",
+            "reasonText": "USER",
+            "successorWorkId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "alternative-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "alternative-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "IMPOSSIBLE"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "alternative-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-impossible-alternative-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "alternative-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "parent",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "alternative-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "actionId": "child30-link",
+      "before": {
+        "id": "child30-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-001-030"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-parent90-superseded-child30-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "child30-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "startQuantity": "0"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-child30-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child30-link-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child30",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child30-link-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "actionId": "child30-close",
+      "before": {
+        "id": "child30-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED",
+            "assessmentId": {
+              "$result": {
+                "actionId": "child30-assessment",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-assessment",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-child30-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "assessmentId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "child30-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child30-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child30-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-child30-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child30-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child30",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child30-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "actionId": "child60-link",
+      "before": {
+        "id": "child60-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "60",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-031-090"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-parent90-superseded-child60-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "child60-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "CONTRIBUTES_TO",
+            "sourceWorkId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive90-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "60",
+              "unit": "BOX"
+            },
+            "startQuantity": "30"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-child60-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "sourceWorkId": "CONTEXT",
+            "targetWorkId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child60-link-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child60",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child60-link-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "actionId": "child60-close",
+      "before": {
+        "id": "child60-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED",
+            "assessmentId": {
+              "$result": {
+                "actionId": "child60-assessment",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-assessment",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-child60-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "assessmentId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "child60-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "child60-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "child60-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-child60-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "child60-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "child60",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "child60-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "actionId": "false-close",
+      "before": {
+        "id": "false-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "false-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "deficit-transfer",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-false-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "false-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "false-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "false-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-false-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "false-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "parent",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "false-close-current-work:actual-artifact"
+        ]
+      }
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "actionId": "alternative-close",
+      "before": {
+        "id": "alternative-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "alternative-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "SUPERSEDED",
+            "decisionEvidenceId": {
+              "$alias": "DOC"
+            },
+            "reasonText": "부족 물량의 승인된 후속 책임으로 이전",
+            "successorWorkId": {
+              "$result": {
+                "actionId": "followup",
+                "pointer": "/response/workId"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "deficit-transfer",
+              "pointer": "/response/workRevision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-alternative-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER",
+            "decisionEvidenceId": "CONTEXT",
+            "reasonText": "USER",
+            "successorWorkId": "CONTEXT"
+          }
+        }
+      },
+      "after": {
+        "id": "alternative-close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "alternative-close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "reason": "SUPERSEDED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "alternative-close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-parent90-superseded-alternative-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": {
+        "id": "alternative-close-current-work",
+        "kind": "query",
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "workId": {
+            "$result": {
+              "actionId": "parent",
+              "pointer": "/response/workId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            }
+          }
+        },
+        "evidenceRefs": [
+          "alternative-close-current-work:actual-artifact"
+        ]
+      }
+    }
+  ],
+  "rangeBasis": "Original receive90 source: startQuantity=0, quantity=90 BOX, rangeRootId=Q; serial-boxes-001-030 -> [0,30), serial-boxes-031-090 -> [30,90). Runtime canonical matching remains mandatory.",
+  "noNewSourceFacts": true,
+  "businessOutcomesChanged": false
+}
