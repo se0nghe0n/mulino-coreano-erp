@@ -254,9 +254,13 @@ final class ScenarioObservationProjection {
             List.of(delivery.path("organizationId").asText(),occurrence.path("id").asText(),knownAt));
         if(owners.size()!=1||!owners.get(0).path("id").equals(delivery.path("id")))return;
         if(superseded("mulino_evidence_CanonicalOccurrences",occurrence,"supersedesId"))return;
+        // Reconciliation.link reuses one typed occurrence identity; competing facts remain unknown.
+        var candidates=query("mulino_evidence_CanonicalOccurrences","r.organizationId=? AND r.kind=? AND r.occurrenceIdentity=? AND r.recordedAt<=?",
+            List.of(delivery.path("organizationId").asText(),occurrence.path("kind").asText(),occurrence.path("occurrenceIdentity").asText(),knownAt));
+        if(candidates.size()!=1||!candidates.get(0).path("id").equals(occurrence.path("id")))return;
         var verifications=query("mulino_evidence_Verifications","r.organizationId=? AND r.canonicalOccurrenceId=? AND r.recordedAt<=?",
             List.of(delivery.path("organizationId").asText(),occurrence.path("id").asText(),knownAt));
-        var chains=Json.array();
+        var chains=new TreeMap<String,JsonNode>();
         for(var verification:verifications) {
             if(!"VERIFIED".equals(verification.path("verdict").asText())
                 ||!List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream()
@@ -275,14 +279,21 @@ final class ScenarioObservationProjection {
             if(superseded("mulino_evidence_Events",event,"supersedesId","invalidatesId")
                 ||superseded("mulino_evidence_Claims",claim,"supersedesId")
                 ||superseded("mulino_evidence_DocumentVersions",document,"supersedesId"))continue;
-            chains.add(Json.object().put("canonicalOccurrenceId",occurrence.path("id").asText())
-                .put("observationId",observation.path("id").asText()).put("dispatchId",dispatch.path("id").asText())
-                .put("verificationId",verification.path("id").asText()).put("claimId",claim.path("id").asText())
+            String verificationId=verification.path("id").asText();
+            if(verificationId.isBlank())continue;
+            var chain=Json.object().put("verificationId",verificationId).put("claimId",claim.path("id").asText())
                 .put("eventId",event.path("id").asText()).put("documentVersionId",document.path("id").asText())
-                .put("sourceProfileId",profile.path("id").asText()).put("inboxId",inbox.get(0).path("id").asText()));
+                .put("sourceProfileId",profile.path("id").asText()).put("inboxId",inbox.get(0).path("id").asText());
+            var prior=chains.putIfAbsent(verificationId,chain);
+            if(prior!=null&&!prior.equals(chain))return; // the same original row ID cannot name conflicting proofs
         }
-        // Multiple independently linked candidates need reconciliation; do not choose an arbitrary first row.
-        if(chains.size()==1){delivery.put("canonical",true);delivery.set("canonicalSource",chains.get(0));}
+        // Reverification adds proof of the same fact, never another quantity row or an arbitrary first proof.
+        if(!chains.isEmpty()) {
+            var source=Json.object().put("canonicalOccurrenceId",occurrence.path("id").asText())
+                .put("observationId",observation.path("id").asText()).put("dispatchId",dispatch.path("id").asText());
+            var proofs=Json.array();chains.values().forEach(proofs::add);source.set("verificationChains",proofs);
+            delivery.put("canonical",true);delivery.set("canonicalSource",source);
+        }
     }
 
     /** Read only the explicitly configured immutable local object; unavailable bytes remain unknown. */

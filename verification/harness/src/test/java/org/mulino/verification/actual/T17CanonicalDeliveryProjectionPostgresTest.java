@@ -114,7 +114,51 @@ class T17CanonicalDeliveryProjectionPostgresTest {
         try(var s=writer.createStatement();var r=s.executeQuery("SELECT count(*) FROM mulino_trade_sales_Deliveries")){assertTrue(r.next());assertEquals(1,r.getInt(1));}
     }
 
-    @ParameterizedTest @ValueSource(strings={"otherCanonical","otherWork","foreignOrg","wrongType","wrongPhysicalScope","wrongItem","wrongUnit","wrongTime","wrongDispatch","outsideDispatch","wrongPayload","unverified","futureSource","futureVerification","futureCanonical","missingDocument","missingOriginal","corruptOriginal","superseded","multipleLinks","multipleOwners","inboxConflict","wrongPolicy","wrongClaimedRoot","wrongOriginalNamespace","missingWork","endedSource"})
+    @Test void reverificationOfTheSameCanonicalSourceKeepsOnePhysicalDeliveryAndEveryProof() throws Exception {
+        sourceGraph("20","0");
+        insert("mulino_evidence_Verifications",source("Verifications").deepCopy().put("ID","second"));
+        installGraph();
+        var result=capture("deliveries");var rows=result.path("rawRows").path("deliveries");
+        assertEquals(1,rows.size());var actual=rows.get(0);
+        assertTrue(actual.path("canonical").asBoolean(),"A second valid verification of the same physical fact is not ambiguity");
+        assertEquals("20",actual.path("quantity").asText());assertEquals("0",actual.path("legitimateQuantity").asText());
+        var proof=actual.path("canonicalSource");assertEquals("canonical",proof.path("canonicalOccurrenceId").asText());
+        assertEquals("observation",proof.path("observationId").asText());assertEquals("dispatch",proof.path("dispatchId").asText());
+        assertFalse(proof.has("verificationId"));var chains=proof.path("verificationChains");assertEquals(2,chains.size());
+        assertEquals("second",chains.get(0).path("verificationId").asText());assertEquals("verification",chains.get(1).path("verificationId").asText());
+        for(var chain:chains){assertEquals("claim",chain.path("claimId").asText());assertEquals("event",chain.path("eventId").asText());assertEquals("document",chain.path("documentVersionId").asText());}
+    }
+
+    @ParameterizedTest @ValueSource(strings={"independentClaimDocument","futureVerification","rejectedVerification","conflictingProofInbox"})
+    void additionalProofsPreserveValidSourcesWithoutDuplicatingQuantity(String variant) throws Exception {
+        sourceGraph("20","0");
+        var second=source("Verifications").deepCopy().put("ID","second");
+        if(variant.equals("independentClaimDocument")) {
+            insert("mulino_evidence_DocumentVersions",source("DocumentVersions").deepCopy().put("ID","second-document"));
+            insert("mulino_evidence_Claims",source("Claims").deepCopy().put("ID","second-claim").put("documentVersionId","second-document"));
+            second.put("claimId","second-claim").put("basisDocumentId","second-document");
+        }
+        if(variant.equals("futureVerification"))second.put("recordedAt",later);
+        if(variant.equals("rejectedVerification"))second.put("verdict","REJECTED");
+        if(variant.equals("conflictingProofInbox")) {
+            var event=source("Events").deepCopy().put("ID","second-event").put("sourceVersion","2");
+            insert("mulino_evidence_Events",event);
+            insert("mulino_evidence_Claims",source("Claims").deepCopy().put("ID","second-claim").put("eventId","second-event"));
+            insert("mulino_evidence_InboxRecords",source("InboxRecords").deepCopy().put("ID","second-inbox").put("eventId","second-event").put("sourceVersion","2").put("state","CONFLICT"));
+            second.put("claimId","second-claim");
+        }
+        insert("mulino_evidence_Verifications",second);installGraph();
+        var rows=capture("deliveries").path("rawRows").path("deliveries");assertEquals(1,rows.size());var actual=rows.get(0);
+        assertTrue(actual.path("canonical").asBoolean());assertEquals("20",actual.path("quantity").asText());assertEquals("0",actual.path("legitimateQuantity").asText());
+        var chains=actual.path("canonicalSource").path("verificationChains");assertEquals(variant.equals("independentClaimDocument")?2:1,chains.size());
+        if(variant.equals("independentClaimDocument")) {
+            assertEquals("second",chains.get(0).path("verificationId").asText());assertEquals("second-claim",chains.get(0).path("claimId").asText());
+            assertEquals("second-document",chains.get(0).path("documentVersionId").asText());assertEquals("event",chains.get(0).path("eventId").asText());
+        }
+        assertEquals("verification",chains.get(chains.size()-1).path("verificationId").asText());
+    }
+
+    @ParameterizedTest @ValueSource(strings={"otherCanonical","otherWork","foreignOrg","wrongType","wrongPhysicalScope","wrongItem","wrongUnit","wrongTime","wrongDispatch","outsideDispatch","wrongPayload","unverified","futureSource","futureVerification","futureCanonical","missingDocument","missingOriginal","corruptOriginal","superseded","competingCanonical","multipleOwners","inboxConflict","wrongPolicy","wrongClaimedRoot","wrongOriginalNamespace","missingWork","endedSource"})
     void invalidOrAmbiguousStoredSourceLeavesCanonicalUnknown(String variant) throws Exception {
         sourceGraph("20","0");
         switch(variant) {
@@ -137,7 +181,7 @@ class T17CanonicalDeliveryProjectionPostgresTest {
             case "missingOriginal"->Files.delete(blobs.resolve("objects").resolve(source("DocumentVersions").path("blobId").asText()));
             case "corruptOriginal"->Files.writeString(blobs.resolve("objects").resolve(source("DocumentVersions").path("blobId").asText()),"{}");
             case "superseded"->insert("mulino_evidence_Events",row("new-event").put("supersedesId","event"));
-            case "multipleLinks"->insert("mulino_evidence_Verifications",source("Verifications").deepCopy().put("ID","second"));
+            case "competingCanonical"->insert("mulino_evidence_CanonicalOccurrences",source("CanonicalOccurrences").deepCopy().put("ID","competing"));
             case "multipleOwners"->insert("mulino_trade_sales_Deliveries",source("Deliveries").deepCopy().put("ID","second"));
             case "inboxConflict"->source("InboxRecords").put("state","CONFLICT");
             case "wrongPolicy"->source("SourceProfiles").put("policyVersion","other");
