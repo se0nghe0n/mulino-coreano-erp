@@ -79,10 +79,10 @@ class SourceProfileContract(unittest.TestCase):
             with self.subTest(field=key), self.assertRaises(ValueError):
                 AUTHOR.apply(changed)
 
-    def test_no_business_authority_added(self):
+    def test_historical_source_layer_added_no_business_authority(self):
         for path in (HERE / 'fixtures').glob('*.json'):
             before = json.loads(original(path))
-            after = json.loads(path.read_bytes())
+            after = PUBLIC.completion.restore_fixture(json.loads(path.read_bytes()))
             self.assertEqual(before['actors'], {k:v for k,v in after['actors'].items() if k != SOURCE.ACTOR})
             self.assertEqual({'organizationAlias': 'ORG', 'itemAliases': sorted({v['itemAlias'] for v in before['aliases'].values() if v['type'] == 'QuantitySegment'})}, after['actors'][SOURCE.ACTOR]['grant']['scope'])
             # No actor has the decision permissions required by QualityCommands.

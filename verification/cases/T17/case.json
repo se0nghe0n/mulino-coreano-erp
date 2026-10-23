@@ -685,7 +685,9 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z",
+              "packageTerms": "sealed-box-v1"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-reserve-pick-dispatch-second-order",
@@ -701,7 +703,9 @@
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT",
+              "packageTerms": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -15766,7 +15770,9 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z",
+              "packageTerms": "sealed-box-v1"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-replacement-no-revival-order",
@@ -15782,7 +15788,9 @@
               "destinationId": "CONTEXT",
               "deliveryEndpoint": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT",
+              "packageTerms": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -16218,6 +16226,32 @@
           ]
         },
         {
+          "id": "hold-current-segment",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$alias": "A"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "QuantitySegment"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "hold-current-segment:actual-query-artifact"
+          ]
+        },
+        {
           "id": "hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -16260,8 +16294,8 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "reserve",
-                "pointer": "/response/revision"
+                "actionId": "hold-current-segment",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T17-replacement-no-revival-hold",
@@ -16354,6 +16388,536 @@
           ]
         },
         {
+          "id": "replace-source-allocation",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Allocation"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "replace-source-allocation:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "replace-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "A"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "7eb3000f-6b4d-5b18-9e3e-8d0482541f5d",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "oldSegmentId": {
+                      "$alias": "A"
+                    },
+                    "newSegmentId": {
+                      "$alias": "B"
+                    },
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "workId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "oldAllocationId": {
+                      "$result": {
+                        "actionId": "reserve",
+                        "pointer": "/response/effects/allocationId"
+                      }
+                    },
+                    "witnessKind": "replacement-proof",
+                    "operation": "replaceAllocation",
+                    "originalRequest": {
+                      "intentKind": "COMMAND",
+                      "definitionVersion": "definition-v1",
+                      "capabilityId": "replaceAllocation",
+                      "subjectRefs": [
+                        {
+                          "type": "TradeItem",
+                          "id": {
+                            "$alias": "P"
+                          }
+                        }
+                      ],
+                      "slots": {
+                        "quantity": "20",
+                        "unit": "BOX",
+                        "evidenceId": {
+                          "$alias": "replacement-proof"
+                        },
+                        "allocationId": {
+                          "$result": {
+                            "actionId": "reserve",
+                            "pointer": "/response/effects/allocationId"
+                          }
+                        },
+                        "segmentId": {
+                          "$alias": "B"
+                        },
+                        "startQuantity": "0"
+                      },
+                      "expectedRevision": {
+                        "$result": {
+                          "actionId": "hold",
+                          "pointer": "/response/revision"
+                        }
+                      },
+                      "commandIdempotencyKey": "T17-replacement-no-revival-replace",
+                      "evidenceRefs": [
+                        {
+                          "$alias": "delivery-proof"
+                        }
+                      ],
+                      "provenance": {
+                        "quantity": "USER",
+                        "unit": "USER",
+                        "evidenceId": "CONTEXT",
+                        "allocationId": "CONTEXT",
+                        "segmentId": "CONTEXT",
+                        "startQuantity": "CONTEXT"
+                      }
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "replacement-proof",
+                      "sha256": "1326083de5ca84faa57a683071e9ebcf6de25346f15cf2e44cc86e223e2643dc",
+                      "sourceNamespace": "SYNTHETIC-replacement-proof",
+                      "externalEventId": "T17-replacement-no-revival-replacement-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "replacement-proof"
+                    },
+                    "proposalOnly": true,
+                    "committedEffectClaimed": false,
+                    "sourceDecisionId": "7eb3000f-6b4d-5b18-9e3e-8d0482541f5d",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "oldSegmentId": {
+                      "$alias": "A"
+                    },
+                    "newSegmentId": {
+                      "$alias": "B"
+                    },
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "workId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "oldAllocationId": {
+                      "$result": {
+                        "actionId": "reserve",
+                        "pointer": "/response/effects/allocationId"
+                      }
+                    },
+                    "witnessKind": "replacement-proof",
+                    "operation": "replaceAllocation",
+                    "originalRequest": {
+                      "intentKind": "COMMAND",
+                      "definitionVersion": "definition-v1",
+                      "capabilityId": "replaceAllocation",
+                      "subjectRefs": [
+                        {
+                          "type": "TradeItem",
+                          "id": {
+                            "$alias": "P"
+                          }
+                        }
+                      ],
+                      "slots": {
+                        "quantity": "20",
+                        "unit": "BOX",
+                        "evidenceId": {
+                          "$alias": "replacement-proof"
+                        },
+                        "allocationId": {
+                          "$result": {
+                            "actionId": "reserve",
+                            "pointer": "/response/effects/allocationId"
+                          }
+                        },
+                        "segmentId": {
+                          "$alias": "B"
+                        },
+                        "startQuantity": "0"
+                      },
+                      "expectedRevision": {
+                        "$result": {
+                          "actionId": "hold",
+                          "pointer": "/response/revision"
+                        }
+                      },
+                      "commandIdempotencyKey": "T17-replacement-no-revival-replace",
+                      "evidenceRefs": [
+                        {
+                          "$alias": "delivery-proof"
+                        }
+                      ],
+                      "provenance": {
+                        "quantity": "USER",
+                        "unit": "USER",
+                        "evidenceId": "CONTEXT",
+                        "allocationId": "CONTEXT",
+                        "segmentId": "CONTEXT",
+                        "startQuantity": "CONTEXT"
+                      }
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "replacement-proof",
+                      "sha256": "1326083de5ca84faa57a683071e9ebcf6de25346f15cf2e44cc86e223e2643dc",
+                      "sourceNamespace": "SYNTHETIC-replacement-proof",
+                      "externalEventId": "T17-replacement-no-revival-replacement-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "replacement-proof"
+                    },
+                    "proposalOnly": true,
+                    "committedEffectClaimed": false,
+                    "sourceDecisionId": "7eb3000f-6b4d-5b18-9e3e-8d0482541f5d",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_ACTION_SOURCE; original evidence descriptor retained; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-replace-source-document"
+          },
+          "evidenceRefs": [
+            "replace-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "replace-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "A"
+                }
+              },
+              "kind": "T17_REPLACEMENT_PROPOSAL",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "7eb3000f-6b4d-5b18-9e3e-8d0482541f5d",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "oldSegmentId": {
+                      "$alias": "A"
+                    },
+                    "newSegmentId": {
+                      "$alias": "B"
+                    },
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "workId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "oldAllocationId": {
+                      "$result": {
+                        "actionId": "reserve",
+                        "pointer": "/response/effects/allocationId"
+                      }
+                    },
+                    "witnessKind": "replacement-proof",
+                    "operation": "replaceAllocation",
+                    "originalRequest": {
+                      "intentKind": "COMMAND",
+                      "definitionVersion": "definition-v1",
+                      "capabilityId": "replaceAllocation",
+                      "subjectRefs": [
+                        {
+                          "type": "TradeItem",
+                          "id": {
+                            "$alias": "P"
+                          }
+                        }
+                      ],
+                      "slots": {
+                        "quantity": "20",
+                        "unit": "BOX",
+                        "evidenceId": {
+                          "$alias": "replacement-proof"
+                        },
+                        "allocationId": {
+                          "$result": {
+                            "actionId": "reserve",
+                            "pointer": "/response/effects/allocationId"
+                          }
+                        },
+                        "segmentId": {
+                          "$alias": "B"
+                        },
+                        "startQuantity": "0"
+                      },
+                      "expectedRevision": {
+                        "$result": {
+                          "actionId": "hold",
+                          "pointer": "/response/revision"
+                        }
+                      },
+                      "commandIdempotencyKey": "T17-replacement-no-revival-replace",
+                      "evidenceRefs": [
+                        {
+                          "$alias": "delivery-proof"
+                        }
+                      ],
+                      "provenance": {
+                        "quantity": "USER",
+                        "unit": "USER",
+                        "evidenceId": "CONTEXT",
+                        "allocationId": "CONTEXT",
+                        "segmentId": "CONTEXT",
+                        "startQuantity": "CONTEXT"
+                      }
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "replacement-proof",
+                      "sha256": "1326083de5ca84faa57a683071e9ebcf6de25346f15cf2e44cc86e223e2643dc",
+                      "sourceNamespace": "SYNTHETIC-replacement-proof",
+                      "externalEventId": "T17-replacement-no-revival-replacement-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "replacement-proof"
+                    },
+                    "proposalOnly": true,
+                    "committedEffectClaimed": false,
+                    "sourceDecisionId": "7eb3000f-6b4d-5b18-9e3e-8d0482541f5d",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "replace-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "New synthetic action proposal source; neither the original evidence nor a committed business effect is asserted",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-replace-source-event"
+          },
+          "evidenceRefs": [
+            "replace-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "replace-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "replace-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "replace-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "A"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:7eb3000f-6b4d-5b18-9e3e-8d0482541f5d:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "새 synthetic 후속 요청 원문과 원래 실물 범위·수량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-replace-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "replace-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "replace-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "replace-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-replace-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "replace-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "replace",
           "kind": "invoke",
           "actorRef": "sales",
@@ -16375,7 +16939,10 @@
               "quantity": "20",
               "unit": "BOX",
               "evidenceId": {
-                "$alias": "replacement-proof"
+                "$result": {
+                  "actionId": "replace-source-document",
+                  "pointer": "/response/id"
+                }
               },
               "allocationId": {
                 "$result": {
@@ -16390,8 +16957,8 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "hold",
-                "pointer": "/response/revision"
+                "actionId": "replace-source-allocation",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T17-replacement-no-revival-replace",
@@ -16478,6 +17045,495 @@
           ]
         },
         {
+          "id": "release-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "A"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "dd5afed8-ee4f-57b2-b10d-6886bf2796fe",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "oldSegmentId": {
+                      "$alias": "A"
+                    },
+                    "newSegmentId": {
+                      "$alias": "B"
+                    },
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "workId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "oldAllocationId": {
+                      "$result": {
+                        "actionId": "reserve",
+                        "pointer": "/response/effects/allocationId"
+                      }
+                    },
+                    "operation": "releaseHold",
+                    "restrictionId": {
+                      "$result": {
+                        "actionId": "hold",
+                        "pointer": "/response/effects/restrictionId"
+                      }
+                    },
+                    "reason": "원래 QC 검토 보류를 해제하고 대체 예약은 유지한다",
+                    "originalRequest": {
+                      "intentKind": "COMMAND",
+                      "definitionVersion": "definition-v1",
+                      "capabilityId": "releaseHold",
+                      "subjectRefs": [
+                        {
+                          "type": "TradeItem",
+                          "id": {
+                            "$alias": "P"
+                          }
+                        }
+                      ],
+                      "slots": {
+                        "restrictionId": {
+                          "$result": {
+                            "actionId": "hold",
+                            "pointer": "/response/effects/restrictionId"
+                          }
+                        },
+                        "evidenceId": {
+                          "$alias": "qc-proof"
+                        }
+                      },
+                      "expectedRevision": {
+                        "$result": {
+                          "actionId": "hold",
+                          "pointer": "/response/revision"
+                        }
+                      },
+                      "commandIdempotencyKey": "T17-replacement-no-revival-release-hold",
+                      "evidenceRefs": [
+                        {
+                          "$alias": "delivery-proof"
+                        }
+                      ],
+                      "provenance": {
+                        "restrictionId": "CONTEXT",
+                        "evidenceId": "CONTEXT"
+                      }
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "a9ae3beedfee02655b4c2edc07c502f3d392a16d63d8d06e0cf2325cb22040ce",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-replacement-no-revival-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "proposalOnly": true,
+                    "committedEffectClaimed": false,
+                    "sourceDecisionId": "dd5afed8-ee4f-57b2-b10d-6886bf2796fe",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "oldSegmentId": {
+                      "$alias": "A"
+                    },
+                    "newSegmentId": {
+                      "$alias": "B"
+                    },
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "workId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "oldAllocationId": {
+                      "$result": {
+                        "actionId": "reserve",
+                        "pointer": "/response/effects/allocationId"
+                      }
+                    },
+                    "operation": "releaseHold",
+                    "restrictionId": {
+                      "$result": {
+                        "actionId": "hold",
+                        "pointer": "/response/effects/restrictionId"
+                      }
+                    },
+                    "reason": "원래 QC 검토 보류를 해제하고 대체 예약은 유지한다",
+                    "originalRequest": {
+                      "intentKind": "COMMAND",
+                      "definitionVersion": "definition-v1",
+                      "capabilityId": "releaseHold",
+                      "subjectRefs": [
+                        {
+                          "type": "TradeItem",
+                          "id": {
+                            "$alias": "P"
+                          }
+                        }
+                      ],
+                      "slots": {
+                        "restrictionId": {
+                          "$result": {
+                            "actionId": "hold",
+                            "pointer": "/response/effects/restrictionId"
+                          }
+                        },
+                        "evidenceId": {
+                          "$alias": "qc-proof"
+                        }
+                      },
+                      "expectedRevision": {
+                        "$result": {
+                          "actionId": "hold",
+                          "pointer": "/response/revision"
+                        }
+                      },
+                      "commandIdempotencyKey": "T17-replacement-no-revival-release-hold",
+                      "evidenceRefs": [
+                        {
+                          "$alias": "delivery-proof"
+                        }
+                      ],
+                      "provenance": {
+                        "restrictionId": "CONTEXT",
+                        "evidenceId": "CONTEXT"
+                      }
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "a9ae3beedfee02655b4c2edc07c502f3d392a16d63d8d06e0cf2325cb22040ce",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-replacement-no-revival-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "proposalOnly": true,
+                    "committedEffectClaimed": false,
+                    "sourceDecisionId": "dd5afed8-ee4f-57b2-b10d-6886bf2796fe",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_ACTION_SOURCE; original evidence descriptor retained; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-release-hold-source-document"
+          },
+          "evidenceRefs": [
+            "release-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "release-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "A"
+                }
+              },
+              "kind": "T17_RELEASE_HOLD_SOURCE",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "dd5afed8-ee4f-57b2-b10d-6886bf2796fe",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "originalAuthorityClaimed": false,
+                    "operatingApprovalClaimed": false,
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "oldSegmentId": {
+                      "$alias": "A"
+                    },
+                    "newSegmentId": {
+                      "$alias": "B"
+                    },
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "workId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "oldAllocationId": {
+                      "$result": {
+                        "actionId": "reserve",
+                        "pointer": "/response/effects/allocationId"
+                      }
+                    },
+                    "operation": "releaseHold",
+                    "restrictionId": {
+                      "$result": {
+                        "actionId": "hold",
+                        "pointer": "/response/effects/restrictionId"
+                      }
+                    },
+                    "reason": "원래 QC 검토 보류를 해제하고 대체 예약은 유지한다",
+                    "originalRequest": {
+                      "intentKind": "COMMAND",
+                      "definitionVersion": "definition-v1",
+                      "capabilityId": "releaseHold",
+                      "subjectRefs": [
+                        {
+                          "type": "TradeItem",
+                          "id": {
+                            "$alias": "P"
+                          }
+                        }
+                      ],
+                      "slots": {
+                        "restrictionId": {
+                          "$result": {
+                            "actionId": "hold",
+                            "pointer": "/response/effects/restrictionId"
+                          }
+                        },
+                        "evidenceId": {
+                          "$alias": "qc-proof"
+                        }
+                      },
+                      "expectedRevision": {
+                        "$result": {
+                          "actionId": "hold",
+                          "pointer": "/response/revision"
+                        }
+                      },
+                      "commandIdempotencyKey": "T17-replacement-no-revival-release-hold",
+                      "evidenceRefs": [
+                        {
+                          "$alias": "delivery-proof"
+                        }
+                      ],
+                      "provenance": {
+                        "restrictionId": "CONTEXT",
+                        "evidenceId": "CONTEXT"
+                      }
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "a9ae3beedfee02655b4c2edc07c502f3d392a16d63d8d06e0cf2325cb22040ce",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-replacement-no-revival-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "proposalOnly": true,
+                    "committedEffectClaimed": false,
+                    "sourceDecisionId": "dd5afed8-ee4f-57b2-b10d-6886bf2796fe",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "release-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "New synthetic action proposal source; neither the original evidence nor a committed business effect is asserted",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-release-hold-source-event"
+          },
+          "evidenceRefs": [
+            "release-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "release-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "release-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "release-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "A"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:dd5afed8-ee4f-57b2-b10d-6886bf2796fe:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "새 synthetic 후속 요청 원문과 원래 실물 범위·수량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-release-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "release-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "release-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "release-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-release-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "release-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "release-hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -16503,8 +17559,12 @@
                 }
               },
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "release-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "reason": "원래 QC 검토 보류를 해제하고 대체 예약은 유지한다"
             },
             "expectedRevision": {
               "$result": {
@@ -16520,7 +17580,8 @@
             ],
             "provenance": {
               "restrictionId": "CONTEXT",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "reason": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -16620,7 +17681,7 @@
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "release-hold",
+                "actionId": "replace",
                 "pointer": "/response/revision"
               }
             },
@@ -18276,7 +19337,8 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-unknown-order",
@@ -18293,7 +19355,8 @@
               "deliveryEndpoint": "USER",
               "packageTerms": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -19500,7 +20563,8 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-conflict-order",
@@ -19517,7 +20581,8 @@
               "deliveryEndpoint": "USER",
               "packageTerms": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -20724,7 +21789,8 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-order",
@@ -20741,7 +21807,8 @@
               "deliveryEndpoint": "USER",
               "packageTerms": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -22222,7 +23289,8 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-order",
@@ -22239,7 +23307,8 @@
               "deliveryEndpoint": "USER",
               "packageTerms": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -23483,7 +24552,8 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "dueAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-order",
@@ -23500,7 +24570,8 @@
               "deliveryEndpoint": "USER",
               "packageTerms": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "dueAt": "CONTEXT"
             }
           },
           "evidenceRefs": [

@@ -17,13 +17,19 @@ import static org.junit.jupiter.api.Assertions.*;
 class T17SourceFactsPostgresTest {
     final Path root=Path.of(System.getProperty("repo.root"));
     ActualConfiguration config;ObjectNode fixture,aliases,installed;T17SourceFacts sources;String org;
-    Connection connection;String testName;
+    Connection connection;String testName;final Map<String,JsonNode> actionResults=new HashMap<>();
     @BeforeEach void install(TestInfo info)throws Exception {
         testName=info.getTestMethod().orElseThrow().getName();
         config=ActualConfiguration.environment(System.getenv());
-        String fixtureName=switch(testName){case "explicitDispatchLateHoldSourceStopsAtRecallAuthority"->"late-restriction-actual-delivery";case "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion"->"reserve-pick-dispatch";case "declaredExpiryGroupsMapToDistinctLots"->"eligibility-fefo-with-reason";case "postDispatchExpiryBoundaryIsExplicit"->"post-dispatch-expiry";case "otherpackUsesItsOwnTypedLot"->"eligibility-packaging-unapproved";case "authoredNoDispatchObservationUsesRealGateway"->"claim-nopriordispatch";default->"normal-consumed-delivery";};
+        String fixtureName=switch(testName){case "completedReplacementUsesRealWitnessAndReleaseSource"->"replacement-no-revival";case "newCategoryHoldAppliesWithinOriginalScope"->"reserve-pick-dispatch";case "newCategoryEarlyHoldApplies"->"eligibility-fefo-with-reason";case "explicitDispatchNewRecallHoldApplies"->"late-restriction-actual-delivery";case "explicitDispatchLateHoldSourceStopsAtRecallAuthority"->"late-restriction-actual-delivery";case "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion"->"reserve-pick-dispatch";case "declaredExpiryGroupsMapToDistinctLots"->"eligibility-fefo-with-reason";case "postDispatchExpiryBoundaryIsExplicit"->"post-dispatch-expiry";case "otherpackUsesItsOwnTypedLot"->"eligibility-packaging-unapproved";case "authoredNoDispatchObservationUsesRealGateway"->"claim-nopriordispatch";default->"normal-consumed-delivery";};
         Path fixturePath=root.resolve("verification/cases/T17/fixtures/"+fixtureName+".json");
         fixture=(ObjectNode)Json.read(fixturePath);
+        if(Set.of("holdSourceReachesCategoryAuthorizationWithoutGrantExpansion","explicitDispatchLateHoldSourceStopsAtRecallAuthority").contains(testName)) {
+            // Historical negative copy uses the complete original actor/grant,
+            // not the newly authorized synthetic category precondition.
+            for(var decision:fixture.path("baseline").path("policy").path("completionInputAuthoring").path("decisions"))if("NEW_CATEGORY_CAPABILITY".equals(decision.path("kind").asText()))
+                ((ObjectNode)fixture.path("actors")).set(decision.path("actorAlias").asText(),decision.path("originalActor").deepCopy());
+        }
         if(!testName.startsWith("explicitDispatch")) {
             // Deliberate SELL-only control; the checked-in fixture now has separate
             // coordinator-authored DISPATCH inputs. No grants are changed.
@@ -169,7 +175,7 @@ class T17SourceFactsPostgresTest {
     String claim(String event)throws Exception {try(var s=connection.prepareStatement("SELECT ID FROM mulino_evidence_Claims WHERE organizationId=? AND eventId=?")){s.setString(1,org);s.setString(2,event);try(var r=s.executeQuery()){r.next();return r.getString(1);}}}
     JsonNode runActions(String subcase,Set<String> names)throws Exception {
         JsonNode selected=null;for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if(subcase.equals(sub.path("id").asText()))selected=sub;
-        assertNotNull(selected);var results=new HashMap<String,JsonNode>();var resolver=new org.mulino.verification.ReferenceResolver(results,aliases);JsonNode last=null;
+        assertNotNull(selected);var results=actionResults;var resolver=new org.mulino.verification.ReferenceResolver(results,aliases);JsonNode last=null;
         for(var action:selected.path("actions"))if(names.contains(action.path("id").asText())) {
             last=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),(ObjectNode)resolver.resolve(action.path("request")));
             var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",last);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
@@ -220,7 +226,11 @@ class T17SourceFactsPostgresTest {
 
     @Test void missingOriginalDueAtRemainsRejectedWithoutOrderEffects()throws Exception {
         JsonNode action=null;for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if("replacement-no-revival".equals(sub.path("id").asText()))for(var candidate:sub.path("actions"))if("order".equals(candidate.path("id").asText()))action=candidate;
-        assertNotNull(action);assertFalse(action.path("request").path("slots").has("dueAt"));
+        assertNotNull(action);action=action.deepCopy();
+        // Explicit negative copy of the original missing input.
+        ((ObjectNode)action.path("request").path("slots")).remove("dueAt");
+        ((ObjectNode)action.path("request").path("provenance")).remove("dueAt");
+        assertFalse(action.path("request").path("slots").has("dueAt"));
         var resolver=new org.mulino.verification.ReferenceResolver(new HashMap<>(),aliases);
         var result=gateway("sales","createSalesOrder",(ObjectNode)resolver.resolve(action.path("request")));
         assertEquals("TYPE_INVALID",result.path("error").path("code").asText());assertEquals("Invalid dueAt",result.path("error").path("message").asText());
@@ -242,6 +252,77 @@ class T17SourceFactsPostgresTest {
         assertEquals("FORBIDDEN",result.path("error").path("code").asText(),result.toPrettyString());
         assertEquals(1,count("mulino_inventory_Dispatches"));assertEquals(0,count("mulino_inventory_Restrictions"));
         assertFalse(fixture.path("actors").path("admin").path("grant").path("actions").toString().contains("decideRecallRestriction"));
+    }
+
+    ObjectNode actionRequest(String subcase,String name)throws Exception {
+        for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if(subcase.equals(sub.path("id").asText()))for(var action:sub.path("actions"))if(name.equals(action.path("id").asText()))
+            return (ObjectNode)new org.mulino.verification.ReferenceResolver(actionResults,aliases).resolve(action.path("request"));
+        throw new AssertionError("Missing bounded test action "+name);
+    }
+    @Test void newSyntheticDueDatesReachAppliedForEveryPreviouslyMissingOrder()throws Exception {
+        int count=0;
+        for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))for(var action:sub.path("actions"))if("createSalesOrder".equals(action.path("capabilityId").asText())) {
+            String sid=sub.path("id").asText(),name=action.path("id").asText();
+            if(!(sid.equals("replacement-no-revival")||sid.startsWith("eligibility-")||(sid.equals("reserve-pick-dispatch")&&name.equals("second-order"))))continue;
+            var request=actionRequest(sid,name);assertEquals("2026-10-07T10:00:00Z",request.path("slots").path("dueAt").asText());
+            assertEquals("APPLIED",gateway("sales","createSalesOrder",request).path("outcome").asText());count++;
+        }
+        assertEquals(7,count);assertEquals(7,count("mulino_trade_sales_Orders"));
+    }
+    @Test void newCategoryHoldAppliesWithinOriginalScope()throws Exception {
+        var result=runActions("reserve-pick-dispatch",Set.of("hold-B40-source-document","hold-B40-source-event","hold-B40-source-match","hold-B40-source-canonical","hold-B40"));
+        assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());assertEquals(1,count("mulino_inventory_Restrictions"));
+        var wrong=actionRequest("reserve-pick-dispatch","hold-B40");((ObjectNode)wrong.path("slots")).put("segmentId",id("A"));wrong.put("commandIdempotencyKey",UUID.randomUUID().toString());
+        assertEquals("EVIDENCE_UNVERIFIED",gateway("qc","placeHold",wrong).path("error").path("code").asText());assertEquals(1,count("mulino_inventory_Restrictions"));
+        int bases=count("mulino_inventory_DispositionBases");
+        var deniedRecord=Json.object().put("intentKind","RECORD").put("definitionVersion","definition-v1").put("capabilityId","recordDispositionBasis").put("commandIdempotencyKey",UUID.randomUUID().toString()).put("expectedRevision",1);
+        deniedRecord.set("subjectRefs",Json.array());deniedRecord.set("provenance",Json.object().put("source","CONTEXT"));deniedRecord.set("slots",permission(installed.path("sourceFactEvidence").path("conditions").get(0).path("documentId").asText()));
+        assertEquals("FORBIDDEN",gateway("qc","recordDispositionBasis",deniedRecord).path("error").path("code").asText());assertEquals(bases,count("mulino_inventory_DispositionBases"));
+        // Current grants still compose all dimensions. A wrong WORK/PLACE does
+        // not become authorized just because the original ITEM dimension fits.
+        String grant;try(var s=connection.prepareStatement("SELECT ID FROM mulino_identity_Grants WHERE organizationId=? AND actorId=?")){s.setString(1,org);s.setString(2,id("qc"));try(var r=s.executeQuery()){assertTrue(r.next());grant=r.getString(1);}}
+        for(String dimension:List.of("WORK","PLACE")) {
+            sql("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES(?,?,?,?)",org,grant,dimension,UUID.randomUUID().toString());
+            var denied=actionRequest("reserve-pick-dispatch","hold-B40");denied.put("commandIdempotencyKey",UUID.randomUUID().toString());
+            var rejection=gateway("qc","placeHold",denied);
+            assertTrue(Set.of("FORBIDDEN","EVIDENCE_UNVERIFIED").contains(rejection.path("error").path("code").asText()),rejection.toPrettyString());
+            sql("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=? AND scopeKind=?",org,grant,dimension);
+        }
+        assertEquals(1,count("mulino_inventory_Restrictions"));
+    }
+    @Test void newCategoryEarlyHoldApplies()throws Exception {
+        var result=runActions("eligibility-fefo-with-reason",Set.of("early-hold-source-document","early-hold-source-event","early-hold-source-match","early-hold-source-canonical","early-hold"));
+        assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());assertEquals(1,count("mulino_inventory_Restrictions"));
+    }
+    @Test void explicitDispatchNewRecallHoldApplies()throws Exception {
+        var result=runActions("late-restriction-actual-delivery",Set.of("order","reserve","pick","dispatch","late-hold-source-scope","late-hold-source-document","late-hold-source-event","late-hold-source-match","late-hold-source-canonical","late-hold"));
+        assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());assertEquals(1,count("mulino_inventory_Restrictions"));
+    }
+    @Test void completedReplacementUsesRealWitnessAndReleaseSource()throws Exception {
+        String sid="replacement-no-revival";int originalMovements=count("mulino_inventory_QuantityMovements");
+        var held=runActions(sid,Set.of("order","reserve","hold-source-document","hold-source-event","hold-source-match","hold-source-canonical","hold-current-segment","hold"));
+        assertEquals("APPLIED",held.path("outcome").asText(),held.toPrettyString());assertEquals(1,count("mulino_inventory_SegmentAllocations"));
+        var proof=runActions(sid,Set.of("replace-source-allocation","replace-source-document","replace-source-event","replace-source-match","replace-source-canonical"));assertNotNull(proof);
+        var fake=actionRequest(sid,"replace");((ObjectNode)fake.path("slots")).put("evidenceId",id("replacement-proof"));fake.put("commandIdempotencyKey",UUID.randomUUID().toString());
+        assertEquals("EVIDENCE_UNVERIFIED",gateway("sales","replaceAllocation",fake).path("error").path("code").asText());assertEquals(1,count("mulino_inventory_SegmentAllocations"));
+        byte[] bytes="{\"witnessKind\":\"replacement-proof\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        var upload=Json.object().put("sourceNamespace","synthetic-t17-eligibility").put("sourceReference",UUID.randomUUID().toString()).put("mediaType","application/json").put("expectedHash",HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes))).put("contentBase64",Base64.getEncoder().encodeToString(bytes)).put("provenance","Explicit wrong Work negative source");
+        upload.set("subject",Json.object().put("kind","WORK").put("id",id("t17SourceWork-A")));
+        var wrongDoc=sources.request("attachEvidence",upload,null);assertEquals("APPLIED",wrongDoc.path("outcome").asText(),wrongDoc.toPrettyString());
+        var wrongScope=actionRequest(sid,"replace");((ObjectNode)wrongScope.path("slots")).put("evidenceId",wrongDoc.path("id").asText());wrongScope.put("commandIdempotencyKey",UUID.randomUUID().toString());
+        assertEquals("EVIDENCE_UNVERIFIED",gateway("sales","replaceAllocation",wrongScope).path("error").path("code").asText());assertEquals(1,count("mulino_inventory_SegmentAllocations"));
+        var payload=actionResults.get("replace-source-event").path("response");
+        try(var s=connection.prepareStatement("SELECT payload FROM mulino_evidence_Events WHERE organizationId=? AND ID=?")){s.setString(1,org);s.setString(2,payload.path("id").asText());try(var r=s.executeQuery()){assertTrue(r.next());var original=Json.parse(r.getString(1));assertEquals("replacement-proof",original.path("witnessKind").asText());assertEquals(id("A"),original.path("oldSegmentId").asText());assertEquals(id("B"),original.path("newSegmentId").asText());assertEquals(actionResults.get("order").path("response").path("workId"),original.path("workId"));assertEquals(actionResults.get("order").path("response").path("line").path("id"),original.path("salesLineId"));}}
+        assertEquals(originalMovements,count("mulino_inventory_QuantityMovements"));
+        var replaced=runActions(sid,Set.of("replace"));assertEquals("APPLIED",replaced.path("outcome").asText(),replaced.toPrettyString());assertEquals(2,count("mulino_inventory_SegmentAllocations"));
+        runActions(sid,Set.of("release-hold-source-document","release-hold-source-event","release-hold-source-match","release-hold-source-canonical"));
+        var invalidRelease=actionRequest(sid,"release-hold");invalidRelease.put("commandIdempotencyKey",UUID.randomUUID().toString());((ObjectNode)invalidRelease.path("slots")).put("evidenceId",id("qc-proof"));
+        assertEquals("EVIDENCE_UNVERIFIED",gateway("qc","releaseHold",invalidRelease).path("error").path("code").asText());
+        var released=runActions(sid,Set.of("release-hold"));assertEquals("APPLIED",released.path("outcome").asText(),released.toPrettyString());
+        var end=runActions(sid,Set.of("allocation-release"));assertEquals("APPLIED",end.path("outcome").asText(),end.toPrettyString());
+        try(var s=connection.prepareStatement("SELECT state FROM mulino_inventory_SegmentAllocations WHERE organizationId=? ORDER BY state")){s.setString(1,org);try(var r=s.executeQuery()){assertTrue(r.next());assertEquals("RELEASED",r.getString(1));assertTrue(r.next());assertEquals("REPLACED",r.getString(1));assertFalse(r.next());}}
+        assertEquals(originalMovements,count("mulino_inventory_QuantityMovements"));
+        try(var s=connection.prepareStatement("SELECT state FROM mulino_inventory_Restrictions WHERE organizationId=?")){s.setString(1,org);try(var r=s.executeQuery()){assertTrue(r.next());assertEquals("RELEASED",r.getString(1));}}
     }
 
 }

@@ -304,7 +304,8 @@
         "getAssessment",
         "traceLot",
         "getEvidence",
-        "evaluateEligibility"
+        "evaluateEligibility",
+        "decideRecallRestriction"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -324,7 +325,8 @@
           "getAssessment",
           "traceLot",
           "getEvidence",
-          "evaluateEligibility"
+          "evaluateEligibility",
+          "decideRecallRestriction"
         ],
         "scope": {
           "organizationAlias": "ORG",
@@ -1270,6 +1272,88 @@
         "originalAuthorityClaimed": false,
         "selection": "NEW_ACTION_SPECIFIC_DISPATCH_SOURCE_INPUTS",
         "preserved": "original condition scope, quantity, unit, status, evidence and interval"
+      },
+      "completionInputAuthoring": {
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "decisions": [
+          {
+            "synthetic": true,
+            "authoredBy": "coordinator-selected-fixture",
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "kind": "NEW_CATEGORY_CAPABILITY",
+            "actorAlias": "admin",
+            "capability": "decideRecallRestriction",
+            "originalActor": {
+              "issuer": "synthetic-issuer",
+              "subject": "T17-admin",
+              "audience": "isolated-ontology",
+              "organizationAlias": "ORG",
+              "roleCapabilities": [
+                "openInvestigation",
+                "proposeRecall",
+                "approveRecall",
+                "recordRecallNotice",
+                "closeRecall",
+                "placeHold",
+                "releaseHold",
+                "recordDispositionBasis",
+                "getObject",
+                "getWork",
+                "getInventory",
+                "getObligations",
+                "getAssessment",
+                "traceLot",
+                "getEvidence",
+                "evaluateEligibility"
+              ],
+              "grant": {
+                "delegatorAlias": "supervisor",
+                "actions": [
+                  "openInvestigation",
+                  "proposeRecall",
+                  "approveRecall",
+                  "recordRecallNotice",
+                  "closeRecall",
+                  "placeHold",
+                  "releaseHold",
+                  "recordDispositionBasis",
+                  "getObject",
+                  "getWork",
+                  "getInventory",
+                  "getObligations",
+                  "getAssessment",
+                  "traceLot",
+                  "getEvidence",
+                  "evaluateEligibility"
+                ],
+                "scope": {
+                  "organizationAlias": "ORG",
+                  "itemAliases": [
+                    "P",
+                    "ALT"
+                  ]
+                },
+                "validFrom": "2026-10-01T00:00:00Z",
+                "validUntil": "2026-10-31T23:59:59Z",
+                "revision": 1
+              }
+            },
+            "scope": {
+              "organizationAlias": "ORG",
+              "itemAliases": [
+                "P",
+                "ALT"
+              ]
+            },
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "selection": "only category prerequisite of original positive hold; original all-of scope and validity unchanged"
+          }
+        ]
       }
     },
     "segments": [

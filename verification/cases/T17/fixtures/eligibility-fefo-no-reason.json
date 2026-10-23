@@ -141,7 +141,8 @@
         "getObligations",
         "getAssessment",
         "traceLot",
-        "getEvidence"
+        "getEvidence",
+        "decideQuality"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -155,7 +156,8 @@
           "getObligations",
           "getAssessment",
           "traceLot",
-          "getEvidence"
+          "getEvidence",
+          "decideQuality"
         ],
         "scope": {
           "organizationAlias": "ORG",
@@ -1490,6 +1492,89 @@
             "hadBefore": true,
             "before": "L",
             "after": "L_EARLY"
+          }
+        ]
+      },
+      "completionInputAuthoring": {
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "decisions": [
+          {
+            "synthetic": true,
+            "authoredBy": "coordinator-selected-fixture",
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "kind": "NEW_CATEGORY_CAPABILITY",
+            "actorAlias": "qc",
+            "capability": "decideQuality",
+            "originalActor": {
+              "issuer": "synthetic-issuer",
+              "subject": "T17-qc",
+              "audience": "isolated-ontology",
+              "organizationAlias": "ORG",
+              "roleCapabilities": [
+                "placeHold",
+                "releaseHold",
+                "evaluateEligibility",
+                "getObject",
+                "getWork",
+                "getInventory",
+                "getObligations",
+                "getAssessment",
+                "traceLot",
+                "getEvidence"
+              ],
+              "grant": {
+                "delegatorAlias": "supervisor",
+                "actions": [
+                  "placeHold",
+                  "releaseHold",
+                  "evaluateEligibility",
+                  "getObject",
+                  "getWork",
+                  "getInventory",
+                  "getObligations",
+                  "getAssessment",
+                  "traceLot",
+                  "getEvidence"
+                ],
+                "scope": {
+                  "organizationAlias": "ORG",
+                  "itemAliases": [
+                    "P",
+                    "ALT"
+                  ]
+                },
+                "validFrom": "2026-10-01T00:00:00Z",
+                "validUntil": "2026-10-31T23:59:59Z",
+                "revision": 1
+              }
+            },
+            "scope": {
+              "organizationAlias": "ORG",
+              "itemAliases": [
+                "P",
+                "ALT"
+              ]
+            },
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "selection": "only category prerequisite of original positive hold; original all-of scope and validity unchanged"
+          },
+          {
+            "synthetic": true,
+            "authoredBy": "coordinator-selected-fixture",
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "kind": "NEW_DUE_AT",
+            "actionId": "order",
+            "originalValuePresent": false,
+            "value": "2026-10-07T10:00:00Z",
+            "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+            "originalAsOf": "2026-10-07T09:00:00Z",
+            "earliestOriginalBoundary": "2026-10-10T00:00:00Z"
           }
         ]
       }

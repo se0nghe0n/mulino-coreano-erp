@@ -15,6 +15,8 @@ from uuid import UUID, uuid5
 HERE = Path(__file__).resolve().parent
 _spec=importlib.util.spec_from_file_location('t17_first_failure',HERE/'author_first_failure_inputs.py')
 first_failure=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(first_failure)
+_completion_spec=importlib.util.spec_from_file_location('t17_completion',HERE/'author_completion_inputs.py')
+completion=importlib.util.module_from_spec(_completion_spec);_completion_spec.loader.exec_module(completion)
 ROOT = HERE.parents[2]
 META = 'publicContractAuthoring'
 NAMESPACE = 'synthetic-t17-eligibility'
@@ -116,7 +118,7 @@ DELIVERY_CASES = {'normal-consumed-delivery', 'late-restriction-actual-delivery'
 
 
 def restore_fixture(f):
-    f = first_failure.restore_fixture(f)
+    f = first_failure.restore_fixture(completion.restore_fixture(f))
     meta = f['baseline']['policy'].pop(META, None)
     if meta:
         for change in reversed(meta['changes']):
@@ -249,7 +251,7 @@ def generate(case, fixtures):
 
 
 def restore_case(case):
-    case=first_failure.restore_case(case)
+    case=first_failure.restore_case(completion.restore_case(case))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     for sub in case['subcases']:
         changes={d['actionId']:d for d in ledger['changes'] if d['subcase']==sub['id']}
@@ -294,7 +296,7 @@ def feature_lines(feature, before, after):
 
 
 def restore_feature(feature):
-    feature=first_failure.restore_feature(feature)
+    feature=first_failure.restore_feature(completion.restore_feature(feature))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     additions={d['actionId'] for d in ledger['changes'] if d['before'] is None}
     return ''.join(line for line in feature.splitlines(keepends=True)
@@ -324,6 +326,7 @@ if __name__ == '__main__':
     # Compose the newer bounded input layer after computing this layer's ledger.
     # Its separate reversible ledger preserves all fifteen root pointer fixes.
     case,authored=first_failure.apply(copy.deepcopy(case),copy.deepcopy(authored),sys.modules[__name__])
+    case,authored=completion.apply(copy.deepcopy(case),copy.deepcopy(authored),sys.modules[__name__])
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
     feature_path.write_text(feature_lines(feature,before,case))

@@ -1,0 +1,997 @@
+{
+  "recordType": "T17_COMPLETION_INPUT_REPAIR",
+  "recordedAt": "2026-10-23T03:08:38.280917+00:00",
+  "base": "2348dfd312579412874398937773f6f4c0f2b96f",
+  "branch": "fix/t17-source-inputs",
+  "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a",
+  "wholeTask": "OPEN",
+  "wholeStep": "OPEN",
+  "actualScenarioRuns": 0,
+  "actualModelClientCalls": 0,
+  "businessOracleAcceptance": false,
+  "modelRuntime": "codex/gpt-6.1-sol high; serviceTier=ultrafast (runtime/coordinator-confirmed)",
+  "newFixtureProvenance": {
+    "synthetic": true,
+    "authoredBy": "coordinator-selected-fixture",
+    "originalAuthorityClaimed": false,
+    "operatingApprovalClaimed": false
+  },
+  "preservation": {
+    "baseline": "2348dfd312579412874398937773f6f4c0f2b96f",
+    "assertionCount": 257,
+    "rawAssertionBlocksUnchanged": true,
+    "assertionBlockSha256": [
+      "303079434a9f709dd35d886deb3d5eb738fa75f48bd283792f3dca14a8a73ecd",
+      "a5917a5054da6324885be9389fb2e137401963bbc36365e5f517b6072f72c249",
+      "2d687664e5dcff2c2b7dff6125398d2df2cd1602f517b8c115e2bb06ae8dbd29",
+      "c970c99da58ea8eda9a3c1d2513b8e3e5638d61eac973ef0ae8fb249db7d57d6",
+      "375e7decbd6789106fa1cf85111a8f990883e9119ddde0d075e107a9391e8612",
+      "6aa84f1f3ac8c5951090f4aaf42211d5744873367231c8e759217fd37940da77",
+      "37203907224d34b24f27982d0e17f0026a2edf03d0c65092af316128398b240a",
+      "542cabad77eec09a1d4b43cf5d4ec14f8e21fb3df381526eea24ef6ee8ed8dac",
+      "8f747249abfa2ad617ba464592a3f95115ad6319730015eb57c52baf3bca8c93",
+      "582753723a5a46aea1c0c4b9b767568a9870bd44338c0f0503eea9ddd0de0222",
+      "f1d4dd4b402e6dd9e520d54a6bfff522a2a4339d767401c64451731ad198bc66",
+      "00f53a9620b5e603c8b846bda83f0d2f87fed59a49f71733f56398243f53f5ac",
+      "78f9a79d78406d7fb7d88966808543763b501a001dea287e181fdb3ddd32e49d",
+      "028da8a2e28108cac062a7ca5b7c7d017b4a156e2f15a064c039e272affe26f6",
+      "f2e98192a848210cf017d35de16682106d3f10d5af96ca2d22c17b1edbe63f60"
+    ],
+    "oldPublicLedgerByteIdentical": true,
+    "oldFirstFailureLedgerByteIdentical": true,
+    "originalFeatureLinesRestored": true,
+    "sourceSnapshotDrift": [],
+    "caseSha256": "ae0ade6eed8a1c676b568be44322632693fd6079e702ff91b97e77c99e6d9994",
+    "featureSha256": "daee9f84ec4bf1133af2642c3bd63b21502a8379d064ecf5c2e1e7b1dfbf2eef",
+    "publicLedgerSha256": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76",
+    "firstFailureLedgerSha256": "d3c39b4b52aed6df92ed1dcfa927ad3fc751c9e7bd3af3512ad4e02d74869ef5"
+  },
+  "sourceSnapshot": {
+    "base": "2348dfd312579412874398937773f6f4c0f2b96f",
+    "branch": "fix/t17-source-inputs",
+    "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a",
+    "sourceTreeDirty": true,
+    "files": {
+      "verification/cases/T17/author_completion_inputs.py": "b7513df7df5cd8a1f23b08b7ed67486ce2b13087e1f0132b0240c31ccde5eb01",
+      "verification/cases/T17/author_public_contracts.py": "65b1a273b6a507778eed9b59def232408f91e96dc40d8705e82c6bf14c060a44",
+      "verification/cases/T17/case.json": "ae0ade6eed8a1c676b568be44322632693fd6079e702ff91b97e77c99e6d9994",
+      "verification/cases/T17/completion-input-delta.json": "bc83efd47acc2ec3ff4e537edc61c66804db6f3e9f6582758d8fc7eee9bf4f5f",
+      "verification/cases/T17/fixtures/eligibility-conflict.json": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+      "verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+      "verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+      "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+      "verification/cases/T17/fixtures/eligibility-unknown.json": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+      "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "c4fa2cc87e5a3bd9e026d815869c7e32b82b1ecc73dd70b9e0af9f8d008a264f",
+      "verification/cases/T17/fixtures/replacement-no-revival.json": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+      "verification/cases/T17/fixtures/reserve-pick-dispatch.json": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52",
+      "verification/cases/T17/scenario.feature": "daee9f84ec4bf1133af2642c3bd63b21502a8379d064ecf5c2e1e7b1dfbf2eef",
+      "verification/cases/T17/test_completion_inputs.py": "901efabde7bb539d9887ccf8658b188497cfcc6dfcba96a651834ad173994bcd",
+      "verification/cases/T17/test_first_failure_inputs.py": "6dfeb0050e38df201c74749ec33aae4890b553e83acd13efcd0a6bd1e022988a",
+      "verification/cases/T17/test_public_contracts.py": "341433b44b44e75dd09207172f9469b93af79e04ba22063bf6fa2eb42d2dea73",
+      "verification/cases/T17/test_source_profiles.py": "8101c16802e23d4eafc8c22611c13b8f155a09423075ad44953729d28760f806",
+      "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java": "140eb6ca56105dd7710c4179b4baeca07b2d4b6661eee218fad1c430b4f56dd2"
+    },
+    "coordinatorRunnerSha256": "b415b93321b1baa2c22b8a5069b553291b0cf6fadf44eb3253c34baf3a32c99c"
+  },
+  "newDueDates": [
+    {
+      "fixture": "eligibility-conflict.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-10T00:00:00Z"
+    },
+    {
+      "fixture": "eligibility-fefo-no-reason.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-10T00:00:00Z"
+    },
+    {
+      "fixture": "eligibility-fefo-with-reason.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-10T00:00:00Z"
+    },
+    {
+      "fixture": "eligibility-packaging-unapproved.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-10T00:00:00Z"
+    },
+    {
+      "fixture": "eligibility-unknown.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-10T00:00:00Z"
+    },
+    {
+      "fixture": "replacement-no-revival.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-31T23:59:59Z"
+    },
+    {
+      "fixture": "reserve-pick-dispatch.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_DUE_AT",
+      "actionId": "second-order",
+      "originalValuePresent": false,
+      "value": "2026-10-07T10:00:00Z",
+      "selection": "original fixture asOf + 1 hour; strictly before original condition and LOT expiry",
+      "originalAsOf": "2026-10-07T09:00:00Z",
+      "earliestOriginalBoundary": "2026-10-31T23:59:59Z"
+    }
+  ],
+  "newPackageTerms": [
+    {
+      "fixture": "replacement-no-revival.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_PACKAGE_TERMS",
+      "actionId": "order",
+      "originalValuePresent": false,
+      "value": "sealed-box-v1",
+      "selection": "new synthetic order term referencing the original TradeItem packagingVersion",
+      "itemAlias": "P"
+    },
+    {
+      "fixture": "reserve-pick-dispatch.json",
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "kind": "NEW_PACKAGE_TERMS",
+      "actionId": "second-order",
+      "originalValuePresent": false,
+      "value": "sealed-box-v1",
+      "selection": "new synthetic order term referencing the original TradeItem packagingVersion",
+      "itemAlias": "P"
+    }
+  ],
+  "categoryGrantChanges": [
+    {
+      "fixture": "eligibility-conflict.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "eligibility-fefo-no-reason.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "eligibility-fefo-with-reason.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "eligibility-packaging-unapproved.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "eligibility-unknown.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "late-restriction-actual-delivery.json",
+      "actorAlias": "admin",
+      "addedCapability": "decideRecallRestriction",
+      "originalRoleCapabilities": [
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "closeRecall",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "newRoleCapabilities": [
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "closeRecall",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility",
+        "decideRecallRestriction"
+      ],
+      "originalGrantActions": [
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "closeRecall",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility"
+      ],
+      "newGrantActions": [
+        "openInvestigation",
+        "proposeRecall",
+        "approveRecall",
+        "recordRecallNotice",
+        "closeRecall",
+        "placeHold",
+        "releaseHold",
+        "recordDispositionBasis",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "evaluateEligibility",
+        "decideRecallRestriction"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "replacement-no-revival.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    },
+    {
+      "fixture": "reserve-pick-dispatch.json",
+      "actorAlias": "qc",
+      "addedCapability": "decideQuality",
+      "originalRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newRoleCapabilities": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "originalGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence"
+      ],
+      "newGrantActions": [
+        "placeHold",
+        "releaseHold",
+        "evaluateEligibility",
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getObligations",
+        "getAssessment",
+        "traceLot",
+        "getEvidence",
+        "decideQuality"
+      ],
+      "unchangedScope": {
+        "organizationAlias": "ORG",
+        "itemAliases": [
+          "P",
+          "ALT"
+        ]
+      },
+      "unchangedValidFrom": "2026-10-01T00:00:00Z",
+      "unchangedValidUntil": "2026-10-31T23:59:59Z",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
+    }
+  ],
+  "actionSources": {
+    "replacement": "NEW synthetic replacement-proof proposal; original A20 -> B20, actual order Work/line/reservation IDs; attach/event/claim/match/canonical",
+    "releaseHold": "NEW synthetic operation-specific proposal and bounded reason; original evidence descriptor and actual restriction identity retained",
+    "revisionBindings": "Public getObject for physical segment after reservation and suspended allocation after hold; replacement response revision for releasing new allocation",
+    "effectSeeding": false
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "verification/cases/T17",
+        "-p",
+        "test_*.py"
+      ],
+      "exitCode": 0,
+      "passed": 25,
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-completion-checks/python.log",
+        "sha256": "3c34c9b742fa9f14d06047a1af6a356a73fbcce71b0ff8c83c9d995e0a846afb"
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "verification/cases/T17/run_source_pg_test.py"
+      ],
+      "exitCode": 0,
+      "passed": 22,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "fresh product build and actual HTTP/Spring/PostgreSQL; no actual scenarios",
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/test.log",
+        "sha256": "fcafde3716c1d5b6f6de6b47dec715c978f1a19f66a7f989dc956013ba2456d6"
+      },
+      "driverLog": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-completion-checks/pg.log",
+        "sha256": "03ce5020f0771e7a733b563112f866ed7173e87f04a24fd0b689384d45e3479c"
+      },
+      "commands": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/commands.json",
+        "sha256": "52e62193e2e8ef5e8eb11029af28f1c5892444c9c61dec7668c667956d4ef443"
+      },
+      "buildIdentity": {
+        "sourceCommit": "2348dfd312579412874398937773f6f4c0f2b96f",
+        "productJar": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/backend/target/ontology-0.1.0-SNAPSHOT.jar",
+        "productJarSha256": "a882b17fe45ddb9746b6ce5712f5c2dff0104f4d3acf988ec0ca139d65f6736d"
+      }
+    },
+    {
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "test"
+      ],
+      "exitCode": 0,
+      "total": 635,
+      "passed": 613,
+      "failed": 0,
+      "skippedPgOptIn": 22,
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-completion-checks/harness.log",
+        "sha256": "ebb01894237d5329a28aa73a1a6de7c6f77681692d633d58f5319b47e86be829"
+      }
+    },
+    {
+      "command": [
+        "./verify",
+        "prepare"
+      ],
+      "exitCode": 0,
+      "status": "PREPARED",
+      "cases": 41,
+      "subcases": 802,
+      "assertions": 24260,
+      "preparationProblems": [],
+      "gateComplete": false,
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-completion-checks/prepare.log",
+        "sha256": "9c731cd461e34b57b24a38173e36195aa0e24684c753cc80b5a5133b8800c527"
+      }
+    }
+  ],
+  "generatorReproduction": {
+    "command": [
+      "python3",
+      "verification/cases/T17/author_public_contracts.py"
+    ],
+    "exitCode": 0,
+    "changedFiles": [],
+    "hashes": {
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/case.json": "ae0ade6eed8a1c676b568be44322632693fd6079e702ff91b97e77c99e6d9994",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/scenario.feature": "daee9f84ec4bf1133af2642c3bd63b21502a8379d064ecf5c2e1e7b1dfbf2eef",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/public-contract-delta.json": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/first-failure-input-delta.json": "d3c39b4b52aed6df92ed1dcfa927ad3fc751c9e7bd3af3512ad4e02d74869ef5",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/completion-input-delta.json": "bc83efd47acc2ec3ff4e537edc61c66804db6f3e9f6582758d8fc7eee9bf4f5f",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/claim-conflictingquantity.json": "fe1e4ba2c616778dcb6e5f43849d7da84f9b090ef3268104658652afd5f34a6f",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/claim-falseclaim.json": "471798f4519317d041e91550d2a3a0b3815605e656b3d93708ab486263ca20df",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/claim-nopriordispatch.json": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/claim-scopeoverflow.json": "4298571d7609e8476d1b59d1f418cc69bc26e0445078a4706356808c9f1828da",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/claim-unidentifiedscope.json": "a6885f43cb93b42e9ea8013bdddd3dca5d877b0f6658c852fced41a8fbf27a7a",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/eligibility-conflict.json": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/eligibility-unknown.json": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "c4fa2cc87e5a3bd9e026d815869c7e32b82b1ecc73dd70b9e0af9f8d008a264f",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/normal-consumed-delivery.json": "e9a3f506e389cfb0a149005d8275a35a826871069a00b91b6f6d5b1d525355c2",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/post-dispatch-expiry.json": "7611225528299da8ca0a30d2a6cfcd6546639c8e3e905f5d02927bd979e4ef72",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/replacement-no-revival.json": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+      "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/verification/cases/T17/fixtures/reserve-pick-dispatch.json": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52"
+    }
+  },
+  "observedCommands": [
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/newCategoryHoldAppliesWithinOriginalScope-T17-reserve-pick-dispatch-hold-B40.json",
+      "sha256": "facfbf5d6321db6b608f81a09f2031aeac6e4d9520bac81d5755581cb352292d",
+      "capability": "placeHold",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/newCategoryEarlyHoldApplies-T17-eligibility-fefo-with-reason-early-hold.json",
+      "sha256": "1fccd4bae4fb66a2782752db00906c37069467228ebe3a5ddf48abfc2f6c5099",
+      "capability": "placeHold",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/explicitDispatchNewRecallHoldApplies-T17-late-restriction-actual-delivery-late-hold.json",
+      "sha256": "73f9de900d06fda2b4eed7494e885ea8a134f99877a4cd72c8b0c39892cbe450",
+      "capability": "placeHold",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/completedReplacementUsesRealWitnessAndReleaseSource-T17-replacement-no-revival-hold.json",
+      "sha256": "bfbbe9ac5855098300a9a4400e4f626a0489bdd10e5303e86a0fab6af95f0e92",
+      "capability": "placeHold",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/completedReplacementUsesRealWitnessAndReleaseSource-T17-replacement-no-revival-replace.json",
+      "sha256": "8661ce04b5add83aebff1d2bc459ff15b465acf14119e8c15fd21595f757bc77",
+      "capability": "replaceAllocation",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/completedReplacementUsesRealWitnessAndReleaseSource-T17-replacement-no-revival-release-hold.json",
+      "sha256": "0ff7d8ca108e3f4cc8046309ec1e4e62c54d744c3698555bd327df6b8c7ba305",
+      "capability": "releaseHold",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/completedReplacementUsesRealWitnessAndReleaseSource-T17-replacement-no-revival-allocation-release.json",
+      "sha256": "b0cfbbf0d446bc6299b8c06fecca5ff1efde4b396bbfc4290825a4fd1aa1a06f",
+      "capability": "releaseAllocation",
+      "httpStatus": 200,
+      "outcome": "APPLIED",
+      "error": null
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/holdSourceReachesCategoryAuthorizationWithoutGrantExpansion-T17-reserve-pick-dispatch-hold-B40.json",
+      "sha256": "e7ad74a1bd3814f5d5549c9ca7332535415daf8d6ed8938d690ee216dfe86df4",
+      "capability": "placeHold",
+      "httpStatus": 200,
+      "outcome": "REJECTED",
+      "error": {
+        "code": "FORBIDDEN",
+        "message": "Unavailable scope"
+      }
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-ba9f42b5-cd1e-4ace-a0c3-c3d26c7fbc70/explicitDispatchLateHoldSourceStopsAtRecallAuthority-T17-late-restriction-actual-delivery-late-hold.json",
+      "sha256": "c572fc6eb2a9dfda7847a6d88c367df0d0b20891bf8e975abccbe31e87b6b49c",
+      "capability": "placeHold",
+      "httpStatus": 200,
+      "outcome": "REJECTED",
+      "error": {
+        "code": "FORBIDDEN",
+        "message": "Unavailable scope"
+      }
+    }
+  ],
+  "negativeControls": [
+    "Original qc/admin category grants restored: exact FORBIDDEN and no restriction effects",
+    "Missing dueAt negative copy: TYPE_INVALID Invalid dueAt and no order/allocation effects",
+    "Original replacement/release evidence aliases: EVIDENCE_UNVERIFIED; wrong Work document cannot replace; no extra allocations or movements",
+    "Same hold source for wrong segment rejected; extra mismatching WORK/PLACE grant dimensions rejected (FORBIDDEN or EVIDENCE_UNVERIFIED) with no restriction growth",
+    "decideQuality does not authorize recordDispositionBasis: FORBIDDEN and no basis growth",
+    "SELL-only cannot DISPATCH; exact explicit DISPATCH 30 BOX applies; UNKNOWN/DENIED/CONFLICT and cross-organization/fake/range/time mismatches remain blocked"
+  ],
+  "priorAttempts": [
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-14271307-9a4e-492d-9b73-049cf9a2e399",
+      "result": "22 tests: 2 failures. Repaired wrong aggregate revision references using public noun reads; accepted either authorization/source-visibility rejection for mismatching grant dimensions. Original 257 oracles untouched."
+    }
+  ],
+  "remainingFrontiers": [
+    {
+      "kind": "KNOWN_TEST_INPUT_GAPS",
+      "status": "CLOSED_FOR_THIS_BOUNDED_SUBTASK",
+      "detail": "Missing dueAt, category hold prerequisite, release source/reason and replacement witness exercised. No further first failure observed in these bounded HTTP paths."
+    },
+    {
+      "kind": "STATIC_CONTRACT_KNOWN_OPEN",
+      "detail": "Existing T17 recordDelivery allocationId slot warnings (10), plus Allocation noun catalog warning (1). Actual Allocation getObject query passed this HTTP/PG test. Shared validator/registry and delivery/observer repairs remain root-owned."
+    },
+    {
+      "kind": "INTEGRATION",
+      "detail": "Root must integrate with observer commits and run combined checks. Root observer was not imported."
+    },
+    {
+      "kind": "ACTUAL_ACCEPTANCE",
+      "detail": "Original 257 business oracles and Haiku 5.5 native dynamic Workflow are NOT_RUN by this sub-agent; full task/step OPEN."
+    }
+  ],
+  "cleanup": {
+    "coordinatorRunnerUnchanged": true,
+    "ephemeralSigningKeysRemoved": true,
+    "ownedPostgresContainerRemoved": true
+  },
+  "prohibitedActionsTaken": []
+}

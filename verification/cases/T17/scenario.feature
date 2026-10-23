@@ -350,12 +350,22 @@
     만일 "t17Source" 역할이 "hold-source-event" 행동을 수행한다
     만일 "t17Source" 역할이 "hold-source-match" 행동을 수행한다
     만일 "t17Source" 역할이 "hold-source-canonical" 행동을 수행한다
+    만일 "observer" 역할이 "hold-current-segment" 행동을 수행한다
     만일 "qc" 역할이 "hold" 행동을 수행한다
     만일 "observer" 역할이 "suspended" 행동을 수행한다
     만일 "시스템" 역할이 "suspended-db" 행동을 수행한다
+    만일 "observer" 역할이 "replace-source-allocation" 행동을 수행한다
+    만일 "t17Source" 역할이 "replace-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "replace-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "replace-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "replace-source-canonical" 행동을 수행한다
     만일 "sales" 역할이 "replace" 행동을 수행한다
     만일 "observer" 역할이 "replaced" 행동을 수행한다
     만일 "시스템" 역할이 "replaced-db" 행동을 수행한다
+    만일 "t17Source" 역할이 "release-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "release-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "release-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "release-hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "release-hold" 행동을 수행한다
     만일 "observer" 역할이 "released" 행동을 수행한다
     만일 "시스템" 역할이 "released-db" 행동을 수행한다

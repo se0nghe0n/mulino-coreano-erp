@@ -1,5 +1,9 @@
 # T17 첫 실패 입력 교정
 
+이 문서는 `2348dfd3` 시점의 역사적 범위와 결과다. 이후 승인된
+새 fixture precondition은 [후속 입력 교정](COMPLETION_INPUTS.md)을 따른다.
+현재 fixture의 grant와 dueAt이 이 문서 당시와 같다는 뜻이 아니다.
+
 기준은 `20c2666848b89b3ab7b4a1b1598e58cb408d13c4`다.
 원래 257개 업무 assertion, 사업 actor/grant, 수량, 날짜, 별칭과
 기존 15개 public response pointer 교정을 보존한다. 전체 Task와
