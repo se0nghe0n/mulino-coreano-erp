@@ -90,6 +90,28 @@ class SourceContracts(unittest.TestCase):
             self.assertEqual(([], []), (problems, known), (action['id'], problems, known))
         self.assertFalse(any('VERIFIED' in a['request']['slots'].get('valueState', '') for a in graph))
 
+    def test_stock_goals_select_the_actual_published_template_without_changing_target(self):
+        definition = json.loads((ROOT / 'verification/actual/scenarios/installer-conventions.json').read_text())['definition']
+        original = json.loads(subprocess.check_output([
+            'git', 'show', '2998782e:verification/cases/T09/case.json'], cwd=ROOT))
+        before = {(s['id'], a['id']): a for s in original['subcases'] for a in s['actions']}
+        current = json.loads((ROOT / 'verification/cases/T09/case.json').read_text())
+        selected = []
+        for sub in current['subcases']:
+            for action in sub['actions']:
+                slots = action.get('request', {}).get('slots', {})
+                mode = slots.get('quantityMode')
+                if action.get('capabilityId') != 'createWork' or mode not in ('STATE_AT', 'EXISTS_IN', 'THROUGHOUT'):
+                    continue
+                templates = [g for g in definition['goals'] if g['endpoint'] == slots['endpoint'] and g['quantityMode'] == mode]
+                self.assertEqual(1, len(templates))
+                self.assertEqual([templates[0]['name']], slots['conditions'])
+                self.assertEqual(before[(sub['id'], action['id'])]['request']['slots']['quantity'], slots['quantity'])
+                if mode != 'STATE_AT':
+                    self.assertEqual('complete-initial-and-final-ledger', slots['observationPolicy'])
+                selected.append((sub['id'], action['id']))
+        self.assertEqual(6, len(selected))
+
     def test_no_document_no_canonical_and_invalid_bindings(self):
         graph = document_and_event('claim', 'A', {'kind': 'WORK', 'id': self.binding['workId']},
             'RECEIPT_CLAIM', {'quantity': '100'}, 'synthetic-warehouse', 'no-evidence', '1',

@@ -156,6 +156,22 @@ def repair_inputs(case, fixture):
                 slots["period"].setdefault("startInclusive", True)
                 request["provenance"].pop("interval", None)
                 request["provenance"]["period"] = "USER"
+            if case["caseId"] == "T09" and cap == "createWork":
+                selectors = {"STATE_AT": "held-at", "EXISTS_IN": "held-exists",
+                             "THROUGHOUT": "held-throughout"}
+                mode = slots.get("quantityMode")
+                if mode in selectors:
+                    selected = [selectors[mode]]
+                    if "conditions" in slots and slots["conditions"] != selected:
+                        raise ValueError("Existing stock condition selector differs")
+                    slots["conditions"] = selected
+                    request["provenance"]["conditions"] = "CONTEXT"
+                    if mode != "STATE_AT":
+                        policy = "complete-initial-and-final-ledger"
+                        if "observationPolicy" in slots and slots["observationPolicy"] != policy:
+                            raise ValueError("Existing stock observation policy differs")
+                        slots["observationPolicy"] = policy
+                        request["provenance"]["observationPolicy"] = "CONTEXT"
             if cap == "createSalesOrder":
                 f["aliases"].setdefault("CUSTOMER_PLACE", {
                     "type": "Place", "kind": "CUSTOMER", "name": "고객 인도 장소"})
