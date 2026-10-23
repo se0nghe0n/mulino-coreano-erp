@@ -128,7 +128,7 @@ class ReceiptGatewayPostgresTest {
 
  void ordered100Fixture(){String proposal=uuid(),approval=uuid(),order=uuid();purchaseLine=uuid();
   jdbc.update("INSERT INTO mulino_trade_purchase_Proposals(organizationId,ID,workId,currentRevision,status,createdAt) VALUES(?,?,?,1,'ORDERED',CURRENT_TIMESTAMP)",ORG,proposal,WORK);
-  jdbc.update("INSERT INTO mulino_trade_purchase_Approvals(organizationId,ID,proposalId,proposalRevision,proposalHash,approverId,policyHash,decision,conditionsJson,decidedAt,validUntil) VALUES(?,?,?,1,?, ?,?,'APPROVE','{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,approval,proposal,"a".repeat(64),ACTOR,"b".repeat(64));
+  jdbc.update("INSERT INTO mulino_trade_purchase_Approvals(organizationId,ID,proposalId,proposalRevision,proposalHash,approverId,policyHash,decision,conditionsJson,decidedAt,validUntil,consumptionPolicy) VALUES(?,?,?,1,?, ?,?,'APPROVE','{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP+INTERVAL '1 day','SINGLE_ORDER_REVISION')",ORG,approval,proposal,"a".repeat(64),ACTOR,"b".repeat(64));
   jdbc.update("INSERT INTO mulino_trade_purchase_Orders(organizationId,ID,proposalId,proposalRevision,proposalHash,approvalId,channel,externalOperationId,outboxId,createdAt) VALUES(?,?,?,1,?,?,'SYNTHETIC',?,?,CURRENT_TIMESTAMP)",ORG,order,proposal,"a".repeat(64),approval,uuid(),uuid());
   jdbc.update("INSERT INTO mulino_trade_purchase_OrderLines(organizationId,ID,orderId,proposalId,proposalRevision,workId,itemId,destinationId,quantity,unit,status,revision) VALUES(?,?,?,?,1,?,?,?,100,'BOX','SUPPLIER_ACCEPTED',1)",ORG,purchaseLine,order,proposal,WORK,ITEM,PLACE);
  }

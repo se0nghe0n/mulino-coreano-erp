@@ -35,7 +35,7 @@ class ShipmentGatewayTest extends EvidencePersistenceTest {
  }
  String line(String quantity){String proposal=uuid(),approval=uuid(),order=uuid(),line=uuid();
   jdbc.update("INSERT INTO mulino_trade_purchase_Proposals VALUES(?,?,?,1,'APPROVED',CURRENT_TIMESTAMP)",ORG,proposal,WORK);
-  jdbc.update("INSERT INTO mulino_trade_purchase_Approvals VALUES(?,?,?,1,?, ?,?,'APPROVED','{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,approval,proposal,"a".repeat(64),ACTOR,"b".repeat(64));
+  jdbc.update("INSERT INTO mulino_trade_purchase_Approvals(organizationId,ID,proposalId,proposalRevision,proposalHash,approverId,policyHash,decision,conditionsJson,decidedAt,validUntil,consumptionPolicy) VALUES(?,?,?,1,?, ?,?,'APPROVED','{}',CURRENT_TIMESTAMP,CURRENT_TIMESTAMP+INTERVAL '1 day','SINGLE_ORDER_REVISION')",ORG,approval,proposal,"a".repeat(64),ACTOR,"b".repeat(64));
   jdbc.update("INSERT INTO mulino_trade_purchase_Orders VALUES(?,?,?,1,?,?,'SYNTHETIC',?,?,CURRENT_TIMESTAMP)",ORG,order,proposal,"a".repeat(64),approval,uuid(),uuid());
   jdbc.update("INSERT INTO mulino_trade_purchase_OrderLines VALUES(?,?,?,?,1,?,?,?,?,'BOX','SUPPLIER_ACCEPTED',1)",ORG,line,order,proposal,WORK,ITEM,TO,new java.math.BigDecimal(quantity));return line;
  }

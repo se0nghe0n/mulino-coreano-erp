@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "5.0.0",
+  "schemaVersion": "5.1.0",
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V38 PostgreSQL comparison: exact 1939 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V39 PostgreSQL comparison: exact 1953 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -199,6 +199,7 @@
     "mulino_runtime_outbox.createdat",
     "mulino_runtime_outbox.leaseexpiresat",
     "mulino_runtime_outbox.nextcheckat",
+    "mulino_runtime_recoveryobservationhistory.recordedat",
     "mulino_runtime_recoveryschedules.lastcheckedat",
     "mulino_runtime_recoveryschedules.nextcheckat",
     "mulino_runtime_recoveryschedules.nextvalidityboundary",
@@ -1148,10 +1149,10 @@
     "mulino_trade_shipment_shipments.revision",
     "mulino_trade_shipment_shipments.state"
   ],
-  "baseline": "5f00e5d84992dd3763eeefd60db9779e624651bc",
-  "observedColumnCount": 1939,
-  "observedArtifactSha256": "4554d8fedc723049b609148399cb416de5e466f9fe6eb3632928b0161586f72a",
-  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill",
+  "baseline": "af7cd03c5979aab4760c7052063c9ebb4f8d2ccb",
+  "observedColumnCount": 1953,
+  "observedArtifactSha256": "dbed9a723234801d615cd23ff660d3e0133f0ae28517bca50864f2d954717ff7",
+  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5865,6 +5866,77 @@
       "migration": "database/migrations/V38__purchase_approval_consumption_policy.sql",
       "cds": "backend/db/purchase.cds",
       "reason": "새 구매 승인에는 검증한 단일 주문 revision 소비 정책을 저장하고 과거 미기록 값은 NULL로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.historycomplete": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.id": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.itemid": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.lotid": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.operation": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.organizationid": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.recordedat": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다.",
+      "timestampWideningReason": "ExecutionClock의 절대 기록 시각을 보존해 knownAt 경계를 독립 SQL로 판정한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.scopecomplete": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.snapshotjson": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.sourceid": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.sourcerevision": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.sourcetable": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.transactionid": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_runtime_recoveryobservationhistory.workid": {
+      "migration": "database/migrations/V39__recovery_observation_history.sql",
+      "cds": "backend/db/runtime.cds",
+      "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
     }
   },
   "exactColumnInventory": [
@@ -6924,6 +6996,20 @@
     "mulino_runtime_outbox.resultevidenceid",
     "mulino_runtime_outbox.stablerequestowner",
     "mulino_runtime_outbox.status",
+    "mulino_runtime_recoveryobservationhistory.historycomplete",
+    "mulino_runtime_recoveryobservationhistory.id",
+    "mulino_runtime_recoveryobservationhistory.itemid",
+    "mulino_runtime_recoveryobservationhistory.lotid",
+    "mulino_runtime_recoveryobservationhistory.operation",
+    "mulino_runtime_recoveryobservationhistory.organizationid",
+    "mulino_runtime_recoveryobservationhistory.recordedat",
+    "mulino_runtime_recoveryobservationhistory.scopecomplete",
+    "mulino_runtime_recoveryobservationhistory.snapshotjson",
+    "mulino_runtime_recoveryobservationhistory.sourceid",
+    "mulino_runtime_recoveryobservationhistory.sourcerevision",
+    "mulino_runtime_recoveryobservationhistory.sourcetable",
+    "mulino_runtime_recoveryobservationhistory.transactionid",
+    "mulino_runtime_recoveryobservationhistory.workid",
     "mulino_runtime_recoveryschedules.attemptcount",
     "mulino_runtime_recoveryschedules.id",
     "mulino_runtime_recoveryschedules.kind",
@@ -8244,5 +8330,35 @@
     "mulino_trade_settlement_paymentreferences.organizationid",
     "mulino_trade_settlement_paymentreferences.recordedat",
     "mulino_trade_settlement_paymentreferences.revision"
-  ]
+  ],
+  "v39AddedColumnInventory": [
+    "mulino_runtime_recoveryobservationhistory.historycomplete",
+    "mulino_runtime_recoveryobservationhistory.id",
+    "mulino_runtime_recoveryobservationhistory.itemid",
+    "mulino_runtime_recoveryobservationhistory.lotid",
+    "mulino_runtime_recoveryobservationhistory.operation",
+    "mulino_runtime_recoveryobservationhistory.organizationid",
+    "mulino_runtime_recoveryobservationhistory.recordedat",
+    "mulino_runtime_recoveryobservationhistory.scopecomplete",
+    "mulino_runtime_recoveryobservationhistory.snapshotjson",
+    "mulino_runtime_recoveryobservationhistory.sourceid",
+    "mulino_runtime_recoveryobservationhistory.sourcerevision",
+    "mulino_runtime_recoveryobservationhistory.sourcetable",
+    "mulino_runtime_recoveryobservationhistory.transactionid",
+    "mulino_runtime_recoveryobservationhistory.workid"
+  ],
+  "v39PrimaryKeyInventory": {
+    "mulino_runtime_recoveryobservationhistory": [
+      "organizationid",
+      "id"
+    ]
+  },
+  "v39Evidence": {
+    "implementationBaseline": "af7cd03c5979aab4760c7052063c9ebb4f8d2ccb",
+    "schemaComparison": "backend/src/test/java/com/mulino/core/S1ReadIntegrationTest.java#freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening",
+    "observedArtifact": "backend/target/s4-compatibility-observed.json",
+    "recoveryMigrationComparison": "backend/src/test/java/com/mulino/runtime/RecoveryHistoryMigrationPostgresTest.java#upgradePreservesUnknownLegacyRowsAndMatchesCdsColumns",
+    "previousBaseline": "5f00e5d84992dd3763eeefd60db9779e624651bc",
+    "previousObservedArtifactSha256": "4554d8fedc723049b609148399cb416de5e466f9fe6eb3632928b0161586f72a"
+  }
 }

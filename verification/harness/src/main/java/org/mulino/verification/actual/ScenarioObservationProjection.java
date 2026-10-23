@@ -195,7 +195,11 @@ final class ScenarioObservationProjection {
         var incomplete=query(history,organization+" AND (NOT r.historyComplete OR (NOT r.scopeComplete AND r.recordedAt<=?))",incompleteParams);
         // An old installation may contain rows with no INSERT history. Never backdate their current state.
         for(String table:List.of("mulino_runtime_RecoverySchedules","mulino_runtime_IntakeRecoveries")) {
-            String predicate=organization+" AND NOT EXISTS (SELECT 1 FROM "+history+" h WHERE h.organizationId=r.organizationId AND h.sourceTable=? AND h.sourceId=r.ID AND h.operation<>'DELETE' AND h.snapshotJson::jsonb=to_jsonb(r) AND NOT EXISTS (SELECT 1 FROM "+history+" later WHERE later.organizationId=h.organizationId AND later.sourceTable=h.sourceTable AND later.sourceId=h.sourceId AND later.ID>h.ID))";
+            // Preserve exact non-time JSON values and key coverage; normalize only the known
+            // timestamptz fields whose text depends on the writer/reader session TimeZone.
+            String timeKeys=table.endsWith("RecoverySchedules")?"ARRAY['nextcheckat','nextvalidityboundary','lastcheckedat']":"ARRAY['nextcheckat','leaseexpiresat']";
+            String snapshotMatches="(h.snapshotJson::jsonb-"+timeKeys+")=(to_jsonb(r)-"+timeKeys+") AND "+"(SELECT array_agg(key ORDER BY key) FROM jsonb_object_keys(h.snapshotJson::jsonb) AS snapshot_keys(key))=(SELECT array_agg(key ORDER BY key) FROM jsonb_object_keys(to_jsonb(r)) AS current_keys(key)) AND jsonb_populate_record(NULL::"+table+",h.snapshotJson::jsonb) IS NOT DISTINCT FROM r";
+            String predicate=organization+" AND NOT EXISTS (SELECT 1 FROM "+history+" h WHERE h.organizationId=r.organizationId AND h.sourceTable=? AND h.sourceId=r.ID AND h.operation<>'DELETE' AND "+snapshotMatches+" AND NOT EXISTS (SELECT 1 FROM "+history+" later WHERE later.organizationId=h.organizationId AND later.sourceTable=h.sourceTable AND later.sourceId=h.sourceId AND later.ID>h.ID))";
             var params=new ArrayList<Object>(orgParams);params.add(table.toLowerCase(Locale.ROOT));
             var missing=query(table,predicate,params);
             if(!missing.isEmpty())throw new UnsupportedOperationException("Recovery organization superset is nonempty without complete source history; requested supervisionIssues scope/knownAt is unknown");

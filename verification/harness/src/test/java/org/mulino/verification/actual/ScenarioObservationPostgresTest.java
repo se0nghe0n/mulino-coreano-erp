@@ -295,6 +295,45 @@ class ScenarioObservationPostgresTest {
         assertThrows(UnsupportedOperationException.class,()->at(later,scope()));
     }
 
+    @Test void recoveryHistoryComparisonUsesAbsoluteInstantsAcrossSessionTimezones() throws Exception {
+        base();installHistory();
+        try(var st=writer.createStatement()){st.execute("SET TIME ZONE 'Asia/Seoul'");}
+        String source=schedule(now,id(),work);
+        try(var st=writer.createStatement();var rs=st.executeQuery("SELECT snapshotJson FROM mulino_runtime_RecoveryObservationHistory")){
+            assertTrue(rs.next());assertTrue(rs.getString(1).contains("+09:00"));
+        }
+        var defaultZone=java.util.TimeZone.getDefault();
+        try {
+            // pgjdbc sends the JVM default zone in its startup packet, overriding the options zone.
+            for(String zone:List.of("UTC","America/New_York")) {
+                java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone(zone));
+                try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());var st=c.createStatement();var rs=st.executeQuery("SHOW TIME ZONE")){assertTrue(rs.next());assertEquals(zone,rs.getString(1));}
+                var rows=at(now,scope()).path("rawRows").path("supervisionIssues");
+                assertEquals(1,rows.size());assertEquals(source,rows.get(0).path("id").asText());assertEquals("Stored human action",rows.get(0).path("nextAction").asText());
+            }
+        } finally {java.util.TimeZone.setDefault(defaultZone);}
+    }
+
+    @Test void typedSnapshotComparisonStillRejectsMissingKeysAndChangedSourceValues() throws Exception {
+        // CSN-shaped tables intentionally have no product writers/triggers, so this fixture can
+        // represent independently corrupted source/history pairs without disabling a product guard.
+        base();String source=id();
+        insert("mulino_runtime_RecoverySchedules",Json.object().put("organizationId",org).put("ID",source).put("workId",work).put("revision",0).put("recoveryStatus","HELD_MANUAL").put("nextAction","Original"));
+        String snapshot;
+        try(var st=writer.prepareStatement("SELECT to_jsonb(r)::text FROM mulino_runtime_RecoverySchedules r WHERE ID=?")){st.setString(1,source);try(var rs=st.executeQuery()){assertTrue(rs.next());snapshot=rs.getString(1);}}
+        insert("mulino_runtime_RecoveryObservationHistory",Json.object().put("organizationId",org).put("ID",1).put("sourceTable","mulino_runtime_recoveryschedules").put("sourceId",source).put("sourceRevision",0).put("recordedAt",now).put("transactionId","1").put("operation","INSERT").put("historyComplete",true).put("scopeComplete",true).put("itemId",item).put("workId",work).put("lotId",lot).put("snapshotJson",snapshot));
+        assertEquals(1,at(now,scope()).path("rawRows").path("supervisionIssues").size());
+        try(var st=writer.createStatement()){st.executeUpdate("UPDATE mulino_runtime_RecoveryObservationHistory SET snapshotJson=(snapshotJson::jsonb-'ownerid')::text");}
+        assertThrows(UnsupportedOperationException.class,()->at(now,scope()));
+        try(var st=writer.prepareStatement("UPDATE mulino_runtime_RecoveryObservationHistory SET snapshotJson=?")){st.setString(1,snapshot);st.executeUpdate();}
+        // A string that can be coerced into the source column type must still fail JSON integrity.
+        try(var st=writer.createStatement()){st.executeUpdate("UPDATE mulino_runtime_RecoveryObservationHistory SET snapshotJson=jsonb_set(snapshotJson::jsonb,'{revision}',to_jsonb('0'::text))::text");}
+        assertThrows(UnsupportedOperationException.class,()->at(now,scope()));
+        try(var st=writer.prepareStatement("UPDATE mulino_runtime_RecoveryObservationHistory SET snapshotJson=?")){st.setString(1,snapshot);st.executeUpdate();}
+        try(var st=writer.createStatement()){st.executeUpdate("UPDATE mulino_runtime_RecoverySchedules SET nextAction='Different actual value'");}
+        assertThrows(UnsupportedOperationException.class,()->at(now,scope()));
+    }
+
     @Test void unsupportedVirtualScopeFailsClosedAndNoDatabaseWritesAreAllowed() throws Exception {
         base();assertThrows(UnsupportedOperationException.class,()->capture("domain_records"));assertThrows(UnsupportedOperationException.class,()->capture("transactions"));assertThrows(UnsupportedOperationException.class,()->capture("unmappedSource"));
         var descendants=scope().put("includeDescendants",true);assertThrows(UnsupportedOperationException.class,()->ScenarioJdbcObservation.capture(config,root,request(descendants,"works")));
