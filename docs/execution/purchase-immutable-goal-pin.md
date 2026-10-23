@@ -245,3 +245,139 @@ assertion을 검사했으며 원래 전체 backend suite가 그대로 통과한�
 Task branch 통합·전체 backend/harness·원본 60건의 독립 observer 및
 scenario/model 재실행은 coordinator의 gate다. 이번 worker는 실행하지
 않았다. R4/R5/R7/R8 운영·규제·BTP·실모델 인수도 완료하지 않았다.
+
+## 2026-10-24 후속: 기존 positive Given의 current pointer 연결
+
+사용자가 기존 backend positive seed의 포인터 연결까지 소유를 확장했다.
+후속 시작 baseline은 `1dac141bb93d5dd55e6dd10a42b7dce0ccf13451`이다.
+같은 worktree와 branch를 사용하며 시작 tree는 clean이었다. 앞 절의
+60건 실행과 `final-evidence.tar.gz`를 덮어쓰지 않고 보존했다.
+
+기존 `PurchaseCommandPostgresTest`와 `SettlementCommandPostgresTest`에
+각각 한 줄만 추가했다. 이미 있는 GoalReferences INSERT 직후 같은
+organization·Work를 조건으로 기존 goal ID를 currentGoalVersionId에
+연결한다. 순환 FK 때문에 Work를 먼저 만든 뒤 goal을 삽입하고 pointer를
+연결한다. 새 goal·정책·목표 slot을 만들지 않는다.
+
+추가한 한 줄을 제거하면 각 파일은 `1dac141b` 원본과 byte 단위로 같다.
+`minimal-given-invariance.json`이 전후 SHA256과 이 검사를 남긴다.
+따라서 원래 goal·definition·predicate·hash·actor·grant·clock,
+모든 assertion ID/op/expected와 mock/legacy NULL negative는 그대로다.
+제품 PurchaseCommands·pin helper·hash도 변경하지 않았다.
+
+호출 조사에서 다음과 같이 실행 의존성을 구별했다.
+
+| 기존 경로 | 조사와 후속 처리 |
+|---|---|
+| PurchaseCommandPostgresTest | 실제 제안·승인·발주를 수행한다. 기존 goal pointer 한 줄을 연결하고 원본 클래스 자체를 실행한다 |
+| SettlementCommandPostgresTest | prepareInvoice가 실제 구매 제안·승인·발주를 선행한다. 동일한 pointer 한 줄만 연결한다 |
+| SalesCommandPostgresTest | propose/approve/dispatch helper는 선언만 있고 호출되지 않는다. source를 수정하지 않고 판매 회귀를 실행한다 |
+| PurchaseApprovalMigrationPostgresTest | V37→V38의 legacy NULL 소비 정책을 검증한다. negative를 그대로 실행한다 |
+| BusinessDiscoveryPostgresTest | legacy NULL goal pin과 기존 임의 hash를 가진 raw 행의 조회를 검증한다. backfill 없이 기존 조회 회귀를 실행한다 |
+| ReceiptGatewayPostgresTest | raw 구매 line을 준비하며 proposePurchase를 호출하지 않는다. 이미 자기 수령 goal pointer가 있고 이번 hook 대상이 아니다 |
+| ShipmentGatewayTest·RecallGatewayFixture·VerificationSchedulerTest | mock/raw 참조 또는 scheduler 계약이며 실제 구매 제안 positive Given이 아니다. 수정하지 않는다 |
+
+`PurchaseGoalPinPostgresTest`의 NULL pointer·다른 Work/조직·goal 변경·
+옛 hash·legacy NULL pin negative와 `PurchaseHashTest`도 그대로 다시
+실행했다. 상속 subclass의 결과와 원본 41건 결과는 별도 JUnit XML로
+구별한다. 클래스마다 새 JVM을 사용해 공통 static PostgreSQL의
+AfterAll과 다음 클래스의 lifecycle이 섞이지 않게 했다.
+
+후속 실행은 앞 절과 같은 명시 PATH/JAVA_HOME/OrbStack 환경에서
+다음 명령으로 실행했다.
+
+```sh
+./mvnw -f backend/pom.xml -B -ntp \
+  -DforkCount=1 -DreuseForks=false \
+  '-Dtest=PurchaseCommandPostgresTest,SettlementCommandPostgresTest,PurchaseGoalPinPostgresTest,PurchaseHashTest,SalesCommandPostgresTest,PurchaseApprovalMigrationPostgresTest,BusinessDiscoveryPostgresTest' \
+  clean test
+```
+
+수정 전 원본 클래스의 positive 한 건은 APPLIED 기대/HELD 관찰로
+실패했다. 이는 기존 current pointer NULL 공백의 실제 실행 기록이다.
+수정 뒤 위 clean build는 exit0, 총 133건 failures0/errors0/skipped0이다.
+원본 클래스 자체와 subclass를 별도 JVM과 XML로 실행한 결과는 다음과 같다.
+
+| 실행 클래스 | 실제 검사 수 | 실패/오류/skip |
+|---|---:|---|
+| BusinessDiscoveryPostgresTest | 8 | 0/0/0 |
+| PurchaseApprovalMigrationPostgresTest | 1 | 0/0/0 |
+| PurchaseCommandPostgresTest | 41 | 0/0/0 |
+| PurchaseGoalPinPostgresTest | 58 | 0/0/0 |
+| SalesCommandPostgresTest | 8 | 0/0/0 |
+| SettlementCommandPostgresTest | 15 | 0/0/0 |
+| PurchaseHashTest | 2 | 0/0/0 |
+
+후속 원증거는 `.local/purchase-goal-seed-followup/evidence/`다.
+앞선 60건 archive와 후속 archive는 별개다. 추가한 Given 이외의 기존
+파일 내용을 바꾸지 않았고 제품 main class가 이전 실행과 같은지도
+대조했다. 전체 source 집합은 두 test source가 바뀌므로 별도 hash다.
+
+후속 source 집합 SHA256은 다음과 같다.
+
+```text
+07a0aac53c9736a69cfbbd7e1a30e0ebdf7b1bffaec0dce840ccda4b21f57f48
+```
+
+후속 compiled main class 집합 SHA256은 다음과 같다.
+
+```text
+8bafa5b8b687c76b1e1ea9d37f1f8a8a26ae6ae787b4cda03fc5bdc5ac38ec89
+```
+
+후속 compiled test class 집합 SHA256은 다음과 같다.
+
+```text
+78fb036d0e548084e8cd1ec4ac58af0e1440d160e0cfd1e84097aa13dd4f3a10
+```
+
+후속 compiled resources 집합 SHA256은 다음과 같다.
+
+```text
+84343f6334314dd8031fc6efea540582e79b57441e2c4a0e29403097c075bd8e
+```
+
+후속 toolchain version artifact 집합 SHA256은 다음과 같다.
+
+```text
+4f05d7ce5c63fc1c30db62ce5d5474c47f220eb386478d79e77008b118de1963
+```
+
+원본 구매 클래스 41건 JUnit XML SHA256은 다음과 같다.
+
+```text
+69966c63afe911af8de44307e3aa940978f3f36d74ec0864ad99897814b21b98
+```
+
+후속 clean build log SHA256은 다음과 같다.
+
+```text
+e9d4f80f7e305f10d062c54c00bbeb6fa187dcc4e4e2652c7c61bface0e37436
+```
+
+후속 input custody JSON SHA256은 다음과 같다.
+
+```text
+e31ffaf79e8cb9e0fea423e6a5ebac1144fffa06a4f72e1f2c72e88c67d0fa9f
+```
+
+후속 raw archive는 다음과 같다.
+
+```text
+.local/purchase-goal-seed-followup/final-evidence.tar.gz
+afe5a289b1da1c403ba8d2c744d634c4f38458458141ba8858208289eeea1f09
+```
+
+기록된 자기 PG/ryuk container 14개의 exact ID가 모두 제거됐음을
+명시한 OrbStack socket에서 inspect했다. 클래스별 AfterAll/close가 자기
+public key·blob directory를 정리했고 cleanup error는 없다. 다른 worker의
+container·process·tree를 정리하지 않았다.
+
+이 후속은 기존 positive Given의 pointer 공백을 닫는 한정 회귀다.
+위 초기 기록의 원본 구매 클래스 미실행 경계를 이 후속 결과로 갱신하며,
+이전 subclass 결과를 원본 클래스의 결과로 승격하지 않는다. 원본 60건
+model·41개 scenario fixture의 변경이나 실행을 허가받은 것으로
+해석하지 않았다. root Task 6929 source를 가져오지 않았다.
+V45 identity·V46 stocktake와 별도 worker의 V47 history는 이 branch에
+통합하지 않았다. 이 조합과 full backend/harness·scenario/model은
+coordinator의 종합 gate로 남는다. Grok이나 외부 메시지는 보내지 않았다.
