@@ -86,7 +86,17 @@ def apply(case, fixture):
 
 def reverse(case_id, value):
     """Validate and undo only the individually reviewed selector corrections."""
-    result = copy.deepcopy(value)
+    if case_id == 'T11':
+        # The newest, strictly checked T11 input layer must be undone before
+        # the older assessment selector ledger can address its original paths.
+        import importlib.util
+        spec = importlib.util.spec_from_file_location(
+            't11_parent_ranges', Path(__file__).parent.parent/'T11'/'author_parent_ranges.py')
+        parent_ranges = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(parent_ranges)
+        result = parent_ranges.restore(value)
+    else:
+        result = copy.deepcopy(value)
     ledger = json.loads((Path(__file__).with_name('assessment-binding-corrections.json')).read_text())
     for change in reversed(ledger['changes']):
         if change['caseId'] != case_id:

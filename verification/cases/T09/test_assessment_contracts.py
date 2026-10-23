@@ -23,12 +23,31 @@ class AssessmentContracts(unittest.TestCase):
             # by the structural binding ledger.
             mutated = copy.deepcopy(current)
             mutated['subcases'][0]['assertions'][0]['expected'] = 'FORGED'
-            self.assertNotEqual([s['assertions'] for s in before['subcases']], [s['assertions'] for s in reverse(case_id, mutated)['subcases']])
+            if case_id == 'T11':
+                # The new whole-layer inverse is stricter: forged oracles are
+                # rejected before the older structural selector ledger runs.
+                with self.assertRaises(ValueError):
+                    reverse(case_id, mutated)
+            else:
+                self.assertNotEqual([s['assertions'] for s in before['subcases']], [s['assertions'] for s in reverse(case_id, mutated)['subcases']])
             for old, new in zip(before['subcases'], current['subcases']):
                 old_ids = [a['id'] for a in old['actions']]
                 self.assertEqual(old_ids, [a['id'] for a in new['actions'] if a['id'] in old_ids])
                 self.assertEqual([a.get('actorRef') for a in old['actions']], [a.get('actorRef') for a in new['actions'] if a['id'] in old_ids])
         self.assertEqual([94, 110, 65], counts)
+
+    def test_t11_composed_inverse_rejects_unrecorded_inputs_and_actor_changes(self):
+        current = json.loads((ROOT/'verification/cases/T11/case.json').read_text())
+        for field, value in (('startQuantity', '1'), ('targetWorkId', {'$alias': 'FORGED'})):
+            mutated = copy.deepcopy(current)
+            action = next(a for a in mutated['subcases'][0]['actions'] if a['id'] == 'child30-link')
+            action['request']['slots'][field] = value
+            with self.assertRaises(ValueError):
+                reverse('T11', mutated)
+        mutated = copy.deepcopy(current)
+        next(a for a in mutated['subcases'][0]['actions'] if a['id'] == 'child30-link')['actorRef'] = 'supervisor'
+        with self.assertRaises(ValueError):
+            reverse('T11', mutated)
 
     def test_correction_ledger_is_only_structural(self):
         ledger = json.loads(Path(__file__).with_name('assessment-binding-corrections.json').read_text())
@@ -70,7 +89,17 @@ class AssessmentContracts(unittest.TestCase):
                 self.assertEqual(before, original_fixture(json.loads(path.read_text())), relative)
             relative = f'verification/cases/{case_id}/scenario.feature'
             before = subprocess.check_output(['git', 'show', baseline+':'+relative], cwd=ROOT).decode()
-            lines = (ROOT/relative).read_text().splitlines(keepends=True)
+            feature = (ROOT/relative).read_text()
+            if case_id == 'T11':
+                import importlib.util
+                spec = importlib.util.spec_from_file_location(
+                    't11_parent_ranges', ROOT/'verification/cases/T11/author_parent_ranges.py')
+                parent_ranges = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(parent_ranges)
+                with self.assertRaises(ValueError):
+                    parent_ranges.restore_feature(feature.replace('child30-link', 'FORGED', 1))
+                feature = parent_ranges.restore_feature(feature)
+            lines = feature.splitlines(keepends=True)
             restored = ''.join(line for line in lines if '"assessmentEvaluator" 역할이' not in line and '-evaluation-work" 행동' not in line and '"clock-assessment" 행동' not in line)
             self.assertEqual(before, restored, relative)
 
