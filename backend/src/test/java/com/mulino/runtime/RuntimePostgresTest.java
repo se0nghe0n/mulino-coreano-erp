@@ -109,4 +109,29 @@ class RuntimePostgresTest {
   assertTrue(tx.execute(s->service.claimDelivery(context(),"new-worker","fixtureExternalEffect",new ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(5))).isEmpty());
   verify(duties,times(1)).ensureRuntimeDuty(any(),eq(WORK),eq("command-record-id"),eq("EXTERNAL_RECONCILIATION"),anyString(),any());
  }
+ /** Lease/IO persistence regression with a controlled guard double, not real authorization coverage. */
+ @Test void leaseExpiredDuringFinalAuthorizationCannotSendExternalIO(){
+  var authorizationCalls=new java.util.concurrent.atomic.AtomicInteger();
+  var adapterCalls=new java.util.concurrent.atomic.AtomicInteger();
+  var guard=mock(ExternalDeliveryAuthorization.class);
+  when(guard.supports("fixtureExternalEffect")).thenReturn(true);
+  doAnswer(call->{if(authorizationCalls.incrementAndGet()==3)now.set(T.plusSeconds(6));return null;}).when(guard).require(any(),any());
+  var provider=mock(org.springframework.beans.factory.ObjectProvider.class);
+  when(provider.stream()).thenAnswer(call->java.util.stream.Stream.of(guard));
+  var service=new RuntimeService(repo,new ExecutionClock(){@Override public Instant instant(){return now.get();}},mock(IdentityAuthorization.class),mock(RuntimeDutyPort.class),mock(com.mulino.application.evidence.ExternalResultEvidenceGuard.class),provider);
+  String id=tx.execute(s->repo.enqueue(context(),"command-record-id","00000000-0000-0000-0000-000000000207","fixtureExternalEffect",Map.of("workId",WORK)));
+  var delivery=tx.execute(s->service.claimDelivery(context(),"worker-a","fixtureExternalEffect",new ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(5)).orElseThrow());
+  assertEquals(T.plusSeconds(5),jdbc.queryForObject("SELECT leaseExpiresAt FROM mulino_runtime_Outbox WHERE ID=?",java.sql.Timestamp.class,id).toInstant());
+  var adapter=mock(ExternalDeliveryAdapter.class);
+  when(adapter.deliver(anyString(),anyString(),anyMap())).thenAnswer(call->{adapterCalls.incrementAndGet();return ExternalDeliveryAdapter.Result.UNKNOWN;});
+  assertThrows(DomainError.class,()->tx.execute(s->{service.deliverUnderFence(context(),id,((Number)delivery.get("fencingtoken")).longValue(),"worker-a",adapter);return null;}));
+  assertEquals(3,authorizationCalls.get());
+  assertEquals("IN_FLIGHT",jdbc.queryForObject("SELECT status FROM mulino_runtime_Outbox WHERE ID=?",String.class,id));
+  assertEquals(0,adapterCalls.get(),"Expired lease must prevent irreversible IO even when expiry occurs inside final authorization");
+  assertEquals(1,tx.execute(s->service.recoverExpiredDeliveries()).intValue());
+  assertEquals("UNKNOWN_EXTERNAL",jdbc.queryForObject("SELECT status FROM mulino_runtime_Outbox WHERE ID=?",String.class,id));
+  assertTrue(tx.execute(s->service.claimDelivery(context(),"worker-b","fixtureExternalEffect",new ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(5))).isEmpty());
+  assertEquals(0,adapterCalls.get());
+ }
+
 }

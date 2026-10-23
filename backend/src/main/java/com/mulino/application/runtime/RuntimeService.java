@@ -116,9 +116,9 @@ public class RuntimeService {
   if(!"IN_FLIGHT".equals(locked.get("status"))||((Number)locked.get("fencingtoken")).longValue()!=token||!worker.equals(locked.get("leaseowner"))||!instant(locked.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
   sameDelivery(row,locked);
   if(deliveryBarrier!=null)deliveryBarrier.reach("AFTER_AUTH_SCOPE_FENCE_ACQUIRED_BEFORE_EFFECT_COMMIT");
-  // Time may advance while an explicitly configured verification barrier is held.
-  if(!instant(locked.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
   authorizeDelivery(c,locked);
+  // Revalidation itself may consume the lease; reject before any irreversible adapter IO.
+  if(!instant(locked.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
   var payload=json.readValue((String)locked.get("payloadjson"),Map.class);
   ExternalDeliveryAdapter.Result result;try{result=adapter.deliver((String)row.get("operation"),(String)row.get("externaloperationid"),payload);}catch(RuntimeException timeout){result=ExternalDeliveryAdapter.Result.UNKNOWN;}
   // Adapter receipt without immutable verified evidence is held for canonical reconciliation.
