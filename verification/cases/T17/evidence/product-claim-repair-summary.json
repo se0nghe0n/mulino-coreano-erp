@@ -1,0 +1,1495 @@
+{
+  "recordType": "T17_PRODUCT_CLAIM_REPAIR",
+  "task": "OPEN",
+  "step": "OPEN",
+  "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3",
+  "branch": "fix/t17-delivery-source-chain",
+  "syncCommits": [
+    {
+      "root": "9b3342ef",
+      "local": "cce45ef6c6bf1aaa6ba7c8929bdb13e55ed0df8e"
+    },
+    {
+      "root": "6fb7fdbd",
+      "local": "99dd6012d2ae35c682b9fd7bda14ad8b291e37b3"
+    },
+    {
+      "root": "5cd13c68",
+      "local": "573b4d5e5327fdab588c23e5a14a9fc3a25b1beb"
+    },
+    {
+      "root": "415a7bb7",
+      "local": "6197f791a15fa41dd36483731b1386597a531677"
+    }
+  ],
+  "implementationBase": "6197f791a15fa41dd36483731b1386597a531677",
+  "businessOracleAcceptance": false,
+  "actualModelCalls": 0,
+  "actualHaikuScenarios": {
+    "status": "NOT_RUN",
+    "count": 0
+  },
+  "fullBackend": {
+    "status": "NOT_RUN",
+    "reason": "Root owns aggregate; focused methods only"
+  },
+  "fullHarness": {
+    "status": "NOT_RUN",
+    "reason": "Root owns aggregate"
+  },
+  "changes": {
+    "rawClaimColumns": [
+      "claimedRangeRootId",
+      "claimPayloadJson"
+    ],
+    "verifiedPhysicalColumn": "rangeRootId",
+    "forwardMigration": "V40__delivery_claim_identity.sql",
+    "columnCountBefore": 1953,
+    "columnCountAfter": 1955,
+    "legacyClaimBackfill": false,
+    "oldForeignKeysChanged": false,
+    "publicInputChanged": false,
+    "sourcePayloadsChanged": false,
+    "originalGoalTargets": [
+      30,
+      30,
+      30
+    ],
+    "actualDeliveryQuantities": [
+      30,
+      20,
+      20
+    ]
+  },
+  "checks": {
+    "python": {
+      "PASS": 31,
+      "FAIL": 0
+    },
+    "generator": {
+      "checks": [
+        {
+          "command": "author_delivery_goal_inputs.py",
+          "exitCode": 0,
+          "identical": true
+        },
+        {
+          "command": "author_public_contracts.py",
+          "exitCode": 0,
+          "identical": true
+        }
+      ],
+      "hashes": {
+        "verification/cases/T17/case.json": "df9cb3dda9799b77f3adfbf3c6aa484cf6ede7f8f8671a0d09135320752b2a82",
+        "verification/cases/T17/scenario.feature": "69dd1b90d8b6ff998dfbe85999a5ec176d45507a6a5db65a104d82693e607e7a",
+        "verification/cases/T17/completion-input-delta.json": "bc83efd47acc2ec3ff4e537edc61c66804db6f3e9f6582758d8fc7eee9bf4f5f",
+        "verification/cases/T17/delivery-goal-input-delta.json": "1c9988a16e33a117ddabd30084d54fe276b0c6baafc09b231c840bb3633577d6",
+        "verification/cases/T17/first-failure-input-delta.json": "d3c39b4b52aed6df92ed1dcfa927ad3fc751c9e7bd3af3512ad4e02d74869ef5",
+        "verification/cases/T17/delivery-input-delta.json": "90e9fd616372e502123605b5147fcc5fcd2457e7ec65b7fba505ddca411c338a",
+        "verification/cases/T17/public-contract-delta.json": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76",
+        "verification/cases/T17/fixtures/claim-conflictingquantity.json": "956bb372df35009e90d21886cc55bb3a1d8786867d6861dab736085ed7942ae4",
+        "verification/cases/T17/fixtures/claim-falseclaim.json": "744000923c5f9abad7fd565108d796d06e2713811e12a04d5f0c3b46e4257f90",
+        "verification/cases/T17/fixtures/claim-nopriordispatch.json": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d",
+        "verification/cases/T17/fixtures/claim-scopeoverflow.json": "37e0200369c494bc352ceaecfebe81e4096ecb7254ed4fc93b5bd63e916b7dd4",
+        "verification/cases/T17/fixtures/claim-unidentifiedscope.json": "379a9df110e17144ee8825c1ad68e9920557174f8c008794ca39277dd89726ad",
+        "verification/cases/T17/fixtures/eligibility-conflict.json": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+        "verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+        "verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+        "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+        "verification/cases/T17/fixtures/eligibility-unknown.json": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+        "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "20513a43eabf5c1ec8cb95f9a3ae2b33b98f3977140b7f13f8cfe856abb1675c",
+        "verification/cases/T17/fixtures/normal-consumed-delivery.json": "9b7eaab4775ea67180a86550ac40016bcadb252377fccf83c1cfb48d90a0cff1",
+        "verification/cases/T17/fixtures/post-dispatch-expiry.json": "8726f2e1f986f4ba431522292e420c0d51130686407da4268261dd4f5cc98944",
+        "verification/cases/T17/fixtures/replacement-no-revival.json": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+        "verification/cases/T17/fixtures/reserve-pick-dispatch.json": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52"
+      }
+    },
+    "focusedBackend": {
+      "counts": {
+        "PASS": 11,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "selection": "Latest result per focused method, runs 3 and 5; run 5 replaced two fixture failures",
+      "tests": {
+        "com.mulino.core.S1ReadIntegrationTest#freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.core.S1ReadIntegrationTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#consumedAllocationNormalDeliveryCountsActual20AndKeepsTransit10": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#deliveryMayNameTheConsumedAllocationOfItsDispatch": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#falseOrUnmatchedDeliveryReportsHaveZeroNormalEffect": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#deliveryReadsUseOccurrenceTimeAndConfirmationVisibleOnlyFromItsKnownAt": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#postDispatchRecallHoldKeepsActual20DeliveredAndTransit10WithZeroLegitimate": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#deliveryClaimRollbackAndConcurrentDuplicateAreAtomic": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#unverifiedDeliveryRootsRetainRawClaimAndCannotPromote": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-5-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-5.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#deliveryClaimMissingInputAndCurrentGrantRemainClosed": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.quality.FulfillmentPostgresTest#postDispatchExpiryKeepsActual20DeliveredAndTransit10WithZeroLegitimate": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-3-reports/TEST-com.mulino.quality.FulfillmentPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-3.log"
+        },
+        "com.mulino.application.trade.sales.DeliveryClaimMigrationPostgresTest#v39UpgradePreservesLegacyAndVerifiedForeignKeysWithoutInventingOriginalClaims": {
+          "status": "PASS",
+          "report": ".local/t17-product-claim/backend-focused-5-reports/TEST-com.mulino.application.trade.sales.DeliveryClaimMigrationPostgresTest.xml",
+          "log": ".local/t17-product-claim/backend-focused-5.log"
+        }
+      }
+    },
+    "sourcePG": {
+      "counts": {
+        "PASS": 34,
+        "FAIL": 0,
+        "SKIP": 0
+      },
+      "tests": [
+        {
+          "method": "explicitDispatchIncompleteGoalRemainsClosed",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "completedReplacementUsesRealWitnessAndReleaseSource",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "newCategoryEarlyHoldApplies",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchMissingActivationGrant",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchUnactivatedWorkRemainsRejected",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchFalseClaim",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchMissingReviseGoalGrant",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchDENIEDRemainsBlocked",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchDeliverySourceBoundaries",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "otherpackUsesItsOwnTypedLot",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "sellOnlyDoesNotAuthorizeDispatch",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchExpiredDelivery",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchConflictingClaim",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "newSyntheticDueDatesReachAppliedForEveryPreviouslyMissingOrder",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchUNKNOWNRemainsBlocked",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "unsupportedSlotsAreNotBusinessGuardAcceptance",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "missingExpiryCopyRemainsUnknown",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchNormalDelivery",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "unknownConditionRemainsOmittedWithoutInventedPermission",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "authoredNoDispatchObservationUsesRealGateway",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchRejectsCrossOrganizationEvidence",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchUnidentifiedClaim",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "sourceChainsUseRealCurrentAuthorityWithDeclaredExpiry",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "missingOriginalDueAtRemainsRejectedWithoutOrderEffects",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchSupportsOriginalRangeAndRejectsFakeEvidence",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchLateHoldSourceStopsAtRecallAuthority",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "postDispatchExpiryBoundaryIsExplicit",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchCONFLICTRemainsBlocked",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchLateDelivery",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchOverflowClaim",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "newCategoryHoldAppliesWithinOriginalScope",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "explicitDispatchNewRecallHoldApplies",
+          "status": "PASS",
+          "failure": null
+        },
+        {
+          "method": "declaredExpiryGroupsMapToDistinctLots",
+          "status": "PASS",
+          "failure": null
+        }
+      ],
+      "log": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/test.log",
+      "junit": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/junit.xml",
+      "junitSha256": "095ac0a033de7b6002036a231b8abf23a7e2d79247279d100a18d01f348132a3"
+    },
+    "prepare": {
+      "status": "PREPARED",
+      "preparedCases": 41,
+      "preparedSubcases": 802,
+      "preparedAssertions": 24260,
+      "preparationProblems": [],
+      "gateComplete": false,
+      "runtimeStatus": "NOT_RUN"
+    },
+    "migration": {
+      "upgrade": "39->40",
+      "legacyUnchanged": true,
+      "legacyOriginalClaimBackfilled": false,
+      "foreignKeys": [
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_canonicaloccu_fkey",
+          "definition": "FOREIGN KEY (organizationid, canonicaloccurrenceid) REFERENCES mulino_evidence_canonicaloccurrences(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_cargoscopeid_fkey",
+          "definition": "FOREIGN KEY (organizationid, cargoscopeid) REFERENCES mulino_inventory_cargoscopes(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_customerid_fkey",
+          "definition": "FOREIGN KEY (organizationid, customerid) REFERENCES mulino_trade_sales_customers(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_dispatchid_fkey",
+          "definition": "FOREIGN KEY (organizationid, dispatchid) REFERENCES mulino_inventory_dispatches(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_itemid_fkey",
+          "definition": "FOREIGN KEY (organizationid, itemid) REFERENCES mulino_inventory_tradeitems(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_lotid_fkey",
+          "definition": "FOREIGN KEY (organizationid, lotid) REFERENCES mulino_inventory_manufacturinglots(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_observationid_fkey",
+          "definition": "FOREIGN KEY (organizationid, observationid) REFERENCES mulino_trade_sales_observations(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_placeid_fkey",
+          "definition": "FOREIGN KEY (organizationid, placeid) REFERENCES mulino_inventory_places(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_rangerootid_fkey",
+          "definition": "FOREIGN KEY (organizationid, rangerootid) REFERENCES mulino_inventory_quantitysegments(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_saleslineid_fkey",
+          "definition": "FOREIGN KEY (organizationid, saleslineid) REFERENCES mulino_trade_sales_orderlines(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_segmentid_fkey",
+          "definition": "FOREIGN KEY (organizationid, segmentid) REFERENCES mulino_inventory_quantitysegments(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_deliveries_organizationid_workid_fkey",
+          "definition": "FOREIGN KEY (organizationid, workid) REFERENCES mulino_work_read_works(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observation_organizationid_cargoscopeid_fkey",
+          "definition": "FOREIGN KEY (organizationid, cargoscopeid) REFERENCES mulino_inventory_cargoscopes(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_customerid_fkey",
+          "definition": "FOREIGN KEY (organizationid, customerid) REFERENCES mulino_trade_sales_customers(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_dispatchid_fkey",
+          "definition": "FOREIGN KEY (organizationid, dispatchid) REFERENCES mulino_inventory_dispatches(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_eventid_fkey",
+          "definition": "FOREIGN KEY (organizationid, eventid) REFERENCES mulino_evidence_events(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_itemid_fkey",
+          "definition": "FOREIGN KEY (organizationid, itemid) REFERENCES mulino_inventory_tradeitems(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_lotid_fkey",
+          "definition": "FOREIGN KEY (organizationid, lotid) REFERENCES mulino_inventory_manufacturinglots(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_placeid_fkey",
+          "definition": "FOREIGN KEY (organizationid, placeid) REFERENCES mulino_inventory_places(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_rangerootid_fkey",
+          "definition": "FOREIGN KEY (organizationid, rangerootid) REFERENCES mulino_inventory_quantitysegments(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_saleslineid_fkey",
+          "definition": "FOREIGN KEY (organizationid, saleslineid) REFERENCES mulino_trade_sales_orderlines(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        },
+        {
+          "conname": "mulino_trade_sales_observations_organizationid_workid_fkey",
+          "definition": "FOREIGN KEY (organizationid, workid) REFERENCES mulino_work_read_works(organizationid, id) DEFERRABLE INITIALLY DEFERRED"
+        }
+      ],
+      "previousChecksums": [
+        {
+          "version": "1",
+          "checksum": -308291496
+        },
+        {
+          "version": "2",
+          "checksum": 1321452478
+        },
+        {
+          "version": "3",
+          "checksum": 1513814506
+        },
+        {
+          "version": "4",
+          "checksum": 482793327
+        },
+        {
+          "version": "5",
+          "checksum": 1419345064
+        },
+        {
+          "version": "6",
+          "checksum": -1572283241
+        },
+        {
+          "version": "7",
+          "checksum": -1247113751
+        },
+        {
+          "version": "8",
+          "checksum": -931822320
+        },
+        {
+          "version": "9",
+          "checksum": 238680446
+        },
+        {
+          "version": "10",
+          "checksum": -598140970
+        },
+        {
+          "version": "11",
+          "checksum": -1479251082
+        },
+        {
+          "version": "12",
+          "checksum": -1129410968
+        },
+        {
+          "version": "13",
+          "checksum": -1143437568
+        },
+        {
+          "version": "14",
+          "checksum": -338741141
+        },
+        {
+          "version": "15",
+          "checksum": -1254643216
+        },
+        {
+          "version": "16",
+          "checksum": -610529104
+        },
+        {
+          "version": "17",
+          "checksum": 723341807
+        },
+        {
+          "version": "18",
+          "checksum": -1079258987
+        },
+        {
+          "version": "19",
+          "checksum": -1188261067
+        },
+        {
+          "version": "20",
+          "checksum": 1332107365
+        },
+        {
+          "version": "21",
+          "checksum": 1844994306
+        },
+        {
+          "version": "22",
+          "checksum": -935749082
+        },
+        {
+          "version": "23",
+          "checksum": 1565390478
+        },
+        {
+          "version": "24",
+          "checksum": 1559999963
+        },
+        {
+          "version": "25",
+          "checksum": 1745616772
+        },
+        {
+          "version": "26",
+          "checksum": 61384864
+        },
+        {
+          "version": "27",
+          "checksum": -870127384
+        },
+        {
+          "version": "28",
+          "checksum": 1909555022
+        },
+        {
+          "version": "29",
+          "checksum": 592005997
+        },
+        {
+          "version": "30",
+          "checksum": -187737956
+        },
+        {
+          "version": "31",
+          "checksum": -317630770
+        },
+        {
+          "version": "32",
+          "checksum": 843147282
+        },
+        {
+          "version": "33",
+          "checksum": 29369156
+        },
+        {
+          "version": "34",
+          "checksum": -780998382
+        },
+        {
+          "version": "35",
+          "checksum": 1834324748
+        },
+        {
+          "version": "36",
+          "checksum": -300587825
+        },
+        {
+          "version": "37",
+          "checksum": -1151392402
+        },
+        {
+          "version": "38",
+          "checksum": 1745187269
+        },
+        {
+          "version": "39",
+          "checksum": 1975572277
+        }
+      ],
+      "unknownClaimRetained": true,
+      "postgresVersion": "18.6 (Debian 18.6-1.pgdg13+2)"
+    }
+  },
+  "logs": {
+    "backend-focused-2.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/backend-focused-2.log",
+      "sha256": "14286e73db34dd8288291fd770547b1f71c6e499e56c3685a31b596366be1d96"
+    },
+    "backend-focused-3.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/backend-focused-3.log",
+      "sha256": "91a314ee081035e3d72474213bef0d8387c9811a588ebc7dae2eec24b9b6d476"
+    },
+    "backend-focused-1.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/backend-focused-1.log",
+      "sha256": "1a012bc283722d6ba1df9bc8a136dac12ab9c842977308130a43265c5f9c22e3"
+    },
+    "backend-focused-4.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/backend-focused-4.log",
+      "sha256": "203930c45e023f02976bd22b6541fc8a3e08d5a7b79858980094535bcf04dba9"
+    },
+    "backend-focused-5.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/backend-focused-5.log",
+      "sha256": "cd5a3123ea6a1f93286f81a22b523719f5de32ab113142144fe59e72ddfa5330"
+    },
+    "source-pg.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/source-pg.log",
+      "sha256": "0974d6500be5c1ca63e0ec693707134668c3dfe973645ef6f4a48daa9020d348"
+    },
+    "npm-ci.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/npm-ci.log",
+      "sha256": "46224a85922637438dc77f4fe11aad5e1f74d80edb08f5e53554d2dc445a3ad0"
+    },
+    "public-key.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/public-key.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "keygen.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/keygen.log",
+      "sha256": "c4c205038d1147530927c47fdb7ca1348469970a7720f4951d9a84e46b5f4bbc"
+    },
+    "prepare.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/prepare.log",
+      "sha256": "7b9e83cc652226234cba72230b802704be0e9c554180bb5ae4f72acf5178e50e"
+    },
+    "python.log": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-product-claim/python.log",
+      "sha256": "de0eeaf3b88155ca8ad80399e2c18bdd5d01c8c3ba56624d78e7a9efdf21c00a"
+    }
+  },
+  "sourcePG": {
+    "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb",
+    "buildIdentity": {
+      "sourceCommit": "6197f791a15fa41dd36483731b1386597a531677",
+      "productJar": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/backend/target/ontology-0.1.0-SNAPSHOT.jar",
+      "productJarSha256": "dc06a218f35cd82fd15046215d804ea7e8c59c58a496a45e56d6a4bb20373ac5"
+    },
+    "springLogSha256": "b69eb89f10c17f98e173c723d68b4cd681619db29ef0f3cad0ce7d822f2396ec",
+    "ledgerArtifacts": [
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/authoredNoDispatchObservationUsesRealGateway-ledger.json",
+        "sha256": "a4e692a007d584f2de7dc9a77bcf0f5441f3bb41306dfd995aa5c1b8113d4188",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": [
+          {
+            "id": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+            "claimedRangeRootId": "1e9f065d-09ed-4028-a51d-93eec5c8948b",
+            "rangeRootId": null,
+            "state": "PROVISIONAL",
+            "claimPayloadSha256": "16905cb7d91216d0b925220ad8fdabc21422f7ebc427deda82a68db9ed68c27e"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/completedReplacementUsesRealWitnessAndReleaseSource-ledger.json",
+        "sha256": "2cd81af7c44bf76d747609fa5cab73687865f1e2d8ad79b7feef4ff8efe876b0",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 2,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/declaredExpiryGroupsMapToDistinctLots-ledger.json",
+        "sha256": "3f16f532fd7beba9aadb76b5e5564c6da7d00049993159c68de1c2b79aeffc87",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 4,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 4,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchCONFLICTRemainsBlocked-ledger.json",
+        "sha256": "26cfce070dd393403654e24520424889ec21abbcf7bbb4cd194c37b2aea1b3d2",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchConflictingClaim-ledger.json",
+        "sha256": "65877cfabb692b7d572004ef5cf9d6b89d693e2fa4abbffd7a5952eb4efd6787",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": [
+          {
+            "id": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+            "claimedRangeRootId": "63a72755-9097-454c-8e88-d8d8ed87a827",
+            "rangeRootId": null,
+            "state": "PROVISIONAL",
+            "claimPayloadSha256": "275e7e31ce27e6ef93ce6680382747a25f5d325b9c7bb0f03db2dd5dcf3e55dd"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchDENIEDRemainsBlocked-ledger.json",
+        "sha256": "9d717273802302cbe2d7090f733529301dfa128ff738a4ed44f5d65e267fbac1",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchDeliverySourceBoundaries-ledger.json",
+        "sha256": "0a8e09f766157defd35278b6863ed12976a6e2db977faa918cc1cd6e09ebaf35",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 3,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 3,
+          "mulino_trade_sales_Deliveries": 1,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 2
+        },
+        "observations": [
+          {
+            "id": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+            "claimedRangeRootId": "a7dbac96-f37f-4389-90b2-665dc4dfcc45",
+            "rangeRootId": "a7dbac96-f37f-4389-90b2-665dc4dfcc45",
+            "state": "CONFIRMED",
+            "claimPayloadSha256": "ba1339185347fff78b0d617b5b529fb7484baf39713bc5693be6af1fa80f1af2"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchExpiredDelivery-ledger.json",
+        "sha256": "f882063f8786a6df12a2cc09bf21f5f540a0c2a7e046e9704f5b4e061c4470b9",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 4,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 4,
+          "mulino_trade_sales_Deliveries": 1,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 2
+        },
+        "observations": [
+          {
+            "id": "eebd95f9-9c05-5217-86aa-d988773f22be",
+            "claimedRangeRootId": "f1961cd7-fc3c-4c5c-9321-8f8921d572f4",
+            "rangeRootId": "f1961cd7-fc3c-4c5c-9321-8f8921d572f4",
+            "state": "CONFIRMED",
+            "claimPayloadSha256": "15811231ed82dba642f465ce8b96eb6831341863390d64e70bf93edf241264ec"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchFalseClaim-ledger.json",
+        "sha256": "770b7237ec089698adc525ca47d7dc2d8ba013bf6081a78326fd25eeae437f8b",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": [
+          {
+            "id": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+            "claimedRangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+            "rangeRootId": null,
+            "state": "PROVISIONAL",
+            "claimPayloadSha256": "9f9702c51f2811662d488a4a296f6abfeda5ea49cb0c313cefa4bf7af27389e2"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchIncompleteGoalRemainsClosed-ledger.json",
+        "sha256": "28c19d8cee070c4cb7312aa1ec5851a5f72874049e9b2a2aeaba71db0cfef8a9",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchLateDelivery-ledger.json",
+        "sha256": "06696f858ee43af5addbacb9a2b5fdd55d8299b52151aaebd834c02231e07859",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 4,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 4,
+          "mulino_trade_sales_Deliveries": 1,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 2
+        },
+        "observations": [
+          {
+            "id": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+            "claimedRangeRootId": "8eb1dcce-447a-4baa-a978-f29b394ee1bf",
+            "rangeRootId": "8eb1dcce-447a-4baa-a978-f29b394ee1bf",
+            "state": "CONFIRMED",
+            "claimPayloadSha256": "401832444d99b1beba91df2fe55a335cbf20241f4291a1c26b3bb666c133cb05"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchLateHoldSourceStopsAtRecallAuthority-ledger.json",
+        "sha256": "6b0eebe40f66e51c089411ec27f0945dcfe01ba4ed3790ba8a6cf62a5d4f0856",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchMissingActivationGrant-ledger.json",
+        "sha256": "2b8780d8033599c4ea56f1aea1cb693157abcfe2b95d66a4f262df58e621e02e",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchMissingReviseGoalGrant-ledger.json",
+        "sha256": "8752b5c479aff01630f92c2e65263164c6eb308e09bf63f4beba1bed7b1fad59",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchNewRecallHoldApplies-ledger.json",
+        "sha256": "43403a9abcffb363f849e3b3dadea976ab2eaa4ec16bf5442af970cfae31a24a",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchNormalDelivery-ledger.json",
+        "sha256": "1b1a66d874e6e6584e9c5e0084a04d04690ce81d40604833ac4ff5897fb41c99",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 3,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 3,
+          "mulino_trade_sales_Deliveries": 1,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 2
+        },
+        "observations": [
+          {
+            "id": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+            "claimedRangeRootId": "48cd1b97-68c2-45de-a3a6-e037b39aab88",
+            "rangeRootId": "48cd1b97-68c2-45de-a3a6-e037b39aab88",
+            "state": "CONFIRMED",
+            "claimPayloadSha256": "cf0e4d67e85f9429beac62e6b3a8adeb1b87cdf11749430add8ee4fef9e84710"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchOverflowClaim-ledger.json",
+        "sha256": "a3d7580e7c3dd10a789e29e6ec4bb4b36f5e222d3c4c0998ce8e38ceaa0c5850",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": [
+          {
+            "id": "68face08-adcf-5b05-bf00-e43c91932bb1",
+            "claimedRangeRootId": "2339736e-0ee0-45d8-9f56-fda35ade748d",
+            "rangeRootId": null,
+            "state": "PROVISIONAL",
+            "claimPayloadSha256": "c5f5a0981904aca22b07c3540e5ab0a24fc57cb8d2266ce85d015b4a0ee26150"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchRejectsCrossOrganizationEvidence-ledger.json",
+        "sha256": "1607cf8188545b260081901c2bf82769b6390d2e0e4df5ee6c2bf6f3e8c5e1f4",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchSupportsOriginalRangeAndRejectsFakeEvidence-ledger.json",
+        "sha256": "b8420001a5196a1e8271511ee61d37928cb217f705b55acc8690d9fef7345c53",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchUNKNOWNRemainsBlocked-ledger.json",
+        "sha256": "1d9a2b38b7cc8fda755deff86b79cc3e921ae259a6f941d2076674a0048e884d",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchUnactivatedWorkRemainsRejected-ledger.json",
+        "sha256": "88e9c3ad24adf5abd23330c931e7ab0c707cf5b80b35162690f9583968c61ce2",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchUnidentifiedClaim-ledger.json",
+        "sha256": "aa1e737c9c03ad7c3e48d8695c94ad8d5d43058e237a07c3932a0c9fce1bc5e4",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 1,
+          "mulino_trade_sales_ExecutionEffects": 1
+        },
+        "observations": [
+          {
+            "id": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+            "claimedRangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+            "rangeRootId": null,
+            "state": "PROVISIONAL",
+            "claimPayloadSha256": "33bbcb777230f462cead7853d01a7b6ba4d07e22351099070701ac8af7165b90"
+          }
+        ]
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/holdSourceReachesCategoryAuthorizationWithoutGrantExpansion-ledger.json",
+        "sha256": "6a35f680737e7d0485b300bd95daeba646fea7ad10e9c602c533eb363334c8f3",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/missingExpiryCopyRemainsUnknown-ledger.json",
+        "sha256": "74f353fafed24c88634dc2a4a08643eba1d50ca6df54fceaac7667aba819e0e9",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/missingOriginalDueAtRemainsRejectedWithoutOrderEffects-ledger.json",
+        "sha256": "7f63d0059312efcda1a1b6b72c1ccbfc2004227141fad81cea6a4eaad25d8c95",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/newCategoryEarlyHoldApplies-ledger.json",
+        "sha256": "27d085c0a8c14e12ec3f83b86a0b7ad82ad6c50a70b1b81e31f1f80bf2a225c8",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 4,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 4,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/newCategoryHoldAppliesWithinOriginalScope-ledger.json",
+        "sha256": "f1aab3797870e40b436b327e4b781b04eb20746c633ca2414f6649796a25b52f",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 2,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 2,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/newSyntheticDueDatesReachAppliedForEveryPreviouslyMissingOrder-ledger.json",
+        "sha256": "22efc2483b5b87afe963f2e9113d587358630570832ca11a691f8bc483200289",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/otherpackUsesItsOwnTypedLot-ledger.json",
+        "sha256": "696394dd31c80865f574b4e691500c5b6bcf812099d120cdf756296d47290e23",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 5,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 5,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/postDispatchExpiryBoundaryIsExplicit-ledger.json",
+        "sha256": "62801bc68df4e2706df8bed5cd80eaaa8e650bf7f39a81679d7463f8c458bad4",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/sellOnlyDoesNotAuthorizeDispatch-ledger.json",
+        "sha256": "8975e4c1d4bc91a1bcc9dec8a5cb4af3c6ffa8bf058ea21116fd6c2c95c03d54",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 1,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/sourceChainsUseRealCurrentAuthorityWithDeclaredExpiry-ledger.json",
+        "sha256": "8c6c6d8d2a1636567322e35fafc9a74b468db88090cec61d475a2034b8eba2a3",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/unknownConditionRemainsOmittedWithoutInventedPermission-ledger.json",
+        "sha256": "02d0c4ac3d1d5c5f2c4356a1e52ac7ac6dfcb6380458f0201d56b4e97dd9b083",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/unsupportedSlotsAreNotBusinessGuardAcceptance-ledger.json",
+        "sha256": "d2980087fc07b97beaf03f680676dd59446acedd411957efc7c6ce0a55e1e8bd",
+        "rows": {
+          "mulino_inventory_QuantityMovements": 1,
+          "mulino_inventory_SegmentAllocations": 0,
+          "mulino_inventory_QuantitySegments": 1,
+          "mulino_trade_sales_Deliveries": 0,
+          "mulino_trade_sales_Observations": 0,
+          "mulino_trade_sales_ExecutionEffects": 0
+        },
+        "observations": []
+      }
+    ],
+    "claimCommands": [
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/authoredNoDispatchObservationUsesRealGateway-T17-claim-nopriordispatch-claim.json",
+        "sha256": "8abfb989bb78f0e20a6111a92fb53ff53030843517308d01e05a40b6aae58fb2",
+        "httpStatus": 200,
+        "response": {
+          "outcome": "APPLIED",
+          "revision": 1,
+          "effects": {
+            "contributedQuantity": "0",
+            "observationId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+            "physicalQuantity": "0"
+          },
+          "commandId": "9ba98f6d-4927-4ffd-87b9-ccf21e8e5c50",
+          "canonicalIntentHash": "f689d4f6e11a0a30b0da3a9aef2cd1cea6cd6d6074a38ba6b18a63c92608f1fb",
+          "proposalRevision": 1
+        }
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchConflictingClaim-T17-claim-conflictingquantity-claim.json",
+        "sha256": "2bef103f156eb3b3f6936cc40001ed42b1cf7db0e874b2b83d227c8d3b5aaef0",
+        "httpStatus": 200,
+        "response": {
+          "outcome": "APPLIED",
+          "revision": 1,
+          "effects": {
+            "contributedQuantity": "0",
+            "observationId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+            "physicalQuantity": "0"
+          },
+          "commandId": "f90a2c2c-cae5-4b0a-8583-1f558b749b33",
+          "canonicalIntentHash": "b7f83cac8705a452a260b0f97583c201cd004352557cb20ee823cb2e244805e2",
+          "proposalRevision": 1
+        }
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchFalseClaim-T17-claim-falseclaim-claim.json",
+        "sha256": "bf902d02322df630eb158e2e6d22b5bf2a5e4d0c2ea74f924344277e18db79f7",
+        "httpStatus": 200,
+        "response": {
+          "outcome": "APPLIED",
+          "revision": 1,
+          "effects": {
+            "contributedQuantity": "0",
+            "observationId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+            "physicalQuantity": "0"
+          },
+          "commandId": "b6c8e8e8-c9be-4d6d-9f12-8b7693417fd6",
+          "canonicalIntentHash": "f90e7ca3c5c9073d1a36be25f4ec6738febc2927fe8774dd1aef0cc2d1c1f51c",
+          "proposalRevision": 1
+        }
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchOverflowClaim-T17-claim-scopeoverflow-claim.json",
+        "sha256": "fb67704f3ea74b7fb7269d84e4c2590a71332949738b9242b9b247528be58197",
+        "httpStatus": 200,
+        "response": {
+          "outcome": "APPLIED",
+          "revision": 1,
+          "effects": {
+            "contributedQuantity": "0",
+            "observationId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+            "physicalQuantity": "0"
+          },
+          "commandId": "ec05e614-3e5c-4f8d-9982-6d1e1816b8b5",
+          "canonicalIntentHash": "b78e4e281155d0537befca28fd55e01af2cf9b2b3b20f8ada3c721350df40a92",
+          "proposalRevision": 1
+        }
+      },
+      {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-88fb0de3/.local/t17-source-pg-3e56d7d0-5861-438a-b6fe-96794617b7cb/explicitDispatchUnidentifiedClaim-T17-claim-unidentifiedscope-claim.json",
+        "sha256": "ee6c1b1e59e0600ec425eac6d8070699cb30947b933a3302d9e1f9c92a74d58f",
+        "httpStatus": 200,
+        "response": {
+          "outcome": "APPLIED",
+          "revision": 1,
+          "effects": {
+            "contributedQuantity": "0",
+            "observationId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+            "physicalQuantity": "0"
+          },
+          "commandId": "786354ff-23d5-469b-bdf9-a9b1f1c01b5d",
+          "canonicalIntentHash": "473ae653615381fbdb80a60b81adf0d323d926da60e8c6efd74f1302484a0d62",
+          "proposalRevision": 1
+        }
+      }
+    ]
+  },
+  "runtimeInputSnapshot": {
+    "base": "6197f791a15fa41dd36483731b1386597a531677",
+    "files": {
+      "backend/db/sales.cds": "cfbbb6c830dafd9596323ddee4bd1094647d7258164fa2b21feb45e89d970ea9",
+      "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java": "a772afa89bb1a7becceb5a659ba27963479b48ce0095af4af56c0e78b5c4d531",
+      "backend/src/main/java/com/mulino/application/trade/sales/DeliveryEvidenceScope.java": "b66b580133eb4930f4b6ff181be71ce783d50a43277082c5c8553c00afb5307d",
+      "backend/src/main/java/com/mulino/application/trade/sales/DeliveryObservationClaim.java": "857c334dd40bcfd0e23b133264c1f9b4f980f0af9b6c3689dd17eeb19d38d0a3",
+      "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java": "46d1e4a1dd6079b84ae1f28a29ea498e7c66ee4f25bf381dc3fd92d523638bd0",
+      "backend/src/test/java/com/mulino/application/trade/sales/DeliveryClaimMigrationPostgresTest.java": "d0c4aeb0b4aac0cb08472d231625244e62a0af11841da91ae04becb20ab6fdb5",
+      "backend/src/test/java/com/mulino/quality/FulfillmentPostgresTest.java": "87a0cd2264c43c4c6b4eeb0e4834d029408fc87339c46a97399720be4aba6fac",
+      "database/migrations/V10__responsibility.sql": "c26e0c6876669b4dbb8160ba57d8f72d0c5f7302844f5123be26d9f8cf44e514",
+      "database/migrations/V11__evaluation.sql": "0f0ebfc33f2e2f347ab609054372abcf77b6582c1a50bb7c256415cea0fbfe07",
+      "database/migrations/V12__control.sql": "9a2fd69d99cb691cfa04b6781efa97d9033009ec35328cb409cb31e6a597456d",
+      "database/migrations/V13__runtime.sql": "5515bc6065c649e6bebe8973600efd15d3749dfdf10b12b6b07e35c11d89ada8",
+      "database/migrations/V14__inventory_commands.sql": "4330a3dc79ffe8670d3cd04baed203d86b6451423a6177c2e8f772deb7195176",
+      "database/migrations/V15__evidence_commands.sql": "764d40de502ec1fff71ad9c5f70d834a578d37724877490887d8ea38c194e245",
+      "database/migrations/V16__purchase_lifecycle.sql": "dfdf13ce3de97d90b569963fc2e578bbc5b7d7486170c8ae1ec79b8a684601ea",
+      "database/migrations/V17__shipment.sql": "8cccbd8fdcfa1f7025c378a044b76678af19541e701550fb848afbce66355f5b",
+      "database/migrations/V18__regulatory_procedures.sql": "e45c867ee7eaff49831871f4b4f7fe7745f9c35cf96eab1401b09812f584ea47",
+      "database/migrations/V19__physical_receipt.sql": "784822c31aca1054457afc789d183dbaa382c3aa32989342cdb1575ab9c596e6",
+      "database/migrations/V1__platform.sql": "df0a6a0060910b286a3656fff132a2fd4c74ece44fc5c5afb5dba557a966f646",
+      "database/migrations/V20__quality_eligibility.sql": "9883851e999c31cab9a09566bd4e5521908938670d868538f2f2df9ccdd7f895",
+      "database/migrations/V21__typed_trade_evidence.sql": "80183d1bea59d92c34f39e36310b11d7e9cbc90b73e737b8fa241539b95d3ff5",
+      "database/migrations/V22__receipt_residual_remedy.sql": "b57a7f646dab3794bcfb9c9b7575339ec39da3f1d613a9b75c3f7ed9d7ea9b4f",
+      "database/migrations/V23__sales_and_delivery.sql": "313dc33fba025a6af9571cbed635a956bf4eba0e18c21e84240e96603acbd2b9",
+      "database/migrations/V24__fulfillment_ranges.sql": "73d560678f985003c0dd8cd70d570ec5091a1ca67be24e85536006562f234452",
+      "database/migrations/V25__returns.sql": "2d730b0ebdf19321ce9e1446a9d4d68b5bc7a120d1a2f5831cecb837e55ddb83",
+      "database/migrations/V26__recall_investigation.sql": "1592be0114dd24c0c0ae247bd717645a2ee561df6836116e4fba02e85cd51b88",
+      "database/migrations/V27__settlement.sql": "490d274e806bd32b28f8d971153e12b01091eb64c2decf06267a639a5bcc85e0",
+      "database/migrations/V28__s4_cross_domain_links.sql": "e4d1994b1d0ffb891a2d47de846fb9a1ad9d91a73d5a001cbe21b85d07f2908c",
+      "database/migrations/V29__settlement_scope_difference.sql": "6767fbeae1159b1a3d0eee2792389ed7982d475a2693ebcd7f53150b9d1a2524",
+      "database/migrations/V2__preserved_upgrade.sql": "4d667eb07f88990b0df776005725f8ec5bb51eb8ab5bea01d652282e5d125668",
+      "database/migrations/V30__delivery_legitimate_ranges.sql": "40d083f4aecf2337f9f3dfd544300ce9e9adc2aa5f22612705757532708d6d48",
+      "database/migrations/V31__recall_investigation_facts.sql": "ddb13a89d71572d4f334fb719320c49eaf278ac5670c66740c2918eb06bcdaf4",
+      "database/migrations/V32__settlement_recognized_contribution.sql": "194ce9d1287fea4e24379efc2348a6ddd0469bbc72e3b40e17b3d07a5cea3278",
+      "database/migrations/V33__sales_order_delivery_work.sql": "39064eb2a60e3754934df15832416a362db7c4890c1b6d40f956914663834e5b",
+      "database/migrations/V34__work_initial_duty.sql": "3741c3c7f05bd62683b6afadc8937615fc0fd9fb00ef4d258717bf16593113fb",
+      "database/migrations/V35__definition_lifecycle.sql": "3df34a588c23a23d17f34a572817b9d4905433f4ee38f96cf1d9b10b6e4f242c",
+      "database/migrations/V36__work_definition_migration_guard.sql": "dafb8f62eb7ffdb484bbcfb70630052df73bff82ecadcdcc87a63632cfd2749b",
+      "database/migrations/V37__work_customer_read_relations.sql": "4bdd4dd5ced2be70a909834c42a246c23fe4259a978e57091ffb4d698058e7b1",
+      "database/migrations/V38__purchase_approval_consumption_policy.sql": "266dc9380a65506c45a1a04858695593090d7d48153c55a33370912a8671b54a",
+      "database/migrations/V39__recovery_observation_history.sql": "a427e5efcfdde01576aee3e45306685391002b66e5c9ee006f0ae985bb6630ca",
+      "database/migrations/V3__identity.sql": "d45474a28db0a4f351f5f0063dc4b19e0fac33df82e2b3c9551fc0cbaa8eb2ec",
+      "database/migrations/V40__delivery_claim_identity.sql": "6086dbea66d08ee6bbddbb2302e12d55bb93fd4ff31665eb625e349fffda53f5",
+      "database/migrations/V4__definitions.sql": "0a5060bdef54a8d3f021d38810dc587cf72c9a8b71a89b901ab30808658639fa",
+      "database/migrations/V5__inventory.sql": "b903d96e19df575ccaae9e088d6ff700e5ca1e95369f1cd9da8da562827f8586",
+      "database/migrations/V6__evidence.sql": "71458b9e3f5955f55d284796102dbfc561cb6e77b8482f957693206518a96d1e",
+      "database/migrations/V7__core_read_links.sql": "b9e8ba09901f47ca8deefcb8b8520cf4c69cc0e6db183a0819a62154ef55723e",
+      "database/migrations/V8__commands.sql": "c2279a942c872a914887ff34e45f03aef894ba1197e63d5607d7e0d1340e4bb1",
+      "database/migrations/V9__work.sql": "7995562dbfa5987f088f2981b71554e27924648785b8e81db17ddbcf338e1ae9",
+      "docs/execution/s4-integration/schema-compatibility.json": "71900682445a53279e8f0267e76892d2fd3ff21cb700860989216d2912dda86f",
+      "verification/cases/T17/GOAL_COMPLETION_INPUTS.md": "625de43e68f42468e6491890026a4530d4ac2791c1d8127899adda0fab38b59c",
+      "verification/cases/T17/PRODUCT_CLAIM_INPUTS.md": "7a56b8611a8bc83d11d2ae201bc26ea95c62df9e735657f1c010dfc47e0c055c",
+      "verification/cases/T17/case.json": "df9cb3dda9799b77f3adfbf3c6aa484cf6ede7f8f8671a0d09135320752b2a82",
+      "verification/cases/T17/fixtures/claim-conflictingquantity.json": "956bb372df35009e90d21886cc55bb3a1d8786867d6861dab736085ed7942ae4",
+      "verification/cases/T17/fixtures/claim-falseclaim.json": "744000923c5f9abad7fd565108d796d06e2713811e12a04d5f0c3b46e4257f90",
+      "verification/cases/T17/fixtures/claim-nopriordispatch.json": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d",
+      "verification/cases/T17/fixtures/claim-scopeoverflow.json": "37e0200369c494bc352ceaecfebe81e4096ecb7254ed4fc93b5bd63e916b7dd4",
+      "verification/cases/T17/fixtures/claim-unidentifiedscope.json": "379a9df110e17144ee8825c1ad68e9920557174f8c008794ca39277dd89726ad",
+      "verification/cases/T17/fixtures/eligibility-conflict.json": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+      "verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+      "verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+      "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+      "verification/cases/T17/fixtures/eligibility-unknown.json": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+      "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "20513a43eabf5c1ec8cb95f9a3ae2b33b98f3977140b7f13f8cfe856abb1675c",
+      "verification/cases/T17/fixtures/normal-consumed-delivery.json": "9b7eaab4775ea67180a86550ac40016bcadb252377fccf83c1cfb48d90a0cff1",
+      "verification/cases/T17/fixtures/post-dispatch-expiry.json": "8726f2e1f986f4ba431522292e420c0d51130686407da4268261dd4f5cc98944",
+      "verification/cases/T17/fixtures/replacement-no-revival.json": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+      "verification/cases/T17/fixtures/reserve-pick-dispatch.json": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52",
+      "verification/cases/T17/run_source_pg_test.py": "b415b93321b1baa2c22b8a5069b553291b0cf6fadf44eb3253c34baf3a32c99c",
+      "verification/cases/T17/scenario.feature": "69dd1b90d8b6ff998dfbe85999a5ec176d45507a6a5db65a104d82693e607e7a",
+      "verification/harness/src/main/java/org/mulino/verification/actual/T17SourceFacts.java": "c92749ec9acfd5eba657ed5958e6cece273c07f64b06b9160cf9a8ae35def91c",
+      "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java": "9965161c2af3760dee9b35c3a562d69024f03f10f2eff8e9de4f07ebe1930d48"
+    }
+  },
+  "runtimeInputDrift": [],
+  "preservation": {
+    "baseline": "6197f791a15fa41dd36483731b1386597a531677",
+    "unchanged": {
+      "verification/cases/T17/case.json": "df9cb3dda9799b77f3adfbf3c6aa484cf6ede7f8f8671a0d09135320752b2a82",
+      "verification/cases/T17/scenario.feature": "69dd1b90d8b6ff998dfbe85999a5ec176d45507a6a5db65a104d82693e607e7a",
+      "verification/cases/T17/run_source_pg_test.py": "b415b93321b1baa2c22b8a5069b553291b0cf6fadf44eb3253c34baf3a32c99c",
+      "verification/cases/T17/fixtures/claim-conflictingquantity.json": "956bb372df35009e90d21886cc55bb3a1d8786867d6861dab736085ed7942ae4",
+      "verification/cases/T17/fixtures/normal-consumed-delivery.json": "9b7eaab4775ea67180a86550ac40016bcadb252377fccf83c1cfb48d90a0cff1",
+      "verification/cases/T17/fixtures/eligibility-conflict.json": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+      "verification/cases/T17/fixtures/eligibility-unknown.json": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+      "verification/cases/T17/fixtures/claim-scopeoverflow.json": "37e0200369c494bc352ceaecfebe81e4096ecb7254ed4fc93b5bd63e916b7dd4",
+      "verification/cases/T17/fixtures/replacement-no-revival.json": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+      "verification/cases/T17/fixtures/claim-nopriordispatch.json": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d",
+      "verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+      "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "20513a43eabf5c1ec8cb95f9a3ae2b33b98f3977140b7f13f8cfe856abb1675c",
+      "verification/cases/T17/fixtures/post-dispatch-expiry.json": "8726f2e1f986f4ba431522292e420c0d51130686407da4268261dd4f5cc98944",
+      "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+      "verification/cases/T17/fixtures/claim-unidentifiedscope.json": "379a9df110e17144ee8825c1ad68e9920557174f8c008794ca39277dd89726ad",
+      "verification/cases/T17/fixtures/claim-falseclaim.json": "744000923c5f9abad7fd565108d796d06e2713811e12a04d5f0c3b46e4257f90",
+      "verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+      "verification/cases/T17/fixtures/reserve-pick-dispatch.json": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52",
+      "verification/cases/T17/completion-input-delta.json": "bc83efd47acc2ec3ff4e537edc61c66804db6f3e9f6582758d8fc7eee9bf4f5f",
+      "verification/cases/T17/delivery-goal-input-delta.json": "1c9988a16e33a117ddabd30084d54fe276b0c6baafc09b231c840bb3633577d6",
+      "verification/cases/T17/first-failure-input-delta.json": "d3c39b4b52aed6df92ed1dcfa927ad3fc751c9e7bd3af3512ad4e02d74869ef5",
+      "verification/cases/T17/delivery-input-delta.json": "90e9fd616372e502123605b5147fcc5fcd2457e7ec65b7fba505ddca411c338a",
+      "verification/cases/T17/public-contract-delta.json": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76",
+      "database/migrations/V37__work_customer_read_relations.sql": "4bdd4dd5ced2be70a909834c42a246c23fe4259a978e57091ffb4d698058e7b1",
+      "database/migrations/V15__evidence_commands.sql": "764d40de502ec1fff71ad9c5f70d834a578d37724877490887d8ea38c194e245",
+      "database/migrations/V30__delivery_legitimate_ranges.sql": "40d083f4aecf2337f9f3dfd544300ce9e9adc2aa5f22612705757532708d6d48",
+      "database/migrations/V22__receipt_residual_remedy.sql": "b57a7f646dab3794bcfb9c9b7575339ec39da3f1d613a9b75c3f7ed9d7ea9b4f",
+      "database/migrations/V16__purchase_lifecycle.sql": "dfdf13ce3de97d90b569963fc2e578bbc5b7d7486170c8ae1ec79b8a684601ea",
+      "database/migrations/V28__s4_cross_domain_links.sql": "e4d1994b1d0ffb891a2d47de846fb9a1ad9d91a73d5a001cbe21b85d07f2908c",
+      "database/migrations/V27__settlement.sql": "490d274e806bd32b28f8d971153e12b01091eb64c2decf06267a639a5bcc85e0",
+      "database/migrations/V23__sales_and_delivery.sql": "313dc33fba025a6af9571cbed635a956bf4eba0e18c21e84240e96603acbd2b9",
+      "database/migrations/V31__recall_investigation_facts.sql": "ddb13a89d71572d4f334fb719320c49eaf278ac5670c66740c2918eb06bcdaf4",
+      "database/migrations/V6__evidence.sql": "71458b9e3f5955f55d284796102dbfc561cb6e77b8482f957693206518a96d1e",
+      "database/migrations/V39__recovery_observation_history.sql": "a427e5efcfdde01576aee3e45306685391002b66e5c9ee006f0ae985bb6630ca",
+      "database/migrations/V8__commands.sql": "c2279a942c872a914887ff34e45f03aef894ba1197e63d5607d7e0d1340e4bb1",
+      "database/migrations/V4__definitions.sql": "0a5060bdef54a8d3f021d38810dc587cf72c9a8b71a89b901ab30808658639fa",
+      "database/migrations/V32__settlement_recognized_contribution.sql": "194ce9d1287fea4e24379efc2348a6ddd0469bbc72e3b40e17b3d07a5cea3278",
+      "database/migrations/V35__definition_lifecycle.sql": "3df34a588c23a23d17f34a572817b9d4905433f4ee38f96cf1d9b10b6e4f242c",
+      "database/migrations/V33__sales_order_delivery_work.sql": "39064eb2a60e3754934df15832416a362db7c4890c1b6d40f956914663834e5b",
+      "database/migrations/V13__runtime.sql": "5515bc6065c649e6bebe8973600efd15d3749dfdf10b12b6b07e35c11d89ada8",
+      "database/migrations/V5__inventory.sql": "b903d96e19df575ccaae9e088d6ff700e5ca1e95369f1cd9da8da562827f8586",
+      "database/migrations/V19__physical_receipt.sql": "784822c31aca1054457afc789d183dbaa382c3aa32989342cdb1575ab9c596e6",
+      "database/migrations/V14__inventory_commands.sql": "4330a3dc79ffe8670d3cd04baed203d86b6451423a6177c2e8f772deb7195176",
+      "database/migrations/V9__work.sql": "7995562dbfa5987f088f2981b71554e27924648785b8e81db17ddbcf338e1ae9",
+      "database/migrations/V25__returns.sql": "2d730b0ebdf19321ce9e1446a9d4d68b5bc7a120d1a2f5831cecb837e55ddb83",
+      "database/migrations/V18__regulatory_procedures.sql": "e45c867ee7eaff49831871f4b4f7fe7745f9c35cf96eab1401b09812f584ea47",
+      "database/migrations/V7__core_read_links.sql": "b9e8ba09901f47ca8deefcb8b8520cf4c69cc0e6db183a0819a62154ef55723e",
+      "database/migrations/V17__shipment.sql": "8cccbd8fdcfa1f7025c378a044b76678af19541e701550fb848afbce66355f5b",
+      "database/migrations/V2__preserved_upgrade.sql": "4d667eb07f88990b0df776005725f8ec5bb51eb8ab5bea01d652282e5d125668",
+      "database/migrations/V24__fulfillment_ranges.sql": "73d560678f985003c0dd8cd70d570ec5091a1ca67be24e85536006562f234452",
+      "database/migrations/V20__quality_eligibility.sql": "9883851e999c31cab9a09566bd4e5521908938670d868538f2f2df9ccdd7f895",
+      "database/migrations/V34__work_initial_duty.sql": "3741c3c7f05bd62683b6afadc8937615fc0fd9fb00ef4d258717bf16593113fb",
+      "database/migrations/V36__work_definition_migration_guard.sql": "dafb8f62eb7ffdb484bbcfb70630052df73bff82ecadcdcc87a63632cfd2749b",
+      "database/migrations/V3__identity.sql": "d45474a28db0a4f351f5f0063dc4b19e0fac33df82e2b3c9551fc0cbaa8eb2ec",
+      "database/migrations/V1__platform.sql": "df0a6a0060910b286a3656fff132a2fd4c74ece44fc5c5afb5dba557a966f646",
+      "database/migrations/V11__evaluation.sql": "0f0ebfc33f2e2f347ab609054372abcf77b6582c1a50bb7c256415cea0fbfe07",
+      "database/migrations/V21__typed_trade_evidence.sql": "80183d1bea59d92c34f39e36310b11d7e9cbc90b73e737b8fa241539b95d3ff5",
+      "database/migrations/V26__recall_investigation.sql": "1592be0114dd24c0c0ae247bd717645a2ee561df6836116e4fba02e85cd51b88",
+      "database/migrations/V12__control.sql": "9a2fd69d99cb691cfa04b6781efa97d9033009ec35328cb409cb31e6a597456d",
+      "database/migrations/V10__responsibility.sql": "c26e0c6876669b4dbb8160ba57d8f72d0c5f7302844f5123be26d9f8cf44e514",
+      "database/migrations/V38__purchase_approval_consumption_policy.sql": "266dc9380a65506c45a1a04858695593090d7d48153c55a33370912a8671b54a",
+      "database/migrations/V29__settlement_scope_difference.sql": "6767fbeae1159b1a3d0eee2792389ed7982d475a2693ebcd7f53150b9d1a2524"
+    },
+    "assertionCount": 257,
+    "schemaColumnDelta": 2,
+    "oldFkMigrationsUnchanged": true
+  },
+  "changedFiles": [
+    "backend/db/sales.cds",
+    "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java",
+    "backend/src/main/java/com/mulino/application/trade/sales/DeliveryEvidenceScope.java",
+    "backend/src/main/java/com/mulino/application/trade/sales/DeliveryObservationClaim.java",
+    "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java",
+    "backend/src/test/java/com/mulino/application/trade/sales/DeliveryClaimMigrationPostgresTest.java",
+    "backend/src/test/java/com/mulino/quality/FulfillmentPostgresTest.java",
+    "database/migrations/V40__delivery_claim_identity.sql",
+    "docs/execution/s4-integration/schema-compatibility.json",
+    "verification/cases/T17/GOAL_COMPLETION_INPUTS.md",
+    "verification/cases/T17/PRODUCT_CLAIM_INPUTS.md",
+    "verification/cases/T17/evidence/product-claim-repair-summary.json",
+    "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java"
+  ],
+  "changedFileHashes": {
+    "backend/db/sales.cds": "cfbbb6c830dafd9596323ddee4bd1094647d7258164fa2b21feb45e89d970ea9",
+    "backend/src/main/java/com/mulino/application/trade/sales/DeliveryCommands.java": "a772afa89bb1a7becceb5a659ba27963479b48ce0095af4af56c0e78b5c4d531",
+    "backend/src/main/java/com/mulino/application/trade/sales/DeliveryEvidenceScope.java": "b66b580133eb4930f4b6ff181be71ce783d50a43277082c5c8553c00afb5307d",
+    "backend/src/main/java/com/mulino/application/trade/sales/DeliveryObservationClaim.java": "857c334dd40bcfd0e23b133264c1f9b4f980f0af9b6c3689dd17eeb19d38d0a3",
+    "backend/src/main/java/com/mulino/application/trade/sales/SalesQueries.java": "46d1e4a1dd6079b84ae1f28a29ea498e7c66ee4f25bf381dc3fd92d523638bd0",
+    "backend/src/test/java/com/mulino/application/trade/sales/DeliveryClaimMigrationPostgresTest.java": "d0c4aeb0b4aac0cb08472d231625244e62a0af11841da91ae04becb20ab6fdb5",
+    "backend/src/test/java/com/mulino/quality/FulfillmentPostgresTest.java": "87a0cd2264c43c4c6b4eeb0e4834d029408fc87339c46a97399720be4aba6fac",
+    "database/migrations/V40__delivery_claim_identity.sql": "6086dbea66d08ee6bbddbb2302e12d55bb93fd4ff31665eb625e349fffda53f5",
+    "docs/execution/s4-integration/schema-compatibility.json": "71900682445a53279e8f0267e76892d2fd3ff21cb700860989216d2912dda86f",
+    "verification/cases/T17/GOAL_COMPLETION_INPUTS.md": "625de43e68f42468e6491890026a4530d4ac2791c1d8127899adda0fab38b59c",
+    "verification/cases/T17/PRODUCT_CLAIM_INPUTS.md": "f4eb0b90186c551acd38529ce7fdfd221848516f1ac996afbe4579700acb029f",
+    "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java": "9965161c2af3760dee9b35c3a562d69024f03f10f2eff8e9de4f07ebe1930d48"
+  },
+  "cleanup": {
+    "sourcePgContainerAbsent": true,
+    "sourcePgContainer": "c82d167ff4923ed95fd679ec8a1efe4228125a1379fd1abaf733e37f922c63a2",
+    "sourcePgKeysAbsent": true,
+    "backendTestKeysAbsent": true,
+    "jarHashMatchesRuntime": true,
+    "javaVersion": "openjdk version \"21.0.12.1\" 2026-08-18\nOpenJDK Runtime Environment Homebrew (build 21.0.12.1)\nOpenJDK 64-Bit Server VM Homebrew (build 21.0.12.1, mixed mode, sharing)\n"
+  },
+  "remainingIntegrationNotes": [
+    {
+      "file": "backend/src/test/java/com/mulino/runtime/RecoveryHistoryMigrationPostgresTest.java:22",
+      "status": "NOT_RUN / static compatibility finding",
+      "detail": "Root-owned V39 test migrates target 38 to latest and expects 1. Pin second Flyway target to 39 before aggregate V40 suite; do not modify original V39 migration."
+    },
+    "Whole 257 business oracle, current query/observer gaps and combined integration remain root-owned."
+  ],
+  "earlierAttempts": [
+    {
+      "log": "backend-focused-1.log",
+      "result": "test compilation ambiguity, corrected"
+    },
+    {
+      "log": "backend-focused-2.log",
+      "result": "7 PASS,1 FAIL,2 ERROR; pre-update schema count and incomplete test fixture inputs"
+    },
+    {
+      "log": "backend-focused-3.log",
+      "result": "9 PASS,2 ERROR; missing LOT in two fixture setups"
+    },
+    {
+      "log": "backend-focused-4.log",
+      "result": "0 PASS,2 ERROR; incomplete legacy Event and test treated UNVERIFIED review as error response"
+    },
+    {
+      "log": "backend-focused-5.log",
+      "result": "2 PASS,0 FAIL; latest result for both prior failures"
+    }
+  ],
+  "preservedOriginalFailure": {
+    "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-20d8c824/.local/source-observer-policy-wave-20261023/results/T17/scenarios.json",
+    "sha256": "afbdf241bb301d88cb064d200bace759ab8d6d1ac80c198760efa23e570515b3",
+    "status": "15 FAIL subcases / 58 PASS assertions before these repairs; no actual rerun claimed"
+  }
+}

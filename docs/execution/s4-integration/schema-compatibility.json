@@ -3,7 +3,7 @@
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V39 PostgreSQL comparison: exact 1953 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V40 PostgreSQL comparison: exact 1955 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -1034,7 +1034,6 @@
     "mulino_trade_sales_observations.occurredat",
     "mulino_trade_sales_observations.placeid",
     "mulino_trade_sales_observations.quantity",
-    "mulino_trade_sales_observations.rangerootid",
     "mulino_trade_sales_observations.recordedat",
     "mulino_trade_sales_observations.revision",
     "mulino_trade_sales_observations.startquantity",
@@ -1149,10 +1148,10 @@
     "mulino_trade_shipment_shipments.revision",
     "mulino_trade_shipment_shipments.state"
   ],
-  "baseline": "af7cd03c5979aab4760c7052063c9ebb4f8d2ccb",
-  "observedColumnCount": 1953,
-  "observedArtifactSha256": "dbed9a723234801d615cd23ff660d3e0133f0ae28517bca50864f2d954717ff7",
-  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled",
+  "baseline": "6197f791a15fa41dd36483731b1386597a531677",
+  "observedColumnCount": 1955,
+  "observedArtifactSha256": "5705b287b0547e7dc9343fd296e4ce51877e460fcb48eb5a637258d4d98ae665",
+  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled; V40 adds nullable original claim capture and makes the existing verified observation root nullable before confirmation; V28 foreign keys and confirmed delivery integrity remain unchanged",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5937,6 +5936,16 @@
       "migration": "database/migrations/V39__recovery_observation_history.sql",
       "cds": "backend/db/runtime.cds",
       "reason": "복구 원본의 실제 변경·조직/item/Work/LOT 범위·시계·순서·삭제 이력을 같은 transaction의 불변 snapshot으로 보존한다."
+    },
+    "mulino_trade_sales_observations.claimedrangerootid": {
+      "migration": "database/migrations/V40__delivery_claim_identity.sql",
+      "cds": "backend/db/sales.cds",
+      "nullableReason": "원문이 주장한 UUID는 존재·조직·품목 조회 없이 그대로 보관한다. 검증된 rangeRootId와 구별하며 legacy 원문을 소급 생성하지 않는다."
+    },
+    "mulino_trade_sales_observations.claimpayloadjson": {
+      "migration": "database/migrations/V40__delivery_claim_identity.sql",
+      "cds": "backend/db/sales.cds",
+      "nullableReason": "공개 관측 입력의 모든 slot을 JSON으로 보존한다. legacy 행의 원래 입력은 확인할 수 없어 NULL로 남기며 원천 document/event는 수정하지 않는다."
     }
   },
   "exactColumnInventory": [
@@ -7498,6 +7507,8 @@
     "mulino_trade_sales_executioneffects.revision",
     "mulino_trade_sales_executioneffects.unit",
     "mulino_trade_sales_observations.cargoscopeid",
+    "mulino_trade_sales_observations.claimedrangerootid",
+    "mulino_trade_sales_observations.claimpayloadjson",
     "mulino_trade_sales_observations.createdat",
     "mulino_trade_sales_observations.customerid",
     "mulino_trade_sales_observations.dispatchid",
@@ -8360,5 +8371,19 @@
     "recoveryMigrationComparison": "backend/src/test/java/com/mulino/runtime/RecoveryHistoryMigrationPostgresTest.java#upgradePreservesUnknownLegacyRowsAndMatchesCdsColumns",
     "previousBaseline": "5f00e5d84992dd3763eeefd60db9779e624651bc",
     "previousObservedArtifactSha256": "4554d8fedc723049b609148399cb416de5e466f9fe6eb3632928b0161586f72a"
+  },
+  "v40Evidence": {
+    "previousColumnCount": 1953,
+    "columnCount": 1955,
+    "addedColumns": [
+      "mulino_trade_sales_observations.claimedrangerootid",
+      "mulino_trade_sales_observations.claimpayloadjson"
+    ],
+    "nullableVerifiedColumn": "mulino_trade_sales_observations.rangerootid",
+    "migration": "database/migrations/V40__delivery_claim_identity.sql",
+    "schemaComparison": "backend/src/test/java/com/mulino/core/S1ReadIntegrationTest.java#freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening",
+    "upgradeComparison": "backend/src/test/java/com/mulino/application/trade/sales/DeliveryClaimMigrationPostgresTest.java#v39UpgradePreservesLegacyAndVerifiedForeignKeysWithoutInventingOriginalClaims",
+    "previousObservedArtifactSha256": "dbed9a723234801d615cd23ff660d3e0133f0ae28517bca50864f2d954717ff7",
+    "legacyClaimBackfilled": false
   }
 }

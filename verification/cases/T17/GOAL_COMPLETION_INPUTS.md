@@ -1,5 +1,8 @@
 # T17 인도 goal의 공개 완성 입력
 
+아래 결과는 bffbde51 시점이다. 이후 미확인 root 저장 변경은
+[PRODUCT_CLAIM_INPUTS.md](PRODUCT_CLAIM_INPUTS.md)에 별도로 기록한다.
+
 `f2f978b51c0eb9b50d75764ebbb0a0329d6a48ea`의 활성화 준비 앞에
 `reviseGoal`을 추가한다. DRAFT를 자동 활성화하거나 원래 주문 Work를
 바꾸지 않는다. 이전 DELIVERY_INPUTS의 미완성 결과와 모든 실패

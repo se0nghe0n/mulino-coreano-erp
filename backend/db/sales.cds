@@ -65,6 +65,8 @@ entity Observations {
  itemId:UUID;
  lotId:UUID;
  rangeRootId:UUID;
+ claimedRangeRootId:UUID;
+ claimPayloadJson:LargeString;
  startQuantity:Decimal(38,12);
  quantity:Decimal(38,12);
  unit:String(40);

@@ -123,6 +123,59 @@ class FulfillmentPostgresTest {
   // Even a direct primitive call with an unlinked canonical identity rolls back with its ledger effects.
   assertThrows(RuntimeException.class,()->tx(()->physical.observeDelivery(c(),dispatch,id(),BigDecimal.ZERO,new BigDecimal("20"),now,id())));
   assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_trade_sales_Deliveries",Integer.class));assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_DeliveryTransfers",Integer.class));assertEquals(movements,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements",Integer.class));assertEquals(0,new BigDecimal("30").compareTo(transitQuantity()));assertEquals(0,customerQuantity().signum());assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_evidence_CanonicalOccurrences WHERE kind='PHYSICAL_DELIVERY'",Integer.class));assertEquals(3,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_trade_sales_Observations WHERE state='PROVISIONAL'",Integer.class));assertEquals(3,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_work_read_ObligationReferences WHERE kind='DELIVERY_RECONCILIATION' AND ownerId=? AND nextCheckAt IS NOT NULL",Integer.class,actor));}
+
+ // Opaque reported roots never become inventory relations merely because the UUID exists somewhere.
+ @Test void unverifiedDeliveryRootsRetainRawClaimAndCannotPromote()throws Exception {
+  allow("100");allowDispatch();String dispatch=dispatched("0","30"),foreignOrg=id(),foreignRoot=id(),otherItem=id(),otherLot=id(),otherRoot=id();
+  insert("mulino_identity_Organizations",map("ID",foreignOrg,"externalAlias",foreignOrg));
+  tx(()->{for(String table:List.of("Actors","Products","SpecificationVersions","PackagingVersions","TradeItems","Manufacturers","ManufacturingLots","Places")) {
+   String full=(table.equals("Actors")?"mulino_identity_":"mulino_inventory_")+table;
+   jdbc.update("INSERT INTO "+full+" SELECT (jsonb_populate_record(NULL::"+full+",to_jsonb(t)||jsonb_build_object('organizationid',?))).* FROM "+full+" t WHERE organizationId=?",foreignOrg,org);
+  }return null;});
+  String transitRoot=jdbc.queryForObject("SELECT transitSegmentId FROM mulino_inventory_Dispatches WHERE ID=?",String.class,dispatch);
+  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments SELECT (jsonb_populate_record(NULL::mulino_inventory_QuantitySegments,to_jsonb(t)||jsonb_build_object('organizationid',?,'id',?))).* FROM mulino_inventory_QuantitySegments t WHERE organizationId=? AND ID=?",foreignOrg,foreignRoot,org,transitRoot);
+  jdbc.update("INSERT INTO mulino_inventory_TradeItems SELECT (jsonb_populate_record(NULL::mulino_inventory_TradeItems,to_jsonb(t)||jsonb_build_object('id',?))).* FROM mulino_inventory_TradeItems t WHERE organizationId=? AND ID=?",otherItem,org,item);
+  jdbc.update("INSERT INTO mulino_inventory_ManufacturingLots SELECT (jsonb_populate_record(NULL::mulino_inventory_ManufacturingLots,to_jsonb(t)||jsonb_build_object('id',?,'itemid',?))).* FROM mulino_inventory_ManufacturingLots t WHERE organizationId=? AND ID=?",otherLot,otherItem,org,lot);
+  jdbc.update("INSERT INTO mulino_inventory_QuantitySegments SELECT (jsonb_populate_record(NULL::mulino_inventory_QuantitySegments,to_jsonb(t)||jsonb_build_object('id',?,'itemid',?,'lotid',?))).* FROM mulino_inventory_QuantitySegments t WHERE organizationId=? AND ID=?",otherRoot,otherItem,otherLot,org,transitRoot);
+  int movements=count("SELECT count(*) FROM mulino_inventory_QuantityMovements");
+  for(String root:List.of(id(),foreignRoot,otherRoot)) {
+   var report=deliveryReport(dispatch,"0","20",destination);report.put("rangeRootId",root);String ids=intakeDelivery(report);
+   var row=jdbc.queryForMap("SELECT * FROM mulino_trade_sales_Observations WHERE ID=?",report.get("physicalScopeId"));
+   assertEquals(root,row.get("claimedrangerootid"));assertNull(row.get("rangerootid"));assertEquals("PROVISIONAL",row.get("state"));
+   var captured=json.readTree(row.get("claimpayloadjson").toString());assertEquals(root,captured.path("rangeRootId").asText());assertEquals("20",captured.path("quantity").asText());
+   assertEquals("Reconcile carrier delivery report",captured.path("nextAction").asText());assertEquals(now.plusSeconds(60).toString(),captured.path("nextCheckAt").asText());
+   var review=matchDelivery(report,ids);assertEquals("APPLIED",review.get("outcome"),review.toString());assertEquals("UNVERIFIED",review.get("evidenceStatus"));assertNotEquals("APPLIED",apply(envelope("linkCanonicalOccurrence",map("reconciliationId",review.get("id")),1)).get("outcome"));
+   var promote=apply(envelope("recordDelivery",map("observationId",report.get("physicalScopeId"),"canonicalOccurrenceId",id()),1));assertEquals("EVIDENCE_UNVERIFIED",code(promote));
+   var read=runtime.requestContext().run(ctx->{return queries.query(QueryRequests.parse("getObject",map("id",report.get("physicalScopeId"),"scope",map("organizationId",org,"itemId",item,"objectType","DeliveryObservation"),"asOf",now.toString(),"knownAt",now.toString())));});
+   assertEquals(root,((Map<?,?>)read.get("data")).get("claimedRangeRootId"));assertNull(((Map<?,?>)read.get("data")).get("rangeRootId"));
+   String doc=ids.split("\\|")[1];assertEquals(com.mulino.adapters.blob.LocalBlobStore.hash(json.writeValueAsBytes(report)),jdbc.queryForObject("SELECT sha256 FROM mulino_evidence_DocumentVersions WHERE ID=?",String.class,doc));
+  }
+  assertEquals(3,count("SELECT count(*) FROM mulino_trade_sales_Observations WHERE state='PROVISIONAL'"));
+  assertEquals(3,count("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE kind='DELIVERY_RECONCILIATION' AND ownerId=? AND nextCheckAt=?",actor,Timestamp.from(now.plusSeconds(60))));
+  assertEquals(movements,count("SELECT count(*) FROM mulino_inventory_QuantityMovements"));assertEquals(0,count("SELECT count(*) FROM mulino_trade_sales_Deliveries"));assertEquals(0,count("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences WHERE kind='PHYSICAL_DELIVERY'"));
+ }
+ @Test void deliveryClaimMissingInputAndCurrentGrantRemainClosed()throws Exception {
+  allow("100");allowDispatch();String dispatch=dispatched("0","30");var report=deliveryReport(dispatch,"0","20",destination);report.put("rangeRootId",id());intakeDelivery(report);
+  var slots=json.readValue(jdbc.queryForObject("SELECT claimPayloadJson FROM mulino_trade_sales_Observations WHERE ID=?",String.class,report.get("physicalScopeId")),Map.class);
+  for(String field:List.of("rangeRootId","workId","itemId","customerId","placeId")){var missing=new LinkedHashMap<String,Object>(slots);missing.remove(field);missing.put("observationId",id());assertEquals("TYPE_INVALID",code(apply(envelope("recordDelivery",missing,1))));}
+  jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE organizationId=? AND capabilityId='recordDelivery'",Timestamp.from(now),org);
+  slots.put("observationId",id());assertEquals("FORBIDDEN",code(apply(envelope("recordDelivery",slots,1))));assertEquals(1,count("SELECT count(*) FROM mulino_trade_sales_Observations"));assertEquals(0,count("SELECT count(*) FROM mulino_trade_sales_Deliveries"));
+ }
+ @Test void deliveryClaimRollbackAndConcurrentDuplicateAreAtomic()throws Exception {
+  allow("100");allowDispatch();String dispatch=dispatched("0","30");var report=deliveryReport(dispatch,"0","20",destination);report.put("rangeRootId",id());intakeDelivery(report);
+  var slots=json.readValue(jdbc.queryForObject("SELECT claimPayloadJson FROM mulino_trade_sales_Observations WHERE ID=?",String.class,report.get("physicalScopeId")),Map.class);slots.put("observationId",id());var input=envelope("recordDelivery",slots,1);
+  int audits=count("SELECT count(*) FROM mulino_commands_CommandAudits"),outbox=count("SELECT count(*) FROM mulino_runtime_Outbox"),duties=count("SELECT count(*) FROM mulino_work_read_ObligationReferences");
+  doThrow(new IllegalStateException("Synthetic post-intake rollback")).when(impact).recorded(any(),anyString(),anyString(),eq("DELIVERY_RECONCILIATION"),anyString(),anyString(),any());
+  assertThrows(IllegalStateException.class,()->apply(input));reset(impact);
+  assertEquals(1,count("SELECT count(*) FROM mulino_trade_sales_Observations"));assertEquals(duties,count("SELECT count(*) FROM mulino_work_read_ObligationReferences"));assertEquals(audits,count("SELECT count(*) FROM mulino_commands_CommandAudits"));assertEquals(outbox,count("SELECT count(*) FROM mulino_runtime_Outbox"));assertEquals(0,count("SELECT count(*) FROM mulino_commands_CommandRecords WHERE commandIdempotencyKey=?",input.get("commandIdempotencyKey")));
+  var ready=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);var pid=new java.util.concurrent.atomic.AtomicInteger();var security=SecurityContextHolder.getContext().getAuthentication();var pool=java.util.concurrent.Executors.newFixedThreadPool(2);
+  try {
+   var first=pool.submit(()->{SecurityContextHolder.getContext().setAuthentication(security);return tx(()->{var result=apply(input);pid.set(jdbc.queryForObject("SELECT pg_backend_pid()",Integer.class));ready.countDown();await(release);return result;});});
+   assertTrue(ready.await(10,java.util.concurrent.TimeUnit.SECONDS));var second=pool.submit(()->{SecurityContextHolder.getContext().setAuthentication(security);return apply(input);});
+   long limit=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(10);boolean blocked=false;while(System.nanoTime()<limit){blocked=jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event_type='Lock' AND ?=ANY(pg_blocking_pids(pid)))",Boolean.class,pid.get());if(blocked)break;Thread.onSpinWait();}assertTrue(blocked,"Duplicate must wait on first real transaction");release.countDown();assertEquals(first.get(20,java.util.concurrent.TimeUnit.SECONDS),second.get(20,java.util.concurrent.TimeUnit.SECONDS));
+  }finally{release.countDown();pool.shutdownNow();}
+  assertEquals(2,count("SELECT count(*) FROM mulino_trade_sales_Observations"));assertEquals(duties+1,count("SELECT count(*) FROM mulino_work_read_ObligationReferences"));assertEquals(0,count("SELECT count(*) FROM mulino_trade_sales_Deliveries"));
+ }
  // Two real transactions hold the common physical fence before the second command starts.
  // The barrier fixes the serial order; it does not rely on timing or thread sleeps.
  Map<String,Object> race(Map<String,Object> first,Map<String,Object> second)throws Exception{
@@ -453,8 +506,8 @@ class FulfillmentPostgresTest {
   now=t0.plusSeconds(30);run("recordDelivery",map("observationId",content.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1);
   var deliveries=read("getDeliveries",null,map("organizationId",org,"itemId",item),t0.plusSeconds(15),now);assertEquals(1,((List<?>)deliveries.get("data")).size(),deliveries.toString());
   var customerSite=(Map<?,?>)read("getInventory",null,map("organizationId",org,"itemId",item,"placeId",destination),t0.plusSeconds(15),now).get("data");assertEquals("20",customerSite.get("heldQuantity"));
-  String observation=content.get("physicalScopeId").toString();var before=read("getObject",observation,map("organizationId",org,"objectType","DeliveryObservation"),t0.plusSeconds(25),t0.plusSeconds(25));assertEquals("PROVISIONAL",((Map<?,?>)before.get("data")).get("state"),before.toString());assertTrue(((List<?>)before.get("unknowns")).contains(observation+":DELIVERY_UNCONFIRMED"),before.toString());
-  var after=read("getObject",observation,map("organizationId",org,"objectType","DeliveryObservation"),t0.plusSeconds(25),now);assertEquals("CONFIRMED",((Map<?,?>)after.get("data")).get("state"),after.toString());assertFalse(((List<?>)after.get("unknowns")).contains(observation+":DELIVERY_UNCONFIRMED"));}
+  String observation=content.get("physicalScopeId").toString();var before=read("getObject",observation,map("organizationId",org,"objectType","DeliveryObservation"),t0.plusSeconds(25),t0.plusSeconds(25));assertEquals("PROVISIONAL",((Map<?,?>)before.get("data")).get("state"),before.toString());assertNull(((Map<?,?>)before.get("data")).get("rangeRootId"));assertEquals(content.get("rangeRootId"),((Map<?,?>)before.get("data")).get("claimedRangeRootId"));assertTrue(((List<?>)before.get("unknowns")).contains(observation+":DELIVERY_UNCONFIRMED"),before.toString());
+  var after=read("getObject",observation,map("organizationId",org,"objectType","DeliveryObservation"),t0.plusSeconds(25),now);assertEquals("CONFIRMED",((Map<?,?>)after.get("data")).get("state"),after.toString());assertEquals(content.get("rangeRootId"),((Map<?,?>)after.get("data")).get("rangeRootId"));assertFalse(((List<?>)after.get("unknowns")).contains(observation+":DELIVERY_UNCONFIRMED"));}
 
  // s4-sales-10 (plan §7.1, §6): authority is the intersection over every changed scope, including transit and the replaced segment.
  @Test void dispatchRequiresAuthorityOverTheTransitDestination(){allow("100");allowDispatch();String allocation=reserve("0","20");run("pickQuantity",map("allocationId",allocation),0);scopedHuman("warehouse-only",List.of("dispatchQuantity"),"PLACE",List.of(place));scopedHuman("warehouse-and-transit",List.of("dispatchQuantity"),"PLACE",List.of(place,transit));
