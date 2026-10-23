@@ -89,20 +89,22 @@ volume·DB·Git archive 삭제나 실제 운영 환경 활성화의 허가가 �
 복원·인증 MCP를 검증했다. CAP 기각 조건은 발견하지 않았다. 운영
 buildpack·identity·BTP 지원은 로컬 결과로 확정하지 않는다.
 
-## T09: 공통 원천 snapshot 계약 결정 대기
+## T09: 공통 원천 snapshot 계약
 
 | 항목 | 현재 값 |
 |---|---|
-| status | PENDING |
-| owner | 사용자·coordinator |
+| status | COORDINATOR_DECIDED, 구현·인수 OPEN |
+| owner | coordinator |
 | inputRefs | D09, T09 same-trajectory-three-goals, 구현 계획 §5.1·§13 |
 | proposedValue | 공통 원천 캡처와 목표별 불변 평가를 분리해 보존한다 |
-| confirmedValue | 미확정. 현재 제품은 평가별 InputSnapshots.ID를 저장한다 |
-| requestedAt | 2026-10-23, Asia/Seoul |
-| blockedStep | 현재 Step의 T09 snapshot 동일성2개. 원천 관계3개의 관찰 행 단위도 함께 검토한다 |
+| confirmedValue | 공통 원천 캡처와 목표별 불변 평가 envelope를 분리한다 |
+| decidedAt | 2026-10-23, Asia/Seoul |
+| blockedStep | 사용자 답변 대기는 해소했다. 동일성2개와 원천 관계3개의 구현·결합 인수는 OPEN이다 |
 | evidencePath | t09-immutable-source-contract.md, 별도 tree의 진단 원문 |
 
 같은 원천을 읽은 세 평가에서 실제 snapshot ID와 조건 행 수가 다름을
-확인했다. 사용자에게 공통 원천 캡처와 평가별 snapshot 중 의미를 물었다.
-답변 전 공통 ID나 새 저장 계약을 확정하지 않는다. 원래 assertion은
-보존하며 독립적인 로컬 검증과 다른 실패의 수정은 계속한다.
+확인한 뒤 의미를 질문했다. 이후 사용자가 더 묻지 말고 계속 진행하도록
+지시해 coordinator가 기존 인수 기준을 유지하는 공통 원천 캡처를
+선택했다. 사용자가 세부 저장 설계를 직접 선택한 것으로 기록하지 않는다.
+실제 영속 identity와 불변 원문·범위·시점·인가의 binding을 구현하며
+합성 공통 ID로 맞추지 않는다. 원래 assertion은 보존한다.

@@ -1039,5 +1039,16 @@ assertions를 병렬 실행한다. 실제 결과와 node model metadata는 아�
 
 T09의 세 모드가 같은 원천을 읽어도 평가별 snapshot ID와 조건 행 수가
 다르다. [불변 원천·snapshot 계약](t09-immutable-source-contract.md)의
-선택을 사용자에게 요청했으며 PENDING이다. 원래94 assertions는
-보존한다. Task와 현재 Step은 OPEN이다.
+선택을 질문한 뒤, 더 묻지 말고 계속하라는 사용자 지시를 받았다.
+coordinator는 공통 원천 캡처와 평가별 불변 envelope 분리로 결정하고
+Sol high/Fast에 구현을 맡겼다. 원래94 assertions는 보존한다.
+Task와 현재 Step은 OPEN이다.
+
+bdcc 실행 원본의 T09는6 PASS·3 FAIL, assertions84 PASS·10 FAIL이다.
+T11은3 PASS·8 FAIL·1 NOT_RUN, assertions32 PASS·7 FAIL·71미관찰이다.
+T17은600초 종료와 node의 조기 반환으로 결과를 회수하지 못해 NOT_RUN이다.
+이 결과를36개 전체의 실행 완료로 표시하지 않는다. T17의 Monitor와
+background task는 이미 사라졌으며 원래 부분 로그는 보존했다.
+꺼진 로컬 Docker daemon을 다시 시작했고, 원본 case를 보존하는
+subcase 선택으로 실제 실행을 나누는 runner를 구현했다.
+[분할 실행 계약](bounded-scenario-selection.md)을 따른다.

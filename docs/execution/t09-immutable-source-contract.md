@@ -39,10 +39,10 @@ coordinator가 AssertionEngine도 추가 확인했다. relationSet은 동일 tup
 공통 값을 덮어써도 같은 배열이 되지 않는다. query revision이나 digest를
 실제 persisted identity인 것처럼 노출하지 않는다.
 
-사용자에게 같은 snapshot이 목표별 결과와 분리된 공통 원천 캡처인지,
-현재의 평가별 snapshot인지 선택을 요청했다. 권장안은 기존 인수 기준을
-유지하며 공통 원천 캡처와 목표별 평가를 따로 보존하는 것이다.
-현재 status는 PENDING이며 답변 전 해당 계약을 확정하지 않는다.
+사용자에게 같은 snapshot의 의미를 물은 뒤, 더 묻지 말고 계속하라는
+지시를 받았다. coordinator는 기존 인수 기준을 유지하는 공통 원천
+캡처와 목표별 평가의 분리로 결정했다. 사용자가 세부 저장 설계를
+직접 선택한 것은 아니다. 사용자 답변 대기는 해소했으며 구현·인수는 OPEN이다.
 공유 범위·시점·권한의 경계, 실제 영속 identity와 Assessment binding,
 관찰 행 단위와 기존 T11/T12 소비자의 보존은 결합 설계에서 검증한다.
 
@@ -50,3 +50,4 @@ coordinator가 AssertionEngine도 추가 확인했다. relationSet은 동일 tup
 `/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-8f21ea6b/`
 `.local/t09-immutable-source-gap/diagnosis.md`와 diagnosis.json에 있다.
 이 진단에서 코드 변경·빌드·테스트·actual 재실행은 수행하지 않았다.
+후속 구현은 별도 Sol high/Fast 작업에서 진행하며 결합 검증 뒤 반영한다.

@@ -17,7 +17,7 @@ def finish(code):
     (OUT/'wrapper-commands.json').write_text(json.dumps({'entrypoint':['./verify']+sys.argv[1:],'timestamp':time.strftime('%Y-%m-%dT%H:%M:%SZ',time.gmtime()),'commands':records,'exitCode':code},indent=2)+'\n')
     sys.exit(code)
 if len(sys.argv)<2:
-    print('Usage: ./verify harness|contract-red|validate <case.json...>|prepare|coverage|schema|contracts|scenarios|recovery|mcp|skills | model --manifest <path> | deployment --manifest <path> | regulatory (NOT_RUN gate)',file=sys.stderr)
+    print('Usage: ./verify harness|contract-red|validate <case.json...>|prepare|coverage|schema|contracts|scenarios [--actual] [--subcase CASE/subcase] [case.json...]|recovery|mcp|skills | model --manifest <path> | deployment --manifest <path> | regulatory (NOT_RUN gate)',file=sys.stderr)
     finish(3)
 mode=sys.argv[1]; extras=sys.argv[2:]
 actual='--actual' in extras
@@ -92,7 +92,7 @@ if mode in {'actual-s1','actual-s2','actual-s3','actual-s4'}:
     finish(command(['sh',ROOT/('verification/actual/'+mode.removeprefix('actual-')+'/run.sh')]+extras))
 if mode=='scenarios' and actual:
     # The actual scenarios suite runs a freshly packaged backend against a disposable PostgreSQL container.
-    # run.sh owns those resources; explicit case.json paths select a subset (never a closed gate).
+    # run.sh owns those resources; explicit case/subcase selections never close the whole-profile gate.
     if command([ROOT/'mvnw','-B','-ntp','-q','-f',ROOT/'backend/pom.xml','-DskipTests','package']): finish(3)
     finish(command(['sh',ROOT/'verification/actual/scenarios/run.sh','--']+extras))
 args=['red']+extras if mode=='contract-red' else [mode]+extras if mode in {'validate','prepare'} else ['profile',mode]+extras

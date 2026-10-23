@@ -22,20 +22,28 @@ public final class Main {
         String mode=args[0],profile=mode.equals("profile") ? args[1] : mode;
         int start=mode.equals("profile") ? 2 : 1;
         List<Path> paths=new ArrayList<>();String manifest=null;
+        Set<String> subcaseSelectors=new LinkedHashSet<>();
         for(int i=start;i<args.length;i++) {
             String arg=args[i];
             if(arg.equals("--manifest")) {
                 if(i+1>=args.length || args[i+1].startsWith("--")) throw new IllegalArgumentException("--manifest requires a path");
                 manifest=args[++i];
             } else if(arg.startsWith("--manifest=")) manifest=arg.substring("--manifest=".length());
+            else if(arg.equals("--subcase")) {
+                if(i+1>=args.length || args[i+1].startsWith("--")) throw new IllegalArgumentException("--subcase requires CASE/subcase");
+                addSubcaseSelector(subcaseSelectors,args[++i]);
+            } else if(arg.startsWith("--subcase=")) addSubcaseSelector(subcaseSelectors,arg.substring("--subcase=".length()));
             else if(arg.equals("--all") && mode.equals("red")) continue;
             else if(arg.startsWith("--")) throw new IllegalArgumentException("Unknown option "+arg);
             else paths.add(validator.path(arg));
         }
         if(manifest!=null && !(mode.equals("profile") && RUN_MANIFEST_PROFILES.contains(profile))) throw new IllegalArgumentException("--manifest applies only to profile model/deployment");
+        if(!subcaseSelectors.isEmpty() && !(mode.equals("profile") && profile.equals("scenarios"))) throw new IllegalArgumentException("--subcase applies only to profile scenarios");
         // Explicit case files select a subset; a subset run never closes the profile's gate.
-        boolean explicitSelection=!paths.isEmpty();
+        boolean explicitCaseFiles=!paths.isEmpty();
+        boolean explicitSelection=explicitCaseFiles || !subcaseSelectors.isEmpty();
         if(paths.isEmpty()) paths.addAll(discoverCases(root));
+        validateSubcaseSelectors(validator,paths,profile,subcaseSelectors);
         if(mode.equals("validate")) {
             if(paths.isEmpty()) throw new IllegalArgumentException("No case files: failIfNoTests");
             for(Path path:paths) { JsonNode c=validator.caseFile(path);System.out.println("PREPARATION_SCHEMA_VALID "+c.path("caseId").asText()+" "+root.relativize(path)); }
@@ -56,8 +64,10 @@ public final class Main {
         for(Path path:paths) {
             JsonNode c=validator.caseFile(path); discovered+=c.path("subcases").size();
             if(!mode.equals("red") && !contains(c.path("profiles"),profile)) continue;
+            if(!subcaseSelectors.isEmpty() && subcaseSelectors.stream().noneMatch(s->s.startsWith(c.path("caseId").asText()+"/"))) continue;
             selectedFiles.add(path);
             for(JsonNode sub:c.path("subcases")) {
+                if(!subcaseSelectors.isEmpty() && !subcaseSelectors.contains(c.path("caseId").asText()+"/"+sub.path("id").asText())) continue;
                 selected++;
                 CaseRunner runner=new CaseRunner(validator,driver,agentRunner,path,Json.required(sub,"id"));
                 started++;
@@ -83,6 +93,8 @@ public final class Main {
         int declared=mode.equals("profile") ? (explicitSelection ? profileDeclaredSubcases(validator,discoverCases(root),profile) : selected) : selected;
         report.put("discovered",declared).put("started",started).put("completed",completed).put("skipped",0);
         report.put("explicitCaseSelection",explicitSelection);
+        report.put("explicitCaseFileSelection",explicitCaseFiles).put("explicitSubcaseSelection",!subcaseSelectors.isEmpty());
+        report.set("subcaseSelectors",Json.MAPPER.valueToTree(subcaseSelectors));
         if(preRun!=null) report.set("preRun",preRun);
         int actualExecutedActions=0;
         for(JsonNode evidence:cases) for(JsonNode action:evidence.path("actions")) if(actual && action.path("driverStatus").asText().equals("EXECUTED")) actualExecutedActions++;
@@ -119,6 +131,23 @@ public final class Main {
             System.out.println("COVERAGE_RECEIPT "+receipt);
         }
         return exit;
+    }
+    private static void addSubcaseSelector(Set<String> selectors,String selector) {
+        String[] parts=selector.split("/",-1);
+        if(parts.length!=2 || Arrays.stream(parts).anyMatch(p->p.isBlank() || !p.equals(p.strip()) || p.chars().anyMatch(Character::isWhitespace)))
+            throw new IllegalArgumentException("--subcase requires CASE/subcase: "+selector);
+        if(!selectors.add(selector)) throw new IllegalArgumentException("Duplicate --subcase selector "+selector);
+    }
+    private static void validateSubcaseSelectors(ContractValidator validator,List<Path> paths,String profile,Set<String> selectors) throws IOException {
+        if(selectors.isEmpty()) return;
+        var declared=new HashSet<String>();
+        for(Path path:paths) {
+            var c=validator.caseFile(path);
+            if(!contains(c.path("profiles"),profile)) continue;
+            for(var sub:c.path("subcases")) declared.add(c.path("caseId").asText()+"/"+sub.path("id").asText());
+        }
+        for(String selector:selectors) if(!declared.contains(selector))
+            throw new IllegalArgumentException("--subcase does not name a declared "+profile+" subcase in the selected case files: "+selector);
     }
     private static int prepare(ContractValidator validator,List<Path> paths,String mode) throws Exception {
         Set<String> expected=new LinkedHashSet<>();for(int i=1;i<=26;i++) expected.add(String.format("T%02d",i));for(int i=1;i<=5;i++) expected.add("C"+i);for(int i=1;i<=8;i++) expected.add("V"+i);expected.add("E1");expected.add("E2");
