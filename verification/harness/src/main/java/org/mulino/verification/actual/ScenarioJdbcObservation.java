@@ -14,7 +14,8 @@ import org.mulino.verification.Json;
  * verification/actual/scenarios/observation-sources.json inside one read-only REPEATABLE READ transaction.
  *
  * Scope: organizationId/organizationIds restrict every table; itemId(s), workId(s), lotId restrict tables having that
- * column (Works: workId restricts ID). includeDescendants=true with a work restriction is refused until a descendant relation is supported. Case namespace keys (caseId, subcaseId, ...) are test metadata.
+ * column (Works: workId restricts ID). includeDescendants=true follows stored, visible FOLLOWUP links
+ * within one organization. Case namespace keys (caseId, subcaseId, ...) are test metadata.
  *
  * RESULT_REVISION: the observer recomputes an organization row digest in its own snapshot and reports the product
  * revision only when it equals the digest bound around the issuing query (ScenarioRevisionBinding). The product API is
@@ -54,7 +55,7 @@ final class ScenarioJdbcObservation {
         if(orgs.isEmpty())throw new IllegalArgumentException("Observer scope requires organizationId");
         for(var it=scope.fieldNames();it.hasNext();){String k=it.next();if(!CASE_METADATA.contains(k)&&!Set.of("organizationId","organizationIds","itemId","itemIds","workId","workIds","lotId","lotIds").contains(k))throw new UnsupportedOperationException("observer scope key "+k+" not implemented");}
         boolean descendants=scope.path("includeDescendants").asBoolean(false);
-        if(descendants&&!works.isEmpty())throw new UnsupportedOperationException("Scoped descendants require an explicit descendant relation, not an organization-wide superset");
+        if(descendants&&works.isEmpty())throw new UnsupportedOperationException("Descendant observation requires explicit Work roots");
         String revision=null;ObjectNode revisionQuery=null;ScenarioRevisionBinding.Binding binding=null;JsonNode source=null;
         if(readMode.equals("RESULT_REVISION")) {
             source=request.path("snapshotSource");
@@ -78,10 +79,13 @@ final class ScenarioJdbcObservation {
             }
             Map<String,ArrayNode> cache=new HashMap<>();Map<String,JsonNode> commandCache=new HashMap<>();
             Map<String,ObjectNode> statements=new HashMap<>();
+            ScenarioWorkDescendants.Expansion descendantsProof=descendants?ScenarioWorkDescendants.expand(c,orgs,works,knownAt):null;
+            if(descendantsProof!=null)works=descendantsProof.ids();
             var projection=new ScenarioObservationProjection(c,root,orgs,items,works,lots,knownAt,
                 OffsetDateTime.parse(Json.required(request,"asOf")));
             for(JsonNode requested:request.path("sources")) {
                 String name=requested.asText();JsonNode tables=sources.path(name);var rows=Json.array();var queries=Json.array();
+                if(descendantsProof!=null)queries.add(descendantsProof.query().deepCopy());
                 for(JsonNode t:tables) {
                     String table=t.asText();String key=table;
                     ArrayNode tableRows=cache.get(key);
