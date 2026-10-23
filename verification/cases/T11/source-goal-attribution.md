@@ -50,7 +50,9 @@ Goal ID가 contribution 또는 assessment snapshot에서 노출되지 않도록 
 AssessmentService.requireFulfilled만 CLOSE_WORK를 선택한다. 요청 slot으로
 purpose를 받지 않는다. receipt admission은 같은 TARGET/ITEM/PLACE 조건을
 유지하며 요청 Work와 실제 원천 Work 각각에 해당 operation 권한을 요구한다.
-DeliveryAdmission은 공유 interface의 새 호출을 연결하는 데만 변경한다.
+DeliveryAdmission도 같은 TARGET/ITEM/PLACE와 현재 purpose를 유지하며
+요청 Work와 원천 Work를 각각 검사한다. WORK 배열 한 번의 any-of 판정으로
+한쪽 권한만 확인하는 경로를 제거한다.
 
 목적은 snapshot에 저장하지 않는다. 성공한 두 operation은 같은 사실·증거를
 반환하므로 purpose만 바뀌어 input hash가 달라지지 않는다. 폐쇄는 여전히
@@ -71,3 +73,14 @@ V40 및 다른 변경과 통합한 뒤 동기화한다.
 폐쇄, 부모90, 원래 단일 canonical/receipt/movement와 두 allocation은
 통과했다. 추가 정정 음성 검사는 기존 supersession 규칙에 맞게 검증
 시계만 1μs 전진시키며 원래 시나리오 시각은 바꾸지 않는다.
+
+
+Delivery 후속 권한 반례는 any-of WORK 의미를 재현하는 독립 unit으로
+검사한다. 요청 Work만 또는 원천 Work만 허용한 경우 두 purpose에서 모두
+거부하고, 양쪽과 같은 TARGET/ITEM/PLACE가 허용될 때만 실제 인도 수량을
+반환한다. 목적만 다른 성공 결과는 동일한 사실/hash를 유지하고 기본 호출은
+assessGoal 전용이다. RED 17개 중 4개 실패를 보존한 뒤 같은 검사로 GREEN을
+확인한다. 증거는 `.local/delivery-admission-authority/`에 둔다.
+GREEN은 새 권한 unit 17개, 기존 DeliveryCorrection 6개, 실제 PG
+Fulfillment 2개로 총 25 PASS다. Fulfillment test 파일은 수정하지 않았으며
+이 작은 수정 때문에 전체 backend/harness/HTTP 검사를 반복하지 않는다.
