@@ -25,6 +25,7 @@ public class ResponsibilityRepository {
     return found.orElseThrow(DomainError::forbidden);
   }
   public List<Map<String,Object>> workContributions(DomainContext c,String occurrence){return db.run(Select.from("mulino.work.WorkContributions").where(x->x.get("organizationId").eq(c.organizationId()).and(x.get("occurrenceId").eq(occurrence)))).listOf(Map.class).stream().map(x->(Map<String,Object>)new LinkedHashMap<String,Object>(x)).toList();}
+  public Map<String,Object> deliveryObservation(String org,String id){return db.run(Select.from("mulino.trade.sales.Observations").where(x->x.get("organizationId").eq(org).and(x.get("ID").eq(id)))).first().map(x->new LinkedHashMap<String,Object>(x)).orElseThrow(DomainError::forbidden);}
   public Optional<Map<String,Object>> rootByDutyKey(String org,String key){return rows("Roots",org).stream().filter(x->key.equals(x.get("dutyKey"))).findFirst();}
  public List<Map<String,Object>> currentAssignments(String org,String root){return rows("Assignments",org).stream().filter(x->root.equals(x.get("rootId"))&&Boolean.TRUE.equals(x.get("valid"))&&"OPEN".equals(x.get("status"))).sorted(Comparator.comparing(x->x.get("ID").toString())).toList();}
  public void fence(String org,String key){if(!TransactionSynchronizationManager.isActualTransactionActive())throw new IllegalStateException("Responsibility requires parent transaction");jdbc.queryForList("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",org+"|responsibility|"+key);}

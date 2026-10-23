@@ -30,7 +30,7 @@ public final class TradeObservationRemedy {
   duties.fence(c.organizationId(),actual.get("workId").toString());
   for(var root:duties.rows("Roots",c.organizationId()))if("RETURN_RECONCILIATION".equals(root.get("kind")))try{
    var scope=new com.fasterxml.jackson.databind.ObjectMapper().readTree(root.get("scopeJson").toString());
-   if(observationId.equals(scope.path("domainSourceId").asText())&&observation.get("workId").equals(scope.path("originalWorkId").asText()))service.applyTradeObservation(c,new Completion(root.get("ID").toString(),"RETURN_RECONCILIATION",ownCanonical,actual.get("ID").toString()));
+   if(observationId.equals(scope.path("domainSourceId").asText())&&observation.get("workId").equals(scope.path("originalWorkId").asText()))service.applyTradeObservation(c,new Completion(root.get("ID").toString(),"RETURN_RECONCILIATION",ownCanonical,actual.get("ID").toString(),decimal(actual,"quantity"),actual.get("unit").toString()));
   }catch(java.io.IOException e){throw DomainError.invalid("Invalid trade reconciliation scope");}
  }
  private void apply(DomainContext c,Map<String,Object> observation,Map<String,Object> actual,String dutyKind,String eventKind,String movementKind){
@@ -44,13 +44,13 @@ public final class TradeObservationRemedy {
   duties.fence(c.organizationId(),actual.get("workId").toString());
   for(var root:duties.rows("Roots",c.organizationId()))if(dutyKind.equals(root.get("kind")))try{
    var scope=new com.fasterxml.jackson.databind.ObjectMapper().readTree(root.get("scopeJson").toString());
-   if(observation.get("ID").equals(scope.path("domainSourceId").asText())&&actual.get("workId").equals(scope.path("originalWorkId").asText())&&Objects.equals("RETURN_RECONCILIATION".equals(dutyKind)?observation.get("rangeRootId"):observation.get("ID"),scope.path("physicalScopeId").asText()))service.applyTradeObservation(c,new Completion(root.get("ID").toString(),dutyKind,canonical,actual.get("ID").toString()));
+   if(observation.get("ID").equals(scope.path("domainSourceId").asText())&&actual.get("workId").equals(scope.path("originalWorkId").asText())&&Objects.equals("RETURN_RECONCILIATION".equals(dutyKind)?observation.get("rangeRootId"):observation.get("ID"),scope.path("physicalScopeId").asText()))service.applyTradeObservation(c,new Completion(root.get("ID").toString(),dutyKind,canonical,actual.get("ID").toString(),decimal(actual,"quantity"),actual.get("unit").toString()));
   }catch(java.io.IOException e){throw DomainError.invalid("Invalid trade reconciliation scope");}
  }
  private static BigDecimal decimal(Map<String,Object> m,String key){return new BigDecimal(m.get(key).toString());}
  public static final class Completion {
-  private final String rootId,kind,canonicalId,actualId;
-  private Completion(String rootId,String kind,String canonicalId,String actualId){this.rootId=rootId;this.kind=kind;this.canonicalId=canonicalId;this.actualId=actualId;}
-  public String rootId(){return rootId;}public String kind(){return kind;}public String canonicalId(){return canonicalId;}public String actualId(){return actualId;}
+  private final String rootId,kind,canonicalId,actualId,unit;private final BigDecimal quantity;
+  private Completion(String rootId,String kind,String canonicalId,String actualId,BigDecimal quantity,String unit){this.rootId=rootId;this.kind=kind;this.canonicalId=canonicalId;this.actualId=actualId;this.quantity=quantity;this.unit=unit;}
+  public String rootId(){return rootId;}public String kind(){return kind;}public String canonicalId(){return canonicalId;}public String actualId(){return actualId;}public BigDecimal quantity(){return quantity;}public String unit(){return unit;}
  }
 }
