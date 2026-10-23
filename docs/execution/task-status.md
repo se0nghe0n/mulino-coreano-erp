@@ -11,18 +11,21 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | d0885a80 초기 실행899개는664 PASS·3 FAIL·232 ERROR, skip0·exit1이었다. 같은 제품 bytes의 JWT 환경 보정232 PASS·witness40 PASS·rollback focused2 및 인접19 PASS를 testcase ID로 대조해 원래899개가 모두 PASS임을 확인했다. 초기 명령 exit1은 보존하고 개별 재실행의 결합 결과로 기록한다. |
+| Backend 전체 | a7f18cc8: 전체 명령908 PASS·실패/오류/skip0·exit0이다. source drift0과 소유 container45개·key/blob 부재를 확인했다. Surefire의 test 종료 뒤 shutdown timeout 원문도 보존한다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | de794494: 1089 executions 중995 PASS·94 opt-in SKIP, 실패·오류0, exit0, source drift0·소유 DB 정리 확인 |
-| Prepare | de794494: 41 case·802 subcase·24312 assertions, PREPARED·preparationProblems0·exit0이다. 원301 T17에 책임 범위 검사8개를 추가했고 기존 fixed oracle은 유지한다. |
+| Harness 전체 | a7f18cc8의 첫 전체 opt-in 실행은1210 중1063 PASS·147 ERROR·exit1이었다. identity-binding/blob-root JVM 설정 누락을 보존했고 환경 보정 r2는1185 PASS·17 FAIL·8 ERROR·skip0·exit1이다. source drift0과 정리를 확인했고 실제 제품·helper 실패의 집중 수정을 통합했고 새 전체 검사는 남았다. |
+| Prepare | a7f18cc8: 41 case·802 subcase·24437 assertions, PREPARED·preparationProblems0·exit0이다. T17 원301·read 엄격125·책임 범위8을 합성했고 기존 fixed oracle을 보존한다. |
 | 최근 실제 T09 | fa316f01: 9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. 최신 결합 Haiku 실행의 동일 product class335개와 소유 DB12개 부재를 primary가 대조했다. |
 | 최근 실제 T11 | fa316f01: 110 assertions 중94 PASS·2 FAIL·14 미관찰이다. |
 | 최근 실제 T17 | fa316f01: 301 assertions 중268 PASS·33 FAIL·미관찰0이다. |
 | 최근 native 재실행 | wf_17cd7443-f63: 36 subcase 중20 PASS·16 FAIL, 505 assertions 중456 PASS·35 FAIL·14 미관찰이다. 실제 Haiku14 node·120 assistant records와 source/JAR/cleanup을 primary가 대조했다. |
-| 현재 제품 통합 | 제품 d0885a80에 rollback hook1f17ee35, recall 입력fb58d866, 원천·FOLLOWUP observer140c9b5a, 독립 EVIDENCE policy03aa82e5, 책임 범위de794494를 통합했다. 원301 T17 assertion의 inverse·7개 policy fixture 추가·전체15 fixture inverse bytes·결합 Python47 PASS를 확인했다. T11 명시 Given·승계 원자성 observer와 T17 공개 read 계약은 별도 writer가 수정한다. |
+| 현재 제품 통합 | a7f18cc8에 T11 명시 Given32b7973f·부모 link40c6bf0b·승계 원자성dd6a219b와 T17 공개 read eaee3408을 통합했다. T17 Python51·T11 Python26, late-hold 원26+범위8의 실제 대조와 공개 read 실제 HTTP/PG7이 통과했다. T11 부모 재평가 수정a1f0dee6를3b2a0a2c에 통합했고 전체 재검사는 남았다. |
 | 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
-| S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
+| S5 실 client·운영 인수 | skills 계약/hash 수정575ba1e6와 서버 인증 capture ce9afb32를 통합했다. capture 집중31 PASS를 primary가 대조했다. 업무 context f9241580도 집중17·실제1 PASS로 통합했다. 실제 model fixture/context/독립 semantic observation 구현을 계속한다. 실제 업무 client/model·S6·BTP gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
+
+현재 전체 실행과 중단된 Workflow의 경계는
+[전체 결합 재개 기록](full-integration-resume-20261024.md)에 기록한다.
 
 Harness 수는 실행 횟수이며 상속된 observer 회귀의 반복 실행을 포함한다.
 최신87개 opt-in SKIP과 native raw gateComplete=false를 PASS로 바꾸지 않는다.
