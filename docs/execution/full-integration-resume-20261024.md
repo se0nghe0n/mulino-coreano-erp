@@ -183,4 +183,3 @@ identity 인수는 차단 상태이며 보정 Given 인수와 구별한다.
 시나리오의 미구현 source 관찰이다. model fixture·binding bridge,
 전체 final-response 의미 검증·실 client·S6도 완료하지 않았다.
 Grok 또는 외부 메시지는 이 통합에서 보내지 않았다.
-
