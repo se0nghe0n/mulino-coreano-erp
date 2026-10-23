@@ -9,6 +9,7 @@ import subprocess
 import time
 import uuid
 import secrets
+import hashlib
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / '.local' / ('t17-source-pg-' + str(uuid.uuid4()))
@@ -36,6 +37,16 @@ try:
                JWT_ISSUER='https://mulino-native.invalid', JWT_AUDIENCE='isolated-ontology',
                DB_USERNAME='postgres', DB_PASSWORD=secrets.token_urlsafe(24))
     env['POSTGRES_PASSWORD'] = env['DB_PASSWORD']
+    # Build this checkout before attributing its commit to a running service.
+    # A pre-existing target jar may belong to another source revision.
+    run([str(ROOT/'mvnw'), '-B', '-ntp', '-f', 'backend/pom.xml',
+         '-Dmaven.test.skip=true', 'package'], 'backend-build.log', env)
+    product_jar = ROOT/'backend/target/ontology-0.1.0-SNAPSHOT.jar'
+    (OUT/'build-identity.json').write_text(json.dumps({
+        'sourceCommit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
+        'productJar': str(product_jar),
+        'productJarSha256': hashlib.sha256(product_jar.read_bytes()).hexdigest(),
+    }, indent=2) + '\n')
     image = json.loads((ROOT/'verification/platform/versions.json').read_text())['postgresImage']['reference']
     run(['docker', 'run', '-d', '--name', container, '-e', 'POSTGRES_PASSWORD', '-e', 'POSTGRES_DB=ontology', '-p', '127.0.0.1::5432', image], 'container.log', env)
     created = True
@@ -46,7 +57,7 @@ try:
         time.sleep(.25)
     else: raise RuntimeError('PostgreSQL startup timeout')
     server_log = (OUT/'spring.log').open('w')
-    command = ['java', '-jar', str(ROOT/'backend/target/ontology-0.1.0-SNAPSHOT.jar'), '--spring.profiles.active=local,verification',
+    command = ['java', '-jar', str(product_jar), '--spring.profiles.active=local,verification',
                '--mulino.verification.instant=2026-10-07T09:00:00Z', '--server.address=127.0.0.1', '--server.port=0', '--mulino.evidence.blob-root='+str(OUT/'blobs')]
     server = subprocess.Popen(command, cwd=ROOT, env=env, stdout=server_log, stderr=subprocess.STDOUT)
     records.append({'command': command, 'log': 'spring.log'})
