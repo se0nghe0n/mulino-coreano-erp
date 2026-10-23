@@ -133,6 +133,21 @@ class FulfillmentPostgresTest {
   var result=apply(input);assertEquals("APPLIED",result.get("outcome"),result.toString());assertNotNull(result.get("movementId"));
   assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND ID=? AND kind='DISPATCH'",Integer.class,org,result.get("movementId")));
  }
+ @Test void repeatedCanonicalVerificationStillConfirmsOnePhysicalDelivery(){
+  allow("100");allowDispatch();String dispatch=dispatched("0","30");
+  var content=deliveryReport(dispatch,"0","20",destination);String intake=intakeDelivery(content);
+  var review=matchDelivery(content,intake);assertEquals("APPLIED",review.get("outcome"),review.toString());
+  var first=run("linkCanonicalOccurrence",map("reconciliationId",review.get("id")),1);
+  var second=run("linkCanonicalOccurrence",map("reconciliationId",review.get("id")),1);
+  assertEquals(first.get("id"),second.get("id"));String canonical=first.get("id").toString();
+  assertEquals(2,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_evidence_Verifications WHERE organizationId=? AND canonicalOccurrenceId=? AND verdict='VERIFIED'",Integer.class,org,canonical));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=? AND ID=?",Integer.class,org,canonical));
+  var delivered=effects(run("recordDelivery",map("observationId",content.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1));
+  assertEquals("20",delivered.get("physicalQuantity"));assertEquals("20",delivered.get("contributedQuantity"));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_trade_sales_Deliveries WHERE organizationId=? AND canonicalOccurrenceId=?",Integer.class,org,canonical));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND kind='DELIVERY'",Integer.class,org));
+  assertEquals(0,new BigDecimal("10").compareTo(transitQuantity()));assertEquals(0,new BigDecimal("20").compareTo(customerQuantity()));
+ }
  @Test void dispatchMovementCountsOnlySelected20AndObserved10KeepsTransit10(){allow("100");allowDispatch();String dispatch=dispatched("20","20");assertEquals(0,new BigDecimal("20").compareTo(sum("SELECT SUM(quantity) FROM mulino_inventory_QuantityMovements WHERE kind='DISPATCH'")));var delivered=deliver(deliveryReport(dispatch,"20","10",destination));assertEquals("10",delivered.get("contributedQuantity"));assertEquals("10",delivered.get("physicalQuantity"));assertEquals(0,new BigDecimal("10").compareTo(transitQuantity()));assertEquals(0,new BigDecimal("10").compareTo(sum("SELECT SUM(quantity) FROM mulino_inventory_QuantityMovements WHERE kind='DELIVERY'")));assertEquals(0,new BigDecimal("10").compareTo(customerQuantity()));}
  // T17/D17: CONSUMED allocation is the dispatch history, not a block on the normal delivery of the same cargo.
  /** Plan §6 recordDelivery input "이미 소비된 배분 참조" (round 14 Step 3 finding 4): an allocationId must be the consumed
