@@ -28,7 +28,9 @@ SCOPE={'organizationId':{'$alias':'ORG'},'itemId':{'$alias':'P'},'lotId':{'$alia
 CAT=json.loads((ROOT/'verification/requirements/mandatory-oracles.json').read_text())
 ALL=CAT['requiredCaseIds'];DS=CAT['requirementIds']
 ORACLES={o['oracleId']:o for o in CAT['oracles']}
-PUBLIC_CAPABILITIES=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
+PUBLIC_DISCOVERY_CAPABILITIES=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
+# Synthetic authority is explicit case input, independent of discovery publication.
+SYNTHETIC_WRITE_CAPABILITIES=('structureIntent','createDraft','activateWork','proposePurchase','revisePurchase','approvePurchase','dispatchPurchaseOrder','confirmReceipt','recordActivity','placeHold','reserveQuantity')
 
 def alias(x):return {'$alias':x}
 def ref(a,p):return {'$result':{'actionId':a,'pointer':p}}
@@ -86,7 +88,7 @@ def sub(cid,i,title,o,actions,assertions,adapters=None):
  return {'id':i,'title':title,'fixtureRef':f'verification/cases/{cid}/fixture.json','requiredAdapters':adapters or ['fixture','api','db'],'actions':actions,'assertions':assertions,'oracleExplanation':title+' — '+o+'의 named observation을 응답과 독립 원행/host artifact로 검증한다. setup은 실행 coverage가 아니다.'}
 def fixture(cid):
  read=['getObject','getWork','getInventory','getObligations','traceLot','getAssessment','getEvidence','getDefinition','searchObjects','searchWorks','getCommandResult']
- writes=['structureIntent','createDraft','activateWork','proposePurchase','revisePurchase','approvePurchase','dispatchPurchaseOrder','confirmReceipt','recordActivity','placeHold','reserveQuantity']
+ writes=list(SYNTHETIC_WRITE_CAPABILITIES)
  actors={}
  for name,caps,grant in [('reader',read,read),('writer',read+writes,read+writes),('manager',read+['approvePurchase'],read+['approvePurchase']),('readAgent',read+writes,read),('otherPrincipal',read,read),('anonymous',[],[])]:
   actors[name]={'issuer':'synthetic-fixture-issuer','subject':'synthetic-'+name,'audience':'isolated-ontology','organizationAlias':'ORG','roleCapabilities':caps,'grant':{'delegatorAlias':'supervisor','actions':grant,'scope':{'organizationAlias':'ORG','itemAliases':['P'],'workAliases':['O1','S1'],'segmentAliases':['A60','B40']},'validFrom':'2026-10-01T00:00:00Z','validUntil':'2026-10-31T23:59:59Z','revision':1}}
@@ -279,7 +281,7 @@ for v in variants:
  if http in (200,400):x += [eq('jsonrpc-version',o,'wire-protocol','wire','/response/body/jsonrpc','2.0'),eq('jsonrpc-id',o,'wire-protocol','wire','/response/body/id','wire')]
  x += no_effect(o,'wire-protocol')
  if expected=='result':
-  x += [eq('protocol-result-version',o,'wire-protocol','wire','/response/body/result/supportedVersions',['2026-07-28'],explain='공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.'),eq('stateless-handshake',o,'wire-protocol','wire','/data/transcript/clientMethods',['server/discover']),eq('server-requests',o,'wire-protocol','wire','/data/transcript/serverRequestMethods',[]),assertion('tool-schema-registry',o,'domain-parity','exactSet','tools-list','/response/body/result/tools',PUBLIC_CAPABILITIES,field='name',explain='독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.')]
+  x += [eq('protocol-result-version',o,'wire-protocol','wire','/response/body/result/supportedVersions',['2026-07-28'],explain='공식 DiscoverResult의 supportedVersions는 [2026-07-28]이며 legacy protocolVersion 필드로 대체하지 않는다.'),eq('stateless-handshake',o,'wire-protocol','wire','/data/transcript/clientMethods',['server/discover']),eq('server-requests',o,'wire-protocol','wire','/data/transcript/serverRequestMethods',[]),assertion('tool-schema-registry',o,'domain-parity','exactSet','tools-list','/response/body/result/tools',PUBLIC_DISCOVERY_CAPABILITIES,field='name',explain='독립 tools/list 응답의 공개 capability name을 고정 목록과 exact 대조한다. discover에서 tools를 꾸미지 않는다.')]
   # tools/list is its own stateless request with the same transport state as discovery.
   tw=wire('tools-list','tools/list',meta=w['request']['body']['params']['_meta'],actor=w['actorRef'],transport=w['request']['transport'])
   for key in ['connectionState','clientAcceptsServerRequests']:

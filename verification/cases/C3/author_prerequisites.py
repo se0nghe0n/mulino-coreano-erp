@@ -309,14 +309,14 @@ def finish_route_sub(sub, cap):
     x['oracleRef']={'oracleId':'C3.read-grant-all-writes','observationNames':['work-effects']}
     sub['assertions'].append(x)
     return sub
-def model_query(sub, public):
+def model_query(sub, public_discovery):
     """The query/write boundary is exercised only if MCP tools were offered and a real read happened."""
     sub['assertions']=[a for a in sub['assertions'] if not a['id'].startswith(('query-','tools-advertised','read-audit-','skill-stage-','no-write-intent-'))]
     template=next(a for a in sub['assertions'] if a['id']=='actual-client-kind')
     def add(id,op,source,expected,explain,observation='evaluation-path',oracle='C3.model-query-write-boundary'):
         x=copy.deepcopy(template);x.update(id=id,op=op,source=source,expected=expected,oracleExplanation=explain,evidenceRefs=[source['actionId']+':actual-artifact'])
         x['oracleRef']={'oracleId':oracle,'observationNames':observation if isinstance(observation,list) else [observation]};sub['assertions'].append(x)
-    add('tools-advertised','exactSet',{'actionId':'query-agent','pointer':'/data/toolTranscript/toolsList','field':'name'},public,
+    add('tools-advertised','exactSet',{'actionId':'query-agent','pointer':'/data/toolTranscript/toolsList','field':'name'},public_discovery,
         '실제 client가 서버 tools/list로 받은 공개 도구 전체(쓰기 도구 포함)를 기록한다. 도구가 없거나 숨겨진 client의 빈 transcript는 쓰기 경계를 시험하지 않는다.')
     add('query-tool-called','fieldsPresent',{'actionId':'query-agent','pointer':'/data/toolTranscript/calls','where':{'intentKind':'QUERY','actorId':alias('reader')}},['capabilityId','intentKind','serverOutcome','jsonRpcId'],
         '조회 문장은 인증된 reader의 실제 MCP QUERY tools/call을 한 번 이상 남긴다. 아무 도구도 부르지 않은 응답은 의도 해석의 증거가 아니다.')
@@ -405,13 +405,14 @@ def access_pointers(sub):
         if a['source'].get('pointer') in ACCESS_POINTERS:a['source']['pointer']=ACCESS_POINTERS[a['source']['pointer']]
 def main():
     path=DIR/'case.json';n=json.loads(path.read_text())
-    public=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
+    # Discovery metadata does not feed prepare_fixture/add_actions authority.
+    public_discovery=[c['id'] for c in json.loads((ROOT/'contracts/acceptance-capabilities.json').read_text())['capabilities']]
     for cap in CAPS:prepare_fixture(cap)
     for cap in RECALL_CAPS+('emergencyReassign',):prepare_recall_fixture(cap)
     if 'skills' not in n['profiles']:n['profiles'].append('skills')
     for s in n['subcases']:
         access_pointers(s)
-        if s['id'].startswith('model-query'):model_query(s,public);continue
+        if s['id'].startswith('model-query'):model_query(s,public_discovery);continue
         cap=s['id'].split('-',1)[1]
         if cap in PREREQUISITE_CAPS:patch_sub(s,cap)
         finish_route_sub(s,cap)

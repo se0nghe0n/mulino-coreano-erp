@@ -118,3 +118,42 @@ case-generators-red.log에 있다. prepare.json에도2개 실패를 유지한다
 검사를 제외하거나 예외를 늘려 기존 generator mismatch를 숨기지 않았다.
 따라서 이 publication은 standalone scoped commit이지만 prepare를 통과한
 통합 결과는 아니며 root가 결합 검증을 소유한다.
+
+## 의존 generator corrective 결과
+
+`30ae0e7c` 뒤의 corrective는 새 공개6개의 discovery metadata를 기존
+fixture authority와 분리한다. 원래114 entries는 값·순서까지 그대로이며
+공개 기대 목록은 각각 원래114 + 정확한6개다. 기존 목록을 줄이지 않았다.
+이 절의 결과가 앞 절의 prepare 실패 상태를 대체하며 원래 RED는 보존한다.
+
+| 파일 | 변경 분류 |
+|---|---|
+| verification/mcp-tests/author_cases.py | PUBLIC_DISCOVERY_CAPABILITIES 이름과 원래11개 SYNTHETIC_WRITE_CAPABILITIES를 분리한다. 원래 fixture read/write actions를 바꾸지 않는다. |
+| verification/cases/C3/author_prerequisites.py | 공개 discovery 변수명을 분리한다. 기존 prepare_fixture/add_actions 권한 경로는 그대로다. |
+| verification/cases/V4/author_review_fixes.py | 공개 enumeration이 fixture grants와 별개임을 명시한다. 생성 의미를 바꾸지 않는다. |
+| verification/cases/T20/case.json | tool-schema-registry 5개 exact expected list에6개만 추가한다. |
+| verification/cases/C3/case.json | tools-advertised 30개 exact expected list에6개만 추가한다. |
+| verification/cases/V4/case.json | mcp-tools-equal-allowlist 1개 list에6개만 추가하고 원본 inventory의 정확한 allowlistSha256을 갱신한다. |
+| verification/cases/C3/observation-bindings.json | 허용된 exact bindinghash metadata로 caseHash 한 필드만 갱신한다. 처음 별도 delta로 분리했지만 일관된 파생 metadata에 필요한 동일 변경으로 처리했다. |
+| verification/cases/V4/observation-bindings.json | caseHash 한 필드만 갱신한다. |
+| verification/mcp-tests/test_public_inventory_preservation.py | 원래114+정확한6, 전체 oracle/입력/fixture 보존, binding 단일 hash, negative mutation control 5건을 검사한다. |
+
+원본 commit ce0eecc1과 대조해 T20 assertion1162개, C3 assertion12438개,
+V4 assertion2448개의 ID·개수를 모두 보존했다. 바뀐 discovery assertion은
+36개뿐이다. 그36개의 expected list와 V4 allowlist hash만 역복원하면
+case.json 전체가 원래 byte와 동일하다. 다른 assertion16012개는 개별
+원문 byte도 동일하다. 원래 양·시계·negative probe·actor·grants·fixture·
+feature는 모두 그대로다. C3/V4 bindings의 observation 목록과 의미 연결도
+같으며 caseHash를 역복원하면 원본 내용이다.
+
+새 보존 tests5 PASS, MCP generator 재현3 PASS, case generator 재현6 PASS,
+prepare asset checks12 PASS / exit0이다. 기존 slot findings413과 미지원
+probe 목록은 그대로 보고한다. 이 결과는 생성·정적 준비의 일관성이며
+실제 업무/native runtime PASS가 아니다. 새로운 backend/PG/HTTP/native/full
+suite 실행, capability/role/grant/원본 업무 oracle 변경은 없다.
+
+`.local/public-capability-generators/`에 최초 전체 생성 delta, 각 generation
+원로그, byte 보존 proof, focused tests, prepare, source hash와 파일별
+분류를 보존한다. root가 `30ae0e7c`와 corrective를 통합하고 최종 검증한다.
+원래 T11 A의 openObligation 권한과 별도 미배분90 OPEN은 그대로다.
+Task와 Step은 OPEN이다.

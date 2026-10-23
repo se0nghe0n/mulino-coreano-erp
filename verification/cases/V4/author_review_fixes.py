@@ -228,6 +228,7 @@ def snapshot_query(aid):
 
 def surface_subcase(template):
     """Enumerate what the running system exposes, then probe every write-capable item with a READ-grant subject."""
+    # Public discovery enumeration is independent of the existing synthetic actor grants.
     capabilities = json.loads(ALLOWLIST.read_text())['capabilities']
     public = [c['id'] for c in capabilities]
     effect_tables = sorted({t for tables in CAP_EFFECTS.values() for t in tables} - set(BASE_SOURCES))
