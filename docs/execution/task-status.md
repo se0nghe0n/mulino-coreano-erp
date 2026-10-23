@@ -944,3 +944,22 @@ T11 폐쇄 재판정의 권한 목적, 부족10/미배분90 책임과 T09 판매
 e9327108의 별도 worktree에서 Sol Ultrafast로 실행한다. 기존 사업 권한과
 94개 oracle를 보존하며 새 fictional fixture 선택을 별도로 기록한다.
 다음 실제 시나리오는 Haiku5.5 native dynamic Workflow로 병렬 실행한다.
+
+## 2026-10-23 폐쇄·예약·출고 내부 원천 권한 결합 검증
+
+폐쇄는 서버가 고른 CLOSE_WORK 목적으로 재판정하며 수령·인도 원천의
+양쪽 Work 권한을 확인한다. 예약·pick·dispatch는 실제 명령의 현재
+권한으로 QC·규제 원문과 canonical을 검증하고 효과 뒤에도 원천 권한을
+재검사한다. 공개 getEvidence나 기존 사업 grant는 넓히지 않았다.
+
+고정 source e2fc92af의 전체 backend는 한 번의 실행에서 727 PASS이며
+실패·오류·SKIP은 0개다. tracked 3,144개 source 파일의 hash는 실행
+전후 같고 원본 JUnit 74개를 보존했다. 이전 harness와 schema 증거는
+이전 source의 결과로 유지한다. [통합·증거 기록](resume-admission-eligibility-integration.md)을
+따른다.
+
+T11 자식30/60 폐쇄는 통과했으나 부족10 의무와 별도 미배분90 책임은
+남아 있다. 별도 T09 입력의 예약60/100과 정정 후 예약 거부는 확인했고
+pick 응답 selector를 보완 중이다. Haiku의 T01·T13·T17 native Workflow는
+별도21850e42에서 실행하며 아직 결과를 합산하지 않았다. 전체 Task와
+현재 Step은 OPEN이고 실모델 client 호출은 0회다.
