@@ -1017,6 +1017,9 @@
               },
               "itemId": {
                 "$alias": "P"
+              },
+              "placeId": {
+                "$alias": "W"
               }
             },
             "asOf": "2026-10-07T09:00:00Z",
@@ -1027,6 +1030,31 @@
           },
           "evidenceRefs": [
             "dispatched:api-response"
+          ]
+        },
+        {
+          "id": "dispatched-item",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "P"
+            }
+          },
+          "evidenceRefs": [
+            "dispatched-item:actual-query-artifact"
           ]
         },
         {
@@ -1045,7 +1073,7 @@
             },
             "snapshotRef": {
               "$result": {
-                "actionId": "dispatched",
+                "actionId": "dispatched-item",
                 "pointer": "/response/snapshotRevision"
               }
             },
@@ -1685,7 +1713,7 @@
           "id": "in-transit-after-dispatch-14",
           "op": "decimalEquals",
           "source": {
-            "actionId": "dispatched",
+            "actionId": "dispatched-item",
             "pointer": "/response/data/inTransitQuantity"
           },
           "expected": "60",
@@ -1773,7 +1801,7 @@
           "id": "delivered-before-observation-16",
           "op": "decimalEquals",
           "source": {
-            "actionId": "dispatched",
+            "actionId": "dispatched-item",
             "pointer": "/response/data/deliveredQuantity"
           },
           "expected": "0",
@@ -1851,7 +1879,7 @@
           "id": "dispatch-allocation-18",
           "op": "equals",
           "source": {
-            "actionId": "dispatched",
+            "actionId": "dispatched-item",
             "pointer": "/response/data/allocationStatus"
           },
           "expected": "CONSUMED",
@@ -17622,7 +17650,7 @@
                   "pointer": "/response/data/ID"
                 }
               },
-              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextAction": "원천 주장과 실제 실물을 대조한다",
               "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
@@ -17715,7 +17743,7 @@
               "movements",
               "allocations",
               "deliveries",
-              "claims",
+              "deliveryObservations",
               "receiptContributions",
               "assessments",
               "obligations",
@@ -18146,7 +18174,15 @@
           "op": "count",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": 1,
           "requirementRefs": [
@@ -18178,8 +18214,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "canonical"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "canonical",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             false
@@ -18213,8 +18257,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "status"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "status",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             "PENDING_RECONCILIATION"
@@ -18282,8 +18334,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": 1,
@@ -18318,8 +18371,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "ownerId"
           },
@@ -18359,8 +18413,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "status"
           },
@@ -18398,8 +18453,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -18437,8 +18493,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextCheckAt"
           },
@@ -18476,8 +18533,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": [
@@ -18520,8 +18578,9 @@
             "actionId": "after-claim",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -18560,8 +18619,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -21600,7 +21660,7 @@
                   "pointer": "/response/data/ID"
                 }
               },
-              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextAction": "원천 주장과 실제 실물을 대조한다",
               "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
@@ -21693,7 +21753,7 @@
               "movements",
               "allocations",
               "deliveries",
-              "claims",
+              "deliveryObservations",
               "receiptContributions",
               "assessments",
               "obligations",
@@ -22124,7 +22184,15 @@
           "op": "count",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": 1,
           "requirementRefs": [
@@ -22156,8 +22224,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "canonical"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "canonical",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             false
@@ -22191,8 +22267,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "status"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "status",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             "PENDING_RECONCILIATION"
@@ -22260,8 +22344,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": 1,
@@ -22296,8 +22381,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "ownerId"
           },
@@ -22337,8 +22423,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "status"
           },
@@ -22376,8 +22463,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -22415,8 +22503,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextCheckAt"
           },
@@ -22454,8 +22543,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": [
@@ -22498,8 +22588,9 @@
             "actionId": "after-claim",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -22538,8 +22629,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -25598,7 +25690,7 @@
                   "pointer": "/response/data/ID"
                 }
               },
-              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextAction": "원천 주장과 실제 실물을 대조한다",
               "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
@@ -25692,7 +25784,7 @@
               "movements",
               "allocations",
               "deliveries",
-              "claims",
+              "deliveryObservations",
               "receiptContributions",
               "assessments",
               "obligations",
@@ -26123,7 +26215,15 @@
           "op": "count",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": 1,
           "requirementRefs": [
@@ -26155,8 +26255,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "canonical"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "canonical",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             false
@@ -26190,8 +26298,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "status"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "status",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             "PENDING_RECONCILIATION"
@@ -26259,8 +26375,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": 1,
@@ -26295,8 +26412,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "ownerId"
           },
@@ -26336,8 +26454,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "status"
           },
@@ -26375,8 +26494,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -26414,8 +26534,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextCheckAt"
           },
@@ -26453,8 +26574,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": [
@@ -26497,8 +26619,9 @@
             "actionId": "after-claim",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -26537,8 +26660,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -26954,7 +27078,7 @@
               "workId": {
                 "$alias": "t17SourceWork-A"
               },
-              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextAction": "원천 주장과 실제 실물을 대조한다",
               "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
@@ -27038,7 +27162,7 @@
               "movements",
               "allocations",
               "deliveries",
-              "claims",
+              "deliveryObservations",
               "receiptContributions",
               "assessments",
               "obligations",
@@ -27469,7 +27593,15 @@
           "op": "count",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": 1,
           "requirementRefs": [
@@ -27501,8 +27633,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "canonical"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "canonical",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             false
@@ -27536,8 +27676,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "status"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "status",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             "PENDING_RECONCILIATION"
@@ -27605,8 +27753,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": 1,
@@ -27641,8 +27790,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "ownerId"
           },
@@ -27682,8 +27832,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "status"
           },
@@ -27721,8 +27872,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -27760,8 +27912,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextCheckAt"
           },
@@ -27799,8 +27952,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": [
@@ -27843,8 +27997,9 @@
             "actionId": "after-claim",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -27883,8 +28038,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -27903,8 +28059,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -31046,7 +31203,7 @@
                   "pointer": "/response/data/ID"
                 }
               },
-              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextAction": "원천 주장과 실제 실물을 대조한다",
               "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
@@ -31140,7 +31297,7 @@
               "movements",
               "allocations",
               "deliveries",
-              "claims",
+              "deliveryObservations",
               "receiptContributions",
               "assessments",
               "obligations",
@@ -31571,7 +31728,15 @@
           "op": "count",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": 1,
           "requirementRefs": [
@@ -31603,8 +31768,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "canonical"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "canonical",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             false
@@ -31638,8 +31811,16 @@
           "op": "exactSet",
           "source": {
             "actionId": "after-claim-db",
-            "pointer": "/data/rawRows/claims",
-            "field": "status"
+            "pointer": "/data/rawRows/deliveryObservations",
+            "field": "status",
+            "where": {
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              }
+            }
           },
           "expected": [
             "PENDING_RECONCILIATION"
@@ -31707,8 +31888,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": 1,
@@ -31743,8 +31925,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "ownerId"
           },
@@ -31784,8 +31967,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "status"
           },
@@ -31823,8 +32007,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextAction"
           },
@@ -31862,8 +32047,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": "nextCheckAt"
           },
@@ -31901,8 +32087,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             }
           },
           "expected": [
@@ -31945,8 +32132,9 @@
             "actionId": "after-claim",
             "pointer": "/response/data/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",
@@ -31985,8 +32173,9 @@
             "actionId": "after-claim-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "kind": "RECONCILIATION",
-              "current": true
+              "kind": "DELIVERY_RECONCILIATION",
+              "current": true,
+              "status": "OPEN"
             },
             "field": [
               "id",

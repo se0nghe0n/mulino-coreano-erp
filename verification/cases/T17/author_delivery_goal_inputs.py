@@ -99,7 +99,10 @@ def ledger():return json.loads((HERE/'delivery-goal-input-delta.json').read_text
 
 
 def restore_case(case):
-    case=copy.deepcopy(case)
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('t17_sales_inputs',HERE/'author_sales_contract_inputs.py')
+    sales=importlib.util.module_from_spec(spec);spec.loader.exec_module(sales)
+    case=sales.restore_case(case)
     for sub in case['subcases']:
         changes={x['actionId']:x for x in ledger()['actionChanges'] if x['subcase']==sub['id']}
         if not set(changes).issubset({a['id'] for a in sub['actions']}):raise ValueError('Missing goal completion action')
@@ -124,6 +127,10 @@ def restore_fixture(f):
 
 
 def restore_feature(text):
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('t17_sales_inputs',HERE/'author_sales_contract_inputs.py')
+    sales=importlib.util.module_from_spec(spec);spec.loader.exec_module(sales)
+    text=sales.restore_feature(text)
     if hashlib.sha256(text.encode()).hexdigest()!=ledger()['featureAfterSha256']:
         raise ValueError('Goal completion feature drift')
     added={x['actionId'] for x in ledger()['actionChanges'] if x['before'] is None}

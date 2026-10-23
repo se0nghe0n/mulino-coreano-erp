@@ -31,6 +31,12 @@ public final class CanonicalEvidenceVerification {
     return verified(c,canonicalId,g->(documentId==null||documentId.equals(g.document().get("ID")))
         &&strict(c,canonical,g)&&purpose.permitsSource(c,g.claim())&&purpose.permitsSource(c,g.event())&&purpose.permitsSource(c,g.document()));
   }
+  /** Causal RECORD reuses the same integrity chain without issuing a public evidence-read grant. */
+  public boolean verifiedForDeliveryRecord(DomainContext c,String canonicalId,com.mulino.application.trade.sales.DeliveryRecordCause cause){
+    Objects.requireNonNull(cause);var canonical=r.require("CanonicalOccurrences",c.organizationId(),canonicalId);
+    if(!visible(canonical,c)||!cause.permitsCanonical(c,canonical))return false;
+    return verified(c,canonicalId,g->strict(c,canonical,g)&&cause.permitsSource(c,g.claim())&&cause.permitsSource(c,g.event())&&cause.permitsSource(c,g.document()));
+  }
   private boolean strict(DomainContext c,Map<String,Object> canonical,Graph g) {
     var v=g.verification();var claim=g.claim();var event=g.event();var doc=g.document();
     if(!List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream().allMatch(k->Boolean.TRUE.equals(v.get(k)))

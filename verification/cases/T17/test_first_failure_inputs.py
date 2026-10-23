@@ -39,7 +39,7 @@ class FirstFailureInputsTest(unittest.TestCase):
                 start=text.index('[',start);_,size=decoder.raw_decode(text[start:])
                 result.append(text[start:start+size]);start+=size
         raw_original=blocks(baseline(HERE/'case.json').decode())
-        self.assertEqual(raw_original,blocks((HERE/'case.json').read_text()))
+        self.assertEqual(raw_original,blocks(PUBLIC.sales_inputs.legacy_bytes((HERE/'case.json').read_bytes()).decode()))
         proof={'baseline':FIRST.BASE,'oracleCount':257,'rawAssertionBlockSha256':[hashlib.sha256(b.encode()).hexdigest() for b in raw_original],
                'publicLedgerSha256':hashlib.sha256((HERE/'public-contract-delta.json').read_bytes()).hexdigest(),
                'caseSha256':hashlib.sha256((HERE/'case.json').read_bytes()).hexdigest(),

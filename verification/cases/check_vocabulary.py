@@ -70,7 +70,6 @@ PENDING = {
     ('code', 'AUDIT_PERSISTENCE_FAILED'): ('T24', '§7.4', 'audit write failure rolls back the business effect; the backend has no structured code for it'),
     ('outcome', 'STRUCTURED'): ('T20', '§3.3', 'structureIntent effect-free structuring result; the vocabulary lists only VALIDATED for validateCommand'),
     ('kind', 'SALES_PROMISE'): ('C1,V2', '§4.2·§13.2 V2', 'customer sales promise obligation; ALLOCATION_SHORTAGE covers only the shortage part'),
-    ('kind', 'RECONCILIATION'): ('T17', '§6 판매·§13.1 D17', 'source claim intake reconciliation; candidates DELIVERY_RECONCILIATION or UNVERIFIED_SOURCE_REVIEW'),
     ('kind', 'REAUTHORIZE'): ('T08,V7', '§7.1·§7.2', 'responsibility left after a grant revocation blocks a command'),
     ('kind', 'QUANTITY_SHORTFALL'): ('T12,T10,T11', '§6 구매·운송', 'arrival shortfall duty; candidate RECEIPT_SHORTFALL'),
     ('kind', 'TRANSPORT_DISCREPANCY'): ('T14', '§6 운송', 'transport loss/discrepancy duty'),

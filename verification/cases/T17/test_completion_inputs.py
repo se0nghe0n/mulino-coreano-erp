@@ -13,7 +13,7 @@ NEW=PUBLIC.completion
 
 def original(path):return subprocess.check_output(['git','show',NEW.BASE+':'+str(path.relative_to(ROOT))],cwd=ROOT)
 def blocks(raw):
-    text=raw.decode();start=0;out=[];decoder=json.JSONDecoder()
+    text=PUBLIC.sales_inputs.legacy_bytes(raw).decode();start=0;out=[];decoder=json.JSONDecoder()
     while True:
         start=text.find('"assertions": [',start)
         if start<0:return out

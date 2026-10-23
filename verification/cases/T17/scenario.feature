@@ -23,6 +23,7 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "dispatched" 행동을 수행한다
+    만일 "observer" 역할이 "dispatched-item" 행동을 수행한다
     만일 "시스템" 역할이 "dispatched-db" 행동을 수행한다
     그러면 "held-after-reserve-1" assertion으로 "held-after-reserve"를 확인한다
     그러면 "held-after-reserve-2" assertion으로 "held-after-reserve"를 확인한다

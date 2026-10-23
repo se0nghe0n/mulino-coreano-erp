@@ -8,10 +8,12 @@ import java.util.*;
 public interface CanonicalFactAdmission {
   /** Internal operation selected by the evaluator entrypoint, never a request slot. */
   enum Purpose {
-    ASSESS_GOAL("assessGoal"), CLOSE_WORK("closeWork"), OPEN_OBLIGATION("openObligation");
+    ASSESS_GOAL("assessGoal"), CLOSE_WORK("closeWork"), OPEN_OBLIGATION("openObligation"),
+    RECORD_DELIVERY("recordDelivery"), RECORD_OBSERVED_MOVEMENT("recordObservedMovement");
     private final String capability;
     Purpose(String capability){this.capability=capability;}
     public String capability(){return capability;}
+    public boolean causalRecord(){return this==RECORD_DELIVERY||this==RECORD_OBSERVED_MOVEMENT;}
   }
   Set<String> eventKinds();
   Admission admit(DomainContext context,String workId,String goalId,Map<String,Object> canonical);

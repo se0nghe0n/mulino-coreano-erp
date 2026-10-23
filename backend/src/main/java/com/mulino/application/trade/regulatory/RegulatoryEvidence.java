@@ -31,7 +31,7 @@ public class RegulatoryEvidence {
    try{
     var mapper=new ObjectMapper();var original=mapper.readTree(blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));var payload=mapper.readTree(event.get("payload").toString());
     var all=new LinkedHashMap<String,Object>(expected);all.put("itemId",procedure.get("itemId"));all.put("lotId",procedure.get("lotId"));all.put("physicalScopeId",procedure.get("physicalScopeId"));all.put("authority",policy.get("authority"));all.put("policyVersion",policy.get("version"));
-    boolean matches=all.entrySet().stream().allMatch(e->(purpose==null?Objects.equals(original.path(e.getKey()).asText(),String.valueOf(e.getValue()))&&Objects.equals(payload.path(e.getKey()).asText(),String.valueOf(e.getValue())):sameValue(e.getKey(),e.getValue(),original.path(e.getKey()).asText())&&sameValue(e.getKey(),e.getValue(),payload.path(e.getKey()).asText())));
+    boolean matches=all.entrySet().stream().allMatch(e->(sameValue(e.getKey(),e.getValue(),original.path(e.getKey()).asText())&&sameValue(e.getKey(),e.getValue(),payload.path(e.getKey()).asText())));
     if(matches)return fact;
    }catch(java.io.IOException ignored){}
   }throw held();

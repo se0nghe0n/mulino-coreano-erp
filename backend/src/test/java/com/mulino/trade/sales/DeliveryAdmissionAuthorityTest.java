@@ -36,27 +36,27 @@ class DeliveryAdmissionAuthorityTest {
  private AnyValueGrant grant(Purpose purpose,Set<String> works){return new AnyValueGrant(Set.of(purpose.capability()),works);}
  private DeliveryAdmission service(AnyValueGrant grant){return new DeliveryAdmission(rows,grant);}
 
- @ParameterizedTest @EnumSource(Purpose.class)
+ @ParameterizedTest @EnumSource(value=Purpose.class,names={"ASSESS_GOAL","CLOSE_WORK","OPEN_OBLIGATION"})
  void requestedWorkOnlyCannotReadTheOtherSource(Purpose purpose){
   assertFalse(service(grant(purpose,Set.of(REQUESTED))).admit(CONTEXT,REQUESTED,"goal",canonical,purpose).admitted());
  }
- @ParameterizedTest @EnumSource(Purpose.class)
+ @ParameterizedTest @EnumSource(value=Purpose.class,names={"ASSESS_GOAL","CLOSE_WORK","OPEN_OBLIGATION"})
  void sourceWorkOnlyCannotActOnRequestedWork(Purpose purpose){
   assertFalse(service(grant(purpose,Set.of(SOURCE))).admit(CONTEXT,REQUESTED,"goal",canonical,purpose).admitted());
  }
- @ParameterizedTest @EnumSource(Purpose.class)
+ @ParameterizedTest @EnumSource(value=Purpose.class,names={"ASSESS_GOAL","CLOSE_WORK","OPEN_OBLIGATION"})
  void bothWorkEndpointsAllowTheActualLegitimateQuantity(Purpose purpose){
   var result=service(grant(purpose,Set.of(REQUESTED,SOURCE))).admit(CONTEXT,REQUESTED,"goal",canonical,purpose);
   assertTrue(result.admitted());assertEquals(new BigDecimal("80"),result.recognizedQuantity());
   assertEquals("lot",result.lotId());assertEquals(List.of("delivery","segment","canonical"),result.evidenceRefs());
  }
- static Stream<Arguments> wrongDimensions(){return Arrays.stream(Purpose.values()).flatMap(p->Stream.of("TARGET","ITEM","PLACE").map(d->Arguments.of(p,d)));}
+ static Stream<Arguments> wrongDimensions(){return Arrays.stream(Purpose.values()).filter(p->!p.causalRecord()).flatMap(p->Stream.of("TARGET","ITEM","PLACE").map(d->Arguments.of(p,d)));}
  @ParameterizedTest @MethodSource("wrongDimensions")
  void anotherRequiredDimensionCannotBeBorrowed(Purpose purpose,String dimension){
   var grant=grant(purpose,Set.of(REQUESTED,SOURCE));grant.scopes.put(dimension,Set.of("foreign"));
   assertFalse(service(grant).admit(CONTEXT,REQUESTED,"goal",canonical,purpose).admitted());
  }
- @ParameterizedTest @EnumSource(Purpose.class)
+ @ParameterizedTest @EnumSource(value=Purpose.class,names={"ASSESS_GOAL","CLOSE_WORK","OPEN_OBLIGATION"})
  void permissionForTheOtherOperationIsInsufficient(Purpose purpose){
   var other=purpose==Purpose.ASSESS_GOAL?Purpose.CLOSE_WORK:Purpose.ASSESS_GOAL;
   assertFalse(service(grant(other,Set.of(REQUESTED,SOURCE))).admit(CONTEXT,REQUESTED,"goal",canonical,purpose).admitted());
@@ -73,6 +73,13 @@ class DeliveryAdmissionAuthorityTest {
   assertFalse(service(grant(Purpose.CLOSE_WORK,Set.of(REQUESTED,SOURCE))).admit(CONTEXT,REQUESTED,"goal",canonical).admitted());
  }
  @Test void nullPurposeDoesNotAdmit(){assertThrows(NullPointerException.class,()->service(grant(Purpose.CLOSE_WORK,Set.of(REQUESTED,SOURCE))).admit(CONTEXT,REQUESTED,"goal",canonical,null));}
+ @ParameterizedTest @EnumSource(value=Purpose.class,names={"RECORD_DELIVERY","RECORD_OBSERVED_MOVEMENT"})
+ void recordCapabilityAndEnumAloneCannotMintACausalAssessment(Purpose purpose){
+  var verification=mock(com.mulino.application.evidence.CanonicalEvidenceVerification.class);
+  when(rows.currentRecordCause(CONTEXT,REQUESTED,purpose.capability())).thenThrow(DomainError.forbidden());
+  var admission=new DeliveryAdmission(rows,grant(purpose,Set.of(REQUESTED,SOURCE)),verification);
+  assertFalse(admission.admit(CONTEXT,REQUESTED,"goal",canonical,purpose).admitted());verifyNoInteractions(verification);
+ }
 
  /** Faithful local grant rule: all configured dimensions, any value within each dimension.
   * Passing [requested, source] once is deliberately insufficient proof for both. */

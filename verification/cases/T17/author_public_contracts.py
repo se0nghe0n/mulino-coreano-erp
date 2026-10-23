@@ -21,6 +21,8 @@ _delivery_spec=importlib.util.spec_from_file_location('t17_delivery',HERE/'autho
 delivery=importlib.util.module_from_spec(_delivery_spec);_delivery_spec.loader.exec_module(delivery)
 _goal_spec=importlib.util.spec_from_file_location('t17_goal',HERE/'author_delivery_goal_inputs.py')
 goal=importlib.util.module_from_spec(_goal_spec);_goal_spec.loader.exec_module(goal)
+_sales_spec=importlib.util.spec_from_file_location('t17_sales_inputs',HERE/'author_sales_contract_inputs.py')
+sales_inputs=importlib.util.module_from_spec(_sales_spec);_sales_spec.loader.exec_module(sales_inputs)
 ROOT = HERE.parents[2]
 META = 'publicContractAuthoring'
 NAMESPACE = 'synthetic-t17-eligibility'
@@ -333,6 +335,7 @@ if __name__ == '__main__':
     case,authored=completion.apply(copy.deepcopy(case),copy.deepcopy(authored),sys.modules[__name__])
     case,authored=delivery.apply(case,authored,sys.modules[__name__])
     case,authored=goal.apply(case,authored,sys.modules[__name__])
+    case=sales_inputs.apply(case)
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
     feature_path.write_text(feature_lines(feature,before,case))

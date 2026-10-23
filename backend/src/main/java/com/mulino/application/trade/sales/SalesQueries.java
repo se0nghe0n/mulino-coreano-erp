@@ -18,6 +18,17 @@ public class SalesQueries implements QueryHandler,ObjectReadProvider,EvidenceSub
   * Deliveries visible at that knownAt.
   */
  private List<Map<String,Object>> observations(DomainContext c){var confirmed=new HashSet<Object>();for(var d:r.rows(c,"Deliveries"))confirmed.add(d.get("observationId"));return r.rows(c,"Observations").stream().map(x->{var row=new LinkedHashMap<String,Object>(x);boolean known=confirmed.contains(x.get("ID"));if("CONFIRMED".equals(x.get("state"))&&!known){row.put("state","PROVISIONAL");row.put("revision",1);if(row.get("claimedRangeRootId")!=null)row.put("rangeRootId",null);}return (Map<String,Object>)row;}).toList();}
+ /** Delivery reports are distinct from quality/regulatory evidence claims in the same item scope. */
+ public List<Map<String,Object>> worldObservations(DomainContext c,Map<String,Object> scope){
+  return observations(c).stream().filter(row->at(c,row)&&!StockPrimitives.instant(row.get("occurredAt")).isAfter(c.asOf()))
+   .filter(row->List.of("itemId","workId","customerId","salesLineId","lotId","placeId").stream().allMatch(key->scope.get(key)==null||Objects.equals(scope.get(key),row.get(key))))
+   .filter(row->scope.get("orderId")==null||row.get("salesLineId")!=null&&Objects.equals(scope.get("orderId"),r.require(c,"OrderLines",row.get("salesLineId").toString()).get("orderId")))
+   .filter(row->auth.permittedScopes(c,"getObject",scopes(row))).sorted(Comparator.comparing(row->row.get("ID").toString())).map(row->{
+    var value=new LinkedHashMap<String,Object>(row);boolean confirmed="CONFIRMED".equals(row.get("state"));value.put("canonical",confirmed);value.put("status",confirmed?"CONFIRMED":"PENDING_RECONCILIATION");
+    value.put("saleExecutionAuthorized",false); // RECORD intake/confirmation never grants a future execution.
+    return (Map<String,Object>)value;
+   }).toList();
+ }
  private boolean at(DomainContext c,Map<String,Object>x){return !StockPrimitives.instant(x.get("effectiveAt")).isAfter(c.asOf());}
  private Map<String,Object> project(DomainContext c,String entity,Map<String,Object>x){var result=new LinkedHashMap<>(x);if(entity.equals("Orders")){var revisions=r.rows(c,"OrderRevisions").stream().filter(a->x.get("ID").equals(a.get("orderId"))&&at(c,a)&&auth.permittedScopes(c,"getSalesOrder",scopes(a))).toList();result.put("revisions",revisions);int visible=revisions.stream().mapToInt(a->((Number)a.get("revisionNumber")).intValue()).max().orElse(0);result.put("currentRevision",visible);result.put("revision",visible);result.put("lines",r.rows(c,"OrderLines").stream().filter(a->x.get("ID").equals(a.get("orderId"))&&at(c,a)&&auth.permittedScopes(c,"getSalesOrder",scopes(a))).toList());}if(entity.equals("Deliveries"))result.put("corrections",r.rows(c,"DeliveryCorrections").stream().filter(a->x.get("ID").equals(a.get("deliveryId"))&&at(c,a)).sorted(Comparator.comparingInt(a->((Number)a.get("revision")).intValue())).toList());return result;}
  /** Current line contracts are selected through immutable visible revisions, not a mutable header counter. */

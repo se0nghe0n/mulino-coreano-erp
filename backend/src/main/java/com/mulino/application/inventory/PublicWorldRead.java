@@ -133,12 +133,14 @@ public class PublicWorldRead {
     if(visibleAssessments.size()!=boundAssessments.size())gaps.add("PARTIAL_ASSESSMENT_READ_AUTHORITY");
     ledger.put("assessments",visibleAssessments);
     var result=new LinkedHashMap<String,Object>();result.put("effectLedger",ledger);
+    result.put("deliveryObservations",salesRead.worldObservations(c,scope).stream().filter(row->workIds.contains(row.get("workId"))).toList());
     var unit=inventory.object(c,"TradeItems",item).get("baseUnit").toString();
     var places=index(inventory.rows(c,"Places"));
     boolean placeKindsKnown=segments.stream().allMatch(s->places.containsKey(s.get("placeId"))&&places.get(s.get("placeId")).get("kind")!=null);
     if(!placeKindsKnown)gaps.add("PHYSICAL_PLACE_KIND_UNAVAILABLE");
     var transit=segments.stream().filter(s->InventoryReadCandidates.active(s,c)&&"TRANSIT".equals(places.getOrDefault(s.get("placeId"),Map.of()).get("kind"))).toList();
     if(stockComplete&&placeKindsKnown){
+      quantity(result,"warehouseHeldQuantity",segments.stream().filter(s->InventoryReadCandidates.active(s,c)&&"INTERNAL_STORAGE".equals(places.getOrDefault(s.get("placeId"),Map.of()).get("kind"))).toList(),"quantity",unit,gaps);
       if(!relationScoped)quantity(result,"inTransitQuantity",transit,"quantity",unit,gaps);
       else if(transit.stream().allMatch(s->unit.equals(s.get("unit")))&&dispatches.stream().allMatch(d->completeRange(edges,d,allSegments.values(),unit,c))){
         BigDecimal total=BigDecimal.ZERO;for(var segment:transit){var ranges=new ArrayList<QualityRanges.Range>();for(var d:dispatches)ranges.addAll(project(edges,d,"rangeRootId",segment));total=total.add(QualityRanges.quantity(QualityRanges.union(ranges)));}result.put("inTransitQuantity",total);
@@ -155,8 +157,28 @@ public class PublicWorldRead {
     result.put("orderContracts",lines);
     if(contracts.complete()&&lines.size()==1)result.put("deliveryEndpoint",lines.getFirst().get("deliveryEndpoint"));
     else if(!lines.isEmpty())gaps.add("ORDER_ENDPOINT_REQUIRES_UNIQUE_LINE");
+    deliveryAssessments(result,world,works,visibleAssessments,workIds,gaps);
     gaps.add("NORMAL_SALE_AUTHORIZATION_REQUIRES_EXECUTION_ASSESSMENT");
     result.put("publicReadGaps",List.copyOf(gaps));return result;
+  }
+
+  /** Only an immutable assessment of the current delivery GoalVersion can supply a summary.
+   * A physical delivery, its recognized quantity, and a future sale authorization remain separate. */
+  @SuppressWarnings("unchecked")
+  private static void deliveryAssessments(Map<String,Object> result,Map<String,Object> world,List<Map<String,Object>> works,List<Map<String,Object>> assessments,Set<Object> workIds,Set<String> gaps){
+    var goals=(List<Map<String,Object>>)world.getOrDefault("goalReferences",List.of());var selected=new ArrayList<Map<String,Object>>();
+    for(var work:works){
+      if(!workIds.contains(work.get("ID")))continue;
+      var goal=goals.stream().filter(g->Objects.equals(work.get("currentGoalVersionId"),g.get("ID"))&&Objects.equals(work.get("ID"),g.get("workId"))&&"DELIVERED".equals(g.get("endpoint"))).findFirst();
+      if(goal.isEmpty())continue;
+      var candidates=assessments.stream().filter(a->Objects.equals(work.get("ID"),a.get("workId"))&&Objects.equals(goal.get().get("ID"),a.get("goalId"))).toList();
+      var heads=candidates.stream().filter(a->candidates.stream().noneMatch(next->Objects.equals(a.get("ID"),next.get("previousAssessmentId")))).toList();
+      if(heads.size()!=1||Boolean.TRUE.equals(work.get("pendingInvalidation"))){gaps.add("DELIVERY_ASSESSMENT_PENDING_OR_UNAVAILABLE");continue;}
+      var row=new LinkedHashMap<String,Object>(heads.getFirst());row.put("goalKind","DELIVERY");row.put("current",true);row.put("result",row.get("outcome"));selected.add(row);
+    }
+    selected.sort(order());result.put("deliveryAssessments",List.copyOf(selected));
+    if(selected.size()==1)result.put("deliveryAssessment",selected.getFirst().get("result"));
+    else if(selected.size()>1)gaps.add("DELIVERY_ASSESSMENT_REQUIRES_UNIQUE_GOAL");
   }
 
   private static List<QualityRanges.Range> project(List<Map<String,Object>> edges,Map<String,Object> binding,String root,Map<String,Object> segment){

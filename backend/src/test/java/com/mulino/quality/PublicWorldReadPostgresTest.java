@@ -28,6 +28,9 @@ class PublicWorldReadPostgresTest {
  @Autowired ApplicationContext context;
  @MockitoBean org.springframework.security.oauth2.jwt.JwtDecoder decoder;
  @MockitoBean ExecutionClock clock;
+ @org.springframework.test.context.bean.override.mockito.MockitoSpyBean com.mulino.application.evaluation.AssessmentService assessmentService;
+ @Autowired com.mulino.application.trade.sales.DeliveryAdmission deliveryAdmission;
+ @Autowired com.mulino.domain.evidence.EvidenceRepository evidenceRepository;
 
  @BeforeEach void seed(TestInfo info)throws Exception{
   context.getAutowireCapableBeanFactory().autowireBean(fixture);
@@ -87,6 +90,8 @@ class PublicWorldReadPostgresTest {
   var scoped=world(fixture.map("salesLineId",fixture.salesLine));assertEquals(amount,scoped.get("deliveredQuantity"));assertEquals(mode.equals("normal")?"0":"10",scoped.get("inTransitQuantity"));
   assertEquals(amount,after.get("deliveredQuantity"));assertEquals(mode.equals("normal")?"0":"10",after.get("inTransitQuantity"));
   assertEquals("100",after.get("heldQuantity"),"Whole ITEM includes warehouse, transit and customer physical goods");
+  assertEquals("70",after.get("warehouseHeldQuantity"));
+  assertEquals("70",world(fixture.map("placeId",fixture.place)).get("warehouseHeldQuantity"));
   assertEquals(mode.equals("normal")?amount:"0",actual.get("contributedQuantity"));
   assertEquals(ledger(before).get("allocations"),ledger(after).get("allocations"));
   assertEquals(before.get("warehouseDispatchQuantity"),after.get("warehouseDispatchQuantity"));
@@ -100,10 +105,82 @@ class PublicWorldReadPostgresTest {
   fixture.allow("100");fixture.allowDispatch();String dispatch=fixture.dispatched("0","30");var before=world(Map.of());
   var report=fixture.deliveryReport(dispatch,"0","20",fixture.place);fixture.intakeDelivery(report);var after=world(Map.of());
   assertEquals(ledger(before),ledger(after));assertEquals("0",after.get("deliveredQuantity"));
+  var observations=(List<Map<String,Object>>)after.get("deliveryObservations");assertEquals(1,observations.size());var observation=observations.getFirst();
+  assertEquals(report.get("physicalScopeId"),observation.get("ID"));assertEquals("PENDING_RECONCILIATION",observation.get("status"));assertEquals(false,observation.get("canonical"));assertEquals(false,observation.get("saleExecutionAuthorized"));
+  assertEquals("20",observation.get("quantity"));assertEquals(report.get("rangeRootId"),observation.get("claimedRangeRootId"));assertNull(observation.get("rangeRootId"));assertNotNull(observation.get("eventId"));
+  assertEquals(0,fixture.jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE organizationId=?",Integer.class,fixture.org));
+  var duty=fixture.jdbc.queryForMap("SELECT * FROM mulino_work_read_ObligationReferences WHERE organizationId=? AND kind='DELIVERY_RECONCILIATION' AND status='OPEN'",fixture.org);
+  assertEquals(0,new BigDecimal("20").compareTo((BigDecimal)duty.get("quantity")));assertEquals("EA",duty.get("unit"));assertNotNull(duty.get("nextaction"));assertNotNull(duty.get("nextcheckat"));
   fixture.segment=fixture.jdbc.queryForObject("SELECT ID FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND placeId=? AND retiredAt IS NULL",String.class,fixture.org,fixture.place);
   String allocation=fixture.reserve("0","60");before=world(Map.of());
   var denied=fixture.apply(fixture.envelope("reserveQuantity",fixture.map("segmentId",fixture.segment,"salesLineId",fixture.salesLine,"startQuantity","0","quantity","60","unit","EA"),0));
   assertEquals("REJECTED",denied.get("outcome"));assertEquals(ledger(before),ledger(world(Map.of())));assertEquals("EXECUTABLE",fixture.allocationState(allocation));evidence("claim-and-denied",after);
+ }
+ @Test void readWithoutRecordAuthorityCannotConfirmDeliveryOrCreateAnAssessment(){
+  fixture.allow("100");fixture.allowDispatch();String dispatch=fixture.dispatched("0","30");
+  var report=fixture.deliveryReport(dispatch,"0","30",fixture.destination);String intake=fixture.intakeDelivery(report);var review=fixture.matchDelivery(report,intake);assertEquals("APPLIED",review.get("outcome"));fixture.run("linkCanonicalOccurrence",fixture.map("reconciliationId",review.get("id")),1);
+  String canonical=fixture.jdbc.queryForObject("SELECT canonicalOccurrenceId FROM mulino_evidence_Verifications WHERE claimId=?",String.class,intake.split("\\|")[0]);
+  fixture.jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE organizationId=? AND actorId=? AND capabilityId='recordDelivery'",Timestamp.from(fixture.now),fixture.org,fixture.actor);
+  var before=world(Map.of());String snapshot=fingerprint();
+  assertEquals(before,world(Map.of()));assertEquals(snapshot,fingerprint());
+  var denied=fixture.apply(fixture.envelope("recordDelivery",fixture.map("observationId",report.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1));assertEquals("FORBIDDEN",fixture.code(denied));
+  assertEquals(ledger(before),ledger(world(Map.of())));assertEquals(0,fixture.customerQuantity().signum());
+  assertEquals(0,fixture.jdbc.queryForObject("SELECT count(*) FROM mulino_trade_sales_Deliveries WHERE organizationId=?",Integer.class,fixture.org));
+  assertEquals(0,fixture.jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE organizationId=?",Integer.class,fixture.org));
+ }
+ @Tag("causal-delivery-integration") @ParameterizedTest @ValueSource(strings={"normal","restricted"})
+ void confirmedDeliveryReassessesOnlyWithCurrentEvaluatorAuthorityAndKeepsCommandIdentity(String mode)throws Exception{
+  fixture.allow("100");fixture.allowDispatch();deliveryGoal();
+  fixture.salesLine=fixture.effects(fixture.run("createSalesOrder",fixture.map("workId",fixture.work,"customerId",fixture.customer,"itemId",fixture.item,"quantity","30","unit","EA","dueAt",fixture.now.plusSeconds(90).toString(),"destinationId",fixture.destination,"deliveryEndpoint","DELIVERED","qualityTerms","fixture","packageTerms","fixture"),null)).get("salesLineId").toString();
+  String dispatch=fixture.dispatched("0","30");
+  if(mode.equals("restricted")){var hold=fixture.permission("placeHold","RECALL","100");hold.put("action","ALL");String doc=fixture.evidence(hold,"HOLD");hold.remove("operation");hold.remove("sourceDecisionId");hold.remove("sourceVersion");hold.putAll(fixture.map("evidenceId",doc,"reason","Post-dispatch restriction","nextCheckAt",fixture.now.plusSeconds(60).toString()));fixture.run("placeHold",hold,1);}
+  var report=fixture.deliveryReport(dispatch,"0","30",fixture.destination);String intake=fixture.intakeDelivery(report);var review=fixture.matchDelivery(report,intake);assertEquals("APPLIED",review.get("outcome"));fixture.run("linkCanonicalOccurrence",fixture.map("reconciliationId",review.get("id")),1);
+  String canonical=fixture.jdbc.queryForObject("SELECT canonicalOccurrenceId FROM mulino_evidence_Verifications WHERE claimId=?",String.class,intake.split("\\|")[0]);
+  var confirmed=fixture.run("recordDelivery",fixture.map("observationId",report.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1);String command=confirmed.get("commandId").toString();
+  assertEquals(command,fixture.jdbc.queryForObject("SELECT commandId FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND kind='DELIVERY' AND evidenceRef=?",String.class,fixture.org,canonical));
+  assertEquals("COMMITTED",fixture.jdbc.queryForObject("SELECT state FROM mulino_commands_CommandRecords WHERE organizationId=? AND ID=?",String.class,fixture.org,command));
+  var data=world(fixture.map("workId",fixture.work));assertEquals("30",data.get("deliveredQuantity"));assertEquals("CONSUMED",data.get("allocationStatus"));
+  assertEquals(mode.equals("normal")?"SATISFIED":"UNSATISFIED",data.get("deliveryAssessment"));assertEquals(1,((List<?>)data.get("deliveryAssessments")).size());assertEquals(false,fixture.jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",Boolean.class,fixture.org,fixture.work));
+  assertEquals(0,fixture.jdbc.queryForObject("SELECT count(*) FROM mulino_identity_CapabilityAssignments WHERE organizationId=? AND actorId=? AND capabilityId='assessGoal'",Integer.class,fixture.org,fixture.actor));
+ }
+ void deliveryGoal()throws Exception{
+  var goal=fixture.map("quantityMode","CUMULATIVE_EVENT","targetQuantity","30","unit","EA","endpoint","DELIVERED","dueAt",fixture.now.plusSeconds(90).toString(),"placeId",fixture.destination,"scope",Map.of("itemId",fixture.item),"timezone","UTC","evidencePolicyVersion","fixture-v1","periodStartInclusive",true,"periodEndInclusive",true,"periodStart",fixture.now.minusSeconds(1).toString(),"periodEnd",fixture.now.plusSeconds(90).toString(),"eventKind","PHYSICAL_DELIVERY","contributionScope",Map.of("itemId",fixture.item),"deduplication","CANONICAL_OCCURRENCE","conditions",List.of(Map.of("id","Delivery")),"evaluatorVersion","core-v1");
+  var draft=fixture.envelope("createDraft",fixture.map("itemId",fixture.item,"definitionVersionId",fixture.definition,"kind","DELIVERY","ownerId",fixture.actor,"supervisorId",fixture.actor,"goal",goal),0);var created=fixture.apply(draft);assertEquals("APPLIED",created.get("outcome"),created.toString());fixture.work=fixture.effects(created).get("workId").toString();
+  var activate=fixture.envelope("activateWork",fixture.map("workId",fixture.work),0);assertEquals("APPLIED",fixture.apply(activate).get("outcome"));
+ }
+ @Tag("causal-delivery-integration") @Test void causalRecordWitnessRequiresRealCommandEffectAndCurrentAllOfSourcesWithoutPublicRead()throws Exception{
+  fixture.allow("100");fixture.allowDispatch();deliveryGoal();
+  fixture.salesLine=fixture.effects(fixture.run("createSalesOrder",fixture.map("workId",fixture.work,"customerId",fixture.customer,"itemId",fixture.item,"quantity","30","unit","EA","dueAt",fixture.now.plusSeconds(90).toString(),"destinationId",fixture.destination,"deliveryEndpoint","DELIVERED","qualityTerms","fixture","packageTerms","fixture"),null)).get("salesLineId").toString();
+  String dispatch=fixture.dispatched("0","30");var report=fixture.deliveryReport(dispatch,"0","30",fixture.destination);String intake=fixture.intakeDelivery(report);var review=fixture.matchDelivery(report,intake);assertEquals("APPLIED",review.get("outcome"));fixture.run("linkCanonicalOccurrence",fixture.map("reconciliationId",review.get("id")),1);
+  String canonical=fixture.jdbc.queryForObject("SELECT canonicalOccurrenceId FROM mulino_evidence_Verifications WHERE claimId=?",String.class,intake.split("\\|")[0]);
+  var calls=new java.util.concurrent.atomic.AtomicInteger();
+  org.mockito.Mockito.doAnswer(call->{
+   calls.incrementAndGet();var c=(DomainContext)call.getArgument(0);assertEquals(fixture.work,call.getArgument(1));var fact=evidenceRepository.require("CanonicalOccurrences",fixture.org,canonical);
+   fixture.jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE organizationId=? AND actorId=? AND capabilityId='getEvidence'",Timestamp.from(fixture.now),fixture.org,fixture.actor);
+   var dimensions=fixture.map("TARGET",report.get("physicalScopeId"),"WORK",fixture.work,"ITEM",fixture.item,"PLACE",fixture.destination,"SOURCE",fact.get("sourceProfileId"));
+   for(var entry:dimensions.entrySet())fixture.insert("mulino_identity_GrantScopes",fixture.map("organizationId",fixture.org,"grantId",fixture.grant,"scopeKind",entry.getKey(),"scopeId",entry.getValue()));
+   fixture.insert("mulino_identity_GrantScopes",fixture.map("organizationId",fixture.org,"grantId",fixture.grant,"scopeKind","PLACE","scopeId",fixture.transit));
+   var purpose=com.mulino.domain.evaluation.CanonicalFactAdmission.Purpose.RECORD_DELIVERY;
+   assertTrue(deliveryAdmission.admit(c,fixture.work,"goal",fact,purpose).admitted());
+   for(String dimension:List.of("SOURCE","TARGET","WORK","ITEM","PLACE")){
+    var prior=fixture.jdbc.queryForList("SELECT scopeId FROM mulino_identity_GrantScopes WHERE grantId=? AND scopeKind=?",String.class,fixture.grant,dimension);
+    fixture.jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE grantId=? AND scopeKind=?",fixture.grant,dimension);
+    fixture.insert("mulino_identity_GrantScopes",fixture.map("organizationId",fixture.org,"grantId",fixture.grant,"scopeKind",dimension,"scopeId",fixture.id()));
+    assertFalse(deliveryAdmission.admit(c,fixture.work,"goal",fact,purpose).admitted(),dimension);
+    fixture.jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE grantId=? AND scopeKind=?",fixture.grant,dimension);
+    for(String id:prior)fixture.insert("mulino_identity_GrantScopes",fixture.map("organizationId",fixture.org,"grantId",fixture.grant,"scopeKind",dimension,"scopeId",id));
+   }
+   fixture.jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE organizationId=? AND actorId=? AND capabilityId='recordDelivery'",Timestamp.from(fixture.now),fixture.org,fixture.actor);
+   assertFalse(deliveryAdmission.admit(c,fixture.work,"goal",fact,purpose).admitted());
+   fixture.jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=NULL WHERE organizationId=? AND actorId=? AND capabilityId='recordDelivery'",fixture.org,fixture.actor);
+   // The integration suite owns persisted assessment truth. This test isolates
+   // the real command-bound source gate and deliberately leaves the goal pending.
+   return Map.of("outcome","HELD");
+  }).when(assessmentService).assessCreated(org.mockito.ArgumentMatchers.any(),org.mockito.ArgumentMatchers.eq(fixture.work));
+  fixture.run("recordDelivery",fixture.map("observationId",report.get("physicalScopeId"),"canonicalOccurrenceId",canonical),1);assertEquals(1,calls.get());
+  assertEquals("30",fixture.customerQuantity().stripTrailingZeros().toPlainString());
+  var c=fixture.c();assertFalse(fixture.runtime.requestContext().run(ctx->{return deliveryAdmission.admit(c,fixture.work,"goal",evidenceRepository.require("CanonicalOccurrences",fixture.org,canonical),com.mulino.domain.evaluation.CanonicalFactAdmission.Purpose.RECORD_DELIVERY);}).admitted());
+  assertEquals(0,fixture.jdbc.queryForObject("SELECT count(*) FROM mulino_identity_CapabilityAssignments WHERE organizationId=? AND actorId=? AND capabilityId='assessGoal'",Integer.class,fixture.org,fixture.actor));
  }
  @Test void publicWorldFefoAndPackagingDenialsHaveNoLedgerEffect(){
   fixture.allow("100");fixture.earlierStock(true);var before=world(Map.of());

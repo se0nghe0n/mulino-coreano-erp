@@ -19,7 +19,7 @@ def original(path):
 
 
 def assertion_blocks(data):
-    text=data.decode();blocks=[];decoder=json.JSONDecoder();start=0
+    text=PUBLIC.sales_inputs.legacy_bytes(data).decode();blocks=[];decoder=json.JSONDecoder();start=0
     while True:
         pos=text.find('"assertions": [',start)
         if pos<0:return blocks
@@ -36,6 +36,7 @@ class PublicContractTests(unittest.TestCase):
         generated,changed=PUBLIC.completion.apply(generated,changed,PUBLIC)
         generated,changed=PUBLIC.delivery.apply(generated,changed,PUBLIC)
         generated,changed=PUBLIC.goal.apply(generated,changed,PUBLIC)
+        generated=PUBLIC.sales_inputs.apply(generated)
         actual=json.loads((HERE/'case.json').read_text())
         self.assertEqual(generated,actual)
         self.assertEqual(before,PUBLIC.restore_case(actual))

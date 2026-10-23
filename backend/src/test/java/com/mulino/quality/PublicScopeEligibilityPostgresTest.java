@@ -230,4 +230,31 @@ class PublicScopeEligibilityPostgresTest {
     fixture.now=fixture.now.plusSeconds(1001);
     result=read(null,scope(),Map.of("customerId",fixture.customer));equivalent(result);assertEquals("0",segments(result).getFirst().get("eligibleQuantity"));
   }
+  @Test @SuppressWarnings("unchecked") void semanticConditionsKeepRealSourcesAndFefoExcludesReservedStock() {
+    allow("0","40",fixture.customer);
+    var response=read(null,scope(),Map.of("customerId",fixture.customer));var row=segments(response).getFirst();
+    var conditions=(List<Map<String,Object>>)row.get("conditionResults");
+    assertEquals(Set.of("QC","REGULATORY","LABEL","DISPOSITION","CUSTOMER_CONTRACT"),conditions.stream().map(c->c.get("conditionId")).collect(java.util.stream.Collectors.toSet()));
+    assertEquals(conditions,data(response).get("conditionResults"));assertEquals(fixture.segment,data(response).get("preferredSegmentId"));
+    assertEquals("40",row.get("unreservedEligibleQuantity"));
+    for(var condition:conditions){assertEquals(fixture.segment,condition.get("segmentId"));assertEquals(com.mulino.application.quality.QualityEligibility.EVALUATOR_VERSION,condition.get("evaluatorVersion"));assertEquals("ALLOWED",condition.get("status"));assertFalse(((List<?>)condition.get("evidenceRefs")).isEmpty());}
+    for(var category:Map.of("QC","QC","DISPOSITION","COMMERCIAL","CUSTOMER_CONTRACT","CUSTOMER").entrySet()){
+      String doc=fixture.jdbc.queryForObject("SELECT evidenceRef FROM mulino_inventory_DispositionBases WHERE category=?",String.class,category.getValue());
+      assertEquals(doc,conditions.stream().filter(c->category.getKey().equals(c.get("conditionId"))).findFirst().orElseThrow().get("evidenceId"));
+    }
+    var label=conditions.stream().filter(c->"LABEL".equals(c.get("conditionId"))).findFirst().orElseThrow();
+    assertEquals(false,label.get("required"));assertEquals("NOT_REQUIRED_BY_POLICY",label.get("basis"));assertEquals(fixture.regPolicy,label.get("evidenceId"));
+    var inventory=runtime.requestContext().run(ctx->{return queries.query(new QueryRequest("getInventory",null,scope(),Map.of("customerId",fixture.customer),200,null,null,fixture.now,fixture.now,null));});
+    assertEquals(conditions,data(inventory).get("conditionResults"));
+    fixture.reserve("0","40");var reserved=read(null,scope(),Map.of("customerId",fixture.customer));
+    assertEquals("0",segments(reserved).getFirst().get("unreservedEligibleQuantity"));assertFalse(data(reserved).containsKey("preferredSegmentId"));
+  }
+  @Test @SuppressWarnings("unchecked") void qcPermissionAndCurrentHoldRemainIndependentAndBothSourcesAreNamed() {
+    allow("0","100",fixture.customer);fixture.hold("100");
+    var response=read(null,scope(),Map.of("customerId",fixture.customer));var row=segments(response).getFirst();
+    var qc=((List<Map<String,Object>>)row.get("conditionResults")).stream().filter(c->"QC".equals(c.get("conditionId"))).findFirst().orElseThrow();
+    assertEquals("ALLOWED",qc.get("permissionStatus"));assertEquals("DENIED",qc.get("restrictionStatus"));assertEquals("DENIED",qc.get("status"));assertEquals("0",row.get("eligibleQuantity"));
+    var expected=new HashSet<>(fixture.jdbc.queryForList("SELECT evidenceRef FROM mulino_inventory_DispositionBases WHERE category='QC' UNION SELECT evidenceRef FROM mulino_inventory_Restrictions WHERE category='QC'",String.class));
+    assertEquals(expected,new HashSet<>((List<String>)qc.get("evidenceRefs")));assertNull(qc.get("evidenceId"));
+  }
 }

@@ -1,0 +1,6387 @@
+{
+  "baseline": "b4772eb6",
+  "assertionCount": 257,
+  "expectedBusinessValuesChanged": false,
+  "fixtureGrantClockChanged": false,
+  "changes": [
+    {
+      "subcase": "reserve-pick-dispatch",
+      "section": "actions",
+      "id": "dispatched",
+      "before": {
+        "id": "dispatched",
+        "kind": "query",
+        "actorRef": "observer",
+        "route": "api",
+        "capabilityId": "getObject",
+        "request": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "id": {
+            "$alias": "P"
+          }
+        },
+        "evidenceRefs": [
+          "dispatched:api-response"
+        ]
+      },
+      "after": {
+        "id": "dispatched",
+        "kind": "query",
+        "actorRef": "observer",
+        "route": "api",
+        "capabilityId": "getObject",
+        "request": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "placeId": {
+              "$alias": "W"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "id": {
+            "$alias": "P"
+          }
+        },
+        "evidenceRefs": [
+          "dispatched:api-response"
+        ]
+      }
+    },
+    {
+      "subcase": "reserve-pick-dispatch",
+      "section": "actions",
+      "id": "dispatched-item",
+      "before": null,
+      "after": {
+        "id": "dispatched-item",
+        "kind": "query",
+        "actorRef": "observer",
+        "route": "api",
+        "capabilityId": "getObject",
+        "request": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "id": {
+            "$alias": "P"
+          }
+        },
+        "evidenceRefs": [
+          "dispatched-item:actual-query-artifact"
+        ]
+      }
+    },
+    {
+      "subcase": "reserve-pick-dispatch",
+      "section": "actions",
+      "id": "dispatched-db",
+      "before": {
+        "id": "dispatched-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "dispatched",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "dispatched-db:raw-rows",
+          "dispatched-db:source-query",
+          "dispatched-db:snapshot"
+        ]
+      },
+      "after": {
+        "id": "dispatched-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "dispatched-item",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "dispatched-db:raw-rows",
+          "dispatched-db:source-query",
+          "dispatched-db:snapshot"
+        ]
+      }
+    },
+    {
+      "subcase": "reserve-pick-dispatch",
+      "section": "assertions",
+      "id": "in-transit-after-dispatch-14",
+      "before": {
+        "id": "in-transit-after-dispatch-14",
+        "op": "decimalEquals",
+        "source": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/inTransitQuantity"
+        },
+        "expected": "60",
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "dispatched:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "reserve-pick-dispatch"
+        },
+        "oracleExplanation": "in-transit-after-dispatch는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.reserve-pick-dispatch",
+          "observationNames": [
+            "in-transit-after-dispatch"
+          ]
+        },
+        "unit": "BOX",
+        "unitSource": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/unit"
+        }
+      },
+      "after": {
+        "id": "in-transit-after-dispatch-14",
+        "op": "decimalEquals",
+        "source": {
+          "actionId": "dispatched-item",
+          "pointer": "/response/data/inTransitQuantity"
+        },
+        "expected": "60",
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "dispatched:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "reserve-pick-dispatch"
+        },
+        "oracleExplanation": "in-transit-after-dispatch는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.reserve-pick-dispatch",
+          "observationNames": [
+            "in-transit-after-dispatch"
+          ]
+        },
+        "unit": "BOX",
+        "unitSource": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/unit"
+        }
+      }
+    },
+    {
+      "subcase": "reserve-pick-dispatch",
+      "section": "assertions",
+      "id": "delivered-before-observation-16",
+      "before": {
+        "id": "delivered-before-observation-16",
+        "op": "decimalEquals",
+        "source": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/deliveredQuantity"
+        },
+        "expected": "0",
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "dispatched:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "reserve-pick-dispatch"
+        },
+        "oracleExplanation": "delivered-before-observation는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.reserve-pick-dispatch",
+          "observationNames": [
+            "delivered-before-observation"
+          ]
+        },
+        "unit": "BOX",
+        "unitSource": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/unit"
+        }
+      },
+      "after": {
+        "id": "delivered-before-observation-16",
+        "op": "decimalEquals",
+        "source": {
+          "actionId": "dispatched-item",
+          "pointer": "/response/data/deliveredQuantity"
+        },
+        "expected": "0",
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "dispatched:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "reserve-pick-dispatch"
+        },
+        "oracleExplanation": "delivered-before-observation는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.reserve-pick-dispatch",
+          "observationNames": [
+            "delivered-before-observation"
+          ]
+        },
+        "unit": "BOX",
+        "unitSource": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/unit"
+        }
+      }
+    },
+    {
+      "subcase": "reserve-pick-dispatch",
+      "section": "assertions",
+      "id": "dispatch-allocation-18",
+      "before": {
+        "id": "dispatch-allocation-18",
+        "op": "equals",
+        "source": {
+          "actionId": "dispatched",
+          "pointer": "/response/data/allocationStatus"
+        },
+        "expected": "CONSUMED",
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "dispatched:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "reserve-pick-dispatch"
+        },
+        "oracleExplanation": "dispatch-allocation는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.reserve-pick-dispatch",
+          "observationNames": [
+            "dispatch-allocation"
+          ]
+        }
+      },
+      "after": {
+        "id": "dispatch-allocation-18",
+        "op": "equals",
+        "source": {
+          "actionId": "dispatched-item",
+          "pointer": "/response/data/allocationStatus"
+        },
+        "expected": "CONSUMED",
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "dispatched:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "reserve-pick-dispatch"
+        },
+        "oracleExplanation": "dispatch-allocation는 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.reserve-pick-dispatch",
+          "observationNames": [
+            "dispatch-allocation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "actions",
+      "id": "claim",
+      "before": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "rangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-falseclaim-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      },
+      "after": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "rangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원천 주장과 실제 실물을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-falseclaim-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "actions",
+      "id": "after-claim-db",
+      "before": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-falseclaim"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "claims",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      },
+      "after": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-falseclaim"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "deliveryObservations",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-not-canonical-11",
+      "before": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-not-canonical-12",
+      "before": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "canonical"
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "canonical",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-not-canonical-13",
+      "before": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "status"
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "status",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-15",
+      "before": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-16",
+      "before": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-17",
+      "before": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-18",
+      "before": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-19",
+      "before": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-20",
+      "before": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-falseclaim",
+      "section": "assertions",
+      "id": "claim-reconciliation-21",
+      "before": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-falseclaim"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 falseClaim 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "actions",
+      "id": "claim",
+      "before": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "rangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-unidentifiedscope-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      },
+      "after": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "rangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원천 주장과 실제 실물을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-unidentifiedscope-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "actions",
+      "id": "after-claim-db",
+      "before": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-unidentifiedscope"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "claims",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      },
+      "after": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-unidentifiedscope"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "deliveryObservations",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-not-canonical-11",
+      "before": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-not-canonical-12",
+      "before": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "canonical"
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "canonical",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-not-canonical-13",
+      "before": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "status"
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "status",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-15",
+      "before": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-16",
+      "before": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-17",
+      "before": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-18",
+      "before": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-19",
+      "before": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-20",
+      "before": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-unidentifiedscope",
+      "section": "assertions",
+      "id": "claim-reconciliation-21",
+      "before": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-unidentifiedscope"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 unidentifiedScope 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "actions",
+      "id": "claim",
+      "before": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "rangeRootId": {
+              "$alias": "A"
+            },
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-conflictingquantity-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      },
+      "after": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "rangeRootId": {
+              "$alias": "A"
+            },
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원천 주장과 실제 실물을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-conflictingquantity-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "actions",
+      "id": "after-claim-db",
+      "before": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-conflictingquantity"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "claims",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      },
+      "after": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-conflictingquantity"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "deliveryObservations",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-not-canonical-11",
+      "before": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-not-canonical-12",
+      "before": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "canonical"
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "canonical",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-not-canonical-13",
+      "before": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "status"
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "status",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-15",
+      "before": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-16",
+      "before": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-17",
+      "before": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-18",
+      "before": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-19",
+      "before": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-20",
+      "before": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-conflictingquantity",
+      "section": "assertions",
+      "id": "claim-reconciliation-21",
+      "before": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-conflictingquantity"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 conflictingQuantity 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "actions",
+      "id": "claim",
+      "before": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordObservedMovement",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordObservedMovement",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "rangeRootId": {
+              "$alias": "A"
+            },
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "observationId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$alias": "t17SourceWork-A"
+            },
+            "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-nopriordispatch-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      },
+      "after": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordObservedMovement",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordObservedMovement",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "rangeRootId": {
+              "$alias": "A"
+            },
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "20",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "observationId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$alias": "t17SourceWork-A"
+            },
+            "nextAction": "원천 주장과 실제 실물을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-nopriordispatch-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "actions",
+      "id": "after-claim-db",
+      "before": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "claims",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      },
+      "after": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "deliveryObservations",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-not-canonical-11",
+      "before": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-not-canonical-12",
+      "before": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "canonical"
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "canonical",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-not-canonical-13",
+      "before": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "status"
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "status",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-15",
+      "before": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-16",
+      "before": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-17",
+      "before": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-18",
+      "before": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-19",
+      "before": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-20",
+      "before": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "claim-reconciliation-21",
+      "before": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-nopriordispatch",
+      "section": "assertions",
+      "id": "no-prior-dispatch-22",
+      "before": {
+        "id": "no-prior-dispatch-22",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "no-prior-dispatch는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "no-prior-dispatch"
+          ]
+        }
+      },
+      "after": {
+        "id": "no-prior-dispatch-22",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-nopriordispatch"
+        },
+        "oracleExplanation": "no-prior-dispatch는 원천 noPriorDispatch 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "no-prior-dispatch"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "actions",
+      "id": "claim",
+      "before": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "rangeRootId": {
+              "$alias": "A"
+            },
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "31",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-scopeoverflow-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      },
+      "after": {
+        "id": "claim",
+        "kind": "invoke",
+        "actorRef": "receiver",
+        "route": "api",
+        "capabilityId": "recordDelivery",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "recordDelivery",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "customerId": {
+              "$alias": "C"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "rangeRootId": {
+              "$alias": "A"
+            },
+            "placeId": {
+              "$alias": "CUSTOMER"
+            },
+            "startQuantity": "0",
+            "quantity": "31",
+            "unit": "BOX",
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "dispatchId": {
+              "$result": {
+                "actionId": "claim-source-dispatch",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "cargoScopeId": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/cargoScopeId"
+              }
+            },
+            "salesLineId": {
+              "$result": {
+                "actionId": "claim-source-sales-line",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "observationId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "workId": {
+              "$result": {
+                "actionId": "order-delivery-work",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "nextAction": "원천 주장과 실제 실물을 대조한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z",
+            "allocationId": {
+              "$result": {
+                "actionId": "reserve",
+                "pointer": "/response/effects/allocationId"
+              }
+            }
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T17-claim-scopeoverflow-claim",
+          "evidenceRefs": [
+            {
+              "$alias": "delivery-proof"
+            }
+          ],
+          "provenance": {
+            "customerId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "rangeRootId": "CONTEXT",
+            "placeId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "dispatchId": "CONTEXT",
+            "cargoScopeId": "CONTEXT",
+            "salesLineId": "CONTEXT",
+            "observationId": "CONTEXT",
+            "eventId": "CONTEXT",
+            "workId": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT",
+            "allocationId": "CONTEXT"
+          }
+        },
+        "evidenceRefs": [
+          "claim:api-response",
+          "claim:actual-command-artifact"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "actions",
+      "id": "after-claim-db",
+      "before": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-scopeoverflow"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "claims",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      },
+      "after": {
+        "id": "after-claim-db",
+        "kind": "observe",
+        "observation": {
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-scopeoverflow"
+          },
+          "snapshotRef": {
+            "$result": {
+              "actionId": "after-claim",
+              "pointer": "/response/snapshotRevision"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z",
+          "sources": [
+            "segments",
+            "movements",
+            "allocations",
+            "deliveries",
+            "deliveryObservations",
+            "receiptContributions",
+            "assessments",
+            "obligations",
+            "audit",
+            "outbox"
+          ]
+        },
+        "evidenceRefs": [
+          "after-claim-db:raw-rows",
+          "after-claim-db:source-query",
+          "after-claim-db:snapshot"
+        ]
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-not-canonical-11",
+      "before": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims"
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-11",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-not-canonical-12",
+      "before": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "canonical"
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-12",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "canonical",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          false
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-not-canonical-13",
+      "before": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/claims",
+          "field": "status"
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-not-canonical-13",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/deliveryObservations",
+          "field": "status",
+          "where": {
+            "eventId": {
+              "$result": {
+                "actionId": "claim-source-event",
+                "pointer": "/response/id"
+              }
+            }
+          }
+        },
+        "expected": [
+          "PENDING_RECONCILIATION"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-not-canonical는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-not-canonical"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-15",
+      "before": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-15",
+        "op": "count",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": 1,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-16",
+      "before": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-16",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "ownerId"
+        },
+        "expected": [
+          {
+            "$alias": "intake"
+          }
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-17",
+      "before": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-17",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "status"
+        },
+        "expected": [
+          "OPEN"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-18",
+      "before": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-18",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextAction"
+        },
+        "expected": [
+          "원천 주장과 실제 실물을 대조한다"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-19",
+      "before": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-19",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": "nextCheckAt"
+        },
+        "expected": [
+          "2026-10-07T10:00:00Z"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-20",
+      "before": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-20",
+        "op": "fieldsPresent",
+        "source": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          }
+        },
+        "expected": [
+          "id",
+          "rootId",
+          "ownerId",
+          "responsibleWorkId",
+          "nextAction",
+          "nextCheckAt",
+          "sourceOccurrenceId"
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "claim-scopeoverflow",
+      "section": "assertions",
+      "id": "claim-reconciliation-21",
+      "before": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "RECONCILIATION",
+            "current": true
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      },
+      "after": {
+        "id": "claim-reconciliation-21",
+        "op": "sameAs",
+        "source": {
+          "actionId": "after-claim",
+          "pointer": "/response/data/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        },
+        "expected": null,
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-claim:actual-response-or-host-artifact"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "claim-scopeoverflow"
+        },
+        "oracleExplanation": "claim-reconciliation는 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.false-or-unmatched-delivery",
+          "observationNames": [
+            "claim-reconciliation"
+          ]
+        },
+        "baseline": {
+          "actionId": "after-claim-db",
+          "pointer": "/data/rawRows/obligations",
+          "where": {
+            "kind": "DELIVERY_RECONCILIATION",
+            "current": true,
+            "status": "OPEN"
+          },
+          "field": [
+            "id",
+            "rootId",
+            "ownerId",
+            "status",
+            "nextAction",
+            "nextCheckAt"
+          ]
+        }
+      }
+    }
+  ]
+}
