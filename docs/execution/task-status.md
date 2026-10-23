@@ -883,3 +883,21 @@ T17 opt-in22개도 별도 fresh HTTP/Spring/PostgreSQL 실행에서 모두 통�
 모두 보존했다. [통합 기록](resume-source-observer-policy.md)을 따른다.
 전체 Task와 현재 Step는 OPEN이며 다음 실제 실행은 Haiku 5.5의
 native dynamic Workflow로 6개 case·70개 subcase를 병렬 실행한다.
+
+## 2026-10-23 통합 source의 실제70개 결과와 후속 수정
+
+위 source `bcac964c`의 실제 병렬 실행을 완료했다. 고유70개는
+26PASS·33FAIL·11NOT_RUN이며 예상786개 assertion은333PASS·157FAIL·
+80명시NOT_RUN·216미관찰이다. T13 승인 개정7건과 T01 회귀12건은
+통과했다. 전체 gate는 false이며 선택 결과를 전체 완료율로 바꾸지 않는다.
+
+실제9개 Haiku5.5 metadata와 source·fixture·원본 report·실행 JAR를
+독립 대조했다. T12/T17의 중단된 첫 orchestration은 보존하고 각각
+한 번의 완료된 native Workflow만 집계했다. 세부 원인과 증거는
+[실제 실행 기록](resume-source-observer-policy-wave.md)을 따른다.
+
+recovery 이력과 관찰, T17 active Work·인도 원천, T13 공급자 입력을
+분리 수정 중이다. 공급자 후속의 새 전달확인 필수 조건은 기존 계획의
+사실 분리와 달라 채택하지 않았다. 기존 업무 oracle을 보존하며 전송
+권한 재검증과 실제 관찰 계약을 수정한다. 결합 검사와 새 source의
+실제 인수 전까지 전체 Task와 현재 Step은 계속 OPEN이다.
