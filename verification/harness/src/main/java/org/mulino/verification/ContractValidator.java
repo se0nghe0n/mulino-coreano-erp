@@ -297,7 +297,8 @@ public final class ContractValidator {
     }
     /**
      * contracts/fixture-place-kinds.json transitReceipt and directReceiptCustody (step2r rounds 7 and 8). A confirmReceipt that
-     * names a fixture QuantitySegment (or the $result child of a splitQuantity of one) is a transit receipt. The product
+     * names a fixture QuantitySegment (or the $result child of a splitQuantity of one), directly or through
+     * receiptId bound to an earlier sequential receiveProvisional, is a transit receipt. The product
      * (ReceiptStockPrimitives.receive) accepts it only for one identified leaf at a TRANSIT place with the same item, LOT and
      * unit and exactly the received quantity, into INTERNAL_STORAGE (partial cargo is split first); the received stock keeps
      * the leaf custodian, which must then be internal when the stock is used. Any other confirmReceipt is a direct receipt:
@@ -336,6 +337,12 @@ public final class ContractValidator {
                 leaves.put(e.getKey(),leaf);}}
             leaves.keySet().removeIf(k->!aliases.path(k).path("type").asText().equals("QuantitySegment"));
             Map<String,JsonNode> byId=new HashMap<>();for(JsonNode a:actions) byId.putIfAbsent(a.path("id").asText(),a);
+            // Only completed, preceding top-level commands have a usable response.
+            // A flattened parallel branch or start call does not establish that ordering.
+            Map<String,Integer> sequential=new HashMap<>();int position=0;
+            for(JsonNode action:sub.path("actions")) sequential.put(action.path("id").asText(),position++);
+            Set<String> ambiguous=new HashSet<>(),seen=new HashSet<>();
+            for(JsonNode action:actions) if(!seen.add(action.path("id").asText())) ambiguous.add(action.path("id").asText());
             Map<String,ObjectNode> children=new HashMap<>();
             Map<String,Set<String>> origins=new HashMap<>();Map<String,JsonNode> receipts=new LinkedHashMap<>();Map<String,ObjectNode> transitLeaf=new HashMap<>();Map<String,List<String>> users=new LinkedHashMap<>();
             for(JsonNode a:actions) {
@@ -345,14 +352,64 @@ public final class ContractValidator {
                 if(cap.equals(splitCapability)) splitChildren(id,slots,leaves,children);
                 if(cap.equals(capability)) {
                     Map<String,ObjectNode> named=new LinkedHashMap<>();
-                    for(String x:aliasRefs(slots)) if(leaves.containsKey(x)) named.put(x,leaves.get(x));
-                    for(JsonNode r:resultNodes(slots)) {
-                        JsonNode source=byId.get(r.path("actionId").asText());
-                        if(source==null || !splitCapability.equals(source.path("capabilityId").asText(source.path("request").path("capabilityId").asText()))) continue;
-                        String key=r.path("actionId").asText()+r.path("pointer").asText();
-                        if(children.containsKey(key)) named.put(key,children.get(key));
-                        else if(splitSource(source.path("request").path("slots"),leaves,children)!=null)
-                            problems.add(where+"/"+id+": transit receipt names "+key+", which is not a "+transit.path("splitChildPointer").asText()+" of an explicit children entry or a /response/children/<index>/segmentId of the quantities of that split; the received leaf quantity cannot be checked");
+                    if(slots.has("receiptId")) {
+                        JsonNode refNode=strictReceiptResult(slots.path("receiptId"));
+                        String sourceId=refNode==null?null:refNode.path("actionId").asText();
+                        JsonNode source=sourceId==null?null:byId.get(sourceId);
+                        boolean prior=source!=null && !ambiguous.contains(sourceId) && !ambiguous.contains(id)
+                            && sequential.containsKey(sourceId) && sequential.containsKey(id)
+                            && sequential.get(sourceId)<sequential.get(id)
+                            && source.path("kind").asText().equals("invoke")
+                            && source.path("capabilityId").asText().equals("receiveProvisional")
+                            && source.path("request").path("capabilityId").asText().equals("receiveProvisional")
+                            && source.path("request").path("intentKind").asText().equals("RECORD")
+                            && refNode.path("pointer").asText().equals("/response/effects/receiptId");
+                        if(!prior) problems.add(where+"/"+id+": receiptId must be a strict /response/effects/receiptId of an earlier sequential receiveProvisional command; transport cannot be inferred");
+                        else {
+                            JsonNode physical=source.path("request").path("slots");
+                            // Only this exact slot supplies transit identity. Incidental rangeRootId,
+                            // document or subject aliases never turn a direct receipt into transport.
+                            if(physical.has("transitSegmentId")) {
+                                JsonNode leafRef=physical.path("transitSegmentId");String leafAlias=strictReceiptAlias(leafRef);
+                                if(leafAlias!=null && leaves.containsKey(leafAlias)) named.put(leafAlias,leaves.get(leafAlias));
+                                else {
+                                    JsonNode splitRef=strictReceiptResult(leafRef);
+                                    String splitId=splitRef==null?null:splitRef.path("actionId").asText();
+                                    JsonNode split=splitId==null?null:byId.get(splitId);
+                                    if(split!=null && !ambiguous.contains(splitId) && sequential.containsKey(splitId)
+                                        && sequential.get(splitId)<sequential.get(sourceId) && split.path("kind").asText().equals("invoke")
+                                        && split.path("capabilityId").asText().equals(splitCapability)
+                                        && split.path("request").path("capabilityId").asText().equals(splitCapability)) {
+                                        String key=splitId+splitRef.path("pointer").asText();
+                                        if(children.containsKey(key)) named.put(key,children.get(key));
+                                    }
+                                }
+                                if(named.isEmpty()) problems.add(where+"/"+id+": provisional transitSegmentId must identify an actual fixture leaf or an earlier splitQuantity child; transport cannot be inferred");
+                                for(String key:List.of("itemId","lotId","placeId")) if(strictReceiptAlias(physical.path(key))==null)
+                                    problems.add(where+"/"+id+": provisional "+key+" must be a strict fixture alias for transit validation");
+                                if(!physical.path("lotId").equals(slots.path("lotId")))
+                                    problems.add(where+"/"+id+": confirmed lotId differs from provisional lotId");
+                                // Present the authored physical input to the unchanged exact-leaf checks.
+                                // This is validation-only; the request sent to the product is untouched.
+                                ObjectNode view=physical.deepCopy();
+                                if(!physical.path("quantity").isTextual() || !physical.path("unit").isTextual())
+                                    problems.add(where+"/"+id+": provisional transit quantity and unit must be authored strings");
+                                view.set("quantity",Json.object().set("value",physical.path("quantity")));
+                                ((ObjectNode)view.path("quantity")).set("unit",physical.path("unit"));
+                                slots.fields().forEachRemaining(e->view.set(e.getKey(),e.getValue()));
+                                slots=view;
+                            }
+                        }
+                    } else {
+                        for(String x:aliasRefs(slots)) if(leaves.containsKey(x)) named.put(x,leaves.get(x));
+                        for(JsonNode r:resultNodes(slots)) {
+                            JsonNode source=byId.get(r.path("actionId").asText());
+                            if(source==null || !splitCapability.equals(source.path("capabilityId").asText(source.path("request").path("capabilityId").asText()))) continue;
+                            String key=r.path("actionId").asText()+r.path("pointer").asText();
+                            if(children.containsKey(key)) named.put(key,children.get(key));
+                            else if(splitSource(source.path("request").path("slots"),leaves,children)!=null)
+                                problems.add(where+"/"+id+": transit receipt names "+key+", which is not a "+transit.path("splitChildPointer").asText()+" of an explicit children entry or a /response/children/<index>/segmentId of the quantities of that split; the received leaf quantity cannot be checked");
+                        }
                     }
                     if(!named.isEmpty()) {
                         if(slots.has(slot)) problems.add(where+"/"+id+": transit receipt of "+named.keySet()+" carries "+slot+"; a transit receipt keeps the leaf's custodian (contracts/fixture-place-kinds.json directReceiptCustody)");
@@ -393,6 +450,17 @@ public final class ContractValidator {
             for(var e:perReceipt.entrySet()) if(e.getValue().size()>1) problems.add(where+": confirmReceipt of the same receipt "+e.getKey()+" carries different "+slot+" values "+e.getValue()+"; every confirm/retry names the same custodian");
         }
         return problems;
+    }
+    private static JsonNode strictReceiptResult(JsonNode value) {
+        if(!value.isObject() || value.size()!=1 || !value.has("$result")) return null;
+        JsonNode ref=value.path("$result");
+        return ref.isObject() && ref.size()==2 && ref.path("actionId").isTextual()
+            && !ref.path("actionId").asText().isBlank() && ref.path("pointer").isTextual()
+            ?ref:null;
+    }
+    private static String strictReceiptAlias(JsonNode value) {
+        return value.isObject() && value.size()==1 && value.path("$alias").isTextual()
+            && !value.path("$alias").asText().isBlank()?value.path("$alias").asText():null;
     }
     /** Fulfilment capabilities whose order the product enforces (FulfillmentCommands, step2r round 9). */
     static final String PICK="pickQuantity",DISPATCH="dispatchQuantity";
