@@ -62,7 +62,7 @@ final class ScenarioJdbcObservation {
             binding=ScenarioRevisionBinding.binding(source.path("actionId").asText());
         }
         OffsetDateTime knownAt=OffsetDateTime.parse(Json.required(request,"knownAt"));
-        var raw=Json.object();var evidence=Json.object();String mvcc;
+        var raw=Json.object();var evidence=Json.object();var measurement=Json.object();var measurementQueries=Json.array();String mvcc;
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             mvcc=ObserverSnapshot.token(c);
@@ -117,12 +117,14 @@ final class ScenarioJdbcObservation {
                 if(mapping(root).path("approximate").toString().contains("\""+name+"\""))e.put("approximateMapping",true);
                 evidence.set(name,e);
             }
+            measurement=projection.measurementMetadata();measurementQueries=projection.drainQueries();
             c.commit();
         }
         var result=Json.object();result.put("snapshotRevision",revision!=null?revision:mvcc).put("asOf",Json.required(request,"asOf")).put("knownAt",Json.required(request,"knownAt")).put("scopeComplete",true);
         result.set("scope",scope);result.set("sourceEvidence",evidence);result.set("sourceQuery",evidence.path(request.path("sources").get(0).asText()).path("sourceQuery"));
-        result.set("rawRows",raw);result.set("data",Json.object());
+        result.set("rawRows",raw);result.set("data",measurement);
         var snapshot=ObserverSnapshot.snapshot(mvcc,readMode,request);if(revisionQuery!=null)snapshot.set("revisionQuery",revisionQuery);
+        if(!measurementQueries.isEmpty())snapshot.set("measurementMetadataQueries",measurementQueries);
         result.set("snapshot",snapshot);
         return result;
     }
@@ -194,7 +196,7 @@ final class ScenarioJdbcObservation {
                 case "mulino_work_read_ObligationReferences" -> {row.set("current",row.path("valid"));row.set("responsibleWorkId",row.path("workId"));row.set("obligationId",row.path("rootId"));
                     JsonNode root=row.hasNonNull("rootId")?projection.linked("mulino_responsibility_Roots",row,row.path("rootId").asText()):null;
                     if(root!=null){if(!row.has("sourceKind"))row.set("sourceKind",root.path("sourceKind"));if(!row.has("sourceId"))row.set("sourceId",root.path("sourceId"));}}
-                case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));}
+                case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));row.set("originId",row.path("sourceId"));}
                 case "mulino_runtime_Outbox" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));}
                 case "mulino_definitions_DefinitionVersions" -> {row.set("hash",row.path("contentHash"));row.set("definitionId",row.path("id"));}
                 default -> {}

@@ -31,6 +31,18 @@ final class ScenarioObservationProjection {
 
     ArrayNode drainQueries() { var copy=queries.deepCopy(); queries.removeAll(); return copy; }
 
+    /** An empty quantity table still has a unit only when the requested ITEM has one actual visible unit row. */
+    ObjectNode measurementMetadata() throws Exception {
+        var out=Json.object();if(orgs.size()!=1||items.size()!=1)return out;
+        var rows=query("mulino_inventory_TradeItems","r.organizationId=? AND r.ID=? AND r.recordedAt<=? AND r.createdAt<=?",
+            List.of(orgs.getFirst(),items.getFirst(),knownAt,knownAt));
+        if(rows.size()>1)throw new UnsupportedOperationException("Ambiguous ITEM measurement metadata");
+        if(rows.size()==1&&rows.get(0).path("baseUnit").isTextual()&&!rows.get(0).path("baseUnit").asText().isBlank()) {
+            copy(out,"unit",rows.get(0),"baseUnit");copy(out,"itemId",rows.get(0),"id");
+        }
+        return out;
+    }
+
     ArrayNode query(String table, String predicate, List<?> parameters) throws Exception {
         String sql="SELECT r.* FROM "+table+" r WHERE "+predicate+(ScenarioJdbcObservation.columns(connection,table).contains("id")?" ORDER BY r.ID":"");
         String key=sql+parameters;
@@ -197,6 +209,16 @@ final class ScenarioObservationProjection {
         for(var node:rows) {
             var row=(ObjectNode)node;
             switch(table) {
+                case "mulino_inventory_Restrictions" -> {
+                    var decision=linked("mulino_quality_Decisions",row,row.path("decisionId").asText(null));
+                    if(decision!=null&&requiredSame(row,decision,"segmentId","commandId")&&"placeHold".equals(decision.path("operation").asText())) {
+                        copy(row,"reason",decision,"reason");copy(row,"reasonDecisionId",decision,"id");
+                    }
+                    var release=linked("mulino_quality_Decisions",row,row.path("releaseDecisionId").asText(null));
+                    if(release!=null&&requiredSame(row,release,"segmentId")&&row.path("id").equals(release.path("restrictionId"))&&"releaseHold".equals(release.path("operation").asText()))
+                        copy(row,"releaseReason",release,"reason");
+                }
+                case "mulino_inventory_SegmentAllocations" -> allocationBasis(row);
                 case "mulino_work_read_GoalReferences" -> {
                     var slots=parse(row,"slotsJson");field(row,"slots",slots);
                     goalFields(row,slots);
@@ -242,6 +264,21 @@ final class ScenarioObservationProjection {
                 }
                 default -> {}
             }
+        }
+    }
+
+    /** Immutable command proof belongs to this allocation, not merely to a command on the same ITEM. */
+    private void allocationBasis(ObjectNode row) throws Exception {
+        var command=linked("mulino_commands_CommandRecords",row,row.path("commandId").asText(null));
+        if(command==null||!"COMMITTED".equals(command.path("state").asText())
+            ||!Set.of("reserveQuantity","replaceAllocation").contains(command.path("capabilityId").asText()))return;
+        var result=parse(command,"resultJson");var effects=result.path("effects");
+        if(!"APPLIED".equals(result.path("outcome").asText())||!row.path("id").equals(effects.path("ID"))
+            ||!requiredSame(row,effects,"organizationId","segmentId","orderLineId","unit")
+            ||!decimalSame(row,effects,"quantity","startQuantity"))return;
+        var basis=effects.path("fulfillmentBasis");
+        if(basis.path("FEFOExceptionReason").isTextual()&&!basis.path("FEFOExceptionReason").asText().isBlank()) {
+            copy(row,"FEFOExceptionReason",basis,"FEFOExceptionReason");copy(row,"fulfillmentBasisCommandId",command,"id");
         }
     }
 
@@ -438,9 +475,23 @@ final class ScenarioObservationProjection {
             var assessments=query("mulino_work_read_AssessmentReferences","r.organizationId=? AND r.workId=? AND r.recordedAt<=?",List.of(work.path("organizationId").asText(),work.path("id").asText(),knownAt));
             var priorIds=new HashSet<String>();for(var row:assessments)if(row.hasNonNull("previousAssessmentId"))priorIds.add(row.path("previousAssessmentId").asText());
             var heads=new ArrayList<JsonNode>();for(var row:assessments)if(!priorIds.contains(row.path("id").asText()))heads.add(row);
-            if(heads.size()!=1)continue; // No invented assessment identifier for an unassessed Work.
-            var named=assessmentConditions(heads.getFirst());if(named.size()!=1)continue;
-            var marker=(ObjectNode)named.get(0).deepCopy();marker.put("status","PENDING").put("rowKind","WORK_PENDING_INPUT");
+            ObjectNode marker;
+            if(heads.isEmpty()) {
+                // PENDING is an actual Work transition even before the first assessment exists. This marker has no
+                // assessment, condition, capture or input snapshot identity and never manufactures any of those rows.
+                marker=Json.object();copy(marker,"organizationId",work,"organizationId");copy(marker,"workId",work,"id");
+                if(state.hasNonNull("currentGoalVersionId")) {
+                    var goal=linked("mulino_work_read_GoalReferences",work,state.path("currentGoalVersionId").asText());
+                    if(goal==null||!work.path("id").equals(goal.path("workId")))throw new UnsupportedOperationException("Pending Work goal binding missing or mismatched");
+                    copy(marker,"goalVersionId",goal,"id");
+                }
+                marker.put("assessmentBinding","UNASSESSED");
+            } else {
+                if(heads.size()!=1)throw new UnsupportedOperationException("Ambiguous pending assessment chain");
+                var named=assessmentConditions(heads.getFirst());if(named.size()!=1)continue;
+                marker=(ObjectNode)named.get(0).deepCopy();
+            }
+            marker.put("status","PENDING").put("rowKind","WORK_PENDING_INPUT");
             marker.set("transitionId",latest.path("id"));marker.set("pendingWorkSnapshot",parse(latest,"snapshotJson"));out.add(marker);
         }
         return out;
