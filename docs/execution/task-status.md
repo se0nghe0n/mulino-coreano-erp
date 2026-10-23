@@ -901,3 +901,23 @@ recovery 이력과 관찰, T17 active Work·인도 원천, T13 공급자 입력�
 사실 분리와 달라 채택하지 않았다. 기존 업무 oracle을 보존하며 전송
 권한 재검증과 실제 관찰 계약을 수정한다. 결합 검사와 새 source의
 실제 인수 전까지 전체 Task와 현재 Step은 계속 OPEN이다.
+
+## 2026-10-23 복구 이력과 불변 공급자 회신 관찰
+
+V39 recovery 변경 이력·시점별 관찰과 시간대 보완, 새 승인 fixture와
+정확한 1953열 schema manifest를 통합했다. 기존 과거 NULL과 미지원
+정책의 거부를 보존한다. 초기 전체 backend의644PASS·2FAIL 중 오류 코드
+선언과 V37→V38 target 범위도 수정했다.
+
+공급자 회신은 같은 조직의 정확한 불변 발주 revision/hash로 품목·Work를
+연결하고, LOT 근거가 없거나 링크가 불완전하면 관찰 불가로 남긴다.
+source415a7bb7의 전체 harness는658PASS·22개 별도 opt-in SKIP·실패0개며,
+실제 PostgreSQL observer42개가 포함된다. 같은 고정 source의 전체 backend
+646개도 한 번의 실행에서 모두 PASS이며 실패·오류·SKIP은0개다.
+[통합·증거 기록](resume-recovery-history.md)을 따른다.
+
+T17 원래257개 assertion의 byte block과 이전 ledger는 독립 대조했다.
+추가 입력의 실제 HTTP/PG는24PASS·8FAIL이며 DRAFT goal 완성이 남았다.
+원래 Work에 명시적 합성 준비 입력을 작성하며 T11 물량 범위와 제품
+전송 권한도 병렬 수정한다. 새 source의 결합·실제 인수 전까지 전체
+Task와 현재 Step은 OPEN이다.
