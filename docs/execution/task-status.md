@@ -992,3 +992,17 @@ NOT_RUN이다. 원래94개 assertion bytes와 fixture·grant는 보존했다.
 사용자가 Ultrafast를 중단했다. 현재 coordinator의 serviceTier는 default며
 이후 새 Codex 위임도 default를 지정한다. 이전 실행의 tier 기록은
 바꾸지 않는다. 전체 Task와 현재 Step은 OPEN이며 제품 실모델 호출은0회다.
+
+## 2026-10-23 일반 tier의 이동·입력 조회 결합
+
+실제 출고 이동 ID의 응답 연결b59ce369와 목표/불변 입력 projection의
+9ebec25c를 통합했다. 실제 gateway/PG8개, 고정9ebec25c의 전체 harness
+673 PASS·80 opt-in SKIP·실패/오류0과 prepare 문제0을 확인했다.
+서로 다른 실제 snapshot ID를 같게 만드는 기대는 미해결로 유지한다.
+
+이전 db594723의 Haiku raw 결과는 T09 6 PASS·3 FAIL, T11 3 PASS·9 FAIL,
+T17 15 FAIL이다. T17의 controller 재실행은 Workflow 밖에서 수행돼
+진단 자료로만 보존하며 지정 방식의 인수 완료로 인정하지 않는다.
+T11의 assertion71개도 미관찰로 남긴다.
+[통합·검증·실행 경계](resume-standard-tier-integration.md)를 따른다.
+Task와 현재 Step은 OPEN이며 Ultrafast는 사용하지 않는다.
