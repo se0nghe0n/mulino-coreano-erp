@@ -21,11 +21,11 @@ class FirstFailureInputsTest(unittest.TestCase):
         before=json.loads(baseline(HERE/'case.json'))
         originals={p.stem:json.loads(baseline(p)) for p in (HERE/'fixtures').glob('*.json')}
         generated,fixtures=FIRST.apply(copy.deepcopy(before),copy.deepcopy(originals),PUBLIC)
-        current=PUBLIC.completion.restore_case(PUBLIC.delivery.restore_case(json.loads((HERE/'case.json').read_text())))
+        current=PUBLIC.completion.restore_case(PUBLIC.delivery.restore_case(PUBLIC.goal.restore_case(json.loads((HERE/'case.json').read_text()))))
         self.assertEqual(generated,current)
         self.assertEqual(before,FIRST.restore_case(current))
         for sid,f in fixtures.items():
-            self.assertEqual(f,PUBLIC.completion.restore_fixture(PUBLIC.delivery.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text()))))
+            self.assertEqual(f,PUBLIC.completion.restore_fixture(PUBLIC.delivery.restore_fixture(PUBLIC.goal.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text())))))
             self.assertEqual(originals[sid],FIRST.restore_fixture(f))
             for key in ['actors','evidence','responsibilities','clock']:
                 self.assertEqual(originals[sid][key],f[key])
@@ -49,7 +49,7 @@ class FirstFailureInputsTest(unittest.TestCase):
         self.assertEqual(257,sum(len(s['assertions']) for s in current['subcases']))
         for original,current_sub in zip(before['subcases'],current['subcases']):
             self.assertEqual(original['assertions'],current_sub['assertions'])
-        self.assertEqual(baseline(HERE/'scenario.feature').decode(),FIRST.restore_feature(PUBLIC.completion.restore_feature(PUBLIC.delivery.restore_feature((HERE/'scenario.feature').read_text()))))
+        self.assertEqual(baseline(HERE/'scenario.feature').decode(),FIRST.restore_feature(PUBLIC.completion.restore_feature(PUBLIC.delivery.restore_feature(PUBLIC.goal.restore_feature((HERE/'scenario.feature').read_text())))))
         # The prior public ledger's full fifteen pointer corrections stay intact.
         self.assertEqual(baseline(HERE/'public-contract-delta.json'),(HERE/'public-contract-delta.json').read_bytes())
 
@@ -66,7 +66,7 @@ class FirstFailureInputsTest(unittest.TestCase):
         self.assertEqual({'A'},{r['originalCondition']['segmentAlias'] for r in reserved['baseline']['t17SourceFacts']['dispatchInputs']})
         f=json.loads((HERE/'fixtures/normal-consumed-delivery.json').read_text())
         f['baseline']['conditions'][0]['status']='UNKNOWN'
-        original=FIRST.restore_fixture(PUBLIC.completion.restore_fixture(PUBLIC.delivery.restore_fixture(json.loads((HERE/'fixtures/normal-consumed-delivery.json').read_text()))))
+        original=FIRST.restore_fixture(PUBLIC.completion.restore_fixture(PUBLIC.delivery.restore_fixture(PUBLIC.goal.restore_fixture(json.loads((HERE/'fixtures/normal-consumed-delivery.json').read_text())))))
         original['baseline']['conditions'][0]['status']='UNKNOWN'
         case=json.loads(baseline(HERE/'case.json'));case['subcases']=[s for s in case['subcases'] if s['id']=='normal-consumed-delivery']
         for state in ['UNKNOWN','DENIED','CONFLICT']:
@@ -100,7 +100,7 @@ class FirstFailureInputsTest(unittest.TestCase):
                 self.assertEqual('qc' if source['category']=='QC' else 'admin',a['actorRef'])
 
     def test_historical_absent_due_dates_remain_recorded(self):
-        before=json.loads(baseline(HERE/'case.json'));actual=PUBLIC.completion.restore_case(PUBLIC.delivery.restore_case(json.loads((HERE/'case.json').read_text())))
+        before=json.loads(baseline(HERE/'case.json'));actual=PUBLIC.completion.restore_case(PUBLIC.delivery.restore_case(PUBLIC.goal.restore_case(json.loads((HERE/'case.json').read_text()))))
         missing=[]
         for b,s in zip(before['subcases'],actual['subcases']):
             actions={a['id']:a for a in s['actions']}

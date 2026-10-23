@@ -23,23 +23,23 @@ class CompletionInputsTest(unittest.TestCase):
     def test_strict_roundtrip_composition_and_original_oracle_bytes(self):
         before=json.loads(original(HERE/'case.json'));fixtures={p.stem:json.loads(original(p)) for p in (HERE/'fixtures').glob('*.json')}
         generated,changed=NEW.apply(copy.deepcopy(before),copy.deepcopy(fixtures),PUBLIC)
-        current=PUBLIC.delivery.restore_case(json.loads((HERE/'case.json').read_text()))
+        current=PUBLIC.delivery.restore_case(PUBLIC.goal.restore_case(json.loads((HERE/'case.json').read_text())))
         self.assertEqual(generated,current);self.assertEqual(before,NEW.restore_case(current))
         for sid,f in changed.items():
-            self.assertEqual(f,PUBLIC.delivery.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text())))
+            self.assertEqual(f,PUBLIC.delivery.restore_fixture(PUBLIC.goal.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text()))))
             self.assertEqual(fixtures[sid],NEW.restore_fixture(f))
             for key in ['clock','evidence','responsibilities','aliases']:self.assertEqual(fixtures[sid][key],f[key])
             for key in ['conditions','segments','sourceProvenance']:self.assertEqual(fixtures[sid]['baseline'][key],f['baseline'][key])
         self.assertEqual(blocks(original(HERE/'case.json')),blocks((HERE/'case.json').read_bytes()))
         self.assertEqual(original(HERE/'public-contract-delta.json'),(HERE/'public-contract-delta.json').read_bytes())
         self.assertEqual(original(HERE/'first-failure-input-delta.json'),(HERE/'first-failure-input-delta.json').read_bytes())
-        self.assertEqual(original(HERE/'scenario.feature').decode(),NEW.restore_feature(PUBLIC.delivery.restore_feature((HERE/'scenario.feature').read_text())))
+        self.assertEqual(original(HERE/'scenario.feature').decode(),NEW.restore_feature(PUBLIC.delivery.restore_feature(PUBLIC.goal.restore_feature((HERE/'scenario.feature').read_text()))))
         self.assertEqual(257,sum(len(s['assertions']) for s in current['subcases']))
 
     def test_only_missing_due_dates_and_minimal_category_capabilities_added(self):
-        old=json.loads(original(HERE/'case.json'));new=PUBLIC.delivery.restore_case(json.loads((HERE/'case.json').read_text()));due=[];grants=[]
+        old=json.loads(original(HERE/'case.json'));new=PUBLIC.delivery.restore_case(PUBLIC.goal.restore_case(json.loads((HERE/'case.json').read_text())));due=[];grants=[]
         for prior,sub in zip(old['subcases'],new['subcases']):
-            actions={a['id']:a for a in sub['actions']};f=PUBLIC.delivery.restore_fixture(json.loads((HERE/'fixtures'/f'{sub["id"]}.json').read_text()));of=json.loads(original(HERE/'fixtures'/f'{sub["id"]}.json'))
+            actions={a['id']:a for a in sub['actions']};f=PUBLIC.delivery.restore_fixture(PUBLIC.goal.restore_fixture(json.loads((HERE/'fixtures'/f'{sub["id"]}.json').read_text())));of=json.loads(original(HERE/'fixtures'/f'{sub["id"]}.json'))
             for a in prior['actions']:
                 self.assertEqual(a.get('actorRef'),actions[a['id']].get('actorRef'))
                 old_slots=a.get('request',{}).get('slots',{});new_slots=actions[a['id']].get('request',{}).get('slots',{})

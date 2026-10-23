@@ -20,6 +20,8 @@ class T17SourceFactsPostgresTest {
     Connection connection;String testName;final Map<String,JsonNode> actionResults=new HashMap<>();
     @BeforeEach void install(TestInfo info)throws Exception {
         testName=info.getTestMethod().orElseThrow().getName();
+        String selected=System.getenv("T17_PG_METHODS");
+        Assumptions.assumeTrue(selected==null||Set.of(selected.split(",")).contains(testName),"Explicit focused deterministic PG selection");
         config=ActualConfiguration.environment(System.getenv());
         String fixtureName=switch(testName){case "completedReplacementUsesRealWitnessAndReleaseSource"->"replacement-no-revival";case "newCategoryHoldAppliesWithinOriginalScope"->"reserve-pick-dispatch";case "newCategoryEarlyHoldApplies"->"eligibility-fefo-with-reason";case "explicitDispatchNewRecallHoldApplies"->"late-restriction-actual-delivery";case "explicitDispatchLateHoldSourceStopsAtRecallAuthority"->"late-restriction-actual-delivery";case "holdSourceReachesCategoryAuthorizationWithoutGrantExpansion"->"reserve-pick-dispatch";case "declaredExpiryGroupsMapToDistinctLots"->"eligibility-fefo-with-reason";case "postDispatchExpiryBoundaryIsExplicit","explicitDispatchExpiredDelivery"->"post-dispatch-expiry";case "explicitDispatchLateDelivery"->"late-restriction-actual-delivery";case "explicitDispatchFalseClaim"->"claim-falseclaim";case "explicitDispatchConflictingClaim"->"claim-conflictingquantity";case "explicitDispatchUnidentifiedClaim"->"claim-unidentifiedscope";case "explicitDispatchOverflowClaim"->"claim-scopeoverflow";case "otherpackUsesItsOwnTypedLot"->"eligibility-packaging-unapproved";case "authoredNoDispatchObservationUsesRealGateway"->"claim-nopriordispatch";default->"normal-consumed-delivery";};
         Path fixturePath=root.resolve("verification/cases/T17/fixtures/"+fixtureName+".json");
@@ -35,6 +37,9 @@ class T17SourceFactsPostgresTest {
             // coordinator-authored DISPATCH inputs. No grants are changed.
             ((ObjectNode)fixture.path("baseline").path("t17SourceFacts")).remove(List.of("dispatchInputs","dispatchPolicyAlias","dispatchSegmentAliases"));
             ((ObjectNode)fixture.path("aliases")).remove("t17DispatchRegulatoryPolicy");
+        }
+        if(testName.equals("explicitDispatchMissingReviseGoalGrant")) {
+            var source=(ObjectNode)fixture.path("actors").path("t17Source");var caps=Json.array();for(var cap:source.path("roleCapabilities"))if(!cap.asText().equals("reviseGoal"))caps.add(cap);source.set("roleCapabilities",caps);((ObjectNode)source.path("grant")).set("actions",caps.deepCopy());
         }
         if(testName.equals("explicitDispatchMissingActivationGrant")) {
             var source=(ObjectNode)fixture.path("actors").path("t17Source");
@@ -181,23 +186,35 @@ class T17SourceFactsPostgresTest {
     JsonNode runActions(String subcase,Set<String> names)throws Exception {
         JsonNode selected=null;for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if(subcase.equals(sub.path("id").asText()))selected=sub;
         assertNotNull(selected);var results=actionResults;var resolver=new org.mulino.verification.ReferenceResolver(results,aliases);JsonNode last=null;
+        names=new HashSet<>(names);if(names.contains("activate-order-delivery-work")){names.add("complete-order-delivery-goal");names.add("completed-order-delivery-work");}
         for(var action:selected.path("actions"))if(names.contains(action.path("id").asText())) {
             if(action.path("kind").asText().equals("control")){
                 var credential=(ObjectNode)fixture.path("actors").path("observer").deepCopy();credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
                 var clockRequest=Json.object().put("instant",action.at("/control/parameters/asOf").asText());
                 var changed=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/__verification/runtime/clock")).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString(clockRequest.toString())).build(),HttpResponse.BodyHandlers.ofString());assertEquals(200,changed.statusCode(),changed.body());continue;
             }
-            last=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),(ObjectNode)resolver.resolve(action.path("request")));
+            var resolved=(ObjectNode)resolver.resolve(action.path("request"));
+            if(action.path("id").asText().equals("complete-order-delivery-goal"))assertGoalBinding(resolved);
+            last=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),resolved);
             var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",last);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
             if(action.path("kind").asText().equals("query"))assertTrue(last.path("data").hasNonNull("ID"),last.toPrettyString());
             else if(!action.path("id").asText().equals("dispatch")&&!action.path("capabilityId").asText().equals("placeHold"))assertEquals("APPLIED",last.path("outcome").asText(),last.toPrettyString());
         }
         return last;
     }
+    void assertGoalBinding(ObjectNode request)throws Exception {
+        var previous=actionResults.get("order-delivery-work").at("/response/data/currentGoal/slots");var goal=request.at("/slots/goal");
+        previous.fields().forEachRemaining(e->assertEquals(e.getValue(),goal.get(e.getKey()),"Original goal slot preserved: "+e.getKey()));
+        assertEquals(fixture.at("/clock/timezone"),goal.get("timezone"));assertEquals(fixture.at("/clock/asOf"),goal.get("periodStart"));assertEquals(previous.get("dueAt"),goal.get("periodEnd"));
+        String definition=goal.at("/defaultContext/definitionVersionId").asText();
+        assertEquals(actionResults.get("order-delivery-work").at("/response/data/definitionVersionId").asText(),definition);
+        try(var q=connection.prepareStatement("SELECT state,contentHash,content,evaluatorVersion FROM mulino_definitions_DefinitionVersions WHERE organizationId=? AND ID=?")){q.setString(1,org);q.setString(2,definition);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals("PUBLISHED",r.getString(1));assertEquals(r.getString(2),goal.at("/defaultContext/definitionContentHash").asText());assertEquals(r.getString(4),goal.path("evaluatorVersion").asText());var content=Json.parse(r.getString(3));var matches=new ArrayList<JsonNode>();for(var t:content.path("goals"))if(t.path("endpoint").asText().equals("DELIVERED")&&t.path("quantityMode").asText().equals("CUMULATIVE_EVENT"))matches.add(t);assertEquals(1,matches.size());assertEquals(matches.getFirst().path("name"),goal.at("/conditions/0/id"));}}
+        try(var q=connection.prepareStatement("SELECT p.contentHash FROM mulino_governance_PolicyVersions p JOIN mulino_governance_ActivePolicies a ON a.organizationId=p.organizationId AND a.policyId=p.ID WHERE p.organizationId=? AND p.kind='EVIDENCE' AND p.version=?")){q.setString(1,org);q.setString(2,goal.path("evidencePolicyVersion").asText());try(var r=q.executeQuery()){assertTrue(r.next());assertEquals(r.getString(1),goal.at("/defaultContext/evidencePolicyHash").asText());assertFalse(r.next());}}
+    }
     JsonNode allCommands(String sid)throws Exception {
         JsonNode selected=null;for(var sub:Json.read(root.resolve("verification/cases/T17/case.json")).path("subcases"))if(sid.equals(sub.path("id").asText()))selected=sub;
         assertNotNull(selected);var names=new HashSet<String>();
-        for(var a:selected.path("actions"))if(a.path("kind").asText().equals("invoke")||a.path("kind").asText().equals("control")||a.path("kind").asText().equals("query")&&Set.of("order-delivery-work","delivery-source-dispatch","delivery-source-sales-line","delivery-source-observation","claim-source-dispatch","claim-source-sales-line","late-hold-source-scope").contains(a.path("id").asText()))names.add(a.path("id").asText());
+        for(var a:selected.path("actions"))if(a.path("kind").asText().equals("invoke")||a.path("kind").asText().equals("control")||a.path("kind").asText().equals("query")&&Set.of("order-delivery-work","completed-order-delivery-work","delivery-source-dispatch","delivery-source-sales-line","delivery-source-observation","claim-source-dispatch","claim-source-sales-line","late-hold-source-scope").contains(a.path("id").asText()))names.add(a.path("id").asText());
         return runActions(sid,names);
     }
     void ledgerEvidence()throws Exception {
@@ -214,7 +231,13 @@ class T17SourceFactsPostgresTest {
         assertEquals(1,count("mulino_trade_sales_Deliveries"));assertEquals(1,count("mulino_inventory_Dispatches"));
         try(var q=connection.prepareStatement("SELECT quantity,legitimateQuantity,workId,salesLineId,dispatchId FROM mulino_trade_sales_Deliveries WHERE organizationId=?")){q.setString(1,org);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals(0,new BigDecimal(expected).compareTo(r.getBigDecimal(1)));assertEquals(0,new BigDecimal(legitimate).compareTo(r.getBigDecimal(2)));assertEquals(actionResults.get("order").at("/response/workId").asText(),r.getString(3));assertEquals(actionResults.get("order").at("/response/line/id").asText(),r.getString(4));assertEquals(actionResults.get("dispatch").at("/response/effects/dispatchId").asText(),r.getString(5));}}
         try(var q=connection.prepareStatement("SELECT state,quantity FROM mulino_inventory_SegmentAllocations WHERE organizationId=?")){q.setString(1,org);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals("CONSUMED",r.getString(1));assertEquals(0,new BigDecimal("30").compareTo(r.getBigDecimal(2)));}}
-        assertEquals(3,count("mulino_inventory_QuantityMovements"));ledgerEvidence();
+        var expectedMovements=new HashMap<String,BigDecimal>();expectedMovements.put("INITIAL_BALANCE",new BigDecimal("30"));expectedMovements.put("DISPATCH",new BigDecimal("30"));expectedMovements.put("DELIVERY",new BigDecimal(expected));
+        BigDecimal remaining=new BigDecimal("30").subtract(new BigDecimal(expected));if(remaining.signum()>0)expectedMovements.put("RETAINED",remaining);
+        var actualMovements=new HashMap<String,BigDecimal>();
+        try(var q=connection.prepareStatement("SELECT kind,sum(quantity),count(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=? GROUP BY kind")){q.setString(1,org);try(var r=q.executeQuery()){while(r.next()){assertEquals(1,r.getInt(3));actualMovements.put(r.getString(1),r.getBigDecimal(2));}}}
+        assertEquals(expectedMovements.keySet(),actualMovements.keySet());for(var entry:expectedMovements.entrySet())assertEquals(0,entry.getValue().compareTo(actualMovements.get(entry.getKey())));
+        for(String place:List.of("TRANSIT","CUSTOMER"))try(var q=connection.prepareStatement("SELECT coalesce(sum(quantity),0) FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND retiredAt IS NULL AND placeId=?")){q.setString(1,org);q.setString(2,id(place));try(var r=q.executeQuery()){assertTrue(r.next());assertEquals(0,(place.equals("TRANSIT")?remaining:new BigDecimal(expected)).compareTo(r.getBigDecimal(1)));}}
+        ledgerEvidence();
     }
     @Test void explicitDispatchUnactivatedWorkRemainsRejected()throws Exception {
         runActions("normal-consumed-delivery",Set.of("order","order-delivery-work","reserve","pick","dispatch","delivery-source-dispatch","delivery-source-sales-line","delivery-source-document","delivery-source-event"));
@@ -226,10 +249,37 @@ class T17SourceFactsPostgresTest {
     }
     @Test void explicitDispatchMissingActivationGrant()throws Exception {
         int originalMovements=count("mulino_inventory_QuantityMovements");
-        runActions("normal-consumed-delivery",Set.of("order","order-delivery-work"));
+        runActions("normal-consumed-delivery",Set.of("order","order-delivery-work","complete-order-delivery-goal","completed-order-delivery-work"));
         var denied=gateway("t17Source","activateWork",actionRequest("normal-consumed-delivery","activate-order-delivery-work"));
         assertEquals("FORBIDDEN",denied.at("/error/code").asText());
         assertEquals(0,count("mulino_trade_sales_Observations"));assertEquals(originalMovements,count("mulino_inventory_QuantityMovements"));
+    }
+    @Test void explicitDispatchMissingReviseGoalGrant()throws Exception {
+        int movements=count("mulino_inventory_QuantityMovements");
+        runActions("normal-consumed-delivery",Set.of("order","order-delivery-work"));
+        var denied=gateway("t17Source","reviseGoal",actionRequest("normal-consumed-delivery","complete-order-delivery-goal"));
+        assertEquals("FORBIDDEN",denied.at("/error/code").asText());assertEquals(movements,count("mulino_inventory_QuantityMovements"));
+        assertEquals(0,count("mulino_trade_sales_Deliveries"));
+    }
+    @Test void explicitDispatchIncompleteGoalRemainsClosed()throws Exception {
+        String sid="normal-consumed-delivery";int movements=count("mulino_inventory_QuantityMovements");
+        runActions(sid,Set.of("order","order-delivery-work"));
+        var complete=actionRequest(sid,"complete-order-delivery-goal");
+        var query=actionRequest(sid,"order-delivery-work");JsonNode current=actionResults.get("order-delivery-work").path("response");
+        for(String field:List.of("timezone","evidencePolicyVersion","conditions","evaluatorVersion","invalid-condition","invalid-evaluator")) {
+            var request=complete.deepCopy();request.put("commandIdempotencyKey",UUID.randomUUID().toString());request.put("expectedRevision",current.at("/data/revision").asInt());
+            var goal=(ObjectNode)request.at("/slots/goal");
+            if(field.equals("invalid-condition"))goal.set("conditions",Json.array().add(Json.object().put("id","not-a-published-template")));
+            else if(field.equals("invalid-evaluator"))goal.put("evaluatorVersion","evaluator-v1");else goal.remove(field);
+            var revised=gateway("t17Source","reviseGoal",request);assertEquals("APPLIED",revised.path("outcome").asText(),revised.toPrettyString());
+            current=gateway("observer","getWork",query);
+            var activation=Json.object().put("intentKind","COMMAND").put("definitionVersion","definition-v1").put("capabilityId","activateWork").put("commandIdempotencyKey",UUID.randomUUID().toString()).put("expectedRevision",current.at("/data/revision").asInt());
+            activation.set("subjectRefs",Json.array());activation.set("provenance",Json.object().put("workId","CONTEXT"));activation.set("slots",Json.object().put("workId",current.at("/data/ID").asText()));
+            var denied=gateway("t17Source","activateWork",activation);
+            assertTrue(Set.of("GOAL_SLOT_MISSING","VERSION_UNSUPPORTED").contains(denied.at("/error/code").asText()),denied.toPrettyString());
+            current=gateway("observer","getWork",query);assertEquals("DRAFT",current.at("/data/status").asText());
+            assertEquals(movements,count("mulino_inventory_QuantityMovements"));assertEquals(0,count("mulino_trade_sales_Deliveries"));
+        }
     }
     @Test void explicitDispatchDeliverySourceBoundaries()throws Exception {
         String sid="normal-consumed-delivery";

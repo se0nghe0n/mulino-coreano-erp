@@ -17,20 +17,20 @@ class DeliveryInputsTest(unittest.TestCase):
     def test_exact_reproduction_inverse_and_prior_ledgers(self):
         before=json.loads(original(HERE/'case.json'));old={p.stem:json.loads(original(p)) for p in (HERE/'fixtures').glob('*.json')}
         case,fixtures=NEW.apply(copy.deepcopy(before),copy.deepcopy(old),PUBLIC)
-        self.assertEqual(case,json.loads((HERE/'case.json').read_text()));self.assertEqual(before,NEW.restore_case(case))
+        self.assertEqual(case,PUBLIC.goal.restore_case(json.loads((HERE/'case.json').read_text())));self.assertEqual(before,NEW.restore_case(case))
         for sid,f in fixtures.items():
-            self.assertEqual(f,json.loads((HERE/'fixtures'/f'{sid}.json').read_text()));self.assertEqual(old[sid],NEW.restore_fixture(f))
+            self.assertEqual(f,PUBLIC.goal.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text())));self.assertEqual(old[sid],NEW.restore_fixture(f))
         self.assertEqual([s['assertions'] for s in before['subcases']],[s['assertions'] for s in case['subcases']])
         from test_public_contracts import assertion_blocks
         self.assertEqual(assertion_blocks(original(HERE/'case.json')),assertion_blocks((HERE/'case.json').read_bytes()))
         for name in ('public-contract-delta.json','first-failure-input-delta.json','completion-input-delta.json'):
             self.assertEqual(original(HERE/name),(HERE/name).read_bytes())
-        self.assertEqual(original(HERE/'scenario.feature').decode(),NEW.restore_feature((HERE/'scenario.feature').read_text()))
+        self.assertEqual(original(HERE/'scenario.feature').decode(),NEW.restore_feature(PUBLIC.goal.restore_feature((HERE/'scenario.feature').read_text())))
 
     def test_minimum_preparation_and_typed_source_chain(self):
         count=0
-        for s in json.loads((HERE/'case.json').read_text())['subcases']:
-            f=json.loads((HERE/'fixtures'/f'{s["id"]}.json').read_text());old=json.loads(original(HERE/'fixtures'/f'{s["id"]}.json'))
+        for s in PUBLIC.goal.restore_case(json.loads((HERE/'case.json').read_text()))['subcases']:
+            f=PUBLIC.goal.restore_fixture(json.loads((HERE/'fixtures'/f'{s["id"]}.json').read_text()));old=json.loads(original(HERE/'fixtures'/f'{s["id"]}.json'))
             actions={a['id']:a for a in s['actions']}
             if NEW.META not in f['baseline']['policy']:
                 self.assertEqual(old,f);continue

@@ -54,6 +54,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "observer" 역할이 "before-delivery" 행동을 수행한다
     만일 "시스템" 역할이 "before-delivery-db" 행동을 수행한다
@@ -88,6 +90,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "observer" 역할이 "late-hold-source-scope" 행동을 수행한다
     만일 "t17Source" 역할이 "late-hold-source-document" 행동을 수행한다
@@ -143,6 +147,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "시스템" 역할이 "expiry-advance" 행동을 수행한다
     만일 "observer" 역할이 "before-delivery" 행동을 수행한다
@@ -185,6 +191,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "observer" 역할이 "before-claim" 행동을 수행한다
     만일 "시스템" 역할이 "before-claim-db" 행동을 수행한다
@@ -225,6 +233,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "observer" 역할이 "before-claim" 행동을 수행한다
     만일 "시스템" 역할이 "before-claim-db" 행동을 수행한다
@@ -265,6 +275,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "observer" 역할이 "before-claim" 행동을 수행한다
     만일 "시스템" 역할이 "before-claim-db" 행동을 수행한다
@@ -340,6 +352,8 @@
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
     만일 "observer" 역할이 "order-delivery-work" 행동을 수행한다
+    만일 "t17Source" 역할이 "complete-order-delivery-goal" 행동을 수행한다
+    만일 "observer" 역할이 "completed-order-delivery-work" 행동을 수행한다
     만일 "t17Source" 역할이 "activate-order-delivery-work" 행동을 수행한다
     만일 "observer" 역할이 "before-claim" 행동을 수행한다
     만일 "시스템" 역할이 "before-claim-db" 행동을 수행한다

@@ -541,7 +541,8 @@
         "recordSubmission",
         "recordRegulatoryDecision",
         "verifyLabel",
-        "activateWork"
+        "activateWork",
+        "reviseGoal"
       ],
       "grant": {
         "delegatorAlias": "supervisor",
@@ -559,7 +560,8 @@
           "recordSubmission",
           "recordRegulatoryDecision",
           "verifyLabel",
-          "activateWork"
+          "activateWork",
+          "reviseGoal"
         ],
         "scope": {
           "organizationAlias": "ORG",
@@ -1159,6 +1161,1947 @@
       "fictional": true,
       "status": "ACTIVE",
       "requiresLabel": true
+    },
+    "t17DeliveryGoalDefinition": {
+      "type": "DefinitionVersion",
+      "version": "definition-v1",
+      "state": "PUBLISHED",
+      "content": {
+        "attributes": [
+          {
+            "core": true,
+            "decimalPlaces": 0,
+            "maximumCount": 1,
+            "minimumCount": 1,
+            "name": "quantity",
+            "nounType": "Receipt",
+            "referenceType": null,
+            "requiredStage": "READ",
+            "type": "DECIMAL",
+            "unit": "BOX"
+          },
+          {
+            "core": true,
+            "decimalPlaces": 0,
+            "maximumCount": 1,
+            "minimumCount": 1,
+            "name": "quantity",
+            "nounType": "Delivery",
+            "referenceType": null,
+            "requiredStage": "READ",
+            "type": "DECIMAL",
+            "unit": "BOX"
+          },
+          {
+            "core": true,
+            "decimalPlaces": 0,
+            "maximumCount": 1,
+            "minimumCount": 1,
+            "name": "stateQuantity",
+            "nounType": "QuantitySegment",
+            "referenceType": null,
+            "requiredStage": "READ",
+            "type": "DECIMAL",
+            "unit": "BOX"
+          },
+          {
+            "core": true,
+            "decimalPlaces": 0,
+            "maximumCount": 1,
+            "minimumCount": 0,
+            "name": "observedQuantity",
+            "nounType": "QuantitySegment",
+            "referenceType": null,
+            "requiredStage": "READ",
+            "type": "DECIMAL",
+            "unit": "BOX"
+          }
+        ],
+        "capabilities": [
+          {
+            "capabilityId": "createWork",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "assessGoal",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "closeWork",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "matchSourceIdentity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "linkCanonicalOccurrence",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "proposePurchase",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "revisePurchase",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "approvePurchase",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "dispatchPurchaseOrder",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordSupplierReply",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "cancelPurchase",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createShipment",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordLegEvent",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordHandover",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "receiveProvisional",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "confirmReceipt",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "prepareRegulatoryProcedure",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordSubmission",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordRegulatoryDecision",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "verifyLabel",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "placeHold",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "releaseHold",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordDispositionBasis",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "revokeDispositionBasis",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getObject",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getWork",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getInventory",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getAssessment",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getObligations",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getEvidence",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createSalesOrder",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "reviseSalesOrder",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordDelivery",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordObservedMovement",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "reserveQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "replaceAllocation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "pickQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "releaseAllocation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "dispatchQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "authorizeReturn",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "receiveReturn",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordInvoice",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "matchInvoice",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createDraft",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "cancelDraft",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "activateWork",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "waitWork",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "resumeWork",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "reviseGoal",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createFollowup",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createWorkLink",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createObligation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "openObligation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "resolveObligation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "waiveObligation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "transferObligation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "proposeHandover",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "acceptHandover",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "rejectHandover",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "expireHandover",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "emergencyReassign",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "decideQuantityDutyWaiver",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "decideQualityDutyWaiver",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "decideRecallDutyWaiver",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "resolveEvidenceConflict",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordExternalReconciliation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordActivity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "attachEvidence",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "correctEvidence",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createGrant",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "revokeGrant",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "assignCapability",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "revokeCapability",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordCharge",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordSettlementAdjustment",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordPaymentReference",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "openInvestigation",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "proposeRecall",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "approveRecall",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordRecallNotice",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordRecovery",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "closeRecall",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "decideReturnDisposition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "registerItem",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "linkExternalId",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createPolicyDraft",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "approvePolicy",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "activatePolicy",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "retirePolicy",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "splitQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "mergeQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "moveQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "recordStocktake",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "adjustQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "disposeQuantity",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "fixtureExternalEffect",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "createDefinitionDraft",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "validateDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "submitDefinitionReview",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "approveDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "publishDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "activateDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "retireDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "migrateWorkDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "traceLot",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getDefinition",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "searchObjects",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "searchWorks",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getInbox",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "searchOperationalIssues",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "getSettlement",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          },
+          {
+            "capabilityId": "traceRecall",
+            "evaluatorVersion": "core-v1",
+            "inputSchemaVersion": "1.0.0",
+            "outputSchemaVersion": "1.0.0",
+            "semanticVersion": "1.0.0",
+            "supportedWorkMigration": []
+          }
+        ],
+        "contentHash": "",
+        "evaluatorVersion": "core-v1",
+        "goals": [
+          {
+            "endpoint": "ARRIVED",
+            "evaluatorVersion": "core-v1",
+            "name": "arrived",
+            "predicate": {
+              "evidenceSelector": "VERIFIED_DISTINCT",
+              "minimum": {
+                "unit": "BOX",
+                "value": "1"
+              },
+              "operator": "quantitySum",
+              "property": "Receipt.quantity",
+              "unit": "BOX"
+            },
+            "quantityMode": "CUMULATIVE_EVENT"
+          },
+          {
+            "endpoint": "DELIVERED",
+            "evaluatorVersion": "core-v1",
+            "name": "delivered",
+            "predicate": {
+              "evidenceSelector": "VERIFIED_DISTINCT",
+              "minimum": {
+                "unit": "BOX",
+                "value": "1"
+              },
+              "operator": "quantitySum",
+              "property": "Delivery.quantity",
+              "unit": "BOX"
+            },
+            "quantityMode": "CUMULATIVE_EVENT"
+          },
+          {
+            "endpoint": "ARRIVED",
+            "evaluatorVersion": "core-v1",
+            "name": "held-at",
+            "predicate": {
+              "evidenceSelector": "CURRENT_STATE",
+              "minimum": {
+                "unit": "BOX",
+                "value": "1"
+              },
+              "operator": "stateQuantity",
+              "property": "QuantitySegment.stateQuantity",
+              "unit": "BOX"
+            },
+            "quantityMode": "STATE_AT"
+          },
+          {
+            "endpoint": "ARRIVED",
+            "evaluatorVersion": "core-v1",
+            "name": "held-exists",
+            "predicate": {
+              "evidenceSelector": "CURRENT_STATE",
+              "minimum": {
+                "unit": "BOX",
+                "value": "1"
+              },
+              "operator": "stateQuantity",
+              "property": "QuantitySegment.stateQuantity",
+              "unit": "BOX"
+            },
+            "quantityMode": "EXISTS_IN"
+          },
+          {
+            "endpoint": "ARRIVED",
+            "evaluatorVersion": "core-v1",
+            "name": "held-throughout",
+            "predicate": {
+              "children": [
+                {
+                  "evidenceSelector": "CURRENT_STATE",
+                  "minimum": {
+                    "unit": "BOX",
+                    "value": "1"
+                  },
+                  "operator": "stateQuantity",
+                  "property": "QuantitySegment.stateQuantity",
+                  "unit": "BOX"
+                },
+                {
+                  "evidenceSelector": "CURRENT_STATE",
+                  "minimum": {
+                    "unit": "BOX",
+                    "value": "1"
+                  },
+                  "operator": "stateQuantity",
+                  "property": "QuantitySegment.observedQuantity",
+                  "unit": "BOX"
+                }
+              ],
+              "operator": "all"
+            },
+            "quantityMode": "THROUGHOUT"
+          }
+        ],
+        "id": "",
+        "nouns": [
+          {
+            "core": true,
+            "name": "Receipt"
+          },
+          {
+            "core": true,
+            "name": "Work"
+          },
+          {
+            "core": true,
+            "name": "TradeItem"
+          },
+          {
+            "core": true,
+            "name": "QuantitySegment"
+          },
+          {
+            "core": true,
+            "name": "PurchaseProposal"
+          },
+          {
+            "core": true,
+            "name": "PurchaseOrder"
+          },
+          {
+            "core": true,
+            "name": "Shipment"
+          },
+          {
+            "core": true,
+            "name": "ShipmentCargo"
+          },
+          {
+            "core": true,
+            "name": "ShipmentLeg"
+          },
+          {
+            "core": true,
+            "name": "RegulatoryProcedure"
+          },
+          {
+            "core": true,
+            "name": "Restriction"
+          },
+          {
+            "core": true,
+            "name": "DispositionBasis"
+          },
+          {
+            "core": true,
+            "name": "PurchaseOrderLine"
+          },
+          {
+            "core": true,
+            "name": "ReceiptObservation"
+          },
+          {
+            "core": true,
+            "name": "SalesOrder"
+          },
+          {
+            "core": true,
+            "name": "SalesOrderLine"
+          },
+          {
+            "core": true,
+            "name": "DeliveryObservation"
+          },
+          {
+            "core": true,
+            "name": "Delivery"
+          },
+          {
+            "core": true,
+            "name": "Return"
+          },
+          {
+            "core": true,
+            "name": "Invoice"
+          },
+          {
+            "core": true,
+            "name": "Dispatch"
+          },
+          {
+            "core": true,
+            "name": "DefinitionPackage"
+          }
+        ],
+        "organizationId": "",
+        "parentVersionId": null,
+        "relations": [],
+        "schemaVersion": "1.0.0",
+        "state": "PUBLISHED",
+        "verbs": [
+          {
+            "capabilityId": "createWork",
+            "intentKind": "COMMAND",
+            "name": "createWork",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "assessGoal",
+            "intentKind": "COMMAND",
+            "name": "assessGoal",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "closeWork",
+            "intentKind": "COMMAND",
+            "name": "closeWork",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "matchSourceIdentity",
+            "intentKind": "COMMAND",
+            "name": "matchSourceIdentity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "linkCanonicalOccurrence",
+            "intentKind": "COMMAND",
+            "name": "linkCanonicalOccurrence",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "proposePurchase",
+            "intentKind": "COMMAND",
+            "name": "proposePurchase",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "revisePurchase",
+            "intentKind": "COMMAND",
+            "name": "revisePurchase",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "approvePurchase",
+            "intentKind": "COMMAND",
+            "name": "approvePurchase",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "dispatchPurchaseOrder",
+            "intentKind": "COMMAND",
+            "name": "dispatchPurchaseOrder",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordSupplierReply",
+            "intentKind": "RECORD",
+            "name": "recordSupplierReply",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "cancelPurchase",
+            "intentKind": "COMMAND",
+            "name": "cancelPurchase",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createShipment",
+            "intentKind": "COMMAND",
+            "name": "createShipment",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordLegEvent",
+            "intentKind": "RECORD",
+            "name": "recordLegEvent",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordHandover",
+            "intentKind": "RECORD",
+            "name": "recordHandover",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "receiveProvisional",
+            "intentKind": "RECORD",
+            "name": "receiveProvisional",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "confirmReceipt",
+            "intentKind": "COMMAND",
+            "name": "confirmReceipt",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "prepareRegulatoryProcedure",
+            "intentKind": "COMMAND",
+            "name": "prepareRegulatoryProcedure",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordSubmission",
+            "intentKind": "RECORD",
+            "name": "recordSubmission",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordRegulatoryDecision",
+            "intentKind": "RECORD",
+            "name": "recordRegulatoryDecision",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "verifyLabel",
+            "intentKind": "RECORD",
+            "name": "verifyLabel",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "placeHold",
+            "intentKind": "COMMAND",
+            "name": "placeHold",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "releaseHold",
+            "intentKind": "COMMAND",
+            "name": "releaseHold",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordDispositionBasis",
+            "intentKind": "RECORD",
+            "name": "recordDispositionBasis",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "revokeDispositionBasis",
+            "intentKind": "COMMAND",
+            "name": "revokeDispositionBasis",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "getObject",
+            "intentKind": "QUERY",
+            "name": "getObject",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getWork",
+            "intentKind": "QUERY",
+            "name": "getWork",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getInventory",
+            "intentKind": "QUERY",
+            "name": "getInventory",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getAssessment",
+            "intentKind": "QUERY",
+            "name": "getAssessment",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getObligations",
+            "intentKind": "QUERY",
+            "name": "getObligations",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getEvidence",
+            "intentKind": "QUERY",
+            "name": "getEvidence",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "createSalesOrder",
+            "intentKind": "COMMAND",
+            "name": "createSalesOrder",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "reviseSalesOrder",
+            "intentKind": "COMMAND",
+            "name": "reviseSalesOrder",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordDelivery",
+            "intentKind": "RECORD",
+            "name": "recordDelivery",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordObservedMovement",
+            "intentKind": "RECORD",
+            "name": "recordObservedMovement",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "reserveQuantity",
+            "intentKind": "COMMAND",
+            "name": "reserveQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "replaceAllocation",
+            "intentKind": "COMMAND",
+            "name": "replaceAllocation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "pickQuantity",
+            "intentKind": "COMMAND",
+            "name": "pickQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "releaseAllocation",
+            "intentKind": "COMMAND",
+            "name": "releaseAllocation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "dispatchQuantity",
+            "intentKind": "COMMAND",
+            "name": "dispatchQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "authorizeReturn",
+            "intentKind": "COMMAND",
+            "name": "authorizeReturn",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "receiveReturn",
+            "intentKind": "RECORD",
+            "name": "receiveReturn",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordInvoice",
+            "intentKind": "RECORD",
+            "name": "recordInvoice",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "matchInvoice",
+            "intentKind": "COMMAND",
+            "name": "matchInvoice",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createDraft",
+            "intentKind": "COMMAND",
+            "name": "createDraft",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "cancelDraft",
+            "intentKind": "COMMAND",
+            "name": "cancelDraft",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "activateWork",
+            "intentKind": "COMMAND",
+            "name": "activateWork",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "waitWork",
+            "intentKind": "COMMAND",
+            "name": "waitWork",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "resumeWork",
+            "intentKind": "COMMAND",
+            "name": "resumeWork",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "reviseGoal",
+            "intentKind": "COMMAND",
+            "name": "reviseGoal",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createFollowup",
+            "intentKind": "COMMAND",
+            "name": "createFollowup",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createWorkLink",
+            "intentKind": "COMMAND",
+            "name": "createWorkLink",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createObligation",
+            "intentKind": "COMMAND",
+            "name": "createObligation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "openObligation",
+            "intentKind": "COMMAND",
+            "name": "openObligation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "resolveObligation",
+            "intentKind": "COMMAND",
+            "name": "resolveObligation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "waiveObligation",
+            "intentKind": "COMMAND",
+            "name": "waiveObligation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "transferObligation",
+            "intentKind": "COMMAND",
+            "name": "transferObligation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "proposeHandover",
+            "intentKind": "COMMAND",
+            "name": "proposeHandover",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "acceptHandover",
+            "intentKind": "COMMAND",
+            "name": "acceptHandover",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "rejectHandover",
+            "intentKind": "COMMAND",
+            "name": "rejectHandover",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "expireHandover",
+            "intentKind": "COMMAND",
+            "name": "expireHandover",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "emergencyReassign",
+            "intentKind": "COMMAND",
+            "name": "emergencyReassign",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "decideQuantityDutyWaiver",
+            "intentKind": "COMMAND",
+            "name": "decideQuantityDutyWaiver",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "decideQualityDutyWaiver",
+            "intentKind": "COMMAND",
+            "name": "decideQualityDutyWaiver",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "decideRecallDutyWaiver",
+            "intentKind": "COMMAND",
+            "name": "decideRecallDutyWaiver",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "resolveEvidenceConflict",
+            "intentKind": "COMMAND",
+            "name": "resolveEvidenceConflict",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordExternalReconciliation",
+            "intentKind": "COMMAND",
+            "name": "recordExternalReconciliation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordActivity",
+            "intentKind": "RECORD",
+            "name": "recordActivity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "attachEvidence",
+            "intentKind": "RECORD",
+            "name": "attachEvidence",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "correctEvidence",
+            "intentKind": "RECORD",
+            "name": "correctEvidence",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createGrant",
+            "intentKind": "COMMAND",
+            "name": "createGrant",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "revokeGrant",
+            "intentKind": "COMMAND",
+            "name": "revokeGrant",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "assignCapability",
+            "intentKind": "COMMAND",
+            "name": "assignCapability",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "revokeCapability",
+            "intentKind": "COMMAND",
+            "name": "revokeCapability",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordCharge",
+            "intentKind": "COMMAND",
+            "name": "recordCharge",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordSettlementAdjustment",
+            "intentKind": "COMMAND",
+            "name": "recordSettlementAdjustment",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordPaymentReference",
+            "intentKind": "COMMAND",
+            "name": "recordPaymentReference",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "openInvestigation",
+            "intentKind": "COMMAND",
+            "name": "openInvestigation",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "proposeRecall",
+            "intentKind": "COMMAND",
+            "name": "proposeRecall",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "approveRecall",
+            "intentKind": "COMMAND",
+            "name": "approveRecall",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordRecallNotice",
+            "intentKind": "RECORD",
+            "name": "recordRecallNotice",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordRecovery",
+            "intentKind": "RECORD",
+            "name": "recordRecovery",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "closeRecall",
+            "intentKind": "COMMAND",
+            "name": "closeRecall",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "decideReturnDisposition",
+            "intentKind": "COMMAND",
+            "name": "decideReturnDisposition",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "registerItem",
+            "intentKind": "COMMAND",
+            "name": "registerItem",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "linkExternalId",
+            "intentKind": "COMMAND",
+            "name": "linkExternalId",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "createPolicyDraft",
+            "intentKind": "COMMAND",
+            "name": "createPolicyDraft",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "approvePolicy",
+            "intentKind": "COMMAND",
+            "name": "approvePolicy",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "activatePolicy",
+            "intentKind": "COMMAND",
+            "name": "activatePolicy",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "retirePolicy",
+            "intentKind": "COMMAND",
+            "name": "retirePolicy",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "splitQuantity",
+            "intentKind": "COMMAND",
+            "name": "splitQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "mergeQuantity",
+            "intentKind": "COMMAND",
+            "name": "mergeQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "moveQuantity",
+            "intentKind": "COMMAND",
+            "name": "moveQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "recordStocktake",
+            "intentKind": "RECORD",
+            "name": "recordStocktake",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "adjustQuantity",
+            "intentKind": "COMMAND",
+            "name": "adjustQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "disposeQuantity",
+            "intentKind": "COMMAND",
+            "name": "disposeQuantity",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "fixtureExternalEffect",
+            "intentKind": "COMMAND",
+            "name": "fixtureExternalEffect",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "traceLot",
+            "intentKind": "QUERY",
+            "name": "traceLot",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getDefinition",
+            "intentKind": "QUERY",
+            "name": "getDefinition",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "searchObjects",
+            "intentKind": "QUERY",
+            "name": "searchObjects",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "searchWorks",
+            "intentKind": "QUERY",
+            "name": "searchWorks",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getInbox",
+            "intentKind": "QUERY",
+            "name": "getInbox",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "searchOperationalIssues",
+            "intentKind": "QUERY",
+            "name": "searchOperationalIssues",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "getSettlement",
+            "intentKind": "QUERY",
+            "name": "getSettlement",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "traceRecall",
+            "intentKind": "QUERY",
+            "name": "traceRecall",
+            "slots": {},
+            "stage": "READ"
+          },
+          {
+            "capabilityId": "createDefinitionDraft",
+            "intentKind": "COMMAND",
+            "name": "createDefinitionDraft",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "validateDefinition",
+            "intentKind": "COMMAND",
+            "name": "validateDefinition",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "submitDefinitionReview",
+            "intentKind": "COMMAND",
+            "name": "submitDefinitionReview",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "approveDefinition",
+            "intentKind": "COMMAND",
+            "name": "approveDefinition",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "publishDefinition",
+            "intentKind": "COMMAND",
+            "name": "publishDefinition",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "activateDefinition",
+            "intentKind": "COMMAND",
+            "name": "activateDefinition",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "retireDefinition",
+            "intentKind": "COMMAND",
+            "name": "retireDefinition",
+            "slots": {},
+            "stage": "DRAFT"
+          },
+          {
+            "capabilityId": "migrateWorkDefinition",
+            "intentKind": "COMMAND",
+            "name": "migrateWorkDefinition",
+            "slots": {},
+            "stage": "DRAFT"
+          }
+        ],
+        "version": "definition-v1"
+      },
+      "synthetic": true,
+      "authoredBy": "coordinator-selected-fixture",
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false
     }
   },
   "baseline": {
@@ -1331,6 +3274,93 @@
           }
         },
         "selection": "Public activation of the original order delivery Work; original ITEM/org all-of scope and validity retained"
+      },
+      "deliveryGoalInputAuthoring": {
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "conventionsPath": "verification/actual/scenarios/installer-conventions.json",
+        "conventionsSha256": "92c679555e84daa6c5c1304ca4e4e868a2455e54e6fc2295f5f626cb862892a0",
+        "definitionVersion": "definition-v1",
+        "definitionTemplateHash": "829d6089693061886df8d54eaa1575b1b314b88f7068170f20e7996f15551201",
+        "template": {
+          "name": "delivered",
+          "quantityMode": "CUMULATIVE_EVENT",
+          "endpoint": "DELIVERED",
+          "evaluatorVersion": "core-v1",
+          "predicate": {
+            "operator": "quantitySum",
+            "property": "Delivery.quantity",
+            "minimum": {
+              "value": "1",
+              "unit": "BOX"
+            },
+            "unit": "BOX",
+            "evidenceSelector": "VERIFIED_DISTINCT"
+          }
+        },
+        "evaluatorVersion": "core-v1",
+        "evidencePolicyVersion": "fixture-v1",
+        "evidencePolicyContent": {},
+        "evidencePolicyHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "window": {
+          "periodStart": "2026-10-07T09:00:00Z",
+          "periodEnd": "2026-10-07T10:00:00Z",
+          "periodStartInclusive": true,
+          "periodEndInclusive": true,
+          "selection": "NEW coordinator-selected synthetic delivery window; not an original given"
+        },
+        "originalActor": {
+          "issuer": "synthetic-issuer",
+          "audience": "isolated-ontology",
+          "organizationAlias": "ORG",
+          "subject": "T17-normal-consumed-delivery-source",
+          "roleCapabilities": [
+            "attachEvidence",
+            "recordActivity",
+            "matchSourceIdentity",
+            "linkCanonicalOccurrence",
+            "getEvidence",
+            "recordDispositionBasis",
+            "decideQuality",
+            "confirmCustomerConditions",
+            "confirmCommercialDisposition",
+            "prepareRegulatoryProcedure",
+            "recordSubmission",
+            "recordRegulatoryDecision",
+            "verifyLabel",
+            "activateWork"
+          ],
+          "grant": {
+            "delegatorAlias": "supervisor",
+            "actions": [
+              "attachEvidence",
+              "recordActivity",
+              "matchSourceIdentity",
+              "linkCanonicalOccurrence",
+              "getEvidence",
+              "recordDispositionBasis",
+              "decideQuality",
+              "confirmCustomerConditions",
+              "confirmCommercialDisposition",
+              "prepareRegulatoryProcedure",
+              "recordSubmission",
+              "recordRegulatoryDecision",
+              "verifyLabel",
+              "activateWork"
+            ],
+            "scope": {
+              "organizationAlias": "ORG",
+              "itemAliases": [
+                "P"
+              ]
+            },
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "revision": 1
+          }
+        }
       }
     },
     "segments": [

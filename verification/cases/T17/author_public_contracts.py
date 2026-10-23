@@ -19,6 +19,8 @@ _completion_spec=importlib.util.spec_from_file_location('t17_completion',HERE/'a
 completion=importlib.util.module_from_spec(_completion_spec);_completion_spec.loader.exec_module(completion)
 _delivery_spec=importlib.util.spec_from_file_location('t17_delivery',HERE/'author_delivery_inputs.py')
 delivery=importlib.util.module_from_spec(_delivery_spec);_delivery_spec.loader.exec_module(delivery)
+_goal_spec=importlib.util.spec_from_file_location('t17_goal',HERE/'author_delivery_goal_inputs.py')
+goal=importlib.util.module_from_spec(_goal_spec);_goal_spec.loader.exec_module(goal)
 ROOT = HERE.parents[2]
 META = 'publicContractAuthoring'
 NAMESPACE = 'synthetic-t17-eligibility'
@@ -120,7 +122,7 @@ DELIVERY_CASES = {'normal-consumed-delivery', 'late-restriction-actual-delivery'
 
 
 def restore_fixture(f):
-    f = first_failure.restore_fixture(completion.restore_fixture(delivery.restore_fixture(f)))
+    f = first_failure.restore_fixture(completion.restore_fixture(delivery.restore_fixture(goal.restore_fixture(f))))
     meta = f['baseline']['policy'].pop(META, None)
     if meta:
         for change in reversed(meta['changes']):
@@ -253,7 +255,7 @@ def generate(case, fixtures):
 
 
 def restore_case(case):
-    case=first_failure.restore_case(completion.restore_case(delivery.restore_case(case)))
+    case=first_failure.restore_case(completion.restore_case(delivery.restore_case(goal.restore_case(case))))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     for sub in case['subcases']:
         changes={d['actionId']:d for d in ledger['changes'] if d['subcase']==sub['id']}
@@ -298,7 +300,7 @@ def feature_lines(feature, before, after):
 
 
 def restore_feature(feature):
-    feature=first_failure.restore_feature(completion.restore_feature(delivery.restore_feature(feature)))
+    feature=first_failure.restore_feature(completion.restore_feature(delivery.restore_feature(goal.restore_feature(feature))))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     additions={d['actionId'] for d in ledger['changes'] if d['before'] is None}
     return ''.join(line for line in feature.splitlines(keepends=True)
@@ -330,6 +332,7 @@ if __name__ == '__main__':
     case,authored=first_failure.apply(copy.deepcopy(case),copy.deepcopy(authored),sys.modules[__name__])
     case,authored=completion.apply(copy.deepcopy(case),copy.deepcopy(authored),sys.modules[__name__])
     case,authored=delivery.apply(case,authored,sys.modules[__name__])
+    case,authored=goal.apply(case,authored,sys.modules[__name__])
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
     feature_path.write_text(feature_lines(feature,before,case))

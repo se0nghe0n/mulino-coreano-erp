@@ -1,5 +1,8 @@
 # T17 인도 Work와 공개 원천 연결
 
+이 문서의 결과는 f2f978b5 시점이다. 이후 승인된 공개 goal 완성은
+[GOAL_COMPLETION_INPUTS.md](GOAL_COMPLETION_INPUTS.md)를 따른다.
+
 기준은 `bcac964ced0d5cf47a990afabba5eddefb66b2c8`이다.
 전체 Task와 Step는 OPEN이다. 이 변경은 실제 Haiku 시나리오 실행이나
 model-client 인수 결과가 아니다.
