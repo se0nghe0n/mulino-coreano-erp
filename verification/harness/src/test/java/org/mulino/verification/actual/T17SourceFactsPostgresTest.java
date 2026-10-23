@@ -21,9 +21,16 @@ class T17SourceFactsPostgresTest {
     @BeforeEach void install(TestInfo info)throws Exception {
         testName=info.getTestMethod().orElseThrow().getName();
         config=ActualConfiguration.environment(System.getenv());
-        fixture=(ObjectNode)Json.read(root.resolve("verification/cases/T17/fixtures/normal-consumed-delivery.json"));
+        String fixtureName=testName.equals("declaredExpiryGroupsMapToDistinctLots")?"eligibility-fefo-with-reason":testName.equals("postDispatchExpiryBoundaryIsExplicit")?"post-dispatch-expiry":"normal-consumed-delivery";
+        Path fixturePath=root.resolve("verification/cases/T17/fixtures/"+fixtureName+".json");
+        fixture=(ObjectNode)Json.read(fixturePath);
+        // Explicit negative copy: the authored positive fixture keeps its expiry.
+        if(testName.equals("missingExpiryCopyRemainsUnknown")){
+            ((ObjectNode)fixture.path("aliases").path("L")).remove("expiresAt");
+            ((ObjectNode)fixture.path("baseline").path("policy")).remove("lotExpiryAuthoring");
+        }
         if(info.getTestMethod().orElseThrow().getName().equals("unknownConditionRemainsOmittedWithoutInventedPermission"))((ObjectNode)fixture.path("baseline").path("conditions").get(0)).put("status","UNKNOWN");
-        var bundle=Json.object().put("fixtureHash",Json.sha256(root.resolve("verification/cases/T17/fixtures/normal-consumed-delivery.json")));bundle.set("fixture",fixture);
+        var bundle=Json.object().put("fixtureHash",HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(fixture.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8))));bundle.set("fixture",fixture);
         bundle=(ObjectNode)ActualFixtureBindings.bind(root,bundle,config);
         fixture=(ObjectNode)bundle.path("fixture");
         installed=ScenarioFixtureInstaller.install(config,root,bundle,true);aliases=(ObjectNode)installed.path("aliasMap");org=aliases.path("ORG").asText();
@@ -40,13 +47,14 @@ class T17SourceFactsPostgresTest {
         // Use the actual immutable source decision, not an assertion expected value.
         try(var s=connection.prepareStatement("SELECT e.payload FROM mulino_evidence_Events e WHERE e.organizationId=? AND e.ID=?")){s.setString(1,org);s.setString(2,receipt.path("eventId").asText());try(var r=s.executeQuery()){r.next();var p=(ObjectNode)Json.parse(r.getString(1));p.remove(List.of("operation","sourceDecisionId","sourceVersion","givenEvidenceAlias"));return p.put("evidenceId",evidence).put("reason","T17 scoped negative").put("nextCheckAt","2026-10-07T10:00:00Z");}}
     }
-    JsonNode queryEligibility()throws Exception {
+    JsonNode queryEligibility()throws Exception {return queryEligibility("2026-10-07T09:00:00Z");}
+    JsonNode queryEligibility(String at)throws Exception {
         var credential=(ObjectNode)fixture.path("actors").path("observer").deepCopy();credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
-        var body=Json.object().put("id",id("A")).put("asOf","2026-10-07T09:00:00Z").put("knownAt","2026-10-07T09:00:01Z");body.set("filters",Json.object().put("action","SELL"));body.set("scope",Json.object().put("itemId",id("P")));
+        var body=Json.object().put("id",id("A")).put("asOf",at).put("knownAt",java.time.Instant.parse(at).plusSeconds(1).toString());body.set("filters",Json.object().put("action","SELL"));body.set("scope",Json.object().put("itemId",id("P")));
         var response=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/api/ontology/queries/evaluateEligibility")).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString(body.toString())).build(),HttpResponse.BodyHandlers.ofString());
         assertEquals(200,response.statusCode(),response.body());return Json.parse(response.body());
     }
-    @Test void sourceChainsUseRealCurrentAuthorityAndKeepUnknownExpiryFailClosed()throws Exception {
+    @Test void sourceChainsUseRealCurrentAuthorityWithDeclaredExpiry()throws Exception {
         var evidence=installed.path("sourceFactEvidence");assertEquals(5,evidence.path("conditions").size(),evidence.toPrettyString());assertTrue(evidence.path("uninstalledConditions").isEmpty());
         assertEquals(3,count("mulino_inventory_DispositionBases"));assertEquals(1,count("mulino_trade_regulatory_DecisionVersions"));assertEquals(1,count("mulino_trade_regulatory_LabelVerifications"));assertEquals(8,count("mulino_evidence_Verifications"));
         try(var s=connection.prepareStatement("SELECT count(*) FROM mulino_inventory_DispositionBases b JOIN mulino_commands_CommandRecords c ON c.organizationId=b.organizationId AND c.ID=b.commandId WHERE b.organizationId=? AND c.capabilityId='recordDispositionBasis'")){s.setString(1,org);try(var r=s.executeQuery()){r.next();assertEquals(3,r.getInt(1));}}
@@ -72,13 +80,34 @@ class T17SourceFactsPostgresTest {
         assertNotEquals("APPLIED",wrong.path("outcome").asText(),wrong.toPrettyString());
         var forged=permission(doc);forged.put("quantity","29");var rejected=sources.request("recordDispositionBasis",forged,1);assertEquals("EVIDENCE_UNVERIFIED",rejected.path("error").path("code").asText(),rejected.toPrettyString());
         assertEquals(3,count("mulino_inventory_DispositionBases"));assertEquals(8,count("mulino_evidence_Verifications"));
-        var query=queryEligibility();assertTrue(query.path("unknowns").toString().contains("LOT_EXPIRY_UNKNOWN"),query.toPrettyString());assertEquals("0",query.path("data").path("eligibleQuantity").asText(),query.toPrettyString());
-        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve("expiry-unknown-query.json"),query.toPrettyString());
+        var query=queryEligibility();assertFalse(query.path("unknowns").toString().contains("LOT_EXPIRY_UNKNOWN"),query.toPrettyString());assertEquals("30",query.path("data").path("eligibleQuantity").asText(),query.toPrettyString());assertEquals("ALLOWED",query.path("data").path("eligibilityStatus").asText());
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve("positive-expiry-query.json"),query.toPrettyString());
     }
     @Test void unknownConditionRemainsOmittedWithoutInventedPermission()throws Exception {
         var result=installed.path("sourceFactEvidence");assertEquals(4,result.path("conditions").size());assertEquals(1,result.path("uninstalledConditions").size());
         assertTrue(result.path("uninstalledConditions").get(0).path("reason").asText().contains("UNKNOWN"));assertTrue(installed.path("omittedFacts").toString().contains("baseline.conditions"));assertEquals(2,count("mulino_inventory_DispositionBases"));
         try(var s=connection.prepareStatement("SELECT count(*) FROM mulino_inventory_DispositionBases WHERE organizationId=? AND category='QC'")){s.setString(1,org);try(var r=s.executeQuery()){r.next();assertEquals(0,r.getInt(1));}}
+    }
+    @Test void missingExpiryCopyRemainsUnknown()throws Exception {
+        assertEquals(5,installed.path("sourceFactEvidence").path("conditions").size());
+        assertEquals(3,count("mulino_inventory_DispositionBases"));assertEquals(8,count("mulino_evidence_Verifications"));
+        var query=queryEligibility();assertTrue(query.path("unknowns").toString().contains("LOT_EXPIRY_UNKNOWN"),query.toPrettyString());assertEquals("0",query.path("data").path("eligibleQuantity").asText());
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve("expiry-unknown-query.json"),query.toPrettyString());
+    }
+    @Test void declaredExpiryGroupsMapToDistinctLots()throws Exception {
+        var lots=new HashSet<String>();
+        for(String name:List.of("A","B","EARLY"))try(var s=connection.prepareStatement("SELECT q.lotId,l.expiresAt,l.manufacturerId,l.itemId FROM mulino_inventory_QuantitySegments q JOIN mulino_inventory_ManufacturingLots l ON l.organizationId=q.organizationId AND l.ID=q.lotId WHERE q.organizationId=? AND q.ID=?")){
+            s.setString(1,org);s.setString(2,id(name));try(var r=s.executeQuery()){assertTrue(r.next());lots.add(r.getString(1));assertEquals(java.time.Instant.parse(fixture.path("aliases").path(name).path("expiresAt").asText()),r.getTimestamp(2).toInstant());assertEquals(id("t17LotManufacturer"),r.getString(3));assertEquals(id("P"),r.getString(4));}
+        }
+        assertEquals(3,lots.size());assertEquals("L",fixture.path("aliases").path("A").path("lotAlias").asText());
+        var query=queryEligibility();assertEquals("20",query.path("data").path("eligibleQuantity").asText(),query.toPrettyString());
+    }
+    @Test void postDispatchExpiryBoundaryIsExplicit()throws Exception {
+        assertEquals("30",queryEligibility().path("data").path("eligibleQuantity").asText());
+        var credential=(ObjectNode)fixture.path("actors").path("observer").deepCopy();credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
+        var response=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/__verification/runtime/clock")).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString("{\"instant\":\"2026-10-07T09:06:00Z\"}")).build(),HttpResponse.BodyHandlers.ofString());
+        assertEquals(200,response.statusCode(),response.body());var query=queryEligibility("2026-10-07T09:06:00Z");assertEquals("0",query.path("data").path("eligibleQuantity").asText(),query.toPrettyString());assertTrue(query.path("data").path("conditions").toString().contains("LOT_VALIDITY"));
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve("post-expiry-query.json"),query.toPrettyString());
     }
     String claim(String event)throws Exception {try(var s=connection.prepareStatement("SELECT ID FROM mulino_evidence_Claims WHERE organizationId=? AND eventId=?")){s.setString(1,org);s.setString(2,event);try(var r=s.executeQuery()){r.next();return r.getString(1);}}}
 }

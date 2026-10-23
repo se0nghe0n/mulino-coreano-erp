@@ -588,7 +588,10 @@
       "packagingVersion": "other-box-v1"
     },
     "L": {
-      "type": "ManufacturerLot"
+      "type": "ManufacturerLot",
+      "manufacturerAlias": "t17LotManufacturer",
+      "itemAlias": "P",
+      "expiresAt": "2026-10-20T00:00:00Z"
     },
     "W": {
       "type": "Place",
@@ -682,7 +685,7 @@
     "B": {
       "type": "QuantitySegment",
       "itemAlias": "P",
-      "lotAlias": "L",
+      "lotAlias": "L_B",
       "locationAlias": "W",
       "quantity": "20",
       "unit": "BOX",
@@ -716,7 +719,7 @@
     "EARLY": {
       "type": "QuantitySegment",
       "itemAlias": "P",
-      "lotAlias": "L",
+      "lotAlias": "L_EARLY",
       "locationAlias": "W",
       "quantity": "20",
       "unit": "BOX",
@@ -1315,6 +1318,22 @@
       "fictional": true,
       "status": "ACTIVE",
       "requiresLabel": true
+    },
+    "t17LotManufacturer": {
+      "type": "Manufacturer",
+      "name": "Synthetic T17 original-L manufacturer"
+    },
+    "L_B": {
+      "type": "ManufacturerLot",
+      "manufacturerAlias": "t17LotManufacturer",
+      "itemAlias": "P",
+      "expiresAt": "2026-10-25T00:00:00Z"
+    },
+    "L_EARLY": {
+      "type": "ManufacturerLot",
+      "manufacturerAlias": "t17LotManufacturer",
+      "itemAlias": "P",
+      "expiresAt": "2026-10-10T00:00:00Z"
     }
   },
   "baseline": {
@@ -1349,6 +1368,130 @@
         "intake": "INTAKE",
         "observer": "OBSERVER",
         "operator": "ORDINARY_OPERATOR"
+      },
+      "lotExpiryAuthoring": {
+        "version": 1,
+        "synthetic": true,
+        "selection": "ORIGINAL_SEGMENT_EXPIRY_GROUPS",
+        "operatingExpiryClaimed": false,
+        "originalLotAlias": "L",
+        "segmentMapping": [
+          {
+            "segmentAlias": "A",
+            "oldLotAlias": "L",
+            "newLotAlias": "L",
+            "oldDeclaredSegmentExpiry": "2026-10-20T00:00:00Z",
+            "newLotExpiry": "2026-10-20T00:00:00Z"
+          },
+          {
+            "segmentAlias": "B",
+            "oldLotAlias": "L",
+            "newLotAlias": "L_B",
+            "oldDeclaredSegmentExpiry": "2026-10-25T00:00:00Z",
+            "newLotExpiry": "2026-10-25T00:00:00Z"
+          },
+          {
+            "segmentAlias": "EARLY",
+            "oldLotAlias": "L",
+            "newLotAlias": "L_EARLY",
+            "oldDeclaredSegmentExpiry": "2026-10-10T00:00:00Z",
+            "newLotExpiry": "2026-10-10T00:00:00Z"
+          },
+          {
+            "segmentAlias": "U",
+            "oldLotAlias": "L",
+            "newLotAlias": "L",
+            "oldDeclaredSegmentExpiry": null,
+            "newLotExpiry": "2026-10-20T00:00:00Z"
+          }
+        ],
+        "changes": [
+          {
+            "path": "/aliases/t17LotManufacturer",
+            "hadBefore": false,
+            "before": null,
+            "after": {
+              "type": "Manufacturer",
+              "name": "Synthetic T17 original-L manufacturer"
+            }
+          },
+          {
+            "path": "/aliases/L/manufacturerAlias",
+            "hadBefore": false,
+            "before": null,
+            "after": "t17LotManufacturer"
+          },
+          {
+            "path": "/aliases/L/itemAlias",
+            "hadBefore": false,
+            "before": null,
+            "after": "P"
+          },
+          {
+            "path": "/aliases/L/expiresAt",
+            "hadBefore": false,
+            "before": null,
+            "after": "2026-10-20T00:00:00Z"
+          },
+          {
+            "path": "/aliases/L_B",
+            "hadBefore": false,
+            "before": null,
+            "after": {
+              "type": "ManufacturerLot",
+              "manufacturerAlias": "t17LotManufacturer",
+              "itemAlias": "P",
+              "expiresAt": "2026-10-25T00:00:00Z"
+            }
+          },
+          {
+            "path": "/aliases/B/lotAlias",
+            "hadBefore": true,
+            "before": "L",
+            "after": "L_B"
+          },
+          {
+            "path": "/aliases/L_EARLY",
+            "hadBefore": false,
+            "before": null,
+            "after": {
+              "type": "ManufacturerLot",
+              "manufacturerAlias": "t17LotManufacturer",
+              "itemAlias": "P",
+              "expiresAt": "2026-10-10T00:00:00Z"
+            }
+          },
+          {
+            "path": "/aliases/EARLY/lotAlias",
+            "hadBefore": true,
+            "before": "L",
+            "after": "L_EARLY"
+          },
+          {
+            "path": "/baseline/sourceProvenance/1/lotAlias",
+            "hadBefore": true,
+            "before": "L",
+            "after": "L_B"
+          },
+          {
+            "path": "/baseline/sourceProvenance/2/lotAlias",
+            "hadBefore": true,
+            "before": "L",
+            "after": "L_EARLY"
+          },
+          {
+            "path": "/baseline/works/1/lotAlias",
+            "hadBefore": true,
+            "before": "L",
+            "after": "L_B"
+          },
+          {
+            "path": "/baseline/works/2/lotAlias",
+            "hadBefore": true,
+            "before": "L",
+            "after": "L_EARLY"
+          }
+        ]
       }
     },
     "segments": [
@@ -1705,13 +1848,13 @@
       },
       {
         "supplierAlias": "SUPPLIER",
-        "lotAlias": "L",
+        "lotAlias": "L_B",
         "segmentAlias": "B",
         "evidenceAlias": "supplier-proof"
       },
       {
         "supplierAlias": "SUPPLIER",
-        "lotAlias": "L",
+        "lotAlias": "L_EARLY",
         "segmentAlias": "EARLY",
         "evidenceAlias": "supplier-proof"
       },
@@ -2432,7 +2575,7 @@
       {
         "alias": "t17SourceWork-B",
         "itemAlias": "P",
-        "lotAlias": "L",
+        "lotAlias": "L_B",
         "ownerAlias": "t17Source",
         "supervisorAlias": "supervisor",
         "kind": "QUALITY",
@@ -2442,7 +2585,7 @@
       {
         "alias": "t17SourceWork-EARLY",
         "itemAlias": "P",
-        "lotAlias": "L",
+        "lotAlias": "L_EARLY",
         "ownerAlias": "t17Source",
         "supervisorAlias": "supervisor",
         "kind": "QUALITY",

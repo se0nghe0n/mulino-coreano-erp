@@ -16,6 +16,9 @@ SPEC.loader.exec_module(AUTHOR)
 SOURCE_SPEC = importlib.util.spec_from_file_location('author_eligibility_sources', HERE / 'author_eligibility_sources.py')
 SOURCE = importlib.util.module_from_spec(SOURCE_SPEC)
 SOURCE_SPEC.loader.exec_module(SOURCE)
+LOT_SPEC = importlib.util.spec_from_file_location('author_lot_expiry', HERE / 'author_lot_expiry.py')
+LOT = importlib.util.module_from_spec(LOT_SPEC)
+LOT_SPEC.loader.exec_module(LOT)
 
 
 def original(path):
@@ -32,7 +35,7 @@ class SourceProfileContract(unittest.TestCase):
             with self.subTest(file=name):
                 before = original(path)
                 if path.parent == HERE / 'fixtures':
-                    fixture = json.loads(path.read_bytes())
+                    fixture = LOT.revert(json.loads(path.read_bytes()))
                     fixture['baseline']['sourceProfiles'] = [p for p in fixture['baseline']['sourceProfiles'] if p['sourceNamespace'] != SOURCE.NAMESPACE]
                     del fixture['baseline']['t17SourceFacts']
                     fixture['baseline']['works'] = [w for w in fixture['baseline']['works'] if not w['alias'].startswith('t17SourceWork-')]
@@ -54,9 +57,11 @@ class SourceProfileContract(unittest.TestCase):
             expected = json.loads(path.read_bytes())
             self.assertEqual(3 * len(before['baseline']['sourceProfiles']), AUTHOR.apply(before))
             SOURCE.apply(before)
+            LOT.apply(before)
             self.assertEqual(expected, before)
             self.assertEqual(0, AUTHOR.apply(before))
             SOURCE.apply(before)
+            LOT.apply(before)
             self.assertEqual(expected, before)
 
     def test_reject_conflicting_namespace_owner_policy(self):

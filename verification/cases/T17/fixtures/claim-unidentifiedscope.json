@@ -588,7 +588,10 @@
       "packagingVersion": "other-box-v1"
     },
     "L": {
-      "type": "ManufacturerLot"
+      "type": "ManufacturerLot",
+      "manufacturerAlias": "t17LotManufacturer",
+      "itemAlias": "P",
+      "expiresAt": "2026-10-31T23:59:59Z"
     },
     "W": {
       "type": "Place",
@@ -1133,6 +1136,10 @@
       "fictional": true,
       "status": "ACTIVE",
       "requiresLabel": true
+    },
+    "t17LotManufacturer": {
+      "type": "Manufacturer",
+      "name": "Synthetic T17 original-L manufacturer"
     }
   },
   "baseline": {
@@ -1167,6 +1174,51 @@
         "intake": "INTAKE",
         "observer": "OBSERVER",
         "operator": "ORDINARY_OPERATOR"
+      },
+      "lotExpiryAuthoring": {
+        "version": 1,
+        "synthetic": true,
+        "selection": "NEW_SYNTHETIC_MAX_ALLOWED_CONDITION_VALID_UNTIL",
+        "operatingExpiryClaimed": false,
+        "originalLotAlias": "L",
+        "segmentMapping": [
+          {
+            "segmentAlias": "A",
+            "oldLotAlias": "L",
+            "newLotAlias": "L",
+            "oldDeclaredSegmentExpiry": null,
+            "newLotExpiry": "2026-10-31T23:59:59Z"
+          }
+        ],
+        "changes": [
+          {
+            "path": "/aliases/t17LotManufacturer",
+            "hadBefore": false,
+            "before": null,
+            "after": {
+              "type": "Manufacturer",
+              "name": "Synthetic T17 original-L manufacturer"
+            }
+          },
+          {
+            "path": "/aliases/L/manufacturerAlias",
+            "hadBefore": false,
+            "before": null,
+            "after": "t17LotManufacturer"
+          },
+          {
+            "path": "/aliases/L/itemAlias",
+            "hadBefore": false,
+            "before": null,
+            "after": "P"
+          },
+          {
+            "path": "/aliases/L/expiresAt",
+            "hadBefore": false,
+            "before": null,
+            "after": "2026-10-31T23:59:59Z"
+          }
+        ]
       }
     },
     "segments": [
