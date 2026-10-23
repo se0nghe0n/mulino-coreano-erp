@@ -41,6 +41,16 @@ SOURCE 없는 READ grant는 별도의 새 권한이며 old grant로 표시하지
 manager root는 원래 grant마다 하나씩 만든다. M42/M46의 없는 write,
 M47의 revoke, M48의 좁은 action, M57의 closeRecall 한정은 유지한다.
 
+`authorityCorrection.capabilityContractPath`는 원래 a7f18cc8 public catalog
+원문인 `capability-contract-a7f18cc8.json`을 명시한다. v1은 그 파일의
+고정 SHA `dd4987f1…505c3a4`만 허용한다. 경로는 repo 내부 실제 파일이어야
+하며 외부 경로와 symlink 탈출을 거부한다. 경로를 생략하면 현재
+`contracts/acceptance-capabilities.json` 하나만 확인한다. 현재 catalog가
+달라졌다고 snapshot을 자동으로 고르거나 새 QUERY를 READ에 추가하지
+않는다. 새 vocabulary는 별도 승인된 correction version이 필요하다.
+기존 60개의 action, 목적 grant ID, scope, 시각, revoke는 동일하다.
+M05의 명시적 getShipment 보완도 해당 case에만 유지한다.
+
 S1은 원래 SalesOrder ID와 다른 delivery Work를 쓴다. typedReferences와
 실제 table/id binding을 반환하며 원래 alias를 몰래 덮어쓰지 않는다.
 M59는 원래 BOX_to_EA=12의 승인된 별도 변환 ledger를 둔다. A/B와

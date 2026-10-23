@@ -41,10 +41,10 @@ class ModelFixtureInstallerTest {
         setup.record("BooleanAnswer","evil",j("eligible",true),"","");assertTrue(ModelFixtureInstaller.inventory(setup.fixture,setup.inputs,setup.hash).path("issues").toString().contains("UNKNOWN_FACT_KIND"));
     }
     @Test void authorityCorrectionPreservesNegativeCasesAndIsExactlyReversible() throws Exception {
-        String pin=Json.sha256(root.resolve("contracts/acceptance-capabilities.json"));
+        String snapshot="verification/model-installation/v1/capability-contract-a7f18cc8.json",pin=Json.sha256(root.resolve(snapshot));
         for(int n=1;n<=60;n++) {
             Path file=root.resolve("verification/model-binding/cases/M%02d/fixture.json".formatted(n));JsonNode original=Json.read(file);String hash=Json.sha256(file);
-            var correction=ModelFixtureAuthority.apply(root,original,j("version",ModelFixtureAuthority.VERSION,"capabilityContractSha256",pin,"supplementalRead",true),hash);
+            var correction=ModelFixtureAuthority.apply(root,original,j("version",ModelFixtureAuthority.VERSION,"capabilityContractPath",snapshot,"capabilityContractSha256",pin,"supplementalRead",true),hash);
             JsonNode effective=correction.fixture();assertEquals(original.path("aliases").path("actor"),effective.path("aliases").path("actor"));
             for(var entries=original.path("baseline").path("grantFacts").fields();entries.hasNext();) {
                 var e=entries.next();JsonNode after=effective.path("baseline").path("grantFacts").path(e.getKey());
@@ -60,6 +60,37 @@ class ModelFixtureInstallerTest {
                 JsonNode operation=correction.ledger().get(i);String pointer=operation.path("pointer").asText();int slash=pointer.lastIndexOf('/');ObjectNode parent=(ObjectNode)restored.at(pointer.substring(0,slash));String key=pointer.substring(slash+1);assertEquals(operation.path("after"),parent.path(key));if(operation.path("beforePresent").asBoolean())parent.set(key,operation.path("before"));else parent.remove(key);
             }assertEquals(original,restored);assertEquals(hash,Json.sha256(file));
         }
+    }
+    @Test void explicitSnapshotPreservesAllSixtyAuthoritiesAcrossPublicCatalogDriftAndRejectsEscapes() throws Exception {
+        Path repository=Files.createDirectories(temp.resolve("repository")),contracts=Files.createDirectories(repository.resolve("contracts"));
+        String snapshot="verification/model-installation/v1/capability-contract-a7f18cc8.json";Path pinned=repository.resolve(snapshot);Files.createDirectories(pinned.getParent());Files.copy(root.resolve(snapshot),pinned);
+        assertEquals(ModelFixtureAuthority.CAPABILITY_CONTRACT_SHA256,Json.sha256(pinned));
+        Path current=contracts.resolve("acceptance-capabilities.json");Files.copy(pinned,current);
+        ObjectNode legacy=j("version",ModelFixtureAuthority.VERSION,"capabilityContractSha256",ModelFixtureAuthority.CAPABILITY_CONTRACT_SHA256,"supplementalRead",true),explicit=legacy.deepCopy().put("capabilityContractPath",snapshot);
+        var previous=new ArrayList<ModelFixtureAuthority.Correction>();
+        for(int n=1;n<=60;n++){Path file=root.resolve("verification/model-binding/cases/M%02d/fixture.json".formatted(n));previous.add(ModelFixtureAuthority.apply(repository,Json.read(file),legacy,Json.sha256(file)));}
+        ObjectNode newer=(ObjectNode)Json.read(current);ArrayNode capabilities=(ArrayNode)newer.path("capabilities");
+        for(int i=0;i<17;i++)capabilities.add(j("id","postBaselineQuery"+i,"kind","QUERY"));
+        Json.MAPPER.writeValue(current.toFile(),newer);
+        var cases=Json.array();for(int n=1;n<=60;n++) {
+            Path file=root.resolve("verification/model-binding/cases/M%02d/fixture.json".formatted(n));JsonNode original=Json.read(file);String hash=Json.sha256(file);
+            var correction=ModelFixtureAuthority.apply(repository,original,explicit,hash);var before=previous.get(n-1);
+            assertEquals(before.fixture(),correction.fixture());assertEquals(before.ledger(),correction.ledger());assertEquals(before.purposeBindings(),correction.purposeBindings());
+            assertFalse(correction.fixture().at("/baseline/grantFacts").toString().contains("postBaselineQuery"));
+            assertEquals("Authority capability contract drift",assertThrows(IllegalArgumentException.class,()->ModelFixtureAuthority.apply(repository,original,legacy,hash)).getMessage());
+            cases.add(j("caseId","M%02d".formatted(n),"fixtureSha256",hash,"effectiveFixtureEqual",true,"authorityLedgerEqual",true,"purposeGrantBindingsEqual",true,"newQueriesAdded",0));
+        }
+        Path fixture=root.resolve("verification/model-binding/cases/M02/fixture.json");JsonNode original=Json.read(fixture);String hash=Json.sha256(fixture);
+        var changedPath=explicit.deepCopy().put("capabilityContractPath","contracts/acceptance-capabilities.json");
+        assertThrows(IllegalArgumentException.class,()->ModelFixtureAuthority.apply(repository,original,changedPath,hash));
+        var changedHash=explicit.deepCopy().put("capabilityContractSha256",Json.sha256(current));
+        assertThrows(IllegalArgumentException.class,()->ModelFixtureAuthority.apply(repository,original,changedHash,hash));
+        Path outside=temp.resolve("outside.json");Files.copy(pinned,outside);Files.createSymbolicLink(repository.resolve("escaped.json"),outside);
+        for(String path:List.of("../outside.json",outside.toString(),"escaped.json",""))assertThrows(IllegalArgumentException.class,()->ModelFixtureAuthority.apply(repository,original,explicit.deepCopy().put("capabilityContractPath",path),hash),path);
+        var unknown=(ObjectNode)original.deepCopy();((ArrayNode)unknown.at("/baseline/grantFacts/grant/actions")).add("postBaselineQuery0");
+        assertThrows(IllegalArgumentException.class,()->ModelFixtureAuthority.apply(repository,unknown,explicit,hash));
+        var proof=j("evidenceClass","FOCUSED_SYNTHETIC_CATALOG_DRIFT_COUNTEREXAMPLE","actualModelCalls",0,"snapshotSha256",Json.sha256(pinned),"changedCatalogSha256",Json.sha256(current),"syntheticAddedQueries",17,"noPathFailure","Authority capability contract drift","changedPathRejected",true,"changedHashRejected",true,"outsidePathRejected",true,"symlinkEscapeRejected",true,"unknownActionRejected",true,"cases",cases);
+        Path output=root.resolve("verification/harness/target/model-fixture-capability-pin-proof.json");Files.createDirectories(output.getParent());Json.MAPPER.writerWithDefaultPrettyPrinter().writeValue(output.toFile(),proof);
     }
     @Test void selectedM59NormalizationKeepsOriginalIdentityAndReversesExactQuantityUnits() throws Exception {
         Path file=root.resolve("verification/model-binding/cases/M59/fixture.json");JsonNode original=Json.read(file);String hash=Json.sha256(file);var corrected=ModelFixtureInputCorrection.apply(original,j("version","model-unit-normalization-v1","fromUnit","BOX","toUnit","EA","factor","12"),hash);

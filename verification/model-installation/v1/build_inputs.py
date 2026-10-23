@@ -4,13 +4,16 @@ import argparse, copy, hashlib, json, pathlib, uuid, datetime
 from decimal import Decimal
 from inventory import ROOT, HERE, verify, sha
 FLAGS={'originalInputProvided':False,'originalAuthorityClaimed':False,'operatingApprovalClaimed':False}
+CAPABILITY_CONTRACT='verification/model-installation/v1/capability-contract-a7f18cc8.json'
+CAPABILITY_CONTRACT_SHA256='dd4987f1ce7050dd510da42e4ab4cf5706d19413e6181bbc29924a251505c3a4'
 def encoded(value):return json.dumps(value,ensure_ascii=False,separators=(',',':')).encode()
 def digest(value):return hashlib.sha256(encoded(value)).hexdigest()
 class Build:
  def __init__(self,path):
   self.file=path;self.f=json.loads(path.read_text());self.hash=sha(path);self.d=self.f['baseline']['domainFacts'];self.ids=dict(self.f['aliases']);self.case=path.parent.name
   self.out=dict(schemaVersion='model-installation-inputs-v1',fixtureSha256=self.hash,records=[],documentBytes={},typedReferences={},logicalCustody=[],completionLedger=[],versionTranslations=[],templateArtifacts=[],grantContents={},**FLAGS)
-  self.out['authorityCorrection']={'version':'model-authority-correction-v1','capabilityContractSha256':sha(ROOT/'contracts/acceptance-capabilities.json'),'supplementalRead':True}
+  if sha(ROOT/CAPABILITY_CONTRACT)!=CAPABILITY_CONTRACT_SHA256:raise ValueError('Version 1 capability snapshot drift')
+  self.out['authorityCorrection']={'version':'model-authority-correction-v1','capabilityContractSha256':CAPABILITY_CONTRACT_SHA256,'supplementalRead':True,'capabilityContractPath':CAPABILITY_CONTRACT}
   self.out['staticClaims']={k:dict(sourcePointer='/baseline/domainFacts/'+k,originalClaim=copy.deepcopy(v),sourceClass='ORIGINAL_STATIC_CLAIM_UNVERIFIED',productFactClaimed=False,promptInputPermitted=False,**FLAGS) for k,v in self.d.items() if k in ['fx','selectionContext','selectedRefs','documentContent','actualLocationStatus','recallCandidates','contaminationConfirmed']}
   if self.case=='M59':
    self.out['quantityCorrection']=dict(version='model-unit-normalization-v1',fromUnit='BOX',toUnit='EA',factor='12')
@@ -67,7 +70,7 @@ class Build:
    canonical,doc=self.source(name+':label',segment,'LABEL_VERIFICATION',label,obj['quantity'],obj['unit'])
    self.row('LabelVerification',name+':labelRecord',dict(recordedBy='synthetic:sourceActor',procedureId=proc,procedureVersionId=submitted,itemId='P',lotId=obj['lotRef'],physicalScopeId=segment,policyId=policy,packagingVersionId='P:pack',specificationVersionId='P:spec',decision='VERIFIED',validFrom=self.now,validUntil=self.expiry,occurrenceId=canonical))
  def build(self):
-  convpath=ROOT/'verification/actual/scenarios/installer-conventions.json';conv=json.loads(convpath.read_text());self.out['templateArtifacts']=[dict(path=str(convpath.relative_to(ROOT)),sha256=sha(convpath)),dict(path='contracts/acceptance-capabilities.json',sha256=sha(ROOT/'contracts/acceptance-capabilities.json'))]
+  convpath=ROOT/'verification/actual/scenarios/installer-conventions.json';conv=json.loads(convpath.read_text());self.out['templateArtifacts']=[dict(path=str(convpath.relative_to(ROOT)),sha256=sha(convpath)),dict(path=CAPABILITY_CONTRACT,sha256=CAPABILITY_CONTRACT_SHA256)]
   for v in sorted(set(self.d['definition']['supportedVersions']+[self.d['objects']['O1']['definitionVersion']])):
    content=copy.deepcopy(conv['definition'])
    if self.case=='M59':

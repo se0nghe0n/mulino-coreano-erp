@@ -10,6 +10,7 @@ import java.util.*;
 /** Coordinator-authorized corrected synthetic Given. Product authorization remains exact and unchanged. */
 final class ModelFixtureAuthority {
     static final String VERSION="model-authority-correction-v1";
+    static final String CAPABILITY_CONTRACT_SHA256="dd4987f1ce7050dd510da42e4ab4cf5706d19413e6181bbc29924a251505c3a4";
     private static final Map<String,String> ACTIONS=Map.ofEntries(
         Map.entry("PROPOSE_PURCHASE","proposePurchase"),Map.entry("RECORD_RECEIPT","confirmReceipt"),Map.entry("RECORD_ACTIVITY","recordActivity"),
         Map.entry("RECORD_SUBMISSION","recordSubmission"),Map.entry("RESERVE","reserveQuantity"),Map.entry("SPLIT","splitQuantity"),Map.entry("PICK","pickQuantity"),
@@ -22,9 +23,9 @@ final class ModelFixtureAuthority {
     static Correction apply(Path root,JsonNode original,JsonNode authorization,String fixtureHash) throws Exception {
         ObjectNode corrected=original.deepCopy();var ledger=Json.array();var purposeBindings=Json.array();
         if(authorization.isMissingNode())return new Correction(corrected,ledger,purposeBindings);
-        authorization.fieldNames().forEachRemaining(k->{if(!Set.of("version","capabilityContractSha256","supplementalRead").contains(k))throw new IllegalArgumentException("Unknown authority correction field: "+k);});
+        authorization.fieldNames().forEachRemaining(k->{if(!Set.of("version","capabilityContractPath","capabilityContractSha256","supplementalRead").contains(k))throw new IllegalArgumentException("Unknown authority correction field: "+k);});
         if(!authorization.path("version").asText().equals(VERSION))throw new IllegalArgumentException("Unknown authority correction version");
-        Path contract=root.resolve("contracts/acceptance-capabilities.json");if(!Json.sha256(contract).equals(authorization.path("capabilityContractSha256").asText()))throw new IllegalArgumentException("Authority capability contract drift");
+        Path contract=capabilityContract(root,authorization);
         var kinds=new LinkedHashMap<String,String>();for(JsonNode c:Json.read(contract).path("capabilities"))kinds.put(c.path("id").asText(),c.path("kind").asText());
         ObjectNode principals=(ObjectNode)corrected.path("baseline").path("principalFacts"),grants=(ObjectNode)corrected.path("baseline").path("grantFacts");
         // Human profiles supply only the actions explicitly intersecting their own original grant (M57 ADMIN/READ).
@@ -66,6 +67,22 @@ final class ModelFixtureAuthority {
             }
         }
         return new Correction(corrected,ledger,purposeBindings);
+    }
+    private static Path capabilityContract(Path root,JsonNode authorization) throws Exception {
+        // Version 1 has a closed vocabulary. Re-pinning a newer public catalog needs an explicit future correction.
+        if(!CAPABILITY_CONTRACT_SHA256.equals(authorization.path("capabilityContractSha256").asText()))throw new IllegalArgumentException("Authority capability contract drift: unsupported v1 snapshot hash");
+        String location="contracts/acceptance-capabilities.json";
+        if(authorization.has("capabilityContractPath")) {
+            JsonNode path=authorization.path("capabilityContractPath");
+            if(!path.isTextual()||path.asText().isBlank())throw new IllegalArgumentException("Explicit authority capability contract path required");
+            location=path.asText();
+        }
+        Path repository=root.toRealPath(),relative=Path.of(location);
+        if(relative.isAbsolute())throw new IllegalArgumentException("Authority capability contract path escapes repository");
+        Path contract=repository.resolve(relative).normalize();
+        if(!contract.startsWith(repository)||!contract.toRealPath().startsWith(repository))throw new IllegalArgumentException("Authority capability contract path escapes repository");
+        if(!Files.isRegularFile(contract)||!Json.sha256(contract).equals(authorization.path("capabilityContractSha256").asText()))throw new IllegalArgumentException("Authority capability contract drift");
+        return contract;
     }
     static List<String> translate(JsonNode actions,Map<String,String> kinds) {
         var result=new LinkedHashSet<String>();for(JsonNode action:actions) {

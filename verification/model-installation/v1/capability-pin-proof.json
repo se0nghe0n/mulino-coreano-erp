@@ -1,0 +1,151 @@
+{
+  "receipt": {
+    "evidenceClass": "ACTUAL_FOCUSED_COMMAND_EXIT_AND_JUNIT_CUSTODY",
+    "sourceBaseline": "a7f18cc8e7124b9fd1cc8bf811687ed7230a4981",
+    "parentInstallerCommit": "26a2fd14ad85dc842aa9f47e316740c5d1db52e9",
+    "cwd": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-94ae2786",
+    "command": "env JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home MAVEN_OPTS='-Xmx512m -XX:ActiveProcessorCount=2' MODEL_INSTALLER_TEST_JDBC_URL=jdbc:postgresql://127.0.0.1:32901/model_installer ./mvnw -q -f verification/harness/pom.xml -Dtest=ModelFixtureInstallerTest,NativeProductIntegrationTest test > .local/model-fixture-probe/capability-pin-focused-first.log 2>&1",
+    "exitCode": 0,
+    "exitEvidence": "exec_command session 54111 completion chunk 515dc8 returned exit_code 0",
+    "combinedStdoutStderr": {
+      "path": ".local/model-fixture-probe/capability-pin-focused-first.log",
+      "sizeBytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "junitReports": [
+      {
+        "path": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.nativeclient.ModelFixtureInstallerTest.xml",
+        "sha256": "18f753654d55307587f65374058276e73df90d0fadd571ea99ece787826d72a4",
+        "sizeBytes": 15593,
+        "mtimeNs": 1792796717048513242
+      },
+      {
+        "path": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.nativeclient.NativeProductIntegrationTest.xml",
+        "sha256": "aa40543e48328955aa037d4c342363340a0e533a03b2af4ee48bff527929f264",
+        "sizeBytes": 15219,
+        "mtimeNs": 1792796717388795087
+      }
+    ],
+    "sourceFiles": [
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureAuthority.java",
+        "sha256": "046aaa506bad8d4a8dff5965f32afd5e6655a16ea02911258b56b85b7b8501d9"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureCatalog.java",
+        "sha256": "f0f1270c26f02130ca9e193b86c4581d78dbb2a05a8bd120b36be3f3e6e67adf"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureInputCorrection.java",
+        "sha256": "b1545a6c567ccb2a35ad51fe8fbe1a784f2f7c65e99e670738da6811a99639f5"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureInstaller.java",
+        "sha256": "b4c42a475639ba9aac9a7e588b92cd7329a0f67dfe7cd6a507937b23c5a44414"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixturePlan.java",
+        "sha256": "44e81ee91fabe95a62464ffac7f68a868792513006248b35f4dbe183fac2e9a8"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixturePriorReceipt.java",
+        "sha256": "a4e30c4e0ab8dc4153cb3eac3da55dbe01d6aa19b0af13ba9ec1c12596d96bec"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureProbe.java",
+        "sha256": "4e44472a565c75f80ef501862e74f6c9d81c20003eaca1478836f2f1b9deb11d"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureReadCompletion.java",
+        "sha256": "59cfabb3056175168dfbe5b2059b1e462be52d29ee2b4ecd2c99a1f8aa1463c6"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/ModelFixtureReadProbe.java",
+        "sha256": "8b44de1ab8549788749f95113fafa8c5d30ce3cbbd4a844cbd03378d9cf3b702"
+      },
+      {
+        "path": "verification/harness/src/main/java/org/mulino/verification/nativeclient/NativeProductIntegration.java",
+        "sha256": "67bbe4e615e1c49b872feb4a5dc8e9b10ce474431c81aa09d4f582b9f5ba8f3c"
+      },
+      {
+        "path": "verification/harness/src/test/java/org/mulino/verification/nativeclient/ModelFixtureInstallerTest.java",
+        "sha256": "8da51b1345b6f66490745cdc8d929cd615973ed05d62d30a5301989f5753258f"
+      }
+    ],
+    "inputArchiveSha256": "14675e882ec7ec4b94df4ce9489448ad7f666cc010d72fb82dac15ad6504dac2",
+    "allSixtyAuthoritiesExactlyEqualToPrior": true,
+    "allSixtyInventoriesEqualIgnoringIssueOrder": true,
+    "unorderedRequiredFieldIssueOrderOnlyCases": [
+      "M47",
+      "M58"
+    ],
+    "staticMappingCompleteCount": 44,
+    "originalArtifactsVerified": 218,
+    "actualModelCalls": 0,
+    "actualScenarioRuns": 0,
+    "workflowRuns": 0,
+    "focusedTests": [
+      {
+        "name": "org.mulino.verification.nativeclient.ModelFixtureInstallerTest",
+        "tests": "7",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      },
+      {
+        "name": "org.mulino.verification.nativeclient.NativeProductIntegrationTest",
+        "tests": "5",
+        "failures": "0",
+        "errors": "0",
+        "skipped": "0"
+      }
+    ]
+  },
+  "evidenceArchive": {
+    "path": "verification/model-installation/v1/capability-pin-evidence.tar.gz",
+    "sha256": "e0641a344092b04519ba2f869881c920ffc1768e38757efad1f26a58123f46af",
+    "sizeBytes": 15107
+  },
+  "artifacts": [
+    {
+      "path": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.nativeclient.ModelFixtureInstallerTest.xml",
+      "sha256": "18f753654d55307587f65374058276e73df90d0fadd571ea99ece787826d72a4",
+      "sizeBytes": 15593
+    },
+    {
+      "path": "verification/harness/target/surefire-reports/TEST-org.mulino.verification.nativeclient.NativeProductIntegrationTest.xml",
+      "sha256": "aa40543e48328955aa037d4c342363340a0e533a03b2af4ee48bff527929f264",
+      "sizeBytes": 15219
+    },
+    {
+      "path": "verification/harness/target/model-fixture-capability-pin-proof.json",
+      "sha256": "9a36d84a6999797a6417c18a21a055b2078e8e441485b0fca5741d273cb7631e",
+      "sizeBytes": 15913
+    },
+    {
+      "path": ".local/model-fixture-probe/capability-pin-input-delta.json",
+      "sha256": "046557cb7111cefbae0bd2a7464885fa8deea9d396fdb31955d28a909b4ca281",
+      "sizeBytes": 33892
+    },
+    {
+      "path": ".local/model-fixture-probe/capability-pin-run-receipt.json",
+      "sha256": "f400a2653f997be160fa2ac706261f150ae1b2a67f0c0f6eca3aeea6c464a1d7",
+      "sizeBytes": 4776
+    },
+    {
+      "path": ".local/model-fixture-probe/capability-pin-focused-first.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sizeBytes": 0
+    },
+    {
+      "path": ".local/model-fixture-probe/capability-pin-inventory.log",
+      "sha256": "0fb6de6099213df2d0b55681d5d6915c1cbff3df1efce38c11ca4c339be1dee3",
+      "sizeBytes": 37
+    },
+    {
+      "path": ".local/model-fixture-probe/capability-pin-inventory-order-first-failure.log",
+      "sha256": "893904180a4315fe93eb23b3c200b24b6a7c99f7511e8fb6658046f1b107dc46",
+      "sizeBytes": 365
+    }
+  ]
+}

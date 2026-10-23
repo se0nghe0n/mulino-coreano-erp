@@ -85,7 +85,17 @@
     "operatingApprovalClaimed": {
       "const": false
     },
-    "authorityCorrection": {},
+    "authorityCorrection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["version", "capabilityContractSha256"],
+      "properties": {
+        "version": {"const": "model-authority-correction-v1"},
+        "capabilityContractPath": {"type": "string", "minLength": 1},
+        "capabilityContractSha256": {"const": "dd4987f1ce7050dd510da42e4ab4cf5706d19413e6181bbc29924a251505c3a4"},
+        "supplementalRead": {"type": "boolean"}
+      }
+    },
     "typedReferences": {},
     "logicalCustody": {},
     "completionLedger": {},
