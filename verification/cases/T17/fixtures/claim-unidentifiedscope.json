@@ -1219,6 +1219,35 @@
             "after": "2026-10-31T23:59:59Z"
           }
         ]
+      },
+      "publicContractAuthoring": {
+        "version": 1,
+        "synthetic": true,
+        "operatingApprovalClaimed": false,
+        "changes": [
+          {
+            "path": "/baseline/sourceProfiles/4/eventKinds",
+            "before": [
+              "RECEIPT_REPORT",
+              "DELIVERY",
+              "RETURN",
+              "RECOVERY",
+              "OBSERVED_MOVEMENT",
+              "DECISION"
+            ],
+            "hadBefore": true,
+            "after": [
+              "RECEIPT_REPORT",
+              "DELIVERY",
+              "RETURN",
+              "RECOVERY",
+              "OBSERVED_MOVEMENT",
+              "DECISION",
+              "PHYSICAL_DELIVERY"
+            ]
+          }
+        ],
+        "otherpackMapping": null
       }
     },
     "segments": [
@@ -1456,7 +1485,8 @@
           "RETURN",
           "RECOVERY",
           "OBSERVED_MOVEMENT",
-          "DECISION"
+          "DECISION",
+          "PHYSICAL_DELIVERY"
         ],
         "canonicalPromotion": "REQUIRES_PHYSICAL_ID_QUANTITY_PRIOR_EVENT_AND_EVIDENCE_MATCH",
         "unknownOrConflict": "QUARANTINE_WITH_OWNER",

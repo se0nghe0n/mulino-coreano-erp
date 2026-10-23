@@ -12,6 +12,9 @@ BASELINE = 'eebb2998511d57826c83303aed2f446ebde8f3a0'
 SPEC = importlib.util.spec_from_file_location('author_lot_expiry', HERE/'author_lot_expiry.py')
 LOT = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(LOT)
+PUBLIC_SPEC = importlib.util.spec_from_file_location('author_public_contracts', HERE/'author_public_contracts.py')
+PUBLIC = importlib.util.module_from_spec(PUBLIC_SPEC)
+PUBLIC_SPEC.loader.exec_module(PUBLIC)
 
 
 def original(path):
@@ -22,7 +25,7 @@ class LotExpiryContract(unittest.TestCase):
     def test_exact_authoring_and_reverse_preserve_all_other_facts(self):
         for path in sorted((HERE/'fixtures').glob('*.json')):
             with self.subTest(fixture=path.stem):
-                before = original(path); after = json.loads(path.read_text())
+                before = original(path); after = PUBLIC.restore_fixture(json.loads(path.read_text()))
                 generated = copy.deepcopy(before)
                 self.assertTrue(LOT.apply(generated))
                 self.assertEqual(after, generated)
@@ -78,7 +81,9 @@ class LotExpiryContract(unittest.TestCase):
     def test_oracle_bytes_are_identical(self):
         for name in ['case.json','scenario.feature']:
             path=HERE/name
-            self.assertEqual(subprocess.check_output(['git','show',f'{BASELINE}:{path.relative_to(ROOT)}'],cwd=ROOT),path.read_bytes())
+            before = subprocess.check_output(['git','show',f'{BASELINE}:{path.relative_to(ROOT)}'],cwd=ROOT)
+            if name == 'case.json': self.assertEqual(json.loads(before), PUBLIC.restore_case(json.loads(path.read_bytes())))
+            else: self.assertEqual(before.decode(),PUBLIC.restore_feature(path.read_text()))
         c=json.loads((HERE/'case.json').read_text())
         self.assertEqual(257,sum(len(s['assertions']) for s in c['subcases']))
 

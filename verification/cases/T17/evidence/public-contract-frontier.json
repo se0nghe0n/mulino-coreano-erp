@@ -1,0 +1,242 @@
+{
+  "baseline": "ac0549e65aabc2137ac44827f544bc3cb0ca782c",
+  "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-54e6637f",
+  "taskAndStep": "OPEN",
+  "actualScenarios": "NOT_RUN: coordinator Haiku workflow only",
+  "assertionCount": 257,
+  "originalAssertionRawBlocksPreserved": "13 assertion records have allocation/restriction response pointer corrections only; strict inverse reproduces all original raw blocks",
+  "originalFeatureLinesPreserved": true,
+  "businessActorGrantsPreserved": true,
+  "slotViolationsBefore": 12,
+  "slotViolationsAfter": 3,
+  "sourceEncoderDeliveryChains": "AUTHORED_NOT_RUNTIME_ACCEPTED",
+  "remaining": [
+    {
+      "id": "FEFO_EXCEPTION",
+      "path": "eligibility-fefo-with-reason/reserve",
+      "symbol": "FulfillmentCommands.prepare / CapabilitySlots reserveQuantity",
+      "requiredContract": "Typed FEFO exception input and FEFO selection/exception decision",
+      "reason": "No FEFOExceptionReason slot or FEFO decision path; original reason and oracle remain intact."
+    },
+    {
+      "id": "REPLACEMENT_EVIDENCE",
+      "path": "replacement-no-revival/replace",
+      "symbol": "FulfillmentCommands.prepare / CapabilitySlots replaceAllocation",
+      "requiredContract": "Published source/evidence input consumed by replacement",
+      "reason": "evidenceId unsupported; do not relocate to ignored metadata."
+    },
+    {
+      "id": "ALLOCATION_RELEASE_REASON",
+      "path": "replacement-no-revival/allocation-release",
+      "symbol": "FulfillmentCommands.prepare / CapabilitySlots releaseAllocation",
+      "requiredContract": "Published release reason input consumed/audited by release",
+      "reason": "reason unsupported; original cancellation reason remains intact."
+    },
+    {
+      "id": "DELIVERY_SOURCE_ENCODING",
+      "symbol": "verification/harness/src/main/java/org/mulino/verification/ReferenceResolver.java ID_FIELDS, identityPointer, encode",
+      "requiredContract": "Allow actual dispatchId, cargoScopeId and deliveryId response identities in INPUT encoding/assertion bindings",
+      "reason": "Compiled identityPointer omits dispatchId/cargoScopeId/deliveryId. Seven prior-dispatch source chains cannot encode their dynamic IDs. The two original delivery /response/id oracle references remain unchanged until the actual deliveryId binding is supported; no fake response alias is added."
+    },
+    {
+      "id": "HOLD_SOURCE_AND_AUTHORITY",
+      "symbol": "QualityCommands.prepare",
+      "requiredContract": "Verified exact placeHold original, validity interval, category and category decision capability",
+      "reason": "Late cargo maps to actual transitSegmentId; missing original validity interval and admin decideRecallRestriction are not invented. Other qc actors similarly lack decideQuality."
+    },
+    {
+      "id": "DISPATCH_PERMISSION",
+      "symbol": "T17SourceFacts.quality/regulatory and FulfillmentCommands.requireContinuousAuthority",
+      "requiredContract": "Original given support for both SELL and DISPATCH authority at occurrence/current time",
+      "reason": "Existing source facts authorize SELL only. No new permission was fabricated."
+    },
+    {
+      "id": "CLAIM_OUTCOME",
+      "symbol": "DeliveryCommands.execute observation",
+      "requiredContract": "Preserve business pending reconciliation/no effects while aligning a justified public outcome contract",
+      "reason": "Public observation returns APPLIED with 0 physical/contributed quantity; original ACCEPTED_PENDING_EXTERNAL assertion is unchanged and remains a real frontier."
+    },
+    {
+      "id": "OTHERPACK_SALES_ITEM",
+      "symbol": "FulfillmentCommands.prepare Sales line item/unit mismatch",
+      "requiredContract": "Original P order vs ALT unapproved packaging business decision",
+      "reason": "L_ALT fixes the physical LOT only. The original P line and ALT segment still yield TYPE_INVALID before packaging logic; business oracle was not changed."
+    }
+  ],
+  "preservationProof": {
+    "baseline": "ac0549e65aabc2137ac44827f544bc3cb0ca782c",
+    "assertionCount": 257,
+    "originalRawAssertionBlockSha256": [
+      "4a33cb441ef76c6035684befcf2a92131c101d2f2134a07206cf1000620813b3",
+      "aeca865027cb02b3762bb38543695b584bef832ec838fad0945299bc04c4cc94",
+      "16d4013d82839d3d1b5afb56e6afb19cc45e1d8272773c292f618132b352f6cb",
+      "52bfd7048fc9be2e77a269f5dfd385591fc3ebd3901f2578eb382031a9e185f3",
+      "375e7decbd6789106fa1cf85111a8f990883e9119ddde0d075e107a9391e8612",
+      "6aa84f1f3ac8c5951090f4aaf42211d5744873367231c8e759217fd37940da77",
+      "37203907224d34b24f27982d0e17f0026a2edf03d0c65092af316128398b240a",
+      "542cabad77eec09a1d4b43cf5d4ec14f8e21fb3df381526eea24ef6ee8ed8dac",
+      "8f747249abfa2ad617ba464592a3f95115ad6319730015eb57c52baf3bca8c93",
+      "ddd44218c261a0e48176e6afeb53fca769774abbc230af90c7ee35e52a04c53a",
+      "f1d4dd4b402e6dd9e520d54a6bfff522a2a4339d767401c64451731ad198bc66",
+      "00f53a9620b5e603c8b846bda83f0d2f87fed59a49f71733f56398243f53f5ac",
+      "78f9a79d78406d7fb7d88966808543763b501a001dea287e181fdb3ddd32e49d",
+      "028da8a2e28108cac062a7ca5b7c7d017b4a156e2f15a064c039e272affe26f6",
+      "f2e98192a848210cf017d35de16682106d3f10d5af96ca2d22c17b1edbe63f60"
+    ],
+    "currentRawAssertionBlockSha256": [
+      "303079434a9f709dd35d886deb3d5eb738fa75f48bd283792f3dca14a8a73ecd",
+      "a5917a5054da6324885be9389fb2e137401963bbc36365e5f517b6072f72c249",
+      "16d4013d82839d3d1b5afb56e6afb19cc45e1d8272773c292f618132b352f6cb",
+      "52bfd7048fc9be2e77a269f5dfd385591fc3ebd3901f2578eb382031a9e185f3",
+      "375e7decbd6789106fa1cf85111a8f990883e9119ddde0d075e107a9391e8612",
+      "6aa84f1f3ac8c5951090f4aaf42211d5744873367231c8e759217fd37940da77",
+      "37203907224d34b24f27982d0e17f0026a2edf03d0c65092af316128398b240a",
+      "542cabad77eec09a1d4b43cf5d4ec14f8e21fb3df381526eea24ef6ee8ed8dac",
+      "8f747249abfa2ad617ba464592a3f95115ad6319730015eb57c52baf3bca8c93",
+      "582753723a5a46aea1c0c4b9b767568a9870bd44338c0f0503eea9ddd0de0222",
+      "f1d4dd4b402e6dd9e520d54a6bfff522a2a4339d767401c64451731ad198bc66",
+      "00f53a9620b5e603c8b846bda83f0d2f87fed59a49f71733f56398243f53f5ac",
+      "78f9a79d78406d7fb7d88966808543763b501a001dea287e181fdb3ddd32e49d",
+      "028da8a2e28108cac062a7ca5b7c7d017b4a156e2f15a064c039e272affe26f6",
+      "f2e98192a848210cf017d35de16682106d3f10d5af96ca2d22c17b1edbe63f60"
+    ],
+    "assertionReferenceCorrections": 13,
+    "featureSha256": "468354e60643f0f070db6e2734ae17901c9ebeb8c8a6fb8dda29844d62d4f863",
+    "caseSha256": "c18e05dc515c2acc73d8ffc8989d8ad36992e4a2666bfd14b4c6c9e1c2762952",
+    "exactReversibleActionDeltas": 61
+  },
+  "hashes": {
+    "verification/cases/T17/case.json": "c18e05dc515c2acc73d8ffc8989d8ad36992e4a2666bfd14b4c6c9e1c2762952",
+    "verification/cases/T17/scenario.feature": "468354e60643f0f070db6e2734ae17901c9ebeb8c8a6fb8dda29844d62d4f863"
+  },
+  "checks": {
+    "python": "17 PASS; .local/t17-public-contracts/python-final.log",
+    "compiledPublicSlots": ".local/t17-public-contracts/compiled-input-check.json",
+    "unit": "T17SourceFactsTest 5 PASS; .local/t17-public-contracts/unit.log",
+    "prepare": "PASS exit 0 (41 cases / 802 subcases / 24248 assertions; T17 3 known-open public slots); .local/t17-public-contracts/prepare-final.log",
+    "postgres": "8 PASS, failures/errors/skipped 0; .local/t17-source-pg-e2cd66f7-a2aa-42ed-b1c8-9637e9f0b032/test.log"
+  },
+  "noProductionOrCommonRegistryChanges": true,
+  "assertionReferenceCorrectionCount": 13,
+  "sourceActors": {
+    "positiveDelivery": "existing t17Source ITEM scope",
+    "unverifiedClaims": "existing receiver under original namespace, intake owner preserved"
+  },
+  "changedFiles": [
+    "verification/cases/T17/T17PublicInputCheck.java",
+    "verification/cases/T17/author_public_contracts.py",
+    "verification/cases/T17/case.json",
+    "verification/cases/T17/evidence/public-contract-frontier.json",
+    "verification/cases/T17/fixtures/claim-conflictingquantity.json",
+    "verification/cases/T17/fixtures/claim-falseclaim.json",
+    "verification/cases/T17/fixtures/claim-nopriordispatch.json",
+    "verification/cases/T17/fixtures/claim-scopeoverflow.json",
+    "verification/cases/T17/fixtures/claim-unidentifiedscope.json",
+    "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json",
+    "verification/cases/T17/fixtures/late-restriction-actual-delivery.json",
+    "verification/cases/T17/fixtures/normal-consumed-delivery.json",
+    "verification/cases/T17/fixtures/post-dispatch-expiry.json",
+    "verification/cases/T17/public-contract-delta.json",
+    "verification/cases/T17/scenario.feature",
+    "verification/cases/T17/test_lot_expiry.py",
+    "verification/cases/T17/test_public_contracts.py",
+    "verification/cases/T17/test_source_profiles.py",
+    "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java"
+  ],
+  "baselineRootPublicContractCompared": "35234fa6: capability slots and Fulfillment/Quality/Delivery handlers are identical; ReferenceResolver only adds assessment ID support, not delivery identities",
+  "originalRawAssertionsSha256": "f3cb4ded4cd4b6cd691c506a17e4e1fdaf542e8ac8af9e1cf53eb7dcfdc69de9",
+  "newSyntheticMetadata": {
+    "observationId": "Deterministic new input UUID; never a fabricated response",
+    "unmatchedRangeId": "New unverified reported range; does not identify existing A/LOT",
+    "nextCheckAt": "2026-10-07T10:00:00Z, new synthetic reconciliation check after the original activity times",
+    "originalActivityTimesChanged": false
+  },
+  "buildIdentity": {
+    "sourceCommit": "ac0549e65aabc2137ac44827f544bc3cb0ca782c",
+    "productJar": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-54e6637f/backend/target/ontology-0.1.0-SNAPSHOT.jar",
+    "productJarSha256": "a28141102913a775ff29ef785ab5bee28a522bd225dff580e5c8a97a173cea32"
+  },
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "verification/cases/T17/author_public_contracts.py"
+      ],
+      "exitCode": 0,
+      "log": ".local/t17-public-contracts/regeneration.log"
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "verification/cases/T17",
+        "-p",
+        "test_*.py"
+      ],
+      "exitCode": 0,
+      "log": ".local/t17-public-contracts/python-final.log"
+    },
+    {
+      "argv": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "-Dtest=T17SourceFactsTest",
+        "test"
+      ],
+      "exitCode": 0,
+      "log": ".local/t17-public-contracts/unit.log"
+    },
+    {
+      "argv": [
+        "python3",
+        ".local/t17-lot-expiry/run-approved-pg.py"
+      ],
+      "environment": {
+        "PATH-prefix": "backend/node_modules/.bin"
+      },
+      "runnerSource": "014da95c:verification/cases/T17/run_source_pg_test.py (exact source executed with original __file__; owned runner unchanged)",
+      "exitCode": 0,
+      "log": ".local/t17-public-contracts/pg-final-verified.log",
+      "detail": ".local/t17-source-pg-e2cd66f7-a2aa-42ed-b1c8-9637e9f0b032"
+    },
+    {
+      "argv": [
+        "./verify",
+        "prepare"
+      ],
+      "environment": {
+        "PATH-prefix": "backend/node_modules/.bin"
+      },
+      "exitCode": 0,
+      "log": ".local/t17-public-contracts/prepare-final.log"
+    },
+    {
+      "argv": [
+        "javac",
+        "-cp",
+        "backend/target/classes:verification/harness/target/classes:<verification/harness/target/classpath.txt>",
+        "-d",
+        ".local/t17-public-contracts/classes",
+        "verification/cases/T17/T17PublicInputCheck.java"
+      ],
+      "exitCode": 0
+    },
+    {
+      "argv": [
+        "java",
+        "-cp",
+        ".local/t17-public-contracts/classes:backend/target/classes:verification/harness/target/classes:<verification/harness/target/classpath.txt>",
+        "org.mulino.verification.actual.T17PublicInputCheck",
+        "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-54e6637f"
+      ],
+      "exitCode": 0,
+      "log": ".local/t17-public-contracts/compiled-input-check.log"
+    }
+  ]
+}

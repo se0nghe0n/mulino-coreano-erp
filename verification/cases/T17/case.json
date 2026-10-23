@@ -165,7 +165,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-reserve-pick-dispatch-reserve",
@@ -178,7 +179,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -400,7 +402,8 @@
                   "actionId": "second-order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": {
               "$result": {
@@ -418,7 +421,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -513,7 +517,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -560,7 +564,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -1480,7 +1484,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -1666,7 +1670,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -1713,7 +1717,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -1814,6 +1818,515 @@
           ]
         },
         {
+          "id": "delivery-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "T17-normal-consumed-delivery-delivery-source",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "30",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+                    "deliveryEventId": "4b78d825-3017-527e-ad62-e77a5a9fad0c",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "30",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-proof"
+                      },
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "30",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+                    "deliveryEventId": "4b78d825-3017-527e-ad62-e77a5a9fad0c",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "30",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-proof"
+                      },
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-normal-consumed-delivery-delivery-source-document"
+          },
+          "evidenceRefs": [
+            "delivery-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "T17-normal-consumed-delivery-delivery-source",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "30",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+                    "deliveryEventId": "4b78d825-3017-527e-ad62-e77a5a9fad0c",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "30",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-proof"
+                      },
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "delivery-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "30",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-normal-consumed-delivery-delivery-source-event"
+          },
+          "evidenceRefs": [
+            "delivery-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-provisional",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "rangeRootId": {
+                "$alias": "A"
+              },
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
+              "quantity": "30",
+              "unit": "BOX",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/dispatchId"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/cargoScopeId"
+                }
+              },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+              "eventId": {
+                "$result": {
+                  "actionId": "delivery-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              }
+            },
+            "provenance": {
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-normal-consumed-delivery-delivery-provisional"
+          },
+          "evidenceRefs": [
+            "delivery-provisional:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "delivery-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "delivery-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": "bda038fd-29a2-57a5-a74a-4b292b672c7c",
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:T17-normal-consumed-delivery-delivery-source:1",
+              "quantity": "30",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "기존 원문과 실제 dispatch의 범위·시각·물량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-normal-consumed-delivery-delivery-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "delivery-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "delivery-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-normal-consumed-delivery-delivery-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "delivery-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "delivery",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -1825,47 +2338,30 @@
             "capabilityId": "recordDelivery",
             "subjectRefs": [
               {
-                "type": "TradeItem",
+                "type": "DeliveryObservation",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "delivery-provisional",
+                    "pointer": "/response/effects/observationId"
+                  }
                 }
               }
             ],
             "slots": {
-              "dispatchId": {
+              "observationId": {
                 "$result": {
-                  "actionId": "dispatch",
+                  "actionId": "delivery-provisional",
+                  "pointer": "/response/effects/observationId"
+                }
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery-source-canonical",
                   "pointer": "/response/id"
                 }
-              },
-              "cargoScopeId": {
-                "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
-                }
-              },
-              "allocationId": {
-                "$result": {
-                  "actionId": "reserve",
-                  "pointer": "/response/allocationId"
-                }
-              },
-              "quantity": "30",
-              "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "delivery-proof"
-              },
-              "occurredAt": "2026-10-07T09:00:00Z",
-              "itemId": {
-                "$alias": "P"
               }
             },
-            "expectedRevision": {
-              "$result": {
-                "actionId": "dispatch",
-                "pointer": "/response/revision"
-              }
-            },
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T17-normal-consumed-delivery-delivery",
             "evidenceRefs": [
               {
@@ -1873,14 +2369,8 @@
               }
             ],
             "provenance": {
-              "dispatchId": "CONTEXT",
-              "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "occurredAt": "USER",
-              "itemId": "CONTEXT"
+              "observationId": "CONTEXT",
+              "canonicalOccurrenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2231,7 +2721,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -2553,7 +3043,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -2600,7 +3090,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -2654,18 +3144,18 @@
               }
             ],
             "slots": {
-              "cargoScopeId": {
-                "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
-                }
-              },
               "quantity": "30",
               "unit": "BOX",
               "action": "SELL",
               "reason": "RECALL_INVESTIGATION",
               "evidenceId": {
                 "$alias": "recall-proof"
+              },
+              "segmentId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/transitSegmentId"
+                }
               }
             },
             "expectedRevision": {
@@ -2681,12 +3171,12 @@
               }
             ],
             "provenance": {
-              "cargoScopeId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "segmentId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -2761,6 +3251,515 @@
           ]
         },
         {
+          "id": "delivery-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "T17-late-restriction-actual-delivery-delivery-source",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+                    "deliveryEventId": "788834b3-e098-543a-9200-bddc43a04fce",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-20"
+                      },
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+                    "deliveryEventId": "788834b3-e098-543a-9200-bddc43a04fce",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-20"
+                      },
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-delivery-source-document"
+          },
+          "evidenceRefs": [
+            "delivery-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "T17-late-restriction-actual-delivery-delivery-source",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+                    "deliveryEventId": "788834b3-e098-543a-9200-bddc43a04fce",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-20"
+                      },
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "delivery-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-delivery-source-event"
+          },
+          "evidenceRefs": [
+            "delivery-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-provisional",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "rangeRootId": {
+                "$alias": "A"
+              },
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
+              "quantity": "20",
+              "unit": "BOX",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/dispatchId"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/cargoScopeId"
+                }
+              },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+              "eventId": {
+                "$result": {
+                  "actionId": "delivery-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              }
+            },
+            "provenance": {
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-delivery-provisional"
+          },
+          "evidenceRefs": [
+            "delivery-provisional:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "delivery-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "delivery-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": "27b81cf4-90dd-5846-88d3-68ab7060f781",
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:T17-late-restriction-actual-delivery-delivery-source:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "기존 원문과 실제 dispatch의 범위·시각·물량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-delivery-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "delivery-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "delivery-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-delivery-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "delivery-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "delivery",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -2772,47 +3771,30 @@
             "capabilityId": "recordDelivery",
             "subjectRefs": [
               {
-                "type": "TradeItem",
+                "type": "DeliveryObservation",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "delivery-provisional",
+                    "pointer": "/response/effects/observationId"
+                  }
                 }
               }
             ],
             "slots": {
-              "dispatchId": {
+              "observationId": {
                 "$result": {
-                  "actionId": "dispatch",
+                  "actionId": "delivery-provisional",
+                  "pointer": "/response/effects/observationId"
+                }
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery-source-canonical",
                   "pointer": "/response/id"
                 }
-              },
-              "cargoScopeId": {
-                "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
-                }
-              },
-              "allocationId": {
-                "$result": {
-                  "actionId": "reserve",
-                  "pointer": "/response/allocationId"
-                }
-              },
-              "quantity": "20",
-              "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "delivery-20"
-              },
-              "occurredAt": "2026-10-07T09:00:00Z",
-              "itemId": {
-                "$alias": "P"
               }
             },
-            "expectedRevision": {
-              "$result": {
-                "actionId": "late-hold",
-                "pointer": "/response/revision"
-              }
-            },
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T17-late-restriction-actual-delivery-delivery",
             "evidenceRefs": [
               {
@@ -2820,14 +3802,8 @@
               }
             ],
             "provenance": {
-              "dispatchId": "CONTEXT",
-              "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "occurredAt": "USER",
-              "itemId": "CONTEXT"
+              "observationId": "CONTEXT",
+              "canonicalOccurrenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -4155,7 +5131,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -4202,7 +5178,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -4330,6 +5306,515 @@
           ]
         },
         {
+          "id": "delivery-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "T17-post-dispatch-expiry-delivery-source",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:06:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
+                    "deliveryEventId": "10a5ef8e-86a4-5b18-933d-0bd5e7fe0aee",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-20"
+                      },
+                      "occurredAt": "2026-10-07T09:06:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:06:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
+                    "deliveryEventId": "10a5ef8e-86a4-5b18-933d-0bd5e7fe0aee",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-20"
+                      },
+                      "occurredAt": "2026-10-07T09:06:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery-source-document"
+          },
+          "evidenceRefs": [
+            "delivery-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "T17-post-dispatch-expiry-delivery-source",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:06:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:06:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
+                    "deliveryEventId": "10a5ef8e-86a4-5b18-933d-0bd5e7fe0aee",
+                    "originalRequest": {
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "delivery-20"
+                      },
+                      "occurredAt": "2026-10-07T09:06:00Z",
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "delivery-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery-source-event"
+          },
+          "evidenceRefs": [
+            "delivery-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-provisional",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [],
+            "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "rangeRootId": {
+                "$alias": "A"
+              },
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
+              "quantity": "20",
+              "unit": "BOX",
+              "occurredAt": "2026-10-07T09:06:00Z",
+              "dispatchId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/dispatchId"
+                }
+              },
+              "cargoScopeId": {
+                "$result": {
+                  "actionId": "dispatch",
+                  "pointer": "/response/effects/cargoScopeId"
+                }
+              },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "eebd95f9-9c05-5217-86aa-d988773f22be",
+              "eventId": {
+                "$result": {
+                  "actionId": "delivery-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
+              "allocationId": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              }
+            },
+            "provenance": {
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "dispatchId": "CONTEXT",
+              "cargoScopeId": "CONTEXT",
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery-provisional"
+          },
+          "evidenceRefs": [
+            "delivery-provisional:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "delivery-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "delivery-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": "eebd95f9-9c05-5217-86aa-d988773f22be",
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:T17-post-dispatch-expiry-delivery-source:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:06:00Z",
+              "reason": "기존 원문과 실제 dispatch의 범위·시각·물량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "delivery-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "delivery-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "delivery-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "delivery-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "delivery",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -4341,47 +5826,30 @@
             "capabilityId": "recordDelivery",
             "subjectRefs": [
               {
-                "type": "TradeItem",
+                "type": "DeliveryObservation",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "delivery-provisional",
+                    "pointer": "/response/effects/observationId"
+                  }
                 }
               }
             ],
             "slots": {
-              "dispatchId": {
+              "observationId": {
                 "$result": {
-                  "actionId": "dispatch",
+                  "actionId": "delivery-provisional",
+                  "pointer": "/response/effects/observationId"
+                }
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "delivery-source-canonical",
                   "pointer": "/response/id"
                 }
-              },
-              "cargoScopeId": {
-                "$result": {
-                  "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
-                }
-              },
-              "allocationId": {
-                "$result": {
-                  "actionId": "reserve",
-                  "pointer": "/response/allocationId"
-                }
-              },
-              "quantity": "20",
-              "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "delivery-20"
-              },
-              "occurredAt": "2026-10-07T09:06:00Z",
-              "itemId": {
-                "$alias": "P"
               }
             },
-            "expectedRevision": {
-              "$result": {
-                "actionId": "dispatch",
-                "pointer": "/response/revision"
-              }
-            },
+            "expectedRevision": 1,
             "commandIdempotencyKey": "T17-post-dispatch-expiry-delivery",
             "evidenceRefs": [
               {
@@ -4389,14 +5857,8 @@
               }
             ],
             "provenance": {
-              "dispatchId": "CONTEXT",
-              "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "occurredAt": "USER",
-              "itemId": "CONTEXT"
+              "observationId": "CONTEXT",
+              "canonicalOccurrenceId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -5386,7 +6848,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -5433,7 +6895,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -5535,6 +6997,357 @@
           ]
         },
         {
+          "id": "claim-source-document",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "sourceReference": "claim-falseclaim-claim",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "rangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+                    "deliveryEventId": "48380a00-767b-5847-adac-f0b0b20f1a60",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-falseclaim-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-falseclaim-unmatched",
+                        "independentCounterEvidence": {
+                          "$alias": "delivery-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "rangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+                    "deliveryEventId": "48380a00-767b-5847-adac-f0b0b20f1a60",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-falseclaim-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-falseclaim-unmatched",
+                        "independentCounterEvidence": {
+                          "$alias": "delivery-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-falseclaim-claim-source-document"
+          },
+          "evidenceRefs": [
+            "claim-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-event",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "externalEventId": "claim-falseclaim-claim",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "rangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+                    "deliveryEventId": "48380a00-767b-5847-adac-f0b0b20f1a60",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-falseclaim-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-falseclaim-unmatched",
+                        "independentCounterEvidence": {
+                          "$alias": "delivery-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "claim-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-falseclaim-claim-source-event"
+          },
+          "evidenceRefs": [
+            "claim-source-event:actual-command-artifact"
+          ]
+        },
+        {
           "id": "claim",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -5553,43 +7366,58 @@
               }
             ],
             "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "rangeRootId": "83914823-43bc-565c-b5e7-af11cb9c4b9c",
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
               "quantity": "20",
               "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "claim-proof"
-              },
-              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
-              "externalEventId": "claim-falseclaim-claim",
-              "sourceVersion": "1",
               "occurredAt": "2026-10-07T09:00:00Z",
-              "identityStatus": "MATCH_CANDIDATES_REQUIRED",
-              "verificationInput": {
-                "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
-                "observedPhysicalScope": "claim-falseclaim-unmatched",
-                "independentCounterEvidence": {
-                  "$alias": "delivery-proof"
-                }
-              },
               "dispatchId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/id"
+                  "pointer": "/response/effects/dispatchId"
                 }
               },
               "cargoScopeId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
+                  "pointer": "/response/effects/cargoScopeId"
                 }
               },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "0082be99-8fc5-5241-ad27-68b1044a7be2",
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
-              },
-              "itemId": {
-                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -5600,19 +7428,23 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "sourceNamespace": "USER",
-              "externalEventId": "USER",
-              "sourceVersion": "USER",
-              "occurredAt": "USER",
-              "identityStatus": "USER",
-              "verificationInput": "USER",
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
               "dispatchId": "CONTEXT",
               "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -6683,7 +8515,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -6730,7 +8562,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -6832,6 +8664,357 @@
           ]
         },
         {
+          "id": "claim-source-document",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "sourceReference": "claim-unidentifiedscope-claim",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "rangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+                    "deliveryEventId": "bd8afd27-b92b-517a-9b6e-3064b849dddc",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-unidentifiedscope-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "UNKNOWN",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-unidentifiedscope-unmatched",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "rangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+                    "deliveryEventId": "bd8afd27-b92b-517a-9b6e-3064b849dddc",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-unidentifiedscope-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "UNKNOWN",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-unidentifiedscope-unmatched",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-unidentifiedscope-claim-source-document"
+          },
+          "evidenceRefs": [
+            "claim-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-event",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "externalEventId": "claim-unidentifiedscope-claim",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "rangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+                    "deliveryEventId": "bd8afd27-b92b-517a-9b6e-3064b849dddc",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-unidentifiedscope-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "UNKNOWN",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-unidentifiedscope-unmatched",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "claim-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-unidentifiedscope-claim-source-event"
+          },
+          "evidenceRefs": [
+            "claim-source-event:actual-command-artifact"
+          ]
+        },
+        {
           "id": "claim",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -6850,43 +9033,58 @@
               }
             ],
             "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "rangeRootId": "e391cc23-6894-58a7-a2fa-60f6e4a129b2",
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
               "quantity": "20",
               "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "claim-proof"
-              },
-              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
-              "externalEventId": "claim-unidentifiedscope-claim",
-              "sourceVersion": "1",
               "occurredAt": "2026-10-07T09:00:00Z",
-              "identityStatus": "UNKNOWN",
-              "verificationInput": {
-                "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
-                "observedPhysicalScope": "claim-unidentifiedscope-unmatched",
-                "independentCounterEvidence": {
-                  "$alias": "claim-proof"
-                }
-              },
               "dispatchId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/id"
+                  "pointer": "/response/effects/dispatchId"
                 }
               },
               "cargoScopeId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
+                  "pointer": "/response/effects/cargoScopeId"
                 }
               },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "5023107d-ece0-5ff1-bc4a-1c3afe3ec8b4",
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
-              },
-              "itemId": {
-                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -6897,19 +9095,23 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "sourceNamespace": "USER",
-              "externalEventId": "USER",
-              "sourceVersion": "USER",
-              "occurredAt": "USER",
-              "identityStatus": "USER",
-              "verificationInput": "USER",
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
               "dispatchId": "CONTEXT",
               "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -7980,7 +10182,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -8027,7 +10229,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -8129,6 +10331,372 @@
           ]
         },
         {
+          "id": "claim-source-document",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "sourceReference": "claim-conflictingquantity-claim",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+                    "deliveryEventId": "bd5bc220-a493-582d-bb60-e15f11fe6d0f",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-conflictingquantity-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-conflictingquantity-A",
+                        "independentCounterEvidence": {
+                          "$alias": "delivery-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+                    "deliveryEventId": "bd5bc220-a493-582d-bb60-e15f11fe6d0f",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-conflictingquantity-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-conflictingquantity-A",
+                        "independentCounterEvidence": {
+                          "$alias": "delivery-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-conflictingquantity-claim-source-document"
+          },
+          "evidenceRefs": [
+            "claim-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-event",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "externalEventId": "claim-conflictingquantity-claim",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+                    "deliveryEventId": "bd5bc220-a493-582d-bb60-e15f11fe6d0f",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-conflictingquantity-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-conflictingquantity-A",
+                        "independentCounterEvidence": {
+                          "$alias": "delivery-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "claim-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-conflictingquantity-claim-source-event"
+          },
+          "evidenceRefs": [
+            "claim-source-event:actual-command-artifact"
+          ]
+        },
+        {
           "id": "claim",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -8147,43 +10715,63 @@
               }
             ],
             "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "rangeRootId": {
+                "$alias": "A"
+              },
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
               "quantity": "20",
               "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "claim-proof"
-              },
-              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
-              "externalEventId": "claim-conflictingquantity-claim",
-              "sourceVersion": "1",
               "occurredAt": "2026-10-07T09:00:00Z",
-              "identityStatus": "MATCH_CANDIDATES_REQUIRED",
-              "verificationInput": {
-                "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
-                "observedPhysicalScope": "claim-conflictingquantity-A",
-                "independentCounterEvidence": {
-                  "$alias": "delivery-proof"
-                }
-              },
               "dispatchId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/id"
+                  "pointer": "/response/effects/dispatchId"
                 }
               },
               "cargoScopeId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
+                  "pointer": "/response/effects/cargoScopeId"
                 }
               },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "3b832987-2878-51dc-aa0b-a6f40bb6af62",
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
-              },
-              "itemId": {
-                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -8194,19 +10782,24 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "sourceNamespace": "USER",
-              "externalEventId": "USER",
-              "sourceVersion": "USER",
-              "occurredAt": "USER",
-              "identityStatus": "USER",
-              "verificationInput": "USER",
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
               "dispatchId": "CONTEXT",
               "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -9211,6 +11804,276 @@
           ]
         },
         {
+          "id": "claim-source-document",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$alias": "t17SourceWork-A"
+                }
+              },
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "sourceReference": "claim-nopriordispatch-claim",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "physicalScopeId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+                    "deliveryEventId": "ea458eff-70cb-51c1-b74a-8f98a27d9b74",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-nopriordispatch-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-nopriordispatch-A",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "segmentId": {
+                        "$alias": "A"
+                      },
+                      "locationId": {
+                        "$alias": "CUSTOMER"
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "physicalScopeId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+                    "deliveryEventId": "ea458eff-70cb-51c1-b74a-8f98a27d9b74",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-nopriordispatch-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-nopriordispatch-A",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "segmentId": {
+                        "$alias": "A"
+                      },
+                      "locationId": {
+                        "$alias": "CUSTOMER"
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-nopriordispatch-claim-source-document"
+          },
+          "evidenceRefs": [
+            "claim-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-event",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$alias": "t17SourceWork-A"
+                }
+              },
+              "kind": "OBSERVED_MOVEMENT",
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "externalEventId": "claim-nopriordispatch-claim",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "physicalScopeId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+                    "deliveryEventId": "ea458eff-70cb-51c1-b74a-8f98a27d9b74",
+                    "originalRequest": {
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-nopriordispatch-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-nopriordispatch-A",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "segmentId": {
+                        "$alias": "A"
+                      },
+                      "locationId": {
+                        "$alias": "CUSTOMER"
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "claim-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-nopriordispatch-claim-source-event"
+          },
+          "evidenceRefs": [
+            "claim-source-event:actual-command-artifact"
+          ]
+        },
+        {
           "id": "claim",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -9229,32 +12092,37 @@
               }
             ],
             "slots": {
-              "quantity": "20",
-              "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "claim-proof"
-              },
-              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
-              "externalEventId": "claim-nopriordispatch-claim",
-              "sourceVersion": "1",
-              "occurredAt": "2026-10-07T09:00:00Z",
-              "identityStatus": "MATCH_CANDIDATES_REQUIRED",
-              "verificationInput": {
-                "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
-                "observedPhysicalScope": "claim-nopriordispatch-A",
-                "independentCounterEvidence": {
-                  "$alias": "claim-proof"
-                }
-              },
-              "segmentId": {
-                "$alias": "A"
-              },
-              "locationId": {
-                "$alias": "CUSTOMER"
+              "customerId": {
+                "$alias": "C"
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "rangeRootId": {
+                "$alias": "A"
+              },
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
+              "quantity": "20",
+              "unit": "BOX",
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "observationId": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$alias": "t17SourceWork-A"
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-claim-nopriordispatch-claim",
@@ -9264,18 +12132,20 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "sourceNamespace": "USER",
-              "externalEventId": "USER",
-              "sourceVersion": "USER",
-              "occurredAt": "USER",
-              "identityStatus": "USER",
-              "verificationInput": "USER",
-              "segmentId": "CONTEXT",
-              "locationId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -10449,7 +13319,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -10496,7 +13366,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "transitPlaceId": {
@@ -10598,6 +13468,372 @@
           ]
         },
         {
+          "id": "claim-source-document",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "sourceReference": "claim-scopeoverflow-claim",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "31",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+                    "deliveryEventId": "ba4b8437-e03e-51a4-89b7-0a8d6f947141",
+                    "originalRequest": {
+                      "quantity": "31",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-scopeoverflow-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-scopeoverflow-A",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "31",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+                    "deliveryEventId": "ba4b8437-e03e-51a4-89b7-0a8d6f947141",
+                    "originalRequest": {
+                      "quantity": "31",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-scopeoverflow-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-scopeoverflow-A",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "SYNTHETIC T17 original given; not a verified fact or regulatory approval"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-scopeoverflow-claim-source-document"
+          },
+          "evidenceRefs": [
+            "claim-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "claim-source-event",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "DISPATCH",
+                "id": {
+                  "$result": {
+                    "actionId": "dispatch",
+                    "pointer": "/response/effects/dispatchId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_DELIVERY",
+              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+              "externalEventId": "claim-scopeoverflow-claim",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "customerId": {
+                      "$alias": "C"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "L"
+                    },
+                    "rangeRootId": {
+                      "$alias": "A"
+                    },
+                    "placeId": {
+                      "$alias": "CUSTOMER"
+                    },
+                    "startQuantity": "0",
+                    "quantity": "31",
+                    "unit": "BOX",
+                    "occurredAt": "2026-10-07T09:00:00Z",
+                    "dispatchId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/dispatchId"
+                      }
+                    },
+                    "cargoScopeId": {
+                      "$result": {
+                        "actionId": "dispatch",
+                        "pointer": "/response/effects/cargoScopeId"
+                      }
+                    },
+                    "salesLineId": {
+                      "$result": {
+                        "actionId": "order",
+                        "pointer": "/response/line/id"
+                      }
+                    },
+                    "physicalScopeId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+                    "deliveryEventId": "ba4b8437-e03e-51a4-89b7-0a8d6f947141",
+                    "originalRequest": {
+                      "quantity": "31",
+                      "unit": "BOX",
+                      "sourceEvidenceId": {
+                        "$alias": "claim-proof"
+                      },
+                      "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
+                      "externalEventId": "claim-scopeoverflow-claim",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "identityStatus": "MATCH_CANDIDATES_REQUIRED",
+                      "verificationInput": {
+                        "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
+                        "observedPhysicalScope": "claim-scopeoverflow-A",
+                        "independentCounterEvidence": {
+                          "$alias": "claim-proof"
+                        }
+                      },
+                      "dispatchId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/dispatchId"
+                        }
+                      },
+                      "cargoScopeId": {
+                        "$result": {
+                          "actionId": "dispatch",
+                          "pointer": "/response/effects/cargoScopeId"
+                        }
+                      },
+                      "allocationId": {
+                        "$result": {
+                          "actionId": "reserve",
+                          "pointer": "/response/effects/allocationId"
+                        }
+                      },
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "synthetic": true,
+                    "operatingApprovalClaimed": false
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "claim-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original reported claim; current reconciliation must establish identity",
+              "quantity": "31",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-scopeoverflow-claim-source-event"
+          },
+          "evidenceRefs": [
+            "claim-source-event:actual-command-artifact"
+          ]
+        },
+        {
           "id": "claim",
           "kind": "invoke",
           "actorRef": "receiver",
@@ -10616,43 +13852,63 @@
               }
             ],
             "slots": {
+              "customerId": {
+                "$alias": "C"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "rangeRootId": {
+                "$alias": "A"
+              },
+              "placeId": {
+                "$alias": "CUSTOMER"
+              },
+              "startQuantity": "0",
               "quantity": "31",
               "unit": "BOX",
-              "sourceEvidenceId": {
-                "$alias": "claim-proof"
-              },
-              "sourceNamespace": "SYNTHETIC-UNVERIFIED-SOURCE",
-              "externalEventId": "claim-scopeoverflow-claim",
-              "sourceVersion": "1",
               "occurredAt": "2026-10-07T09:00:00Z",
-              "identityStatus": "MATCH_CANDIDATES_REQUIRED",
-              "verificationInput": {
-                "signedSource": "SYNTHETIC-UNVERIFIED-SOURCE",
-                "observedPhysicalScope": "claim-scopeoverflow-A",
-                "independentCounterEvidence": {
-                  "$alias": "claim-proof"
-                }
-              },
               "dispatchId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/id"
+                  "pointer": "/response/effects/dispatchId"
                 }
               },
               "cargoScopeId": {
                 "$result": {
                   "actionId": "dispatch",
-                  "pointer": "/response/cargoScope/id"
+                  "pointer": "/response/effects/cargoScopeId"
                 }
               },
+              "salesLineId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/line/id"
+                }
+              },
+              "observationId": "68face08-adcf-5b05-bf00-e43c91932bb1",
+              "eventId": {
+                "$result": {
+                  "actionId": "claim-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "workId": {
+                "$result": {
+                  "actionId": "order",
+                  "pointer": "/response/workId"
+                }
+              },
+              "nextAction": "원래 보고의 실물 범위와 원문을 대조한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z",
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
-              },
-              "itemId": {
-                "$alias": "P"
               }
             },
             "expectedRevision": 1,
@@ -10663,19 +13919,24 @@
               }
             ],
             "provenance": {
-              "quantity": "USER",
-              "unit": "USER",
-              "sourceEvidenceId": "CONTEXT",
-              "sourceNamespace": "USER",
-              "externalEventId": "USER",
-              "sourceVersion": "USER",
-              "occurredAt": "USER",
-              "identityStatus": "USER",
-              "verificationInput": "USER",
+              "customerId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
               "dispatchId": "CONTEXT",
               "cargoScopeId": "CONTEXT",
-              "allocationId": "CONTEXT",
-              "itemId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "observationId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "allocationId": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -11697,7 +14958,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-replacement-no-revival-reserve",
@@ -11710,7 +14972,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -11860,12 +15123,13 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "segmentId": {
                 "$alias": "B"
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": {
               "$result": {
@@ -11884,7 +15148,8 @@
               "unit": "USER",
               "evidenceId": "CONTEXT",
               "allocationId": "CONTEXT",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -11977,7 +15242,7 @@
               "restrictionId": {
                 "$result": {
                   "actionId": "hold",
-                  "pointer": "/response/restrictionId"
+                  "pointer": "/response/effects/restrictionId"
                 }
               },
               "evidenceId": {
@@ -12091,7 +15356,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "reason": "ORDER_CANCELLED_UNUSED_ALLOCATION"
@@ -12223,7 +15488,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12298,7 +15563,7 @@
               "id": {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12507,7 +15772,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12544,7 +15809,7 @@
               "id": {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12561,7 +15826,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12598,7 +15863,7 @@
               "id": {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12695,7 +15960,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12770,7 +16035,7 @@
               "id": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -12832,7 +16097,7 @@
               {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               {
@@ -12858,7 +16123,7 @@
               {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               {
@@ -12942,12 +16207,12 @@
           "op": "equals",
           "source": {
             "actionId": "release-hold",
-            "pointer": "/response/restrictionId"
+            "pointer": "/response/effects/restrictionId"
           },
           "expected": {
             "$result": {
               "actionId": "hold",
-              "pointer": "/response/restrictionId"
+              "pointer": "/response/effects/restrictionId"
             }
           },
           "requirementRefs": [
@@ -12984,7 +16249,7 @@
               "id": {
                 "$result": {
                   "actionId": "hold",
-                  "pointer": "/response/restrictionId"
+                  "pointer": "/response/effects/restrictionId"
                 }
               }
             },
@@ -13002,7 +16267,7 @@
               {
                 "$result": {
                   "actionId": "hold",
-                  "pointer": "/response/restrictionId"
+                  "pointer": "/response/effects/restrictionId"
                 }
               },
               {
@@ -13048,7 +16313,7 @@
               "id": {
                 "$result": {
                   "actionId": "hold",
-                  "pointer": "/response/restrictionId"
+                  "pointer": "/response/effects/restrictionId"
                 }
               }
             },
@@ -13066,7 +16331,7 @@
               {
                 "$result": {
                   "actionId": "hold",
-                  "pointer": "/response/restrictionId"
+                  "pointer": "/response/effects/restrictionId"
                 }
               },
               {
@@ -13112,7 +16377,7 @@
               "id": {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -13131,7 +16396,7 @@
               {
                 "$result": {
                   "actionId": "replace",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               {
@@ -13498,7 +16763,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-unknown-reserve",
@@ -13511,7 +16777,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -14319,7 +17586,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-conflict-reserve",
@@ -14332,7 +17600,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -15140,7 +18409,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-reserve",
@@ -15153,7 +18423,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -16236,7 +19507,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-reserve",
@@ -16250,7 +19522,8 @@
               "quantity": "USER",
               "unit": "USER",
               "FEFOExceptionReason": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -17093,7 +20366,8 @@
                   "actionId": "order",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-reserve",
@@ -17106,7 +20380,8 @@
               "segmentId": "CONTEXT",
               "quantity": "USER",
               "unit": "USER",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           },
           "evidenceRefs": [

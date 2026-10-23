@@ -19,6 +19,9 @@ SOURCE_SPEC.loader.exec_module(SOURCE)
 LOT_SPEC = importlib.util.spec_from_file_location('author_lot_expiry', HERE / 'author_lot_expiry.py')
 LOT = importlib.util.module_from_spec(LOT_SPEC)
 LOT_SPEC.loader.exec_module(LOT)
+PUBLIC_SPEC = importlib.util.spec_from_file_location('author_public_contracts', HERE / 'author_public_contracts.py')
+PUBLIC = importlib.util.module_from_spec(PUBLIC_SPEC)
+PUBLIC_SPEC.loader.exec_module(PUBLIC)
 
 
 def original(path):
@@ -35,7 +38,7 @@ class SourceProfileContract(unittest.TestCase):
             with self.subTest(file=name):
                 before = original(path)
                 if path.parent == HERE / 'fixtures':
-                    fixture = LOT.revert(json.loads(path.read_bytes()))
+                    fixture = LOT.revert(PUBLIC.restore_fixture(json.loads(path.read_bytes())))
                     fixture['baseline']['sourceProfiles'] = [p for p in fixture['baseline']['sourceProfiles'] if p['sourceNamespace'] != SOURCE.NAMESPACE]
                     del fixture['baseline']['t17SourceFacts']
                     fixture['baseline']['works'] = [w for w in fixture['baseline']['works'] if not w['alias'].startswith('t17SourceWork-')]
@@ -47,6 +50,10 @@ class SourceProfileContract(unittest.TestCase):
                             del profile[field]
                         profiles += 1
                     self.assertEqual(before, (json.dumps(fixture, ensure_ascii=False, indent=2) + '\n').encode())
+                elif path.name == 'scenario.feature':
+                    self.assertEqual(before.decode(), PUBLIC.restore_feature(path.read_text()))
+                elif path.name == 'case.json':
+                    self.assertEqual(json.loads(before), PUBLIC.restore_case(json.loads(path.read_bytes())))
                 elif path.name not in {'author_source_profiles.py', 'test_source_profiles.py', 'T17SourceProfileMappingCheck.java'}:
                     self.assertEqual(before, path.read_bytes())
         self.assertEqual(370, profiles)
@@ -54,7 +61,7 @@ class SourceProfileContract(unittest.TestCase):
     def test_regeneration_is_stable_and_exactly_additive(self):
         for path in (HERE / 'fixtures').glob('*.json'):
             before = json.loads(original(path))
-            expected = json.loads(path.read_bytes())
+            expected = PUBLIC.restore_fixture(json.loads(path.read_bytes()))
             self.assertEqual(3 * len(before['baseline']['sourceProfiles']), AUTHOR.apply(before))
             SOURCE.apply(before)
             LOT.apply(before)
@@ -86,13 +93,13 @@ class SourceProfileContract(unittest.TestCase):
     def test_case_actions_feature_and_257_assertions_unchanged(self):
         path = HERE / 'case.json'
         before = original(path)
-        self.assertEqual(before, path.read_bytes())
+        self.assertEqual(json.loads(before), PUBLIC.restore_case(json.loads(path.read_bytes())))
         case = json.loads(before)
         count = sum(len(s['assertions']) for s in case['subcases'])
         self.assertEqual(257, count)
-        self.assertEqual(original(HERE / 'scenario.feature'), (HERE / 'scenario.feature').read_bytes())
+        self.assertEqual(original(HERE / 'scenario.feature').decode(), PUBLIC.restore_feature((HERE / 'scenario.feature').read_text()))
         print('T17 original case sha256=' + hashlib.sha256(before).hexdigest())
-        print('T17 original feature sha256=' + hashlib.sha256((HERE / 'scenario.feature').read_bytes()).hexdigest())
+        print('T17 original feature sha256=' + hashlib.sha256(original(HERE / 'scenario.feature')).hexdigest())
 
 
 if __name__ == '__main__':

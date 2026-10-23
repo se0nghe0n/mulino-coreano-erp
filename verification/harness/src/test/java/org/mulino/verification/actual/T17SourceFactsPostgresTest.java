@@ -21,7 +21,7 @@ class T17SourceFactsPostgresTest {
     @BeforeEach void install(TestInfo info)throws Exception {
         testName=info.getTestMethod().orElseThrow().getName();
         config=ActualConfiguration.environment(System.getenv());
-        String fixtureName=testName.equals("declaredExpiryGroupsMapToDistinctLots")?"eligibility-fefo-with-reason":testName.equals("postDispatchExpiryBoundaryIsExplicit")?"post-dispatch-expiry":"normal-consumed-delivery";
+        String fixtureName=switch(testName){case "declaredExpiryGroupsMapToDistinctLots"->"eligibility-fefo-with-reason";case "postDispatchExpiryBoundaryIsExplicit"->"post-dispatch-expiry";case "otherpackUsesItsOwnTypedLot"->"eligibility-packaging-unapproved";case "authoredNoDispatchObservationUsesRealGateway"->"claim-nopriordispatch";default->"normal-consumed-delivery";};
         Path fixturePath=root.resolve("verification/cases/T17/fixtures/"+fixtureName+".json");
         fixture=(ObjectNode)Json.read(fixturePath);
         // Explicit negative copy: the authored positive fixture keeps its expiry.
@@ -108,6 +108,52 @@ class T17SourceFactsPostgresTest {
         var response=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/__verification/runtime/clock")).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString("{\"instant\":\"2026-10-07T09:06:00Z\"}")).build(),HttpResponse.BodyHandlers.ofString());
         assertEquals(200,response.statusCode(),response.body());var query=queryEligibility("2026-10-07T09:06:00Z");assertEquals("0",query.path("data").path("eligibleQuantity").asText(),query.toPrettyString());assertTrue(query.path("data").path("conditions").toString().contains("LOT_VALIDITY"));
         Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve("post-expiry-query.json"),query.toPrettyString());
+    }
+    @Test void otherpackUsesItsOwnTypedLot()throws Exception {
+        try(var s=connection.prepareStatement("SELECT s.itemId,s.lotId,l.itemId,l.manufacturerId,l.expiresAt,s.quantity,s.placeId,s.identificationStatus FROM mulino_inventory_QuantitySegments s JOIN mulino_inventory_ManufacturingLots l ON l.organizationId=s.organizationId AND l.ID=s.lotId WHERE s.organizationId=? AND s.ID=?")){
+            s.setString(1,org);s.setString(2,id("OTHERPACK"));try(var r=s.executeQuery()){
+                assertTrue(r.next());assertEquals(id("ALT"),r.getString(1));assertEquals(id("L_ALT"),r.getString(2));assertEquals(id("ALT"),r.getString(3));
+                assertEquals(id("t17LotManufacturer"),r.getString(4));assertEquals(java.time.Instant.parse("2026-10-20T00:00:00Z"),r.getTimestamp(5).toInstant());
+                assertEquals(0,new BigDecimal("20").compareTo(r.getBigDecimal(6)));assertEquals(id("W"),r.getString(7));assertEquals("CONFIRMED",r.getString(8));
+            }
+        }
+        assertNotEquals(id("L"),id("L_ALT"));
+        // Original LABEL status is preserved; package mismatch remains a separate guard.
+        var labels=new ArrayList<JsonNode>();for(var c:fixture.path("baseline").path("conditions"))if("OTHERPACK".equals(c.path("segmentAlias").asText())&&"LABEL".equals(c.path("conditionId").asText()))labels.add(c);
+        assertEquals(1,labels.size());assertEquals("ALLOWED",labels.getFirst().path("status").asText());
+        assertEquals("other-box-v1",fixture.path("aliases").path("ALT").path("packagingVersion").asText());assertNotEquals(fixture.path("aliases").path("P").path("packagingVersion"),fixture.path("aliases").path("ALT").path("packagingVersion"));
+    }
+    JsonNode gateway(String actor,String capability,ObjectNode request)throws Exception {
+        var credential=(ObjectNode)fixture.path("actors").path(actor).deepCopy();credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
+        String category="RECORD".equals(request.path("intentKind").asText())?"records":"commands";
+        var response=HttpClient.newHttpClient().send(HttpRequest.newBuilder(config.baseUri().resolve("/api/ontology/"+category+"/"+capability)).header("Content-Type","application/json").header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).POST(HttpRequest.BodyPublishers.ofString(request.toString())).build(),HttpResponse.BodyHandlers.ofString());
+        var result=Json.parse(response.body());var artifact=Json.object().put("httpStatus",response.statusCode()).put("actor",actor).put("capability",capability);artifact.set("request",request);artifact.set("response",result);
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-"+request.path("commandIdempotencyKey").asText()+".json"),artifact.toPrettyString());return result;
+    }
+    @Test void authoredNoDispatchObservationUsesRealGateway()throws Exception {
+        var cases=Json.read(root.resolve("verification/cases/T17/case.json"));JsonNode selected=null;for(var s:cases.path("subcases"))if("claim-nopriordispatch".equals(s.path("id").asText()))selected=s;
+        assertNotNull(selected);var results=new HashMap<String,JsonNode>();var resolver=new org.mulino.verification.ReferenceResolver(results,aliases);
+        for(var action:selected.path("actions"))if(Set.of("claim-source-document","claim-source-event","claim").contains(action.path("id").asText())){
+            var request=(ObjectNode)resolver.resolve(action.path("request"));var result=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),request);
+            assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",result);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
+        }
+        var claim=results.get("claim").path("response");assertEquals("0",claim.path("effects").path("physicalQuantity").asText());assertEquals("0",claim.path("effects").path("contributedQuantity").asText());
+        try(var s=connection.prepareStatement("SELECT intakeOwnerId,sourceNamespace,externalEventId FROM mulino_evidence_InboxRecords WHERE organizationId=? AND eventId=?")){
+            s.setString(1,org);s.setString(2,results.get("claim-source-event").path("response").path("id").asText());
+            try(var r=s.executeQuery()){assertTrue(r.next());assertEquals(id("intake"),r.getString(1));assertEquals("SYNTHETIC-UNVERIFIED-SOURCE",r.getString(2));assertEquals("claim-nopriordispatch-claim",r.getString(3));}
+        }
+        assertEquals(1,count("mulino_trade_sales_Observations"));assertEquals(0,count("mulino_trade_sales_Deliveries"));assertEquals(0,count("mulino_inventory_Dispatches"));
+        var request=Json.object().put("intentKind","RECORD").put("definitionVersion","definition-v1").put("capabilityId","recordDelivery").put("commandIdempotencyKey",UUID.randomUUID().toString()).put("expectedRevision",1);
+        request.set("subjectRefs",Json.array());request.set("provenance",Json.object().put("observationId","CONTEXT").put("canonicalOccurrenceId","CONTEXT"));request.set("slots",Json.object().put("observationId",claim.path("effects").path("observationId").asText()).put("canonicalOccurrenceId",UUID.randomUUID().toString()));
+        var denied=gateway("receiver","recordDelivery",request);assertEquals("DELIVERY_UNMATCHED",denied.path("error").path("code").asText(),denied.toPrettyString());assertEquals(0,count("mulino_trade_sales_Deliveries"));
+    }
+    @Test void unsupportedSlotsAreNotBusinessGuardAcceptance()throws Exception {
+        for(String cap:List.of("reserveQuantity","replaceAllocation","releaseAllocation","placeHold")){
+            String key=switch(cap){case "reserveQuantity"->"FEFOExceptionReason";case "replaceAllocation"->"evidenceId";case "releaseAllocation"->"reason";default->"cargoScopeId";};
+            var denied=sources.request(cap,Json.object().put(key,"original unsupported field"),1);
+            assertEquals("TYPE_INVALID",denied.path("error").path("code").asText(),denied.toPrettyString());
+        }
+        assertEquals(0,count("mulino_inventory_SegmentAllocations"));assertEquals(0,count("mulino_inventory_Restrictions"));assertEquals(0,count("mulino_inventory_Dispatches"));
     }
     String claim(String event)throws Exception {try(var s=connection.prepareStatement("SELECT ID FROM mulino_evidence_Claims WHERE organizationId=? AND eventId=?")){s.setString(1,org);s.setString(2,event);try(var r=s.executeQuery()){r.next();return r.getString(1);}}}
 }
