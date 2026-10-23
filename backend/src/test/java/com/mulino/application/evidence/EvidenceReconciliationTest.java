@@ -261,6 +261,20 @@ class EvidenceReconciliationTest {
     assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences",Integer.class));
     assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));
   }
+  @Test void itemScopedSourceReviewerLinksWithoutWeakeningAllOf(){
+    String physical=segment();
+    jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE grantId=?",GRANT);
+    jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,'ITEM',?)",ORG,GRANT,ITEM);
+    var observation=observation(physical,"item-source",OCCURRED,OCCURRED.plusSeconds(3600));
+    var matched=matchObservation(observation,physical,"item-source","60");assertEquals("MATCHED",matched.get("outcome"));
+    linkObservation(matched);
+    assertTrue(observed(Instant.now()).properties().get("QuantitySegment.observedQuantity").getFirst().verified());
+    // A second WORK dimension must still deny a SEGMENT-only source request.
+    jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,'WORK',?)",ORG,GRANT,uuid());
+    assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->observation(physical,"item-and-work",OCCURRED,OCCURRED.plusSeconds(3600))).code());
+    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences",Integer.class));
+    assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements",Integer.class));
+  }
   @Test void observationCurrentSourceOwnerAndOrganizationAreMandatory(){
     String physical=segment();var observation=observation(physical,"scope-a",OCCURRED,OCCURRED.plusSeconds(3600));
     assertEquals("UNVERIFIED",request(()->reconciliation.match(auth.context(null,null),new EvidenceReconciliation.Review(observation.claim(),observation.document(),segment(),null,"synthetic-v1","warehouse:scope-a:1","60","BOX",OCCURRED,"Wrong physical segment"),"matchSourceIdentity")).get("outcome"));

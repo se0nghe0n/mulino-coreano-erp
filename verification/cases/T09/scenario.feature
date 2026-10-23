@@ -151,10 +151,14 @@
     먼저 사례 파일 "verification/cases/T09/case.json"의 "throughout-gap"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
-    만일 "A" 역할이 "initial-observation-document" 행동을 수행한다
-    만일 "A" 역할이 "initial-observation" 행동을 수행한다
-    만일 "A" 역할이 "final-observation-document" 행동을 수행한다
-    만일 "A" 역할이 "final-observation" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation-document" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation-match" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation-canonical" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation-document" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation-match" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation-canonical" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -168,10 +172,14 @@
     먼저 사례 파일 "verification/cases/T09/case.json"의 "throughout-complete"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
-    만일 "A" 역할이 "initial-observation-document" 행동을 수행한다
-    만일 "A" 역할이 "initial-observation" 행동을 수행한다
-    만일 "A" 역할이 "final-observation-document" 행동을 수행한다
-    만일 "A" 역할이 "final-observation" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation-document" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation-match" 행동을 수행한다
+    만일 "observationSource" 역할이 "initial-observation-canonical" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation-document" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation-match" 행동을 수행한다
+    만일 "observationSource" 역할이 "final-observation-canonical" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다

@@ -393,6 +393,38 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "observationSource": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "T09-throughout-complete-observation-source",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "attachEvidence",
+        "recordActivity",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "observationSource",
+        "actions": [
+          "attachEvidence",
+          "recordActivity",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -496,6 +528,9 @@
     },
     "warehouse": {
       "type": "Human"
+    },
+    "observationSource": {
+      "type": "Human"
     }
   },
   "baseline": {
@@ -596,8 +631,8 @@
     "sourceProfiles": [
       {
         "namespace": "synthetic-warehouse",
-        "policyVersion": "fixture-v1",
-        "reconciliationOwnerAlias": "A"
+        "policyVersion": "SYNTHETIC-policy-v1",
+        "reconciliationOwnerAlias": "observationSource"
       }
     ]
   },

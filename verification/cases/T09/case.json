@@ -5692,7 +5692,7 @@
         {
           "id": "initial-observation-document",
           "kind": "invoke",
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "attachEvidence",
           "evidenceRefs": [
@@ -5776,7 +5776,7 @@
           "evidenceRefs": [
             "initial-observation:actual-artifact"
           ],
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "recordActivity",
           "request": {
@@ -5828,7 +5828,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "assertion": "Synthetic original observation; subject to source reconciliation"
+              "assertion": "Synthetic original observation; subject to source reconciliation",
+              "effectiveUntil": "2026-10-07T01:00:00.000001Z"
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -5844,7 +5845,8 @@
               "quantity": "CONTEXT",
               "unit": "CONTEXT",
               "documentId": "CONTEXT",
-              "assertion": "CONTEXT"
+              "assertion": "CONTEXT",
+              "effectiveUntil": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-gap-initial-observation",
@@ -5859,9 +5861,100 @@
           }
         },
         {
+          "id": "initial-observation-match",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "evidenceRefs": [
+            "initial-observation-match:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "initial-observation",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "initial-observation-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "Q"
+              },
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "sourceIdentity": "synthetic-warehouse:T09-throughout-gap-initial-observation:1",
+              "quantity": "100",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T00:00:00Z",
+              "reason": "원문과 실제 물량의 관측 범위·보고 시각·수량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "initial-observation",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "initial-observation-match"
+          }
+        },
+        {
+          "id": "initial-observation-canonical",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "evidenceRefs": [
+            "initial-observation-canonical:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "initial-observation-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "initial-observation-match",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "initial-observation-canonical"
+          }
+        },
+        {
           "id": "final-observation-document",
           "kind": "invoke",
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "attachEvidence",
           "evidenceRefs": [
@@ -5945,7 +6038,7 @@
           "evidenceRefs": [
             "final-observation:actual-artifact"
           ],
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "recordActivity",
           "request": {
@@ -6025,6 +6118,97 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "id": "final-observation-match",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "evidenceRefs": [
+            "final-observation-match:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "final-observation",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "final-observation-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "Q"
+              },
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "sourceIdentity": "synthetic-warehouse:T09-throughout-gap-final-observation:2",
+              "quantity": "100",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T02:00:00Z",
+              "reason": "원문과 실제 물량의 관측 범위·보고 시각·수량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "final-observation",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "final-observation-match"
+          }
+        },
+        {
+          "id": "final-observation-canonical",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "evidenceRefs": [
+            "final-observation-canonical:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "final-observation-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "final-observation-match",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "final-observation-canonical"
           }
         },
         {
@@ -6468,7 +6652,7 @@
         {
           "id": "initial-observation-document",
           "kind": "invoke",
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "attachEvidence",
           "evidenceRefs": [
@@ -6552,7 +6736,7 @@
           "evidenceRefs": [
             "initial-observation:actual-artifact"
           ],
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "recordActivity",
           "request": {
@@ -6604,7 +6788,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "assertion": "Synthetic original observation; subject to source reconciliation"
+              "assertion": "Synthetic original observation; subject to source reconciliation",
+              "effectiveUntil": "2026-10-07T01:00:00.000001Z"
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -6620,7 +6805,8 @@
               "quantity": "CONTEXT",
               "unit": "CONTEXT",
               "documentId": "CONTEXT",
-              "assertion": "CONTEXT"
+              "assertion": "CONTEXT",
+              "effectiveUntil": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-complete-initial-observation",
@@ -6635,9 +6821,100 @@
           }
         },
         {
+          "id": "initial-observation-match",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "evidenceRefs": [
+            "initial-observation-match:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "initial-observation",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "initial-observation-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "Q"
+              },
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "sourceIdentity": "synthetic-warehouse:T09-throughout-complete-initial-observation:1",
+              "quantity": "100",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T00:00:00Z",
+              "reason": "원문과 실제 물량의 관측 범위·보고 시각·수량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "initial-observation",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "initial-observation-match"
+          }
+        },
+        {
+          "id": "initial-observation-canonical",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "evidenceRefs": [
+            "initial-observation-canonical:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "initial-observation-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "initial-observation-match",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "initial-observation-canonical"
+          }
+        },
+        {
           "id": "final-observation-document",
           "kind": "invoke",
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "attachEvidence",
           "evidenceRefs": [
@@ -6721,7 +6998,7 @@
           "evidenceRefs": [
             "final-observation:actual-artifact"
           ],
-          "actorRef": "A",
+          "actorRef": "observationSource",
           "route": "api",
           "capabilityId": "recordActivity",
           "request": {
@@ -6740,7 +7017,7 @@
               "sourceNamespace": "synthetic-warehouse",
               "externalEventId": "T09-throughout-complete-final-observation",
               "sourceVersion": "2",
-              "effectiveFrom": "2026-10-07T02:00:00Z",
+              "effectiveFrom": "2026-10-07T01:00:00Z",
               "timeZone": "UTC",
               "timePrecision": "SECOND",
               "valueState": "KNOWN",
@@ -6773,7 +7050,8 @@
                   "pointer": "/response/id"
                 }
               },
-              "assertion": "Synthetic original observation; subject to source reconciliation"
+              "assertion": "Synthetic original observation; subject to source reconciliation",
+              "effectiveUntil": "2026-10-07T02:00:00.000001Z"
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -6789,7 +7067,8 @@
               "quantity": "CONTEXT",
               "unit": "CONTEXT",
               "documentId": "CONTEXT",
-              "assertion": "CONTEXT"
+              "assertion": "CONTEXT",
+              "effectiveUntil": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-complete-final-observation",
@@ -6801,6 +7080,97 @@
                 }
               }
             ]
+          }
+        },
+        {
+          "id": "final-observation-match",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "evidenceRefs": [
+            "final-observation-match:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "final-observation",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "final-observation-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "Q"
+              },
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "sourceIdentity": "synthetic-warehouse:T09-throughout-complete-final-observation:2",
+              "quantity": "100",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T01:00:00Z",
+              "reason": "원문과 실제 물량의 관측 범위·보고 시각·수량을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "final-observation",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "final-observation-match"
+          }
+        },
+        {
+          "id": "final-observation-canonical",
+          "kind": "invoke",
+          "actorRef": "observationSource",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "evidenceRefs": [
+            "final-observation-canonical:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "final-observation-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "final-observation-match",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "final-observation-canonical"
           }
         },
         {

@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from source_contracts import ROOT, CASES, document_and_event, receipt_chain, repair_inputs, SOURCE_ACTOR, SOURCE_CAPABILITIES
+from source_contracts import ROOT, CASES, document_and_event, receipt_chain, repair_inputs, SOURCE_ACTOR, SOURCE_CAPABILITIES, OBSERVATION_ACTOR, OBSERVATION_CAPABILITIES
 
 spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
 rc = importlib.util.module_from_spec(spec)
@@ -211,6 +211,125 @@ class SourceContracts(unittest.TestCase):
                     profile = next(p for p in current['baseline']['sourceProfiles'] if p['namespace'] == 'synthetic-receipt')
                     self.assertEqual(SOURCE_ACTOR, profile['reconciliationOwnerAlias'])
                     self.assertEqual('SYNTHETIC-policy-v1', profile['policyVersion'])
+
+    def test_only_eight_authorized_source_roles_and_eight_auxiliary_actions_change(self):
+        before = json.loads(subprocess.check_output(['git', 'show', '76fe11e2:verification/cases/T09/case.json'], cwd=ROOT))
+        current = json.loads((ROOT / 'verification/cases/T09/case.json').read_text())
+        roles = additions = 0
+        normalized = copy.deepcopy(current)
+        for old, new, restored in zip(before['subcases'], current['subcases'], normalized['subcases']):
+            if old['id'] not in ('throughout-gap', 'throughout-complete'):
+                self.assertEqual(old, new)
+                continue
+            originals = {a['id']: a for a in old['actions']}
+            new_actions = {a['id']: a for a in new['actions']}
+            expected_extra = {prefix + suffix for prefix in ('initial-observation', 'final-observation')
+                              for suffix in ('-match', '-canonical')}
+            self.assertEqual(expected_extra, set(new_actions) - set(originals))
+            additions += len(expected_extra)
+            self.assertEqual(list(originals), [a['id'] for a in new['actions'] if a['id'] in originals])
+            restored['actions'] = [a for a in restored['actions'] if a['id'] in originals]
+            for action in restored['actions']:
+                aid = action['id']
+                if aid in ('initial-observation-document', 'initial-observation',
+                           'final-observation-document', 'final-observation'):
+                    self.assertEqual('A', originals[aid]['actorRef'])
+                    self.assertEqual(OBSERVATION_ACTOR, action['actorRef'])
+                    action['actorRef'] = 'A'
+                    roles += 1
+                if aid in ('initial-observation', 'final-observation'):
+                    # Only the canonical validity coordinates differ from the report time.
+                    action['request']['slots']['effectiveFrom'] = originals[aid]['request']['slots']['effectiveFrom']
+                    action['request']['slots'].pop('effectiveUntil', None)
+                    action['request']['provenance'].pop('effectiveUntil', None)
+            self.assertEqual(old, restored)
+        self.assertEqual((8, 8), (roles, additions))
+        self.assertEqual(before, normalized)
+        feature = (ROOT / 'verification/cases/T09/scenario.feature').read_text()
+        original_feature = subprocess.check_output(['git', 'show', '76fe11e2:verification/cases/T09/scenario.feature'], cwd=ROOT).decode()
+        lines = []
+        replaced = removed = 0
+        for line in feature.splitlines(keepends=True):
+            if '"observationSource" 역할이' in line:
+                if '-match" 행동' in line or '-canonical" 행동' in line:
+                    removed += 1
+                    continue
+                line = line.replace('"observationSource" 역할이', '"A" 역할이')
+                replaced += 1
+            lines.append(line)
+        self.assertEqual((8, 8), (replaced, removed))
+        self.assertEqual(original_feature, ''.join(lines))
+        print('source roles: exactly 8 substitutions; exactly 8 auxiliary actions; every other feature line unchanged')
+
+    def test_observation_reviewer_is_additive_and_item_scoped(self):
+        for suffix in ('gap', 'complete'):
+            ref = f'verification/cases/T09/fixtures/throughout-{suffix}.json'
+            before = json.loads(subprocess.check_output(['git', 'show', '76fe11e2:' + ref], cwd=ROOT))
+            current = json.loads((ROOT / ref).read_text())
+            actor = current['actors'].pop(OBSERVATION_ACTOR)
+            self.assertEqual(OBSERVATION_CAPABILITIES, actor['roleCapabilities'])
+            self.assertEqual(OBSERVATION_CAPABILITIES, actor['grant']['actions'])
+            self.assertEqual(OBSERVATION_ACTOR, actor['grant']['delegatorAlias'])
+            self.assertEqual({'organizationAlias': 'ORG', 'itemAliases': ['P']}, actor['grant']['scope'])
+            self.assertEqual({'type': 'Human'}, current['aliases'].pop(OBSERVATION_ACTOR))
+            profile = next(p for p in current['baseline']['sourceProfiles'] if p['namespace'] == 'synthetic-warehouse')
+            self.assertEqual(OBSERVATION_ACTOR, profile['reconciliationOwnerAlias'])
+            self.assertEqual('SYNTHETIC-policy-v1', profile['policyVersion'])
+            previous_profile = next(p for p in before['baseline']['sourceProfiles'] if p['namespace'] == 'synthetic-warehouse')
+            profile.clear()
+            profile.update(previous_profile)
+            self.assertEqual(before, current)
+
+    def test_four_observation_graphs_keep_original_bytes_and_explicit_time_bounds(self):
+        from datetime import datetime, timedelta
+        before = json.loads(subprocess.check_output(['git', 'show', '76fe11e2:verification/cases/T09/case.json'], cwd=ROOT))
+        current = json.loads((ROOT / 'verification/cases/T09/case.json').read_text())
+        contract = rc.Contracts(ROOT)
+        graphs = 0
+        for sub in current['subcases']:
+            if sub['id'] not in ('throughout-gap', 'throughout-complete'):
+                continue
+            old = next(s for s in before['subcases'] if s['id'] == sub['id'])
+            for prefix in ('initial-observation', 'final-observation'):
+                ids = [prefix + '-document', prefix, prefix + '-match', prefix + '-canonical']
+                graph = [next(a for a in sub['actions'] if a['id'] == aid) for aid in ids]
+                self.assertEqual(['attachEvidence', 'recordActivity', 'matchSourceIdentity', 'linkCanonicalOccurrence'],
+                                 [a['capabilityId'] for a in graph])
+                self.assertEqual([sub['actions'].index(graph[0]) + i for i in range(4)],
+                                 [sub['actions'].index(a) for a in graph])
+                document, event, match, canonical = [a['request']['slots'] for a in graph]
+                original = next(a for a in old['actions'] if a['id'] == prefix)['request']['slots']['payload']['$encode']['source']
+                self.assertEqual(original, event['payload']['$encode']['source'])
+                self.assertEqual(original, document['contentBase64']['$encode']['source'])
+                self.assertEqual(original, document['expectedHash']['$encode']['source'])
+                self.assertEqual(original['coverageStart'], event['effectiveFrom'])
+                self.assertEqual(event['effectiveFrom'], match['effectiveFrom'])
+                self.assertEqual(original['segmentId'], match['physicalScopeId'])
+                self.assertEqual(original['quantity'], match['quantity'])
+                self.assertEqual(event['quantity'], match['quantity'])
+                self.assertEqual(event['unit'], match['unit'])
+                self.assertEqual(':'.join(event[k] for k in ('sourceNamespace', 'externalEventId', 'sourceVersion')), match['sourceIdentity'])
+                self.assertEqual({'$result': {'actionId': prefix, 'pointer': '/response/claimId'}}, match['claimId'])
+                self.assertEqual({'$result': {'actionId': prefix + '-document', 'pointer': '/response/id'}}, match['basisDocumentId'])
+                self.assertEqual({'$result': {'actionId': prefix + '-match', 'pointer': '/response/id'}}, canonical['reconciliationId'])
+                if original['coverageStart'] == original['coverageEnd']:
+                    self.assertNotIn('effectiveUntil', event)
+                    self.assertEqual('throughout-gap', sub['id'])
+                else:
+                    until = datetime.fromisoformat(event['effectiveUntil'].replace('Z', '+00:00'))
+                    end = datetime.fromisoformat(original['coverageEnd'].replace('Z', '+00:00'))
+                    self.assertEqual(timedelta(microseconds=1), until - end)
+                resolved = rc.Placeholders()(graph)
+                original_bytes = base64.b64decode(resolved[0]['request']['slots']['contentBase64'])
+                self.assertEqual(hashlib.sha256(original_bytes).hexdigest(), resolved[0]['request']['slots']['expectedHash'])
+                self.assertEqual(json.loads(original_bytes), json.loads(resolved[1]['request']['slots']['payload']))
+                for action in graph:
+                    problems, known = contract.command_problems(action, sub)
+                    self.assertEqual(([], []), (problems, known), (sub['id'], action['id']))
+                self.assertEqual('KNOWN', event['valueState'])
+                graphs += 1
+        self.assertEqual(4, graphs)
+        print('4 real observation graphs: original byte/hash/identity bindings and PostgreSQL microsecond bounds preserved')
 
     def test_actual_receipt_matcher_rejects_source_mutations(self):
         """Execute the product's matcher source, not a Python facsimile of it."""

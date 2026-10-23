@@ -208,7 +208,7 @@ def repair_inputs(case, fixture):
                                 caps.append("attachEvidence")
             output.append(action)
         sub["actions"] = output
-    return connect_sources(case, fixture)
+    return connect_observations(connect_sources(case, fixture), fixture)
 
 
 # Each receipt keeps its original final action ID. These are authoritative Work
@@ -342,19 +342,88 @@ def connect_sources(case, fixture):
     return case
 
 
-def main():
+OBSERVATION_ACTOR = "observationSource"
+OBSERVATION_CAPABILITIES = ["attachEvidence", "recordActivity", "matchSourceIdentity",
+                            "linkCanonicalOccurrence", "getEvidence"]
+
+
+def connect_observations(case, fixture):
+    """Use original source bytes and report times; only canonical validity is normalized.
+
+    coverageStart/coverageEnd are closed PostgreSQL-microsecond coordinates.
+    A point (equal endpoints) has no effectiveUntil and no inferred tail.
+    """
+    if case["caseId"] != "T09":
+        return case
+    from datetime import datetime, timedelta
+    for sub in case["subcases"]:
+        if sub["id"] not in ("throughout-gap", "throughout-complete"):
+            continue
+        f = fixture(sub["fixtureRef"])
+        basis = f["actors"]["A"]
+        f["aliases"][OBSERVATION_ACTOR] = {"type": "Human"}
+        f["actors"][OBSERVATION_ACTOR] = {
+            "issuer": basis["issuer"], "subject": f["fixtureId"] + "-observation-source",
+            "audience": basis["audience"], "organizationAlias": "ORG",
+            "roleCapabilities": list(OBSERVATION_CAPABILITIES),
+            "grant": {"delegatorAlias": OBSERVATION_ACTOR, "actions": list(OBSERVATION_CAPABILITIES),
+                      "scope": {"organizationAlias": "ORG", "itemAliases": ["P"]},
+                      "validFrom": basis["grant"]["validFrom"],
+                      "validUntil": basis["grant"]["validUntil"], "revision": 1}}
+        work = next(a for a in sub["actions"] if a["id"] == "work")
+        policy = work["request"]["slots"]["evidencePolicyVersion"]
+        profiles = f["baseline"]["sourceProfiles"]
+        profile = next(p for p in profiles if p["namespace"] == "synthetic-warehouse")
+        profile.update(policyVersion=policy, reconciliationOwnerAlias=OBSERVATION_ACTOR)
+        output = []
+        existing = {a["id"] for a in sub["actions"]}
+        for action in sub["actions"]:
+            aid = action["id"]
+            if aid in ("initial-observation-document", "final-observation-document"):
+                action["actorRef"] = OBSERVATION_ACTOR
+            if aid in ("initial-observation", "final-observation"):
+                action["actorRef"] = OBSERVATION_ACTOR
+                slots = action["request"]["slots"]
+                original = slots["payload"]["$encode"]["source"]
+                start, end = original["coverageStart"], original["coverageEnd"]
+                slots["effectiveFrom"] = start
+                if start != end:
+                    # One microsecond survives PostgreSQL persistence; +1ns does not.
+                    until = datetime.fromisoformat(end.replace("Z", "+00:00")) + timedelta(microseconds=1)
+                    slots["effectiveUntil"] = until.isoformat(timespec="microseconds").replace("+00:00", "Z")
+                    action["request"]["provenance"]["effectiveUntil"] = "CONTEXT"
+                else:
+                    slots.pop("effectiveUntil", None)
+                    action["request"]["provenance"].pop("effectiveUntil", None)
+            output.append(action)
+            if aid in ("initial-observation", "final-observation") and aid + "-match" not in existing:
+                slots = action["request"]["slots"]
+                output.append(command(aid + "-match", OBSERVATION_ACTOR, "matchSourceIdentity", {
+                    "claimId": result(aid, "claimId"), "basisDocumentId": result(aid + "-document"),
+                    "physicalScopeId": slots["subject"]["id"], "policyVersion": policy,
+                    "sourceIdentity": slots["sourceNamespace"] + ":" + slots["externalEventId"] + ":" + slots["sourceVersion"],
+                    "quantity": slots["quantity"], "unit": slots["unit"], "effectiveFrom": slots["effectiveFrom"],
+                    "reason": "원문과 실제 물량의 관측 범위·보고 시각·수량을 대조한다"}, revision=result(aid, "revision")))
+                output.append(command(aid + "-canonical", OBSERVATION_ACTOR, "linkCanonicalOccurrence", {
+                    "reconciliationId": result(aid + "-match")}, revision=result(aid + "-match", "revision")))
+        sub["actions"] = output
+    return case
+
+
+def main(case_ids=CASES):
     """Reapply owned repairs without touching T13 or executing any scenario."""
     fixtures = {}
     def fixture(ref):
         if ref not in fixtures:
             fixtures[ref] = json.loads((ROOT / ref).read_text())
         return fixtures[ref]
-    for name in CASES:
+    for name in case_ids:
         path = ROOT / "verification/cases" / name / "case.json"
         case = repair_inputs(json.loads(path.read_text()), fixture)
         path.write_text(json.dumps(case, ensure_ascii=False, indent=2) + "\n")
         # Add missing auxiliary actions at the original action's position. Keep
-        # every original scenario line and assertion byte-for-byte.
+        # every original scenario line and assertion byte-for-byte, except the
+        # eight T09 observation actor labels authorized on 2026-10-23.
         feature = path.with_name("scenario.feature")
         text = feature.read_text()
         for sub in case["subcases"]:
@@ -370,6 +439,11 @@ def main():
                     continue
                 line = f'    만일 "{action.get("actorRef", "A")}" 역할이 "{action["id"]}" 행동을 수행한다\n'
                 if f'"{action["id"]}" 행동을 수행한다' in block:
+                    if (name == "T09" and sub["id"] in ("throughout-gap", "throughout-complete")
+                            and action["id"] in ("initial-observation-document", "initial-observation",
+                                                 "final-observation-document", "final-observation")):
+                        original_line = f'    만일 "A" 역할이 "{action["id"]}" 행동을 수행한다\n'
+                        block = block.replace(original_line, line, 1)
                     if pending:
                         anchor = next(x for x in block.splitlines(keepends=True) if f'"{action["id"]}" 행동을 수행한다' in x)
                         block = block.replace(anchor, ''.join(pending) + anchor, 1)
