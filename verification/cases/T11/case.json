@@ -82,7 +82,9 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              }
+              },
+              "nextAction": "남은10상자 수령 확인",
+              "nextCheckAt": "2026-10-08T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-parent90-cancelled-parent",
@@ -107,7 +109,9 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT"
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
             }
           }
         },
@@ -1428,6 +1432,29 @@
           }
         },
         {
+          "id": "deficit-transfer-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "deficit-transfer-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "deficit-transfer",
           "kind": "invoke",
           "evidenceRefs": [
@@ -1455,19 +1482,13 @@
                   "pointer": "/response/workId"
                 }
               },
-              "acceptanceEvidenceId": {
-                "$alias": "DOC"
-              },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
               "nextAction": "남은10상자 수령 확인",
               "nextCheckAt": "2026-10-08T09:00:00Z",
               "assignmentId": {
                 "$result": {
-                  "actionId": "parent-assessment",
-                  "pointer": "/response/obligationId"
+                  "actionId": "parent-assessment-evaluate",
+                  "pointer": "/response/effects/responsibility/assignments/0/ID"
                 }
               },
               "recipientId": {
@@ -1478,12 +1499,13 @@
                   "actionId": "parent",
                   "pointer": "/response/workId"
                 }
-              }
+              },
+              "expiresAt": "2026-10-08T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "parent-assessment",
-                "pointer": "/response/workRevision"
+                "actionId": "deficit-transfer-current-work",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T11-parent90-cancelled-deficit-transfer",
@@ -1494,14 +1516,50 @@
             ],
             "provenance": {
               "targetWorkId": "CONTEXT",
-              "acceptanceEvidenceId": "CONTEXT",
               "quantity": "USER",
               "nextAction": "USER",
               "nextCheckAt": "USER",
               "assignmentId": "CONTEXT",
               "recipientId": "CONTEXT",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "expiresAt": "USER"
             }
+          }
+        },
+        {
+          "id": "deficit-accept",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "acceptHandover",
+          "evidenceRefs": [
+            "deficit-accept:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "acceptHandover",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "handoverId": {
+                "$result": {
+                  "actionId": "deficit-transfer",
+                  "pointer": "/response/effects/responsibility/ID"
+                }
+              }
+            },
+            "provenance": {
+              "handoverId": "CONTEXT"
+            },
+            "expectedRevision": 0,
+            "commandIdempotencyKey": "parent90-cancelled-deficit-accept"
           }
         },
         {
@@ -2591,7 +2649,9 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              }
+              },
+              "nextAction": "남은10상자 수령 확인",
+              "nextCheckAt": "2026-10-08T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-parent90-impossible-parent",
@@ -2616,7 +2676,9 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT"
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
             }
           }
         },
@@ -3937,6 +3999,29 @@
           }
         },
         {
+          "id": "deficit-transfer-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "deficit-transfer-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "deficit-transfer",
           "kind": "invoke",
           "evidenceRefs": [
@@ -3964,19 +4049,13 @@
                   "pointer": "/response/workId"
                 }
               },
-              "acceptanceEvidenceId": {
-                "$alias": "DOC"
-              },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
               "nextAction": "남은10상자 수령 확인",
               "nextCheckAt": "2026-10-08T09:00:00Z",
               "assignmentId": {
                 "$result": {
-                  "actionId": "parent-assessment",
-                  "pointer": "/response/obligationId"
+                  "actionId": "parent-assessment-evaluate",
+                  "pointer": "/response/effects/responsibility/assignments/0/ID"
                 }
               },
               "recipientId": {
@@ -3987,12 +4066,13 @@
                   "actionId": "parent",
                   "pointer": "/response/workId"
                 }
-              }
+              },
+              "expiresAt": "2026-10-08T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "parent-assessment",
-                "pointer": "/response/workRevision"
+                "actionId": "deficit-transfer-current-work",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T11-parent90-impossible-deficit-transfer",
@@ -4003,14 +4083,50 @@
             ],
             "provenance": {
               "targetWorkId": "CONTEXT",
-              "acceptanceEvidenceId": "CONTEXT",
               "quantity": "USER",
               "nextAction": "USER",
               "nextCheckAt": "USER",
               "assignmentId": "CONTEXT",
               "recipientId": "CONTEXT",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "expiresAt": "USER"
             }
+          }
+        },
+        {
+          "id": "deficit-accept",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "acceptHandover",
+          "evidenceRefs": [
+            "deficit-accept:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "acceptHandover",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "handoverId": {
+                "$result": {
+                  "actionId": "deficit-transfer",
+                  "pointer": "/response/effects/responsibility/ID"
+                }
+              }
+            },
+            "provenance": {
+              "handoverId": "CONTEXT"
+            },
+            "expectedRevision": 0,
+            "commandIdempotencyKey": "parent90-impossible-deficit-accept"
           }
         },
         {
@@ -5100,7 +5216,9 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              }
+              },
+              "nextAction": "남은10상자 수령 확인",
+              "nextCheckAt": "2026-10-08T09:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-parent90-superseded-parent",
@@ -5125,7 +5243,9 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT"
+              "supervisorId": "CONTEXT",
+              "nextAction": "USER",
+              "nextCheckAt": "USER"
             }
           }
         },
@@ -6446,6 +6566,29 @@
           }
         },
         {
+          "id": "deficit-transfer-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "deficit-transfer-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "deficit-transfer",
           "kind": "invoke",
           "evidenceRefs": [
@@ -6473,19 +6616,13 @@
                   "pointer": "/response/workId"
                 }
               },
-              "acceptanceEvidenceId": {
-                "$alias": "DOC"
-              },
-              "quantity": {
-                "value": "10",
-                "unit": "BOX"
-              },
+              "quantity": "10",
               "nextAction": "남은10상자 수령 확인",
               "nextCheckAt": "2026-10-08T09:00:00Z",
               "assignmentId": {
                 "$result": {
-                  "actionId": "parent-assessment",
-                  "pointer": "/response/obligationId"
+                  "actionId": "parent-assessment-evaluate",
+                  "pointer": "/response/effects/responsibility/assignments/0/ID"
                 }
               },
               "recipientId": {
@@ -6496,12 +6633,13 @@
                   "actionId": "parent",
                   "pointer": "/response/workId"
                 }
-              }
+              },
+              "expiresAt": "2026-10-08T09:00:00Z"
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "parent-assessment",
-                "pointer": "/response/workRevision"
+                "actionId": "deficit-transfer-current-work",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T11-parent90-superseded-deficit-transfer",
@@ -6512,14 +6650,50 @@
             ],
             "provenance": {
               "targetWorkId": "CONTEXT",
-              "acceptanceEvidenceId": "CONTEXT",
               "quantity": "USER",
               "nextAction": "USER",
               "nextCheckAt": "USER",
               "assignmentId": "CONTEXT",
               "recipientId": "CONTEXT",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "expiresAt": "USER"
             }
+          }
+        },
+        {
+          "id": "deficit-accept",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "acceptHandover",
+          "evidenceRefs": [
+            "deficit-accept:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "acceptHandover",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "handoverId": {
+                "$result": {
+                  "actionId": "deficit-transfer",
+                  "pointer": "/response/effects/responsibility/ID"
+                }
+              }
+            },
+            "provenance": {
+              "handoverId": "CONTEXT"
+            },
+            "expectedRevision": 0,
+            "commandIdempotencyKey": "parent90-superseded-deficit-accept"
           }
         },
         {
@@ -8151,6 +8325,97 @@
           }
         },
         {
+          "id": "wait-original-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "wait-original-work:actual-artifact"
+          ]
+        },
+        {
+          "id": "wait-pin-goal",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "reviseGoal",
+          "evidenceRefs": [
+            "wait-pin-goal:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "reviseGoal",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "workId": {
+                "$alias": "SOURCE"
+              },
+              "goal": {
+                "quantityMode": "CUMULATIVE_EVENT",
+                "targetQuantity": "10",
+                "unit": "BOX",
+                "endpoint": "ARRIVED",
+                "dueAt": "2026-10-07T02:00:00Z",
+                "timezone": "UTC",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluatorVersion": "core-v1",
+                "scope": {
+                  "itemId": {
+                    "$alias": "P"
+                  }
+                },
+                "placeId": {
+                  "$alias": "W"
+                },
+                "periodStart": "2026-10-07T00:00:00Z",
+                "periodEnd": "2026-10-07T02:00:00Z",
+                "periodStartInclusive": true,
+                "periodEndInclusive": true,
+                "eventKind": "CONFIRMED_RECEIPT",
+                "contributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "deduplication": "CANONICAL_OCCURRENCE",
+                "conditions": [
+                  {
+                    "id": "arrived"
+                  }
+                ]
+              },
+              "reason": "기존10상자 도착 목표의 정의·시각·근거 계약을 명시한다"
+            },
+            "provenance": {
+              "workId": "CONTEXT",
+              "goal": "USER",
+              "reason": "USER"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "wait-original-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "wait-pin-goal"
+          }
+        },
+        {
           "id": "wait",
           "kind": "invoke",
           "evidenceRefs": [
@@ -8182,7 +8447,8 @@
                 },
                 "resumePredicate": {
                   "operator": "exists",
-                  "verifiedOccurrenceKind": "CONFIRMED_RECEIPT"
+                  "property": "Receipt.quantity",
+                  "evidenceSelector": "VERIFIED_DISTINCT"
                 },
                 "verifier": {
                   "$alias": "A"
@@ -8191,7 +8457,12 @@
                 "overdueAction": "ESCALATE_SUPERVISOR"
               }
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "wait-pin-goal",
+                "pointer": "/response/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-wait-timeout-wait",
             "evidenceRefs": [
               {
@@ -8433,7 +8704,7 @@
             "actionId": "resume-without-proof",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D11"
           ],
@@ -8959,7 +9230,7 @@
             "actionId": "activate",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D11"
           ],
@@ -9135,7 +9406,7 @@
             "pointer": "/data/rawRows/audit",
             "where": {
               "commandIdempotencyKey": "T11-unsupported-evaluator-activate",
-              "outcome": "REJECTED"
+              "outcome": "HELD"
             }
           },
           "expected": 1,
@@ -11406,14 +11677,34 @@
           }
         },
         {
-          "id": "transfer",
-          "kind": "invoke",
+          "id": "transfer-source-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
           "evidenceRefs": [
-            "transfer:actual-artifact"
-          ],
-          "actorRef": "B",
+            "transfer-source-work:actual-artifact"
+          ]
+        },
+        {
+          "id": "transfer-proposal",
+          "kind": "invoke",
+          "actorRef": "A",
           "route": "api",
           "capabilityId": "transferObligation",
+          "evidenceRefs": [
+            "transfer-proposal:actual-artifact"
+          ],
           "request": {
             "intentKind": "COMMAND",
             "definitionVersion": "definition-v1",
@@ -11427,37 +11718,95 @@
               }
             ],
             "slots": {
+              "workId": {
+                "$alias": "SOURCE"
+              },
               "targetWorkId": {
                 "$alias": "TARGET"
               },
-              "acceptanceEvidenceId": {
-                "$alias": "TRANSFERPROPOSAL"
-              },
-              "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z",
               "assignmentId": {
-                "$alias": "ROOT"
+                "$alias": "ASSIGN"
               },
               "recipientId": {
                 "$alias": "B"
-              }
+              },
+              "nextAction": "남은10상자 수령 확인",
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "expiresAt": "2026-10-08T09:00:00Z"
             },
-            "expectedRevision": 1,
-            "commandIdempotencyKey": "T11-cancel-after-shipment-transfer",
-            "evidenceRefs": [
-              {
-                "$alias": "TRANSFERPROPOSAL"
-              }
-            ],
             "provenance": {
+              "workId": "CONTEXT",
               "targetWorkId": "CONTEXT",
-              "acceptanceEvidenceId": "CONTEXT",
+              "assignmentId": "CONTEXT",
+              "recipientId": "CONTEXT",
               "nextAction": "USER",
               "nextCheckAt": "USER",
-              "assignmentId": "CONTEXT",
-              "recipientId": "CONTEXT"
-            }
+              "expiresAt": "USER"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "transfer-source-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "transfer-proposal"
           }
+        },
+        {
+          "id": "transfer",
+          "kind": "invoke",
+          "actorRef": "B",
+          "route": "api",
+          "capabilityId": "acceptHandover",
+          "evidenceRefs": [
+            "transfer:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "acceptHandover",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              }
+            ],
+            "slots": {
+              "handoverId": {
+                "$result": {
+                  "actionId": "transfer-proposal",
+                  "pointer": "/response/effects/responsibility/ID"
+                }
+              }
+            },
+            "provenance": {
+              "handoverId": "CONTEXT"
+            },
+            "expectedRevision": 0,
+            "commandIdempotencyKey": "T11-cancel-after-shipment-transfer"
+          }
+        },
+        {
+          "id": "cancel-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "cancel-current-work:actual-artifact"
+          ]
         },
         {
           "id": "close",
@@ -11484,16 +11833,12 @@
               "workId": {
                 "$alias": "SOURCE"
               },
-              "reason": "CANCELLED",
-              "decisionEvidenceId": {
-                "$alias": "DOC"
-              },
-              "reasonText": "출하 계약과 잔여 책임은 보존하며 업무 취소"
+              "reason": "CANCELLED"
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "transfer",
-                "pointer": "/response/workRevision"
+                "actionId": "cancel-current-work",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T11-cancel-after-shipment-close",
@@ -11504,9 +11849,7 @@
             ],
             "provenance": {
               "workId": "CONTEXT",
-              "reason": "USER",
-              "decisionEvidenceId": "CONTEXT",
-              "reasonText": "USER"
+              "reason": "USER"
             }
           }
         },
@@ -12015,7 +12358,7 @@
               {
                 "$alias": "B"
               },
-              "transferObligation",
+              "acceptHandover",
               "APPLIED"
             ]
           ],
@@ -13504,7 +13847,7 @@
             "field": [
               "workId",
               "quantity",
-              "physicalScope"
+              "physicalRange"
             ]
           },
           "expected": [
@@ -13516,7 +13859,20 @@
                 }
               },
               "30",
-              "serial-boxes-001-030"
+              {
+                "physicalScopeId": {
+                  "$alias": "Q"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "receive60-canonical",
+                    "pointer": "/response/id"
+                  }
+                },
+                "startQuantity": "0",
+                "endQuantity": "30",
+                "unit": "BOX"
+              }
             ],
             [
               {
@@ -13526,7 +13882,20 @@
                 }
               },
               "30",
-              "serial-boxes-031-060"
+              {
+                "physicalScopeId": {
+                  "$alias": "Q"
+                },
+                "occurrenceId": {
+                  "$result": {
+                    "actionId": "receive60-canonical",
+                    "pointer": "/response/id"
+                  }
+                },
+                "startQuantity": "30",
+                "endQuantity": "60",
+                "unit": "BOX"
+              }
             ]
           ],
           "requirementRefs": [
@@ -13805,6 +14174,26 @@
           }
         },
         {
+          "id": "followup-original-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "PARENT"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "followup-original-work:actual-artifact"
+          ]
+        },
+        {
           "id": "followup",
           "kind": "invoke",
           "evidenceRefs": [
@@ -13826,25 +14215,63 @@
               }
             ],
             "slots": {
-              "sourceOccurrenceId": {
-                "$result": {
-                  "actionId": "temperature",
-                  "pointer": "/response/occurrenceId"
-                }
-              },
-              "ownerId": {
-                "$alias": "A"
-              },
-              "supervisorId": {
-                "$alias": "supervisor"
-              },
-              "nextAction": "남은10상자 수령 확인",
-              "nextCheckAt": "2026-10-08T09:00:00Z",
               "workId": {
                 "$alias": "PARENT"
+              },
+              "sourceEventId": {
+                "$result": {
+                  "actionId": "temperature",
+                  "pointer": "/response/id"
+                }
+              },
+              "reason": "종료 뒤 원천 온도 관측의 대응 책임을 별도 업무에 연결한다",
+              "draft": {
+                "itemId": {
+                  "$alias": "P"
+                },
+                "kind": "TEMPERATURE_REVIEW",
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "goal": {
+                  "quantityMode": "STATE_AT",
+                  "targetQuantity": "100",
+                  "unit": "BOX",
+                  "endpoint": "ARRIVED",
+                  "dueAt": "2026-10-07T02:00:00Z",
+                  "timezone": "UTC",
+                  "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                  "evaluatorVersion": "core-v1",
+                  "scope": {
+                    "itemId": {
+                      "$alias": "P"
+                    }
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  },
+                  "evaluationAt": "2026-10-07T02:00:00Z",
+                  "action": "PHYSICAL_HELD",
+                  "includeReserved": true,
+                  "conditions": [
+                    {
+                      "id": "held-at"
+                    }
+                  ]
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z"
               }
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "followup-original-work",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-closed-followup-followup",
             "evidenceRefs": [
               {
@@ -13852,12 +14279,10 @@
               }
             ],
             "provenance": {
-              "sourceOccurrenceId": "CONTEXT",
-              "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "nextAction": "USER",
-              "nextCheckAt": "USER",
-              "workId": "CONTEXT"
+              "workId": "CONTEXT",
+              "sourceEventId": "CONTEXT",
+              "reason": "USER",
+              "draft": "USER"
             }
           }
         },

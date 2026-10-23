@@ -32,7 +32,7 @@ class ParentRanges(unittest.TestCase):
     def test_all_110_oracle_bytes_and_other_nine_subcases_unchanged(self):
         import subprocess
         before=subprocess.check_output(['git','show',layer.BASE+':verification/cases/T11/case.json'],cwd=layer.ROOT).decode()
-        self.assertEqual(blocks(before),blocks((HERE/'case.json').read_text()))
+        self.assertEqual(blocks(before),blocks(layer.runtime_layer().lifecycle_layer().original('case.json').decode()))
         self.assertEqual(110,sum(len(s['assertions']) for s in self.current['subcases']))
         others=[s for s in self.old['subcases'] if s['id'] not in layer.SELECTED]
         self.assertEqual(9,len(others));self.assertEqual(others,[s for s in self.current['subcases'] if s['id'] not in layer.SELECTED])

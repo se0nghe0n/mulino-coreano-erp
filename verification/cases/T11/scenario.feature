@@ -34,7 +34,9 @@
     만일 "A" 역할이 "before-transfer-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-transfer-db" 행동을 수행한다
     만일 "A" 역할이 "followup" 행동을 수행한다
+    만일 "A" 역할이 "deficit-transfer-current-work" 행동을 수행한다
     만일 "A" 역할이 "deficit-transfer" 행동을 수행한다
+    만일 "A" 역할이 "deficit-accept" 행동을 수행한다
     만일 "A" 역할이 "before-false-close-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-false-close-db" 행동을 수행한다
     만일 "A" 역할이 "false-close-current-work" 행동을 수행한다
@@ -94,7 +96,9 @@
     만일 "A" 역할이 "before-transfer-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-transfer-db" 행동을 수행한다
     만일 "A" 역할이 "followup" 행동을 수행한다
+    만일 "A" 역할이 "deficit-transfer-current-work" 행동을 수행한다
     만일 "A" 역할이 "deficit-transfer" 행동을 수행한다
+    만일 "A" 역할이 "deficit-accept" 행동을 수행한다
     만일 "A" 역할이 "before-false-close-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-false-close-db" 행동을 수행한다
     만일 "A" 역할이 "false-close-current-work" 행동을 수행한다
@@ -154,7 +158,9 @@
     만일 "A" 역할이 "before-transfer-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-transfer-db" 행동을 수행한다
     만일 "A" 역할이 "followup" 행동을 수행한다
+    만일 "A" 역할이 "deficit-transfer-current-work" 행동을 수행한다
     만일 "A" 역할이 "deficit-transfer" 행동을 수행한다
+    만일 "A" 역할이 "deficit-accept" 행동을 수행한다
     만일 "A" 역할이 "before-false-close-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-false-close-db" 행동을 수행한다
     만일 "A" 역할이 "false-close-current-work" 행동을 수행한다
@@ -203,6 +209,8 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "A" 역할이 "wait-original-work" 행동을 수행한다
+    만일 "A" 역할이 "wait-pin-goal" 행동을 수행한다
     만일 "A" 역할이 "wait" 행동을 수행한다
     만일 "시스템" 역할이 "advance" 행동을 수행한다
     만일 "시스템" 역할이 "due-wait-advance" 행동을 수행한다
@@ -299,7 +307,10 @@
     만일 "A" 역할이 "shipped-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "shipped-db" 행동을 수행한다
     만일 "A" 역할이 "close-with-duty" 행동을 수행한다
+    만일 "A" 역할이 "transfer-source-work" 행동을 수행한다
+    만일 "A" 역할이 "transfer-proposal" 행동을 수행한다
     만일 "B" 역할이 "transfer" 행동을 수행한다
+    만일 "A" 역할이 "cancel-current-work" 행동을 수행한다
     만일 "A" 역할이 "close" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -361,6 +372,7 @@
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "A" 역할이 "temperature-document" 행동을 수행한다
     만일 "A" 역할이 "temperature" 행동을 수행한다
+    만일 "A" 역할이 "followup-original-work" 행동을 수행한다
     만일 "A" 역할이 "followup" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다

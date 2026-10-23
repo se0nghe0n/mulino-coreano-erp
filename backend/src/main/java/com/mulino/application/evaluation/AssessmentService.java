@@ -18,6 +18,8 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
   private final ExecutionClock clock;private final DefinitionValidator validator;private final AssessmentFactProvider provider;private final PolicyRepository policies;
   @org.springframework.beans.factory.annotation.Autowired private ReadAuthorizer authority;
   @org.springframework.beans.factory.annotation.Autowired private EvidenceCaptureRepository captures;
+  @org.springframework.beans.factory.annotation.Autowired private org.springframework.beans.factory.ObjectProvider<WorkResponsibility> duties;
+  @org.springframework.beans.factory.annotation.Autowired private CausalAssessmentGuard causal;
   private final TypedPredicateEvaluator evaluator=new TypedPredicateEvaluator();
   private final ObjectMapper json=new ObjectMapper().findAndRegisterModules().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
   public AssessmentService(WorkAccess work,AssessmentRepository repository,DefinitionRepository definitions,DefinitionValidator validator,AssessmentFactProvider provider,PolicyRepository policies,ExecutionClock clock){this.clock=clock;this.work=work;this.repository=repository;this.definitions=definitions;this.validator=validator;this.provider=provider;this.policies=policies;}
@@ -30,27 +32,34 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     return List.of(SubjectBinding.optional("Work",Set.of(target.get("ID").toString())),SubjectBinding.optional("Goal",Set.of(goal.get("ID").toString())));
   }
   @Transactional
-  public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){var p=parameters(intent);if(!Set.of("workId").equals(p.keySet()))throw DomainError.invalid("Only workId selects a current pinned goal");return assess(c,id(p.get("workId")));}
+  public Map<String,Object> execute(DomainContext c,Map<String,Object> intent){var p=parameters(intent);if(!Set.of("workId").equals(p.keySet()))throw DomainError.invalid("Only workId selects a current pinned goal");String workId=id(p.get("workId"));var result=new LinkedHashMap<String,Object>(assess(c,workId));
+    var w=work.require(c,workId,false);var a=map(result.get("assessment"));
+    if(w.get("nextAction")!=null&&"UNSATISFIED".equals(a.get("outcome"))&&!Boolean.TRUE.equals(a.get("conflict"))&&!Boolean.TRUE.equals(a.get("held"))){
+      var responsibility=duties.getObject().assessed(c,workId);var effects=new LinkedHashMap<String,Object>(map(result.get("effects")));effects.put("responsibility",TransportValues.normalize(responsibility));result.put("effects",effects);
+    }return result;}
   @Transactional
-  public Map<String,Object> assess(DomainContext c,String workId){
-    var w=work.require(c,workId,true);var goal=work.currentGoal(c,workId);var calculation=calculate(c,w,goal);String assessmentId=UUID.randomUUID().toString();
+  public Map<String,Object> assess(DomainContext c,String workId){return assess(c,workId,CanonicalFactAdmission.Purpose.ASSESS_GOAL);}
+  private Map<String,Object> assess(DomainContext c,String workId,CanonicalFactAdmission.Purpose purpose){
+    var w=work.require(c,workId,true);var goal=work.currentGoal(c,workId);var calculation=calculate(c,w,goal,c.asOf(),purpose);String assessmentId=UUID.randomUUID().toString();
     var previous=latest(c,workId,null);Instant now=clock.instant();
     var a=new LinkedHashMap<String,Object>();a.put("organizationId",c.organizationId());a.put("ID",assessmentId);a.put("revision",0);a.put("createdAt",now);a.put("recordedAt",now);a.put("effectiveAt",c.asOf());a.put("workId",workId);a.put("goalId",goal.get("ID"));a.put("outcome",calculation.result.truth().state().name());a.put("evaluatorVersion",Objects.toString(decode(goal.get("slotsJson")).get("evaluatorVersion"),"UNAVAILABLE"));a.put("assessedAt",now);a.put("conditionsJson",encode(calculation.result.conditions()));a.put("definitionVersionId",goal.get("definitionVersionId"));a.put("policyVersionId",calculation.policy);a.put("knownAt",c.knownAt());a.put("asOf",c.asOf());a.put("previousAssessmentId",previous==null?null:previous.get("ID"));a.put("inputSnapshotHash",calculation.hash);a.put("conflict",calculation.result.truth().conflict());a.put("held",calculation.held);
-    boolean violated=previous!=null&&Boolean.TRUE.equals(previous.get("deadlineViolated"))||deadline(c,w,goal,calculation);a.put("deadlineViolated",violated);
+    boolean violated=previous!=null&&Boolean.TRUE.equals(previous.get("deadlineViolated"))||deadline(c,w,goal,calculation,purpose);a.put("deadlineViolated",violated);
     var s=new LinkedHashMap<String,Object>();s.put("organizationId",c.organizationId());s.put("ID",UUID.randomUUID().toString());s.put("assessmentId",assessmentId);s.put("workId",workId);s.put("goalId",goal.get("ID"));s.put("recordedAt",now);s.put("asOf",c.asOf());s.put("knownAt",c.knownAt());s.put("contentHash",calculation.hash);s.put("contentJson",calculation.snapshot);
     if(calculation.capturePayload!=null){
       var boundary=map(decode(calculation.capturePayload).get("boundary"));
-      String capture=captures.acquire(c.organizationId(),encode(boundary.get("scope")),c.asOf(),c.knownAt(),c.asOf(),"ASSESS_GOAL",calculation.capturePayload,now);
+      String capture=captures.acquire(c.organizationId(),encode(boundary.get("scope")),c.asOf(),c.knownAt(),c.asOf(),purpose.name(),calculation.capturePayload,now);
       s.put("evidenceCaptureId",capture);
     }
     repository.save(a,s);work.markInvalidation(c,workId,calculation.held);
     return Map.of("outcome",calculation.held?"HELD":"APPLIED","effects",Map.of("assessmentId",assessmentId,"workId",workId),"assessment",TransportValues.normalize(a),"quantityEffects",List.of());
   }
-  public Map<String,Object> assessCreated(DomainContext c,String workId){return assess(c,workId);}
+  /** Existing creation callers keep ASSESS_GOAL; a confirmed RECORD is bound to its own active command and delivery Work. */
+  @Transactional public Map<String,Object> assessCreated(DomainContext c,String workId){var current=c.knownThrough(clock.instant());var purpose=causal.purpose(current,workId);return assess(purpose==CanonicalFactAdmission.Purpose.ASSESS_GOAL?c:current,workId,purpose);}
   public void requireSupportedGoal(DomainContext c,Map<String,Object> goal){definition(goal,c);}
   public void requireFulfilled(DomainContext c,Map<String,Object> w,Map<String,Object> goal){
     var latest=latest(c,w.get("ID").toString(),goal.get("ID").toString());var current=calculate(c,w,goal,c.asOf(),CanonicalFactAdmission.Purpose.CLOSE_WORK);
     if(!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw new DomainError("HELD","POLICY_UNRESOLVED","Current evidence policy required for closure");
+    if(latest!=null&&!current.held&&!Boolean.TRUE.equals(latest.get("held"))&&"UNSATISFIED".equals(latest.get("outcome"))&&current.result.truth().state()==PredicateTruth.State.UNSATISFIED&&!current.result.truth().conflict()&&sameCurrentSources(c,latest,current))throw new DomainError("REJECTED","GOAL_UNSATISFIED","Current goal is proven unsatisfied");
     if(latest==null||latest.get("inputSnapshotHash")==null||Boolean.TRUE.equals(latest.get("held"))||current.held||!"SATISFIED".equals(latest.get("outcome"))||current.result.truth().state()!=PredicateTruth.State.SATISFIED||current.result.truth().conflict()||!sameCurrentSources(c,latest,current))throw new DomainError("HELD","ASSESSMENT_NOT_CURRENT","Current immutable goal assessment and inputs required");
   }
   /** Scope selection uses immutable snapshot lineage; execution revalidates every admitted source. */
@@ -64,24 +73,31 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     }
     scopes.put("WORK",List.copyOf(works));if(!places.isEmpty())scopes.put("PLACE",List.copyOf(places));return scopes;
   }
-  public GoalShortfallProof.Proof require(DomainContext c,String workId,Map<String,Object> command){
+  public GoalShortfallProof.Proof require(DomainContext c,String workId,Map<String,Object> command){return require(c,workId,command,false);}
+  public GoalShortfallProof.Proof requireInAssessment(DomainContext c,String workId,Map<String,Object> command){return require(c,workId,command,true);}
+  private GoalShortfallProof.Proof require(DomainContext c,String workId,Map<String,Object> command,boolean pending){
     var w=work.require(c,workId,true);var goal=work.currentGoal(c,workId);var latest=latest(c,workId,goal.get("ID").toString());
     if(latest==null||Boolean.TRUE.equals(w.get("pendingInvalidation"))||Boolean.TRUE.equals(latest.get("held"))||Boolean.TRUE.equals(latest.get("conflict"))||!"UNSATISFIED".equals(latest.get("outcome")))throw shortfallUnavailable();
-    if(!"COMMITTED".equals(command.get("state"))||!"assessGoal".equals(command.get("capabilityId"))||!c.organizationId().equals(command.get("organizationId"))||command.get("completedAt")==null||instant(command.get("completedAt")).isAfter(c.knownAt()))throw shortfallUnavailable();
-    var result=decode(command.get("resultJson"));var recorded=map(result.get("assessment"));var effects=map(result.get("effects"));
-    if(!"APPLIED".equals(result.get("outcome"))||!Objects.equals(effects.get("assessmentId"),latest.get("ID"))||!workId.equals(effects.get("workId")))throw shortfallUnavailable();
-    for(String key:List.of("ID","workId","goalId","inputSnapshotHash","outcome","definitionVersionId","policyVersionId","conditionsJson"))if(!Objects.equals(recorded.get(key),latest.get(key)))throw shortfallUnavailable();
+    if(!"assessGoal".equals(command.get("capabilityId"))||!c.organizationId().equals(command.get("organizationId")))throw shortfallUnavailable();
+    if(pending){
+      if(!CommandExecution.commandId().equals(command.get("ID"))||!"IN_PROGRESS".equals(command.get("state")))throw shortfallUnavailable();
+    }else{
+      if(!"COMMITTED".equals(command.get("state"))||command.get("completedAt")==null||instant(command.get("completedAt")).isAfter(c.knownAt()))throw shortfallUnavailable();
+      var result=decode(command.get("resultJson"));var recorded=map(result.get("assessment"));var effects=map(result.get("effects"));
+      if(!"APPLIED".equals(result.get("outcome"))||!Objects.equals(effects.get("assessmentId"),latest.get("ID"))||!workId.equals(effects.get("workId")))throw shortfallUnavailable();
+      for(String key:List.of("ID","workId","goalId","inputSnapshotHash","outcome","definitionVersionId","policyVersionId","conditionsJson"))if(!Objects.equals(recorded.get(key),latest.get(key)))throw shortfallUnavailable();
+    }
     var original=decode(command.get("canonicalIntentJson"));
     if(!"assessGoal".equals(original.get("capabilityId"))||!workId.equals(map(original.get("slots")).get("workId"))||!Objects.equals(CommandRequests.hash(original),command.get("canonicalHash")))throw shortfallUnavailable();
     var snapshot=proofSnapshot(c,latest);var slots=decode(goal.get("slotsJson"));
     if(!"CUMULATIVE_EVENT".equals(slots.get("quantityMode"))||slots.get("targetQuantity")==null||slots.get("unit")==null||slots.get("periodStart")==null||slots.get("periodEnd")==null||!Objects.equals(goal.get("ID"),snapshot.get("goalId")))throw shortfallUnavailable();
-    var current=calculate(c,w,goal,c.asOf(),CanonicalFactAdmission.Purpose.OPEN_OBLIGATION);
+    var current=calculate(c,w,goal,c.asOf(),pending?CanonicalFactAdmission.Purpose.ASSESS_GOAL:CanonicalFactAdmission.Purpose.OPEN_OBLIGATION);
     if(current.held||current.result.truth().state()!=PredicateTruth.State.UNSATISFIED||current.result.truth().conflict()||!sameCurrentSources(c,latest,current)||!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw shortfallUnavailable();
     // IdentityAuthorization's WORK list is any-of. Check each endpoint separately.
     var sourceFacts=map(map(snapshot.get("facts")).get("sources"));
     if(!(sourceFacts.get("evidence.CanonicalOccurrences") instanceof List<?> actuals)||actuals.isEmpty())throw shortfallUnavailable();
     for(Object value:actuals){var actual=map(value);if(actual.get("workId")==null||actual.get("placeId")==null||!Objects.equals(actual.get("itemId"),w.get("itemId")))throw shortfallUnavailable();
-      for(String endpoint:new LinkedHashSet<>(List.of(workId,actual.get("workId").toString())))authority.authorizeScopes(c,"openObligation",Map.of("TARGET",List.of(workId),"WORK",List.of(endpoint),"ITEM",List.of(w.get("itemId").toString()),"PLACE",List.of(actual.get("placeId").toString())));
+      for(String endpoint:new LinkedHashSet<>(List.of(workId,actual.get("workId").toString())))authority.authorizeScopes(c,pending?"assessGoal":"openObligation",Map.of("TARGET",List.of(workId),"WORK",List.of(endpoint),"ITEM",List.of(w.get("itemId").toString()),"PLACE",List.of(actual.get("placeId").toString())));
     }
     Definition d=definition(goal,c);var predicate=goalPredicate(d,slots);var leaves=new LinkedHashMap<String,Map<String,Object>>();quantityLeaves(predicate,"root",leaves);
     String unit=slots.get("unit").toString(),property=GoalQuantityProperty.resolve(d,template(d,slots).predicate(),unit);
@@ -114,6 +130,9 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
       var boundary=new LinkedHashMap<>(map(snapshot.get("captureBoundary")));
       if(!boundary.keySet().containsAll(Set.of("asOf","knownAt","evaluationHorizon")))return false;
       boundary.remove("asOf");boundary.remove("knownAt");boundary.remove("evaluationHorizon");
+      // Admission authority is rechecked for each operation; its provenance is not a source revision.
+      try{CanonicalFactAdmission.Purpose.valueOf(boundary.get("admissionPurpose").toString());}catch(RuntimeException invalid){return false;}
+      boundary.remove("admissionPurpose");
       snapshot.put("captureBoundary",boundary);
     }
     return encode(frozen).equals(encode(fresh));
@@ -169,10 +188,10 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     var captureScope=new TreeMap<String,Object>();captureScope.putAll((Map<String,Object>)scope);captureScope.put("itemId",w.get("itemId"));
     if(!captureScope.containsKey("lotId")&&w.get("lotId")!=null)captureScope.put("lotId",w.get("lotId"));
     if(!captureScope.containsKey("placeId")&&slots.get("placeId")!=null)captureScope.put("placeId",slots.get("placeId"));
-    var boundary=new TreeMap<String,Object>();boundary.put("organizationId",c.organizationId());boundary.put("scope",captureScope);boundary.put("asOf",c.asOf());boundary.put("knownAt",c.knownAt());boundary.put("evaluationHorizon",evaluationHorizon);boundary.put("admissionPurpose","ASSESS_GOAL");boundary.put("admissionContract","canonical-admission-v1");boundary.put("definitionHash",d.contentHash());boundary.put("definitionId",d.id());boundary.put("evaluatorVersion",d.evaluatorVersion());boundary.put("policyHash",policy.getFirst().get("contentHash"));boundary.put("policyId",policy.getFirst().get("ID"));boundary.put("policyVersion",policy.getFirst().get("version"));
+    var boundary=new TreeMap<String,Object>();boundary.put("organizationId",c.organizationId());boundary.put("scope",captureScope);boundary.put("asOf",c.asOf());boundary.put("knownAt",c.knownAt());boundary.put("evaluationHorizon",evaluationHorizon);boundary.put("admissionPurpose",purpose.name());boundary.put("admissionContract","canonical-admission-v1");boundary.put("definitionHash",d.contentHash());boundary.put("definitionId",d.id());boundary.put("evaluatorVersion",d.evaluatorVersion());boundary.put("policyHash",policy.getFirst().get("contentHash"));boundary.put("policyId",policy.getFirst().get("ID"));boundary.put("policyVersion",policy.getFirst().get("version"));
     for(String key:List.of("action","includeReserved","evaluationAt","eventKind","evidenceSource","periodStart","periodEnd","periodStartInclusive","periodEndInclusive"))if(slots.containsKey(key))boundary.put(key,slots.get(key));
-    // Purpose is checked by the provider. Only ASSESS_GOAL creates persisted captures;
-    // read-only guards compare re-admitted source content while preserving this provenance.
+    // The provider checks the selected authority. Causal RECORD and ASSESS_GOAL persist their own provenance;
+    // read-only guards compare re-admitted source content without rewriting prior captures.
     snapshot.put("captureBoundary",boundary);String payload=encode(snapshot);
     return new Calculation(result,DefinitionRepository.sha256(payload),payload,policy.getFirst().get("ID").toString(),false,encode(Map.of("boundary",boundary,"facts",facts)));
   }
@@ -214,7 +233,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
 
   private Definition.Goal template(Definition d,Map<String,Object> slots){var candidates=d.goals().stream().filter(g->Objects.equals(g.endpoint(),slots.get("endpoint"))&&Objects.equals(g.quantityMode(),slots.get("quantityMode"))).toList();if(candidates.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique pinned goal template required");return candidates.getFirst();}
   private Calculation held(Map<String,Object> goal,Map<String,Object> slots,String reason){String payload=encode(Map.of("goalId",goal.get("ID"),"goal",goal,"slots",slots,"unknown",reason));return new Calculation(new TypedPredicateEvaluator.Result(new PredicateTruth(PredicateTruth.State.UNVERIFIED,false),List.of()),DefinitionRepository.sha256(payload),payload,null,true,null);}
-  private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;if(c.asOf().equals(instant(slots.get("dueAt")))&&Boolean.TRUE.equals(slots.get("deadlineInclusive")))return false;Instant boundary=instant(slots.get("dueAt"));if(Boolean.FALSE.equals(slots.get("deadlineInclusive")))boundary=boundary.minusNanos(1);var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),boundary,c.knownAt());var atDeadline=calculate(deadlineContext,w,goal,c.asOf());return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}
+  private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current,CanonicalFactAdmission.Purpose purpose){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;if(c.asOf().equals(instant(slots.get("dueAt")))&&Boolean.TRUE.equals(slots.get("deadlineInclusive")))return false;Instant boundary=instant(slots.get("dueAt"));if(Boolean.FALSE.equals(slots.get("deadlineInclusive")))boundary=boundary.minusNanos(1);var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),boundary,c.knownAt());var atDeadline=calculate(deadlineContext,w,goal,c.asOf(),purpose);return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}
   private Map<String,Object> latest(DomainContext c,String workId,String goalId){
     var all=repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(a->workId.equals(a.get("workId"))).toList();
     var previousIds=new HashSet<Object>();all.forEach(a->{if(a.get("previousAssessmentId")!=null)previousIds.add(a.get("previousAssessmentId"));});

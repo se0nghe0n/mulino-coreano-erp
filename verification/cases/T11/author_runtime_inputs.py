@@ -90,13 +90,23 @@ def authored(old):
         sub['actions']=output
     return value,changes
 
+def lifecycle_layer():
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('t11_lifecycle_inputs',HERE/'author_lifecycle_inputs.py')
+    layer=importlib.util.module_from_spec(spec);spec.loader.exec_module(layer);return layer
+
+def is_lifecycle(v):
+    layer=lifecycle_layer();return v==layer.authored(layer.baseline())[0]
+
 def apply(v):
+    if is_lifecycle(v):return copy.deepcopy(v)
     old=baseline();new,_=authored(old)
     if v==new:return copy.deepcopy(v)
     if v!=old:raise ValueError('T11 runtime input baseline drift')
     return new
 
 def restore(v):
+    if is_lifecycle(v):v=lifecycle_layer().restore(v)
     old=baseline();new,_=authored(old)
     if v!=new:raise ValueError('T11 runtime strict inverse refuses unrecorded input/oracle drift')
     return old
@@ -117,6 +127,7 @@ def feature():
     return text
 
 def restore_feature(text):
+    if text==lifecycle_layer().feature():text=lifecycle_layer().original("scenario.feature").decode()
     if text!=feature():raise ValueError('T11 runtime feature drift')
     return original_bytes('scenario.feature').decode()
 

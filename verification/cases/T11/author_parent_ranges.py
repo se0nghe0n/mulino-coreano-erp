@@ -82,7 +82,7 @@ def runtime_layer():
 
 def apply(value):
     runtime=runtime_layer()
-    if value == runtime.authored(runtime.baseline())[0]:return copy.deepcopy(value)
+    if runtime.is_lifecycle(value) or value == runtime.authored(runtime.baseline())[0]:return copy.deepcopy(value)
     old = baseline(); new, _ = authored(old)
     if value == new:
         return copy.deepcopy(value)
@@ -93,7 +93,7 @@ def apply(value):
 
 def restore(value):
     runtime=runtime_layer()
-    if value == runtime.authored(runtime.baseline())[0]:value=runtime.restore(value)
+    if runtime.is_lifecycle(value) or value == runtime.authored(runtime.baseline())[0]:value=runtime.restore(value)
     old = baseline(); new, _ = authored(old)
     if value != new:
         raise ValueError('T11 strict inverse refuses unrecorded input/oracle drift')
@@ -121,7 +121,7 @@ def authored_feature():
 
 def restore_feature(value):
     runtime=runtime_layer()
-    if value == runtime.feature():value=runtime.restore_feature(value)
+    if value == runtime.lifecycle_layer().feature() or value == runtime.feature():value=runtime.restore_feature(value)
     if value != authored_feature():
         raise ValueError('T11 strict inverse refuses unrecorded feature drift')
     return subprocess.check_output(['git', 'show', BASE+':verification/cases/T11/scenario.feature'], cwd=ROOT).decode()

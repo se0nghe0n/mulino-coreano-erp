@@ -1,8 +1,14 @@
 # T11 독립 관찰 계약
 
-모든 scenario는 setup도 명시적 행동으로 실행한다. 제품 adapter와 실제
-API/DB/host/model은 아직 없어 NOT_RUN이다. 고정 selftest는 제품 fake가
-아니다. 원행 source는 조직·caseId·품목 scope 안에서 완전하게 조회한다.
+현재 입력과 제품 경로는
+[2026-10-24 수정 기록](../../../docs/execution/fix-wave-20261024-t11.md)을
+따른다. 원본110 assertion ID와 fixture·grant·clock은 유지한다.
+새 가역 입력 layer와5개 oracle 표현의 계약 교정, 실제 focused PG
+검증을 추가했다. 전체 actual scenarios는 통합 뒤 Haiku 실행이 필요하다.
+
+모든 scenario는 setup도 명시적 행동으로 실행한다. 아래 초기 관찰
+설계의 미구현 표기는 작성 당시의 기록이다. 현재 실행 결과는 위 수정
+기록에서 focused 검사와 전체 인수를 구별한다. 원행 source는 조직·caseId·품목 scope 안에서 완전하게 조회한다.
 DB snapshot token은 직전 공개 조회가 발급한 snapshotRevision으로 고정한다.
 
 각 fixture의 policy는 synthetic이며 법규나 운영 승인으로 해석하지 않는다.
@@ -14,7 +20,7 @@ setup에 seed하지 않는다. 전송 요청의 IDs는 alias/result로 연결한
 obligations/assignments/handovers/workLinks, segments/movements/contributions,
 activities/inbox/audit/outbox/executionAttempts/approvals/contracts/claims,
 observationCoverage/supervisionIssues는 독립 observer의 read-only mapping
-계약이다. 현 제품 schema의 존재를 주장하지 않는다. API 결과와 함께
+계약이다. 현재 구현된 범위는 실제 observer source와 실행 증거로 확인한다. API 결과와 함께
 원행 sourceQuery·parameters·mappingVersion·scopeComplete·snapshot artifact를
 요구한다. count0도 완전한 scope의 실제 빈 원행 관찰이 필요하다.
 

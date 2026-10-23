@@ -15,6 +15,13 @@ import org.mulino.verification.ReferenceResolver;
 /** New diagnostic inputs only; original T11 fixtures, actions and 110 oracles remain unchanged. */
 @EnabledIfEnvironmentVariable(named="T11_PG_TEST",matches="true")
 class T11GoalShortfallPostgresTest {
+    /** These pre-existing tests isolate the explicit synthetic-grant route. The new declared
+     * Work next-action route is tested independently by T11WorkLifecyclePostgresTest. */
+    static T11ParentHttp explicitOnly(T11ParentHttp w) throws Exception {
+        var parent=(ObjectNode)w.action("parent").path("request");
+        for(String key:List.of("nextAction","nextCheckAt")){((ObjectNode)parent.path("slots")).remove(key);((ObjectNode)parent.path("provenance")).remove(key);}
+        Json.write(w.evidence.resolve("diagnostic-explicit-only-parent-input.json"),parent);return w;
+    }
     static String parent(T11ParentHttp w){return w.results.get("parent").path("response").path("workId").asText();}
     static Map<String,Object> work(T11ParentHttp w) throws Exception{return w.rows("mulino_work_read_Works").stream().filter(r->parent(w).equals(r.get("id"))).findFirst().orElseThrow();}
     static List<Map<String,Object>> roots(T11ParentHttp w) throws Exception{
@@ -50,7 +57,7 @@ class T11GoalShortfallPostgresTest {
     }
     static void physicalUnchanged(T11ParentHttp w) throws Exception{for(String table:List.of("mulino_evidence_CanonicalOccurrences","mulino_trade_receipt_Receipts","mulino_inventory_QuantityMovements"))assertEquals(1,w.rows(table).size(),table);assertEquals(2,w.rows("mulino_work_WorkContributions").size());assertEquals(new BigDecimal("90.000000000000"),w.rows("mulino_trade_receipt_Receipts").getFirst().get("quantity"));}
     @Test void explicitProofPins100Minus90AndReusesRoot() throws Exception{
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-positive")){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-positive"))){
             w.through("parent-assessment");syntheticOpenGrant(w);var r=request(w);
             var a=w.send("open-shortfall","A","/api/ontology/commands/openObligation",r);assertEquals("APPLIED",a.path("outcome").asText(),a.toPrettyString());
             String root=a.path("effects").path("responsibility").path("rootId").asText();assertEquals(1,roots(w).size());var original=roots(w).getFirst();assertEquals(new BigDecimal("10.000000000000"),original.get("quantity"));
@@ -64,7 +71,7 @@ class T11GoalShortfallPostgresTest {
         }
     }
     @Test void transferRepeatKeepsActualSuccessorAndOriginalNinetyDuty() throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-transfer")){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-transfer"))){
             w.through("parent-assessment");syntheticOpenGrant(w);var opened=w.send("open-shortfall","A","/api/ontology/commands/openObligation",request(w));assertEquals("APPLIED",opened.path("outcome").asText(),opened.toPrettyString());
             var root=roots(w).getFirst();String assignment=opened.path("effects").path("responsibility").path("assignments").get(0).path("ID").asText();
             w.execute("followup");String target=w.results.get("followup").path("response").path("workId").asText();
@@ -76,11 +83,11 @@ class T11GoalShortfallPostgresTest {
             assess(w);var repeat=w.send("repeat-after-transfer","A","/api/ontology/commands/openObligation",request(w));assertEquals("APPLIED",repeat.path("outcome").asText(),repeat.toPrettyString());
             var current=repeat.path("effects").path("responsibility").path("assignments");assertEquals(1,current.size());assertEquals(target,current.get(0).path("workId").asText());assertEquals(w.aliases.path("A").asText(),current.get(0).path("ownerId").asText());assertEquals("OPEN",current.get(0).path("status").asText());assertNotEquals(assignment,current.get(0).path("ID").asText());assertEquals(root,roots(w).getFirst());
             assertEquals(1,w.rows("mulino_work_read_ObligationReferences").stream().filter(a->target.equals(a.get("workid"))&&"OPEN".equals(a.get("status"))).count());
-            assertEquals(1,w.rows("mulino_work_read_ObligationReferences").stream().filter(a->parent(w).equals(a.get("workid"))&&"RECEIPT_UNALLOCATED".equals(a.get("kind"))&&"OPEN".equals(a.get("status"))&&new BigDecimal("90").compareTo((BigDecimal)a.get("quantity"))==0).count());physicalUnchanged(w);
+            assertEquals(1,w.rows("mulino_work_read_ObligationReferences").stream().filter(a->parent(w).equals(a.get("workid"))&&"RECEIPT_UNALLOCATED".equals(a.get("kind"))&&"RESOLVED".equals(a.get("status"))&&"VERIFIED_WORK_CONTRIBUTION_ALLOCATION".equals(a.get("basis"))&&new BigDecimal("90").compareTo((BigDecimal)a.get("quantity"))==0).count());physicalUnchanged(w);
         }
     }
     @Test void concurrentNewKeysAndFaultRollbackKeepOneAtomicRoot() throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-race")){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-race"))){
             w.through("parent-assessment");syntheticOpenGrant(w);var request=request(w);
             var control=Json.object().put("operation","arm").put("organizationId",w.org).put("point","command.beforeCommit").put("capabilityId","openObligation").put("commandKey",request.path("commandIdempotencyKey").asText()).put("occurrences",1);
             var armed=w.send("arm-rollback","A","/__verification/runtime/fault",control);assertEquals("ARMED",armed.path("state").asText());
@@ -98,14 +105,14 @@ class T11GoalShortfallPostgresTest {
         }
     }
     @Test void changedPolicyRetainsFirstProofAndCurrentResponsibilityWithoutEffects() throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-review")){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-review"))){
             w.through("parent-assessment");syntheticOpenGrant(w);assertEquals("APPLIED",w.send("open-shortfall","A","/api/ontology/commands/openObligation",request(w)).path("outcome").asText());var before=roots(w);var assignments=w.rows("mulino_work_read_ObligationReferences");
             try(var q=w.db.prepareStatement("DELETE FROM mulino_governance_ActivePolicies WHERE organizationId=? AND kind='EVIDENCE'")){q.setString(1,w.org);assertEquals(1,q.executeUpdate());}
             var held=w.send("review-required","A","/api/ontology/commands/openObligation",request(w));assertEquals("HELD",held.path("outcome").asText(),held.toPrettyString());assertEquals(before.getFirst().get("id"),held.path("responsibility").path("rootId").asText());assertEquals("OPEN",held.path("responsibility").path("status").asText());assertTrue(held.path("effects").isEmpty());assertEquals(before,roots(w));assertEquals(assignments,w.rows("mulino_work_read_ObligationReferences"));physicalUnchanged(w);
         }
     }
     @Test void firstRootProofMustBeDatabaseImmutable() throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-immutable")){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-immutable"))){
             w.through("parent-assessment");syntheticOpenGrant(w);var opened=w.send("open-shortfall","A","/api/ontology/commands/openObligation",request(w));assertEquals("APPLIED",opened.path("outcome").asText(),opened.toPrettyString());
             w.db.setAutoCommit(false);
             try {assertThrows(java.sql.SQLException.class,()->{try(var q=w.db.prepareStatement("UPDATE mulino_responsibility_Roots SET sourceVersion='mutated' WHERE organizationId=? AND ID=?")){q.setString(1,w.org);q.setString(2,roots(w).getFirst().get("id").toString());q.executeUpdate();}});}finally {w.db.rollback();w.db.setAutoCommit(true);}
@@ -113,14 +120,14 @@ class T11GoalShortfallPostgresTest {
     }
     @ParameterizedTest @ValueSource(strings={"quantity","unit","condition","goal","scope","source","hash","sourceKind","nextCheck","policy","revoked","alias","staleAssessment","sourceWork","wrongPlace","corrected","crossOrg","callerPurpose"})
     void invalidProofOrAuthorityCreatesNoRoot(String variant) throws Exception{
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-negative-"+variant)){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-negative-"+variant))){
             w.through("parent-assessment");syntheticOpenGrant(w);var r=request(w);var p=(ObjectNode)r.path("slots");
             switch(variant){
                 case "quantity"->p.put("quantity","11");case "unit"->p.put("unit","KG");case "source"->p.put("sourceId",UUID.randomUUID().toString());case "hash"->p.put("sourceVersion","0".repeat(64));case "sourceKind"->p.put("sourceKind","OCCURRENCE");case "nextCheck"->p.put("nextCheckAt","2026-10-07T02:00:00Z");
                 case "condition","goal","scope"->{var scope=(ObjectNode)Json.parse(p.path("scopeJson").asText());scope.put(variant.equals("condition")?"conditionId":variant.equals("goal")?"goalVersionId":"itemId",UUID.randomUUID().toString());p.put("scopeJson",scope.toString());}
                 case "policy"->{try(var s=w.db.prepareStatement("DELETE FROM mulino_governance_ActivePolicies WHERE organizationId=? AND kind='EVIDENCE'")){s.setString(1,w.org);s.executeUpdate();}}
                 case "revoked"->{try(var s=w.db.prepareStatement("UPDATE mulino_identity_Grants SET revokedAt='2026-10-07T02:00:00Z' WHERE organizationId=? AND actorId=?")){s.setString(1,w.org);s.setString(2,w.aliases.path("A").asText());s.executeUpdate();}}
-                case "crossOrg"->{try(var other=new T11ParentHttp("parent90-cancelled","foreign-shortfall")){other.through("parent-assessment");var otherRequest=request(other);p.put("sourceId",otherRequest.path("slots").path("sourceId").asText()).put("sourceVersion",otherRequest.path("slots").path("sourceVersion").asText());}}
+                case "crossOrg"->{try(var other=explicitOnly(new T11ParentHttp("parent90-cancelled","foreign-shortfall"))){other.through("parent-assessment");var otherRequest=request(other);p.put("sourceId",otherRequest.path("slots").path("sourceId").asText()).put("sourceVersion",otherRequest.path("slots").path("sourceVersion").asText());}}
                 case "callerPurpose"->p.put("evaluationPurpose","ASSESS_GOAL");
                 case "sourceWork"->{var source=w.rows("mulino_commands_CommandRecords").stream().filter(x->"assessGoal".equals(x.get("capabilityid"))&&x.get("resultjson")!=null&&x.get("resultjson").toString().contains(w.results.get("child30-assessment-evaluate").path("response").path("effects").path("assessmentId").asText())).findFirst().orElseThrow();p.put("sourceId",source.get("id").toString()).put("sourceVersion",source.get("canonicalhash").toString());}
                 case "wrongPlace"->{try(var q=w.db.prepareStatement("UPDATE mulino_identity_GrantScopes SET scopeId=? WHERE organizationId=? AND scopeKind='PLACE' AND grantId IN (SELECT grantId FROM mulino_identity_GrantActions WHERE capabilityId='openObligation')")){q.setString(1,UUID.randomUUID().toString());q.setString(2,w.org);q.executeUpdate();}}

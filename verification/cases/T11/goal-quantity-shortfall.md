@@ -1,14 +1,19 @@
 # T11 명시적 목표 수량 부족 의무
 
-Task와 현재 Step은 OPEN이다. 원래 T11의 입력·110 oracle·grant는 변경하지
-않는다. 이 문서의 HTTP 입력과 open 권한은 별도 합성 진단에만 사용한다.
+Task와 현재 Step은 OPEN이다. 이 문서의 open HTTP 입력과 권한은
+별도 합성 진단에 사용한다. 현재 T11의 공개 입력·110 ID·원 grant와
+자동 경로는 [최신 수정 기록](../../../docs/execution/fix-wave-20261024-t11.md)을
+따른다.
 
 ## 제품 경로
 
 `openObligation(kind=GOAL_QUANTITY_SHORTFALL)`은 실제 COMMITTED
 `assessGoal` command의 ID와 canonical hash를 DECISION으로 받는다.
-`createObligation` alias는 이 kind를 거부한다. 별도 endpoint나 자동 assessment
-hook은 없다.
+`createObligation` alias는 이 kind를 거부한다. 별도 endpoint는 없다.
+2026-10-24에는 Work가 nextAction/nextCheckAt을 명시하고 실제 현재
+부족 proof가 성립할 때 assessGoal 내부에서 같은 root를 여는 hook을
+추가했다. 활성 command ID·hash를 확인하며 이 합성 open grant를
+T11 actor에게 추가하지 않는다.
 
 `GoalShortfallProof`는 Work의 현재 불변 GoalVersion, 최신 assessment,
 InputSnapshot의 실제 hash, command 결과의 assessment/work/goal/hash를 대조한다.

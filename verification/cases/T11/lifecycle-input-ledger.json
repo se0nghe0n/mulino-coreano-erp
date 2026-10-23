@@ -1,0 +1,2778 @@
+{
+  "recordType": "T11_LIFECYCLE_INPUT_AUTHORING",
+  "baseline": "b4772eb6",
+  "originalAssertionIDsPreserved": 110,
+  "originalFixturesUnchanged": true,
+  "changes": [
+    {
+      "subcaseId": "parent90-cancelled",
+      "beforeActionIds": [
+        "setup",
+        "parent",
+        "child30",
+        "child60",
+        "receive90-event-document",
+        "receive90-event",
+        "receive90-provisional",
+        "receive90-match",
+        "receive90-canonical",
+        "receive90",
+        "child30-link-current-work",
+        "child30-link",
+        "child30-assessment-evaluation-work",
+        "child30-assessment-evaluate",
+        "child30-assessment",
+        "child30-close-current-work",
+        "child30-close",
+        "child60-link-current-work",
+        "child60-link",
+        "child60-assessment-evaluation-work",
+        "child60-assessment-evaluate",
+        "child60-assessment",
+        "child60-close-current-work",
+        "child60-close",
+        "parent-assessment-evaluation-work",
+        "parent-assessment-evaluate",
+        "parent-assessment",
+        "before-transfer-db-snapshot",
+        "before-transfer-db",
+        "followup",
+        "deficit-transfer",
+        "before-false-close-db-snapshot",
+        "before-false-close-db",
+        "false-close-current-work",
+        "false-close",
+        "rejected-db-snapshot",
+        "rejected-db",
+        "alternative-close-current-work",
+        "alternative-close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "parent",
+        "child30",
+        "child60",
+        "receive90-event-document",
+        "receive90-event",
+        "receive90-provisional",
+        "receive90-match",
+        "receive90-canonical",
+        "receive90",
+        "child30-link-current-work",
+        "child30-link",
+        "child30-assessment-evaluation-work",
+        "child30-assessment-evaluate",
+        "child30-assessment",
+        "child30-close-current-work",
+        "child30-close",
+        "child60-link-current-work",
+        "child60-link",
+        "child60-assessment-evaluation-work",
+        "child60-assessment-evaluate",
+        "child60-assessment",
+        "child60-close-current-work",
+        "child60-close",
+        "parent-assessment-evaluation-work",
+        "parent-assessment-evaluate",
+        "parent-assessment",
+        "before-transfer-db-snapshot",
+        "before-transfer-db",
+        "followup",
+        "deficit-transfer-current-work",
+        "deficit-transfer",
+        "deficit-accept",
+        "before-false-close-db-snapshot",
+        "before-false-close-db",
+        "false-close-current-work",
+        "false-close",
+        "rejected-db-snapshot",
+        "rejected-db",
+        "alternative-close-current-work",
+        "alternative-close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [
+        {
+          "actionId": "parent",
+          "before": {
+            "id": "parent",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "parent:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workType": "PURCHASE_ARRIVAL",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T02:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "period": {
+                  "start": "2026-10-05T09:00:00Z",
+                  "end": "2026-10-07T01:30:00Z",
+                  "endInclusive": true,
+                  "startInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluationTime": "2026-10-07T02:00:00Z",
+                "placeId": {
+                  "$alias": "W"
+                },
+                "eligibilityAction": "PHYSICAL_HELD",
+                "includeReservations": true,
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-parent90-cancelled-parent",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workType": "USER",
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "period": "USER",
+                "eventKinds": "USER",
+                "distinctContributionScope": "USER",
+                "evidencePolicyVersion": "USER",
+                "evaluationTime": "USER",
+                "placeId": "CONTEXT",
+                "eligibilityAction": "USER",
+                "includeReservations": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "parent",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "parent:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workType": "PURCHASE_ARRIVAL",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T02:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "period": {
+                  "start": "2026-10-05T09:00:00Z",
+                  "end": "2026-10-07T01:30:00Z",
+                  "endInclusive": true,
+                  "startInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluationTime": "2026-10-07T02:00:00Z",
+                "placeId": {
+                  "$alias": "W"
+                },
+                "eligibilityAction": "PHYSICAL_HELD",
+                "includeReservations": true,
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-parent90-cancelled-parent",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workType": "USER",
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "period": "USER",
+                "eventKinds": "USER",
+                "distinctContributionScope": "USER",
+                "evidencePolicyVersion": "USER",
+                "evaluationTime": "USER",
+                "placeId": "CONTEXT",
+                "eligibilityAction": "USER",
+                "includeReservations": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "nextAction": "USER",
+                "nextCheckAt": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "deficit-transfer",
+          "before": {
+            "id": "deficit-transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "deficit-transfer:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$result": {
+                    "actionId": "followup",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "acceptanceEvidenceId": {
+                  "$alias": "DOC"
+                },
+                "quantity": {
+                  "value": "10",
+                  "unit": "BOX"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$result": {
+                    "actionId": "parent-assessment",
+                    "pointer": "/response/obligationId"
+                  }
+                },
+                "recipientId": {
+                  "$alias": "A"
+                },
+                "workId": {
+                  "$result": {
+                    "actionId": "parent",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "parent-assessment",
+                  "pointer": "/response/workRevision"
+                }
+              },
+              "commandIdempotencyKey": "T11-parent90-cancelled-deficit-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "acceptanceEvidenceId": "CONTEXT",
+                "quantity": "USER",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "workId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "deficit-transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "deficit-transfer:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$result": {
+                    "actionId": "followup",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "quantity": "10",
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$result": {
+                    "actionId": "parent-assessment-evaluate",
+                    "pointer": "/response/effects/responsibility/assignments/0/ID"
+                  }
+                },
+                "recipientId": {
+                  "$alias": "A"
+                },
+                "workId": {
+                  "$result": {
+                    "actionId": "parent",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "expiresAt": "2026-10-08T09:00:00Z"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "deficit-transfer-current-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-parent90-cancelled-deficit-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "quantity": "USER",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "workId": "CONTEXT",
+                "expiresAt": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "deficit-transfer-current-work",
+          "before": null,
+          "after": {
+            "id": "deficit-transfer-current-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "deficit-transfer-current-work:actual-artifact"
+            ]
+          }
+        },
+        {
+          "actionId": "deficit-accept",
+          "before": null,
+          "after": {
+            "id": "deficit-accept",
+            "kind": "invoke",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "acceptHandover",
+            "evidenceRefs": [
+              "deficit-accept:actual-artifact"
+            ],
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "acceptHandover",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "handoverId": {
+                  "$result": {
+                    "actionId": "deficit-transfer",
+                    "pointer": "/response/effects/responsibility/ID"
+                  }
+                }
+              },
+              "provenance": {
+                "handoverId": "CONTEXT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "parent90-cancelled-deficit-accept"
+            }
+          }
+        }
+      ],
+      "assertions": []
+    },
+    {
+      "subcaseId": "parent90-impossible",
+      "beforeActionIds": [
+        "setup",
+        "parent",
+        "child30",
+        "child60",
+        "receive90-event-document",
+        "receive90-event",
+        "receive90-provisional",
+        "receive90-match",
+        "receive90-canonical",
+        "receive90",
+        "child30-link-current-work",
+        "child30-link",
+        "child30-assessment-evaluation-work",
+        "child30-assessment-evaluate",
+        "child30-assessment",
+        "child30-close-current-work",
+        "child30-close",
+        "child60-link-current-work",
+        "child60-link",
+        "child60-assessment-evaluation-work",
+        "child60-assessment-evaluate",
+        "child60-assessment",
+        "child60-close-current-work",
+        "child60-close",
+        "parent-assessment-evaluation-work",
+        "parent-assessment-evaluate",
+        "parent-assessment",
+        "before-transfer-db-snapshot",
+        "before-transfer-db",
+        "followup",
+        "deficit-transfer",
+        "before-false-close-db-snapshot",
+        "before-false-close-db",
+        "false-close-current-work",
+        "false-close",
+        "rejected-db-snapshot",
+        "rejected-db",
+        "alternative-close-current-work",
+        "alternative-close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "parent",
+        "child30",
+        "child60",
+        "receive90-event-document",
+        "receive90-event",
+        "receive90-provisional",
+        "receive90-match",
+        "receive90-canonical",
+        "receive90",
+        "child30-link-current-work",
+        "child30-link",
+        "child30-assessment-evaluation-work",
+        "child30-assessment-evaluate",
+        "child30-assessment",
+        "child30-close-current-work",
+        "child30-close",
+        "child60-link-current-work",
+        "child60-link",
+        "child60-assessment-evaluation-work",
+        "child60-assessment-evaluate",
+        "child60-assessment",
+        "child60-close-current-work",
+        "child60-close",
+        "parent-assessment-evaluation-work",
+        "parent-assessment-evaluate",
+        "parent-assessment",
+        "before-transfer-db-snapshot",
+        "before-transfer-db",
+        "followup",
+        "deficit-transfer-current-work",
+        "deficit-transfer",
+        "deficit-accept",
+        "before-false-close-db-snapshot",
+        "before-false-close-db",
+        "false-close-current-work",
+        "false-close",
+        "rejected-db-snapshot",
+        "rejected-db",
+        "alternative-close-current-work",
+        "alternative-close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [
+        {
+          "actionId": "parent",
+          "before": {
+            "id": "parent",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "parent:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workType": "PURCHASE_ARRIVAL",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T02:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "period": {
+                  "start": "2026-10-05T09:00:00Z",
+                  "end": "2026-10-07T01:30:00Z",
+                  "endInclusive": true,
+                  "startInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluationTime": "2026-10-07T02:00:00Z",
+                "placeId": {
+                  "$alias": "W"
+                },
+                "eligibilityAction": "PHYSICAL_HELD",
+                "includeReservations": true,
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-parent90-impossible-parent",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workType": "USER",
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "period": "USER",
+                "eventKinds": "USER",
+                "distinctContributionScope": "USER",
+                "evidencePolicyVersion": "USER",
+                "evaluationTime": "USER",
+                "placeId": "CONTEXT",
+                "eligibilityAction": "USER",
+                "includeReservations": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "parent",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "parent:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workType": "PURCHASE_ARRIVAL",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T02:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "period": {
+                  "start": "2026-10-05T09:00:00Z",
+                  "end": "2026-10-07T01:30:00Z",
+                  "endInclusive": true,
+                  "startInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluationTime": "2026-10-07T02:00:00Z",
+                "placeId": {
+                  "$alias": "W"
+                },
+                "eligibilityAction": "PHYSICAL_HELD",
+                "includeReservations": true,
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-parent90-impossible-parent",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workType": "USER",
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "period": "USER",
+                "eventKinds": "USER",
+                "distinctContributionScope": "USER",
+                "evidencePolicyVersion": "USER",
+                "evaluationTime": "USER",
+                "placeId": "CONTEXT",
+                "eligibilityAction": "USER",
+                "includeReservations": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "nextAction": "USER",
+                "nextCheckAt": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "deficit-transfer",
+          "before": {
+            "id": "deficit-transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "deficit-transfer:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$result": {
+                    "actionId": "followup",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "acceptanceEvidenceId": {
+                  "$alias": "DOC"
+                },
+                "quantity": {
+                  "value": "10",
+                  "unit": "BOX"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$result": {
+                    "actionId": "parent-assessment",
+                    "pointer": "/response/obligationId"
+                  }
+                },
+                "recipientId": {
+                  "$alias": "A"
+                },
+                "workId": {
+                  "$result": {
+                    "actionId": "parent",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "parent-assessment",
+                  "pointer": "/response/workRevision"
+                }
+              },
+              "commandIdempotencyKey": "T11-parent90-impossible-deficit-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "acceptanceEvidenceId": "CONTEXT",
+                "quantity": "USER",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "workId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "deficit-transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "deficit-transfer:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$result": {
+                    "actionId": "followup",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "quantity": "10",
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$result": {
+                    "actionId": "parent-assessment-evaluate",
+                    "pointer": "/response/effects/responsibility/assignments/0/ID"
+                  }
+                },
+                "recipientId": {
+                  "$alias": "A"
+                },
+                "workId": {
+                  "$result": {
+                    "actionId": "parent",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "expiresAt": "2026-10-08T09:00:00Z"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "deficit-transfer-current-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-parent90-impossible-deficit-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "quantity": "USER",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "workId": "CONTEXT",
+                "expiresAt": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "deficit-transfer-current-work",
+          "before": null,
+          "after": {
+            "id": "deficit-transfer-current-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "deficit-transfer-current-work:actual-artifact"
+            ]
+          }
+        },
+        {
+          "actionId": "deficit-accept",
+          "before": null,
+          "after": {
+            "id": "deficit-accept",
+            "kind": "invoke",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "acceptHandover",
+            "evidenceRefs": [
+              "deficit-accept:actual-artifact"
+            ],
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "acceptHandover",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "handoverId": {
+                  "$result": {
+                    "actionId": "deficit-transfer",
+                    "pointer": "/response/effects/responsibility/ID"
+                  }
+                }
+              },
+              "provenance": {
+                "handoverId": "CONTEXT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "parent90-impossible-deficit-accept"
+            }
+          }
+        }
+      ],
+      "assertions": []
+    },
+    {
+      "subcaseId": "parent90-superseded",
+      "beforeActionIds": [
+        "setup",
+        "parent",
+        "child30",
+        "child60",
+        "receive90-event-document",
+        "receive90-event",
+        "receive90-provisional",
+        "receive90-match",
+        "receive90-canonical",
+        "receive90",
+        "child30-link-current-work",
+        "child30-link",
+        "child30-assessment-evaluation-work",
+        "child30-assessment-evaluate",
+        "child30-assessment",
+        "child30-close-current-work",
+        "child30-close",
+        "child60-link-current-work",
+        "child60-link",
+        "child60-assessment-evaluation-work",
+        "child60-assessment-evaluate",
+        "child60-assessment",
+        "child60-close-current-work",
+        "child60-close",
+        "parent-assessment-evaluation-work",
+        "parent-assessment-evaluate",
+        "parent-assessment",
+        "before-transfer-db-snapshot",
+        "before-transfer-db",
+        "followup",
+        "deficit-transfer",
+        "before-false-close-db-snapshot",
+        "before-false-close-db",
+        "false-close-current-work",
+        "false-close",
+        "rejected-db-snapshot",
+        "rejected-db",
+        "alternative-close-current-work",
+        "alternative-close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "parent",
+        "child30",
+        "child60",
+        "receive90-event-document",
+        "receive90-event",
+        "receive90-provisional",
+        "receive90-match",
+        "receive90-canonical",
+        "receive90",
+        "child30-link-current-work",
+        "child30-link",
+        "child30-assessment-evaluation-work",
+        "child30-assessment-evaluate",
+        "child30-assessment",
+        "child30-close-current-work",
+        "child30-close",
+        "child60-link-current-work",
+        "child60-link",
+        "child60-assessment-evaluation-work",
+        "child60-assessment-evaluate",
+        "child60-assessment",
+        "child60-close-current-work",
+        "child60-close",
+        "parent-assessment-evaluation-work",
+        "parent-assessment-evaluate",
+        "parent-assessment",
+        "before-transfer-db-snapshot",
+        "before-transfer-db",
+        "followup",
+        "deficit-transfer-current-work",
+        "deficit-transfer",
+        "deficit-accept",
+        "before-false-close-db-snapshot",
+        "before-false-close-db",
+        "false-close-current-work",
+        "false-close",
+        "rejected-db-snapshot",
+        "rejected-db",
+        "alternative-close-current-work",
+        "alternative-close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [
+        {
+          "actionId": "parent",
+          "before": {
+            "id": "parent",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "parent:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workType": "PURCHASE_ARRIVAL",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T02:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "period": {
+                  "start": "2026-10-05T09:00:00Z",
+                  "end": "2026-10-07T01:30:00Z",
+                  "endInclusive": true,
+                  "startInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluationTime": "2026-10-07T02:00:00Z",
+                "placeId": {
+                  "$alias": "W"
+                },
+                "eligibilityAction": "PHYSICAL_HELD",
+                "includeReservations": true,
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-parent90-superseded-parent",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workType": "USER",
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "period": "USER",
+                "eventKinds": "USER",
+                "distinctContributionScope": "USER",
+                "evidencePolicyVersion": "USER",
+                "evaluationTime": "USER",
+                "placeId": "CONTEXT",
+                "eligibilityAction": "USER",
+                "includeReservations": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "parent",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "parent:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workType": "PURCHASE_ARRIVAL",
+                "quantity": {
+                  "value": "100",
+                  "unit": "BOX"
+                },
+                "destinationId": {
+                  "$alias": "W"
+                },
+                "dueAt": "2026-10-07T02:00:00Z",
+                "endpoint": "ARRIVED",
+                "quantityMode": "CUMULATIVE_EVENT",
+                "period": {
+                  "start": "2026-10-05T09:00:00Z",
+                  "end": "2026-10-07T01:30:00Z",
+                  "endInclusive": true,
+                  "startInclusive": true
+                },
+                "eventKinds": [
+                  "CONFIRMED_RECEIPT"
+                ],
+                "distinctContributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                "evaluationTime": "2026-10-07T02:00:00Z",
+                "placeId": {
+                  "$alias": "W"
+                },
+                "eligibilityAction": "PHYSICAL_HELD",
+                "includeReservations": true,
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-parent90-superseded-parent",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workType": "USER",
+                "quantity": "USER",
+                "destinationId": "CONTEXT",
+                "dueAt": "USER",
+                "endpoint": "USER",
+                "quantityMode": "USER",
+                "period": "USER",
+                "eventKinds": "USER",
+                "distinctContributionScope": "USER",
+                "evidencePolicyVersion": "USER",
+                "evaluationTime": "USER",
+                "placeId": "CONTEXT",
+                "eligibilityAction": "USER",
+                "includeReservations": "USER",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "nextAction": "USER",
+                "nextCheckAt": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "deficit-transfer",
+          "before": {
+            "id": "deficit-transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "deficit-transfer:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$result": {
+                    "actionId": "followup",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "acceptanceEvidenceId": {
+                  "$alias": "DOC"
+                },
+                "quantity": {
+                  "value": "10",
+                  "unit": "BOX"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$result": {
+                    "actionId": "parent-assessment",
+                    "pointer": "/response/obligationId"
+                  }
+                },
+                "recipientId": {
+                  "$alias": "A"
+                },
+                "workId": {
+                  "$result": {
+                    "actionId": "parent",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "parent-assessment",
+                  "pointer": "/response/workRevision"
+                }
+              },
+              "commandIdempotencyKey": "T11-parent90-superseded-deficit-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "acceptanceEvidenceId": "CONTEXT",
+                "quantity": "USER",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "workId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "deficit-transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "deficit-transfer:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$result": {
+                    "actionId": "followup",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "quantity": "10",
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$result": {
+                    "actionId": "parent-assessment-evaluate",
+                    "pointer": "/response/effects/responsibility/assignments/0/ID"
+                  }
+                },
+                "recipientId": {
+                  "$alias": "A"
+                },
+                "workId": {
+                  "$result": {
+                    "actionId": "parent",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "expiresAt": "2026-10-08T09:00:00Z"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "deficit-transfer-current-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-parent90-superseded-deficit-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "quantity": "USER",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "workId": "CONTEXT",
+                "expiresAt": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "deficit-transfer-current-work",
+          "before": null,
+          "after": {
+            "id": "deficit-transfer-current-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "deficit-transfer-current-work:actual-artifact"
+            ]
+          }
+        },
+        {
+          "actionId": "deficit-accept",
+          "before": null,
+          "after": {
+            "id": "deficit-accept",
+            "kind": "invoke",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "acceptHandover",
+            "evidenceRefs": [
+              "deficit-accept:actual-artifact"
+            ],
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "acceptHandover",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "handoverId": {
+                  "$result": {
+                    "actionId": "deficit-transfer",
+                    "pointer": "/response/effects/responsibility/ID"
+                  }
+                }
+              },
+              "provenance": {
+                "handoverId": "CONTEXT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "parent90-superseded-deficit-accept"
+            }
+          }
+        }
+      ],
+      "assertions": []
+    },
+    {
+      "subcaseId": "wait-timeout",
+      "beforeActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "wait",
+        "advance",
+        "due-wait-advance",
+        "due-wait",
+        "due-wait-terminal",
+        "resume-without-proof-current-work",
+        "resume-without-proof",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "wait-original-work",
+        "wait-pin-goal",
+        "wait",
+        "advance",
+        "due-wait-advance",
+        "due-wait",
+        "due-wait-terminal",
+        "resume-without-proof-current-work",
+        "resume-without-proof",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [
+        {
+          "actionId": "wait",
+          "before": {
+            "id": "wait",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "wait:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "waitWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "waitWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "wait": {
+                  "reason": "수령 근거 대기",
+                  "target": {
+                    "$alias": "Q"
+                  },
+                  "resumePredicate": {
+                    "operator": "exists",
+                    "verifiedOccurrenceKind": "CONFIRMED_RECEIPT"
+                  },
+                  "verifier": {
+                    "$alias": "A"
+                  },
+                  "nextCheckAt": "2026-10-07T01:00:00Z",
+                  "overdueAction": "ESCALATE_SUPERVISOR"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-wait-timeout-wait",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "wait": "USER"
+              }
+            }
+          },
+          "after": {
+            "id": "wait",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "wait:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "waitWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "waitWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "wait": {
+                  "reason": "수령 근거 대기",
+                  "target": {
+                    "$alias": "Q"
+                  },
+                  "resumePredicate": {
+                    "operator": "exists",
+                    "property": "Receipt.quantity",
+                    "evidenceSelector": "VERIFIED_DISTINCT"
+                  },
+                  "verifier": {
+                    "$alias": "A"
+                  },
+                  "nextCheckAt": "2026-10-07T01:00:00Z",
+                  "overdueAction": "ESCALATE_SUPERVISOR"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "wait-pin-goal",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-wait-timeout-wait",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "wait": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "wait-original-work",
+          "before": null,
+          "after": {
+            "id": "wait-original-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$alias": "SOURCE"
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "wait-original-work:actual-artifact"
+            ]
+          }
+        },
+        {
+          "actionId": "wait-pin-goal",
+          "before": null,
+          "after": {
+            "id": "wait-pin-goal",
+            "kind": "invoke",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "reviseGoal",
+            "evidenceRefs": [
+              "wait-pin-goal:actual-artifact"
+            ],
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "reviseGoal",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "goal": {
+                  "quantityMode": "CUMULATIVE_EVENT",
+                  "targetQuantity": "10",
+                  "unit": "BOX",
+                  "endpoint": "ARRIVED",
+                  "dueAt": "2026-10-07T02:00:00Z",
+                  "timezone": "UTC",
+                  "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                  "evaluatorVersion": "core-v1",
+                  "scope": {
+                    "itemId": {
+                      "$alias": "P"
+                    }
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  },
+                  "periodStart": "2026-10-07T00:00:00Z",
+                  "periodEnd": "2026-10-07T02:00:00Z",
+                  "periodStartInclusive": true,
+                  "periodEndInclusive": true,
+                  "eventKind": "CONFIRMED_RECEIPT",
+                  "contributionScope": "CANONICAL_PHYSICAL_FULFILMENT",
+                  "deduplication": "CANONICAL_OCCURRENCE",
+                  "conditions": [
+                    {
+                      "id": "arrived"
+                    }
+                  ]
+                },
+                "reason": "기존10상자 도착 목표의 정의·시각·근거 계약을 명시한다"
+              },
+              "provenance": {
+                "workId": "CONTEXT",
+                "goal": "USER",
+                "reason": "USER"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "wait-original-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "wait-pin-goal"
+            }
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "assertionId": "resume-denied",
+          "before": {
+            "id": "resume-denied",
+            "op": "equals",
+            "source": {
+              "actionId": "resume-without-proof",
+              "pointer": "/response/outcome"
+            },
+            "expected": "REJECTED",
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "resume-without-proof:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "업무 상태의 독립 판정 wait-timeout. timeout-generated-arrival-or-approval의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "timeout-generated-arrival-or-approval"
+              ]
+            }
+          },
+          "after": {
+            "id": "resume-denied",
+            "op": "equals",
+            "source": {
+              "actionId": "resume-without-proof",
+              "pointer": "/response/outcome"
+            },
+            "expected": "HELD",
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "resume-without-proof:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "업무 상태의 독립 판정 wait-timeout. timeout-generated-arrival-or-approval의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "timeout-generated-arrival-or-approval"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "subcaseId": "unsupported-evaluator",
+      "beforeActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "draft",
+        "activate",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "draft",
+        "activate",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [],
+      "assertions": [
+        {
+          "assertionId": "activate-outcome",
+          "before": {
+            "id": "activate-outcome",
+            "op": "equals",
+            "source": {
+              "actionId": "activate",
+              "pointer": "/response/outcome"
+            },
+            "expected": "REJECTED",
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "activate:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "업무 상태의 독립 판정 unsupported-evaluator. unsupported-activation-effects의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "unsupported-activation-effects"
+              ]
+            }
+          },
+          "after": {
+            "id": "activate-outcome",
+            "op": "equals",
+            "source": {
+              "actionId": "activate",
+              "pointer": "/response/outcome"
+            },
+            "expected": "HELD",
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "activate:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "업무 상태의 독립 판정 unsupported-evaluator. unsupported-activation-effects의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "unsupported-activation-effects"
+              ]
+            }
+          }
+        },
+        {
+          "assertionId": "activate-denial-audit",
+          "before": {
+            "id": "activate-denial-audit",
+            "op": "count",
+            "source": {
+              "actionId": "after-db",
+              "pointer": "/data/rawRows/audit",
+              "where": {
+                "commandIdempotencyKey": "T11-unsupported-evaluator-activate",
+                "outcome": "REJECTED"
+              }
+            },
+            "expected": 1,
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "after-db:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "업무 상태의 독립 판정 unsupported-evaluator. unsupported-activation-effects의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "unsupported-activation-effects"
+              ]
+            }
+          },
+          "after": {
+            "id": "activate-denial-audit",
+            "op": "count",
+            "source": {
+              "actionId": "after-db",
+              "pointer": "/data/rawRows/audit",
+              "where": {
+                "commandIdempotencyKey": "T11-unsupported-evaluator-activate",
+                "outcome": "HELD"
+              }
+            },
+            "expected": 1,
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "after-db:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "업무 상태의 독립 판정 unsupported-evaluator. unsupported-activation-effects의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "unsupported-activation-effects"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "subcaseId": "cancel-after-shipment",
+      "beforeActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "sale",
+        "reserve",
+        "pick",
+        "dispatch",
+        "shipped-db-snapshot",
+        "shipped-db",
+        "close-with-duty",
+        "transfer",
+        "close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "sale",
+        "reserve",
+        "pick",
+        "dispatch",
+        "shipped-db-snapshot",
+        "shipped-db",
+        "close-with-duty",
+        "transfer-source-work",
+        "transfer-proposal",
+        "transfer",
+        "cancel-current-work",
+        "close",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [
+        {
+          "actionId": "transfer",
+          "before": {
+            "id": "transfer",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "transfer:actual-artifact"
+            ],
+            "actorRef": "B",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "targetWorkId": {
+                  "$alias": "TARGET"
+                },
+                "acceptanceEvidenceId": {
+                  "$alias": "TRANSFERPROPOSAL"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "assignmentId": {
+                  "$alias": "ROOT"
+                },
+                "recipientId": {
+                  "$alias": "B"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-cancel-after-shipment-transfer",
+              "evidenceRefs": [
+                {
+                  "$alias": "TRANSFERPROPOSAL"
+                }
+              ],
+              "provenance": {
+                "targetWorkId": "CONTEXT",
+                "acceptanceEvidenceId": "CONTEXT",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "transfer",
+            "kind": "invoke",
+            "actorRef": "B",
+            "route": "api",
+            "capabilityId": "acceptHandover",
+            "evidenceRefs": [
+              "transfer:actual-artifact"
+            ],
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "acceptHandover",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "handoverId": {
+                  "$result": {
+                    "actionId": "transfer-proposal",
+                    "pointer": "/response/effects/responsibility/ID"
+                  }
+                }
+              },
+              "provenance": {
+                "handoverId": "CONTEXT"
+              },
+              "expectedRevision": 0,
+              "commandIdempotencyKey": "T11-cancel-after-shipment-transfer"
+            }
+          }
+        },
+        {
+          "actionId": "close",
+          "before": {
+            "id": "close",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "close:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "closeWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "closeWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "reason": "CANCELLED",
+                "decisionEvidenceId": {
+                  "$alias": "DOC"
+                },
+                "reasonText": "출하 계약과 잔여 책임은 보존하며 업무 취소"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "transfer",
+                  "pointer": "/response/workRevision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-close",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "reason": "USER",
+                "decisionEvidenceId": "CONTEXT",
+                "reasonText": "USER"
+              }
+            }
+          },
+          "after": {
+            "id": "close",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "close:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "closeWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "closeWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "reason": "CANCELLED"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "cancel-current-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-close",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "reason": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "transfer-source-work",
+          "before": null,
+          "after": {
+            "id": "transfer-source-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$alias": "SOURCE"
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "transfer-source-work:actual-artifact"
+            ]
+          }
+        },
+        {
+          "actionId": "transfer-proposal",
+          "before": null,
+          "after": {
+            "id": "transfer-proposal",
+            "kind": "invoke",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "transferObligation",
+            "evidenceRefs": [
+              "transfer-proposal:actual-artifact"
+            ],
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "transferObligation",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "targetWorkId": {
+                  "$alias": "TARGET"
+                },
+                "assignmentId": {
+                  "$alias": "ASSIGN"
+                },
+                "recipientId": {
+                  "$alias": "B"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "expiresAt": "2026-10-08T09:00:00Z"
+              },
+              "provenance": {
+                "workId": "CONTEXT",
+                "targetWorkId": "CONTEXT",
+                "assignmentId": "CONTEXT",
+                "recipientId": "CONTEXT",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "expiresAt": "USER"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "transfer-source-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "transfer-proposal"
+            }
+          }
+        },
+        {
+          "actionId": "cancel-current-work",
+          "before": null,
+          "after": {
+            "id": "cancel-current-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$alias": "SOURCE"
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "cancel-current-work:actual-artifact"
+            ]
+          }
+        }
+      ],
+      "assertions": [
+        {
+          "assertionId": "recipient-authenticated-acceptance",
+          "before": {
+            "id": "recipient-authenticated-acceptance",
+            "op": "relationSet",
+            "source": {
+              "actionId": "after-db",
+              "pointer": "/data/rawRows/audit",
+              "where": {
+                "commandIdempotencyKey": "T11-cancel-after-shipment-transfer"
+              },
+              "field": [
+                "actorId",
+                "capabilityId",
+                "outcome"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$alias": "B"
+                },
+                "transferObligation",
+                "APPLIED"
+              ]
+            ],
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "after-db:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "실제 scoped grant를 가진 B의 공개 명령과 저장된 audit가 인수 수락을 확인한다. proposal Document나 acceptedById 문자열로 수락을 대체하지 않는다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "cancel-preservation"
+              ]
+            }
+          },
+          "after": {
+            "id": "recipient-authenticated-acceptance",
+            "op": "relationSet",
+            "source": {
+              "actionId": "after-db",
+              "pointer": "/data/rawRows/audit",
+              "where": {
+                "commandIdempotencyKey": "T11-cancel-after-shipment-transfer"
+              },
+              "field": [
+                "actorId",
+                "capabilityId",
+                "outcome"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$alias": "B"
+                },
+                "acceptHandover",
+                "APPLIED"
+              ]
+            ],
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "after-db:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "실제 scoped grant를 가진 B의 공개 명령과 저장된 audit가 인수 수락을 확인한다. proposal Document나 acceptedById 문자열로 수락을 대체하지 않는다.",
+            "oracleRef": {
+              "oracleId": "T11.work-transitions",
+              "observationNames": [
+                "cancel-preservation"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "subcaseId": "shared-distinct60",
+      "beforeActionIds": [
+        "setup",
+        "parent-one",
+        "parent-two",
+        "receive60-event-document",
+        "receive60-event",
+        "receive60-provisional",
+        "receive60-match",
+        "receive60-canonical",
+        "receive60",
+        "parent-one-link-current-work",
+        "parent-one-link",
+        "parent-two-link-current-work",
+        "parent-two-link",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "parent-one",
+        "parent-two",
+        "receive60-event-document",
+        "receive60-event",
+        "receive60-provisional",
+        "receive60-match",
+        "receive60-canonical",
+        "receive60",
+        "parent-one-link-current-work",
+        "parent-one-link",
+        "parent-two-link-current-work",
+        "parent-two-link",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [],
+      "assertions": [
+        {
+          "assertionId": "shared-scope-partition",
+          "before": {
+            "id": "shared-scope-partition",
+            "op": "relationSet",
+            "source": {
+              "actionId": "after-db",
+              "pointer": "/data/rawRows/contributions",
+              "field": [
+                "workId",
+                "quantity",
+                "physicalScope"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$result": {
+                    "actionId": "parent-one",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "30",
+                "serial-boxes-001-030"
+              ],
+              [
+                {
+                  "$result": {
+                    "actionId": "parent-two",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "30",
+                "serial-boxes-031-060"
+              ]
+            ],
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "after-db:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "공유 활동60을 부모 둘에30씩 배분하여120으로 복제하지 않는다. shared-distinct-contribution의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.dependency-and-followup",
+              "observationNames": [
+                "shared-distinct-contribution"
+              ]
+            }
+          },
+          "after": {
+            "id": "shared-scope-partition",
+            "op": "relationSet",
+            "source": {
+              "actionId": "after-db",
+              "pointer": "/data/rawRows/contributions",
+              "field": [
+                "workId",
+                "quantity",
+                "physicalRange"
+              ]
+            },
+            "expected": [
+              [
+                {
+                  "$result": {
+                    "actionId": "parent-one",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "30",
+                {
+                  "physicalScopeId": {
+                    "$alias": "Q"
+                  },
+                  "occurrenceId": {
+                    "$result": {
+                      "actionId": "receive60-canonical",
+                      "pointer": "/response/id"
+                    }
+                  },
+                  "startQuantity": "0",
+                  "endQuantity": "30",
+                  "unit": "BOX"
+                }
+              ],
+              [
+                {
+                  "$result": {
+                    "actionId": "parent-two",
+                    "pointer": "/response/workId"
+                  }
+                },
+                "30",
+                {
+                  "physicalScopeId": {
+                    "$alias": "Q"
+                  },
+                  "occurrenceId": {
+                    "$result": {
+                      "actionId": "receive60-canonical",
+                      "pointer": "/response/id"
+                    }
+                  },
+                  "startQuantity": "30",
+                  "endQuantity": "60",
+                  "unit": "BOX"
+                }
+              ]
+            ],
+            "requirementRefs": [
+              "D11"
+            ],
+            "evidenceRefs": [
+              "after-db:actual-artifact"
+            ],
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "oracleExplanation": "공유 활동60을 부모 둘에30씩 배분하여120으로 복제하지 않는다. shared-distinct-contribution의 독립 고정 기대값을 대조한다.",
+            "oracleRef": {
+              "oracleId": "T11.dependency-and-followup",
+              "observationNames": [
+                "shared-distinct-contribution"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "subcaseId": "closed-followup",
+      "beforeActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "temperature-document",
+        "temperature",
+        "followup",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "afterActionIds": [
+        "setup",
+        "before-db-snapshot",
+        "before-db",
+        "temperature-document",
+        "temperature",
+        "followup-original-work",
+        "followup",
+        "after-db-snapshot",
+        "after-db"
+      ],
+      "actions": [
+        {
+          "actionId": "followup",
+          "before": {
+            "id": "followup",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "followup:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createFollowup",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createFollowup",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "sourceOccurrenceId": {
+                  "$result": {
+                    "actionId": "temperature",
+                    "pointer": "/response/occurrenceId"
+                  }
+                },
+                "ownerId": {
+                  "$alias": "A"
+                },
+                "supervisorId": {
+                  "$alias": "supervisor"
+                },
+                "nextAction": "남은10상자 수령 확인",
+                "nextCheckAt": "2026-10-08T09:00:00Z",
+                "workId": {
+                  "$alias": "PARENT"
+                }
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-closed-followup-followup",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "sourceOccurrenceId": "CONTEXT",
+                "ownerId": "CONTEXT",
+                "supervisorId": "CONTEXT",
+                "nextAction": "USER",
+                "nextCheckAt": "USER",
+                "workId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "followup",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "followup:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "createFollowup",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "createFollowup",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "PARENT"
+                },
+                "sourceEventId": {
+                  "$result": {
+                    "actionId": "temperature",
+                    "pointer": "/response/id"
+                  }
+                },
+                "reason": "종료 뒤 원천 온도 관측의 대응 책임을 별도 업무에 연결한다",
+                "draft": {
+                  "itemId": {
+                    "$alias": "P"
+                  },
+                  "kind": "TEMPERATURE_REVIEW",
+                  "ownerId": {
+                    "$alias": "A"
+                  },
+                  "supervisorId": {
+                    "$alias": "supervisor"
+                  },
+                  "goal": {
+                    "quantityMode": "STATE_AT",
+                    "targetQuantity": "100",
+                    "unit": "BOX",
+                    "endpoint": "ARRIVED",
+                    "dueAt": "2026-10-07T02:00:00Z",
+                    "timezone": "UTC",
+                    "evidencePolicyVersion": "SYNTHETIC-policy-v1",
+                    "evaluatorVersion": "core-v1",
+                    "scope": {
+                      "itemId": {
+                        "$alias": "P"
+                      }
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "evaluationAt": "2026-10-07T02:00:00Z",
+                    "action": "PHYSICAL_HELD",
+                    "includeReserved": true,
+                    "conditions": [
+                      {
+                        "id": "held-at"
+                      }
+                    ]
+                  },
+                  "nextAction": "남은10상자 수령 확인",
+                  "nextCheckAt": "2026-10-08T09:00:00Z"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "followup-original-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-closed-followup-followup",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "sourceEventId": "CONTEXT",
+                "reason": "USER",
+                "draft": "USER"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "followup-original-work",
+          "before": null,
+          "after": {
+            "id": "followup-original-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$alias": "PARENT"
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "followup-original-work:actual-artifact"
+            ]
+          }
+        }
+      ],
+      "assertions": []
+    }
+  ]
+}

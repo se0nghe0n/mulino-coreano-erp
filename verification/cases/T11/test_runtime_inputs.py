@@ -11,7 +11,7 @@ import author_parent_ranges as parent
 from test_parent_ranges import blocks
 
 class RuntimeInputs(unittest.TestCase):
-    def setUp(self):self.old=layer.baseline();self.new=json.loads((HERE/'case.json').read_text())
+    def setUp(self):self.old=layer.baseline();self.new=layer.lifecycle_layer().restore(json.loads((HERE/'case.json').read_text()))
 
     def test_fixed_point_strict_inverse_and_complete_ledger(self):
         self.assertEqual(self.new,layer.apply(self.old));self.assertEqual(self.new,layer.apply(self.new))
@@ -22,7 +22,7 @@ class RuntimeInputs(unittest.TestCase):
         self.assertEqual(parent.baseline(),parent.restore(self.new))
 
     def test_110_assertion_bytes_all_fixtures_and_older_ledgers_unchanged(self):
-        self.assertEqual(blocks(layer.original_bytes('case.json').decode()),blocks((HERE/'case.json').read_text()))
+        self.assertEqual(blocks(layer.original_bytes('case.json').decode()),blocks(layer.lifecycle_layer().original('case.json').decode()))
         self.assertEqual(110,sum(len(s['assertions']) for s in self.new['subcases']))
         self.assertEqual([s for s in self.old['subcases'] if s['id'] not in layer.SELECTED],
                          [s for s in self.new['subcases'] if s['id'] not in layer.SELECTED])
@@ -121,7 +121,7 @@ class RuntimeInputs(unittest.TestCase):
             with self.assertRaises(ValueError):parent.restore(v)
 
     def test_feature_inverse_preserves_original_and_refuses_mutation(self):
-        text=(HERE/'scenario.feature').read_text();self.assertEqual(layer.feature(),text)
+        text=layer.lifecycle_layer().original('scenario.feature').decode();self.assertEqual(layer.feature(),text)
         self.assertEqual(layer.original_bytes('scenario.feature').decode(),layer.restore_feature(text))
         self.assertEqual(parent.restore_feature(text),parent.restore_feature(layer.restore_feature(text)))
         with self.assertRaises(ValueError):layer.restore_feature(text.replace('close-current-work','forged',1))

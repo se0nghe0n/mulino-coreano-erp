@@ -32,7 +32,7 @@ class T11ShortfallRemainingPostgresTest {
     };}
     @ParameterizedTest @ValueSource(strings={"ambiguous","nonquantity","unsupported"})
     void actualPublishedConditionMustBeUniqueSupportedAndExclusivelyQuantitative(String variant) throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-contract-"+variant,definition(variant))){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-contract-"+variant,definition(variant)))){
             w.through("receive90");assertEquals("APPLIED",w.results.get("receive90").path("response").path("outcome").asText(),w.actions.toPrettyString());
             assess(w);assertEquals("UNSATISFIED",w.results.get("parent-assessment-evaluate").path("response").path("assessment").path("outcome").asText());if(variant.equals("nonquantity")){var conditions=Json.parse(w.results.get("parent-assessment-evaluate").path("response").path("assessment").path("conditionsJson").asText());assertTrue(java.util.stream.StreamSupport.stream(conditions.spliterator(),false).anyMatch(c->c.path("conditionId").asText().equals("root.0.1")&&c.path("truth").path("state").asText().equals("UNSATISFIED")));}syntheticOpenGrant(w);
             var before=w.rows("mulino_work_read_ObligationReferences");var canonical=w.rows("mulino_evidence_CanonicalOccurrences");var moves=w.rows("mulino_inventory_QuantityMovements");
@@ -41,7 +41,7 @@ class T11ShortfallRemainingPostgresTest {
     }
     @ParameterizedTest @ValueSource(strings={"missing","unverified"})
     void actualMissingOrUnverifiedAssessmentDoesNotProveZeroOrTen(String state) throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-head-"+state)){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-head-"+state))){
             if(state.equals("missing")){
                 var draft=(ObjectNode)new org.mulino.verification.ReferenceResolver(w.results,w.aliases).resolve(w.action("parent").path("request"));draft.put("capabilityId","createDraft").put("commandIdempotencyKey",UUID.randomUUID().toString());var created=w.send("parent","A","/api/ontology/commands/createDraft",draft);assertEquals("APPLIED",created.path("outcome").asText(),created.toPrettyString());
                 var activate=draft.deepCopy().put("capabilityId","activateWork").put("commandIdempotencyKey",UUID.randomUUID().toString()).put("expectedRevision",created.path("revision").asInt());activate.set("slots",Json.object().put("workId",parent(w)));activate.set("subjectRefs",Json.array().add(Json.object().put("type","Work").put("id",parent(w))));assertEquals("APPLIED",w.send("activate-no-assessment","A","/api/ontology/commands/activateWork",activate).path("outcome").asText());assertTrue(w.rows("mulino_work_read_AssessmentReferences").stream().noneMatch(a->parent(w).equals(a.get("workid"))));
@@ -77,7 +77,7 @@ class T11ShortfallRemainingPostgresTest {
     }
     @ParameterizedTest @ValueSource(strings={"source","goal","policy","identity"})
     void currentInvalidationRetainsTransferredRootWithoutEffects(String change) throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-current-"+change)){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-current-"+change))){
             w.through("parent-assessment");syntheticOpenGrant(w);String target=transfer(w);var initial=roots(w);String root=initial.getFirst().get("id").toString();var assignments=w.rows("mulino_work_read_ObligationReferences").stream().filter(a->root.equals(a.get("rootid"))).toList();
             switch(change){
                 case "source"->{w.send("later","A","/__verification/runtime/clock",Json.object().put("instant","2026-10-07T02:00:00.000001Z"));var correction=original(w,"receive90-event").put("capabilityId","correctEvidence").put("commandIdempotencyKey",UUID.randomUUID().toString());((ObjectNode)correction.path("slots")).put("supersedesId",w.results.get("receive90-event").path("response").path("id").asText()).put("sourceVersion","2");assertEquals("APPLIED",w.send("source-correction","A","/api/ontology/records/correctEvidence",correction).path("outcome").asText());}
@@ -91,14 +91,14 @@ class T11ShortfallRemainingPostgresTest {
         }
     }
     @Test void changedActualDeficitPreservesTenAndTransferredOwner() throws Exception {
-        try(var w=new T11ParentHttp("parent90-cancelled","shortfall-actual-progress")){
+        try(var w=explicitOnly(new T11ParentHttp("parent90-cancelled","shortfall-actual-progress"))){
             w.through("parent-assessment");syntheticOpenGrant(w);String target=transfer(w);var initial=roots(w);var initialAssignments=w.rows("mulino_work_read_ObligationReferences").stream().filter(a->initial.getFirst().get("id").equals(a.get("rootid"))).toList();
             additionalFive(w);assess(w);var assessment=w.results.get("parent-assessment-evaluate").path("response").path("assessment");assertEquals("UNSATISFIED",assessment.path("outcome").asText());
             var facts=Json.parse(assessment.path("conditionsJson").asText()).get(0).path("inputs");BigDecimal recognized=BigDecimal.ZERO;for(var fact:facts)recognized=recognized.add(new BigDecimal(fact.path("value").asText()));assertEquals(0,new BigDecimal("95").compareTo(recognized));
             for(String quantity:List.of("5","10")){var r=request(w);((ObjectNode)r.path("slots")).put("quantity",quantity);var held=w.send("retain-for-"+quantity,"A","/api/ontology/commands/openObligation",r);assertEquals("HELD",held.path("outcome").asText(),held.toPrettyString());assertEquals(initial.getFirst().get("id"),held.path("responsibility").path("rootId").asText());assertTrue(held.path("effects").isEmpty());}
             assertEquals(initial,roots(w));var current=w.rows("mulino_work_read_ObligationReferences").stream().filter(a->initial.getFirst().get("id").equals(a.get("rootid"))).toList();assertEquals(initialAssignments,current);assertEquals(1,current.stream().filter(a->"OPEN".equals(a.get("status"))&&target.equals(a.get("workid"))).count());assertEquals(new BigDecimal("10.000000000000"),initial.getFirst().get("quantity"));
             assertEquals(2,w.rows("mulino_evidence_CanonicalOccurrences").size());assertEquals(2,w.rows("mulino_trade_receipt_Receipts").size());assertEquals(2,w.rows("mulino_inventory_QuantityMovements").size());assertEquals(2,w.rows("mulino_work_WorkContributions").size());assertEquals(0,new BigDecimal("95").compareTo(w.rows("mulino_trade_receipt_Receipts").stream().map(x->(BigDecimal)x.get("quantity")).reduce(BigDecimal.ZERO,BigDecimal::add)));
-            assertEquals(1,w.rows("mulino_work_read_ObligationReferences").stream().filter(a->"RECEIPT_UNALLOCATED".equals(a.get("kind"))&&new BigDecimal("90").compareTo((BigDecimal)a.get("quantity"))==0&&"OPEN".equals(a.get("status"))).count());
+            assertEquals(1,w.rows("mulino_work_read_ObligationReferences").stream().filter(a->"RECEIPT_UNALLOCATED".equals(a.get("kind"))&&new BigDecimal("90").compareTo((BigDecimal)a.get("quantity"))==0&&"RESOLVED".equals(a.get("status"))&&"VERIFIED_WORK_CONTRIBUTION_ALLOCATION".equals(a.get("basis"))).count());
         }
     }
 }
