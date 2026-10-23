@@ -586,3 +586,42 @@ T09 9개·T11 12개·T12 5개·T13 17개, 총43개 subcase의 병렬 실제
 빌드를 수행하고, 모든 실행 종료 뒤 원행·hash·누락·중복·후속 실패를
 대조한다. 기존 assertion392개와 partial fixture 한계를 유지한다.
 전체 profile gate와 현재 통합 Step는 열려 있다.
+
+## 2026-10-23 원행 분류와 후속 구현
+
+기준 실행의 non-PASS680개를 Haiku dynamic Workflow로 분류하고,
+coordinator가 419개 source hash와 pointer1,976개를 대조했다. 최종
+분류는 TEST_INPUT434·ADAPTER220·PRODUCT22·EXTERNAL_GATE4다.
+이는 기준 source1e6a6a52의 첫 실패 진단이며 현재 source의 인수 결과가
+아니다. [분류와 후속 실행](scenario-triage-20261023.md)에 원본 hash,
+정당한 null action36개와 후속 부분 실행을 기록했다.
+
+누적 목표 입력 통합 source d3d4c2df의 후속 실행은 3PASS·28FAIL·
+12NOT_RUN이다. T11은 실행 agent가 완료하지 못해 별도로 재실행 중이다.
+목표 활성화23개가 공통 정의 검증 실패를 드러내 후속 수정을 진행했다.
+
+T17 예약7개에 실물 범위 [0,30)의 startQuantity와 provenance를
+명시한 worker8d1bc8c6을 022c642a로 통합했다. assertion257개와
+선택 밖 action147개를 보존했다. coordinator의 Python 검사3개와
+T17 준비 검사가 통과했다. 실제 재실행 전에는 PASS로 집계하지 않는다.
+
+기본 fixture 정의의 capability manifest 누락8개와 미구현 선언1개를
+정합화한 workera0303696을 4cdda709로 통합했다. 실제 Spring 등록
+handler/query를 사용하는 PostgreSQL 검사4개에서 기존 위반9개가
+수정 후 VALID·문제0개로 바뀌었다. 생산 validator·evaluator의 거부
+규칙은 유지한다. recovery fixture28개는 동일 metadata만 중복 제거하고
+충돌을 계속 거부한다. getCommandResult 구현과 해당 case 인수는 여전히
+미완료이며 기본 fixture에서 가용한 기능으로 선언하지 않는다.
+
+모든 변경의 결합 검사와 Haiku 실제 재실행이 끝나기 전에는 현재
+통합 Step와 전체 profile gate를 닫지 않는다.
+
+T11 재실행도 source d3d4c2df에서 완료했다. 같은 source의 네 case43개는
+최종6PASS·37FAIL이고 actual action178개를 실행했다. 앞선 부분 실행의
+12NOT_RUN을 지우지 않고 새 report에 연결했다. 새 공통 정의 수정의
+결합 검사는 전체 harness588개·실제 backend 등록 검사4개와 prepare가
+모두 통과했다. 준비 수는41 case·802 subcase·24,248 assertion이다.
+로그는 `.local/resume-20261023/`의
+`harness-default-definition-integrated.log`,
+`default-definition-backend-integrated.log`,
+`prepare-default-definition-integrated.log`다.
