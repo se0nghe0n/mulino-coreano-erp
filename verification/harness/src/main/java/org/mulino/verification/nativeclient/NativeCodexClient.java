@@ -137,7 +137,7 @@ public final class NativeCodexClient implements AgentRunner.ActualClientPort {
         static final String CONFIG="""
             model = "gpt-6.1-sol"
             model_provider = "openai"
-            service_tier = "ultrafast"
+            service_tier = "priority"
             model_reasoning_effort = "high"
             forced_login_method = "chatgpt"
             cli_auth_credentials_store = "file"
@@ -169,7 +169,6 @@ public final class NativeCodexClient implements AgentRunner.ActualClientPort {
             in_app_local_automation = false
             daemon_auto_start = false
             unbounded_connection_retries = false
-            ultrafast_mode = true
             """;
         final Path root,home,workspace,binary;
         final String binaryHash;

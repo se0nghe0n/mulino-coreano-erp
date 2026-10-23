@@ -105,7 +105,7 @@ final class CodexAppServer implements AutoCloseable {
         } while (cursor != null);
         require(chosen != null,"EXACT_MODEL_UNAVAILABLE");
         boolean supported=false;for(JsonNode t:chosen.path("serviceTiers")) if(t.path("id").asText().equals(TIER)) supported=true;
-        require(supported,"ULTRAFAST_NOT_ADVERTISED");
+        require(supported,"REQUESTED_SERVICE_TIER_NOT_ADVERTISED");
         boolean effort=false;for(JsonNode e:chosen.path("supportedReasoningEfforts"))if(e.path("reasoningEffort").asText().equals("high"))effort=true;
         require(effort,"HIGH_EFFORT_NOT_ADVERTISED");
         var r=Json.object().put("authentication","chatgpt").put("requestedModel",MODEL).put("requestedServiceTier",TIER);

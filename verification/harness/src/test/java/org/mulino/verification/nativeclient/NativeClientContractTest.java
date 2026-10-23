@@ -117,7 +117,7 @@ class NativeClientContractTest {
         }
         var approval=policy.approval();
         assertEquals("gpt-6.1-sol",approval.path("modelExactId").asText());
-        assertEquals("ultrafast",approval.path("serviceTier").asText());
+        assertEquals("priority",approval.path("serviceTier").asText());
         assertFalse(approval.path("implementationModelCallsAllowed").asBoolean());
         assertEquals("0",approval.path("approvedCostCap").asText());
     }
@@ -151,8 +151,8 @@ class NativeClientContractTest {
                 notice('turn/completed',{'threadId':'thread','turn':{'id':'turn','status':'completed'}});continue
             if m=='account/read':r={'account':{'type':'apiKey' if scenario=='api' else 'chatgpt','planType':'pro'}}
             if m=='account/rateLimits/read':r={'rateLimits':{'credits':{'hasCredits':scenario=='credits','unlimited':False}}}
-            if m=='model/list':r={'data':[{'model':'gpt-6.1-sol','supportedReasoningEfforts':[{'reasoningEffort':'high'}],'serviceTiers':[] if scenario=='no-tier' else [{'id':'ultrafast'}]}]}
-            if m=='thread/start':r={'model':'gpt-6.1-sol','modelProvider':'openai','serviceTier':'priority' if scenario=='wrong-tier' else 'ultrafast','instructionSources':[],'thread':{'id':'thread'}}
+            if m=='model/list':r={'data':[{'model':'gpt-6.1-sol','supportedReasoningEfforts':[{'reasoningEffort':'high'}],'serviceTiers':[] if scenario=='no-tier' else [{'id':'priority'}]}]}
+            if m=='thread/start':r={'model':'gpt-6.1-sol','modelProvider':'openai','serviceTier':'ultrafast' if scenario=='wrong-tier' else 'priority','instructionSources':[],'thread':{'id':'thread'}}
             if m=='turn/start':
                 r={'turn':{'id':'turn'}}
                 if scenario=='early':tool()

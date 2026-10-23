@@ -19,6 +19,7 @@
 | 실제 T17 전체 | 27ec8cc3: native Haiku 15 subcase·257 assertions, 79 PASS·178 FAIL·미관찰0; 모든 subcase FAIL |
 | 최근 native 재실행 | 64054871: Haiku 14 node, 36 subcase 모두 필수 관찰 schema 오류로 FAIL; assertion 실행0·미관찰461, DB12개 정리. 업무 PASS/FAIL로 재분류하지 않는다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
+| 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
 
 Harness 수는 실행 횟수이며 상속된 observer 회귀의 반복 실행을 포함한다.
 80개 opt-in SKIP과 native raw gateComplete=false를 PASS로 바꾸지 않는다.
@@ -42,6 +43,8 @@ ACCEPTED_PENDING_EXTERNAL 응답(64054871)까지 통합했고 전체 backend를
 [T17 공개 조회](t17-public-world-read.md),
 [T11 실제 정정·재평가 제어](t11-deferred-reassessment.md),
 [관찰 wire 계약 보정](observer-measurement-schema.md)에 연결한다.
+[구독 client의 현재 Fast 설정](native-client-fast.md)은 실제 모델 인수와
+구별한다.
 최근 전체 harness 원로그·JUnit·source drift·DB 정리 증거는
 `.local/resume-20261023/world-deferred-combined/`에 보존한다.
 
