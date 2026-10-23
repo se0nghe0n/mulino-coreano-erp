@@ -11,7 +11,7 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | 과거08e2a7a5의827 PASS는 보존한다. 새 d0885a80 초기 실행은899개 중664 PASS·3 FAIL·232 ERROR, skip0·exit1이다. JWT 공개키 설정을 보완한 같은 source의15 suites·232개는 전부 PASS, source drift0·소유 DB9개와 임시 key 정리를 확인했다. 초기 실패를 별도 성공으로 덮지 않는다. |
+| Backend 전체 | d0885a80 초기 실행899개는664 PASS·3 FAIL·232 ERROR, skip0·exit1이었다. 같은 제품 bytes의 JWT 환경 보정232 PASS·witness40 PASS·rollback focused2 및 인접19 PASS를 testcase ID로 대조해 원래899개가 모두 PASS임을 확인했다. 초기 명령 exit1은 보존하고 개별 재실행의 결합 결과로 기록한다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
 | Harness 전체 | fa316f01: 1025 executions 중938 PASS·87 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
 | Prepare | fa316f01: 41 case·802 subcase·24304 assertions, PREPARED·preparationProblems0·exit0이다. 조건 검증44개를 추가했고 기존 업무 oracle은 유지했다. |
@@ -19,7 +19,7 @@
 | 최근 실제 T11 | f8bb11e9: 110 assertions 중35 PASS·4 FAIL·71 미관찰이다. |
 | 최근 실제 T17 | f8bb11e9: 257 assertions 중165 PASS·92 FAIL·미관찰0이다. |
 | 최근 native 재실행 | wf_88ab8831-3ac: 36 subcase 중11 PASS·25 FAIL, 461 assertions 중286 PASS·104 FAIL·71 미관찰이다. 실제 Haiku14 node·228 assistant records, 동일 product class330개와 소유 DB12개 부재를 대조했다. |
-| 현재 제품 통합 | Sales·T11 제품을 d0885a80까지, 조건 observer·receipt resolver·T11 selftest·원래10 조건 oracle·상충 근거 설치·witness grant 복원 검사를 fa316f01까지 통합했다. 정상/제한 인도의 자동 판정2개와 worker 실제 PG14·권한26 PASS를 대조했다. delivery rollback2개와 formal recall 입력은 별도 Sol/xhigh/priority writer가 수정한다. 새 결합 harness·prepare는 통과했고 Haiku용12개 tree·36 subcase·505 assertions는 준비만 완료했다. |
+| 현재 제품 통합 | 제품 d0885a80·조건/observer/witness fa316f01에 이어 typed rollback hook 수정을1f17ee35로 통합했다. 실제 의무 생성 직후의 rollback과 두 transaction 중복 oracle을 보존했고 제품 변경은 없다. formal recall 입력은 Sol/xhigh/priority writer가 수정한다. 새 결합 harness·prepare가 통과했고 Haiku controller에12개 tree·36 subcase·505 assertions의 native Workflow 실행을 위임했다. |
 | 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
@@ -101,7 +101,14 @@ fa316f01의 전체 harness·JUnit·source drift·생성 DB 정리 증거는
 `fix-until-done/condition-prepare/`에 있다. 이 경로의 기준도
 `.local/resume-20261024/`다. 새 Haiku 실행을 위한 원본461 ID·순서와
 추가44개 검증의 보존을12개 격리 tree에서 확인했다. 새 실제 결과는
-아직 NOT_RUN이며 이전 raw 보고서를 덮지 않는다.
+아직 NOT_RUN이며 이전 raw 보고서를 덮지 않는다. Haiku controller의
+위임 수락은 native Workflow 실행 완료가 아니다.
+typed hook의 두 실패는 제품의 실제10인자 호출을7인자 Mockito hook이
+잡지 못한 원인이었다. [rollback 수정](delivery-rollback-typed-duty-fix.md)의
+실제 PG RED2·수정 후2·인접19와 commit byte·소유 자원 정리를 대조했다.
+제품은 그대로이며 원래899 testcase의 최종 결합 결과는
+`.local/resume-20261024/fix-until-done/backend-cohort/proof.json`에 있다.
+이 파일의 `fullCommandPASS=false`와 최초 exit1을 보존한다.
 primary의 7개 변경 파일 일치·원본 case/database 보존과 규제 결합 검증은
 `.local/resume-20261024/atomic-regulatory-combined/`에 남겼다.
 처음 Docker socket을 찾지 못한 환경 오류도 보존했고 실제 OrbStack
