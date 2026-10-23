@@ -24,8 +24,8 @@ exit0이다. 원문 hash·두 로그·옛 계약은
 raw 단계에는 adapter가 나중에 붙이는 artifactRef가 없으므로, 그 단계의
 probe 오류도 별도로 보존하고 native wire 결과와 혼동하지 않는다.
 
-ObservationSourceRelationsPostgresTest의 모든 실제 PG capture가 이제
-전체 wire schema를 검사한다. fixture는 실제 JDBC 사실을 그대로 두고
+ObservationSourceRelationsPostgresTest의 공통 capture helper가 반환하는
+실제 PG 관찰은 이제 전체 wire schema를 검사한다. fixture는 실제 JDBC 사실을 그대로 두고
 실제로 저장한 test artifact의 참조만 연결한다. 새 반례는 필수 query
 필드 누락, 잘못된 boundValues 타입, query/snapshot의 미등록 속성을
 거부하는지 검사한다. 실제 PG 관계37개가 전체 wire schema 검사를

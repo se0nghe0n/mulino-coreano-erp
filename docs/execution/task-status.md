@@ -30,8 +30,8 @@ ACCEPTED_PENDING_EXTERNAL 응답(64054871)까지 통합했고 전체 backend를
 통과했다. 이전 선택 이름 오류로 미실행이던 RuntimePostgresTest7개도
 집중 결합28개와 전체807개에서 실행했다.
 새 native 실행에서 measurementMetadataQueries의 wire schema 등록 누락이
-드러나 모든 assertion이 미실행이었다. 계약 필드만 명시하고 실제 JDBC
-capture37개가 전체 schema를 검사하도록 보강했다. 같은 native 원문이
+드러나 모든 assertion이 미실행이었다. 계약 필드만 명시하고 실제 PG
+관계 검사37개에서 공통 관찰 helper의 전체 schema 검사를 보강했다. 같은 native 원문이
 옛 schema에서 거부되고 보정 schema에서 통과한다. 업무 oracle은 그대로이며
 새 기준선의 native 재실행이 남아 있다.
 
