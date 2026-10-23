@@ -96,7 +96,30 @@ public class WorkReadHandler implements QueryHandler {
   }
   return out;
  }
- private List<Map<String,Object>> linked(DomainContext c,String entity,Set<String> ids){return repository.rows(entity,c).stream().filter(r->ids.contains(String.valueOf(r.get("workId")))).map(r->{var data=new LinkedHashMap<String,Object>(r);if(entity.equals("GoalReferences")){if(data.get("slotsJson")!=null)data.put("slots",decode(data.remove("slotsJson")));if(data.get("provenanceJson")!=null)data.put("provenance",decode(data.remove("provenanceJson")));data.put("scope",decode(data.remove("scopeJson")));}if(entity.equals("AssessmentReferences")&&data.get("conditionsJson")!=null)data.put("conditionResults",decodeAny(data.remove("conditionsJson")));return (Map<String,Object>)data;}).toList();}
+ private List<Map<String,Object>> linked(DomainContext c,String entity,Set<String> ids){
+  var snapshots=new HashMap<String,List<Map<String,Object>>>();
+  return repository.rows(entity,c).stream().filter(r->ids.contains(String.valueOf(r.get("workId")))).map(r->{
+   var data=new LinkedHashMap<String,Object>(r);
+   if(entity.equals("GoalReferences")){if(data.get("slotsJson")!=null)data.put("slots",decode(data.remove("slotsJson")));if(data.get("provenanceJson")!=null)data.put("provenance",decode(data.remove("provenanceJson")));data.put("scope",decode(data.remove("scopeJson")));}
+   if(entity.equals("AssessmentReferences")&&data.get("conditionsJson")!=null){
+    data.put("conditionResults",decodeAny(data.remove("conditionsJson")));
+    if(assessmentRead.getIfAvailable()!=null){
+     var candidates=snapshots.computeIfAbsent(r.get("workId").toString(),id->assessmentSnapshots(c,id)).stream()
+       .filter(s->Objects.equals(r.get("ID"),s.get("assessmentId"))).toList();
+     if(candidates.size()>1)throw new IllegalStateException("Ambiguous immutable assessment envelope");
+     if(candidates.size()==1){
+      var stored=candidates.getFirst();
+      if(!Objects.equals(stored.get("organizationId"),r.get("organizationId"))||!Objects.equals(stored.get("workId"),r.get("workId"))||!Objects.equals(stored.get("goalId"),r.get("goalId"))
+        ||!Objects.equals(stored.get("contentHash"),r.get("inputSnapshotHash"))||!Objects.equals(stored.get("contentHash"),com.mulino.domain.definitions.DefinitionRepository.sha256(stored.get("contentJson").toString())))
+       throw new IllegalStateException("Invalid immutable assessment envelope binding");
+      var envelope=(Map<?,?>)decode(stored.get("contentJson"));
+      if(envelope.get("publicConditions") instanceof List<?> authored)data.put("conditionResults",authored);
+     }
+    }
+   }
+   return (Map<String,Object>)data;
+  }).toList();
+ }
   private List<Map<String,Object>> assessmentSnapshots(DomainContext c,String workId){try{return assessmentRead.getIfAvailable().snapshots(c,workId);}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;return List.of();}}
   private Object decodeAny(Object value){try{return json.readValue(String.valueOf(value),Object.class);}catch(Exception failure){throw new IllegalStateException("Invalid assessment condition results",failure);}}
   private List<Map<String,Object>> obligations(DomainContext c,Set<String> ids){return linked(c,"ObligationReferences",ids).stream().map(r->{Map<String,Object> result=new LinkedHashMap<>(r);result.put("scope",decode(result.remove("scopeJson")));result.put("responsibleWorkId",result.get("workId"));return result;}).toList();}

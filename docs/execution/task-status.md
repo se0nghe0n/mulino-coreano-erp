@@ -1091,3 +1091,13 @@ asset checks12개가 PASS했다. 원본110 assertions·fixture12개·기존
 grants와 ledger는 보존했다. parent 세 변형의 부족10 생성 경계는
 OPEN이며 기존 slot findings414개도 숨기지 않았다.
 [T11 실제 입력 계약](t11-runtime-input-contracts.md)을 따른다.
+
+공통 evidence capture의7f11ee73·86309e9a를29e724f5·3ef1b35d에
+통합했다. 실제 캡처 행과 평가별 불변 envelope를 분리하며 과거 평가를
+backfill하지 않는다. coordinator는 getWork의 인가된 authored 조건과
+observer의 원래 asOf 전달도 연결했다. backend 집중6개가 PASS했다.
+새 getWork 검사 fixture의 독립 inventory 권한 누락 오류는 원로그에
+보존한 뒤 해당 새 fixture만 보완했다. 전체 결합 검증은 진행 중이다.
+[공통 캡처 기록](shared-evidence-capture.md)을 따른다.
+직접 수령 목표 기여와 WorkContributions의 원천 불일치, 실제
+INITIAL_BALANCE1과 원래 movement0 기대의 차이는 그대로 OPEN이다.

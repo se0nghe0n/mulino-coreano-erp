@@ -137,13 +137,25 @@ class SharedCaptureAssessmentPostgresTest {
   insert("mulino_identity_Memberships",row("organizationId",org,"ID",id(),"actorId",actor,"validFrom",from,"validUntil",until));
   insert("mulino_identity_Grants",row("organizationId",org,"ID",grant,"actorId",actor,"delegatorId",actor,"validFrom",from,"validUntil",until));
   for(var scope:Map.of("WORK",work,"TARGET",work,"ITEM",item).entrySet())insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grant,"scopeKind",scope.getKey(),"scopeId",scope.getValue()));
-  insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","getAssessment","scopeKind","ORGANIZATION","scopeId",org,"validFrom",from,"validUntil",until));
-  insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId","getAssessment"));insert("mulino_identity_AuthorityFences",row("organizationId",org,"actorId",actor,"revision",1));
+  for(String capability:List.of("getAssessment","getWork")){
+   insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId",capability,"scopeKind","ORGANIZATION","scopeId",org,"validFrom",from,"validUntil",until));
+   insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId",capability));
+  }
+  insert("mulino_identity_AuthorityFences",row("organizationId",org,"actorId",actor,"revision",1));
+  // The public getWork world also reads inventory; its authority stays separate.
+  String inventoryGrant=id();
+  insert("mulino_identity_Grants",row("organizationId",org,"ID",inventoryGrant,"actorId",actor,"delegatorId",actor,"validFrom",from,"validUntil",until));
+  for(var scope:Map.of("TARGET",item,"ITEM",item).entrySet())insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",inventoryGrant,"scopeKind",scope.getKey(),"scopeId",scope.getValue()));
+  insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId","getInventory","scopeKind","ORGANIZATION","scopeId",org,"validFrom",from,"validUntil",until));
+  insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",inventoryGrant,"capabilityId","getInventory"));
   var jwt=Jwt.withTokenValue("local-capture-test").header("alg","RS256").issuer("https://evaluation.invalid").subject(actor).claim("organizationId",org).build();SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt,List.of()));
   java.util.function.Supplier<Map<String,Object>> read=()->runtime.requestContext().run(c->{return queries.query(new QueryRequest("getAssessment",assessed.get("ID").toString(),Map.of(),Map.of(),50,null,null,t,t.plusSeconds(1000),null));});
+  java.util.function.Supplier<Map<String,Object>> readWork=()->runtime.requestContext().run(c->{return queries.query(new QueryRequest("getWork",work,Map.of(),Map.of(),50,null,null,t,t.plusSeconds(1000),null));});
   try{
    var data=(Map<?,?>)read.get().get("data");assertEquals("100",data.get("evaluatedQuantity"));assertEquals("BOX",data.get("unit"));assertEquals(1,((List<?>)data.get("conditionResults")).size());assertNotNull(data.get("evidenceCaptureId"));
+   var workData=(Map<?,?>)readWork.get().get("data");var linked=(List<?>)workData.get("assessments");assertEquals(1,linked.size());assertEquals(data.get("conditionResults"),((Map<?,?>)linked.getFirst()).get("conditionResults"));
    jdbc.update("UPDATE mulino_identity_GrantScopes SET scopeId=? WHERE organizationId=? AND grantId=? AND scopeKind='ITEM'",id(),org,grant);assertEquals("FORBIDDEN",assertThrows(DomainError.class,read::get).code());
+   assertEquals("FORBIDDEN",assertThrows(DomainError.class,readWork::get).code());
   }finally{SecurityContextHolder.clearContext();}
  }
  @AfterAll static void cleanupSharedCaptureFixture() throws Exception {

@@ -78,7 +78,8 @@ final class ScenarioJdbcObservation {
             }
             Map<String,ArrayNode> cache=new HashMap<>();Map<String,JsonNode> commandCache=new HashMap<>();
             Map<String,ObjectNode> statements=new HashMap<>();
-            var projection=new ScenarioObservationProjection(c,root,orgs,items,works,lots,knownAt);
+            var projection=new ScenarioObservationProjection(c,root,orgs,items,works,lots,knownAt,
+                OffsetDateTime.parse(Json.required(request,"asOf")));
             for(JsonNode requested:request.path("sources")) {
                 String name=requested.asText();JsonNode tables=sources.path(name);var rows=Json.array();var queries=Json.array();
                 for(JsonNode t:tables) {

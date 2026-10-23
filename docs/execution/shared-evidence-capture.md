@@ -95,6 +95,13 @@ PENDING projection은 fail-closed로 생략한다.
 
 아래 두 파일은 소유권 밖이어서 수정하지 않았다.
 
+coordinator는 통합 시 아래 두 hook을 연결했다. getWork는 기존
+getAssessment 인가를 통과한 snapshot의 조직·Work·Goal·hash를 검증한
+후에만 authored 조건을 사용한다. 새 공개 권한이나 read 면을 추가하지
+않는다. 실제 PG에서 getWork와 getAssessment의 조건 일치와 ITEM 권한
+제거 후 양쪽 거부를 확인했다. observer PG 회귀에는 원래 capture
+진입점에서 요청 asOf가 전달되는지도 추가했다. 결합 검증은 진행 중이다.
+
 1. `ScenarioJdbcObservation.capture`에서 projection 생성 시 기존 인자 뒤에
    `OffsetDateTime.parse(Json.required(request,"asOf"))`를 넘긴다.
    새 overload가 이를 받아 PENDING의 effective-time fence를 적용한다.
