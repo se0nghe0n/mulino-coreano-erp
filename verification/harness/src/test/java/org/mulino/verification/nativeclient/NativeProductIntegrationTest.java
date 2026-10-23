@@ -76,14 +76,34 @@ class NativeProductIntegrationTest {
             var generator=KeyPairGenerator.getInstance("RSA");generator.initialize(2048);
             Path key=tmp.resolve("private.pem");Files.writeString(key,"-----BEGIN PRIVATE KEY-----\n"+Base64.getEncoder().encodeToString(generator.generateKeyPair().getPrivate().getEncoded())+"\n-----END PRIVATE KEY-----");
             var config=new ActualConfiguration(URI.create("http://127.0.0.1:"+server.getAddress().getPort()),"jdbc:postgresql://127.0.0.1:1/unused","u","p",key,"issuer","aud","commit");
-            var transport=new NativeMcpTransport(config,new NativeIntegrationEvidence(root));var actor=Json.object().put("issuer","issuer").put("audience","aud").put("subject","subject").put("organizationAlias","org");
-            var listed=transport.send("list","tools/list",null,Json.object(),actor,Json.object());
+            var evidence=new NativeIntegrationEvidence(root);var transport=new NativeMcpTransport(config,evidence);var actor=Json.object().put("issuer","issuer").put("audience","aud").put("subject","subject").put("organizationAlias","org");
+            // This peer has no server observer. Inspect the immutable diagnostic after the intentional fail-closed send;
+            // constructing a Capture here exercises raw helpers only and is not authenticated backend evidence.
+            java.util.function.Function<String,NativeMcpTransport.Capture> savedCapture=action->{
+                try(var paths=Files.walk(root.resolve("verification/harness/target/native-integration"))) {
+                    for(Path path:paths.filter(p->p.getFileName().toString().startsWith("mcp-")&&p.toString().endsWith(".json")).toList()) {
+                        JsonNode saved=Json.read(path);if(!action.equals(saved.path("actionId").asText()))continue;
+                        assertEquals("UNAVAILABLE",saved.path("authenticatedActorStatus").asText());
+                        assertEquals("SERVER_CAPTURE_ABSENT",saved.path("missingObservation").asText());
+                        return new NativeMcpTransport.Capture(saved.path("request"),saved.path("response"),saved.path("httpStatus").asInt(),evidence.descriptor(path));
+                    }
+                    throw new AssertionError("Missing saved raw transport diagnostic");
+                }catch(java.io.IOException failure){throw new java.io.UncheckedIOException(failure);}
+            };
+            String listAction="list-"+UUID.randomUUID();
+            assertEquals("SERVER_CAPTURE_ABSENT",assertThrows(IllegalStateException.class,()->transport.send(listAction,"tools/list",null,Json.object(),actor,Json.object())).getMessage());
+            var listed=savedCapture.apply(listAction);assertEquals(request.get(),listed.request());
             assertEquals(listed.response().path("result").path("tools").get(0).path("inputSchema"),transport.tools(listed).get(0).path("inputSchema"));
             var arguments=Json.object().put("id","verbatim-user-id");
-            var rejected=transport.send("call","tools/call","getObject",arguments,actor,Json.object().put("installationId","i"));
+            String callAction="call-"+UUID.randomUUID();
+            assertEquals("SERVER_CAPTURE_ABSENT",assertThrows(IllegalStateException.class,()->transport.send(callAction,"tools/call","getObject",arguments,actor,Json.object().put("installationId","i"))).getMessage());
+            var rejected=savedCapture.apply(callAction);assertEquals(request.get(),rejected.request());
             assertEquals(arguments,request.get().path("params").path("arguments"));assertFalse(NativeMcpTransport.nativeReply(rejected).path("success").asBoolean());
+            assertTrue(rejected.response().path("result").path("isError").asBoolean());
+            assertEquals("typed rejection",rejected.response().path("result").path("content").get(0).path("text").asText());
+            assertEquals("typed rejection",NativeMcpTransport.nativeReply(rejected).path("contentItems").get(0).path("text").asText());
             String saved=Files.readString(root.resolve(rejected.artifact().path("path").asText()));
-            assertFalse(saved.contains(bearer.get()));assertFalse(saved.contains("BEGIN PRIVATE KEY"));assertTrue(saved.contains("NOT_IMPLEMENTED"));
+            assertFalse(saved.contains(bearer.get()));assertFalse(saved.contains("BEGIN PRIVATE KEY"));assertTrue(saved.contains("SERVER_CAPTURE_ABSENT"));
             assertThrows(IllegalStateException.class,()->transport.send("call","tools/call","getObject",arguments,actor.deepCopy().put("issuer","unbound"),Json.object()));
         } finally {server.stop(0);}
     }
