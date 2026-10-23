@@ -149,7 +149,7 @@ class T17SourceFactsPostgresTest {
     }
     @Test void unsupportedSlotsAreNotBusinessGuardAcceptance()throws Exception {
         for(String cap:List.of("reserveQuantity","replaceAllocation","releaseAllocation","placeHold")){
-            String key=switch(cap){case "reserveQuantity"->"FEFOExceptionReason";case "replaceAllocation"->"evidenceId";case "releaseAllocation"->"reason";default->"cargoScopeId";};
+            String key="unsupportedFulfillmentSlot";
             var denied=sources.request(cap,Json.object().put(key,"original unsupported field"),1);
             assertEquals("TYPE_INVALID",denied.path("error").path("code").asText(),denied.toPrettyString());
         }
