@@ -17,6 +17,8 @@ entity ProposalRevisions {
  createdAt:Timestamp not null; effectiveAt:Timestamp not null;
 }
 entity Approvals {
+ // NULL only represents historical approvals whose original policy was not stored.
+ consumptionPolicy:String(40);
  key organizationId:UUID; key ID:UUID; proposalId:UUID not null; proposalRevision:Integer not null;
  proposalHash:String(64) not null; approverId:UUID not null; policyHash:String(64) not null;
  decision:String(24) not null; conditionsJson:LargeString not null;

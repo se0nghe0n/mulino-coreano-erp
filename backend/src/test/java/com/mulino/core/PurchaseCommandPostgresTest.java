@@ -65,7 +65,7 @@ class PurchaseCommandPostgresTest {
     insert("mulino_identity_ExternalIdentities",row("organizationId",org,"ID",id(),"actorId",actor,"issuer","https://mulino.local.invalid","subject","writer-a","organizationAlias",org));
     insert("mulino_identity_Memberships",row("organizationId",org,"ID",id(),"actorId",actor,"validFrom",Timestamp.from(Instant.now().minusSeconds(3600)),"validUntil",Timestamp.from(Instant.now().plusSeconds(3600))));
     String grant=id();insert("mulino_identity_Grants",row("organizationId",org,"ID",grant,"actorId",actor,"delegatorId",actor,"validFrom",Timestamp.from(Instant.now().minusSeconds(3600)),"validUntil",Timestamp.from(Instant.now().plusSeconds(3600))));
-    for(String cap:List.of("getObject","searchObjects","getWork","searchWorks","getInventory","getEvidence","getAssessment","getObligations","getDefinition","createDraft","createWork","cancelDraft","reviseGoal")){
+    for(String cap:List.of("getPurchase","getObject","searchObjects","getWork","searchWorks","getInventory","getEvidence","getAssessment","getObligations","getDefinition","createDraft","createWork","cancelDraft","reviseGoal")){
       insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId",cap,"scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(Instant.now().minusSeconds(3600)),"validUntil",Timestamp.from(Instant.now().plusSeconds(3600))));
       insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId",cap));
     }
@@ -156,5 +156,79 @@ class PurchaseCommandPostgresTest {
 
  @Test void ordinaryHumanCannotCreateManagerDecision(){var p=propose();jdbc.update("DELETE FROM mulino_identity_ManagementAuthorities WHERE organizationId=?",org);var result=approve(p,"APPROVE");assertEquals("REJECTED",result.get("outcome"));assertEquals(0,count("mulino_trade_purchase_Approvals"));assertEquals(0,count("mulino_trade_purchase_Orders"));assertEquals(0,count("mulino_runtime_Outbox"));}
  @Test void supplierDocumentAloneCannotCreateAcceptedCommitment(){var p=propose();var order=dispatch(p,approve(p,"APPROVE"));var result=purchase("recordSupplierReply",1,row("purchaseId",order.get("orderId"),"reply","ACCEPT","proposedQuantity",Map.of("value","100","unit","BOX"),"evidence",document),id());assertEquals("HELD",result.get("outcome"));assertEquals(0,count("mulino_trade_purchase_SupplierReplies"));assertEquals("DISPATCH_PENDING",jdbc.queryForObject("SELECT status FROM mulino_trade_purchase_OrderLines WHERE organizationId=?",String.class,org));assertEquals(1,count("mulino_runtime_Outbox"));assertEquals(0,count("mulino_trade_purchase_ReceiptCredits"));}
+
+  Map<String,Object> approvalSlots(Map<String,Object> p) {
+    return row("proposalId",p.get("proposalId"),"proposalHash",p.get("proposalHash"),
+        "decision","APPROVE","conditions",List.of(),"validUntil",Instant.now().plusSeconds(3600).toString());
+  }
+  Map<String,Object> dispatchSlots(Map<String,Object> p,Map<String,Object> a) {
+    return row("proposalId",p.get("proposalId"),"proposalHash",p.get("proposalHash"),
+        "approvalId",a.get("approvalId"),"channel","SYNTHETIC_SUPPLIER","externalOperationId",id());
+  }
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.ValueSource(booleans={true,false})
+  void explicitAndDefaultPolicyArePersistedAndReadFromBothEntrypoints(boolean explicit) {
+    var p=propose();var slots=approvalSlots(p);
+    if(explicit)slots.put("consumptionPolicy",Map.of("value","SINGLE_ORDER_REVISION","provenance","USER"));
+    var a=purchase("approvePurchase",1,slots,id());assertEquals("APPLIED",a.get("outcome"),a.toString());
+    assertEquals("SINGLE_ORDER_REVISION",jdbc.queryForObject("SELECT consumptionPolicy FROM mulino_trade_purchase_Approvals WHERE ID=?",String.class,a.get("approvalId")));
+    for(String operation:List.of("getPurchase","getObject")) {
+      var input=row("id",p.get("proposalId"),"scope",Map.of("organizationId",org),"asOf",Instant.now().plusSeconds(60).toString(),"knownAt",Instant.now().plusSeconds(60).toString());
+      if(operation.equals("getObject"))input.put("scope",Map.of("organizationId",org,"objectType","PurchaseProposal"));
+      var response=runtime.requestContext().run(c->{return queries.query(QueryRequests.parse(operation,input));});
+      assertTrue(response.toString().contains("consumptionPolicy=SINGLE_ORDER_REVISION"),response.toString());
+    }
+    assertThrows(Exception.class,()->jdbc.update("UPDATE mulino_trade_purchase_Approvals SET consumptionPolicy=NULL WHERE ID=?",a.get("approvalId")));
+    assertEquals("APPLIED",dispatch(p,a).get("outcome"));
+  }
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.ValueSource(strings={"REUSABLE","SINGLE_GOAL_REVISION","", "single_order_revision"})
+  void unsupportedPolicyNeverCreatesApprovalOrEffects(String value) {
+    var p=propose();var slots=approvalSlots(p);slots.put("consumptionPolicy",value);
+    assertEquals("REJECTED",purchase("approvePurchase",1,slots,id()).get("outcome"));
+    assertEquals(0,count("mulino_trade_purchase_Approvals"));assertEquals(0,count("mulino_trade_purchase_Orders"));assertEquals(0,count("mulino_runtime_Outbox"));
+  }
+  @Test void missingHistoricalPolicyRequiresNewApproval() {
+    var p=propose();var a=approve(p,"APPROVE");
+    // Simulate an immutable pre-V38 row; the separate migration test proves preservation.
+    jdbc.execute("ALTER TABLE mulino_trade_purchase_Approvals DISABLE TRIGGER purchase_approvals_immutable");
+    try {jdbc.update("UPDATE mulino_trade_purchase_Approvals SET consumptionPolicy=NULL WHERE ID=?",a.get("approvalId"));}
+    finally {jdbc.execute("ALTER TABLE mulino_trade_purchase_Approvals ENABLE TRIGGER purchase_approvals_immutable");}
+    int stock=count("mulino_inventory_QuantitySegments");var denied=dispatch(p,a);
+    assertEquals("HELD",denied.get("outcome"));assertEquals("APPROVAL_CONSUMPTION_POLICY_UNSUPPORTED",((Map<?,?>)denied.get("error")).get("code"));
+    assertEquals(0,count("mulino_trade_purchase_Orders"));assertEquals(0,count("mulino_runtime_Outbox"));assertEquals(stock,count("mulino_inventory_QuantitySegments"));
+    assertEquals("APPLIED",dispatch(p,approve(p,"APPROVE")).get("outcome"));
+  }
+  @Test void dispatchReplayAndNewKeysConsumeOrderRevisionOnlyOnceAndRequireCurrentGrant() {
+    var p=propose();var a=approve(p,"APPROVE");var slots=dispatchSlots(p,a);String key=id();
+    var first=purchase("dispatchPurchaseOrder",1,slots,key);assertEquals("APPLIED",first.get("outcome"));
+    assertEquals(first,purchase("dispatchPurchaseOrder",1,slots,key));
+    assertEquals("CONFLICT",purchase("dispatchPurchaseOrder",1,dispatchSlots(p,a),id()).get("outcome"));
+    var newApproval=approve(p,"APPROVE");assertEquals("CONFLICT",dispatch(p,newApproval).get("outcome"));
+    assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_runtime_Outbox"));
+    jdbc.update("UPDATE mulino_identity_Grants SET revokedAt=CURRENT_TIMESTAMP WHERE organizationId=?",org);
+    assertEquals("REJECTED",purchase("dispatchPurchaseOrder",1,slots,key).get("outcome"));
+    assertEquals(1,count("mulino_trade_purchase_Orders"));
+  }
+  @Test void concurrentDispatchKeysCreateOneOrderAndOutbox() throws Exception {
+    var p=propose();var a=approve(p,"APPROVE");var gate=new java.util.concurrent.CountDownLatch(1);
+    try(var executor=java.util.concurrent.Executors.newFixedThreadPool(2)) {
+      var futures=new ArrayList<java.util.concurrent.Future<Map<String,Object>>>();
+      for(int n=0;n<2;n++)futures.add(executor.submit(()->{login();try {assertTrue(gate.await(10,java.util.concurrent.TimeUnit.SECONDS));return dispatch(p,a);}finally{clear();}}));
+      gate.countDown();var outcomes=new ArrayList<String>();
+      for(var future:futures)outcomes.add(future.get(30,java.util.concurrent.TimeUnit.SECONDS).get("outcome").toString());
+      assertEquals(1,Collections.frequency(outcomes,"APPLIED"),outcomes.toString());assertEquals(1,Collections.frequency(outcomes,"CONFLICT"),outcomes.toString());
+    }
+    assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_runtime_Outbox"));
+  }
+  @Test void rolledBackDispatchDoesNotConsumeApproval() {
+    var p=propose();var a=approve(p,"APPROVE");var slots=dispatchSlots(p,a);String key=id();
+    runtime.requestContext().run(c->{new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->{
+      assertEquals("APPLIED",purchase("dispatchPurchaseOrder",1,slots,key).get("outcome"));tx.setRollbackOnly();return null;
+    });});
+    assertEquals(0,count("mulino_trade_purchase_Orders"));assertEquals(0,count("mulino_runtime_Outbox"));
+    assertEquals("APPLIED",purchase("dispatchPurchaseOrder",1,slots,key).get("outcome"));
+    assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_runtime_Outbox"));
+  }
 
 }

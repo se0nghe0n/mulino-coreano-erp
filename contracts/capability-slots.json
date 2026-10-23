@@ -71,11 +71,13 @@
     "approvePurchase": {
       "slots": [
         "conditions",
+        "consumptionPolicy",
         "decision",
         "proposalHash",
         "proposalId",
         "validUntil"
-      ]
+      ],
+      "note": "consumptionPolicy accepts SINGLE_ORDER_REVISION only; omission explicitly defaults to SINGLE_ORDER_REVISION. The immutable approval permits one order for its exact proposal revision, with current authority and policy checked at dispatch. Historical missing policy requires a new approval."
     },
     "approveRecall": {
       "slots": [
