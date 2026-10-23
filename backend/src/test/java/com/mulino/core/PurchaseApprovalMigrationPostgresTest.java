@@ -22,7 +22,7 @@ class PurchaseApprovalMigrationPostgresTest {
         }
         s.execute("SET session_replication_role = origin");
       }
-      var flyway=Flyway.configure().dataSource(pg.getJdbcUrl(),pg.getUsername(),pg.getPassword()).load();
+      var flyway=Flyway.configure().dataSource(pg.getJdbcUrl(),pg.getUsername(),pg.getPassword()).target("38").load();
       assertEquals(1,flyway.migrate().migrationsExecuted);flyway.validate();assertEquals(0,flyway.migrate().migrationsExecuted);
       try(var c=DriverManager.getConnection(pg.getJdbcUrl(),pg.getUsername(),pg.getPassword());var s=c.createStatement()) {
         try(var rs=s.executeQuery("SELECT consumptionPolicy,proposalHash,decision FROM mulino_trade_purchase_Approvals")) {
