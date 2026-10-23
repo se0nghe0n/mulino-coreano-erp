@@ -67,7 +67,11 @@ final class T09SaleSourceFacts {
     }
     String reserveId() { return sub.path("id").asText().equals("cumulative-versus-state")?"reserve60":"reserve"; }
     String saleId() { return reserveId().equals("reserve60")?"sale60":"sale"; }
-    String segment() { return request(reserveId()).path("slots").path("segmentId").asText(); }
+    String segment() {
+        for(var action:sub.path("actions"))if(reserveId().equals(action.path("id").asText()))
+            return new ReferenceResolver(results,aliases).resolve(action.at("/request/slots/segmentId")).asText();
+        throw new IllegalArgumentException(reserveId());
+    }
     String work() { return results.get(saleId()).at("/response/workId").asText(); }
     JsonNode execute(JsonNode action) throws Exception {
         String id=action.path("id").asText(), kind=action.path("kind").asText(); JsonNode result;
@@ -113,6 +117,12 @@ final class T09SaleSourceFacts {
         Set<String> ids=new HashSet<>();for(var a:sub.path("actions"))if(a.path("id").asText().startsWith(PREFIX))ids.add(a.path("id").asText());return ids;
     }
     JsonNode reserve() throws Exception {
+        // Execute the declared public selector even when a bounded test calls
+        // reserve directly instead of walking the complete action sequence.
+        for(var action:sub.path("actions")) {
+            String id=action.path("id").asText();
+            if(id.equals("t09-sale-source-reserve60-current-segment")&&!results.containsKey(id))execute(action);
+        }
         String before=physicalState();
         var r=call("reserveQuantity",request(reserveId()),"warehouse");results.put(reserveId(),r);
         if(!"APPLIED".equals(r.at("/response/outcome").asText())&&!before.equals(physicalState()))

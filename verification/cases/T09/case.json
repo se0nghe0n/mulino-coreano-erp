@@ -5011,6 +5011,30 @@
           }
         },
         {
+          "id": "t09-sale-source-reserve60-current-segment",
+          "kind": "query",
+          "actorRef": "t09SaleSource",
+          "route": "api",
+          "capabilityId": "getObject",
+          "evidenceRefs": [
+            "t09-sale-source-reserve60-current-segment:actual-artifact"
+          ],
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "receive60",
+                "pointer": "/response/effects/segmentId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "objectType": "QuantitySegment"
+            }
+          }
+        },
+        {
           "id": "reserve60",
           "kind": "invoke",
           "evidenceRefs": [
@@ -5048,7 +5072,12 @@
               },
               "startQuantity": "0"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "t09-sale-source-reserve60-current-segment",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T09-cumulative-versus-state-reserve60",
             "evidenceRefs": [
               {

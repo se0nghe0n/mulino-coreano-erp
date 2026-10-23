@@ -23,7 +23,12 @@ class SaleSources(unittest.TestCase):
         self.assertEqual(94,sum(map(len,blocks((HERE/'case.json').read_text()))))
         for before,after in zip(old['subcases'],current['subcases']):
             original_ids={a['id'] for a in before['actions']}
-            self.assertEqual(before['actions'],[a for a in after['actions'] if a['id'] in original_ids])
+            original_actions=[copy.deepcopy(a) for a in after['actions'] if a['id'] in original_ids]
+            if before['id']==SELECTED[0]:
+                action=next(a for a in original_actions if a['id']=='reserve60')
+                self.assertEqual(ref('t09-sale-source-reserve60-current-segment','data/revision'),action['request']['expectedRevision'])
+                action['request']['expectedRevision']=1
+            self.assertEqual(before['actions'],original_actions)
             if before['id'] not in SELECTED:self.assertEqual(before,after)
             else:
                 previous=json.loads(baseline(before['fixtureRef'])); f=json.loads((ROOT/before['fixtureRef']).read_text())
@@ -53,6 +58,25 @@ class SaleSources(unittest.TestCase):
             value=copy.deepcopy(f);mutation(value)
             with self.assertRaises(ValueError):restore_fixture(value)
         with self.assertRaises(ValueError):restore_feature((HERE/'scenario.feature').read_text().replace('reserve60','forged',1))
+
+    def test_protocol_revision_change_is_only_observed_metadata(self):
+        new,_=authored();old,_=authored(protocol=False)
+        for previous,current in zip(old['subcases'],new['subcases']):
+            if current['id']!=SELECTED[0]:
+                self.assertEqual(previous,current);continue
+            restored=copy.deepcopy(current)
+            query_id='t09-sale-source-reserve60-current-segment'
+            query_action=next(a for a in restored['actions'] if a['id']==query_id)
+            reserve=next(a for a in restored['actions'] if a['id']=='reserve60')
+            self.assertEqual(reserve['request']['slots']['segmentId'],query_action['request']['id'])
+            self.assertEqual('QuantitySegment',query_action['request']['scope']['objectType'])
+            self.assertEqual(ACTOR,query_action['actorRef'])
+            reserve['request']['expectedRevision']=1
+            restored['actions']=[a for a in restored['actions'] if a['id']!=query_id]
+            self.assertEqual(previous,restored)
+        mutated=copy.deepcopy(new)
+        next(a for a in mutated['subcases'][0]['actions'] if a['id']=='reserve60')['request']['expectedRevision']=0
+        with self.assertRaises(ValueError):restore(mutated)
 
     def test_ledger_itself_rejects_tampering(self):
         ledger=expected_ledger()
@@ -91,7 +115,7 @@ class SaleSources(unittest.TestCase):
                 for k,v in FLAGS.items():self.assertEqual(v,policy[k])
                 self.assertFalse(policy['requiresLabel']);self.assertEqual(NAMESPACE,policy['sourceNamespace'])
             actions=[a for a in sub['actions'] if a['id'].startswith('t09-sale-source-')]
-            self.assertEqual(68,len(actions))
+            self.assertEqual(69 if sub['id']==SELECTED[0] else 68,len(actions))
             for a in actions:
                 if a['kind']=='invoke':
                     problems,known=contract.command_problems(a,sub)

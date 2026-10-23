@@ -218,3 +218,97 @@ claim/verification/canonical의 조직 join, 실제 procedure/version ID,
 가리키며 versionId 일반 허용을 사용하지 않는다. 정리는
 `.local/t09-cleanup-audit.json`에서 여덟 실행 모두 key 부재, container 부재,
 Spring 종료를 확인했다. 모든 결과는 한정 검증이며 Task/Step은 OPEN이다.
+
+## 제품 sync와 검증된 protocol selector 보완
+
+Coordinator가 허용한 제품 commit
+`e2fc92af784eae95ecf51fe78edc7ff9ee21e251`만 이 worktree에
+`bca2d866abc16f44fef4cd6e64693c514e4ad445`로 cherry-pick했다.
+이 SYNC는 입력 변경 commit과 별개이며 통합 때 중복 적용하지 않는다.
+추가 backend 수정과 다른 writer의 sync는 하지 않았다.
+
+새 허용 범위에 따라 cumulative의 `reserve60.expectedRevision=1`만
+실제 `getObject`의 `/response/data/revision`으로 연결했다. 조회 대상은
+원래 reserve가 가리키는 confirmReceipt의 정확한 QuantitySegment다.
+새 source actor의 기존 조회 권한을 사용하며 원래 warehouse grant는
+유지한다. ledger의 `protocolSelectors`가 이전 값, 새 참조와 실제
+revision 0을 확인한 HTTP 증거를 기록한다. inverse는 원래 1을 복원한다.
+원래 pick/dispatch의 revision 참조는 아직 바꿀 근거가 없으므로 유지한다.
+원래 94개 assertion raw bytes와 나머지 원래 요청 필드는 그대로다.
+
+Correction 반례는 독립 실행 instance에서만 실제 발행 definition과
+원래 판매 goal을 읽는다. 원래 goal의 모든 field를 보존하고 해당
+fixture의 timezone, policy, asOf, 원래 dueAt, 원래 cumulative interval의
+startInclusive, fixture deadlineInclusive와 발행 goal의 evaluator/name으로
+필수 goal 입력을 명시한다. A가 공개 reviseGoal, 최신 getWork,
+activateWork를 수행한다. 원래 시나리오의 판매 goal과 actor 권한을
+변경하지 않는다. 이 입력과 definition ID/hash는 HTTP 증거에 남긴다.
+
+첫 SYNC 후 전체 실행은
+`.local/t09-sale-source-pg-a6c3027c-bae3-49f6-9125-d02ca2c77bd7/`이다.
+10개 중 6개 PASS, 4개 FAIL, ERROR/SKIP 0이다. exists 예약은 실제
+APPLIED와 allocation revision 0까지 진행했다. 원래 pick은
+`/response/allocationId`를 요구하나 실제 reserve 응답에는
+`/response/effects/allocationId`만 존재해 해석 단계에서 멈췄다.
+별도 cumulative 직접호출 test helper가 새 selector query를 건너뛰던
+문제도 발견해, 선언된 query를 실행하도록 고쳤다. 실패 로그는 보존한다.
+
+### SYNC 후 최종 실행 증거
+
+중간 실행
+`.local/t09-sale-source-pg-0e60da2c-c5da-4c7e-8016-763547662c82/`도
+6 PASS / 4 FAIL로 남겼다. source SQL 검사가 segment ID를 읽으면서
+아직 실행 전인 reserve의 revision까지 해석하던 helper 의존성을
+분리했다. 이제 segment 조회는 정확히 해당 slot만 strict resolver로
+해석하고 예약 직전에 선언된 공개 revision query를 실행한다.
+
+최종 전체 10개 test는
+`.local/t09-sale-source-pg-2fec7e58-328b-4dfc-9bd3-55f9aa1cca75/`에서
+7 PASS / 3 FAIL, ERROR/SKIP 0, exit 1이다. 이전 7 PASS / 3 FAIL과
+개수만 같으며 실패 원인과 도달 범위는 다음처럼 달라졌다.
+
+- 원래 `reserve60`과 `reserve` 모두 APPLIED다. 각각 [0,60), [0,100)
+  BOX가 실제 SQL allocation 한 개로 기록됐다. 각 요청을 그대로 재실행한
+  두 번째 HTTP 응답도 같은 allocation ID를 반환하고 행 수는 한 개다.
+- warehouse의 공개 getEvidence는 cumulative HTTP 200, exists HTTP 403을
+  유지한다. 내부 적격성 계산을 위해 기존 grant를 넓히지 않았다.
+- 두 fixture의 실제 typed basis 6개, 독립 SELL/DISPATCH 규제 결정 2개와
+  원문/claim/verification/canonical join 검사가 통과했다.
+- correction은 공개 reviseGoal/activateWork/correctEvidence 모두 APPLIED다.
+  그 뒤 SELL 적격량은 60에서 0으로 줄고 원래 예약은
+  INSUFFICIENT_ELIGIBLE_QUANTITY다. allocation은 생기지 않았다.
+- 원래 입력의 예약 거부, category/규제 누락, expiry, raw/unverified,
+  원문과 다른 typed 범위/단위/조직/품목/leaf/customer, 원천 권한 반례는
+  통과했다. SELL만 있는 반례의 SELL=60, DISPATCH=0도 확인했다.
+
+남은 FAIL 세 개는 모두 같은 공개 응답 계약 경계다.
+`completeCumulativeSources`, `completeExistsSourcesAndInternalAuthorizationSeam`,
+`sellAloneDoesNotAuthorizeDispatch`는 원래 pick의 allocationId 참조에서
+`Missing/null observed value at reserve60/response/allocationId` 또는
+`reserve/response/allocationId`로 멈춘다. 실제 응답은 top-level에 그
+field가 없고 `/response/effects/allocationId`에만 canonical ID를 준다.
+허용된 변경은 expectedRevision metadata이므로 원래 allocationId slot이나
+backend 응답을 바꾸지 않았다. 이 계약을 coordinator가 연결해야 한다.
+
+따라서 원래 pick/dispatch, 물리 출고 60/100, 후속 receipt contribution
+검사는 아직 NOT_RUN이다. 출고 SQL 행은 0이며 출고 성공으로 해석하지
+않는다. 선택한 원래 47개 oracle는 2 PASS / 45 NOT_RUN이고 다른 7개
+subcase의 47개는 이 bounded 실행 밖이다. 94개 raw assertion은 보존한다.
+상세 미도달 action은 각 `*-oracles.json`과 `bounded-frontier.json`에 있다.
+
+실행 명령은 `python3 verification/cases/T09/run_sale_source_pg_test.py`다.
+자체 source는 `bca2d866`와 `build-identity.json`의 입력 변경 hash,
+JAR SHA-256은
+`8adfbb5e5881049b020a56d77b350c4fea99f7f0c511c7b1864dc4eeaed6fdb9`다.
+정확한 npm/JAR/JUnit 명령과 exit는 `commands.json`, 실제 class hash는
+`compiled-test-identity.json`에 있다. 이전 RED를 삭제하지 않았다.
+`.local/t09-protocol-acceptance-summary.json`에서 세 후속 실행의 임시 key,
+자체 PostgreSQL container 삭제와 자체 Spring 종료를 확인했다.
+
+정적 검사는 T09 Python 27 PASS, T11 parent 6 PASS와 생성기 재현 PASS다.
+기록은 `.local/t09-protocol-python.log`,
+`.local/t09-protocol-t11-parent.log`, `.local/t09-protocol-generator.log`다.
+ReferenceResolver 19개와 prepare 결과는 각각
+`.local/t09-protocol-resolver.log`, `.local/t09-protocol-prepare.log`에 남긴다.
+Task와 현재 Step은 OPEN이며 coordinator 통합 전 bounded handoff다.
+최종 `ReferenceResolverTest`는 19 PASS, `./verify prepare`는 exit 0이다.

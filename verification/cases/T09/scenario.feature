@@ -82,6 +82,7 @@
     만일 "t09SaleSource" 역할이 "t09-sale-source-dispatch-regulatory-decision-match" 행동을 수행한다
     만일 "t09SaleSource" 역할이 "t09-sale-source-dispatch-regulatory-decision-canonical" 행동을 수행한다
     만일 "t09SaleSource" 역할이 "t09-sale-source-dispatch-regulatory-allow" 행동을 수행한다
+    만일 "t09SaleSource" 역할이 "t09-sale-source-reserve60-current-segment" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve60" 행동을 수행한다
     만일 "warehouse" 역할이 "pick60" 행동을 수행한다
     만일 "시스템" 역할이 "clock-dispatch60" 행동을 수행한다

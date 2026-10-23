@@ -114,16 +114,10 @@ class T09SaleSourceFactsPostgresTest {
         var read=Json.object().put("id",doc);read.set("scope",Json.object().put("organizationId",f.aliases.path("ORG").asText()));
         var sourceRead=f.call("getEvidence",read,"t09SaleSource");assertEquals(200,sourceRead.path("httpStatus").asInt(),sourceRead.toString());
         var warehouseRead=f.call("getEvidence",read,"warehouse");f.results.put("warehouse-public-evidence",warehouseRead);
-        if(sid.equals("exists-versus-end-throughout"))assertEquals("FORBIDDEN",warehouseRead.at("/response/error/code").asText());
+        assertEquals(sid.equals("exists-versus-end-throughout")?403:200,warehouseRead.path("httpStatus").asInt(),warehouseRead.toString());
         JsonNode r=f.reserve();
-        if(sid.equals("exists-versus-end-throughout")&&!"APPLIED".equals(r.at("/response/outcome").asText())) {
-            // This frozen baseline lacks the separate product owner's internal fact purpose patch.
-            assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",r.at("/response/error/code").asText(),r.toString());denied(r);
-            Json.write(out.resolve("remaining-product-seam.json"),Json.object().put("status","OPEN_PRODUCT_INTERNAL_EVIDENCE_AUTHORIZATION").put("action",f.reserveId()).put("range","[0,100) BOX").put("allTypedSourcesAudited",true));
-            return;
-        }
         applied(r);assertEquals(1,f.rows("mulino_inventory_SegmentAllocations").size());
-        var replay=f.reserve();applied(replay);assertEquals(r.at("/response/allocationId"),replay.at("/response/allocationId"));assertEquals(1,f.rows("mulino_inventory_SegmentAllocations").size());
+        var replay=f.reserve();applied(replay);assertFalse(r.at("/response/effects/allocationId").asText().isEmpty());assertEquals(r.at("/response/effects/allocationId"),replay.at("/response/effects/allocationId"));assertEquals(1,f.rows("mulino_inventory_SegmentAllocations").size());
         reached("after-db");
         BigDecimal remaining=BigDecimal.ZERO;
         for(var row:f.rows("mulino_inventory_QuantitySegments"))if(row.get("retiredat")==null&&f.aliases.path("W").asText().equals(row.get("placeid")))remaining=remaining.add((BigDecimal)row.get("quantity"));
@@ -219,19 +213,57 @@ class T09SaleSourceFactsPostgresTest {
         }
     }
 
+    void activateCorrectionWork() throws Exception {
+        // Complete only this independent negative-test instance, from actual stored
+        // goal/definition plus the fixture's explicit timezone and observation window.
+        var work=f.rows("mulino_work_read_Works").stream().filter(x->f.work().equals(x.get("id"))).findFirst().orElseThrow();
+        var goalRow=f.rows("mulino_work_read_GoalReferences").stream().filter(x->work.get("currentgoalversionid").equals(x.get("id"))).findFirst().orElseThrow();
+        var definition=f.rows("mulino_definitions_DefinitionVersions").stream().filter(x->work.get("definitionversionid").equals(x.get("id"))).findFirst().orElseThrow();
+        assertEquals("PUBLISHED",definition.get("state"));
+        var published=Json.parse(definition.get("content").toString());
+        ObjectNode original=(ObjectNode)Json.parse(goalRow.get("slotsjson").toString());
+        JsonNode template=null;
+        for(var candidate:published.path("goals"))if(candidate.path("endpoint").equals(original.path("endpoint"))&&candidate.path("quantityMode").equals(original.path("quantityMode"))) {
+            assertNull(template,"Exactly one published goal must match the original target");template=candidate;
+        }
+        assertNotNull(template,"Published delivery goal required");
+        ObjectNode completed=original.deepCopy();
+        completed.put("timezone",f.fixture.path("clock").path("timezone").asText());
+        completed.put("evidencePolicyVersion",f.fixture.path("versions").path("policy").asText());
+        completed.put("evaluatorVersion",template.path("evaluatorVersion").asText());
+        completed.set("conditions",Json.array().add(Json.object().put("id",template.path("name").asText())));
+        completed.put("periodStart",f.fixture.path("clock").path("asOf").asText());
+        completed.set("periodEnd",original.path("dueAt"));
+        completed.set("periodStartInclusive",f.results.get("cumulative").at("/request/slots/period/startInclusive"));
+        assertTrue(completed.path("periodStartInclusive").isBoolean(),"Original cumulative interval must declare start inclusion");
+        assertTrue(f.fixture.path("clock").has("deadlineInclusive"));
+        completed.set("periodEndInclusive",f.fixture.path("clock").path("deadlineInclusive"));
+        for(var fields=original.fields();fields.hasNext();) {
+            var field=fields.next();assertEquals(field.getValue(),completed.path(field.getKey()),"Original target field changed: "+field.getKey());
+        }
+        var evidence=Json.object().put("driverStatus","EXECUTED");
+        evidence.set("provenance",Json.object().put("source","POSTGRESQL_READ_ONLY").put("scopeComplete",true));
+        evidence.set("response",Json.object().put("definitionId",definition.get("id").toString()).put("definitionHash",definition.get("contenthash").toString()).set("completedGoal",completed));
+        f.results.put("correction-explicit-goal-inputs",evidence);
+        var read=Json.object().put("workId",f.work());read.set("scope",Json.object().put("organizationId",f.aliases.path("ORG").asText()));
+        var current=f.call("getWork",read,"A");f.results.put("correction-current-sale-work",current);
+        var revise=Json.object().put("intentKind","COMMAND").put("definitionVersion","definition-v1").put("capabilityId","reviseGoal").put("commandIdempotencyKey","correction-complete-test-goal");
+        revise.set("subjectRefs",Json.array());revise.set("slots",Json.object().put("workId",f.work()).put("reason","새 correction 반례의 목표 입력을 발행 정의와 fixture 시점으로 명시한다").set("goal",completed));
+        revise.set("provenance",Json.object().put("workId","CONTEXT").put("reason","USER").put("goal","USER"));revise.set("expectedRevision",current.at("/response/data/revision"));
+        var revised=f.call("reviseGoal",revise,"A");f.results.put("correction-complete-test-goal",revised);applied(revised);
+        current=f.call("getWork",read,"A");f.results.put("correction-current-completed-work",current);
+        var activate=Json.object().put("intentKind","COMMAND").put("definitionVersion","definition-v1").put("capabilityId","activateWork").put("commandIdempotencyKey","correction-activate-sale-work");
+        activate.set("subjectRefs",Json.array());activate.set("slots",Json.object().put("workId",f.work()));activate.set("provenance",Json.object().put("workId","CONTEXT"));activate.set("expectedRevision",current.at("/response/data/revision"));
+        var activated=f.call("activateWork",activate,"A");f.results.put("correction-activate-sale-work",activated);applied(activated);
+    }
+
     @Test void missingExpiryAndCorrectedSourceCannotAllocate() throws Exception {
         for(String mode:List.of("missing-expiry","corrected-source")) {
             install("cumulative-versus-state",false,fixture->{if(mode.equals("missing-expiry"))((ObjectNode)fixture.path("aliases").path("LOT")).remove("expiresAt");});
             reached("t09-sale-source-dispatch-regulatory-allow");auditSources();
             if(mode.equals("corrected-source")) {
                 assertEquals("60",sourceEligibility("SELL").at("/response/data/eligibleQuantity").asText());
-                // This isolated correction probe needs an active responsibility Work.
-                // Original scenario actions and its DRAFT sales Work remain unchanged.
-                var read=Json.object().put("workId",f.work());read.set("scope",Json.object().put("organizationId",f.aliases.path("ORG").asText()));
-                var current=f.call("getWork",read,"A");f.results.put("correction-current-sale-work",current);
-                var activate=Json.object().put("intentKind","COMMAND").put("definitionVersion","definition-v1").put("capabilityId","activateWork").put("commandIdempotencyKey","correction-activate-sale-work");
-                activate.set("subjectRefs",Json.array());activate.set("slots",Json.object().put("workId",f.work()));activate.set("provenance",Json.object().put("workId","CONTEXT"));activate.set("expectedRevision",current.at("/response/data/revision"));
-                var activated=f.call("activateWork",activate,"A");f.results.put("correction-activate-sale-work",activated);applied(activated);
+                activateCorrectionWork();
                 f.post("/__verification/runtime/clock",Json.object().put("instant",java.time.Instant.parse(f.fixture.path("clock").path("asOf").asText()).plusSeconds(1).toString()),"A");
                 var req=f.request("t09-sale-source-sell-qc-document").put("capabilityId","correctEvidence").put("commandIdempotencyKey","correct-qc-source").put("expectedRevision",1);
                 var slots=(ObjectNode)req.path("slots");slots.put("evidenceType","DOCUMENT").put("supersedesId",f.results.get("t09-sale-source-sell-qc-document").at("/response/id").asText());

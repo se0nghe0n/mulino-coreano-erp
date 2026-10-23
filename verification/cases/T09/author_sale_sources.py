@@ -167,7 +167,7 @@ def fixture_inputs(f):
     return f
 
 
-def authored():
+def authored(protocol=True):
     case=json.loads(baseline('verification/cases/T09/case.json'))
     fixtures={}
     for sub in case['subcases']:
@@ -177,6 +177,14 @@ def authored():
         sale,extra=source_actions(sub,f)
         index=next(i for i,a in enumerate(sub['actions']) if a['id']==sale)
         sub['actions'][index+1:index+1]=extra
+        if protocol and sub['id'] == SELECTED[0]:
+            reserve = next(a for a in sub['actions'] if a['id'] == 'reserve60')
+            assert reserve['request']['expectedRevision'] == 1
+            read = query('t09-sale-source-reserve60-current-segment', 'getObject',
+                         dict(id=copy.deepcopy(reserve['request']['slots']['segmentId'])))
+            at = sub['actions'].index(reserve)
+            sub['actions'].insert(at, read)
+            reserve['request']['expectedRevision'] = ref(read['id'], 'data/revision')
     return case,fixtures
 
 
@@ -203,13 +211,14 @@ def restore_fixture(value):
 def apply(value):
     new,_=authored()
     old=json.loads(baseline('verification/cases/T09/case.json'))
-    if value != old and value != new: raise ValueError('T09 sale-source authoring baseline drift')
+    previous,_=authored(protocol=False)
+    if value != old and value != new and value != previous: raise ValueError('T09 sale-source authoring baseline drift')
     return new
 
 
-def authored_feature():
+def authored_feature(protocol=True):
     text=baseline('verification/cases/T09/scenario.feature')
-    case,_=authored()
+    case,_=authored(protocol=protocol)
     for sub in case['subcases']:
         if sub['id'] not in SELECTED: continue
         old=next(s for s in json.loads(baseline('verification/cases/T09/case.json'))['subcases'] if s['id']==sub['id'])
@@ -248,6 +257,13 @@ def expected_ledger():
         work='Actual sale order Work, never purchase/quantity-assessment Work',
         ranges={'cumulative-versus-state':'original reserve60 [0,60) BOX on actual received leaf',
                 'exists-versus-end-throughout':'original reserve [0,100) BOX on fixture Q'},
+        protocolSelectors=[dict(subcase='cumulative-versus-state',actionId='reserve60',
+            field='request.expectedRevision',before=1,
+            after=ref('t09-sale-source-reserve60-current-segment','data/revision'),
+            queryActionId='t09-sale-source-reserve60-current-segment',
+            proofSource='.local/t09-sale-source-pg-54af05c6-d17c-4f1b-b4b6-4dc967c691c5/completeCumulativeSources-http.json',
+            observed='Actual confirmReceipt leaf revision 0; original reserve metadata 1 is stale',
+            unchanged=['slots','actorRef','quantity','clock','oracle','pick selector','dispatch selector'])],
         generatedActionIds={s['id']:[a['id'] for a in s['actions'] if a['id'].startswith('t09-sale-source-')] for s in case['subcases'] if s['id'] in SELECTED})
 
 
@@ -268,12 +284,13 @@ def main():
         before=baseline(path)
         after=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
         current=(ROOT/path).read_text()
-        if current not in (before,after): raise ValueError('Undeclared file drift: '+path)
+        previous=json.dumps(authored(protocol=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        if current not in (before,after,previous): raise ValueError('Undeclared file drift: '+path)
         records.append(dict(path=path,beforeSha256=hashlib.sha256(before.encode()).hexdigest(),
                             afterSha256=hashlib.sha256(after.encode()).hexdigest()))
         (ROOT/path).write_text(after)
     feature=HERE/'scenario.feature';before=baseline(str(feature.relative_to(ROOT)));after=authored_feature()
-    if feature.read_text() not in (before,after):raise ValueError('Undeclared feature drift')
+    if feature.read_text() not in (before,after,authored_feature(protocol=False)):raise ValueError('Undeclared feature drift')
     feature.write_text(after)
     records.append(dict(path=str(feature.relative_to(ROOT)),beforeSha256=hashlib.sha256(before.encode()).hexdigest(),afterSha256=hashlib.sha256(after.encode()).hexdigest()))
     ledger=expected_ledger()
