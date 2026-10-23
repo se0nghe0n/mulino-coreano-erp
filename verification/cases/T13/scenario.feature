@@ -21,6 +21,8 @@
     그러면 "segments-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
+    그러면 "changed-field-unit" assertion으로 "개정값의 원래 단위 또는 통화를 정확히 보존한다"를 확인한다
 
   시나리오: 승인 뒤 price 변경은 원승인으로 전달되지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "changed-price"를 준비한다
@@ -41,6 +43,8 @@
     그러면 "segments-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
+    그러면 "changed-field-currency" assertion으로 "개정값의 원래 단위 또는 통화를 정확히 보존한다"를 확인한다
 
   시나리오: 승인 뒤 itemId 변경은 원승인으로 전달되지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "changed-itemId"를 준비한다
@@ -61,6 +65,7 @@
     그러면 "segments-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 승인 뒤 supplierId 변경은 원승인으로 전달되지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "changed-supplierId"를 준비한다
@@ -82,6 +87,7 @@
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "supplier-not-item" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 승인 뒤 dueAt 변경은 원승인으로 전달되지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "changed-dueAt"를 준비한다
@@ -102,6 +108,7 @@
     그러면 "segments-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 승인 뒤 destinationId 변경은 원승인으로 전달되지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "changed-destinationId"를 준비한다
@@ -122,6 +129,7 @@
     그러면 "segments-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 승인 뒤 endpoint 변경은 원승인으로 전달되지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "changed-endpoint"를 준비한다
@@ -142,6 +150,7 @@
     그러면 "segments-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "approval-binding" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 구매 결정 REJECT는 범위와 유효성을 보존한다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "decision-reject"를 준비한다
@@ -159,6 +168,7 @@
     그러면 "dispatch-not-approved" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "decision-kept" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit-one" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 구매 결정 CONDITIONAL는 범위와 유효성을 보존한다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "decision-conditional"를 준비한다
@@ -212,6 +222,7 @@
     그러면 "dispatch-not-approved" assertion으로 "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "decision-kept" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "denial-audit-one" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 승인 뒤 현재 policy 변경을 재검증한다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "policy-rechecked"를 준비한다
@@ -231,6 +242,7 @@
     그러면 "new-policy-used" assertion으로 "고정 oracle approval-bound의 실제 값과 범위를 확인한다"를 확인한다
     그러면 "po-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
     그러면 "external-zero" assertion으로 "실제 전후 원행이 같아 금지 효과가 없다"를 확인한다
+    그러면 "dispatch-approval-code" assertion으로 "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다"를 확인한다
 
   시나리오: 발주 전달과 공급자 ACCEPT는 도착을 만들지 않는다
     먼저 사례 파일 "verification/cases/T13/case.json"의 "supplier-accept"를 준비한다

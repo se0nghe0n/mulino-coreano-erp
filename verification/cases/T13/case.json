@@ -392,7 +392,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-quantity-external"
+              "externalOperationId": "82a6af5d-f7b5-53cb-9caa-6d06a8540dde"
             },
             "expectedRevision": {
               "$result": {
@@ -431,12 +431,16 @@
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -481,20 +485,17 @@
       "assertions": [
         {
           "id": "changed-field-value",
-          "op": "equals",
+          "op": "decimalEquals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/quantity"
+            "actionId": "after",
+            "pointer": "/response/data/quantity"
           },
-          "expected": {
-            "value": "120",
-            "unit": "BOX"
-          },
+          "expected": "120",
           "requirementRefs": [
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -521,7 +522,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -745,7 +746,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -769,6 +770,70 @@
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
               "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-quantity",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "changed-field-unit",
+          "op": "equals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/unit"
+          },
+          "expected": "BOX",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-quantity",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "개정값의 원래 단위 또는 통화를 정확히 보존한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "approval-bound"
             ]
           }
         }
@@ -1157,7 +1222,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-price-external"
+              "externalOperationId": "d49e7d69-8855-5b21-9233-a243a9ba4bc1"
             },
             "expectedRevision": {
               "$result": {
@@ -1196,12 +1261,16 @@
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -1246,20 +1315,17 @@
       "assertions": [
         {
           "id": "changed-field-value",
-          "op": "equals",
+          "op": "decimalEquals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/price"
+            "actionId": "after",
+            "pointer": "/response/data/price"
           },
-          "expected": {
-            "value": "1.20",
-            "currency": "EUR"
-          },
+          "expected": "1.20",
           "requirementRefs": [
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -1286,7 +1352,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -1510,7 +1576,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -1534,6 +1600,70 @@
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
               "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-price",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "changed-field-currency",
+          "op": "equals",
+          "source": {
+            "actionId": "after",
+            "pointer": "/response/data/currency"
+          },
+          "expected": "EUR",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "after:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-price",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "개정값의 원래 단위 또는 통화를 정확히 보존한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "approval-bound"
             ]
           }
         }
@@ -1897,7 +2027,7 @@
               {
                 "type": "TradeItem",
                 "id": {
-                  "$alias": "P"
+                  "$alias": "P-alt"
                 }
               }
             ],
@@ -1921,7 +2051,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-itemId-external"
+              "externalOperationId": "5a9018b5-d31b-5e0b-9b53-aec71c48a051"
             },
             "expectedRevision": {
               "$result": {
@@ -1959,13 +2089,17 @@
                 "$alias": "ORG"
               },
               "itemId": {
-                "$alias": "P"
-              }
+                "$alias": "P-alt"
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -2012,8 +2146,8 @@
           "id": "changed-field-value",
           "op": "equals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/itemId"
+            "actionId": "after",
+            "pointer": "/response/data/itemId"
           },
           "expected": {
             "$alias": "P-alt"
@@ -2022,7 +2156,7 @@
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -2049,7 +2183,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -2273,7 +2407,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -2293,6 +2427,38 @@
             }
           },
           "oracleExplanation": "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-itemId",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
           "oracleRef": {
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
@@ -2684,7 +2850,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-supplierId-external"
+              "externalOperationId": "83998f14-7ed6-5ddb-bf69-9e8c25d82a67"
             },
             "expectedRevision": {
               "$result": {
@@ -2723,12 +2889,16 @@
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -2776,8 +2946,8 @@
           "id": "changed-field-value",
           "op": "equals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/supplierId"
+            "actionId": "after",
+            "pointer": "/response/data/supplierId"
           },
           "expected": {
             "$alias": "SUP-alt"
@@ -2786,7 +2956,7 @@
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -2813,7 +2983,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -3037,7 +3207,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -3114,6 +3284,38 @@
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
               "approval-bound"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-supplierId",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
             ]
           }
         }
@@ -3499,7 +3701,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-dueAt-external"
+              "externalOperationId": "43877221-71a9-5c98-abb9-e1e89f1532d8"
             },
             "expectedRevision": {
               "$result": {
@@ -3538,12 +3740,16 @@
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -3590,15 +3796,15 @@
           "id": "changed-field-value",
           "op": "equals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/dueAt"
+            "actionId": "after",
+            "pointer": "/response/data/dueAt"
           },
           "expected": "2026-10-10T09:00:00Z",
           "requirementRefs": [
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -3625,7 +3831,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -3849,7 +4055,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -3869,6 +4075,38 @@
             }
           },
           "oracleExplanation": "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-dueAt",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
           "oracleRef": {
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
@@ -4260,7 +4498,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-destinationId-external"
+              "externalOperationId": "ea51428b-71e9-56c4-9199-ffef5d4ed463"
             },
             "expectedRevision": {
               "$result": {
@@ -4299,12 +4537,16 @@
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -4351,8 +4593,8 @@
           "id": "changed-field-value",
           "op": "equals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/destinationId"
+            "actionId": "after",
+            "pointer": "/response/data/destinationId"
           },
           "expected": {
             "$alias": "W-alt"
@@ -4361,7 +4603,7 @@
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -4388,7 +4630,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -4612,7 +4854,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -4632,6 +4874,38 @@
             }
           },
           "oracleExplanation": "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-destinationId",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
           "oracleRef": {
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
@@ -5021,7 +5295,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-changed-endpoint-external"
+              "externalOperationId": "f49fccfd-8bf1-5844-a8d1-51834670a8bb"
             },
             "expectedRevision": {
               "$result": {
@@ -5060,12 +5334,16 @@
               },
               "itemId": {
                 "$alias": "P"
-              }
+              },
+              "objectType": "PurchaseProposal"
             },
             "asOf": "2026-10-07T09:00:00Z",
             "knownAt": "2026-10-07T09:00:01Z",
             "id": {
-              "$alias": "P"
+              "$result": {
+                "actionId": "revision",
+                "pointer": "/response/proposalId"
+              }
             }
           },
           "evidenceRefs": [
@@ -5112,15 +5390,15 @@
           "id": "changed-field-value",
           "op": "equals",
           "source": {
-            "actionId": "revision",
-            "pointer": "/response/changes/endpoint"
+            "actionId": "after",
+            "pointer": "/response/data/endpoint"
           },
           "expected": "SELL_ELIGIBLE",
           "requirementRefs": [
             "D13"
           ],
           "evidenceRefs": [
-            "revision:actual-adapter-artifact"
+            "after:actual-adapter-artifact"
           ],
           "scope": {
             "organizationId": {
@@ -5147,7 +5425,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -5371,7 +5649,7 @@
                 "$alias": "procurement"
               },
               "dispatchPurchaseOrder",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -5391,6 +5669,38 @@
             }
           },
           "oracleExplanation": "고정 oracle old-approval-revised-dispatch의 실제 값과 범위를 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_NOT_CURRENT",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "changed-endpoint",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
           "oracleRef": {
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
@@ -5727,7 +6037,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-decision-reject-external"
+              "externalOperationId": "8f771303-6825-5fb0-bc36-de8c32a21948"
             },
             "expectedRevision": {
               "$result": {
@@ -5892,7 +6202,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -5978,7 +6288,7 @@
             "pointer": "/data/rawRows/audit",
             "where": {
               "capabilityId": "dispatchPurchaseOrder",
-              "outcome": "REJECTED"
+              "outcome": "HELD"
             }
           },
           "expected": 1,
@@ -6003,6 +6313,38 @@
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
               "approval-bound"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_REJECTED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "decision-reject",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
             ]
           }
         }
@@ -6337,7 +6679,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-decision-conditional-external"
+              "externalOperationId": "b3e14249-3d92-5f4a-8090-dba8a0150dad"
             },
             "expectedRevision": {
               "$result": {
@@ -7557,7 +7899,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-decision-expired-external"
+              "externalOperationId": "d2802f67-cba3-56d4-b109-05791d913477"
             },
             "expectedRevision": {
               "$result": {
@@ -7722,7 +8064,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -7808,7 +8150,7 @@
             "pointer": "/data/rawRows/audit",
             "where": {
               "capabilityId": "dispatchPurchaseOrder",
-              "outcome": "REJECTED"
+              "outcome": "HELD"
             }
           },
           "expected": 1,
@@ -7833,6 +8175,38 @@
             "oracleId": "T13.approval-version-binding",
             "observationNames": [
               "approval-bound"
+            ]
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_EXPIRED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "decision-expired",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "old-approval-revised-dispatch"
             ]
           }
         }
@@ -8147,7 +8521,7 @@
               "id": {
                 "$result": {
                   "actionId": "policy-draft",
-                  "pointer": "/response/policyId"
+                  "pointer": "/response/id"
                 }
               },
               "contentHash": {
@@ -8201,7 +8575,7 @@
               "id": {
                 "$result": {
                   "actionId": "policy-draft",
-                  "pointer": "/response/policyId"
+                  "pointer": "/response/id"
                 }
               }
             },
@@ -8319,7 +8693,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-policy-rechecked-external"
+              "externalOperationId": "6b58d6bb-5346-5fa1-9f0e-86523b606a47"
             },
             "expectedRevision": {
               "$result": {
@@ -8412,7 +8786,7 @@
             "actionId": "dispatch",
             "pointer": "/response/outcome"
           },
-          "expected": "REJECTED",
+          "expected": "HELD",
           "requirementRefs": [
             "D13"
           ],
@@ -8456,7 +8830,7 @@
             [
               "dispatchPurchaseOrder",
               "SYNTHETIC-policy-v2",
-              "REJECTED"
+              "HELD"
             ]
           ],
           "requirementRefs": [
@@ -8553,6 +8927,38 @@
           "baseline": {
             "actionId": "before-db",
             "pointer": "/data/rawRows/outbox"
+          }
+        },
+        {
+          "id": "dispatch-approval-code",
+          "op": "equals",
+          "source": {
+            "actionId": "dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "APPROVAL_POLICY_CHANGED",
+          "requirementRefs": [
+            "D13"
+          ],
+          "evidenceRefs": [
+            "dispatch:actual-adapter-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "caseId": "T13",
+            "subcaseId": "policy-rechecked",
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "oracleExplanation": "공개 승인 code로 의도한 승인 guard가 실행됐는지 확인한다",
+          "oracleRef": {
+            "oracleId": "T13.approval-version-binding",
+            "observationNames": [
+              "approval-bound"
+            ]
           }
         }
       ],
@@ -8884,7 +9290,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-supplier-accept-external"
+              "externalOperationId": "da76ceb5-ec2c-5732-b2a2-bf7d55ac5d1a"
             },
             "expectedRevision": {
               "$result": {
@@ -9686,7 +10092,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-supplier-reject-external"
+              "externalOperationId": "17c8cb68-c9fe-52e9-8ae3-05fe922d5790"
             },
             "expectedRevision": {
               "$result": {
@@ -10488,7 +10894,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-supplier-change-external"
+              "externalOperationId": "b71565fb-e784-51ae-89fc-5f46e754b56d"
             },
             "expectedRevision": {
               "$result": {
@@ -11698,7 +12104,7 @@
                 }
               },
               "channel": "SYNTHETIC_SUPPLIER",
-              "externalOperationId": "T13-partial-excess-return-relocation-external"
+              "externalOperationId": "8fece9ca-756a-5cf1-b6d5-139abfa54fc4"
             },
             "expectedRevision": {
               "$result": {
