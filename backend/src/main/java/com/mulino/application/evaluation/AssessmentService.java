@@ -118,7 +118,26 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     if(amount.uncertain()||amount.conflict()||amount.total().signum()<0||amount.total().compareTo(target)>=0)throw shortfallUnavailable();
     var scope=new LinkedHashMap<String,Object>(map(slots.get("scope")));scope.put("workId",workId);scope.put("goalVersionId",goal.get("ID"));scope.put("conditionId",property);
     var proof=new LinkedHashMap<String,Object>();proof.put("assessmentId",latest.get("ID"));proof.put("inputSnapshotHash",latest.get("inputSnapshotHash"));proof.put("definitionVersionId",goal.get("definitionVersionId"));proof.put("definitionHash",snapshot.get("definitionHash"));proof.put("policyVersionId",current.policy);proof.put("policy",snapshot.get("policy"));proof.put("goalSlots",slots);proof.put("targetQuantity",target);proof.put("recognizedQuantity",amount.total());proof.put("shortfallQuantity",target.subtract(amount.total()));proof.put("unit",unit);proof.put("conditionId",property);proof.put("inputs",normalize(chosen.inputs()));proof.put("asOf",c.asOf());proof.put("knownAt",c.knownAt());
+    proof.put("shortfallBasisHash",shortfallBasisHash(snapshot));
     return new GoalShortfallProof.Proof(workId,goal.get("ID").toString(),property,target,amount.total(),target.subtract(amount.total()),unit,Map.copyOf(scope),Map.copyOf(proof));
+  }
+  /** Preserve the full capture hash separately. A directly observed canonical superset
+   * does not depend on unused allocations to children; child range proofs still do. */
+  String shortfallBasisHash(Map<String,Object> snapshot){
+    var basis=decode(encode(snapshot));var facts=map(basis.get("facts"));var sources=map(facts.get("sources"));
+    if(sources.get("work.Contributions") instanceof List<?> credits&&sources.get("evidence.CanonicalOccurrences") instanceof List<?> occurrences){
+      var inputs=new ArrayList<Map<String,Object>>();
+      for(String kind:List.of("properties","relations"))for(Object values:map(facts.get(kind)).values())for(Object value:(List<?>)values)inputs.add(map(value));
+      String workId=map(basis.get("goal")).get("workId").toString();
+      sources.put("work.Contributions",credits.stream().filter(value->{
+        var credit=map(value);Object creditId=credit.get("ID");
+        if(creditId==null||inputs.stream().anyMatch(input->input.get("evidenceRefs") instanceof List<?> refs&&refs.contains(creditId)))return true;
+        return occurrences.stream().map(this::map).noneMatch(actual->
+          workId.equals(actual.get("workId"))&&Objects.equals(credit.get("occurrenceId"),actual.get("ID"))&&actual.get("physicalScopeId")!=null&&
+          inputs.stream().anyMatch(input->Objects.equals(actual.get("ID"),input.get("sourceId"))&&Objects.equals(actual.get("ID"),input.get("canonicalId"))&&Objects.equals(actual.get("physicalScopeId"),input.get("physicalScopeId"))));
+      }).toList());
+    }
+    return DefinitionRepository.sha256(encode(basis));
   }
   /** Re-admit current sources for the requested purpose before checking the frozen proof.
    * Request cutoffs describe capture provenance, not a source revision. Everything else,

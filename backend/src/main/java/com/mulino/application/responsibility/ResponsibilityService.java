@@ -76,7 +76,9 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
    if(current.isEmpty())throw DomainError.invalid("Shortfall root has no current responsibility");
    for(var assignment:current){var scopes=new LinkedHashMap<>(shortfalls.scopes(c,workId));scopes.put("WORK",List.of(text(assignment,"workId")));auth.authorizeScopes(c,authority,scopes);}
    var stored=scopeMap(text(root,"scopeJson"));var first=scopeMap(json(stored.get("proof")));
-   if(!"GOAL_QUANTITY_SHORTFALL".equals(root.get("kind"))||quantity(root.get("quantity")).compareTo(proof.shortfall())!=0||!Objects.equals(root.get("unit"),proof.unit())||!Objects.equals(first.get("inputSnapshotHash"),proof.provenance().get("inputSnapshotHash")))throw ObligationClosureCatalog.held(current.getFirst(),"openObligation");
+   boolean sameBasis=Objects.equals(first.get("inputSnapshotHash"),proof.provenance().get("inputSnapshotHash"))
+     ||first.get("shortfallBasisHash")!=null&&Objects.equals(first.get("shortfallBasisHash"),proof.provenance().get("shortfallBasisHash"));
+   if(!"GOAL_QUANTITY_SHORTFALL".equals(root.get("kind"))||quantity(root.get("quantity")).compareTo(proof.shortfall())!=0||!Objects.equals(root.get("unit"),proof.unit())||!sameBasis)throw ObligationClosureCatalog.held(current.getFirst(),"openObligation");
    if(requestedQuantity.compareTo(proof.shortfall())!=0)throw DomainError.invalid("Requested shortfall quantity differs from proof");
    return Map.of("rootId",root.get("ID"),"assignments",current);
   }

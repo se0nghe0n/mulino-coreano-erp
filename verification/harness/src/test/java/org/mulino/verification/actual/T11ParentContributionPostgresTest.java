@@ -45,6 +45,8 @@ class T11ParentContributionPostgresTest {
             assertEquals("APPLIED",world.results.get("child30-link").path("response").path("outcome").asText());
             freshAssessment(world,"parent");
             assertParent90(world);
+            var originalRoots=shortfallRows(world,"mulino_responsibility_Roots");
+            var originalDuties=shortfallRows(world,"mulino_work_read_ObligationReferences");
             // Continue original inputs; the injected observations do not change any original action.
             boolean after=false;
             for(var action:world.subcase.path("actions")){
@@ -59,6 +61,7 @@ class T11ParentContributionPostgresTest {
                 assertEquals("CLOSED",world.rows("mulino_work_read_Works").stream().filter(r->child.equals(r.get("id"))).findFirst().orElseThrow().get("status"));
             }
             assertParent90(world);
+            assertRetainedShortfall(world,originalRoots,originalDuties);
             var rows=world.rows("mulino_work_WorkContributions");assertEquals(2,rows.size());
             assertEquals(2,rows.stream().map(r->r.get("id")).distinct().count());
             String parent=world.results.get("parent").path("response").path("workId").asText();
@@ -81,6 +84,8 @@ class T11ParentContributionPostgresTest {
         try(var world=new T11ParentHttp("parent90-cancelled","views")) {
             world.through("child30-link");
             freshAssessment(world,"parent");assertParent90(world);
+            var originalRoots=shortfallRows(world,"mulino_responsibility_Roots");
+            var originalDuties=shortfallRows(world,"mulino_work_read_ObligationReferences");
             freshAssessment(world,"child30");
             assertEquals("SATISFIED",world.results.get("child30-assessment").path("response").path("data").path("outcome").asText());
             world.execute("child30-close-current-work");var sourceView=world.results.get("child30-close-current-work").path("response").path("data").path("contributions");
@@ -92,6 +97,7 @@ class T11ParentContributionPostgresTest {
             world.execute("child60-link-current-work");world.execute("child60-link");world.execute("child60-assessment-evaluation-work");world.execute("child60-assessment-evaluate");world.execute("child60-assessment");
             assertEquals("SATISFIED",world.results.get("child60-assessment").path("response").path("data").path("outcome").asText());
             freshAssessment(world,"parent");assertParent90(world);
+            assertRetainedShortfall(world,originalRoots,originalDuties);
             var rows=world.rows("mulino_work_WorkContributions");assertEquals(2,rows.size());assertEquals(2,rows.stream().map(r->r.get("id")).distinct().count());
             assertTrue(rows.stream().allMatch(r->r.get("sourcegoalversionid")!=null&&r.get("sourceconditionid").equals("Receipt.quantity")));
             for(String table:List.of("mulino_evidence_CanonicalOccurrences","mulino_trade_receipt_Receipts","mulino_inventory_QuantityMovements"))assertEquals(1,world.rows(table).size());
@@ -179,6 +185,20 @@ class T11ParentContributionPostgresTest {
         try(var s=world.db.prepareStatement("SELECT contentJson FROM mulino_evaluation_InputSnapshots WHERE organizationId=? AND workId=? AND assessmentId=?")){
             s.setString(1,world.org);s.setString(2,parent);s.setString(3,world.results.get("parent-assessment").path("response").path("data").path("ID").asText());try(var r=s.executeQuery()){assertTrue(r.next());var facts=Json.parse(r.getString(1)).path("facts").path("properties").path("Receipt.quantity");assertEquals(1,facts.size(),facts.toPrettyString());assertEquals(0,new BigDecimal("90").compareTo(new BigDecimal(facts.get(0).path("value").asText())));}
         }
+    }
+    private List<Map<String,Object>> shortfallRows(T11ParentHttp world,String table) throws Exception {
+        return world.rows(table).stream().filter(row->"GOAL_QUANTITY_SHORTFALL".equals(row.get("kind"))).toList();
+    }
+    private void assertRetainedShortfall(T11ParentHttp world,List<Map<String,Object>> roots,List<Map<String,Object>> duties) throws Exception {
+        assertEquals(1,roots.size());assertEquals(1,duties.size());
+        assertEquals(roots,shortfallRows(world,"mulino_responsibility_Roots"),"First source command, immutable proof and quantity must remain exact");
+        assertEquals(duties,shortfallRows(world,"mulino_work_read_ObligationReferences"),"Reassessment neither resolves nor reassigns the remaining duty");
+        assertEquals("OPEN",duties.getFirst().get("status"));assertEquals(Boolean.TRUE,duties.getFirst().get("valid"));
+        assertEquals(0,new BigDecimal("10").compareTo((BigDecimal)roots.getFirst().get("quantity")));assertEquals("BOX",roots.getFirst().get("unit"));
+        var proof=Json.parse(roots.getFirst().get("scopejson").toString()).path("proof");
+        assertNotEquals(proof.path("inputSnapshotHash").asText(),world.results.get("parent-assessment").path("response").path("data").path("inputSnapshotHash").asText(),"Full captures retain the newly added allocation lineage");
+        var snapshot=world.rows("mulino_evaluation_InputSnapshots").stream().filter(row->proof.path("assessmentId").asText().equals(row.get("assessmentid"))).findFirst().orElseThrow();
+        assertEquals(proof.path("inputSnapshotHash").asText(),snapshot.get("contenthash"));
     }
     @ParameterizedTest @ValueSource(strings={"overlap","overflow","missingCanonical","crossOrganization","revokedGrant"})
     void invalidContributionRangesAndAuthorityHaveNoEffects(String variant) throws Exception {

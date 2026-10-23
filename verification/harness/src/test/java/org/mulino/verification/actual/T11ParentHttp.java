@@ -81,7 +81,7 @@ final class T11ParentHttp implements AutoCloseable {
     void dump() throws Exception {
         var out=Json.object();db.setAutoCommit(false);db.setReadOnly(true);db.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
         out.put("snapshot",ObserverSnapshot.token(db));out.put("readOnly",db.isReadOnly());
-        for(String table:List.of("mulino_work_read_Works","mulino_work_WorkLinks","mulino_work_WorkContributions","mulino_work_read_AssessmentReferences","mulino_work_read_ObligationReferences","mulino_inventory_QuantityMovements","mulino_trade_receipt_Receipts","mulino_evidence_CanonicalOccurrences")) {
+        for(String table:List.of("mulino_work_read_Works","mulino_work_read_GoalReferences","mulino_work_WorkLinks","mulino_work_WorkContributions","mulino_work_read_AssessmentReferences","mulino_evaluation_InputSnapshots","mulino_responsibility_Roots","mulino_responsibility_Scopes","mulino_commands_CommandRecords","mulino_work_read_ObligationReferences","mulino_inventory_QuantityMovements","mulino_trade_receipt_Receipts","mulino_evidence_CanonicalOccurrences")) {
             var entries=Json.array();String sql="SELECT row_to_json(r)::text FROM "+table+" r WHERE organizationId=? ORDER BY ID";
             try(var s=db.prepareStatement(sql)){s.setString(1,org);try(var r=s.executeQuery()){while(r.next())entries.add(Json.parse(r.getString(1)));}}
             var proof=Json.object().put("sql",sql);proof.set("boundParameters",Json.array().add(org));proof.set("rows",entries);out.set(table,proof);
