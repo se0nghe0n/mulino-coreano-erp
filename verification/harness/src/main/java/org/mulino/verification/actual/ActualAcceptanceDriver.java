@@ -39,7 +39,7 @@ public final class ActualAcceptanceDriver implements AcceptanceDriver, Independe
         processes=new BackendProcessControls(root,run,configuration.baseUri(),processEnvironment);
     }
     public static ActualAcceptanceDriver fromEnvironment(Path root) {return new ActualAcceptanceDriver(root,ActualConfiguration.environment(System.getenv()));}
-    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","worker","management","blob","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
+    @Override public Set<String> availableAdapters() {return suiteIsolation?Set.of("api","mcp","wire","direct","batch","worker","management","blob","control","clock","barrier","host","process","coverage","fixture","db"):Set.of("api","fixture","db");}
     @Override public StepResult installFixture(String id,JsonNode bundle) {
         // A new installation is an isolation boundary: never carry the previous subcase's organization or control identity.
         if(suiteIsolation){externalOrganization=null;externalOrganizations=null;controlActor=null;installedActors=null;idTypes=null;lastClock=null;

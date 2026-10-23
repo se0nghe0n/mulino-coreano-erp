@@ -1074,3 +1074,12 @@ root의 실제 PostgreSQL 검사3개는실패·오류·skip0으로 통과했다.
 호출해prepare가 실패하므로 통합하지 않았다. 원래 grants와110개
 assertions를 보존하면서 공개 계약을 다시 연결하는 수정이 진행 중이다.
 이 집중 검증을 실제 T09/T11 시나리오 PASS로 표시하지 않는다.
+
+T11 wait-timeout의원본6 assertions와실제 clock/scheduler 제어가 모두
+실행됐어도 driver의공급 adapter목록에control이없어 NOT_RUN이었다.
+suite driver에기존 제어기능의공급을선언했다. 지원하지않는 operation과
+설치된 identity가없는제어는계속 NOT_IMPLEMENTED다. 관련 metadata·
+실제 clock/process transport검사15개가실패·오류·skip0으로통과했다.
+원본 T11 기대와requiredAdapters는바꾸지않았다. 원로그와검증은
+`.local/resume-20261023/control-adapter-contract/`이며 실제 재실행은
+Haiku Workflow가소유한다. 과거 NOT_RUN을소급해PASS로변경하지않는다.
