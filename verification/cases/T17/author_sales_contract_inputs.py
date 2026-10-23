@@ -9,6 +9,10 @@ import subprocess
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+import importlib.util
+_condition_spec = importlib.util.spec_from_file_location('t17_condition_oracle', HERE/'author_condition_oracle.py')
+condition_oracle = importlib.util.module_from_spec(_condition_spec)
+_condition_spec.loader.exec_module(condition_oracle)
 BASE = 'b4772eb6'
 LEDGER = HERE / 'sales-contract-input-delta.json'
 
@@ -52,11 +56,11 @@ def apply(case):
                 if where.get('kind') == 'RECONCILIATION':
                     where['kind'] = 'DELIVERY_RECONCILIATION'
                     where['status'] = 'OPEN'
-    return case
+    return condition_oracle.apply(case)
 
 
 def restore_case(case):
-    case = copy.deepcopy(case)
+    case = condition_oracle.restore_case(case)
     if not LEDGER.exists():
         return case
     marked = any(
@@ -95,7 +99,7 @@ def apply_feature(text):
 
 
 def restore_feature(text):
-    return text.replace('    만일 "observer" 역할이 "dispatched-item" 행동을 수행한다\n','')
+    return condition_oracle.restore_feature(text).replace('    만일 "observer" 역할이 "dispatched-item" 행동을 수행한다\n','')
 
 
 def legacy_bytes(raw):
@@ -108,7 +112,7 @@ if __name__ == '__main__':
     root = HERE.parents[2]
     before = json.loads(subprocess.check_output(
         ['git', 'show', BASE + ':verification/cases/T17/case.json'], cwd=root))
-    after = apply(before)
+    after = condition_oracle.restore_case(apply(before))
     changes = []
     for old, new in zip(before['subcases'], after['subcases']):
         for section in ('actions', 'assertions'):
@@ -121,9 +125,10 @@ if __name__ == '__main__':
     LEDGER.write_text(json.dumps({'baseline': BASE, 'assertionCount': 257,
         'expectedBusinessValuesChanged': False, 'fixtureGrantClockChanged': False,
         'changes': changes}, ensure_ascii=False, indent=2) + '\n')
+    after = condition_oracle.apply(after)
     (HERE / 'case.json').write_text(json.dumps(after, ensure_ascii=False, indent=2) + '\n')
     feature=subprocess.check_output(['git','show',BASE+':verification/cases/T17/scenario.feature'],cwd=root).decode()
-    (HERE/'scenario.feature').write_text(apply_feature(feature))
+    (HERE/'scenario.feature').write_text(condition_oracle.apply_feature(apply_feature(feature)))
     assert restore_case(after) == before
     assert apply(after) == after
     print('T17 sales contract inputs:', len(changes), 'reversible scope/source changes')

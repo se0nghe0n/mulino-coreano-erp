@@ -21,6 +21,7 @@ class SalesContractInputTest(unittest.TestCase):
         self.assertEqual(INPUTS.apply(before), actual)
         self.assertEqual(before, INPUTS.restore_case(actual))
         self.assertEqual(actual, INPUTS.apply(actual))
+        actual = INPUTS.condition_oracle.restore_case(actual)
         self.assertEqual(257, sum(len(s['assertions']) for s in actual['subcases']))
         for a, b in zip(before['subcases'], actual['subcases']):
             self.assertEqual([x['id'] for x in a['assertions']], [x['id'] for x in b['assertions']])

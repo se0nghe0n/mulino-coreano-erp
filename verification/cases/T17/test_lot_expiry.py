@@ -85,7 +85,7 @@ class LotExpiryContract(unittest.TestCase):
             if name == 'case.json': self.assertEqual(json.loads(before), PUBLIC.restore_case(json.loads(path.read_bytes())))
             else: self.assertEqual(before.decode(),PUBLIC.restore_feature(path.read_text()))
         c=json.loads((HERE/'case.json').read_text())
-        self.assertEqual(257,sum(len(s['assertions']) for s in c['subcases']))
+        self.assertEqual(257,sum(len(s['assertions']) for s in PUBLIC.sales_inputs.condition_oracle.restore_case(c)['subcases']))
 
 
 if __name__=='__main__':unittest.main()

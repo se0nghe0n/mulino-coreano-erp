@@ -50,7 +50,7 @@ class PublicContractTests(unittest.TestCase):
         restored=PUBLIC.restore_case(actual)
         restored_blocks=[json.dumps(sub['assertions'],ensure_ascii=False,indent=2).replace('\n','\n      ').encode() for sub in restored['subcases']]
         self.assertEqual(old,restored_blocks);self.assertEqual(15,len(new))
-        self.assertEqual(257,sum(len(s['assertions']) for s in actual['subcases']))
+        self.assertEqual(257,sum(len(s['assertions']) for s in PUBLIC.sales_inputs.condition_oracle.restore_case(actual)['subcases']))
         self.assertEqual(original(HERE/'scenario.feature').decode(),PUBLIC.restore_feature((HERE/'scenario.feature').read_text()))
         ledger=json.loads((HERE/'public-contract-delta.json').read_text())
         self.assertEqual(BASE,ledger['baseline'])

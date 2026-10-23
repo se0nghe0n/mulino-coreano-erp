@@ -464,6 +464,13 @@
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 CONFLICT 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-conflict"를 준비한다
@@ -487,6 +494,15 @@
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-conflict-decisions" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-no-singleton-conflict" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-no-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-no-reason"를 준비한다
@@ -517,6 +533,13 @@
     그러면 "eligibility-response-11" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-12" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-13" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-with-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-with-reason"를 준비한다
@@ -541,6 +564,13 @@
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-7" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 packaging-unapproved 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-packaging-unapproved"를 준비한다
@@ -552,6 +582,8 @@
     만일 "qc" 역할이 "early-hold" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "observer" 역할이 "eligibility" 행동을 수행한다
+    만일 "observer" 역할이 "eligibility-alt" 행동을 수행한다
+    만일 "시스템" 역할이 "eligibility-alt-db" 행동을 수행한다
     만일 "observer" 역할이 "before-reserve" 행동을 수행한다
     만일 "시스템" 역할이 "before-reserve-db" 행동을 수행한다
     만일 "sales" 역할이 "reserve" 행동을 수행한다
@@ -571,3 +603,17 @@
     그러면 "unauthorized-packaging-fulfilment-11" assertion으로 "unauthorized-packaging-fulfilment"를 확인한다
     그러면 "unauthorized-packaging-fulfilment-12" assertion으로 "unauthorized-packaging-fulfilment"를 확인한다
     그러면 "unauthorized-packaging-fulfilment-13" assertion으로 "unauthorized-packaging-fulfilment"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-business-status" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-source-equivalence" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-installed-identities" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-typed-links" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-alt-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다

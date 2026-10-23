@@ -37,6 +37,11 @@ final class T17SourceFacts {
             if(workRow==null||!physical.path("itemAlias").asText().equals(workRow.path("itemAlias").asText())||!physical.path("lotAlias").asText().equals(workRow.path("lotAlias").asText())||!f.path("aliases").has(Json.required(row,"evidenceAlias")))throw new IllegalArgumentException("Given condition Work/evidence binding mismatch");
             if(!row.path("synthetic").asBoolean()||!"QuantitySegment".equals(physical.path("type").asText())||!spec.path("workAliases").hasNonNull(segment))throw new IllegalArgumentException("Exact synthetic segment and Work required");
             if(new BigDecimal(Json.required(row,"quantity")).signum()<=0||new BigDecimal(Json.required(row,"quantity")).compareTo(new BigDecimal(Json.required(physical,"quantity")))>0||!Json.required(row,"unit").equals(physical.path("unit").asText()))throw new IllegalArgumentException("Source range exceeds original physical quantity/unit");
+            if(isRegulatoryConflict(row)) {
+                var refs=row.path("evidenceAliases");
+                if(!refs.isArray()||refs.size()!=2||!refs.get(0).asText().equals(row.path("evidenceAlias").asText())||refs.get(0).equals(refs.get(1)))throw new IllegalArgumentException("Regulatory conflict requires two distinct original evidence aliases");
+                for(var ref:refs)if(!f.path("aliases").has(ref.asText())||!f.path("evidence").findValuesAsText("alias").contains(ref.asText()))throw new IllegalArgumentException("Conflict original evidence provenance missing");
+            }
             var from=Instant.parse(Json.required(row,"validFrom"));var until=Instant.parse(Json.required(row,"validUntil"));
             if(!until.isAfter(from)||from.isAfter(Instant.parse(f.path("clock").path("asOf").asText())))throw new IllegalArgumentException("Source interval is not a past/current given");
             if(!Set.of("QC","CUSTOMER_CONTRACT","DISPOSITION","REGULATORY","LABEL").contains(Json.required(row,"conditionId"))||!Set.of("ALLOWED","UNKNOWN","CONFLICT","DENIED").contains(Json.required(row,"status")))throw new IllegalArgumentException("Unsupported source condition");
@@ -69,13 +74,15 @@ final class T17SourceFacts {
         var procedures=new HashMap<String,JsonNode>();
         for(int index=0;index<fixture.path("baseline").path("conditions").size();index++){
             var row=fixture.path("baseline").path("conditions").get(index);String kind=Json.required(row,"conditionId"),segment=Json.required(row,"segmentAlias");
-            if(!"ALLOWED".equals(row.path("status").asText())){uninstalled.add(Json.object().put("pointer","/baseline/conditions/"+index).put("reason","Original "+row.path("status").asText()+" is not a positive authority"));continue;}
+            if(!"ALLOWED".equals(row.path("status").asText())&&!isRegulatoryConflict(row)){
+                var missing=Json.object().put("pointer","/baseline/conditions/"+index).put("reason","Original "+row.path("status").asText()+" is not a positive authority");missing.set("given",row.deepCopy());uninstalled.add(missing);continue;
+            }
             ObjectNode receipt;
             if(Set.of("QC","CUSTOMER_CONTRACT","DISPOSITION").contains(kind))receipt=quality(row,index);
             else {
                 JsonNode proc=procedures.get(segment);
                 if(proc==null){proc=procedure(segment,row);procedures.put(segment,proc);}
-                receipt=regulatory(row,index,proc);
+                receipt=isRegulatoryConflict(row)?conflict(row,index,proc):regulatory(row,index,proc);
                 if(kind.equals("REGULATORY"))procedures.put(segment,receipt.path("procedure"));
             }
             receipt.put("pointer","/baseline/conditions/"+index);receipt.set("given",row.deepCopy());conditions.add(receipt);
@@ -111,6 +118,12 @@ final class T17SourceFacts {
         out.put("provenanceLimitation","The original supplier assertion has a generic exact-segment canonical record, not verified supplier/LOT semantics; no published relationship command exists, so baseline.sourceProvenance stays omitted.");
         return out;
     }
+    static boolean isRegulatoryConflict(JsonNode row){return "REGULATORY".equals(row.path("conditionId").asText())&&"CONFLICT".equals(row.path("status").asText());}
+    private ObjectNode conflict(JsonNode row,int index,JsonNode prepared)throws Exception {
+        var first=regulatory(row,index,prepared,"SELL",fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText(),null,"ALLOWED",row.path("evidenceAliases").get(0).asText(),true);
+        var second=regulatory(row,index,first.path("procedure"),"SELL",fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText(),null,"REVOKED",row.path("evidenceAliases").get(1).asText(),false);
+        var result=Json.object();result.set("decisionReceipts",Json.array().add(first).add(second));result.set("procedure",second.path("procedure"));return result;
+    }
     private String work(String segment){return id(fixture.path("baseline").path("t17SourceFacts").path("workAliases").path(segment).asText());}
     private ObjectNode quality(JsonNode row,int index)throws Exception {return quality(row,index,"SELL",null);}
     private ObjectNode quality(JsonNode row,int index,String action,JsonNode authoredInput)throws Exception {
@@ -130,21 +143,29 @@ final class T17SourceFacts {
     }
     private ObjectNode regulatory(JsonNode row,int index,JsonNode prepared)throws Exception {return regulatory(row,index,prepared,"SELL",fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText(),null);}
     private ObjectNode regulatory(JsonNode row,int index,JsonNode prepared,String action,String policyAlias,JsonNode authoredInput)throws Exception {
+        return regulatory(row,index,prepared,action,policyAlias,authoredInput,"ALLOWED",Json.required(row,"evidenceAlias"),true);
+    }
+    private ObjectNode regulatory(JsonNode row,int index,JsonNode prepared,String action,String policyAlias,JsonNode authoredInput,String decision,String originalAlias,boolean submit)throws Exception {
         String segment=Json.required(row,"segmentAlias");JsonNode proc=prepared;var a=fixture.path("aliases").path(segment);
-        if(row.path("conditionId").asText().equals("REGULATORY")){
+        if(submit&&row.path("conditionId").asText().equals("REGULATORY")){
             var original=regOriginal(segment,proc,policyAlias).put("occurredAt",Json.required(row,"validFrom"));
             if(authoredInput!=null)original.set("syntheticActionInput",authoredInput.deepCopy());
             var source=publish(segment,"REGULATORY_SUBMISSION",original,row.path("validFrom").asText(),null,null);
             proc=invoke("recordSubmission",Json.object().put("procedureId",Json.required(proc,"procedureId")).put("occurredAt",row.path("validFrom").asText()).put("occurrenceId",source.canonical()),proc.path("revision").asInt());
         }
-        boolean label=row.path("conditionId").asText().equals("LABEL");var original=regOriginal(segment,proc,policyAlias).put("decision",label?"VERIFIED":"ALLOWED").put("validFrom",Json.required(row,"validFrom")).put("validUntil",Json.required(row,"validUntil"));
+        boolean label=row.path("conditionId").asText().equals("LABEL");var original=regOriginal(segment,proc,policyAlias).put("decision",label?"VERIFIED":decision).put("validFrom",Json.required(row,"validFrom")).put("validUntil",Json.required(row,"validUntil"));
         if(label){original.put("packagingVersionId",itemField(id(Json.required(a,"itemAlias")),"packagingVersionId")).put("specificationVersionId",itemField(id(Json.required(a,"itemAlias")),"specificationVersionId"));}
         else original.put("action",action).put("startQuantity","0").put("quantity",Json.required(row,"quantity")).put("unit",Json.required(row,"unit"));
+        if(isRegulatoryConflict(row)) {
+            var provenance=Json.object();for(var declared:fixture.path("evidence"))if(originalAlias.equals(declared.path("alias").asText()))provenance.setAll((ObjectNode)declared);
+            original.put("synthetic",true).put("operatingApprovalClaimed",false).put("originalConditionPointer","/baseline/conditions/"+index).put("givenEvidenceAlias",originalAlias);
+            original.set("originalCondition",row.deepCopy());original.set("originalEvidenceProvenance",provenance);
+        }
         if(authoredInput!=null)original.set("syntheticActionInput",authoredInput.deepCopy());
         Source source=publish(segment,label?"LABEL_VERIFICATION":"REGULATORY_DECISION",original,row.path("validFrom").asText(),label?null:row.path("quantity").asText(),label?null:row.path("unit").asText());
-        var slots=original.deepCopy();slots.remove(List.of("procedureVersionId","itemId","lotId","physicalScopeId","authority","policyVersion","regulatoryEventId","syntheticActionInput"));slots.put("occurrenceId",source.canonical());
+        var slots=original.deepCopy();slots.remove(List.of("procedureVersionId","itemId","lotId","physicalScopeId","authority","policyVersion","regulatoryEventId","syntheticActionInput","synthetic","operatingApprovalClaimed","originalConditionPointer","givenEvidenceAlias","originalCondition","originalEvidenceProvenance"));slots.put("occurrenceId",source.canonical());
         var applied=invoke(label?"verifyLabel":"recordRegulatoryDecision",slots,proc.path("revision").asInt());
-        var result=receipt(source).put("typedDecisionId",Json.required(applied,"versionId"));result.set("procedure",applied);return result;
+        var result=receipt(source).put("typedDecisionId",Json.required(applied,"versionId"));if(isRegulatoryConflict(row))result.put("givenEvidenceAlias",originalAlias).put("decision",decision);result.set("procedure",applied);return result;
     }
     private ObjectNode regOriginal(String segment,JsonNode proc,String policyAlias){var a=fixture.path("aliases").path(segment);var policy=fixture.path("aliases").path(policyAlias);return Json.object().put("procedureId",Json.required(proc,"procedureId")).put("procedureVersionId",Json.required(proc,"procedureVersionId")).put("regulatoryEventId",UUID.randomUUID().toString()).put("itemId",id(Json.required(a,"itemAlias"))).put("lotId",id(Json.required(a,"lotAlias"))).put("physicalScopeId",id(segment)).put("authority",Json.required(policy,"authority")).put("policyVersion",policyVersion);}
     Source publish(String segment,String kind,ObjectNode original,String effective,String quantity,String unit)throws Exception {

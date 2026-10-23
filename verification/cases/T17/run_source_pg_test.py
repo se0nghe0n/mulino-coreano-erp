@@ -10,6 +10,7 @@ import time
 import uuid
 import secrets
 import hashlib
+import shutil
 
 ROOT = Path(__file__).resolve().parents[3]
 OUT = ROOT / '.local' / ('t17-source-pg-' + str(uuid.uuid4()))
@@ -46,6 +47,9 @@ try:
         'sourceCommit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'productJar': str(product_jar),
         'productJarSha256': hashlib.sha256(product_jar.read_bytes()).hexdigest(),
+        'sourceSha256': {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                         for folder in ['backend/src', 'backend/db', 'backend/srv', 'verification/harness/src', 'verification/cases/T17']
+                         for p in sorted((ROOT/folder).rglob('*')) if p.is_file() and '__pycache__' not in p.parts},
     }, indent=2) + '\n')
     image = json.loads((ROOT/'verification/platform/versions.json').read_text())['postgresImage']['reference']
     run(['docker', 'run', '-d', '--name', container, '-e', 'POSTGRES_PASSWORD', '-e', 'POSTGRES_DB=ontology', '-p', '127.0.0.1::5432', image], 'container.log', env)
@@ -70,7 +74,7 @@ try:
     env.update(ACTUAL_BASE_URL='http://127.0.0.1:'+match[-1], ACTUAL_DISPOSABLE_DATABASE='true',
                ACTUAL_BUILD_COMMIT=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                T17_PG_TEST='true', T17_TEST_EVIDENCE=str(OUT))
-    run([str(ROOT/'mvnw'), '-B', '-ntp', '-f', 'verification/harness/pom.xml', '-Dtest=T17SourceFactsPostgresTest',
+    run([str(ROOT/'mvnw'), '-B', '-ntp', '-f', 'verification/harness/pom.xml', '-Dtest='+env.get('T17_PG_TEST_CLASS','T17SourceFactsPostgresTest'),
          '-Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json',
          '-Dverification.actual.blobRoot='+str(OUT/'blobs'), 'test'], 'test.log', env)
     print('PASS T17 source PostgreSQL integration:', OUT)
@@ -85,5 +89,14 @@ finally:
     # Authentication materials are ephemeral and never part of evidence.
     for name in ['private.pem', 'public.pem']:
         (OUT/name).unlink(missing_ok=True)
+    shutil.rmtree(OUT/'blobs', ignore_errors=True)
+    absent = subprocess.run(['docker','inspect',container],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL).returncode != 0
+    (OUT/'cleanup.json').write_text(json.dumps({
+        'container': container, 'containerAbsent': absent,
+        'serverStopped': server is None or server.poll() is not None,
+        'privateKeyAbsent': not (OUT/'private.pem').exists(),
+        'publicKeyAbsent': not (OUT/'public.pem').exists(),
+        'blobRootAbsent': not (OUT/'blobs').exists(),
+    },indent=2)+'\n')
     (OUT/'commands.json').write_text(json.dumps(records,indent=2)+'\n')
     print('Evidence:', OUT)

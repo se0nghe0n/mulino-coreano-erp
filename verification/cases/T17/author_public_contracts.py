@@ -296,7 +296,7 @@ def feature_lines(feature, before, after):
         if ' 행동을 수행한다' in line:
             action=line.split('역할이 "',1)[1].split('"',1)[0]
             for a in additions.get(current,{}).get(action,[]):
-                output.append(f'    만일 "{a["actorRef"]}" 역할이 "{a["id"]}" 행동을 수행한다\n')
+                output.append(f'    만일 "{a.get("actorRef", "시스템")}" 역할이 "{a["id"]}" 행동을 수행한다\n')
         output.append(line)
     return ''.join(output)
 
@@ -338,7 +338,7 @@ if __name__ == '__main__':
     case=sales_inputs.apply(case)
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
-    feature_path.write_text(feature_lines(feature,before,case))
+    feature_path.write_text(sales_inputs.condition_oracle.apply_feature(feature_lines(feature,before,case)))
     for path,value in [(case_path,case),(HERE/'public-contract-delta.json',ledger)]+[(HERE/'fixtures'/f'{sid}.json',f) for sid,f in authored.items()]:
         data=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
         if not path.exists() or path.read_text()!=data: path.write_text(data)
