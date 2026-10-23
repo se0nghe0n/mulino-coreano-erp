@@ -115,28 +115,35 @@
     "reserveQuantity": {
       "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
       "slots": [
+        "FEFOExceptionReason",
         "quantity",
         "salesLineId",
         "segmentId",
         "startQuantity",
         "unit"
-      ]
+      ],
+      "note": "현재 적격·미예약 창고 물량의 FEFO를 적용한다. 뒤의 만료 물량을 선택하면 FEFOExceptionReason에 공백이 아닌 500자 이하 문자열을 요구하며 command 효과에 보존한다. 사유는 적격성·권한·물량 검사를 우회하지 않는다."
     },
     "replaceAllocation": {
       "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
       "slots": [
+        "FEFOExceptionReason",
         "allocationId",
+        "evidenceId",
         "quantity",
         "segmentId",
         "startQuantity",
         "unit"
-      ]
+      ],
+      "note": "evidenceId는 필수 DocumentVersion UUID다. 현재 접근 가능한 replacement-proof 원본과 관련 물량·Work·판매 행의 대상 일치를 검증한다. 원 배분 비활성과 같은 수량의 새 배분을 한 거래로 수행하고 근거 hash를 command 효과에 보존한다. FEFOExceptionReason은 reserveQuantity와 같은 규칙이다."
     },
     "releaseAllocation": {
       "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
       "slots": [
-        "allocationId"
-      ]
+        "allocationId",
+        "reason"
+      ],
+      "note": "reason에 공백이 아닌 500자 이하 문자열을 요구한다. 해제 배분 ID와 사유를 같은 거래의 command 효과·감사 연결에 보존한다."
     },
     "pickQuantity": {
       "provider": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java",
