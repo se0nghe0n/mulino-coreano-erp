@@ -157,3 +157,15 @@ suite 실행, capability/role/grant/원본 업무 oracle 변경은 없다.
 분류를 보존한다. root가 `30ae0e7c`와 corrective를 통합하고 최종 검증한다.
 원래 T11 A의 openObligation 권한과 별도 미배분90 OPEN은 그대로다.
 Task와 Step은 OPEN이다.
+
+
+## Coordinator 통합 확인
+
+30ae0e7c·b20932f6을 Task branch 908fe638·96891bc4에 통합했다.
+coordinator의 실제 handler metadata 계약3개와 Python 보존5개, prepare
+asset checks12개가 통과했다. 전체 harness에서 드러난 synthetic self-test
+옛 allowlist hash 한 필드는 b9f3afc8에 별도 수정했다. 요청 identity와
+현재 inventory hash를 대조하는 검사·negative probe는 그대로다.
+최종 전체 harness는 910 executions 중830 PASS·80 opt-in SKIP,
+실패·오류0·exit0이다. 이 결과는 위 standalone 작업의 미실행을 대체하는
+통합 증거이며 실제 native 업무/client 인수로 표시하지 않는다.

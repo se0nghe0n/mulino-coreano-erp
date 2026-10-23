@@ -3,6 +3,32 @@
 기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
 
+## 현재 통합 gate (2026-10-23)
+
+전체 Task와 현재 구현 Step은 OPEN이다. 아래는 최근 실행의 실제 기준선이며
+뒤의 기록은 당시 결과로 보존한다. 집중·정적 검사와 native 업무 인수를
+서로 대신하지 않는다.
+
+| 검증 층 | 실제 결과와 기준선 |
+|---|---|
+| Backend 전체 | 5bcb46b5: 773 PASS, 실패·오류·skip0, exit0, source3175개 drift0, 정리42개 확인 |
+| 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
+| Harness 전체 | b9f3afc8: 910 executions 중830 PASS·80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
+| Prepare | 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
+| 실제 T09/T11 부분 | 5bcb46b5: native Haiku 12 subcase·107 assertions, 100 PASS·7 FAIL·미관찰0; subcase7 PASS·5 FAIL |
+| 실제 T17 전체 | 27ec8cc3: native Haiku 15 subcase·257 assertions, 79 PASS·178 FAIL·미관찰0; 모든 subcase FAIL |
+| S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
+
+Harness 수는 실행 횟수이며 상속된 observer 회귀의 반복 실행을 포함한다.
+80개 opt-in SKIP과 native raw gateComplete=false를 PASS로 바꾸지 않는다.
+실제 실패를 해소하기 위한 T17 공개 조회와 T11 정정·재평가 제어는 별도
+worktree에서 진행 중이며 아직 이 Task branch의 완료로 세지 않는다.
+
+증거와 실패는 [공통 캡처 부분 인수](capture-case-acceptance.md),
+[T17 실제 인수](t17-five-shard-acceptance.md),
+[독립 관찰 원천](observer-source-relations.md),
+[공개 capability](public-capability-inventory.md)에 연결한다.
+
 ## Task와 기준선
 
 - Task: [구현 계획](../ontology-implementation-plan.md)의 채택된
@@ -1154,3 +1180,19 @@ T11 terminal의 명시 SQL null을 누락 필드와 구별하는 필터 수정�
 `f5e3c478`에 별도로 기록했다. 새 반례6개·기존32개, 합38개 집중 검사와
 prepare가 통과했다. 누락·미실행 관찰과 수량 null은 계속 실패한다.
 이 검사와 공개 목록 변경을 실제 native 업무 재인수로 표시하지 않는다.
+
+
+## 2026-10-23 observer 결합 회귀의 최종 확인
+
+독립 관찰 변경 a3419b21의 첫 전체 harness는 910 executions 중826 PASS·
+4 ERROR·80 opt-in SKIP이었다. 오류4개는 synthetic host self-test의
+operationEvidence.allowlistSha256에 옛 공개 목록 hash가 남은 원인이었다.
+기대값·거부 probe를 바꾸지 않고 b9f3afc8에서 그 hash 한 필드만 갱신했다.
+다른 byte 동일 proof와 최초 RED를 보존했다.
+
+b9f3afc8 전체 재실행은 830 PASS·80 opt-in SKIP, 실패·오류0, exit0이다.
+검사 중 tracked source drift0과 생성 observer DB 부재를 확인했다. 원로그·
+JUnit·동결 source·정리 증거는
+.local/resume-20261023/observer-relations-full-corrected/에 남긴다.
+이는 제품 write 변경이나 원래 T17/T11 업무 인수의 새 실행이 아니다.
+Task와 현재 Step은 OPEN이며 남은 구현·실제 인수를 계속한다.
