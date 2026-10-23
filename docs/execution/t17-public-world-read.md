@@ -122,3 +122,47 @@ root·다른 tree·B 소유 recovery/fault/evaluation correction·observer·
 Main/verify·AGENTS·task-status를 수정하지 않는다. 새 agent/Workflow/API
 과금·배포·Grok·push는 실행하지 않는다. primary가 통합과 최종 인수를
 소유하며 Task/Step은 OPEN이다.
+
+## 후속: 공유 fixture 수명과 기본 discovery
+
+`cb93fb40`의 새 test class가 FulfillmentPostgresTest를 상속하면서
+원래 test도 discovery에 포함했고, 자체 AfterAll이 다른 class도 쓰는
+static PG/blob을 먼저 종료했다. 새 검사
+`publicWorldReadUsesCurrentAllOfAuthorityAndRejectsForeignScope` 다음에
+원래 `exactSplitProjectsPermissionsAndDisjointHold`를 같은 JVM에서
+선택한 RED는 1 PASS/1 ERROR(exit 1)다. 원래 seed의 TRUNCATE에서
+`DataAccessResourceFailure: An I/O error occurred while sending to the
+backend`가 발생했다.
+
+새 class를 기존 PublicScopeEligibilityPostgresTest와 같은 composition으로
+바꿨다. Spring이 helper를 autowire하고 seed와 saleFixture를 명시적으로
+실행하며 각 검사마다 원래 시계로 초기화한다. SecurityContext는 매 검사
+뒤 해제한다. 기존 test/helper 본문은 명시적 `fixture.` receiver를 제거하면
+byte 단위로 원본과 같고 assertion 호출 60곳을 모두 보존했다.
+
+class 종료에서는 공유 PG/blob을 건드리지 않는다. PG 종료는 원래
+Testcontainers가 맡는다. JVM 종료 hook은 그때 존재하는 blob tree의
+부모부터 deleteOnExit에 등록한다. Java21 JVM의 파일 삭제 단계에서
+자식부터 지워지며, 이미 없는 파일과 중복 등록은 무해하다. 기존
+PublicScopeEligibilityPostgresTest의 종료 hook은 먼저 같은 tree를 지울
+수 있다. 새 hook은 그 class의 삭제와 경합해 직접 파일을 지우지 않는다.
+
+집중 실행은 기본 동일 JVM 설정을 유지했다. 아래 정순·역순은 검증
+명령의 선택이며 suite 설정·fork·skip·disabled를 바꾸지 않았다.
+
+| 실행 | 결과 |
+|---|---|
+| 수정 전 새 검사→원래 검사, reversealphabetical | 1 PASS/1 ERROR, exit 1 |
+| 수정 후 같은 두 검사, reversealphabetical | 2 PASS, exit 0 |
+| 원래·PublicScope·새 검사, alphabetical | 3 PASS, exit 0 |
+| 새·PublicScope·원래 검사, reversealphabetical | 3 PASS, exit 0 |
+| PublicWorldReadPostgresTest 기본 discovery, # 필터 없음 | 10 PASS, exit 0 |
+
+각 세 class 실행의 PublicScope 검사는
+`allOfScopesIncludeEveryReturnedTargetAndOptionalWork`다. 정확한 명령,
+JVM PID·선택 순서·container ID·blob 절대 경로, source/class/log hash,
+XML과 cleanup 결과는 `.local/t17-public-world-read-lifecycle/`에 남긴다.
+RED의 blob 절대 경로는 원래 cleanup이 출력하지 않아 독립 기록이 없고,
+알 수 없는 임시 디렉터리를 추측해 정리하지 않는다. 제품 source,
+원래 tests/oracle/grant는 수정하지 않는다. 전체 backend와 native actual은
+NOT_RUN이며 primary가 통합 인수를 소유한다. Task/Step은 OPEN이다.
