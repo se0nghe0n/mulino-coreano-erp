@@ -181,4 +181,53 @@ public final class ReferenceResolverTest {
         assertThrows(AssertionError.class,()->new ReferenceResolver(Map.of("assessment",incomplete),Json.object()).identity(ref));
     }
 
+    @Test void exactRegulatoryResponsePointersRequireCanonicalUuidsEverywhere() {
+        String id="71183868-30ae-4fa0-9a90-823cfe08b647";
+        var effects=Json.object();var result=Json.object().put("driverStatus","EXECUTED");
+        result.set("provenance",Json.object().put("scopeComplete",true));result.set("response",Json.object().set("effects",effects));
+        var resolver=new ReferenceResolver(Map.of("regulatory",result),Json.object());
+        for(String field:List.of("procedureId","procedureVersionId")) {
+            String pointer="/response/effects/"+field;
+            var ref=Json.object().set("$result",Json.object().put("actionId","regulatory").put("pointer",pointer));
+            var source=Json.object().set(field,ref);
+            var encoded=Json.object().set("$encode",Json.object().put("encoding","json").set("source",source));
+            effects.put(field,id);assertTrue(ReferenceResolver.identityPointer(pointer));
+            assertEquals(id,resolver.identity(ref).asText());assertEquals(id,resolver.resolve(ref).asText());
+            assertEquals(id,Json.parse(resolver.resolve(encoded).asText()).path(field).asText());
+            assertThrows(IllegalArgumentException.class,()->resolver.identity(encoded));
+            for(JsonNode invalid:List.<JsonNode>of(Json.MAPPER.valueToTree("not-a-uuid"),Json.MAPPER.valueToTree("1-1-1-1-1"),Json.MAPPER.valueToTree(""),Json.MAPPER.valueToTree(" "),Json.MAPPER.valueToTree(1),Json.MAPPER.valueToTree(false),Json.object(),Json.array())) {
+                effects.set(field,invalid);
+                assertThrows(IllegalArgumentException.class,()->resolver.resolve(ref));
+                assertThrows(IllegalArgumentException.class,()->resolver.identity(ref));
+                assertThrows(IllegalArgumentException.class,()->resolver.resolve(encoded));
+            }
+            effects.putNull(field);
+            assertThrows(AssertionError.class,()->resolver.resolve(ref));
+            assertThrows(AssertionError.class,()->resolver.identity(ref));
+            assertThrows(AssertionError.class,()->resolver.resolve(encoded));
+            for(String counterfeit:List.of("/response/"+field,"/data/"+field,"/response/effects/nested/"+field,"/response/effects/"+field+"/","/response/effects/"+field+"~0")) {
+                assertFalse(ReferenceResolver.identityPointer(counterfeit));
+                ((ObjectNode)ref.path("$result")).put("pointer",counterfeit);
+                assertThrows(IllegalArgumentException.class,()->resolver.resolve(encoded));
+            }
+        }
+        for(String field:List.of("versionId","quantity","status")) {
+            effects.put(field,id);String pointer="/response/effects/"+field;assertFalse(ReferenceResolver.identityPointer(pointer));
+            var ref=Json.object().set("$result",Json.object().put("actionId","regulatory").put("pointer",pointer));
+            var encoded=Json.object().set("$encode",Json.object().put("encoding","json").set("source",Json.object().set(field,ref)));
+            assertThrows(IllegalArgumentException.class,()->resolver.resolve(encoded));
+        }
+    }
+    @Test void regulatoryPointersStillRequireExecutedCompleteResults() {
+        for(String field:List.of("procedureId","procedureVersionId")) {
+            var ref=Json.object().set("$result",Json.object().put("actionId","regulatory").put("pointer","/response/effects/"+field));
+            for(String status:List.of("NOT_IMPLEMENTED","STARTED","PENDING","FAILED")) {
+                var result=Json.object().put("driverStatus",status);result.set("provenance",Json.object().put("scopeComplete",true));result.set("response",Json.object().set("effects",Json.object().put(field,"71183868-30ae-4fa0-9a90-823cfe08b647")));
+                assertThrows(AssertionError.class,()->new ReferenceResolver(Map.of("regulatory",result),Json.object()).resolve(ref));
+            }
+            var incomplete=Json.object().put("driverStatus","EXECUTED");incomplete.set("provenance",Json.object().put("scopeComplete",false));incomplete.set("response",Json.object().set("effects",Json.object().put(field,"71183868-30ae-4fa0-9a90-823cfe08b647")));
+            assertThrows(AssertionError.class,()->new ReferenceResolver(Map.of("regulatory",incomplete),Json.object()).resolve(ref));
+        }
+    }
+
 }

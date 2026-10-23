@@ -86,7 +86,10 @@ def apply(case, fixture):
 
 def reverse(case_id, value):
     """Validate and undo only the individually reviewed selector corrections."""
-    if case_id == 'T11':
+    if case_id == 'T09':
+        from author_sale_sources import restore
+        result = restore(value)
+    elif case_id == 'T11':
         # The newest, strictly checked T11 input layer must be undone before
         # the older assessment selector ledger can address its original paths.
         import importlib.util
@@ -126,7 +129,12 @@ def original_view(case_id, value):
 
 
 def original_fixture(value):
-    value = copy.deepcopy(value)
+    if value.get('fixtureId', '').startswith('T09-') or any(
+            name in value.get('actors', {}) for name in ('t09SaleSource', 't09SaleSourceDelegator')):
+        from author_sale_sources import restore_fixture
+        value = restore_fixture(value)
+    else:
+        value = copy.deepcopy(value)
     value['aliases'].pop('syntheticPolicyVersion', None)
     value['aliases'].pop(ACTOR, None)
     value['actors'].pop(ACTOR, None)

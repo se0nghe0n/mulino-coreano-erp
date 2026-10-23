@@ -136,6 +136,34 @@ final class T09SaleSourceFacts {
             }
         }
     }
+    private static void referencedActions(JsonNode node, Set<String> names) {
+        if(node.isObject()&&node.path("actionId").isTextual())names.add(node.path("actionId").asText());
+        if(node.isContainerNode())for(var child:node)referencedActions(child,names);
+    }
+    JsonNode oracleReport() throws Exception {
+        var report=Json.object().put("recordType","T09_BOUNDED_ORACLE_OBSERVATIONS")
+            .put("fixtureSubcase",sub.path("id").asText()).put("fullScenarioRunnerUsed",false)
+            .put("caseSha256",Json.sha256(root.resolve("verification/cases/T09/case.json")));
+        var rows=Json.array();
+        for(var scenario:Json.read(root.resolve("verification/cases/T09/case.json")).path("subcases")) {
+            boolean selected=scenario.path("id").equals(sub.path("id"));
+            for(var assertion:scenario.path("assertions")) {
+                var row=Json.object().put("subcase",scenario.path("id").asText()).put("id",assertion.path("id").asText());
+                var dependencies=new TreeSet<String>();referencedActions(assertion,dependencies);
+                if(!selected)row.put("status","NOT_RUN").put("reason","Different isolated fixture; outside this probe instance");
+                else {
+                    dependencies.removeAll(results.keySet());
+                    if(!dependencies.isEmpty()) {
+                        row.put("status","NOT_RUN").put("reason","Required actions not reached");row.set("unreachedActions",Json.MAPPER.valueToTree(dependencies));
+                    } else try {
+                        var engine=new AssertionEngine();engine.check(assertion,results,aliases);row.put("status","PASS");
+                    } catch(AssertionError|IllegalArgumentException failed) {row.put("status","FAIL").put("reason",failed.getMessage());}
+                }
+                rows.add(row);
+            }
+        }
+        report.set("assertions",rows);return report;
+    }
     void save(Path path) throws Exception {
         var data=Json.object();data.set("httpReceipts",Json.MAPPER.valueToTree(httpReceipts));
         data.set("commands",Json.MAPPER.valueToTree(results));data.set("installer",installed);
@@ -150,5 +178,6 @@ final class T09SaleSourceFacts {
             var values=Json.array();for(var row:rows(table)) {var v=Json.object();row.forEach((k,x)->{if(x==null)v.putNull(k);else v.put(k,x.toString());});values.add(v);}sql.set(table,values);
         }
         data.set("rawRows",sql);Json.write(path,data);
+        Json.write(path.resolveSibling(path.getFileName().toString().replace(".json","-oracles.json")),oracleReport());
     }
 }

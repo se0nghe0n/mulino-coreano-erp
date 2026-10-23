@@ -24,6 +24,13 @@ class T09SaleSourceFactsPostgresTest {
         f=new T09SaleSourceFacts(root,ActualConfiguration.environment(System.getenv()),sid,old,mutate);
     }
     void install(String sid) throws Exception {install(sid,false,x->{});}
+    JsonNode sourceEligibility(String action) throws Exception {
+        var query=Json.object().put("id",f.segment());query.set("scope",Json.object().put("organizationId",f.aliases.path("ORG").asText()));
+        query.set("filters",Json.object().put("action",action).put("customerId",f.aliases.path("CUSTOMER").asText()));
+        var result=f.call("evaluateEligibility",query,"t09SaleSource");
+        f.results.put("source-eligibility-"+action+"-"+f.results.size(),result);
+        assertEquals(200,result.path("httpStatus").asInt(),result.toString());return result;
+    }
     void noAllocation() throws Exception {assertTrue(f.rows("mulino_inventory_SegmentAllocations").isEmpty());}
     void denied(JsonNode r) throws Exception {assertNotEquals("APPLIED",r.at("/response/outcome").asText(),r.toPrettyString());noAllocation();}
     void applied(JsonNode r){assertEquals("APPLIED",r.at("/response/outcome").asText(),r.toPrettyString());}
@@ -102,6 +109,7 @@ class T09SaleSourceFactsPostgresTest {
     }
     void complete(String sid) throws Exception {
         install(sid);reached("t09-sale-source-dispatch-regulatory-allow");auditSources();noAllocation();
+        assertEquals(sid.equals("cumulative-versus-state")?"60":"100",sourceEligibility("SELL").at("/response/data/eligibleQuantity").asText());
         String doc=f.results.get("t09-sale-source-sell-qc-document").at("/response/id").asText();
         var read=Json.object().put("id",doc);read.set("scope",Json.object().put("organizationId",f.aliases.path("ORG").asText()));
         var sourceRead=f.call("getEvidence",read,"t09SaleSource");assertEquals(200,sourceRead.path("httpStatus").asInt(),sourceRead.toString());
@@ -111,7 +119,7 @@ class T09SaleSourceFactsPostgresTest {
         if(sid.equals("exists-versus-end-throughout")&&!"APPLIED".equals(r.at("/response/outcome").asText())) {
             // This frozen baseline lacks the separate product owner's internal fact purpose patch.
             assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",r.at("/response/error/code").asText(),r.toString());denied(r);
-            Json.write(out.resolve("remaining-product-seam.json"),Json.object().put("status","BLOCKED_PRODUCT_INTERNAL_EVIDENCE_AUTHORIZATION").put("action",f.reserveId()).put("range","[0,100) BOX").put("allTypedSourcesAudited",true));
+            Json.write(out.resolve("remaining-product-seam.json"),Json.object().put("status","OPEN_PRODUCT_INTERNAL_EVIDENCE_AUTHORIZATION").put("action",f.reserveId()).put("range","[0,100) BOX").put("allTypedSourcesAudited",true));
             return;
         }
         applied(r);assertEquals(1,f.rows("mulino_inventory_SegmentAllocations").size());
@@ -216,17 +224,30 @@ class T09SaleSourceFactsPostgresTest {
             install("cumulative-versus-state",false,fixture->{if(mode.equals("missing-expiry"))((ObjectNode)fixture.path("aliases").path("LOT")).remove("expiresAt");});
             reached("t09-sale-source-dispatch-regulatory-allow");auditSources();
             if(mode.equals("corrected-source")) {
+                assertEquals("60",sourceEligibility("SELL").at("/response/data/eligibleQuantity").asText());
+                // This isolated correction probe needs an active responsibility Work.
+                // Original scenario actions and its DRAFT sales Work remain unchanged.
+                var read=Json.object().put("workId",f.work());read.set("scope",Json.object().put("organizationId",f.aliases.path("ORG").asText()));
+                var current=f.call("getWork",read,"A");f.results.put("correction-current-sale-work",current);
+                var activate=Json.object().put("intentKind","COMMAND").put("definitionVersion","definition-v1").put("capabilityId","activateWork").put("commandIdempotencyKey","correction-activate-sale-work");
+                activate.set("subjectRefs",Json.array());activate.set("slots",Json.object().put("workId",f.work()));activate.set("provenance",Json.object().put("workId","CONTEXT"));activate.set("expectedRevision",current.at("/response/data/revision"));
+                var activated=f.call("activateWork",activate,"A");f.results.put("correction-activate-sale-work",activated);applied(activated);
+                f.post("/__verification/runtime/clock",Json.object().put("instant",java.time.Instant.parse(f.fixture.path("clock").path("asOf").asText()).plusSeconds(1).toString()),"A");
                 var req=f.request("t09-sale-source-sell-qc-document").put("capabilityId","correctEvidence").put("commandIdempotencyKey","correct-qc-source").put("expectedRevision",1);
-                var slots=(ObjectNode)req.path("slots");slots.put("evidenceType","DOCUMENT").put("supersedesId",f.results.get("t09-sale-source-sell-qc-document").at("/response/id").asText()).put("sourceReference","new-explicit-correction");
+                var slots=(ObjectNode)req.path("slots");slots.put("evidenceType","DOCUMENT").put("supersedesId",f.results.get("t09-sale-source-sell-qc-document").at("/response/id").asText());
                 var corrected=f.call("correctEvidence",req,"A");f.results.put("correct-qc-source",corrected);applied(corrected);
             }
+            assertEquals("0",sourceEligibility("SELL").at("/response/data/eligibleQuantity").asText());
             denied(f.reserve());f.save(out.resolve(mode+".json"));
         }
     }
     @Test void sellAloneDoesNotAuthorizeDispatch() throws Exception {
         install("cumulative-versus-state");
         var omit=new HashSet<String>();for(String id:f.sources())if(id.startsWith("t09-sale-source-dispatch-"))omit.add(id);
-        assertEquals(f.reserveId(),f.through(f.reserveId(),omit));applied(f.results.get(f.reserveId()));
+        assertEquals(f.reserveId(),f.through(f.reserveId(),omit));
+        assertEquals("60",sourceEligibility("SELL").at("/response/data/eligibleQuantity").asText());
+        assertEquals("0",sourceEligibility("DISPATCH").at("/response/data/eligibleQuantity").asText());
+        applied(f.results.get(f.reserveId()));
         JsonNode pick=null,dispatch=null;
         for(var a:f.sub.path("actions")) {
             String cap=a.path("capabilityId").asText();

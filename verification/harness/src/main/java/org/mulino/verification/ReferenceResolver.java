@@ -29,7 +29,7 @@ public final class ReferenceResolver {
             require(ref.isObject() && ref.size()==2 && ref.has("actionId") && ref.has("pointer"),"Result reference requires only actionId/pointer");
             if(identity) require(identityPointer(ref.path("pointer").asText()),"Assertion references must bind identity, not observed business values");
             JsonNode value=new AssertionEngine().select(ref,results,false);
-            if(identity || ASSESSMENT_ROW_ID.equals(ref.path("pointer").asText()) || DELIVERY_RESPONSE_IDS.contains(ref.path("pointer").asText())) checkIdentityValue(ref.path("pointer").asText(),value);
+            if(identity || ASSESSMENT_ROW_ID.equals(ref.path("pointer").asText()) || DELIVERY_RESPONSE_IDS.contains(ref.path("pointer").asText()) || REGULATORY_RESPONSE_IDS.contains(ref.path("pointer").asText())) checkIdentityValue(ref.path("pointer").asText(),value);
             return value.deepCopy();
         }
         if(node.isObject() && node.has("$encode")) {
@@ -58,9 +58,11 @@ public final class ReferenceResolver {
     private static final String ASSESSMENT_ROW_ID="/response/data/ID";
     private static final Set<String> DELIVERY_RESPONSE_IDS=Set.of(
         "/response/effects/dispatchId","/response/effects/cargoScopeId","/response/effects/deliveryId");
+    private static final Set<String> REGULATORY_RESPONSE_IDS=Set.of(
+        "/response/effects/procedureId","/response/effects/procedureVersionId");
     private static String identityField(String pointer) {return pointer.substring(pointer.lastIndexOf('/')+1);}
     public static boolean identityPointer(String pointer) {
-        if(ASSESSMENT_ROW_ID.equals(pointer) || DELIVERY_RESPONSE_IDS.contains(pointer)) return true;
+        if(ASSESSMENT_ROW_ID.equals(pointer) || DELIVERY_RESPONSE_IDS.contains(pointer) || REGULATORY_RESPONSE_IDS.contains(pointer)) return true;
         if(!pointer.startsWith("/")) return false;
         String field=identityField(pointer);
         return ID_FIELDS.contains(field) || IDS_FIELDS.contains(field) || HASH_FIELDS.contains(field) || REVISION_FIELDS.contains(field);
@@ -72,6 +74,10 @@ public final class ReferenceResolver {
         }
         if(DELIVERY_RESPONSE_IDS.contains(pointer)) {
             require(nonemptyString(value) && canonicalUuid(value.textValue()),"Delivery response identity must be a canonical UUID");
+            return;
+        }
+        if(REGULATORY_RESPONSE_IDS.contains(pointer)) {
+            require(nonemptyString(value) && canonicalUuid(value.textValue()),"Regulatory response identity must be a canonical UUID");
             return;
         }
         String field=identityField(pointer);

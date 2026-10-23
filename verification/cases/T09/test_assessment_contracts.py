@@ -23,7 +23,7 @@ class AssessmentContracts(unittest.TestCase):
             # by the structural binding ledger.
             mutated = copy.deepcopy(current)
             mutated['subcases'][0]['assertions'][0]['expected'] = 'FORGED'
-            if case_id == 'T11':
+            if case_id in ('T09', 'T11'):
                 # The new whole-layer inverse is stricter: forged oracles are
                 # rejected before the older structural selector ledger runs.
                 with self.assertRaises(ValueError):
@@ -48,6 +48,25 @@ class AssessmentContracts(unittest.TestCase):
         next(a for a in mutated['subcases'][0]['actions'] if a['id'] == 'child30-link')['actorRef'] = 'supervisor'
         with self.assertRaises(ValueError):
             reverse('T11', mutated)
+
+    def test_t09_canonical_inverse_rejects_unowned_and_new_layer_mutations(self):
+        from assessment_contracts import original_fixture
+        current = json.loads((ROOT/'verification/cases/T09/case.json').read_text())
+        for action_id in ('sale60', 't09-sale-source-sell-qc-document'):
+            mutated = copy.deepcopy(current)
+            next(a for a in mutated['subcases'][0]['actions'] if a['id'] == action_id)['actorRef'] = 'supervisor'
+            with self.assertRaises(ValueError):
+                reverse('T09', mutated)
+        fixture = json.loads((ROOT/'verification/cases/T09/fixtures/cumulative-versus-state.json').read_text())
+        for actor in ('warehouse', 't09SaleSource'):
+            mutated = copy.deepcopy(fixture)
+            mutated['actors'][actor]['grant']['actions'].append('emergencyReassign')
+            with self.assertRaises(ValueError):
+                original_fixture(mutated)
+        mutated = copy.deepcopy(fixture)
+        mutated['fixtureId'] = 'FORGED'
+        with self.assertRaises(ValueError):
+            original_fixture(mutated)
 
     def test_correction_ledger_is_only_structural(self):
         ledger = json.loads(Path(__file__).with_name('assessment-binding-corrections.json').read_text())
@@ -90,7 +109,12 @@ class AssessmentContracts(unittest.TestCase):
             relative = f'verification/cases/{case_id}/scenario.feature'
             before = subprocess.check_output(['git', 'show', baseline+':'+relative], cwd=ROOT).decode()
             feature = (ROOT/relative).read_text()
-            if case_id == 'T11':
+            if case_id == 'T09':
+                from author_sale_sources import restore_feature
+                with self.assertRaises(ValueError):
+                    restore_feature(feature.replace('t09-sale-source-sell-qc-document', 'FORGED', 1))
+                feature = restore_feature(feature)
+            elif case_id == 'T11':
                 import importlib.util
                 spec = importlib.util.spec_from_file_location(
                     't11_parent_ranges', ROOT/'verification/cases/T11/author_parent_ranges.py')

@@ -194,6 +194,9 @@ def restore_fixture(value):
         if value.get('fixtureId') == new['fixtureId']:
             if value != new: raise ValueError('T09 strict fixture inverse rejects unrecorded source/grant drift')
             return json.loads(baseline(path))
+    if any(name in value.get('actors', {}) for name in (ACTOR, DELEGATOR)) or any(
+            profile.get('namespace') == NAMESPACE for profile in value.get('baseline', {}).get('sourceProfiles', [])):
+        raise ValueError('T09 sale-source fixture identity differs from the declared fixtures')
     return copy.deepcopy(value)
 
 
