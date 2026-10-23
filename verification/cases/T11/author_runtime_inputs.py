@@ -36,6 +36,39 @@ def authored(old):
                 slots['evidence']={};r['provenance']['evidence']=r['provenance'].pop('resumeEvidenceIds')
                 q=a['id']+'-current-work';inserted_before.append(query(q,slots['workId']))
                 r['expectedRevision']=ref(q,'/response/data/revision')
+            elif sub['id']=='pending-correction' and a['id']=='correction':
+                original=next(x for x in sub['actions'] if x['id']=='receipt-event')['request']['slots']
+                r=a['request'];old=r['slots'];amount=old['correctedQuantity']
+                assert original['sourceVersion']==old['supersedesVersion']=='1'
+                assert amount=={'value':'98','unit':'BOX'} and original['quantity']=='100'
+                assert old['occurredAt']==original['effectiveFrom']
+                payload=copy.deepcopy(original['payload'])
+                payload['$encode']['source']['quantity']=amount['value']
+                q='correction-original-event'
+                inserted_before.append({'id':q,'kind':'query','actorRef':a['actorRef'],'route':'api',
+                    'capabilityId':'getEvidence','request':{'id':ref('receipt-event','/response/id'),
+                    'scope':{'organizationId':{'$alias':'ORG'},'kind':'EVENT'}},'evidenceRefs':[q+':actual-artifact']})
+                # Correct the recorded source observation, never the canonical occurrence.
+                # Do not attach the original 100 document as proof of the corrected 98.
+                slots={'evidenceType':'EVENT','subject':{'kind':ref(q,'/response/data/subjectKind'),
+                    'id':ref(q,'/response/data/subjectId')},'kind':ref(q,'/response/data/kind'),
+                    'sourceNamespace':ref(q,'/response/data/sourceNamespace'),
+                    'externalEventId':ref(q,'/response/data/externalEventId'),'sourceVersion':'2',
+                    'effectiveFrom':original['effectiveFrom'],'timeZone':original['timeZone'],
+                    'timePrecision':original['timePrecision'],'valueState':original['valueState'],
+                    'payload':payload,'quantity':amount['value'],'unit':amount['unit'],
+                    'supersedesId':ref(q,'/response/data/ID')}
+                r['slots']=slots;r['provenance']={k:'CONTEXT' for k in slots}
+                for k in ('payload','quantity','unit'):r['provenance'][k]='USER'
+                r['expectedRevision']=ref(q,'/response/data/revision')
+                r['subjectRefs']=[{'type':'Work','id':ref(q,'/response/data/subjectId')}]
+            elif sub['id']=='pending-correction' and a['id'] in ('delay-reassessment','release-reassessment'):
+                params=a['control']['parameters']
+                assert params['point']=='evidence.correct.afterPendingBeforeAssessment'
+                params.pop('mode',None)
+                params['scope']={'organizationId':{'$alias':'ORG'},'caseId':'T11','itemId':{'$alias':'P'}}
+                # Preserve the requested point/release semantics. This product does
+                # not support them; never replace them with a rollback fault.
             elif sub['id']=='pending-correction' and a['id']=='close':
                 q='close-current-work';inserted_before.append(query(q,a['request']['slots']['workId']))
                 a['request']['expectedRevision']=ref(q,'/response/data/revision')
@@ -76,7 +109,7 @@ def feature():
         block=text[start:end]
         for c in changes:
             if c['subcaseId']!=sid:continue
-            old=f'    만일 "{c["before"]["actorRef"]}" 역할이 "{c["actionId"]}" 행동을 수행한다\n'
+            old=f'    만일 "{c["before"].get("actorRef","시스템")}" 역할이 "{c["actionId"]}" 행동을 수행한다\n'
             assert block.count(old)==1
             def lines(actions):return ''.join(f'    만일 "{a["actorRef"]}" 역할이 "{a["id"]}" 행동을 수행한다\n' for a in actions)
             block=block.replace(old,lines(c['insertedBefore'])+old+lines(c['insertedAfter']))

@@ -250,6 +250,7 @@
     만일 "A" 역할이 "confirmed-before-correction-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "confirmed-before-correction-db" 행동을 수행한다
     만일 "시스템" 역할이 "delay-reassessment" 행동을 수행한다
+    만일 "A" 역할이 "correction-original-event" 행동을 수행한다
     만일 "A" 역할이 "correction" 행동을 수행한다
     만일 "A" 역할이 "close-current-work" 행동을 수행한다
     만일 "A" 역할이 "close" 행동을 수행한다

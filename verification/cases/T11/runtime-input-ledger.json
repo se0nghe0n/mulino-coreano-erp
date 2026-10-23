@@ -3,7 +3,7 @@
   "baseline": "477bba574e9ac6c4be32b236d93164f763b12401",
   "assertionsUnchanged": 110,
   "beforeSha256": "19d04b6e6e284cee63e654a818985d6a00d58730bc12d93a842736b24295ab2c",
-  "afterSha256": "683bc75f86d5b6845f1b7bb19e0c5158370609d15606c0cf0ac7227ab28b0734",
+  "afterSha256": "a2f8d298a92731899f874b8c2ca5bf412ec8ec385c43eed4465c3479baa1c4b6",
   "changes": [
     {
       "subcaseId": "wait-timeout",
@@ -124,6 +124,261 @@
     },
     {
       "subcaseId": "pending-correction",
+      "actionId": "delay-reassessment",
+      "before": {
+        "id": "delay-reassessment",
+        "kind": "control",
+        "evidenceRefs": [
+          "delay-reassessment:actual-artifact"
+        ],
+        "control": {
+          "type": "fault",
+          "operation": "arm",
+          "parameters": {
+            "point": "evidence.correct.afterPendingBeforeAssessment",
+            "mode": "DEFER_UNTIL_RELEASE"
+          }
+        }
+      },
+      "after": {
+        "id": "delay-reassessment",
+        "kind": "control",
+        "evidenceRefs": [
+          "delay-reassessment:actual-artifact"
+        ],
+        "control": {
+          "type": "fault",
+          "operation": "arm",
+          "parameters": {
+            "point": "evidence.correct.afterPendingBeforeAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            }
+          }
+        }
+      },
+      "insertedBefore": [],
+      "insertedAfter": []
+    },
+    {
+      "subcaseId": "pending-correction",
+      "actionId": "correction",
+      "before": {
+        "id": "correction",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "correction:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "correctEvidence",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "correctEvidence",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "originalEvidenceId": {
+              "$result": {
+                "actionId": "receipt-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "correctedQuantity": {
+              "value": "98",
+              "unit": "BOX"
+            },
+            "supersedesVersion": "1",
+            "reason": "실수량 정정",
+            "occurredAt": "2026-10-07T00:00:00Z"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-pending-correction-correction",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "originalEvidenceId": "CONTEXT",
+            "correctedQuantity": "USER",
+            "supersedesVersion": "USER",
+            "reason": "USER",
+            "occurredAt": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "correction",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "correction:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "correctEvidence",
+        "request": {
+          "intentKind": "RECORD",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "correctEvidence",
+          "subjectRefs": [
+            {
+              "type": "Work",
+              "id": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/subjectId"
+                }
+              }
+            }
+          ],
+          "slots": {
+            "evidenceType": "EVENT",
+            "subject": {
+              "kind": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/subjectKind"
+                }
+              },
+              "id": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/subjectId"
+                }
+              }
+            },
+            "kind": {
+              "$result": {
+                "actionId": "correction-original-event",
+                "pointer": "/response/data/kind"
+              }
+            },
+            "sourceNamespace": {
+              "$result": {
+                "actionId": "correction-original-event",
+                "pointer": "/response/data/sourceNamespace"
+              }
+            },
+            "externalEventId": {
+              "$result": {
+                "actionId": "correction-original-event",
+                "pointer": "/response/data/externalEventId"
+              }
+            },
+            "sourceVersion": "2",
+            "effectiveFrom": "2026-10-07T00:00:00Z",
+            "timeZone": "UTC",
+            "timePrecision": "SECOND",
+            "valueState": "KNOWN",
+            "payload": {
+              "$encode": {
+                "source": {
+                  "quantity": "98",
+                  "itemId": {
+                    "$alias": "P"
+                  },
+                  "lotId": {
+                    "$alias": "LOT"
+                  },
+                  "placeId": {
+                    "$alias": "W"
+                  },
+                  "occurredAt": "2026-10-07T00:00:00Z",
+                  "workId": {
+                    "$alias": "SOURCE"
+                  },
+                  "rangeRootId": {
+                    "$alias": "Q"
+                  },
+                  "startQuantity": "0",
+                  "unit": "BOX"
+                },
+                "encoding": "json"
+              }
+            },
+            "quantity": "98",
+            "unit": "BOX",
+            "supersedesId": {
+              "$result": {
+                "actionId": "correction-original-event",
+                "pointer": "/response/data/ID"
+              }
+            }
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "correction-original-event",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-pending-correction-correction",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "evidenceType": "CONTEXT",
+            "subject": "CONTEXT",
+            "kind": "CONTEXT",
+            "sourceNamespace": "CONTEXT",
+            "externalEventId": "CONTEXT",
+            "sourceVersion": "CONTEXT",
+            "effectiveFrom": "CONTEXT",
+            "timeZone": "CONTEXT",
+            "timePrecision": "CONTEXT",
+            "valueState": "CONTEXT",
+            "payload": "USER",
+            "quantity": "USER",
+            "unit": "USER",
+            "supersedesId": "CONTEXT"
+          }
+        }
+      },
+      "insertedBefore": [
+        {
+          "id": "correction-original-event",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "receipt-event",
+                "pointer": "/response/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "kind": "EVENT"
+            }
+          },
+          "evidenceRefs": [
+            "correction-original-event:actual-artifact"
+          ]
+        }
+      ],
+      "insertedAfter": []
+    },
+    {
+      "subcaseId": "pending-correction",
       "actionId": "close",
       "before": {
         "id": "close",
@@ -232,6 +487,49 @@
           ]
         }
       ],
+      "insertedAfter": []
+    },
+    {
+      "subcaseId": "pending-correction",
+      "actionId": "release-reassessment",
+      "before": {
+        "id": "release-reassessment",
+        "kind": "control",
+        "evidenceRefs": [
+          "release-reassessment:actual-artifact"
+        ],
+        "control": {
+          "type": "fault",
+          "operation": "release",
+          "parameters": {
+            "point": "evidence.correct.afterPendingBeforeAssessment"
+          }
+        }
+      },
+      "after": {
+        "id": "release-reassessment",
+        "kind": "control",
+        "evidenceRefs": [
+          "release-reassessment:actual-artifact"
+        ],
+        "control": {
+          "type": "fault",
+          "operation": "release",
+          "parameters": {
+            "point": "evidence.correct.afterPendingBeforeAssessment",
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "caseId": "T11",
+              "itemId": {
+                "$alias": "P"
+              }
+            }
+          }
+        }
+      },
+      "insertedBefore": [],
       "insertedAfter": []
     },
     {

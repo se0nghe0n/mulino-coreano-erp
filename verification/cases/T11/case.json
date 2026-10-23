@@ -9763,9 +9763,41 @@
             "operation": "arm",
             "parameters": {
               "point": "evidence.correct.afterPendingBeforeAssessment",
-              "mode": "DEFER_UNTIL_RELEASE"
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T11",
+                "itemId": {
+                  "$alias": "P"
+                }
+              }
             }
           }
+        },
+        {
+          "id": "correction-original-event",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "receipt-event",
+                "pointer": "/response/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "kind": "EVENT"
+            }
+          },
+          "evidenceRefs": [
+            "correction-original-event:actual-artifact"
+          ]
         },
         {
           "id": "correction",
@@ -9782,28 +9814,95 @@
             "capabilityId": "correctEvidence",
             "subjectRefs": [
               {
-                "type": "TradeItem",
+                "type": "Work",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "correction-original-event",
+                    "pointer": "/response/data/subjectId"
+                  }
                 }
               }
             ],
             "slots": {
-              "originalEvidenceId": {
-                "$result": {
-                  "actionId": "receipt-canonical",
-                  "pointer": "/response/id"
+              "evidenceType": "EVENT",
+              "subject": {
+                "kind": {
+                  "$result": {
+                    "actionId": "correction-original-event",
+                    "pointer": "/response/data/subjectKind"
+                  }
+                },
+                "id": {
+                  "$result": {
+                    "actionId": "correction-original-event",
+                    "pointer": "/response/data/subjectId"
+                  }
                 }
               },
-              "correctedQuantity": {
-                "value": "98",
-                "unit": "BOX"
+              "kind": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/kind"
+                }
               },
-              "supersedesVersion": "1",
-              "reason": "실수량 정정",
-              "occurredAt": "2026-10-07T00:00:00Z"
+              "sourceNamespace": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/sourceNamespace"
+                }
+              },
+              "externalEventId": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/externalEventId"
+                }
+              },
+              "sourceVersion": "2",
+              "effectiveFrom": "2026-10-07T00:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "quantity": "98",
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "workId": {
+                      "$alias": "SOURCE"
+                    },
+                    "rangeRootId": {
+                      "$alias": "Q"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "quantity": "98",
+              "unit": "BOX",
+              "supersedesId": {
+                "$result": {
+                  "actionId": "correction-original-event",
+                  "pointer": "/response/data/ID"
+                }
+              }
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "correction-original-event",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-pending-correction-correction",
             "evidenceRefs": [
               {
@@ -9811,11 +9910,20 @@
               }
             ],
             "provenance": {
-              "originalEvidenceId": "CONTEXT",
-              "correctedQuantity": "USER",
-              "supersedesVersion": "USER",
-              "reason": "USER",
-              "occurredAt": "USER"
+              "evidenceType": "CONTEXT",
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "USER",
+              "quantity": "USER",
+              "unit": "USER",
+              "supersedesId": "CONTEXT"
             }
           }
         },
@@ -9966,7 +10074,16 @@
             "type": "fault",
             "operation": "release",
             "parameters": {
-              "point": "evidence.correct.afterPendingBeforeAssessment"
+              "point": "evidence.correct.afterPendingBeforeAssessment",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T11",
+                "itemId": {
+                  "$alias": "P"
+                }
+              }
             }
           }
         },

@@ -33,7 +33,7 @@ D11 표는 자식 종료/부모90≠100·부족10 이전을 명시한다.
 |---|---|
 | `getAssessment`, `getObligations` | 공개 QUERY다. 의무 생성 효과와 생성 root/assignment ID를 반환하는 명령이 아니다. |
 | `transferObligation`, `proposeHandover`, `acceptHandover` | 공개되어 있고 원래 A에게 허용된다. 기존 실제 assignment 또는 handover가 선행해야 하며 부족10의 최초 proof/root를 만들지 않는다. |
-| `createFollowup` | 공개되어 있고 A에게 허용된다. `WorkLifecycle`은 원래 CLOSED Work와 기존 obligationIds를 검증해 연결한다. 현재 ACTIVE 부모의 새로운 부족10을 증명·생성하는 대체 경로가 아니다. |
+| `createFollowup` | 공개되어 있고 A에게 허용된다. `WorkLifecycle`은 CLOSED Work와 별도 draft로 새 Work를 만든다. 현재 `ResponsibilityService.followup`은 두 Work의 존재만 확인하며 의무/source를 생성·연결하지 않는다. 현재 ACTIVE 부모의 새로운 부족10을 증명·생성하는 대체 경로가 아니다. |
 | `activateWork`의 초기 의무 | `ResponsibilityService.initialDuty`는 nextAction이 있을 때 일반 WORK_NEXT_ACTION을 만든다. 원래 부모 createWork에는 nextAction이 없고 이 의무는 증명된 수량10이 아니다. 새 text나 slot을 추가해 대체하지 않는다. |
 | receipt shortfall/excess/unallocated | 실제 PO line과 ReceiptCredits가 있어야 RECEIPT_SHORTFALL이다. 현재 no-PO90은 RECEIPT_UNALLOCATED90이며 부족10으로 재해석하거나 부분 이전하지 않는다. |
 | `createObligation` | handler/slot catalog에만 있으며 공개 inventory와 원래 grant에는 없다. `ResponsibilityCommands.prepare/execute`는 GOAL_QUANTITY_SHORTFALL을 이 alias로 보내면 명시적으로 거부한다. |
@@ -113,3 +113,85 @@ assertion 블록·fixture12개·이전 ledger를 보존했고 parent 세 변형�
 포함한9개 subcase가 baseline과 동일함을 독립 대조했다. 증거는
 `.local/resume-20261023/t11-runtime-input-integrated/`에 남긴다.
 실제 Haiku 재실행은 아직 NOT_RUN이며 Task와 현재 Step은 OPEN이다.
+
+## pending-correction / closed-followup 후속 입력 경계
+
+이번 후속은 root의 control metadata 수정 `581284cb`를 복사하지 않는다.
+해당 선언과 입력 parameters는 다른 경계다. backend/evaluation/observer도
+변경하지 않는다.
+
+### 실제 원본 source를 정정한다
+
+기존 native raw의 receipt-event는 APPLIED이고 실제 event ID
+`e0e01eee-85a5-4f3c-901e-8dbfea6d1417`, revision 1을 반환했다.
+기존 correction은 `originalEvidenceId=receipt-canonical.id`와
+correctedQuantity/supersedesVersion/reason/occurredAt을 보내 TYPE_INVALID였다.
+이 원래 실패와 pendingInputs=0 관찰은 artifact에 보존한다.
+
+공개 `EvidenceRecordCommands`의 correctEvidence EVENT form은
+`EvidenceCommandInputs.event`를 사용한다. 같은 subject의 원래 Events 행을
+supersedesId로 요구하고 그 행의 현재 revision으로 expectedRevision을 검증한다.
+canonical ID는 이 EVENT row의 대체 identity가 아니다.
+
+새 correction-original-event는 getEvidence(id=receipt-event.id,
+kind=EVENT)로 원래 행을 읽는다. 정확한 현재 ID/revision과 subjectKind/subjectId,
+kind/sourceNamespace/externalEventId를 실제 응답에서 연결한다.
+subjectRefs도 이 실제 Work를 가리킨다. 기존 payload의 범위/item/LOT/place/
+Work/발생시각은 보존하고, 원래 주어진 정정 수량98 BOX만 payload/quantity에
+반영한다. 원래 sourceVersion 1에 대한 명시적인 successor version 2를 쓴다.
+원래 문서100을 documentId로 연결해98의 claim을 만들지 않으며 새 문서,
+verification, canonical, 물리 movement를 생성하는 행동은 추가하지 않는다.
+원래 reason/이전 version/표현은 가역 ledger의 before에 보존한다.
+정정은 관측 이력이며 98을 verified canonical fact라고 주장하지 않는다.
+
+이 입력 수정의 runtime 결과는 NOT_RUN이다. TYPE_INVALID가 해소되었다는
+제품 실행 PASS나 pending flag가 생겼다는 주장은 하지 않는다.
+
+### fault scope 수정과 지원되지 않는 deferral
+
+ActualAcceptanceDriver.faultControl이 인식하는 scope.organizationId를
+arm/release 양쪽에 추가하고 미지원 parameter mode=DEFER_UNTIL_RELEASE를
+제거했다. 원래 point와 release operation은 의미를 바꾸지 않고 보존한다.
+
+현재 VerificationFaults.POINTS에는 command.beforeCommit 등의 실패 주입만
+있으며 `evidence.correct.afterPendingBeforeAssessment`는 없다. control도
+arm/inject/install/disarm/remove만 지원하고 release를 지원하지 않는다.
+AssessmentCorrectionImpact는 증거 transaction 안에서 invalidate/책임 연결을
+처리하며 해당 이름의 pause hook을 보고하지 않는다. 따라서 원래 시나리오의
+pending 상태를 유지한 뒤 release하는 시간창을 이번 입력만으로 만들 수 없다.
+command.beforeCommit rollback fault나 일반 auth barrier로 바꾸면 다른 의미다.
+그런 변경이나 가짜 pending flag는 하지 않았다. root control 선언 수정만으로
+이 point/operation 지원까지 생기지는 않는다.
+
+### closed-followup은 pointer 오타로 해결되지 않는다
+
+기존 raw temperature는 APPLIED이고 실제 event ID
+`8672395b-60ba-4fb2-9934-b0669ee3aaf7`, revision 1과 claimId를 반환한다.
+canonical occurrence나 obligation/assignment ID를 반환하지 않는다.
+recordActivity 응답의 `/id`를 `/occurrenceId` 대신 쓰면 event를 canonical로
+잘못 표시한다.
+
+더구나 공개 createFollowup slot은 `draft, obligationIds, reason, workId`다.
+sourceOccurrenceId/ownerId/supervisorId/nextAction/nextCheckAt은 이 명령의
+최상위 slot이 아니다. WorkLifecycle은 CLOSED 부모와 명시적 draft를 요구하며,
+ResponsibilityService.followup은 현재 두 Work 존재 확인만 한다. source event나
+canonical을 인자로 받아 책임을 입증·생성하는 구현이 아니다.
+
+원래 fixture는 CLOSED parent/과거 assessment와 segment temperature source를
+제공하지만 obligations/assignments는 비어 있다. temperature에 document/claim이
+있다는 사실은 canonical reconciliation/verification이나 anomaly duty를
+입증하지 않는다. 일반 nextAction으로 초기 의무를 만들어 원래 anomaly
+책임인 것처럼 대체하거나, 부모 goal을 새 draft에 복사하지 않는다.
+따라서 closed-followup subcase 전체를 원래 baseline과 동일하게 보존한다.
+공개 계약의 실제 anomaly source→책임→후속 Work 연결과 명시적 draft의
+필수 goal 입력이 미해결 경계다. 원래 9 assertions는 수정하지 않았다.
+
+원문 응답/old rejection과 source·slot·fault 근거는
+`.local/t11-correction-followup-inputs/`에 남긴다. Python/prepare 증거와
+실제 runtime 미실행을 구별한다. 원래110 oracle와 원본 fixtures/grants/
+수량/시계/이전126 ledger는 계속 보존한다.
+
+이번 후속 최종 결과는 T11 Python 15 PASS, 이전 보존 Python 20 PASS,
+prepare asset checks 12 PASS / exit 0이다. slot findings는 413개이며 T11의
+correction 미지원 slot 1건만 제거됐다. PG/HTTP/native scenarios와 full
+backend/harness는 모두 이번 후속에서 NOT_RUN이다. 새 Docker/key/blob은 없다.
