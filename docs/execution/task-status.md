@@ -3,7 +3,7 @@
 기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
 
-## 현재 통합 gate (2026-10-23)
+## 현재 통합 gate (2026-10-24)
 
 전체 Task와 현재 구현 Step은 OPEN이다. 아래는 최근 실행의 실제 기준선이며
 뒤의 기록은 당시 결과로 보존한다. 집중·정적 검사와 native 업무 인수를
@@ -17,7 +17,8 @@
 | Prepare | 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
 | 실제 T09/T11 부분 | 5bcb46b5: native Haiku 12 subcase·107 assertions, 100 PASS·7 FAIL·미관찰0; subcase7 PASS·5 FAIL |
 | 실제 T17 전체 | 27ec8cc3: native Haiku 15 subcase·257 assertions, 79 PASS·178 FAIL·미관찰0; 모든 subcase FAIL |
-| 최근 native 재실행 | 64054871: Haiku 14 node, 36 subcase 모두 필수 관찰 schema 오류로 FAIL; assertion 실행0·미관찰461, DB12개 정리. 업무 PASS/FAIL로 재분류하지 않는다. |
+| 최근 native 재실행 | b507aa8a: Haiku 14 node·217 assistant records, 36 subcase 모두 관찰 `/itemId` 원행 derivation 누락으로 FAIL; assertion 실행0·미관찰461, DB12개 정리. 업무 PASS/FAIL로 재분류하지 않는다. |
+| 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
 
@@ -33,8 +34,23 @@ ACCEPTED_PENDING_EXTERNAL 응답(64054871)까지 통합했고 전체 backend를
 새 native 실행에서 measurementMetadataQueries의 wire schema 등록 누락이
 드러나 모든 assertion이 미실행이었다. 계약 필드만 명시하고 실제 PG
 관계 검사37개에서 공통 관찰 helper의 전체 schema 검사를 보강했다. 같은 native 원문이
-옛 schema에서 거부되고 보정 schema에서 통과한다. 업무 oracle은 그대로이며
-새 기준선의 native 재실행이 남아 있다.
+옛 schema에서 거부되고 보정 schema에서 통과한다. 업무 oracle은 그대로다.
+이어 실행한 b507aa8a의 native Workflow `wf_5b5e1885-698`는 JSON schema를
+통과한 뒤 `/itemId`의 원행 derivation 누락으로 중단됐다. 461 assertion은
+모두 미관찰이며, 실제 업무 결과가 개선됐다는 근거로 사용하지 않는다.
+primary가 12개 shard의 commit·원본 case·source3189개·동일 product class330개,
+실제 Haiku 모델14개와 소유 DB12개의 부재를 대조했다. 의미 검증까지 포함한
+관찰 계약 보정과 새 결합 검증을 진행한다. 두 실패 실행은 모두 보존한다.
+
+이 실행의 원문과 primary 대조 증거는
+`.local/resume-20261023/native-measurement-schema-b507aa8a-audit/`에 있다.
+[allocation 원행 귀속](observer-atomic-attribution.md)과
+[규제 중첩 상태](regulatory-conflict-state.md)의 집중 증거는 native 업무
+인수와 구별한다. allocation API transactionId 응답 공백도 아직 열려 있다.
+primary의 7개 변경 파일 일치·원본 case/database 보존과 규제 결합 검증은
+`.local/resume-20261024/atomic-regulatory-combined/`에 남겼다.
+처음 Docker socket을 찾지 못한 환경 오류도 보존했고 실제 OrbStack
+socket을 지정한 재실행에서 15 PASS·실패/오류/skip0을 확인했다.
 
 증거와 실패는 [공통 캡처 부분 인수](capture-case-acceptance.md),
 [T17 실제 인수](t17-five-shard-acceptance.md),
