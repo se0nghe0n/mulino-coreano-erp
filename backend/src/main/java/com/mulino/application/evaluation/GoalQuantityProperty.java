@@ -6,13 +6,18 @@ import java.util.*;
 public final class GoalQuantityProperty {
  private GoalQuantityProperty(){}
  public static String resolve(Definition definition,Map<String,Object> predicate,String unit){
+  var properties=resolveAll(definition,predicate,unit);
+  if(properties.size()!=1)throw held();return properties.getFirst();
+ }
+ /** Each explicit quantity predicate in a stock interval constrains the same requested target. */
+ public static List<String> resolveAll(Definition definition,Map<String,Object> predicate,String unit){
   var references=new TreeSet<String>();collect(predicate,references);
-  var quantities=definition.attributes().stream().filter(a->Set.of("quantity","stateQuantity").contains(a.name())&&a.type()==Definition.ValueType.DECIMAL&&Objects.equals(a.unit(),unit)).map(a->a.nounType()+"."+a.name()).toList();
+  var quantities=definition.attributes().stream().filter(a->Set.of("quantity","stateQuantity","observedQuantity").contains(a.name())&&a.type()==Definition.ValueType.DECIMAL&&Objects.equals(a.unit(),unit)).map(a->a.nounType()+"."+a.name()).toList();
   if(!references.isEmpty()){
-   if(references.size()!=1||!quantities.contains(references.first()))throw held();
-   return references.first();
+   if(!quantities.containsAll(references))throw held();
+   return List.copyOf(references);
   }
-  if(quantities.size()!=1)throw held();return quantities.getFirst();
+  if(quantities.size()!=1)throw held();return List.copyOf(quantities);
  }
  public static String operator(Map<String,Object> predicate,String property,String mode){
   var operators=new HashSet<String>();collectOperators(predicate,property,operators);

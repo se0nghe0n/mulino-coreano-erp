@@ -81,7 +81,14 @@ public final class TypedPredicateEvaluator {
       var p=new HashMap<String,List<Fact>>();facts.properties().forEach((key,values)->p.put(key,values.stream().filter(f->covers(f,at)).toList()));
       var r=evaluate(node,new EvaluationFacts(p,facts.relations()),at,known);answers.add(r.truth());conditions.addAll(r.conditions());
     }
-    return new Result(throughout?PredicateTruth.all(answers):PredicateTruth.any(answers),List.copyOf(conditions));
+    var grouped=new LinkedHashMap<String,List<Condition>>();
+    for(var condition:conditions)grouped.computeIfAbsent(condition.conditionId(),key->new ArrayList<>()).add(condition);
+    var combined=new ArrayList<Condition>();
+    grouped.forEach((id,values)->combined.add(new Condition(id,
+      throughout?PredicateTruth.all(values.stream().map(Condition::truth).toList()):PredicateTruth.any(values.stream().map(Condition::truth).toList()),
+      values.stream().flatMap(value->value.inputs().stream()).distinct().toList(),
+      values.stream().flatMap(value->value.evidenceRefs().stream()).distinct().sorted().toList(),VERSION)));
+    return new Result(throughout?PredicateTruth.all(answers):PredicateTruth.any(answers),List.copyOf(combined));
   }
   private static boolean covers(Fact f,Instant at){return f.effectiveFrom()!=null&&!at.isBefore(f.effectiveFrom())&&(f.effectiveUntil()==null||at.isBefore(f.effectiveUntil()));}
   private static boolean typedEquals(Fact f,Object other){if(other instanceof Map<?,?> m)return Objects.equals(f.unit(),m.get("unit"))&&decimal(f.value()).compareTo(decimal(m.get("value")))==0;return Objects.equals(f.value(),other);}

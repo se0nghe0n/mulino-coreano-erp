@@ -117,8 +117,8 @@ class ScenarioDefinitionContractTest {
     assertFalse(registeredQueries.contains("getCommandResult"));
     assertFalse(d.verbs().stream().anyMatch(v -> v.capabilityId().equals("getCommandResult")));
     assertFalse(d.capabilities().stream().anyMatch(c -> c.capabilityId().equals("getCommandResult")));
-    assertEquals(List.of("arrived", "delivered"), d.goals().stream().map(Definition.Goal::name).toList());
-    for (var template : d.goals()) {
+    assertEquals(List.of("arrived", "delivered", "held-at", "held-exists", "held-throughout"), d.goals().stream().map(Definition.Goal::name).toList());
+    for (var template : d.goals().stream().filter(g -> g.quantityMode().equals("CUMULATIVE_EVENT")).toList()) {
       assertEquals("core-v1", template.evaluatorVersion());
       assertEquals("quantitySum", template.predicate().get("operator"));
       assertEquals("VERIFIED_DISTINCT", template.predicate().get("evidenceSelector"));
@@ -180,4 +180,28 @@ class ScenarioDefinitionContractTest {
     assertNotEquals("VALID", validator.validate(futureDefinition).outcome());
     unsupported(futureDefinition, goal(futureDefinition, "ARRIVED"), "Pinned predicate unsupported");
   }
+  @Test void stockTemplatesAreTypedDistinctAndRequireExplicitPublishedSelectors() throws Exception {
+    var d=install(common());
+    assertEquals(d.goals().size(),d.goals().stream().map(g->g.endpoint()+"/"+g.quantityMode()).distinct().count());
+    for(var template:d.goals().stream().filter(g->!g.quantityMode().equals("CUMULATIVE_EVENT")).toList()){
+      var slots=new LinkedHashMap<String,Object>();
+      slots.putAll(Map.of("quantityMode",template.quantityMode(),"endpoint",template.endpoint(),"evaluatorVersion","core-v1","unit","BOX","targetQuantity","100","placeId",UUID.randomUUID().toString(),"action","PHYSICAL_HELD","includeReserved",true,"observationPolicy","complete-initial-and-final-ledger"));
+      slots.put("conditions",List.of(template.name()));
+      var selected=Map.<String,Object>of("definitionVersionId",d.id(),"slotsJson",json.writeValueAsString(slots));
+      requireSupported(d,selected);
+      slots.remove("conditions");
+      unsupported(d,Map.of("definitionVersionId",d.id(),"slotsJson",json.writeValueAsString(slots)),"Complete pinned goal conditions required");
+      slots.put("conditions",List.of("arrived"));
+      unsupported(d,Map.of("definitionVersionId",d.id(),"slotsJson",json.writeValueAsString(slots)),"Condition selector not published in pinned definition");
+      if(!template.quantityMode().equals("STATE_AT")){
+        slots.put("conditions",List.of(template.name()));slots.remove("observationPolicy");
+        unsupported(d,Map.of("definitionVersionId",d.id(),"slotsJson",json.writeValueAsString(slots)),"Explicit supported stock observation policy required");
+      }
+    }
+    var duplicate=common();
+    ((ArrayNode)duplicate.path("goals")).add(duplicate.path("goals").get(0).deepCopy());
+    var ambiguous=install(duplicate);
+    unsupported(ambiguous,goal(ambiguous,"ARRIVED"),"Unique pinned goal template required");
+  }
+
 }

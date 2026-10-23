@@ -58,7 +58,10 @@ public class DefinitionValidator {
       if(d.capabilities().stream().noneMatch(c->c.capabilityId().equals(v.capabilityId()))) p.add(new Problem(v.name(),"UNSUPPORTED_CAPABILITY"));
       for(var slot:v.slots().entrySet()) if(!names.contains(slot.getValue())&&!Set.of("DECIMAL","STRING","INSTANT","DATE","BOOLEAN").contains(slot.getValue())) p.add(new Problem(v.name()+"."+slot.getKey(),"SLOT_TYPE"));
     }
+    var goalNames=new HashSet<String>();var goalCoordinates=new HashSet<List<String>>();
     for(var g:d.goals()) {
+      if(!goalNames.add(g.name()))p.add(new Problem(g.name(),"DUPLICATE_GOAL"));
+      if(!goalCoordinates.add(Arrays.asList(g.endpoint(),g.quantityMode())))p.add(new Problem(g.name(),"AMBIGUOUS_GOAL_TEMPLATE"));
       if(!Set.of("CUMULATIVE_EVENT","STATE_AT","EXISTS_IN","THROUGHOUT").contains(g.quantityMode())||g.endpoint()==null||g.endpoint().isBlank()) p.add(new Problem(g.name(),"GOAL_INCOMPLETE"));
       if(d.capabilities().stream().noneMatch(c->c.evaluatorVersion().equals(g.evaluatorVersion()))) p.add(new Problem(g.name(),"UNSUPPORTED_EVALUATOR"));
       predicate(d,g.predicate(),g.name(),p,0,new int[]{0});

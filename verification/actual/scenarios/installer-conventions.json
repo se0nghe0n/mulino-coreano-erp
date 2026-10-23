@@ -121,6 +121,30 @@
     "maximumCount": 1,
     "requiredStage": "READ",
     "core": true
+   },
+   {
+    "nounType": "QuantitySegment",
+    "name": "stateQuantity",
+    "type": "DECIMAL",
+    "referenceType": null,
+    "unit": "BOX",
+    "decimalPlaces": 0,
+    "minimumCount": 1,
+    "maximumCount": 1,
+    "requiredStage": "READ",
+    "core": true
+   },
+   {
+    "nounType": "QuantitySegment",
+    "name": "observedQuantity",
+    "type": "DECIMAL",
+    "referenceType": null,
+    "unit": "BOX",
+    "decimalPlaces": 0,
+    "minimumCount": 0,
+    "maximumCount": 1,
+    "requiredStage": "READ",
+    "core": true
    }
   ],
   "verbs": [
@@ -941,6 +965,69 @@
      },
      "unit": "BOX",
      "evidenceSelector": "VERIFIED_DISTINCT"
+    }
+   },
+   {
+    "name": "held-at",
+    "quantityMode": "STATE_AT",
+    "endpoint": "ARRIVED",
+    "evaluatorVersion": "core-v1",
+    "predicate": {
+     "operator": "stateQuantity",
+     "property": "QuantitySegment.stateQuantity",
+     "minimum": {
+      "value": "1",
+      "unit": "BOX"
+     },
+     "unit": "BOX",
+     "evidenceSelector": "CURRENT_STATE"
+    }
+   },
+   {
+    "name": "held-exists",
+    "quantityMode": "EXISTS_IN",
+    "endpoint": "ARRIVED",
+    "evaluatorVersion": "core-v1",
+    "predicate": {
+     "operator": "stateQuantity",
+     "property": "QuantitySegment.stateQuantity",
+     "minimum": {
+      "value": "1",
+      "unit": "BOX"
+     },
+     "unit": "BOX",
+     "evidenceSelector": "CURRENT_STATE"
+    }
+   },
+   {
+    "name": "held-throughout",
+    "quantityMode": "THROUGHOUT",
+    "endpoint": "ARRIVED",
+    "evaluatorVersion": "core-v1",
+    "predicate": {
+     "operator": "all",
+     "children": [
+      {
+       "operator": "stateQuantity",
+       "property": "QuantitySegment.stateQuantity",
+       "minimum": {
+        "value": "1",
+        "unit": "BOX"
+       },
+       "unit": "BOX",
+       "evidenceSelector": "CURRENT_STATE"
+      },
+      {
+       "operator": "stateQuantity",
+       "property": "QuantitySegment.observedQuantity",
+       "minimum": {
+        "value": "1",
+        "unit": "BOX"
+       },
+       "unit": "BOX",
+       "evidenceSelector": "CURRENT_STATE"
+      }
+     ]
     }
    }
   ],

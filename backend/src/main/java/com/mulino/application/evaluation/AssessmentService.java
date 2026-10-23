@@ -71,16 +71,29 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     String mode=slots.get("quantityMode").toString();
     if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"),!Boolean.FALSE.equals(slots.get("periodStartInclusive")),!Boolean.FALSE.equals(slots.get("periodEndInclusive")));
     else result=evaluator.evaluate(predicate,facts,mode.equals("STATE_AT")?instant(slots.get("evaluationAt")):c.asOf(),c.knownAt());
+    if(usesStock(template(d,slots).predicate())){
+      String name=template(d,slots).name();
+      result=new TypedPredicateEvaluator.Result(result.truth(),result.conditions().stream().map(condition->new TypedPredicateEvaluator.Condition(
+        condition.conditionId().replaceFirst("^root",java.util.regex.Matcher.quoteReplacement(name)),condition.truth(),condition.inputs(),condition.evidenceRefs(),condition.evaluatorVersion())).toList());
+    }
     var snapshot=new LinkedHashMap<String,Object>();snapshot.put("goalId",goal.get("ID"));snapshot.put("goal",goal);snapshot.put("definitionId",d.id());snapshot.put("definitionHash",d.contentHash());snapshot.put("goalSlots",slots);snapshot.put("policy",policy.getFirst());snapshot.put("facts",facts);snapshot.put("conditions",result.conditions());String payload=encode(snapshot);
     return new Calculation(result,DefinitionRepository.sha256(payload),payload,policy.getFirst().get("ID").toString(),false);
   }
   private Definition definition(Map<String,Object> goal,DomainContext c){var slots=decode(goal.get("slotsJson"));if(!TypedPredicateEvaluator.VERSION.equals(slots.get("evaluatorVersion")))throw new DomainError("HELD","VERSION_UNSUPPORTED","Pinned evaluator unsupported");Definition d=definitions.get(c.organizationId(),goal.get("definitionVersionId").toString());var template=template(d,slots);validateConditions(slots,template);
+    if(Set.of("EXISTS_IN","THROUGHOUT").contains(slots.get("quantityMode"))&&usesStock(template.predicate())){
+      if(!"complete-initial-and-final-ledger".equals(slots.get("observationPolicy")))throw new DomainError("HELD","VERSION_UNSUPPORTED","Explicit supported stock observation policy required");
+      if(!Set.of("PHYSICAL","PHYSICAL_HELD").contains(Objects.toString(slots.get("action")))||!Boolean.TRUE.equals(slots.get("includeReserved"))||slots.get("placeId")==null||slots.get("targetQuantity")==null||slots.get("unit")==null)throw new DomainError("NEEDS_INPUT","GOAL_SLOT_MISSING","Stock interval requires targetQuantity, unit, placeId, physical action and includeReserved=true");
+    }
     if("STATE_AT".equals(slots.get("quantityMode"))||slots.containsKey("evidenceSource")){
       String operator=GoalQuantityProperty.operator(template.predicate(),GoalQuantityProperty.resolve(d,template.predicate(),Objects.toString(slots.get("unit"),null)),Objects.toString(slots.get("quantityMode")));
       if(slots.containsKey("evidenceSource")&&!"quantitySum".equals(operator))throw new DomainError("HELD","VERSION_UNSUPPORTED","Source identity requires canonical evidence");
       if("STATE_AT".equals(slots.get("quantityMode"))&&"quantitySum".equals(operator)&&(!"PHYSICAL".equals(slots.get("action"))||!Boolean.TRUE.equals(slots.get("includeReserved"))))throw new DomainError("HELD","VERSION_UNSUPPORTED","Canonical state evidence does not establish action eligibility or unreserved quantity");
     }
     if(!TypedPredicateEvaluator.VERSION.equals(d.evaluatorVersion())||!"1.0.0".equals(d.schemaVersion())||!"VALID".equals(validator.validate(d).outcome())||!TypedPredicateEvaluator.VERSION.equals(template.evaluatorVersion())||!"VALID".equals(validator.validatePredicate(d,template.predicate()).outcome()))throw new DomainError("HELD","VERSION_UNSUPPORTED","Pinned predicate unsupported");return d;}
+  private boolean usesStock(Map<String,Object> node){
+    if("stateQuantity".equals(node.get("operator")))return true;
+    return node.get("children") instanceof List<?> children&&children.stream().anyMatch(child->child instanceof Map<?,?> m&&usesStock((Map<String,Object>)m));
+  }
   private void validateConditions(Map<String,Object> slots,Definition.Goal template){
     if(!(slots.get("conditions") instanceof List<?> selected)||selected.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Complete pinned goal conditions required");
     Object condition=selected.getFirst();
@@ -90,13 +103,18 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   private Map<String,Object> goalPredicate(Definition d,Map<String,Object> slots){
     var original=template(d,slots).predicate();
     if(slots.get("targetQuantity")==null)return original;
-    String quantityProperty=GoalQuantityProperty.resolve(d,original,Objects.toString(slots.get("unit"),null));
     String mode=slots.get("quantityMode").toString();
-    if(!Set.of("CUMULATIVE_EVENT","STATE_AT").contains(mode))return original;
-    String operator=GoalQuantityProperty.operator(original,quantityProperty,mode);
-    var target=Map.<String,Object>of("operator",operator,"property",quantityProperty,"minimum",Map.of("value",slots.get("targetQuantity"),"unit",slots.get("unit")),"unit",slots.get("unit"),"evidenceSelector",operator.equals("quantitySum")?"VERIFIED_DISTINCT":"CURRENT_STATE");
-    return Map.of("operator","all","children",List.of(original,target));
+    var properties=Set.of("EXISTS_IN","THROUGHOUT").contains(mode)
+      ?GoalQuantityProperty.resolveAll(d,original,Objects.toString(slots.get("unit"),null))
+      :List.of(GoalQuantityProperty.resolve(d,original,Objects.toString(slots.get("unit"),null)));
+    var children=new ArrayList<Map<String,Object>>();children.add(original);
+    for(String quantityProperty:properties){
+      String operator=GoalQuantityProperty.operator(original,quantityProperty,mode);
+      children.add(Map.of("operator",operator,"property",quantityProperty,"minimum",Map.of("value",slots.get("targetQuantity"),"unit",slots.get("unit")),"unit",slots.get("unit"),"evidenceSelector",operator.equals("quantitySum")?"VERIFIED_DISTINCT":"CURRENT_STATE"));
+    }
+    return Map.of("operator","all","children",children);
   }
+
   private Definition.Goal template(Definition d,Map<String,Object> slots){var candidates=d.goals().stream().filter(g->Objects.equals(g.endpoint(),slots.get("endpoint"))&&Objects.equals(g.quantityMode(),slots.get("quantityMode"))).toList();if(candidates.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique pinned goal template required");return candidates.getFirst();}
   private Calculation held(Map<String,Object> goal,Map<String,Object> slots,String reason){String payload=encode(Map.of("goalId",goal.get("ID"),"goal",goal,"slots",slots,"unknown",reason));return new Calculation(new TypedPredicateEvaluator.Result(new PredicateTruth(PredicateTruth.State.UNVERIFIED,false),List.of()),DefinitionRepository.sha256(payload),payload,null,true);}
   private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;if(c.asOf().equals(instant(slots.get("dueAt")))&&Boolean.TRUE.equals(slots.get("deadlineInclusive")))return false;Instant boundary=instant(slots.get("dueAt"));if(Boolean.FALSE.equals(slots.get("deadlineInclusive")))boundary=boundary.minusNanos(1);var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),boundary,c.knownAt());var atDeadline=calculate(deadlineContext,w,goal,c.asOf());return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}

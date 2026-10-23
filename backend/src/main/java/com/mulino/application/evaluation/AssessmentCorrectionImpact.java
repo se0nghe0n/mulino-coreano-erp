@@ -97,7 +97,7 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
     for(var work:repository.rows(c,"mulino.work.read.Works")) {
       if(!Set.of("ACTIVE","WAITING","CLOSED").contains(work.get("status"))||!Objects.equals(occurrence.get("itemId"),work.get("itemId")))continue;
       var goals=repository.rows(c,"mulino.work.read.GoalReferences").stream().filter(g->Objects.equals(g.get("ID"),work.get("currentGoalVersionId"))).toList();
-      for(var goal:goals)try{var slots=json.readValue(Objects.toString(goal.get("slotsJson"),"{}"),Map.class);if(slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),occurrence.get("placeId")))continue;if(slots.get("eventKind")!=null&&!Objects.equals(slots.get("eventKind"),occurrence.get("kind")))continue;ids.add(work.get("ID").toString());}catch(java.io.IOException e){throw DomainError.invalid("Invalid current goal scope");}
+      for(var goal:goals)try{var slots=json.readValue(Objects.toString(goal.get("slotsJson"),"{}"),Map.class);if(slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),occurrence.get("placeId")))continue;if(!com.mulino.domain.evaluation.CanonicalEventSemantics.affects(slots,occurrence.get("kind")))continue;ids.add(work.get("ID").toString());}catch(java.io.IOException e){throw DomainError.invalid("Invalid current goal scope");}
     }
     for(var credit:repository.rows(c,"mulino.work.WorkContributions"))if(Objects.equals(occurrence.get("ID"),credit.get("occurrenceId")))ids.add(credit.get("targetWorkId").toString());
   }

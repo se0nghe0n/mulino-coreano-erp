@@ -47,4 +47,14 @@ class TypedPredicateEvaluatorTest {
    assertEquals(PredicateTruth.State.SATISFIED,evaluator.evaluateInterval(n,startOnly,t,t.plusSeconds(10),t,false,true,false).truth().state());
  }
 
+ @Test void intervalConditionsSummarizeEveryBoundaryWithoutHidingTheGap(){
+   var n=Map.<String,Object>of("operator","stateQuantity","property","Receipt.quantity","minimum",Map.of("value","100","unit","BOX"),"unit","BOX","evidenceSelector","CURRENT_STATE");
+   var input=facts(fact("a","p","100",t,t.plusSeconds(5),true),fact("b","p","100",t.plusSeconds(10),t.plusSeconds(20),true));
+   var result=evaluator.evaluateInterval(n,input,t,t.plusSeconds(20),t,true);
+   assertEquals(PredicateTruth.State.UNVERIFIED,result.truth().state());
+   assertEquals(1,result.conditions().size());
+   assertEquals(result.truth(),result.conditions().getFirst().truth());
+   assertEquals(Set.of("evidence-a","evidence-b"),new HashSet<>(result.conditions().getFirst().evidenceRefs()));
+ }
+
 }

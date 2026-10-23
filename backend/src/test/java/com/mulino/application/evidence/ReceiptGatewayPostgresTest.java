@@ -197,4 +197,73 @@ class ReceiptGatewayPostgresTest {
   String segment=uuid();jdbc.update("INSERT INTO mulino_inventory_QuantitySegments(organizationId,ID,itemId,lotId,identificationStatus,quantity,unit,placeId,ownerId,custodianId,controlScope,validFrom,mixtureStatus) VALUES(?,?,?,?,'CONFIRMED',60,'BOX',?,?,?,'transit','2026-01-01','IDENTIFIED')",ORG,segment,ITEM,LOT,TRANSIT,ACTOR,ACTOR);
   var a=provisional(uuid(),"60",true,segment,CUSTODIAN,CUSTODIAN);String occurrence=canonical(a,null);var rejected=confirm(a,occurrence,uuid(),CUSTODIAN);assertEquals("REJECTED",rejected.get("outcome"),rejected.toString());assertEquals(1,count("mulino_inventory_QuantitySegments"));assertEquals(0,count("mulino_trade_receipt_Receipts"));
   var moved=confirm(a,occurrence,uuid());assertEquals("APPLIED",moved.get("outcome"),moved.toString());String target=((Map<?,?>)moved.get("effects")).get("segmentId").toString();assertEquals(ACTOR,jdbc.queryForObject("SELECT custodianId FROM mulino_inventory_QuantitySegments WHERE ID=?",String.class,target));assertEquals(ACTOR,jdbc.queryForObject("SELECT ownerId FROM mulino_inventory_QuantitySegments WHERE ID=?",String.class,target));}
+ @Autowired com.mulino.application.trade.receipt.ReceiptCanonicalFactAdmission admission;
+ @Autowired com.mulino.application.evaluation.AssessmentCorrectionImpact correctionImpact;
+ void goalEvent(String kind){
+  String goal=uuid();
+  jdbc.update("INSERT INTO mulino_work_read_GoalReferences(organizationId,ID,createdAt,recordedAt,effectiveAt,workId,definitionVersionId,quantityMode,targetQuantity,unit,endpoint,scopeJson,slotsJson) SELECT organizationId,?,createdAt,recordedAt,effectiveAt,workId,definitionVersionId,quantityMode,targetQuantity,unit,endpoint,scopeJson,jsonb_set(slotsJson::jsonb,'{eventKind}',to_jsonb(?::text))::text FROM mulino_work_read_GoalReferences WHERE ID=(SELECT currentGoalVersionId FROM mulino_work_read_Works WHERE ID=?)",goal,kind,WORK);
+  jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE ID=?",goal,WORK);
+ }
+ java.math.BigDecimal assessedCredit(Map<String,Object> result)throws Exception{
+  String assessment=((Map<?,?>)result.get("assessment")).get("ID").toString();
+  var snapshot=new com.fasterxml.jackson.databind.ObjectMapper().readTree(jdbc.queryForObject("SELECT contentJson FROM mulino_evaluation_InputSnapshots WHERE assessmentId=?",String.class,assessment));
+  java.math.BigDecimal total=java.math.BigDecimal.ZERO;
+  for(var fact:snapshot.path("facts").path("properties").path("Receipt.quantity"))if(fact.path("verified").asBoolean())total=total.add(new java.math.BigDecimal(fact.path("value").asText()));
+  return total;
+ }
+ @Test void authoredConfirmedReceiptMeansCommittedPhysicalCreditAndNeverRelabelsSource()throws Exception{
+  goalEvent("CONFIRMED_RECEIPT");ordered100Fixture();
+  var a=provisional(uuid(),"60",true,null);String occurrence=canonical(a,null);
+  assertEquals(java.math.BigDecimal.ZERO,assessedCredit(assess()),"A reviewed source without confirmation contributes nothing");
+  Instant beforeConfirmation=Instant.now();
+  var first=confirm(a,occurrence,uuid());assertEquals("APPLIED",first.get("outcome"),first.toString());
+  assertEquals(0,new java.math.BigDecimal("60").compareTo(assessedCredit(assess())));
+  assertFalse(request(()->admission.admit(auth.context(Instant.now(),beforeConfirmation),WORK,null,repository.require("CanonicalOccurrences",ORG,occurrence))).admitted(),"Historical knownAt cannot see the later receipt transaction");
+  var duplicate=provisional(a.root(),"60",true,null);assertEquals(occurrence,canonical(duplicate,occurrence));
+  assertEquals("APPLIED",confirm(duplicate,occurrence,uuid()).get("outcome"));
+  assertEquals(0,new java.math.BigDecimal("60").compareTo(assessedCredit(assess())));
+  var b=provisional(uuid(),"40",true,null);String second=canonical(b,null);assertEquals("APPLIED",confirm(b,second,uuid()).get("outcome"));
+  assertEquals("SATISFIED",((Map<?,?>)assess().get("assessment")).get("outcome"));
+  assertEquals(0,new java.math.BigDecimal("100").compareTo(assessedCredit(assess())));
+  assertEquals(2,count("mulino_trade_purchase_ReceiptCredits"));assertEquals(2,count("mulino_inventory_QuantityMovements"));
+  assertEquals(List.of("PHYSICAL_RECEIPT"),jdbc.queryForList("SELECT DISTINCT kind FROM mulino_evidence_CanonicalOccurrences",String.class));
+ }
+ @Test void confirmedReceiptAdmissionRejectsMismatchedPhysicalFactsAndForeignScope(){
+  goalEvent("CONFIRMED_RECEIPT");ordered100Fixture();var a=provisional(uuid(),"60",true,null);String occurrence=canonical(a,null);
+  assertEquals("APPLIED",confirm(a,occurrence,uuid()).get("outcome"));
+  request(()->{var c=auth.context(Instant.now(),Instant.now());var canonical=repository.require("CanonicalOccurrences",ORG,occurrence);
+   assertTrue(admission.admit(c,WORK,null,canonical).admitted());
+   for(var entry:Map.<String,Object>of("quantity",new java.math.BigDecimal("59"),"unit","EA","placeId",uuid(),"workId",uuid(),"physicalScopeId",uuid()).entrySet()){
+    var changed=new LinkedHashMap<>(canonical);changed.put(entry.getKey(),entry.getValue());assertFalse(admission.admit(c,WORK,null,changed).admitted(),entry.getKey());
+   }
+   assertFalse(admission.admit(new DomainContext(OTHER,ACTOR,OWNER,c.asOf(),c.knownAt()),WORK,null,canonical).admitted());
+   return null;
+  });
+  jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=?",ORG,GRANT);
+  jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,'ITEM',?)",ORG,GRANT,ITEM);
+  jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,'WORK',?)",ORG,GRANT,uuid());
+  request(()->{assertFalse(admission.admit(auth.context(Instant.now(),Instant.now()),WORK,null,repository.require("CanonicalOccurrences",ORG,occurrence)).admitted(),"All grant dimensions must match");return null;});
+ }
+ @Test void sourceAliasCannotBypassPhysicalAdmission()throws Exception{
+  goalEvent("CONFIRMED_RECEIPT");var a=provisional(uuid(),"100",true,null);String occurrence=canonical(a,null);
+  assertFalse(com.mulino.domain.evaluation.CanonicalEventSemantics.matches("CONFIRMED_RECEIPT","CONFIRMED_RECEIPT"));
+  assertEquals("PHYSICAL_RECEIPT",jdbc.queryForObject("SELECT kind FROM mulino_evidence_CanonicalOccurrences WHERE ID=?",String.class,occurrence));
+  assertEquals(java.math.BigDecimal.ZERO,assessedCredit(assess()));assertEquals(0,count("mulino_trade_receipt_Receipts"));
+ }
+ @Test void receiptCorrectionInvalidatesMatchingAuthoredGoalWithoutPriorAssessment(){
+  goalEvent("CONFIRMED_RECEIPT");ordered100Fixture();var a=provisional(uuid(),"60",true,null);String occurrence=canonical(a,null);
+  assertEquals("APPLIED",confirm(a,occurrence,uuid()).get("outcome"));
+  String follower=uuid(),followerGoal=uuid();
+  jdbc.update("INSERT INTO mulino_work_read_Works(organizationId,ID,createdAt,recordedAt,effectiveAt,itemId,definitionVersionId,kind,status,ownerId,supervisorId,lifecycleMode,pendingInvalidation) SELECT organizationId,?,createdAt,recordedAt,effectiveAt,itemId,definitionVersionId,kind,status,ownerId,supervisorId,lifecycleMode,false FROM mulino_work_read_Works WHERE ID=?",follower,WORK);
+  jdbc.update("INSERT INTO mulino_work_read_GoalReferences(organizationId,ID,createdAt,recordedAt,effectiveAt,workId,definitionVersionId,quantityMode,targetQuantity,unit,endpoint,scopeJson,slotsJson) SELECT organizationId,?,createdAt,recordedAt,effectiveAt,?,definitionVersionId,quantityMode,targetQuantity,unit,endpoint,scopeJson,jsonb_set(slotsJson::jsonb,'{scope}',jsonb_build_object('itemId',?::text))::text FROM mulino_work_read_GoalReferences WHERE ID=(SELECT currentGoalVersionId FROM mulino_work_read_Works WHERE ID=?)",followerGoal,follower,ITEM,WORK);
+  jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE ID=?",followerGoal,follower);
+  request(()->new TransactionTemplate(tx).execute(status->{
+   String corrected=records.recordActivity(new EventInput(new Subject(SubjectKind.WORK,WORK),"PHYSICAL_RECEIPT","warehouse",uuid(),"2",new EffectiveTime(OCCURRED,null,"Asia/Seoul","SECOND"),ValueState.KNOWN,"corrected source",a.event(),null)).get("id").toString();
+   correctionImpact.apply(auth.context(Instant.now(),Instant.now()),new EvidenceCorrectionImpact.Correction(a.event(),corrected,Set.of(WORK),Set.of()));return corrected;
+  }));
+  assertTrue(jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",Boolean.class,follower));
+  assertTrue(jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE workId=? AND valid AND status='OPEN'",Integer.class,follower)>0);
+  assertEquals("PHYSICAL_RECEIPT",jdbc.queryForObject("SELECT kind FROM mulino_evidence_CanonicalOccurrences WHERE ID=?",String.class,occurrence));
+ }
+
 }
