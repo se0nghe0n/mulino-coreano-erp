@@ -19,6 +19,8 @@ public class ApplicationQueries {
   private final ExecutionClock clock;
   private final WorkReadHandler work;
   private final ObjectMapper json=new ObjectMapper();
+  @org.springframework.beans.factory.annotation.Autowired(required=false)
+  private com.mulino.application.inventory.PublicWorldRead publicWorld;
   public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock){this(handlers,auth,work,clock,List.of());}
   @org.springframework.beans.factory.annotation.Autowired
   public ApplicationQueries(List<QueryHandler> handlers,ReadAuthorizer auth,WorkReadHandler work,ExecutionClock clock,List<ObjectReadProvider> objects){
@@ -45,7 +47,7 @@ public class ApplicationQueries {
     DomainContext context=auth.context(asOf,knownAt);
     if(request.scope().containsKey("organizationId")&&!context.organizationId().equals(request.scope().get("organizationId")))throw DomainError.forbidden();
     boolean evidenceOperation=Set.of("getEvidence","getInbox").contains(request.operation());
-    Set<String> allowedScope=evidenceOperation?Set.of("organizationId","kind","subjectKind","subjectId"):Set.of("organizationId","itemId","lotId","workId","placeId","customerId","objectType");
+    Set<String> allowedScope=evidenceOperation?Set.of("organizationId","kind","subjectKind","subjectId"):Set.of("organizationId","itemId","lotId","workId","placeId","customerId","orderId","salesLineId","objectType");
     if(!allowedScope.containsAll(request.scope().keySet()))throw DomainError.invalid("Unsupported scope key");
     request.scope().forEach((key,value)->{
       Set<String> enumValues=switch(key){case "objectType"->objectTypes;case "kind"->Set.of("DOCUMENT","EVENT","CLAIM","CANONICAL");case "subjectKind"->Set.of("ITEM","LOT","SEGMENT","WORK","PLACE","PURCHASE_ORDER");default->null;};
@@ -65,7 +67,7 @@ public class ApplicationQueries {
     Object shared=data;
     Map<String,Object> snapshotScope=scope;
     if(worldOperations.contains(request.operation())&&(!request.operation().equals("getAssessment")||request.filters().containsKey("action"))&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
-      var worldScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId"))if(scope.containsKey(key))worldScope.put(key,scope.get(key));
+      var worldScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId","workId","orderId","salesLineId"))if(scope.containsKey(key))worldScope.put(key,scope.get(key));
       snapshotScope=worldScope;
       Map<String,Object> world=work.world(context,worldScope);
       if(handlers.containsKey("getInventory")){
@@ -77,6 +79,10 @@ public class ApplicationQueries {
         QueryResult inventoryResult=handlers.get("getInventory").query(context,inventory);
         if(inventoryResult.data() instanceof Map<?,?> inventoryData)world.putAll((Map<String,Object>)inventoryData);
         evidence.addAll(inventoryResult.evidenceRefs());unknowns.addAll(inventoryResult.unknowns());conflicts.addAll(inventoryResult.conflicts());
+      }
+      if(publicWorld!=null){
+        var recorded=publicWorld.read(context,worldScope,world,now);world.putAll(recorded);
+        unknowns.addAll((List<String>)recorded.get("publicReadGaps"));
       }
       if(scope.get("itemId")!=null)world.put("itemId",scope.get("itemId"));
       evidence.addAll((List<String>)world.getOrDefault("evidenceRefs",List.of()));

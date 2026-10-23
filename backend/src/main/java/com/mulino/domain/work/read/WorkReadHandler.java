@@ -16,6 +16,8 @@ public class WorkReadHandler implements QueryHandler {
   private org.springframework.beans.factory.ObjectProvider<com.mulino.application.inventory.InventoryQueries> inventoryRead;
   @org.springframework.beans.factory.annotation.Autowired
   private org.springframework.beans.factory.ObjectProvider<com.mulino.application.inventory.WorkSupplyRead> supplyRead;
+  @org.springframework.beans.factory.annotation.Autowired
+  private org.springframework.beans.factory.ObjectProvider<com.mulino.application.trade.sales.SalesQueries> salesRead;
   public Set<String> operations(){return Set.of("getWork","searchWorks","getObligations","getAssessment");}
   public QueryResult query(DomainContext c,QueryRequest q){
     // Action-scoped supply assessment keeps the shared noun/Work world snapshot.
@@ -65,7 +67,8 @@ public class WorkReadHandler implements QueryHandler {
     data.put("workIds",List.copyOf(ids));data.put("ownerIds",List.copyOf(owners));data.put("nextActions",List.copyOf(next));data.put("evidenceRefs",List.copyOf(evidence));data.put("obligations",obligations);
     data.put("workLinks",workLinks(c,ids));data.put("contributions",contributions(c,ids));
     if(inventoryRead!=null&&inventoryRead.getIfAvailable()!=null&&scope.containsKey("itemId")){
-      var inventory=inventoryRead.getObject().query(c,new QueryRequest("getInventory",null,scope,Map.of(),200,null,null,c.asOf(),c.knownAt(),null));
+      var physicalScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId"))if(scope.containsKey(key))physicalScope.put(key,scope.get(key));
+      var inventory=inventoryRead.getObject().query(c,new QueryRequest("getInventory",null,physicalScope,Map.of(),200,null,null,c.asOf(),c.knownAt(),null));
       evidence.addAll(inventory.evidenceRefs());data.put("evidenceRefs",List.copyOf(evidence));
     }
     data.put("workReferences",works);data.put("goalReferences",linked(c,"GoalReferences",ids));data.put("assessmentReferences",linked(c,"AssessmentReferences",ids));
@@ -73,7 +76,13 @@ public class WorkReadHandler implements QueryHandler {
     return data;
   }
   private List<Map<String,Object>> authorizedWorks(DomainContext c,Map<String,Object> scope,Map<String,Object> filters,String capability){
-    return repository.rows("Works",c).stream().filter(w->matches(c,w,scope)&&matches(c,w,filters)).filter(w->{
+    Set<Object> salesWorks=null;
+    if((scope.containsKey("orderId")||scope.containsKey("salesLineId"))&&scope.containsKey("itemId")){
+      if(salesRead==null||salesRead.getIfAvailable()==null)throw DomainError.unsupported();
+      salesWorks=new HashSet<>();for(var line:salesRead.getObject().worldLines(c,scope).rows())salesWorks.add(line.get("workId"));
+    }
+    var boundSalesWorks=salesWorks;
+    return repository.rows("Works",c).stream().filter(w->boundSalesWorks==null||boundSalesWorks.contains(w.get("ID"))).filter(w->matches(c,w,scope)&&matches(c,w,filters)).filter(w->{
       try{auth.authorizeScopes(c,capability,workScopes(w));return true;}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;return false;}
     }).toList();
   }
@@ -122,7 +131,7 @@ public class WorkReadHandler implements QueryHandler {
  }
   private List<Map<String,Object>> assessmentSnapshots(DomainContext c,String workId){try{return assessmentRead.getIfAvailable().snapshots(c,workId);}catch(DomainError denied){if(!denied.code().equals("FORBIDDEN"))throw denied;return List.of();}}
   private Object decodeAny(Object value){try{return json.readValue(String.valueOf(value),Object.class);}catch(Exception failure){throw new IllegalStateException("Invalid assessment condition results",failure);}}
-  private List<Map<String,Object>> obligations(DomainContext c,Set<String> ids){return linked(c,"ObligationReferences",ids).stream().map(r->{Map<String,Object> result=new LinkedHashMap<>(r);result.put("scope",decode(result.remove("scopeJson")));result.put("responsibleWorkId",result.get("workId"));return result;}).toList();}
+  private List<Map<String,Object>> obligations(DomainContext c,Set<String> ids){return linked(c,"ObligationReferences",ids).stream().map(r->{Map<String,Object> result=new LinkedHashMap<>(r);result.put("scope",decode(result.remove("scopeJson")));result.put("responsibleWorkId",result.get("workId"));result.put("id",result.get("ID"));if(result.get("valid")!=null)result.put("current",result.get("valid"));return result;}).toList();}
   private Object decode(Object value){try{return json.readValue(String.valueOf(value),Map.class);}catch(Exception failure){throw new IllegalStateException("Invalid stored read reference",failure);}}
   private Map<String,Object> scope(DomainContext c,Map<String,Object> input,Map<String,Object> work){Map<String,Object> scope=new LinkedHashMap<>(input);scope.put("organizationId",c.organizationId());if(work!=null){scope.putIfAbsent("itemId",work.get("itemId"));if(work.get("lotId")!=null)scope.putIfAbsent("lotId",work.get("lotId"));}return scope;}
 }

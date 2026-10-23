@@ -20,4 +20,20 @@ public class SalesQueries implements QueryHandler,ObjectReadProvider,EvidenceSub
  private List<Map<String,Object>> observations(DomainContext c){var confirmed=new HashSet<Object>();for(var d:r.rows(c,"Deliveries"))confirmed.add(d.get("observationId"));return r.rows(c,"Observations").stream().map(x->{var row=new LinkedHashMap<String,Object>(x);boolean known=confirmed.contains(x.get("ID"));if("CONFIRMED".equals(x.get("state"))&&!known){row.put("state","PROVISIONAL");row.put("revision",1);if(row.get("claimedRangeRootId")!=null)row.put("rangeRootId",null);}return (Map<String,Object>)row;}).toList();}
  private boolean at(DomainContext c,Map<String,Object>x){return !StockPrimitives.instant(x.get("effectiveAt")).isAfter(c.asOf());}
  private Map<String,Object> project(DomainContext c,String entity,Map<String,Object>x){var result=new LinkedHashMap<>(x);if(entity.equals("Orders")){var revisions=r.rows(c,"OrderRevisions").stream().filter(a->x.get("ID").equals(a.get("orderId"))&&at(c,a)&&auth.permittedScopes(c,"getSalesOrder",scopes(a))).toList();result.put("revisions",revisions);int visible=revisions.stream().mapToInt(a->((Number)a.get("revisionNumber")).intValue()).max().orElse(0);result.put("currentRevision",visible);result.put("revision",visible);result.put("lines",r.rows(c,"OrderLines").stream().filter(a->x.get("ID").equals(a.get("orderId"))&&at(c,a)&&auth.permittedScopes(c,"getSalesOrder",scopes(a))).toList());}if(entity.equals("Deliveries"))result.put("corrections",r.rows(c,"DeliveryCorrections").stream().filter(a->x.get("ID").equals(a.get("deliveryId"))&&at(c,a)).sorted(Comparator.comparingInt(a->((Number)a.get("revision")).intValue())).toList());return result;}
+ /** Current line contracts are selected through immutable visible revisions, not a mutable header counter. */
+ public record WorldLines(List<Map<String,Object>> rows,boolean complete){}
+ public WorldLines worldLines(DomainContext c,Map<String,Object> scope){
+  var revisions=r.rows(c,"OrderRevisions").stream().filter(x->at(c,x)).toList();
+  var orders=r.rows(c,"Orders").stream().filter(x->at(c,x)).map(x->x.get("ID")).collect(java.util.stream.Collectors.toSet());
+  var heads=new HashMap<Object,Integer>();for(var revision:revisions)if(orders.contains(revision.get("orderId")))heads.merge(revision.get("orderId"),((Number)revision.get("revisionNumber")).intValue(),Math::max);
+  var candidates=r.rows(c,"OrderLines").stream().filter(x->at(c,x)&&Objects.equals(scope.get("itemId"),x.get("itemId")))
+   .filter(x->List.of("workId","customerId","orderId").stream().allMatch(k->scope.get(k)==null||Objects.equals(scope.get(k),x.get(k))))
+   .filter(x->scope.get("salesLineId")==null||Objects.equals(scope.get("salesLineId"),x.get("ID")))
+   .filter(x->revisions.stream().anyMatch(v->Objects.equals(v.get("ID"),x.get("revisionId"))&&Objects.equals(v.get("orderId"),x.get("orderId"))
+     &&(scope.get("salesLineId")!=null||Objects.equals(heads.get(v.get("orderId")),((Number)v.get("revisionNumber")).intValue()))))
+   .sorted(Comparator.comparing(x->x.get("ID").toString())).toList();
+  var visible=candidates.stream().filter(x->auth.permittedScopes(c,"getObject",scopes(x))).map(x->(Map<String,Object>)new LinkedHashMap<String,Object>(x)).toList();
+  return new WorldLines(visible,visible.size()==candidates.size());
+ }
+
 }
