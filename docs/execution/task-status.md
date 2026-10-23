@@ -1026,5 +1026,18 @@ canonical과 원천 불일치는 계속 거부한다. 실제 제품 gateway/PG �
 asset12 PASS다. T17 원본71개 파일·257 assertions는 보존했다.
 [canonical 통합·실행 경계](t17-canonical-delivery-projection.md)를 따른다.
 다섯 assertion의 새 actual 인수는 NOT_RUN이며 gate는 false다.
-기존 Haiku T09/T17 실행은7e1236bf 기준이므로 이번 변경을 포함하지 않는다.
 Task와 현재 Step은 OPEN이다.
+
+7e1236bf의 Haiku 실행은 CDS CLI 의존성 누락으로 실제 case 시작 전에
+끝나 T09/T17 모두 NOT_RUN이다. T17의 잘못된 cwd도 기록했으며 기존
+24 subcase·351 assertions의 결과가 생겼다고 표시하지 않는다.
+추가 설치 승인 대기를 해소하고 coordinator가 최신bdcc9abc의 세 전용
+tree에 locked npm ci와 Java/CDS/Docker·source 사전 검사를 마쳤다.
+새 native Workflow wf_9e2befed-50c는 T09/T11/T17의36 subcase·461
+assertions를 병렬 실행한다. 실제 결과와 node model metadata는 아직
+회수 전이다. 원래 실패 기록과 이번 준비를 actual PASS로 세지 않는다.
+
+T09의 세 모드가 같은 원천을 읽어도 평가별 snapshot ID와 조건 행 수가
+다르다. [불변 원천·snapshot 계약](t09-immutable-source-contract.md)의
+선택을 사용자에게 요청했으며 PENDING이다. 원래94 assertions는
+보존한다. Task와 현재 Step은 OPEN이다.
