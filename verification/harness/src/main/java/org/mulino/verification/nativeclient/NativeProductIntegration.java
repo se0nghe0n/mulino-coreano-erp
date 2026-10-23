@@ -107,15 +107,22 @@ public final class NativeProductIntegration implements NativeClientIntegration {
                 return new StepResult(id,result.driverStatus(),data,result.response(),result.reason(),result.provenance(),result.artifactRefs());
             }return result;
         }
-        public StepResult query(String id,String route,JsonNode actor,String query,JsonNode request){return send(id,route,actor,query,request);}
+        public StepResult query(String id,String route,JsonNode actor,String query,JsonNode request){
+            if(!NativePermittedContext.matches(query,request))return send(id,route,actor,query,request);
+            if(!route.equalsIgnoreCase("MCP"))return StepResult.missing(id,"NATIVE_ROUTE_NOT_IMPLEMENTED");
+            try {
+                return NativePermittedContext.query(id,actor,request,installedScope,
+                    (operation,input)->transport.send(id,"tools/call",operation,input,actor,request.path("scope")),evidence);
+            }catch(Exception failure){return StepResult.missing(id,"NATIVE_PERMITTED_CONTEXT_UNAVAILABLE");}
+        }
         public StepResult invoke(String id,String route,JsonNode actor,String capability,JsonNode request){return send(id,route,actor,capability,request);}
         private StepResult send(String id,String route,JsonNode actor,String operation,JsonNode request) {
             if(!route.equalsIgnoreCase("MCP"))return StepResult.missing(id,"NATIVE_ROUTE_NOT_IMPLEMENTED");
             try {
                 if(installedScope==null)return StepResult.missing(id,"NATIVE_INSTALLATION_SCOPE_MISSING");
                 var capture=transport.send(id,"tools/call",operation,request,actor,installedScope);
-                // Keep exact product error/response for diagnosis, but never claim the stronger binding provenance.
-                return missing(id,"SERVER_AUTHENTICATED_CAPTURE_NOT_IMPLEMENTED",capture.response(),capture.artifact());
+                try{return NativePermittedContextCapture.ordinary(id,actor,installedScope,capture,evidence);}
+                catch(Exception unavailable){return missing(id,"SERVER_AUTHENTICATED_CAPTURE_NOT_IMPLEMENTED",capture.response(),capture.artifact());}
             }catch(Exception failure){return StepResult.missing(id,"NATIVE_PRODUCT_TRANSPORT_UNAVAILABLE");}
         }
         public StepResult observe(String id,JsonNode request) {
