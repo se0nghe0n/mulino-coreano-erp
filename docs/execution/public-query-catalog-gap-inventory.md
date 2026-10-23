@@ -97,3 +97,20 @@ LOT·CUSTOMER·SUPPLIER를 추가했으며 UUID 검사와 NOT_ASSERTED 의미를
 아래 proof.json과 harness.log에 남겼다. 원 worker의 PG 27개 결과는
 archive SHA와 압축 JUnit을 직접 대조했다. V45+V46 결합 검사는 아직
 후속 작업이다.
+
+## 고정 discovery assertion을 같은 전체 목록에 맞춘다
+
+첫 통합 뒤 ./verify prepare가 generator 재현성에서 실패했다. 기존
+T20·C3·V4의 exactSet 목록도 공개 registry를 입력으로 생성하기 때문이다.
+기존 120개 entry와 순서를 보존한 뒤 새 QUERY 17개를 뒤에 붙였다.
+T20의 5개, C3의 30개, V4의 1개 discovery assertion에 이 17개 이름만
+추가했다. V4 enumerate의 실제 allowlist SHA도 새 byte에 결합했다.
+
+이는 전체 공개 목록의 exactSet을 확장한 변경이다. 기존 ID·op·source·
+scope·actor·grant와 모든 업무 기대값은 그대로다. 정확 inverse로 이전
+case tree와 같음을 확인했다. metadata 확장이 없던 첫 prepare FAIL은
+보존한다. generator 재현성 9개와 publication 보존 5개가 통과했다.
+상세 delta는 .local/resume-20261024/fix-until-done/public-query-inventory/
+exact-delta.json과 각 raw log다. 새 목록을 runtime PASS로 세지 않는다.
+모델 installer는 당시의 120개 snapshot에 명시적으로 고정하여 이 변경이
+기존 교정 권한을 자동으로 늘리지 않는다.

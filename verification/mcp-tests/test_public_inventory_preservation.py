@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT=Path(__file__).resolve().parents[2]
 BASE='ce0eecc1'
 ADDED=['createObligation','decideQualityDutyWaiver','decideQuantityDutyWaiver','decideRecallDutyWaiver','expireHandover','openObligation']
+QUERY_ADDED=['getTrace','getSettlement','getSalesOrder','getSalesOrders','getDelivery','getDeliveries','getRegulatoryProcedure','getRecall','getRecalls','traceRecall','getReceipt','getReceipts','getPurchase','getReturn','getReturns','getShipment','searchShipments']
 def old_bytes(path):return subprocess.check_output(['git','show',BASE+':'+path],cwd=ROOT)
 def old_json(path):return json.loads(old_bytes(path))
 def current(path):return json.loads((ROOT/path).read_text())
@@ -28,17 +29,18 @@ def restore_metadata(cid,value):
             if assertion==prior:continue
             expected_id={'T20':'tool-schema-registry','C3':'tools-advertised','V4':'mcp-tools-equal-allowlist'}[cid]
             if assertion['id']!=expected_id:raise ValueError('Unrecorded business oracle mutation')
-            if assertion['expected']!=prior['expected']+ADDED:raise ValueError('Discovery additions must be exactly six; no shrink or unrelated name')
+            if assertion['expected']!=prior['expected']+ADDED+QUERY_ADDED:raise ValueError('Discovery additions must be six published commands and seventeen registered queries; no shrink or unrelated name')
             assertion['expected']=prior['expected'];changes+=1
     if result!=before:raise ValueError('Unrecorded action, oracle, actor or scope mutation')
     return result,changes
 
 class PublicationPreservation(unittest.TestCase):
-    def test_original_114_entries_and_exact_six_publication(self):
+    def test_original_114_entries_six_commands_and_seventeen_registered_queries(self):
         path='contracts/acceptance-capabilities.json';old=old_json(path);new=current(path)
         self.assertEqual(114,len(old['capabilities']));self.assertEqual(old['capabilities'],new['capabilities'][:114])
-        self.assertEqual(ADDED,[c['id'] for c in new['capabilities'][114:]])
-        self.assertEqual(120,len({c['id'] for c in new['capabilities']}))
+        self.assertEqual(ADDED,[c['id'] for c in new['capabilities'][114:120]])
+        self.assertEqual(QUERY_ADDED,[c['id'] for c in new['capabilities'][120:]])
+        self.assertEqual(137,len({c['id'] for c in new['capabilities']}))
         self.assertEqual({k:v for k,v in old.items() if k!='capabilities'},{k:v for k,v in new.items() if k!='capabilities'})
 
     def test_every_original_assertion_id_count_and_business_value_preserved(self):
