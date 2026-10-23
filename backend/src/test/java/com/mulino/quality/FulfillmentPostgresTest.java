@@ -156,10 +156,20 @@ class FulfillmentPostgresTest {
   if(mode.equals("revoked"))jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE organizationId=? AND capabilityId='recordDelivery'",Timestamp.from(now),org);else {String foreign=id();insert("mulino_identity_Organizations",map("ID",foreign,"externalAlias",foreign));jdbc.update("UPDATE mulino_identity_GrantScopes SET scopeId=? WHERE organizationId=? AND grantId=?",foreign,org,grant);}
   var denied=apply(envelope("recordDelivery",slots,1));assertEquals("REJECTED",denied.get("outcome"));assertEquals("FORBIDDEN",code(denied));assertEquals(1,count("SELECT count(*) FROM mulino_trade_sales_Observations WHERE organizationId=?",org));assertEquals(duties,jdbc.queryForList("SELECT * FROM mulino_work_read_ObligationReferences ORDER BY ID"));assertEquals(before,provisionalPhysicalState());provisionalOutcomeEvidence("denied-"+mode);
  }
+ void failAfterRealDeliveryDuty(String observation){
+  // Run the typed production overload and inspect its real writes before aborting the transaction.
+  doAnswer(call->{
+   call.callRealMethod();
+   assertEquals(1,count("SELECT count(*) FROM mulino_responsibility_Roots WHERE organizationId=? AND kind='DELIVERY_RECONCILIATION' AND scopeJson::jsonb->>'domainSourceId'=? AND quantity=20 AND unit='EA'",org,observation));
+   assertEquals(1,count("SELECT count(*) FROM mulino_work_read_ObligationReferences a JOIN mulino_responsibility_Roots r ON r.organizationId=a.organizationId AND r.ID=a.rootId WHERE a.organizationId=? AND r.scopeJson::jsonb->>'domainSourceId'=? AND a.status='OPEN' AND a.valid AND a.ownerId=? AND a.nextAction IS NOT NULL AND a.nextCheckAt IS NOT NULL AND a.quantity=20 AND a.unit='EA'",org,observation,actor));
+   provisionalOutcomeEvidence("in-flight-"+observation);
+   throw new IllegalStateException("Synthetic failure after real provisional reconciliation duty");
+  }).when(impact).recorded(any(),anyString(),eq(observation),eq("DELIVERY_RECONCILIATION"),eq(observation),anyString(),any(Instant.class),anyMap(),any(BigDecimal.class),anyString());
+ }
  @Test void provisionalDeliveryRollbackAfterRealDutyLeavesNoNewObservationOrDuty()throws Exception{
   var report=provisionalReport(false);intakeDelivery(report);var input=savedProvisionalIntent(report.get("physicalScopeId").toString());input.put("commandIdempotencyKey",id());var slots=new LinkedHashMap<String,Object>((Map<String,Object>)input.get("slots"));slots.put("observationId",id());input.put("slots",slots);var before=provisionalPhysicalState();var duties=jdbc.queryForList("SELECT * FROM mulino_work_read_ObligationReferences ORDER BY ID");int roots=count("SELECT count(*) FROM mulino_responsibility_Roots"),audits=count("SELECT count(*) FROM mulino_commands_CommandAudits");
-  doAnswer(call->{call.callRealMethod();assertEquals(1,count("SELECT count(*) FROM mulino_responsibility_Roots WHERE kind='DELIVERY_RECONCILIATION' AND scopeJson::jsonb->>'domainSourceId'=?",slots.get("observationId")));throw new IllegalStateException("Synthetic failure after real provisional reconciliation duty");}).when(impact).recorded(any(),anyString(),anyString(),eq("DELIVERY_RECONCILIATION"),anyString(),anyString(),any());
-  try{assertThrows(IllegalStateException.class,()->apply(input));}finally{reset(impact);}
+  failAfterRealDeliveryDuty(slots.get("observationId").toString());
+  try{assertEquals("Synthetic failure after real provisional reconciliation duty",assertThrows(IllegalStateException.class,()->apply(input)).getMessage());}finally{reset(impact);}
   assertEquals(1,count("SELECT count(*) FROM mulino_trade_sales_Observations WHERE organizationId=?",org));assertEquals(0,count("SELECT count(*) FROM mulino_trade_sales_Observations WHERE ID=?",slots.get("observationId")));assertEquals(0,count("SELECT count(*) FROM mulino_responsibility_Roots WHERE scopeJson::jsonb->>'domainSourceId'=?",slots.get("observationId")));assertEquals(duties,jdbc.queryForList("SELECT * FROM mulino_work_read_ObligationReferences ORDER BY ID"));assertEquals(roots,count("SELECT count(*) FROM mulino_responsibility_Roots"));assertEquals(audits,count("SELECT count(*) FROM mulino_commands_CommandAudits"));assertEquals(0,count("SELECT count(*) FROM mulino_commands_CommandRecords WHERE commandIdempotencyKey=?",input.get("commandIdempotencyKey")));assertEquals(before,provisionalPhysicalState());provisionalOutcomeEvidence("rollback");
  }
  @Test void repeatedCanonicalVerificationStillConfirmsOnePhysicalDelivery(){
@@ -244,9 +254,11 @@ class FulfillmentPostgresTest {
   allow("100");allowDispatch();String dispatch=dispatched("0","30");var report=deliveryReport(dispatch,"0","20",destination);report.put("rangeRootId",id());intakeDelivery(report);
   var slots=json.readValue(jdbc.queryForObject("SELECT claimPayloadJson FROM mulino_trade_sales_Observations WHERE ID=?",String.class,report.get("physicalScopeId")),Map.class);slots.put("observationId",id());var input=envelope("recordDelivery",slots,1);
   int audits=count("SELECT count(*) FROM mulino_commands_CommandAudits"),outbox=count("SELECT count(*) FROM mulino_runtime_Outbox"),duties=count("SELECT count(*) FROM mulino_work_read_ObligationReferences");
-  doThrow(new IllegalStateException("Synthetic post-intake rollback")).when(impact).recorded(any(),anyString(),anyString(),eq("DELIVERY_RECONCILIATION"),anyString(),anyString(),any());
-  assertThrows(IllegalStateException.class,()->apply(input));reset(impact);
+  int roots=count("SELECT count(*) FROM mulino_responsibility_Roots");var physicalBefore=provisionalPhysicalState();
+  failAfterRealDeliveryDuty(slots.get("observationId").toString());
+  try{assertEquals("Synthetic failure after real provisional reconciliation duty",assertThrows(IllegalStateException.class,()->apply(input)).getMessage());}finally{reset(impact);}
   assertEquals(1,count("SELECT count(*) FROM mulino_trade_sales_Observations"));assertEquals(duties,count("SELECT count(*) FROM mulino_work_read_ObligationReferences"));assertEquals(audits,count("SELECT count(*) FROM mulino_commands_CommandAudits"));assertEquals(outbox,count("SELECT count(*) FROM mulino_runtime_Outbox"));assertEquals(0,count("SELECT count(*) FROM mulino_commands_CommandRecords WHERE commandIdempotencyKey=?",input.get("commandIdempotencyKey")));
+  assertEquals(0,count("SELECT count(*) FROM mulino_trade_sales_Observations WHERE ID=?",slots.get("observationId")));assertEquals(0,count("SELECT count(*) FROM mulino_responsibility_Roots WHERE scopeJson::jsonb->>'domainSourceId'=?",slots.get("observationId")));assertEquals(roots,count("SELECT count(*) FROM mulino_responsibility_Roots"));assertEquals(physicalBefore,provisionalPhysicalState());provisionalOutcomeEvidence("claim-rollback");
   var ready=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);var pid=new java.util.concurrent.atomic.AtomicInteger();var security=SecurityContextHolder.getContext().getAuthentication();var pool=java.util.concurrent.Executors.newFixedThreadPool(2);
   try {
    var first=pool.submit(()->{SecurityContextHolder.getContext().setAuthentication(security);return tx(()->{var result=apply(input);pid.set(jdbc.queryForObject("SELECT pg_backend_pid()",Integer.class));ready.countDown();await(release);return result;});});
@@ -254,6 +266,7 @@ class FulfillmentPostgresTest {
    long limit=System.nanoTime()+java.util.concurrent.TimeUnit.SECONDS.toNanos(10);boolean blocked=false;while(System.nanoTime()<limit){blocked=jdbc.queryForObject("SELECT EXISTS(SELECT 1 FROM pg_stat_activity WHERE wait_event_type='Lock' AND ?=ANY(pg_blocking_pids(pid)))",Boolean.class,pid.get());if(blocked)break;Thread.onSpinWait();}assertTrue(blocked,"Duplicate must wait on first real transaction");release.countDown();assertEquals(first.get(20,java.util.concurrent.TimeUnit.SECONDS),second.get(20,java.util.concurrent.TimeUnit.SECONDS));
   }finally{release.countDown();pool.shutdownNow();}
   assertEquals(2,count("SELECT count(*) FROM mulino_trade_sales_Observations"));assertEquals(duties+1,count("SELECT count(*) FROM mulino_work_read_ObligationReferences"));assertEquals(0,count("SELECT count(*) FROM mulino_trade_sales_Deliveries"));
+  assertEquals(roots+1,count("SELECT count(*) FROM mulino_responsibility_Roots"));assertEquals(physicalBefore,provisionalPhysicalState());provisionalOutcomeEvidence("claim-concurrent-duplicate");
  }
  // Two real transactions hold the common physical fence before the second command starts.
  // The barrier fixes the serial order; it does not rely on timing or thread sleeps.
