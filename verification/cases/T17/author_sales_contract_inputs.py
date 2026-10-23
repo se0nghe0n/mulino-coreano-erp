@@ -17,6 +17,9 @@ _condition_spec.loader.exec_module(condition_oracle)
 _recall_spec = importlib.util.spec_from_file_location('t17_recall_inputs', HERE/'author_recall_inputs.py')
 recall_inputs = importlib.util.module_from_spec(_recall_spec)
 _recall_spec.loader.exec_module(recall_inputs)
+_response_spec = importlib.util.spec_from_file_location('t17_response_scope', HERE/'author_response_scope.py')
+response_scope = importlib.util.module_from_spec(_response_spec)
+_response_spec.loader.exec_module(response_scope)
 BASE = 'b4772eb6'
 LEDGER = HERE / 'sales-contract-input-delta.json'
 POLICY_LEDGER = HERE / 'delivery-assessment-policy-delta.json'
@@ -197,6 +200,7 @@ def apply(case):
 
 
 def restore_case(case):
+    case = response_scope.restore_case(case)
     case = restore_policy_case(case)
     case = recall_inputs.restore_case(case)
     case = condition_oracle.restore_case(case)
@@ -238,6 +242,7 @@ def apply_feature(text):
 
 
 def restore_feature(text):
+    text = response_scope.restore_feature(text)
     text = recall_inputs.restore_feature(text)
     return condition_oracle.restore_feature(text).replace('    만일 "observer" 역할이 "dispatched-item" 행동을 수행한다\n','')
 

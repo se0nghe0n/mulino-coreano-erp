@@ -15,6 +15,9 @@ recall_spec = importlib.util.spec_from_file_location('recall_inputs', HERE/'auth
 RECALL = importlib.util.module_from_spec(recall_spec)
 recall_spec.loader.exec_module(RECALL)
 import author_sales_contract_inputs as SALES
+response_spec = importlib.util.spec_from_file_location('response_scope', HERE/'author_response_scope.py')
+RESPONSE = importlib.util.module_from_spec(response_spec)
+response_spec.loader.exec_module(RESPONSE)
 
 
 def original(path):
@@ -24,7 +27,7 @@ def original(path):
 class ConditionOracleTest(unittest.TestCase):
     def test_reversible_fixedpoint_all_257_original_ids_and_every_business_tuple(self):
         before = json.loads(original(HERE/'case.json'))
-        actual = RECALL.restore_case(SALES.restore_policy_case(json.loads((HERE/'case.json').read_text())))
+        actual = RECALL.restore_case(SALES.restore_policy_case(RESPONSE.restore_case(json.loads((HERE/'case.json').read_text()))))
         self.assertEqual(actual, ORACLE.apply(before))
         self.assertEqual(actual, ORACLE.apply(actual))
         self.assertEqual(before, ORACLE.restore_case(actual))
@@ -60,7 +63,7 @@ class ConditionOracleTest(unittest.TestCase):
             restored = RECALL.bytes_of(RECALL.restore_fixture(SALES.restore_policy_fixture(json.loads(p.read_bytes()))))
             self.assertEqual(original(p), restored)
             self.assertEqual(ledger['fixtureSha256'][p.name], hashlib.sha256(restored).hexdigest())
-        feature = RECALL.restore_feature((HERE/'scenario.feature').read_text())
+        feature = RECALL.restore_feature(RESPONSE.restore_feature((HERE/'scenario.feature').read_text()))
         self.assertEqual(original(HERE/'scenario.feature').decode(), ORACLE.restore_feature(feature))
         self.assertEqual(feature, ORACLE.apply_feature(feature))
         for line in feature.splitlines():

@@ -9606,6 +9606,47 @@
           ]
         },
         {
+          "id": "after-delivery-responses-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "late-restriction-actual-delivery",
+              "workIds": [
+                {
+                  "$result": {
+                    "actionId": "order-delivery-work",
+                    "pointer": "/response/data/ID"
+                  }
+                },
+                {
+                  "$alias": "t17FormalRecallWork"
+                }
+              ]
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "after-delivery",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "obligations"
+            ]
+          },
+          "evidenceRefs": [
+            "after-delivery-responses-db:raw-rows"
+          ]
+        },
+        {
           "id": "after-delivery-db",
           "kind": "observe",
           "observation": {
@@ -10083,10 +10124,11 @@
           "id": "fact-not-permission-11",
           "op": "exactSet",
           "source": {
-            "actionId": "after-delivery-db",
+            "actionId": "after-delivery-responses-db",
             "pointer": "/data/rawRows/obligations",
             "where": {
-              "current": true
+              "current": true,
+              "status": "OPEN"
             },
             "field": "kind"
           },
@@ -10098,7 +10140,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-delivery-db:raw-rows"
+            "after-delivery-responses-db:raw-rows"
           ],
           "scope": {
             "organizationId": {
@@ -10110,7 +10152,7 @@
             "caseId": "T17",
             "scenarioId": "late-restriction-actual-delivery"
           },
-          "oracleExplanation": "fact-not-permission는 출고30 뒤 SELL 금지에도 확인 인도20과 운송10을 보존하고 위반·회수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+          "oracleExplanation": "인도와 명시 조사 Work의 열린 후속 책임 두 종류를 대조한다. ITEM 전체의 준비·해소 assignment는 별도 oracle로 보존한다.",
           "oracleRef": {
             "oracleId": "T17.late-restriction-actual-delivery",
             "observationNames": [
@@ -10743,6 +10785,378 @@
               "status",
               "nextAction",
               "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-all-assignments",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-delivery-responses-db",
+            "pointer": "/data/rawRows/obligations",
+            "field": [
+              "kind",
+              "status",
+              "current",
+              "workId"
+            ]
+          },
+          "expected": [
+            [
+              "DELIVERY_RESTRICTION_RESPONSE",
+              "OPEN",
+              true,
+              {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            ],
+            [
+              "DELIVERY_RECONCILIATION",
+              "RESOLVED",
+              true,
+              {
+                "$result": {
+                  "actionId": "order-delivery-work",
+                  "pointer": "/response/data/ID"
+                }
+              }
+            ],
+            [
+              "RECALL_INVESTIGATION",
+              "OPEN",
+              true,
+              {
+                "$alias": "t17FormalRecallWork"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-responses-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-delivery-public-link",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-delivery-responses-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_RESTRICTION_RESPONSE",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "rootId",
+              "responsibleWorkId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-responses-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "DELIVERY_RESTRICTION_RESPONSE",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "rootId",
+              "responsibleWorkId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-recall-public-link",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-delivery-responses-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "RECALL_INVESTIGATION",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "rootId",
+              "responsibleWorkId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-responses-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-delivery",
+            "pointer": "/response/data/obligations",
+            "where": {
+              "kind": "RECALL_INVESTIGATION",
+              "current": true,
+              "status": "OPEN"
+            },
+            "field": [
+              "id",
+              "rootId",
+              "responsibleWorkId",
+              "ownerId",
+              "status",
+              "nextAction",
+              "nextCheckAt"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-bounded-row-count",
+          "op": "count",
+          "source": {
+            "actionId": "after-delivery-responses-db",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "expected": 3,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-responses-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-whole-item-row-count",
+          "op": "count",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations"
+          },
+          "expected": 6,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-resolved-regulatory-retained",
+          "op": "count",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "REGULATORY_REVIEW",
+              "status": "RESOLVED",
+              "current": true
+            }
+          },
+          "expected": 2,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-resolved-intake-retained",
+          "op": "count",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "DELIVERY_RECONCILIATION",
+              "status": "RESOLVED",
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
+            ]
+          }
+        },
+        {
+          "id": "response-scope-open-quality-retained",
+          "op": "count",
+          "source": {
+            "actionId": "after-delivery-db",
+            "pointer": "/data/rawRows/obligations",
+            "where": {
+              "kind": "QUALITY_REVIEW",
+              "status": "OPEN",
+              "current": true
+            }
+          },
+          "expected": 1,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-delivery-db:raw-rows"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "late-restriction-actual-delivery"
+          },
+          "oracleExplanation": "인도·조사의 Work 범위를 실제 행으로 확인하고 ITEM 전체의 해소·품질 책임도 고정 개수로 보존한다.",
+          "oracleRef": {
+            "oracleId": "T17.late-restriction-actual-delivery",
+            "observationNames": [
+              "late-restriction-duty"
             ]
           }
         }

@@ -116,6 +116,7 @@
     만일 "t17Source" 역할이 "delivery-source-canonical" 행동을 수행한다
     만일 "receiver" 역할이 "delivery" 행동을 수행한다
     만일 "observer" 역할이 "after-delivery" 행동을 수행한다
+    만일 "시스템" 역할이 "after-delivery-responses-db" 행동을 수행한다
     만일 "시스템" 역할이 "after-delivery-db" 행동을 수행한다
     그러면 "actual-delivered-1" assertion으로 "actual-delivered"를 확인한다
     그러면 "actual-delivered-2" assertion으로 "actual-delivered"를 확인한다
@@ -143,6 +144,14 @@
     그러면 "late-restriction-duty-24" assertion으로 "late-restriction-duty"를 확인한다
     그러면 "late-restriction-duty-25" assertion으로 "late-restriction-duty"를 확인한다
     그러면 "late-restriction-duty-26" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-all-assignments" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-delivery-public-link" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-recall-public-link" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-bounded-row-count" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-whole-item-row-count" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-resolved-regulatory-retained" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-resolved-intake-retained" assertion으로 "late-restriction-duty"를 확인한다
+    그러면 "response-scope-open-quality-retained" assertion으로 "late-restriction-duty"를 확인한다
 
   시나리오: 출고30 뒤 처분 허용이 만료돼도 실제 인도20과 운송10을 보존하고 위반 대응 책임을 남긴다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "post-dispatch-expiry"를 준비한다

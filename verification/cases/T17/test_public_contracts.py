@@ -38,7 +38,7 @@ class PublicContractTests(unittest.TestCase):
         generated,changed=PUBLIC.goal.apply(generated,changed,PUBLIC)
         generated=PUBLIC.sales_inputs.apply(generated)
         changed=PUBLIC.sales_inputs.apply_policy_fixtures(generated,changed)
-        actual=PUBLIC.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text()))
+        actual=PUBLIC.recall_inputs.restore_case(PUBLIC.sales_inputs.response_scope.restore_case(json.loads((HERE/'case.json').read_text())))
         self.assertEqual(generated,actual)
         self.assertEqual(before,PUBLIC.restore_case(actual))
         for sid,f in changed.items():

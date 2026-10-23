@@ -17,7 +17,7 @@ class SalesContractInputTest(unittest.TestCase):
     def test_exact_257_ids_oracles_fixtures_grants_and_clock_survive(self):
         before = json.loads(subprocess.check_output(
             ['git', 'show', INPUTS.BASE+':verification/cases/T17/case.json'], cwd=ROOT))
-        actual = INPUTS.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text()))
+        actual = INPUTS.recall_inputs.restore_case(INPUTS.response_scope.restore_case(json.loads((HERE/'case.json').read_text())))
         self.assertEqual(INPUTS.apply(before), actual)
         self.assertEqual(before, INPUTS.restore_case(actual))
         self.assertEqual(actual, INPUTS.apply(actual))
@@ -38,7 +38,7 @@ class SalesContractInputTest(unittest.TestCase):
         baseline = INPUTS.POLICY_BASE
         raw = subprocess.check_output(['git', 'show', baseline+':verification/cases/T17/case.json'], cwd=ROOT)
         before = json.loads(raw)
-        actual = INPUTS.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text()))
+        actual = INPUTS.recall_inputs.restore_case(INPUTS.response_scope.restore_case(json.loads((HERE/'case.json').read_text())))
         selected = ['normal-consumed-delivery', 'late-restriction-actual-delivery',
                     'post-dispatch-expiry', 'claim-falseclaim', 'claim-unidentifiedscope',
                     'claim-conflictingquantity', 'claim-scopeoverflow']
@@ -75,7 +75,7 @@ class SalesContractInputTest(unittest.TestCase):
             self.assertEqual({}, f['aliases'][INPUTS.POLICY_ALIAS]['content'])
             self.assertEqual(f['clock']['asOf'], f['aliases'][INPUTS.POLICY_ALIAS]['effectiveFrom'])
             self.assertFalse(f['aliases'][INPUTS.POLICY_ALIAS]['operatingApprovalClaimed'])
-        self.assertEqual(subprocess.check_output(['git', 'show', baseline+':verification/cases/T17/scenario.feature'], cwd=ROOT), INPUTS.recall_inputs.restore_feature((HERE/'scenario.feature').read_text()).encode())
+        self.assertEqual(subprocess.check_output(['git', 'show', baseline+':verification/cases/T17/scenario.feature'], cwd=ROOT), INPUTS.recall_inputs.restore_feature(INPUTS.response_scope.restore_feature((HERE/'scenario.feature').read_text())).encode())
 
     def test_policy_inverse_rejects_tampered_inputs_and_preserves_other_writers(self):
         case = json.loads((HERE/'case.json').read_text())

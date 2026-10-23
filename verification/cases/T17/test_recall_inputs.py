@@ -19,6 +19,9 @@ spec.loader.exec_module(RECALL)
 condition_spec = importlib.util.spec_from_file_location('condition_oracle', HERE/'author_condition_oracle.py')
 CONDITION = importlib.util.module_from_spec(condition_spec)
 condition_spec.loader.exec_module(CONDITION)
+response_spec = importlib.util.spec_from_file_location('response_scope', HERE/'author_response_scope.py')
+RESPONSE = importlib.util.module_from_spec(response_spec)
+response_spec.loader.exec_module(RESPONSE)
 
 
 def load_original(path):
@@ -43,7 +46,7 @@ class RecallInputsTest(unittest.TestCase):
         before = load_original(HERE / 'case.json')
         old = {p.stem: load_original(p) for p in (HERE / 'fixtures').glob('*.json')}
         after, fixtures = RECALL.apply(before, old)
-        current = CONDITION.restore_case(SALES.restore_policy_case(json.loads((HERE / 'case.json').read_text())))
+        current = CONDITION.restore_case(SALES.restore_policy_case(RESPONSE.restore_case(json.loads((HERE / 'case.json').read_text()))))
         self.assertEqual(after, current)
         self.assertEqual(before, RECALL.restore_case(after))
         self.assertEqual((after, fixtures), RECALL.apply(after, fixtures))
@@ -68,7 +71,7 @@ class RecallInputsTest(unittest.TestCase):
         for key in ('actors', 'clock', 'responsibilities', 'evidence'):
             self.assertEqual(old[RECALL.SID][key], f[key])
         self.assertEqual(RECALL.original(HERE / 'scenario.feature').decode(),
-                         RECALL.restore_feature(CONDITION.restore_feature((HERE / 'scenario.feature').read_text())))
+                         RECALL.restore_feature(CONDITION.restore_feature(RESPONSE.restore_feature((HERE / 'scenario.feature').read_text()))))
         proof = {'kind': 'STATIC_EXACT_INPUT_PRESERVATION_NOT_RUNTIME_ACCEPTANCE',
                  'baseline': RECALL.BASE, 'originalAssertions': 257,
                  'assertionBlockSha256': [hashlib.sha256(b).hexdigest() for b in old_blocks],
