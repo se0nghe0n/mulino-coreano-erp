@@ -69,9 +69,9 @@ assignment·인계 근거 결정은 coordinator에게 남긴다. 전체 Task/Ste
 원래 scenario 인수는 OPEN이다. 실행별 세부 결과는 `.local/t11-parent-followup`
 원로그와 인계 artifact에 보존한다.
 
-기존 `T09/test_assessment_contracts.py`의 T11 역변환은 이 새 layer보다
-이전 형태를 전제한다. 공용 `assessment_contracts.reverse`의 T11 분기에
-이 layer의 역변환을 먼저 연결하고, 해당 test의 T11 feature 복원에도
-추가 조회를 제거하는 순서를 연결해야 한다. 이 두 공용 파일은 현재
-소유 경계 밖이라 변경하지 않았다. 그 검사에서 확인한 1 FAIL/1 ERROR는
-별도로 보존하며, 새 T11 검사로 대체하거나 숨기지 않는다.
+2026-10-23 후속 승인으로 공용 `assessment_contracts.reverse`의 T11 분기에
+새 layer의 strict inverse를 먼저 연결했다. feature도 T11 전용 역변환을
+거친 뒤 기존 복원을 적용한다. T09/T12 분기와 126개 기존 binding ledger는
+변경하지 않았고, oracle·입력·actor·feature 변조 거부를 유지한다.
+제품의 남은 경계와 최소 변경안은 [도메인 후속 제안](domain-gap-proposal.md)에
+읽기 전용 조사로 정리했다. 제품 구현·추가 fixture 입력은 적용하지 않았다.
