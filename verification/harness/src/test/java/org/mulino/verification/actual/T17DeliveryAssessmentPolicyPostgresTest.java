@@ -71,7 +71,9 @@ class T17DeliveryAssessmentPolicyPostgresTest {
     void ready(boolean includeHold)throws Exception {
         for(var a:sub.path("actions")){
             String actionId=a.path("id").asText();if(actionId.equals("delivery"))break;
-            if(!includeHold&&actionId.startsWith("late-hold"))continue;
+            // This counterfactual excludes the restriction and its formal recall branch.
+            // Both require the skipped late-hold source chain; delivery inputs still execute.
+            if(!includeHold&&(actionId.startsWith("late-hold")||Set.of("open-recall-investigation","formal-recall-work","formal-recall-basis","formal-recall-investigation").contains(actionId)))continue;
             // Only the existing case's HTTP commands and their required reads.
             if(a.path("kind").asText().equals("invoke")||a.path("kind").asText().equals("query"))run(actionId);
         }
