@@ -3,7 +3,7 @@ package org.mulino.verification.nativeclient;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.mulino.verification.*;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.*;
 
 /** Lossless response custody. No NLP heuristics, string similarity or model self-labels become facts. */
 final class NativeFinalResponseObserver {
@@ -17,8 +17,10 @@ final class NativeFinalResponseObserver {
         var report=store.base(evidenceClass,scope).put("actionId",action)
             .put("status","NOT_IMPLEMENTED").put("reason","Independent complete final-response semantic extractor unavailable");
         report.set("sourceCapture",store.descriptor(capture));report.set("sourceResponse",response.deepCopy());
-        var host=NativeHostObserver.extract(recorded);report.set("rawHostObservation",host);
-        var parsed=NativeResponseSemantics.extract(response.asText());report.set("semanticExtraction",parsed);
+        var extraction=NativeHostExtractionProcess.extract(capture,store);
+        var host=extraction.observation().path("host");report.set("rawHostObservation",host);
+        var parsed=extraction.observation().path("semantics");report.set("semanticExtraction",parsed);
+        report.set("independentExtractionProcess",extraction.custody());
         if(parsed.path("complete").asBoolean()) {
             var semantic=Json.object().put("evidenceClass",evidenceClass.equals("ACTUAL_NATIVE_RESPONSE_CAPTURE")&&host.path("complete").asBoolean()?"ACTUAL_HOST":"CAPTURED_CONTRACT_SELFTEST")
                 .put("sourceTranscriptRef",store.descriptor(capture).path("path").asText()).put("complete",true);
@@ -29,11 +31,12 @@ final class NativeFinalResponseObserver {
             // Still a diagnostic until actual extractor process custody/host contract is wired.
             report.set("semanticObservation",semantic);
         }
-        report.put("reason","Host acceptance extractor command/custody not integrated; arbitrary text semantics remain UNKNOWN");
+        report.put("reason","Independent extractor process captured; full host acceptance mapping and arbitrary prose semantics remain unavailable");
         report.set("implementationSource",store.source("verification/harness/src/main/java/org/mulino/verification/nativeclient/NativeFinalResponseObserver.java"));
         var artifact=store.save("final-response",report);
         StepResult missing=StepResult.missing(action,"NATIVE_FINAL_RESPONSE_SEMANTICS_NOT_IMPLEMENTED");
-        return new StepResult(action,missing.driverStatus(),null,null,missing.reason(),missing.provenance(),
-            List.of(store.descriptor(capture).path("path").asText(),artifact.path("path").asText()));
+        var refs=new ArrayList<String>();refs.add(store.descriptor(capture).path("path").asText());refs.add(artifact.path("path").asText());
+        for(String ref:extraction.artifactRefs())if(!refs.contains(ref))refs.add(ref);
+        return new StepResult(action,missing.driverStatus(),null,null,missing.reason(),missing.provenance(),refs);
     }
 }
