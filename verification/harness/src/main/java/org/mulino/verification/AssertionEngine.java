@@ -110,7 +110,9 @@ public final class AssertionEngine {
             for(JsonNode row:value) {
                 boolean match=true;
                 for(var it=where.fields();it.hasNext();) { var entry=it.next(); JsonNode f=row.get(entry.getKey());
-                    require(f!=null && !f.isNull(),"filter field missing: "+entry.getKey()); if(!f.equals(entry.getValue())) match=false;
+                    // SQL NULL is an observed value, unlike an omitted column. It can exclude an ACTIVE Work
+                    // from a CLOSED/FULFILLED filter without inventing a close reason or hiding a missing field.
+                    require(f!=null,"filter field missing: "+entry.getKey()); if(!f.equals(entry.getValue())) match=false;
                 }
                 if(match) rows.add(row);
             }
