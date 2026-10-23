@@ -142,6 +142,17 @@ def receipt_chain(prefix, actor, binding, quantity, occurred_at, *,
 
 def repair_inputs(case, fixture):
     """Only replace supported input shapes; leave unresolved positive receipts visible."""
+    # T09-only strict additive layer. T11/T12 follow the identical old path.
+    if case.get("caseId") == "T09" and any(a["id"].startswith("t09-sale-source-")
+            for sub in case["subcases"] for a in sub["actions"]):
+        from author_sale_sources import restore, restore_fixture, apply
+        old = restore(case)
+        old_fixtures = {}
+        def previous(ref):
+            if ref not in old_fixtures:
+                old_fixtures[ref] = restore_fixture(fixture(ref))
+            return old_fixtures[ref]
+        return apply(repair_inputs(old, previous))
     for sub in case["subcases"]:
         output = []
         f = fixture(sub["fixtureRef"])

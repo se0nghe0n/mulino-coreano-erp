@@ -10,7 +10,19 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from assessment_contracts import reverse, original_view, original_fixture
+from assessment_contracts import reverse as previous_reverse, original_view as previous_view, original_fixture as previous_fixture
+from author_sale_sources import restore, restore_fixture, restore_feature
+
+# Strict T09-only composition. Other cases use the original functions unchanged.
+def reverse(case_id, value):
+    return previous_reverse(case_id, restore(value) if case_id == 'T09' else value)
+
+def original_view(case_id, value):
+    return previous_view(case_id, restore(value) if case_id == 'T09' else value)
+
+def original_fixture(value):
+    return previous_fixture(restore_fixture(value))
+
 from source_contracts import ROOT, CASES, document_and_event, receipt_chain, repair_inputs, SOURCE_ACTOR, SOURCE_CAPABILITIES, OBSERVATION_ACTOR, OBSERVATION_CAPABILITIES
 
 spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
@@ -272,7 +284,7 @@ class SourceContracts(unittest.TestCase):
             self.assertEqual(old, restored)
         self.assertEqual((8, 8), (roles, additions))
         self.assertEqual(before, normalized)
-        feature = (ROOT / 'verification/cases/T09/scenario.feature').read_text()
+        feature = restore_feature((ROOT / 'verification/cases/T09/scenario.feature').read_text())
         original_feature = subprocess.check_output(['git', 'show', '76fe11e2:verification/cases/T09/scenario.feature'], cwd=ROOT).decode()
         lines = []
         replaced = removed = 0

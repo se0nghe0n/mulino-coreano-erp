@@ -417,6 +417,114 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "t09SaleSourceDelegator": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "T09-exists-versus-end-throughout-t09SaleSourceDelegator",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getEvidence",
+        "evaluateEligibility",
+        "attachEvidence",
+        "recordActivity",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "recordDispositionBasis",
+        "decideQuality",
+        "confirmCustomerConditions",
+        "confirmCommercialDisposition",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision"
+      ],
+      "grant": {
+        "delegatorAlias": "t09SaleSourceDelegator",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getEvidence",
+          "evaluateEligibility",
+          "attachEvidence",
+          "recordActivity",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "recordDispositionBasis",
+          "decideQuality",
+          "confirmCustomerConditions",
+          "confirmCommercialDisposition",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
+    },
+    "t09SaleSource": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "T09-exists-versus-end-throughout-t09SaleSource",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "getObject",
+        "getWork",
+        "getInventory",
+        "getEvidence",
+        "evaluateEligibility",
+        "attachEvidence",
+        "recordActivity",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "recordDispositionBasis",
+        "decideQuality",
+        "confirmCustomerConditions",
+        "confirmCommercialDisposition",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision"
+      ],
+      "grant": {
+        "delegatorAlias": "t09SaleSourceDelegator",
+        "actions": [
+          "getObject",
+          "getWork",
+          "getInventory",
+          "getEvidence",
+          "evaluateEligibility",
+          "attachEvidence",
+          "recordActivity",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "recordDispositionBasis",
+          "decideQuality",
+          "confirmCustomerConditions",
+          "confirmCommercialDisposition",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -430,7 +538,8 @@
     "LOT": {
       "type": "ManufacturingLot",
       "itemAlias": "P",
-      "manufacturerAlias": "M"
+      "manufacturerAlias": "M",
+      "expiresAt": "2026-10-31T23:59:59Z"
     },
     "M": {
       "type": "Manufacturer"
@@ -570,6 +679,44 @@
     },
     "assessmentEvaluator": {
       "type": "Human"
+    },
+    "t09SaleSourceDelegator": {
+      "type": "Human"
+    },
+    "t09SaleSource": {
+      "type": "Human"
+    },
+    "t09SalePolicySELL": {
+      "type": "RegulatoryPolicy",
+      "fictional": true,
+      "newSynthetic": true,
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "actorAlias": "t09SaleSource",
+      "version": "SYNTHETIC-policy-v1",
+      "authority": "T09_SYNTHETIC_AUTHORITY",
+      "sourceNamespace": "t09-sale-eligibility",
+      "action": "SELL",
+      "validFrom": "2026-10-07T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "status": "ACTIVE",
+      "requiresLabel": false
+    },
+    "t09SalePolicyDISPATCH": {
+      "type": "RegulatoryPolicy",
+      "fictional": true,
+      "newSynthetic": true,
+      "originalAuthorityClaimed": false,
+      "operatingApprovalClaimed": false,
+      "actorAlias": "t09SaleSource",
+      "version": "SYNTHETIC-policy-v1",
+      "authority": "T09_SYNTHETIC_AUTHORITY",
+      "sourceNamespace": "t09-sale-eligibility",
+      "action": "DISPATCH",
+      "validFrom": "2026-10-07T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "status": "ACTIVE",
+      "requiresLabel": false
     }
   },
   "baseline": {
@@ -665,6 +812,16 @@
           "EXISTS_IN",
           "THROUGHOUT"
         ]
+      }
+    ],
+    "sourceProfiles": [
+      {
+        "namespace": "t09-sale-eligibility",
+        "policyVersion": "SYNTHETIC-policy-v1",
+        "reconciliationOwnerAlias": "t09SaleSource",
+        "newSynthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
       }
     ]
   },
