@@ -440,7 +440,7 @@
     "mulino_work_read_GoalReferences": "intervalStart/intervalEnd/startInclusive/endInclusive from immutable slotsJson period fields; no default endpoints or policy versions",
     "mulino_work_read_AssessmentReferences": "result=outcome, goalVersionId=goalId; definitionVersion/policyVersion from exact stored version IDs; conditionResults from conditionsJson; inputSnapshotIds from exact assessment/work/goal/hash binding",
     "mulino_evaluation_InputSnapshots": "inputSnapshot from contentJson, conditionResults from its immutable conditions, goalVersionId=goalId; no missing input or quantity is invented",
-    "mulino_trade_purchase_Approvals": "conditions from conditionsJson; consumptionPolicy is not stored and remains absent",
+    "mulino_trade_purchase_Approvals": "conditions from conditionsJson; consumptionPolicy is the actual immutable stored value (historical NULL stays unknown), never an observer default",
     "mulino_evidence_Events": "Only a verified, matching persisted STATE_OBSERVATION chain can supply canonical quantity/unit; payload alone is not verified evidence"
   },
   "virtual": {

@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "4.0.0",
+  "schemaVersion": "5.0.0",
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V32 PostgreSQL comparison: exact 1867 column names, sizes, decimal scales, PKs; only explicit timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V38 PostgreSQL comparison: exact 1939 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -1148,10 +1148,10 @@
     "mulino_trade_shipment_shipments.revision",
     "mulino_trade_shipment_shipments.state"
   ],
-  "baseline": "2e1d90cc",
-  "observedColumnCount": 1938,
-  "observedArtifactSha256": "488b02a3337abe4ffe62c7eccf3f944f4297ba484cb532868872d4dd421b3672",
-  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns",
+  "baseline": "5f00e5d84992dd3763eeefd60db9779e624651bc",
+  "observedColumnCount": 1939,
+  "observedArtifactSha256": "4554d8fedc723049b609148399cb416de5e466f9fe6eb3632928b0161586f72a",
+  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5860,6 +5860,11 @@
       "cds": "backend/db/work-read.cds",
       "timestampWideningReason": "정의 lifecycle·초기 의무의 기록·승인·유효 시각을 절대 instant로 보존한다.",
       "reason": "s5e 추가: UD-2 Work 생성 시 첫 다음 행동"
+    },
+    "mulino_trade_purchase_approvals.consumptionpolicy": {
+      "migration": "database/migrations/V38__purchase_approval_consumption_policy.sql",
+      "cds": "backend/db/purchase.cds",
+      "reason": "새 구매 승인에는 검증한 단일 주문 revision 소비 정책을 저장하고 과거 미기록 값은 NULL로 보존한다."
     }
   },
   "exactColumnInventory": [
@@ -6936,6 +6941,7 @@
     "mulino_runtime_recoveryschedules.workid",
     "mulino_trade_purchase_approvals.approverid",
     "mulino_trade_purchase_approvals.conditionsjson",
+    "mulino_trade_purchase_approvals.consumptionpolicy",
     "mulino_trade_purchase_approvals.createdat",
     "mulino_trade_purchase_approvals.decidedat",
     "mulino_trade_purchase_approvals.decision",
