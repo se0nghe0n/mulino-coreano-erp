@@ -151,3 +151,10 @@ history-before와 history-after 파일 bytes는 동일하다. 이 index는 수�
 `python3 -m unittest discover -s verification/cases/T11`은26개가 통과한다.
 원110개 assertion 전체, 원 fixture bytes와 strict inverse를 검사한다.
 `./verify prepare`는 입력 준비 검사이며 제품 runtime 성공이 아니다.
+
+## Root의 관계 projection 결합
+
+Root는 실제 WorkLinks에서 parentWorkId를 읽는140c9b5a와 입력을 합성했다.
+Focused historical Given 검사도 원래 followup-parent-link를 포함하도록
+확장한다. 새 현재 source의 실제 PG 결과는 별도 root evidence로 대조하며,
+worker attempt7의10 PASS·1 FAIL과 원 cancel13 PASS·1 FAIL은 보존한다.

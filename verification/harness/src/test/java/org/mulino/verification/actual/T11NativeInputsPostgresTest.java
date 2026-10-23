@@ -101,7 +101,7 @@ class T11NativeInputsPostgresTest {
    w.execute("before-db-snapshot");observe(w,"before-db");
    for(var assertion:w.subcase.path("assertions"))if(assertion.path("id").asText().endsWith("baseline-one"))new AssertionEngine().check(assertion,w.results,w.aliases);
    w.through("followup");assertEquals("APPLIED",w.results.get("followup").path("response").path("outcome").asText());w.execute("after-db-snapshot");observe(w,"after-db");
-   for(var assertion:w.subcase.path("assertions"))if(!assertion.path("id").asText().equals("followup-parent-link"))new AssertionEngine().check(assertion,w.results,w.aliases);
+   for(var assertion:w.subcase.path("assertions"))new AssertionEngine().check(assertion,w.results,w.aliases);
    assertEquals(parent,w.rows("mulino_work_read_Works").stream().filter(row->a.get("workid").equals(row.get("id"))).findFirst().orElseThrow());
    assertEquals(before,historyBytes(w));Json.write(w.evidence.resolve("historical-given-after.json"),Json.parse(historyBytes(w)));
    String child=w.results.get("followup").path("response").path("workId").asText();assertTrue(w.rows("mulino_work_read_AssessmentReferences").stream().noneMatch(row->child.equals(row.get("workid"))));
