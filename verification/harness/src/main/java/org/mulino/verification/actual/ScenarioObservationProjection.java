@@ -111,8 +111,82 @@ final class ScenarioObservationProjection {
     }
 
     ArrayNode read(String table) throws Exception {
+        if(table.equals("mulino_trade_purchase_SupplierReplies"))return supplierReplies();
         var params=new ArrayList<Object>();
         return query(table,predicate(table,ScenarioJdbcObservation.columns(connection,table),params),params);
+    }
+
+    private record SupplierBinding(JsonNode order, JsonNode revision, JsonNode goal) {}
+
+    /** Scope comes from the dispatched immutable revision, never the mutable proposal head. */
+    private ArrayNode supplierReplies() throws Exception {
+        String table="mulino_trade_purchase_SupplierReplies";
+        var params=new ArrayList<Object>();var predicate=new StringBuilder();
+        in(predicate,"r.organizationId",orgs,params);
+        predicate.append(" AND r.recordedAt<=?");params.add(knownAt);
+        var bindings=new HashMap<String,SupplierBinding>();
+        // Validate the visible organization superset before claiming even an empty scoped result.
+        // A broken link cannot safely be classified as belonging to some other requested item.
+        for(var reply:query(table,predicate.toString(),params)) {
+            var order=supplierLink("mulino_trade_purchase_Orders",reply,"r.ID=?",reply.path("orderId").asText());
+            var revision=supplierLink("mulino_trade_purchase_ProposalRevisions",reply,
+                "r.proposalId=? AND r.revision=?",order.path("proposalId").asText(),order.path("proposalRevision").asInt());
+            if(!order.hasNonNull("proposalHash")||order.path("proposalHash").asText().isBlank()||!order.path("proposalHash").equals(revision.path("proposalHash"))
+                ||!revision.hasNonNull("itemId")||!revision.hasNonNull("workId"))
+                throw supplierUnknown("order/revision hash or scope mismatch");
+            JsonNode goal=null;
+            if(revision.hasNonNull("goalVersionId")) {
+                goal=supplierLink("mulino_work_read_GoalReferences",reply,"r.ID=?",revision.path("goalVersionId").asText());
+                var scope=parse(goal,"scopeJson");
+                if(!goal.path("workId").equals(revision.path("workId"))||!scope.isObject()
+                    ||(scope.has("itemId")&&!scope.path("itemId").equals(revision.path("itemId")))
+                    ||(scope.has("workId")&&!scope.path("workId").equals(revision.path("workId"))))
+                    throw supplierUnknown("pinned goal scope mismatch");
+            }
+            if(!lots.isEmpty()&&(goal==null||!parse(goal,"scopeJson").path("lotId").isTextual()
+                ||parse(goal,"scopeJson").path("lotId").asText().isBlank()))
+                throw supplierUnknown("no explicit immutable LOT binding");
+            bindings.put(reply.path("organizationId").asText()+":"+reply.path("id").asText(),new SupplierBinding(order,revision,goal));
+        }
+        predicate.append(" AND EXISTS (SELECT 1 FROM mulino_trade_purchase_Orders o JOIN mulino_trade_purchase_ProposalRevisions p ON p.organizationId=o.organizationId AND p.proposalId=o.proposalId AND p.revision=o.proposalRevision AND p.proposalHash=o.proposalHash");
+        if(!lots.isEmpty())predicate.append(" JOIN mulino_work_read_GoalReferences g ON g.organizationId=p.organizationId AND g.ID=p.goalVersionId AND g.workId=p.workId");
+        predicate.append(" WHERE o.organizationId=r.organizationId AND o.ID=r.orderId AND o.recordedAt<=? AND o.createdAt<=? AND p.recordedAt<=?");
+        params.add(knownAt);params.add(knownAt);params.add(knownAt);
+        if(!items.isEmpty()){predicate.append(" AND ");in(predicate,"p.itemId",items,params);}
+        if(!works.isEmpty()){predicate.append(" AND ");in(predicate,"p.workId",works,params);}
+        if(!lots.isEmpty()) {
+            predicate.append(" AND g.recordedAt<=? AND ");params.add(knownAt);
+            in(predicate,"g.scopeJson::jsonb->>'lotId'",lots,params);
+        }
+        predicate.append(")");
+        var rows=query(table,predicate.toString(),params);
+        for(var node:rows) {
+            var row=(ObjectNode)node;var binding=bindings.get(row.path("organizationId").asText()+":"+row.path("id").asText());
+            copy(row,"purchaseId",row,"orderId");copy(row,"quantity",row,"proposedQuantity");
+            copy(row,"itemId",binding.revision(),"itemId");copy(row,"workId",binding.revision(),"workId");
+            copy(row,"proposalRevisionId",binding.revision(),"id");copy(row,"proposalHash",binding.order(),"proposalHash");
+            if(binding.goal()!=null) {
+                copy(row,"goalVersionId",binding.goal(),"id");
+                var scope=parse(binding.goal(),"scopeJson");
+                if(scope.path("lotId").isTextual())copy(row,"lotId",scope,"lotId");
+            }
+        }
+        return rows;
+    }
+
+    private JsonNode supplierLink(String table,JsonNode reply,String predicate,Object... values) throws Exception {
+        var params=new ArrayList<Object>();params.add(reply.path("organizationId").asText());params.addAll(Arrays.asList(values));
+        var rows=query(table,"r.organizationId=? AND "+predicate,params);
+        if(rows.size()!=1)throw supplierUnknown("missing or ambiguous "+table);
+        var row=rows.get(0);
+        if(!row.hasNonNull("recordedAt")||OffsetDateTime.parse(row.path("recordedAt").asText()).isAfter(knownAt)
+            ||(table.endsWith("_Orders")&&(!row.hasNonNull("createdAt")||OffsetDateTime.parse(row.path("createdAt").asText()).isAfter(knownAt))))
+            throw supplierUnknown("time-ineligible "+table);
+        return row;
+    }
+
+    private UnsupportedOperationException supplierUnknown(String reason) {
+        return new UnsupportedOperationException("Supplier commitment immutable scope/knownAt is unknown: "+reason);
     }
 
     void enrich(String table, ArrayNode rows) throws Exception {

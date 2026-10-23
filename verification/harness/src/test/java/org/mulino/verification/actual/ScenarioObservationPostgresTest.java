@@ -8,6 +8,8 @@ import java.sql.*;
 import java.time.*;
 import java.util.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mulino.verification.Json;
 
@@ -20,7 +22,7 @@ class ScenarioObservationPostgresTest {
     Connection writer;ActualConfiguration config;String schema;String testName;int captures;
     static String id(){return UUID.randomUUID().toString();}
     @BeforeEach void setup(TestInfo info) throws Exception {
-        testName=info.getTestMethod().orElseThrow().getName();
+        testName=info.getTestMethod().orElseThrow().getName()+"-"+info.getDisplayName().replaceAll("[^A-Za-z0-9_-]","_");
         String url=System.getenv("OBSERVER_PG_URL");schema="obs_"+UUID.randomUUID().toString().replace("-","");
         writer=DriverManager.getConnection(url,"observer","observer-local");
         try(var s=writer.createStatement()){s.execute("CREATE SCHEMA "+schema);s.execute("SET search_path TO "+schema);}
@@ -63,6 +65,119 @@ class ScenarioObservationPostgresTest {
     }
     ObjectNode assessment(String id,String workId,String at,String conditions){return row(id).put("workId",workId).put("goalId",goal).put("recordedAt",at).put("definitionVersionId",definition).put("policyVersionId",policy).put("evaluatorVersion","core-v1").put("outcome","UNVERIFIED").put("conditionsJson",conditions).put("inputSnapshotHash","snapshot-hash");}
     String conditions(){return "[{\"conditionId\":\"root.0\",\"truth\":{\"state\":\"UNVERIFIED\",\"conflict\":true},\"evidenceRefs\":[\"original-evidence\"],\"inputs\":[{\"state\":\"UNKNOWN\",\"value\":null,\"sourceId\":\"actual-source\"}]}]";}
+
+    record SupplierRows(ObjectNode order, ObjectNode revision, ObjectNode goal, ObjectNode reply) {}
+    SupplierRows supplier(String kind,String quantity,String organization,String scopedItem,String scopedWork,String scopedLot) throws Exception {
+        String proposal=id(),order=id(),revision=id(),goalId=id();
+        var g=row(goalId).put("organizationId",organization).put("workId",scopedWork)
+            .put("scopeJson",Json.object().put("itemId",scopedItem).put("lotId",scopedLot).toString());
+        var p=row(revision).put("organizationId",organization).put("proposalId",proposal).put("revision",1)
+            .put("proposalHash","original-hash").put("workId",scopedWork).put("itemId",scopedItem).put("goalVersionId",goalId);
+        var o=row(order).put("organizationId",organization).put("proposalId",proposal).put("proposalRevision",1).put("proposalHash","original-hash");
+        var r=row(id()).put("organizationId",organization).put("orderId",order).put("reply",kind).put("proposedQuantity",quantity).put("unit","BOX").put("canonicalOccurrenceId",id()).put("evidenceId",id());
+        insert("mulino_work_read_GoalReferences",g);insert("mulino_trade_purchase_ProposalRevisions",p);
+        insert("mulino_trade_purchase_Orders",o);insert("mulino_trade_purchase_SupplierReplies",r);
+        return new SupplierRows(o,p,g,r);
+    }
+    void changeSupplier(String table,ObjectNode row,String field,Object value) throws Exception {
+        try(var s=writer.prepareStatement("UPDATE "+table+" SET "+field+"=? WHERE organizationId=? AND ID=?")) {
+            if(field.endsWith("At"))s.setObject(1,OffsetDateTime.parse(value.toString()));else s.setObject(1,value);
+            s.setString(2,row.path("organizationId").asText());s.setString(3,row.path("ID").asText());assertEquals(1,s.executeUpdate());
+        }
+    }
+
+    @ParameterizedTest @ValueSource(strings={"ACCEPT:100","REJECT:100","CHANGE:80"})
+    void supplierAliasesPreserveEachReplyAndOriginalQuantity(String sample) throws Exception {
+        var parts=sample.split(":");var fixture=supplier(parts[0],parts[1],org,item,work,lot);
+        var result=capture("supplierCommitments");var rows=result.path("rawRows").path("supplierCommitments");assertEquals(1,rows.size());var actual=rows.get(0);
+        assertEquals(fixture.reply().path("ID"),actual.path("id"));assertEquals(parts[0],actual.path("reply").asText());
+        assertEquals(fixture.order().path("ID"),actual.path("orderId"));assertEquals(actual.path("orderId"),actual.path("purchaseId"));
+        assertEquals(actual.path("proposedQuantity"),actual.path("quantity"));assertEquals(0,new java.math.BigDecimal(parts[1]).compareTo(new java.math.BigDecimal(actual.path("quantity").asText())));
+        assertEquals("BOX",actual.path("unit").asText());assertEquals(item,actual.path("itemId").asText());assertEquals(work,actual.path("workId").asText());assertEquals(lot,actual.path("lotId").asText());
+        assertEquals(fixture.revision().path("ID"),actual.path("proposalRevisionId"));assertEquals("original-hash",actual.path("proposalHash").asText());
+        assertFalse(actual.has("supplierAcceptance"));assertFalse(actual.has("arrivalQuantity"));assertFalse(actual.has("transmissionStatus"));
+        assertTrue(result.path("scopeComplete").asBoolean());assertEquals("REPEATABLE_READ",result.path("snapshot").path("isolation").asText());
+        String evidence=result.path("sourceEvidence").path("supplierCommitments").toString();
+        for(String fragment:List.of("p.itemId IN (?)","p.workId IN (?)","g.scopeJson::jsonb->>'lotId' IN (?)","p.proposalHash=o.proposalHash","o.recordedAt<=?","p.recordedAt<=?","boundValues",org,item,work,lot))assertTrue(evidence.contains(fragment),fragment);
+    }
+
+    @Test void supplierScopeHasPositiveAndEmptyProofWithoutOtherOrganizationsItemsWorksLotsOrFutureReplies() throws Exception {
+        var accepted=supplier("ACCEPT","100",org,item,work,lot);
+        supplier("REJECT","100",id(),item,work,lot);supplier("CHANGE","80",org,id(),work,lot);
+        supplier("CHANGE","80",org,item,id(),lot);supplier("CHANGE","80",org,item,work,id());
+        var future=supplier("CHANGE","80",org,item,work,lot);changeSupplier("mulino_trade_purchase_SupplierReplies",future.reply(),"recordedAt",later);
+        var rows=capture("supplierCommitments").path("rawRows").path("supplierCommitments");assertEquals(1,rows.size());assertEquals(accepted.reply().path("ID"),rows.get(0).path("id"));
+        var empty=ScenarioJdbcObservation.capture(config,root,request(scope().put("itemId",id()),"supplierCommitments"));
+        assertTrue(empty.path("rawRows").path("supplierCommitments").isEmpty());assertTrue(empty.path("scopeComplete").asBoolean());
+        var request=request(scope(),"supplierCommitments").put("knownAt",before);assertTrue(ScenarioJdbcObservation.capture(config,root,request).path("rawRows").path("supplierCommitments").isEmpty());
+    }
+
+    @ParameterizedTest @ValueSource(strings={"orderRecorded","orderCreated","revision","goal"})
+    void supplierVisibleReplyWithTimeIneligibleImmutableLinkIsUnknown(String target) throws Exception {
+        var f=supplier("ACCEPT","100",org,item,work,lot);
+        switch(target) {
+            case "orderRecorded" -> changeSupplier("mulino_trade_purchase_Orders",f.order(),"recordedAt",later);
+            case "orderCreated" -> changeSupplier("mulino_trade_purchase_Orders",f.order(),"createdAt",later);
+            case "revision" -> changeSupplier("mulino_trade_purchase_ProposalRevisions",f.revision(),"recordedAt",later);
+            case "goal" -> changeSupplier("mulino_work_read_GoalReferences",f.goal(),"recordedAt",later);
+        }
+        assertTrue(assertThrows(UnsupportedOperationException.class,()->capture("supplierCommitments")).getMessage().contains("time-ineligible"));
+    }
+
+    @ParameterizedTest @ValueSource(strings={"missingOrder","duplicateOrder","foreignOrder","missingRevision","duplicateRevision","hashMismatch","missingGoal","duplicateGoal","goalWorkMismatch","goalItemMismatch"})
+    void supplierMissingAmbiguousOrMismatchedLinksFailClosedEvenForAnEmptyRequestedScope(String target) throws Exception {
+        var f=supplier("ACCEPT","100",org,item,work,lot);
+        switch(target) {
+            case "missingOrder" -> changeSupplier("mulino_trade_purchase_SupplierReplies",f.reply(),"orderId",id());
+            case "duplicateOrder" -> insert("mulino_trade_purchase_Orders",f.order());
+            case "foreignOrder" -> changeSupplier("mulino_trade_purchase_Orders",f.order(),"organizationId",id());
+            case "missingRevision" -> changeSupplier("mulino_trade_purchase_Orders",f.order(),"proposalId",id());
+            case "duplicateRevision" -> insert("mulino_trade_purchase_ProposalRevisions",f.revision().deepCopy().put("ID",id()).put("proposalHash","other-hash"));
+            case "hashMismatch" -> changeSupplier("mulino_trade_purchase_Orders",f.order(),"proposalHash","other-hash");
+            case "missingGoal" -> changeSupplier("mulino_trade_purchase_ProposalRevisions",f.revision(),"goalVersionId",id());
+            case "duplicateGoal" -> insert("mulino_work_read_GoalReferences",f.goal());
+            case "goalWorkMismatch" -> changeSupplier("mulino_work_read_GoalReferences",f.goal(),"workId",id());
+            case "goalItemMismatch" -> changeSupplier("mulino_work_read_GoalReferences",f.goal(),"scopeJson",Json.object().put("itemId",id()).put("lotId",lot).toString());
+        }
+        assertThrows(UnsupportedOperationException.class,()->ScenarioJdbcObservation.capture(config,root,request(scope().put("itemId",id()),"supplierCommitments")));
+    }
+
+    @Test void supplierLotRequiresExplicitRevisionPinnedGoalRatherThanCurrentWork() throws Exception {
+        base();var f=supplier("ACCEPT","100",org,item,work,lot);
+        changeSupplier("mulino_trade_purchase_ProposalRevisions",f.revision(),"goalVersionId",null);
+        assertTrue(assertThrows(UnsupportedOperationException.class,()->capture("supplierCommitments")).getMessage().contains("LOT"));
+        var noLot=scope();noLot.remove("lotId");var rows=ScenarioJdbcObservation.capture(config,root,request(noLot,"supplierCommitments")).path("rawRows").path("supplierCommitments");
+        assertEquals(1,rows.size());assertFalse(rows.get(0).has("lotId"));assertEquals(item,rows.get(0).path("itemId").asText());
+        changeSupplier("mulino_trade_purchase_ProposalRevisions",f.revision(),"goalVersionId",f.goal().path("ID").asText());
+        changeSupplier("mulino_work_read_GoalReferences",f.goal(),"scopeJson",Json.object().put("itemId",item).toString());
+        assertThrows(UnsupportedOperationException.class,()->capture("supplierCommitments"));
+    }
+
+    @Test void supplierUsesImmutableRevisionAndGoalDespiteNewerProposalAndCurrentWorkLot() throws Exception {
+        base();var f=supplier("ACCEPT","100",org,item,work,lot);
+        insert("mulino_trade_purchase_Proposals",row(f.order().path("proposalId").asText()).put("currentRevision",2).put("workId",work));
+        insert("mulino_trade_purchase_ProposalRevisions",f.revision().deepCopy().put("ID",id()).put("revision",2).put("proposalHash","new-hash").put("itemId",id()).put("workId",id()).put("goalVersionId",id()));
+        changeSupplier("mulino_work_read_Works",row(work),"lotId",id());
+        var actual=capture("supplierCommitments").path("rawRows").path("supplierCommitments").get(0);
+        assertEquals(f.revision().path("ID"),actual.path("proposalRevisionId"));assertEquals(item,actual.path("itemId").asText());assertEquals(work,actual.path("workId").asText());assertEquals(lot,actual.path("lotId").asText());
+    }
+
+    @Test void supplierReadOnlySnapshotExcludesLaterCommitAndDoesNotWrite() throws Exception {
+        var f=supplier("ACCEPT","100",org,item,work,lot);
+        try(var reader=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+            reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(reader);
+            supplier("CHANGE","80",org,item,work,lot);
+            var projection=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
+            var rows=projection.read("mulino_trade_purchase_SupplierReplies");assertEquals(1,rows.size());assertEquals(f.reply().path("ID"),rows.get(0).path("id"));
+            try(var s=reader.createStatement()) {
+                try(var state=s.executeQuery("SHOW transaction_read_only")){assertTrue(state.next());assertEquals("on",state.getString(1));}
+                assertEquals("25006",assertThrows(SQLException.class,()->s.executeUpdate("DELETE FROM mulino_trade_purchase_SupplierReplies")).getSQLState());
+            }
+            reader.rollback();
+        }
+        assertEquals(2,capture("supplierCommitments").path("rawRows").path("supplierCommitments").size());
+        try(var s=writer.createStatement();var rows=s.executeQuery("SELECT count(*) FROM mulino_trade_purchase_SupplierReplies")){assertTrue(rows.next());assertEquals(2,rows.getInt(1));}
+    }
 
     @Test void historicalVersionsAndImmutableInputDetailsKeepTheirStoredIdentities() throws Exception {
         base();String assessment=id(),snapshot=id();insert("mulino_work_read_AssessmentReferences",assessment(assessment,work,now,conditions()));

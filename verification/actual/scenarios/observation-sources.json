@@ -1,6 +1,6 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.3.0",
+  "schemaVersion": "1.4.0",
   "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED. Recovery issues are independent SQL projections of trigger-owned, application-clock history; incomplete legacy history is unsupported.",
   "sources": {
     "segments": [
@@ -410,7 +410,7 @@
     "canonical_links": "EvidenceLinks links document/event/claim to canonicalOccurrenceId",
     "observationCoverage": "STATE_OBSERVATION Events joined to their actual Claims, VERIFIED Verifications, CanonicalOccurrences and available DocumentVersions. Closed coverage endpoints come from the matching persisted payload; this is not responsibility CompletionCoverages.",
     "receiptContributions": "ReceiptCredits holds contributedQuantity/excessQuantity per receipt and PO line",
-    "supplierCommitments": "SupplierReplies holds the supplier ACCEPT/REJECT/CHANGE commitment",
+    "supplierCommitments": "SupplierReplies preserves ACCEPT/REJECT/CHANGE and proposedQuantity. SQL scopes replies through the exact same-organization immutable Orders proposalId/revision/hash and ProposalRevisions item/work, with knownAt fences. LOT requires explicit scopeJson.lotId on the revision-pinned immutable GoalReferences; current Work/proposal state is never substituted. Missing, ambiguous, mismatched or time-ineligible links are unsupported, including when a scoped result would otherwise be empty.",
     "saleMatches": "settlement Matches",
     "adjustmentProposals": "settlement Adjustments carry mode (PROPOSE/CONFIRM), status and proposalId",
     "cancellationRequests": "purchase Cancellations (externalAcceptance UNKNOWN until reconciled)",
@@ -440,6 +440,7 @@
     "mulino_work_read_GoalReferences": "intervalStart/intervalEnd/startInclusive/endInclusive from immutable slotsJson period fields; no default endpoints or policy versions",
     "mulino_work_read_AssessmentReferences": "result=outcome, goalVersionId=goalId; definitionVersion/policyVersion from exact stored version IDs; conditionResults from conditionsJson; inputSnapshotIds from exact assessment/work/goal/hash binding",
     "mulino_evaluation_InputSnapshots": "inputSnapshot from contentJson, conditionResults from its immutable conditions, goalVersionId=goalId; no missing input or quantity is invented",
+    "mulino_trade_purchase_SupplierReplies": "purchaseId=orderId, quantity=proposedQuantity, preserving original columns/reply/unit. itemId/workId/proposalRevisionId/proposalHash from the exact immutable order/revision/hash chain; goalVersionId and optional explicit lotId from that revision-pinned GoalReferences.scopeJson. No transmission, acceptance or physical arrival state is inferred. Every validation and scoped query uses bound parameters in the same read-only REPEATABLE_READ snapshot.",
     "mulino_trade_purchase_Approvals": "conditions from conditionsJson; consumptionPolicy is the actual immutable stored value (historical NULL stays unknown), never an observer default",
     "mulino_evidence_Events": "Only a verified, matching persisted STATE_OBSERVATION chain can supply canonical quantity/unit; payload alone is not verified evidence"
   },
