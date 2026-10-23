@@ -77,5 +77,11 @@ public final class FulfillmentCommands implements CommandHandler {
   return quality.assessForFulfillment(c,segment,action,customer,purpose(c,capability,segment,lineId));
  }
  private DomainContext current(DomainContext c){var now=clock.instant();return new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),now,now);}
- private Map<String,Object> response(Map<String,Object> row,String key){var effects=new LinkedHashMap<String,Object>(row);effects.put(key,row.get("ID"));for(String field:List.of("quantity","startQuantity"))if(effects.get(field) instanceof BigDecimal q)effects.put(field,InventoryQuantity.text(q));return Map.of("outcome","APPLIED","revision",row.get("revision"),"effects",effects);}
+ private Map<String,Object> response(Map<String,Object> row,String key){
+  var effects=new LinkedHashMap<String,Object>(row);effects.put(key,row.get("ID"));
+  for(String field:List.of("quantity","startQuantity"))if(effects.get(field) instanceof BigDecimal q)effects.put(field,InventoryQuantity.text(q));
+  var result=new LinkedHashMap<String,Object>();result.put("outcome","APPLIED");result.put("revision",row.get("revision"));result.put("effects",effects);
+  if(key.equals("dispatchId"))result.put("movementId",row.get("movementId"));
+  return result;
+ }
 }

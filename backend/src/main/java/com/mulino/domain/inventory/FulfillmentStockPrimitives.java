@@ -24,7 +24,10 @@ public final class FulfillmentStockPrimitives implements DispatchCargoPort {
   transition(c,allocationId,"CONSUMED");BigDecimal start=(BigDecimal)a.get("startQuantity"),q=(BigDecimal)a.get("quantity");
   String leaf=stock.transferRange(c,(String)s.get("ID"),start,q,transit,at,evidence,command,"DISPATCH");
   var d=row(c,id(),at);String cargo=id();d.putAll(Map.of("cargoScopeId",cargo,"allocationId",allocationId,"salesLineId",a.get("orderLineId"),"customerId",a.get("customerId"),"workId",a.get("workId"),"itemId",s.get("itemId"),"lotId",s.get("lotId"),"rangeRootId",s.get("ID"),"startQuantity",start,"quantity",q));d.putAll(Map.of("unit",s.get("unit"),"transitSegmentId",leaf,"destinationId",destination,"occurredAt",at,"commandId",command,"evidenceRef",evidence));r.insert("Dispatches",d);
-  var scope=row(c,cargo,at);scope.putAll(Map.of("dispatchId",d.get("ID"),"rangeRootId",s.get("ID"),"startQuantity",start,"quantity",q,"unit",s.get("unit"),"segmentId",leaf,"customerId",a.get("customerId"),"workId",a.get("workId"),"commandId",command));r.insert("CargoScopes",scope);return d;
+  var scope=row(c,cargo,at);scope.putAll(Map.of("dispatchId",d.get("ID"),"rangeRootId",s.get("ID"),"startQuantity",start,"quantity",q,"unit",s.get("unit"),"segmentId",leaf,"customerId",a.get("customerId"),"workId",a.get("workId"),"commandId",command));r.insert("CargoScopes",scope);
+  var result=new LinkedHashMap<String,Object>(d);
+  result.put("movementId",r.dispatchMovementId(c,command,(String)s.get("ID"),leaf));
+  return result;
  }
  public Map<String,Object> requireDispatch(DomainContext c,String id){var d=r.object(c,"Dispatches",id);if(!"CONSUMED".equals(r.current(c,"SegmentAllocations",(String)d.get("allocationId")).get("state")))throw DomainError.invalid("Dispatch allocation history inconsistent");return d;}
  public Map<String,Object> requireCargoScope(DomainContext c,String id){return r.object(c,"CargoScopes",id);}

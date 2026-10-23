@@ -52,5 +52,14 @@ public class InventoryRepository {
     check(entity); return db.run(Select.from("mulino.inventory."+entity).where(r -> r.get("organizationId").eq(c.organizationId())))
       .listOf(Map.class).stream().map(r -> (Map<String,Object>)r).toList();
   }
+  /** The command's exact physical dispatch effect, inside the gateway transaction. */
+  public String dispatchMovementId(DomainContext c,String command,String source,String target) {
+    var rows=db.run(Select.from("mulino.inventory.QuantityMovements").where(r ->
+        r.get("organizationId").eq(c.organizationId()).and(r.get("commandId").eq(command))
+        .and(r.get("sourceId").eq(source)).and(r.get("targetId").eq(target))
+        .and(r.get("kind").eq("DISPATCH")))).listOf(Map.class);
+    if(rows.size()!=1)throw new IllegalStateException("Dispatch movement identity is missing or ambiguous");
+    return (String)rows.getFirst().get("ID");
+  }
   private void check(String entity) { if (!ENTITIES.contains(entity)) throw DomainError.unsupported(); }
 }

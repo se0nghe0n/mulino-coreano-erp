@@ -100,6 +100,39 @@ class FulfillmentPostgresTest {
  BigDecimal transitQuantity(){return sum("SELECT SUM(s.quantity) FROM mulino_inventory_QuantitySegments s JOIN mulino_inventory_Places p ON s.placeId=p.ID AND s.organizationId=p.organizationId WHERE s.retiredAt IS NULL AND p.kind='TRANSIT'");}
  BigDecimal customerQuantity(){return sum("SELECT SUM(s.quantity) FROM mulino_inventory_QuantitySegments s WHERE s.retiredAt IS NULL AND s.placeId=?",destination);}
  String dispatched(String start,String amount){String allocation=reserve(start,amount);run("pickQuantity",map("allocationId",allocation),0);var out=run("dispatchQuantity",map("allocationId",allocation,"transitPlaceId",transit,"occurredAt",now.toString(),"evidenceRef","synthetic dispatch"),1);assertEquals("CONSUMED",jdbc.queryForObject("SELECT state FROM mulino_inventory_SegmentAllocations WHERE ID=?",String.class,allocation));return effects(out).get("dispatchId").toString();}
+ @ParameterizedTest @ValueSource(strings={"20","100"})
+ void dispatchReturnsThePersistedMovementIdentityAndReplayKeepsIt(String quantity){
+  allow("100");allowDispatch();String allocation=reserve(quantity.equals("100")?"0":"20",quantity);
+  run("pickQuantity",map("allocationId",allocation),0);
+  var input=envelope("dispatchQuantity",map("allocationId",allocation,"transitPlaceId",transit,"occurredAt",now.toString(),"evidenceRef","synthetic movement identity"),1);
+  var result=apply(input);assertEquals("APPLIED",result.get("outcome"),result.toString());
+  String movement=Objects.toString(result.get("movementId"),null);assertNotNull(movement,result.toString());
+  var effect=effects(result);assertEquals(movement,effect.get("movementId"));
+  assertNotEquals(effect.get("dispatchId"),movement);assertNotEquals(effect.get("transitSegmentId"),movement);assertNotEquals(allocation,movement);
+  var row=jdbc.queryForMap("SELECT * FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND ID=?",org,movement);
+  assertEquals("DISPATCH",row.get("kind"));assertEquals(effect.get("commandId"),row.get("commandId"));
+  assertEquals(segment,row.get("sourceId"));assertEquals(effect.get("transitSegmentId"),row.get("targetId"));
+  assertEquals(0,new BigDecimal(quantity).compareTo((BigDecimal)row.get("quantity")));assertEquals("EA",row.get("unit"));
+  assertEquals(now,((java.sql.Timestamp)row.get("occurredAt")).toInstant());assertEquals("synthetic movement identity",row.get("evidenceRef"));
+  var replay=apply(input);assertEquals("APPLIED",replay.get("outcome"),replay.toString());
+  assertEquals(movement,replay.get("movementId"));assertEquals(movement,effects(replay).get("movementId"));
+  assertEquals(effect.get("dispatchId"),effects(replay).get("dispatchId"));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND commandId=? AND kind='DISPATCH'",Integer.class,org,row.get("commandId")));
+ }
+ @Test void dispatchMovementIdentityRollsBackAndTheSameRequestCanRetry(){
+  allow("100");allowDispatch();String allocation=reserve("20","20");run("pickQuantity",map("allocationId",allocation),0);
+  var input=envelope("dispatchQuantity",map("allocationId",allocation,"transitPlaceId",transit,"occurredAt",now.toString(),"evidenceRef","synthetic rollback identity"),1);
+  doThrow(new IllegalStateException("rollback dispatch identity")).when(impact).invalidate(any(),anyString());
+  assertThrows(IllegalStateException.class,()->apply(input));
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND kind='DISPATCH'",Integer.class,org));
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_Dispatches WHERE organizationId=?",Integer.class,org));
+  assertEquals(0,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_CargoScopes WHERE organizationId=?",Integer.class,org));
+  assertEquals("EXECUTABLE",jdbc.queryForObject("SELECT state FROM mulino_inventory_SegmentAllocations WHERE organizationId=? AND ID=?",String.class,org,allocation));
+  assertNull(jdbc.queryForObject("SELECT retiredAt FROM mulino_inventory_QuantitySegments WHERE organizationId=? AND ID=?",Object.class,org,segment));
+  doCallRealMethod().when(impact).invalidate(any(),anyString());
+  var result=apply(input);assertEquals("APPLIED",result.get("outcome"),result.toString());assertNotNull(result.get("movementId"));
+  assertEquals(1,jdbc.queryForObject("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=? AND ID=? AND kind='DISPATCH'",Integer.class,org,result.get("movementId")));
+ }
  @Test void dispatchMovementCountsOnlySelected20AndObserved10KeepsTransit10(){allow("100");allowDispatch();String dispatch=dispatched("20","20");assertEquals(0,new BigDecimal("20").compareTo(sum("SELECT SUM(quantity) FROM mulino_inventory_QuantityMovements WHERE kind='DISPATCH'")));var delivered=deliver(deliveryReport(dispatch,"20","10",destination));assertEquals("10",delivered.get("contributedQuantity"));assertEquals("10",delivered.get("physicalQuantity"));assertEquals(0,new BigDecimal("10").compareTo(transitQuantity()));assertEquals(0,new BigDecimal("10").compareTo(sum("SELECT SUM(quantity) FROM mulino_inventory_QuantityMovements WHERE kind='DELIVERY'")));assertEquals(0,new BigDecimal("10").compareTo(customerQuantity()));}
  // T17/D17: CONSUMED allocation is the dispatch history, not a block on the normal delivery of the same cargo.
  /** Plan §6 recordDelivery input "이미 소비된 배분 참조" (round 14 Step 3 finding 4): an allocationId must be the consumed
