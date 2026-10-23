@@ -22,7 +22,7 @@ import org.mulino.verification.Json;
 final class ScenarioFixtureInstaller {
     static final Set<String> SUPPORTED_TYPES=Set.of("Organization","Human","Agent","TradeItem","Product","Manufacturer","ManufacturerLot","ManufacturingLot",
         "Place","Customer","Supplier","QuantitySegment","Work","DocumentVersion","DefinitionVersion","PolicyVersion","SalesOrder","SalesOrderLine","Allocation",
-        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage");
+        "PurchaseProposal","PurchaseOrder","PurchaseOrderLine","Invoice","Recall","Investigation","Shipment","CargoScope","RegulatoryProcedure","RegulatoryPolicy","ReconciliationCase","Grant","Obligation","Handover","DefinitionPackage");
     /** Baseline keys whose content is merged into alias attributes or installed by a dedicated step. */
     static final Set<String> CONSUMED_BASELINE=Set.of("segments","works","work","items","places","lots","organizations","priorEntities","documents","sourceProfiles","entityRevisions","salesOrder","allocations","allocation","managementAuthorities","definitionContract");
     /**
@@ -93,12 +93,19 @@ final class ScenarioFixtureInstaller {
             c=connection;c.setAutoCommit(false);
             try {
                 for(String org:externals.keySet()) insert("mulino_identity_Organizations",row("ID",aliases.path(org).asText(),"externalAlias",externals.get(org),"createdAt",asOf,"recordedAt",asOf));
-                actors();definitionsAndPolicies();items();places();parties();lots();segments();works();sourceProfiles();T01SourceFacts.prepare(fixture,aliases);evidence();sales();allocations();tradeAliases();grants();
+                actors();definitionsAndPolicies();regulatoryPolicies();items();places();parties();lots();segments();works();sourceProfiles();T01SourceFacts.prepare(fixture,aliases);evidence();sales();allocations();tradeAliases();grants();
                 if(!partial&&!omitted.isEmpty())throw new UnsupportedOperationException("scenario fixture facts not installable: "+String.join("; ",omitted.subList(0,Math.min(12,omitted.size()))));
                 c.commit();
             } catch(Exception failure){c.rollback();for(Path b:writtenBlobs)java.nio.file.Files.deleteIfExists(b);throw failure;}
         }
         ObjectNode sourceFactEvidence=T01SourceFacts.enabled(fixture)?new T01SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias),conventions).install():null;
+        if(T17SourceFacts.enabled(fixture)) {
+            sourceFactEvidence=new T17SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias)).install();
+            omitted.remove("baseline.t17SourceFacts");
+            if(sourceFactEvidence.path("uninstalledConditions").isEmpty())omitted.remove("baseline.conditions");
+            else omitted.add("T17 conditions not installed: "+sourceFactEvidence.path("uninstalledConditions"));
+            // Provenance has no published supplier/LOT relation command yet. Keep the original omission.
+        }
         var result=Json.object();result.set("aliasMap",aliases);result.put("fixtureHash",Json.required(bundle,"fixtureHash"));result.set("clock",fixture.path("clock"));
         if(bundle.hasNonNull("identityBindingHash"))result.set("identityBindingHash",bundle.path("identityBindingHash"));
         result.put("organizationExternalAlias",externals.get(defaultOrgAlias));result.set("organizationExternalAliases",Json.MAPPER.valueToTree(externals));
@@ -128,6 +135,7 @@ final class ScenarioFixtureInstaller {
             String k=e.getKey();JsonNode v=e.getValue();
             if(DESCRIPTIVE_BASELINE.contains(k)||v.isNull()||v.isBoolean()&&!v.asBoolean()||v.isContainerNode()&&v.isEmpty())return;
             if(CONSUMED_BASELINE.contains(k)||T01SourceFacts.consumes(fixture,k))return;
+            if(T17SourceFacts.enabled(fixture)&&Set.of("conditions","t17SourceFacts").contains(k)){T17SourceFacts.validate(fixture);omitted.add("baseline."+k);return;}
             omitted.add("baseline."+k);
         });
         responsibilitySurvey();
@@ -341,6 +349,16 @@ final class ScenarioFixtureInstaller {
             policy(org,uuid(),p.path("kind").asText(),p.path("version").asText(),p.path("content"),asOf.minusDays(30),null,true);
         }
         conventions.add("activated convention policies for kinds without an authored PolicyVersion");
+    }
+    /** Same typed regulatory policy row as FixtureInstaller; never an operating approval. */
+    private void regulatoryPolicies() throws SQLException {
+        for(var it=fixture.path("aliases").fields();it.hasNext();) {
+            var e=it.next();JsonNode a=e.getValue();if(!"RegulatoryPolicy".equals(a.path("type").asText()))continue;
+            if(!a.path("fictional").asBoolean(false))throw new IllegalArgumentException("Only explicitly fictional regulatory fixture policies allowed");
+            var from=time(Json.required(a,"validFrom"));var until=time(Json.required(a,"validUntil"));
+            if(!from.isBefore(until)||!Set.of("SELL","DISPATCH","DISPOSE","INTERNAL_MOVE").contains(Json.required(a,"action"))||!"ACTIVE".equals(Json.required(a,"status")))throw new IllegalArgumentException("Invalid regulatory fixture policy interval/action/status");
+            insert("mulino_trade_regulatory_Policies",row("organizationId",orgOf.get(e.getKey()),"ID",id(e.getKey()),"revision",1,"createdAt",asOf,"recordedAt",asOf,"recordedBy",id(Json.required(a,"actorAlias")),"version",Json.required(a,"version"),"authority",Json.required(a,"authority"),"sourceNamespace",Json.required(a,"sourceNamespace"),"action",Json.required(a,"action"),"validFrom",from,"validUntil",until,"fictional",true,"status","ACTIVE","requiresLabel",a.path("requiresLabel").asBoolean()));
+        }
     }
     private void publish(String org,String id,ObjectNode content,String state) throws Exception {
         RecoveryGoalDefinition.apply(content,fixture.path("baseline").path("definitionContract"));

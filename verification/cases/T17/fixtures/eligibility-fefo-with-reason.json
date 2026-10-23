@@ -521,6 +521,54 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "t17Source": {
+      "issuer": "synthetic-issuer",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "subject": "T17-eligibility-fefo-with-reason-source",
+      "roleCapabilities": [
+        "attachEvidence",
+        "recordActivity",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "getEvidence",
+        "recordDispositionBasis",
+        "decideQuality",
+        "confirmCustomerConditions",
+        "confirmCommercialDisposition",
+        "prepareRegulatoryProcedure",
+        "recordSubmission",
+        "recordRegulatoryDecision",
+        "verifyLabel"
+      ],
+      "grant": {
+        "delegatorAlias": "supervisor",
+        "actions": [
+          "attachEvidence",
+          "recordActivity",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "getEvidence",
+          "recordDispositionBasis",
+          "decideQuality",
+          "confirmCustomerConditions",
+          "confirmCommercialDisposition",
+          "prepareRegulatoryProcedure",
+          "recordSubmission",
+          "recordRegulatoryDecision",
+          "verifyLabel"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -1239,6 +1287,34 @@
         "witnessKind": "supplier-proof"
       },
       "contentEncoding": "CANONICAL_JSON_UTF8"
+    },
+    "t17Source": {
+      "type": "Human"
+    },
+    "t17SourceWork-A": {
+      "type": "Work"
+    },
+    "t17SourceWork-B": {
+      "type": "Work"
+    },
+    "t17SourceWork-EARLY": {
+      "type": "Work"
+    },
+    "t17SourceWork-U": {
+      "type": "Work"
+    },
+    "t17RegulatoryPolicy": {
+      "type": "RegulatoryPolicy",
+      "actorAlias": "t17Source",
+      "version": "t17-synthetic-v1",
+      "authority": "FICTIONAL_T17_GIVEN_AUTHORITY",
+      "sourceNamespace": "synthetic-t17-eligibility",
+      "action": "SELL",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "fictional": true,
+      "status": "ACTIVE",
+      "requiresLabel": true
     }
   },
   "baseline": {
@@ -2320,8 +2396,82 @@
         "namespace": "SYNTHETIC-warehouse-60",
         "reconciliationOwnerAlias": "intake",
         "policyVersion": "source-profile-v1"
+      },
+      {
+        "synthetic": true,
+        "sourceNamespace": "synthetic-t17-eligibility",
+        "namespace": "synthetic-t17-eligibility",
+        "version": "t17-synthetic-v1",
+        "policyVersion": "t17-synthetic-v1",
+        "reconciliationOwnerAlias": "t17Source",
+        "acceptedActorAliases": [
+          "t17Source"
+        ],
+        "eventKinds": [
+          "QUALITY_DECISION_recordDispositionBasis_QC",
+          "QUALITY_DECISION_recordDispositionBasis_CUSTOMER",
+          "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
+          "REGULATORY_SUBMISSION",
+          "REGULATORY_DECISION",
+          "LABEL_VERIFICATION"
+        ]
       }
-    ]
+    ],
+    "works": [
+      {
+        "alias": "t17SourceWork-A",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "ownerAlias": "t17Source",
+        "supervisorAlias": "supervisor",
+        "kind": "QUALITY",
+        "status": "ACTIVE",
+        "revision": 1
+      },
+      {
+        "alias": "t17SourceWork-B",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "ownerAlias": "t17Source",
+        "supervisorAlias": "supervisor",
+        "kind": "QUALITY",
+        "status": "ACTIVE",
+        "revision": 1
+      },
+      {
+        "alias": "t17SourceWork-EARLY",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "ownerAlias": "t17Source",
+        "supervisorAlias": "supervisor",
+        "kind": "QUALITY",
+        "status": "ACTIVE",
+        "revision": 1
+      },
+      {
+        "alias": "t17SourceWork-U",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "ownerAlias": "t17Source",
+        "supervisorAlias": "supervisor",
+        "kind": "QUALITY",
+        "status": "ACTIVE",
+        "revision": 1
+      }
+    ],
+    "t17SourceFacts": {
+      "version": 1,
+      "actorAlias": "t17Source",
+      "namespace": "synthetic-t17-eligibility",
+      "policyAlias": "t17RegulatoryPolicy",
+      "legalComplianceClaimed": false,
+      "workAliases": {
+        "A": "t17SourceWork-A",
+        "B": "t17SourceWork-B",
+        "EARLY": "t17SourceWork-EARLY",
+        "U": "t17SourceWork-U"
+      }
+    }
   },
   "evidence": [
     {

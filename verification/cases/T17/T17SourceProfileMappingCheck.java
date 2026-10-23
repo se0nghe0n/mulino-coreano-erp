@@ -50,14 +50,14 @@ public final class T17SourceProfileMappingCheck {
         set(installer,"c",capture);call(installer,"sourceProfiles");
         var omitted=(List<String>)field(installer,"omitted");
         int count=fixture.path("baseline").path("sourceProfiles").size();
-        if(old){require(rows.isEmpty(),"Old profiles must remain omitted");require(omitted.size()==count,"All old namespaces omitted");}
+        if(old){require(rows.size()==1,"Only the new explicit typed profile is installable");require(omitted.size()==count-1,"All legacy namespaces omitted without mapping fields");}
         else {
             require(omitted.isEmpty(),"Corrected profile omitted: "+omitted);require(rows.size()==count,"One row per original namespace");
             for(int i=0;i<count;i++){
                 var profile=fixture.path("baseline").path("sourceProfiles").get(i);var row=rows.get(i);
                 require(row.get("namespace").equals(profile.path("sourceNamespace").asText()),"Namespace changed");
                 require(row.get("policyVersion").equals(profile.path("version").asText()),"Policy not pinned");
-                require(row.get("intakeOwnerId").equals(aliases.path("intake").asText()),"Wrong intake owner");
+                require(row.get("intakeOwnerId").equals(aliases.path(profile.path("reconciliationOwnerAlias").asText()).asText()),"Wrong intake owner");
                 require(row.get("supervisorId").equals(aliases.path("supervisor").asText()),"Wrong supervisor");
             }
         }
@@ -65,7 +65,7 @@ public final class T17SourceProfileMappingCheck {
         call(installer,"survey");
         require(omitted.contains("baseline.conditions"),"Conditions unexpectedly became installable");
         require(omitted.contains("baseline.sourceProvenance"),"Provenance unexpectedly became installable");
-        require(!ScenarioFixtureInstaller.SUPPORTED_TYPES.contains("RegulatoryPolicy"),"Reassess newly supported policy path");
+        require(ScenarioFixtureInstaller.SUPPORTED_TYPES.contains("RegulatoryPolicy"),"Typed regulatory policy must be supported");
     }
     public static void main(String[] args)throws Exception {
         Path root=Path.of(args[0]);int profiles=0,fixtures=0;
@@ -74,11 +74,12 @@ public final class T17SourceProfileMappingCheck {
                 ObjectNode fixture=(ObjectNode)Json.read(path);check(root,fixture,false);
                 ObjectNode old=fixture.deepCopy();
                 for(JsonNode profile:old.path("baseline").path("sourceProfiles")){
-                    ((ObjectNode)profile).remove(List.of("namespace","reconciliationOwnerAlias","policyVersion"));profiles++;
+                    if(!profile.path("namespace").asText().equals("synthetic-t17-eligibility"))((ObjectNode)profile).remove(List.of("namespace","reconciliationOwnerAlias","policyVersion"));
+                    profiles++;
                 }
                 check(root,old,true);fixtures++;
             }
         }
-        System.out.println("PASS compiled installer mapping: "+fixtures+" fixtures, "+profiles+" source profiles; original omission and remaining policy/condition blockers confirmed. JDBC captured only, scenarios NOT_RUN.");
+        System.out.println("PASS compiled installer mapping: "+fixtures+" fixtures, "+profiles+" source profiles; legacy namespace omission and new typed policy support confirmed; conditions stay pending until gateway execution. JDBC captured only, scenarios NOT_RUN.");
     }
 }

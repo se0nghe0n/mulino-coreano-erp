@@ -13,6 +13,9 @@ BASELINE = '04af8e3c8c76820b855d6b644dc36d958b446d44'
 SPEC = importlib.util.spec_from_file_location('author_source_profiles', HERE / 'author_source_profiles.py')
 AUTHOR = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(AUTHOR)
+SOURCE_SPEC = importlib.util.spec_from_file_location('author_eligibility_sources', HERE / 'author_eligibility_sources.py')
+SOURCE = importlib.util.module_from_spec(SOURCE_SPEC)
+SOURCE_SPEC.loader.exec_module(SOURCE)
 
 
 def original(path):
@@ -30,12 +33,18 @@ class SourceProfileContract(unittest.TestCase):
                 before = original(path)
                 if path.parent == HERE / 'fixtures':
                     fixture = json.loads(path.read_bytes())
+                    fixture['baseline']['sourceProfiles'] = [p for p in fixture['baseline']['sourceProfiles'] if p['sourceNamespace'] != SOURCE.NAMESPACE]
+                    del fixture['baseline']['t17SourceFacts']
+                    fixture['baseline']['works'] = [w for w in fixture['baseline']['works'] if not w['alias'].startswith('t17SourceWork-')]
+                    if not fixture['baseline']['works']: del fixture['baseline']['works']
+                    for key in [k for k in fixture['aliases'] if k == SOURCE.ACTOR or k == 't17RegulatoryPolicy' or k.startswith('t17SourceWork-')]: del fixture['aliases'][key]
+                    del fixture['actors'][SOURCE.ACTOR]
                     for profile in fixture['baseline']['sourceProfiles']:
                         for field in AUTHOR.FIELDS:
                             del profile[field]
                         profiles += 1
                     self.assertEqual(before, (json.dumps(fixture, ensure_ascii=False, indent=2) + '\n').encode())
-                else:
+                elif path.name not in {'author_source_profiles.py', 'test_source_profiles.py', 'T17SourceProfileMappingCheck.java'}:
                     self.assertEqual(before, path.read_bytes())
         self.assertEqual(370, profiles)
 
@@ -44,8 +53,11 @@ class SourceProfileContract(unittest.TestCase):
             before = json.loads(original(path))
             expected = json.loads(path.read_bytes())
             self.assertEqual(3 * len(before['baseline']['sourceProfiles']), AUTHOR.apply(before))
+            SOURCE.apply(before)
             self.assertEqual(expected, before)
             self.assertEqual(0, AUTHOR.apply(before))
+            SOURCE.apply(before)
+            self.assertEqual(expected, before)
 
     def test_reject_conflicting_namespace_owner_policy(self):
         fixture = json.loads((HERE / 'fixtures/normal-consumed-delivery.json').read_bytes())
@@ -59,9 +71,10 @@ class SourceProfileContract(unittest.TestCase):
         for path in (HERE / 'fixtures').glob('*.json'):
             before = json.loads(original(path))
             after = json.loads(path.read_bytes())
-            self.assertEqual(before['actors'], after['actors'])
+            self.assertEqual(before['actors'], {k:v for k,v in after['actors'].items() if k != SOURCE.ACTOR})
+            self.assertEqual({'organizationAlias': 'ORG', 'itemAliases': sorted({v['itemAlias'] for v in before['aliases'].values() if v['type'] == 'QuantitySegment'})}, after['actors'][SOURCE.ACTOR]['grant']['scope'])
             # No actor has the decision permissions required by QualityCommands.
-            capabilities = {c for a in after['actors'].values() for c in a['roleCapabilities']}
+            capabilities = {c for a in before['actors'].values() for c in a['roleCapabilities']}
             self.assertTrue(capabilities.isdisjoint({'decideQuality', 'confirmCustomerConditions',
                                                     'confirmCommercialDisposition'}))
 

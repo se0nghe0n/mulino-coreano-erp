@@ -20,6 +20,9 @@ def apply(fixture):
     changed = 0
     seen = set()
     for profile in fixture['baseline']['sourceProfiles']:
+        # The separately authored typed-source actor owns this explicit new profile.
+        if profile['sourceNamespace'] == 'synthetic-t17-eligibility':
+            continue
         namespace = profile['sourceNamespace']
         if namespace in seen or profile.get('synthetic') is not True:
             raise ValueError('Distinct synthetic source namespace required')
