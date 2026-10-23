@@ -43,11 +43,20 @@ class T13SupplierSourceFactsPostgresTest {
   var bad=f.replyRequest().put("commandIdempotencyKey",UUID.randomUUID().toString());((ObjectNode)bad.path("slots").path("proposedQuantity")).put("unit","EA");var denied=f.call("recordSupplierReply",bad,"source");assertNotEquals("APPLIED",denied.at("/response/outcome").asText());assertTrue(rows("mulino_trade_purchase_SupplierReplies").isEmpty());zeroPhysical();
  }
 
- @Test void missingTransmissionConfirmationCannotCreateCommitment()throws Exception {
-  install("supplier-accept");f.executeThrough("source-reply-canonical",Set.of("transmission"));
-  var result=f.call("recordSupplierReply",f.replyRequest(),"source");f.results.put("missing-transmission-probe",result);
-  assertNotEquals("APPLIED",result.at("/response/outcome").asText(),"Product accepted supplier commitment without confirmed transmission: "+result);
-  assertTrue(rows("mulino_trade_purchase_SupplierReplies").isEmpty());zeroPhysical();
+ /** Coordinator correction: plan section 6 makes supplier acceptance independent of transport confirmation. */
+ @Test void verifiedReplyRemainsDistinctFromUnconfirmedTransmission()throws Exception {
+  install("supplier-accept");f.executeThrough("source-reply-canonical",Set.of("transmission","delivery-ack","source-delivery-tick"));
+  assertEquals("PENDING",rows("mulino_runtime_Outbox").getFirst().get("status"));
+  var result=f.call("recordSupplierReply",f.replyRequest(),"source");f.results.put("unconfirmed-transmission-reply",result);
+  assertEquals("APPLIED",result.at("/response/outcome").asText(),result.toString());
+  assertEquals("PENDING",rows("mulino_runtime_Outbox").getFirst().get("status"));
+  assertEquals(1,rows("mulino_trade_purchase_SupplierReplies").size());zeroPhysical();
+  assertTrue(rows("mulino_runtime_ExternalReconciliations").isEmpty());
+  var unverified=f.replyRequest().put("commandIdempotencyKey",UUID.randomUUID().toString()).put("expectedRevision",2);
+  ((ObjectNode)unverified.path("slots")).put("evidence",f.aliases.path("supplier-ship").asText()).remove("canonicalOccurrenceId");
+  var denied=f.call("recordSupplierReply",unverified,"source");f.results.put("unverified-separate-reply",denied);
+  assertEquals("EVIDENCE_UNVERIFIED",denied.at("/response/error/code").asText());
+  assertEquals(1,rows("mulino_trade_purchase_SupplierReplies").size());zeroPhysical();
  }
  @Test void wrongScopeAndExpiredSourceCannotPublish()throws Exception {
   for(String mode:List.of("wrong-item","wrong-work","expired")) {

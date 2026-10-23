@@ -48,6 +48,8 @@ try:
         'sourceCommit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip(),
         'productJar': str(product_jar),
         'productJarSha256': hashlib.sha256(product_jar.read_bytes()).hexdigest(),
+        'sourceDiffSha256': hashlib.sha256(subprocess.check_output(['git','diff','HEAD'],cwd=ROOT)).hexdigest(),
+        'changedSourceSha256': {name: hashlib.sha256((ROOT/name).read_bytes()).hexdigest() for name in subprocess.check_output(['git','ls-files','--modified','--others','--exclude-standard'],cwd=ROOT,text=True).splitlines() if name.endswith(('.java','.py','.json')) and (ROOT/name).is_file()},
     }, indent=2) + '\n')
     image = json.loads((ROOT/'verification/platform/versions.json').read_text())['postgresImage']['reference']
     run(['docker', 'run', '-d', '--name', container, '-e', 'POSTGRES_PASSWORD', '-e', 'POSTGRES_DB=ontology', '-p', '127.0.0.1::5432', image], 'container.log', env)
@@ -72,7 +74,7 @@ try:
     env.update(ACTUAL_BASE_URL='http://127.0.0.1:'+match[-1], ACTUAL_DISPOSABLE_DATABASE='true',
                ACTUAL_BUILD_COMMIT=subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
                T13_PG_TEST='true', T13_TEST_EVIDENCE=str(OUT))
-    run([str(ROOT/'mvnw'), '-B', '-ntp', '-f', 'verification/harness/pom.xml', '-Dtest=T13SupplierSourceFactsPostgresTest',
+    run([str(ROOT/'mvnw'), '-B', '-ntp', '-f', 'verification/harness/pom.xml', '-Dtest=T13SupplierSourceFactsPostgresTest,T13PurchaseDeliveryPostgresTest',
          '-Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json',
          '-Dverification.actual.blobRoot='+str(OUT/'blobs'), 'test'], 'test.log', env)
     print('PASS T13 source PostgreSQL integration:', OUT)
@@ -89,7 +91,7 @@ finally:
         (OUT/name).unlink(missing_ok=True)
     import shutil
     reports=ROOT/'verification/harness/target/surefire-reports'
-    for report in reports.glob('*T13SupplierSourceFactsPostgresTest*'):
+    for report in reports.glob('*T13*PostgresTest*'):
         shutil.copy2(report,OUT/report.name)
     (OUT/'commands.json').write_text(json.dumps(records,indent=2)+'\n')
     print('Evidence:', OUT)

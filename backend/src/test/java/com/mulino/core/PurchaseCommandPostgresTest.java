@@ -231,4 +231,51 @@ class PurchaseCommandPostgresTest {
     assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_runtime_Outbox"));
   }
 
+
+  @Autowired com.mulino.application.runtime.RuntimeService purchaseDelivery;
+  DomainContext deliveryContext(){return new DomainContext(org,actor,jdbc.queryForObject("SELECT stableRequestOwner FROM mulino_identity_Actors WHERE organizationId=? AND ID=?",String.class,org,actor),Instant.now(),Instant.now());}
+  <T> T deliveryTransaction(java.util.function.Supplier<T> operation){return runtime.requestContext().run(context->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->operation.get());});}
+  Map<String,Object> conditionalOrder(){var p=propose();var a=purchase("approvePurchase",1,row("proposalId",p.get("proposalId"),"proposalHash",p.get("proposalHash"),"decision","CONDITIONAL","conditions",List.of("CurrentPhysicalStock"),"validUntil",Instant.now().plusSeconds(3600).toString()),id());var order=dispatch(p,a);assertEquals("APPLIED",order.get("outcome"),order.toString());return order;}
+  @Test void conditionalDeliveryRechecksCurrentPhysicalFactsWithoutConsumingAgain(){
+    var order=conditionalOrder();var c=deliveryContext();
+    var claim=deliveryTransaction(()->purchaseDelivery.claimDelivery(c,"conditional-worker","dispatchPurchaseOrder",new com.mulino.application.runtime.ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(30)).orElseThrow());
+    var sent=new java.util.concurrent.atomic.AtomicInteger();
+    var adapter=new com.mulino.application.runtime.ExternalDeliveryAdapter(){public Support support(String op){return new Support(false,false);}public Result deliver(String op,String ext,Map<String,Object> payload){sent.incrementAndGet();return Result.CONFIRMED_SUCCESS;}public Result lookup(String op,String ext){return Result.UNKNOWN;}};
+    deliveryTransaction(()->{purchaseDelivery.deliverUnderFence(c,order.get("outboxId").toString(),((Number)claim.get("fencingtoken")).longValue(),"conditional-worker",adapter);return null;});
+    assertEquals(1,sent.get());assertEquals("UNKNOWN_EXTERNAL",jdbc.queryForObject("SELECT status FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=?",String.class,org,order.get("outboxId")));
+    assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_trade_purchase_Approvals"));assertEquals(1,count("mulino_runtime_Outbox"));
+  }
+  @Test void changedConditionalFactsAfterDeliveryClaimPreventIO(){
+    var order=conditionalOrder();var c=deliveryContext();
+    var claim=deliveryTransaction(()->purchaseDelivery.claimDelivery(c,"conditional-worker","dispatchPurchaseOrder",new com.mulino.application.runtime.ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(30)).orElseThrow());
+    jdbc.update("UPDATE mulino_inventory_QuantitySegments SET identificationStatus='UNKNOWN' WHERE organizationId=?",org);
+    var adapter=mock(com.mulino.application.runtime.ExternalDeliveryAdapter.class);
+    var failure=assertThrows(DomainError.class,()->deliveryTransaction(()->{purchaseDelivery.deliverUnderFence(c,order.get("outboxId").toString(),((Number)claim.get("fencingtoken")).longValue(),"conditional-worker",adapter);return null;}));
+    assertEquals("APPROVAL_CONDITION_UNVERIFIED",failure.code());verifyNoInteractions(adapter);assertEquals("IN_FLIGHT",jdbc.queryForObject("SELECT status FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=?",String.class,org,order.get("outboxId")));
+    assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_runtime_Outbox"));
+  }
+  @org.junit.jupiter.params.ParameterizedTest
+  @org.junit.jupiter.params.provider.ValueSource(strings={"quantity","price","itemId","supplierId","dueAt","destinationId","endpoint"})
+  void deliveryRetainsApprovalCauseForEveryCommercialDimension(String field){
+    var p=propose();var a=approve(p,"APPROVE");var order=dispatch(p,a);Object change;
+    switch(field){
+      case "quantity"->change=Map.of("value","120","unit","BOX");
+      case "price"->change=Map.of("value","1.20","currency","EUR");
+      case "dueAt"->change=Instant.now().plusSeconds(172800).toString();
+      case "endpoint"->change="SELL_ELIGIBLE";
+      case "supplierId"->{change=id();insert("mulino_trade_purchase_Suppliers",row("organizationId",org,"ID",change,"name","alternate supplier"));}
+      case "destinationId"->{change=id();var dest=scoped(change.toString());dest.putAll(row("name","alternate warehouse","kind","WAREHOUSE"));insert("mulino_inventory_Places",dest);}
+      case "itemId"->{change=id();var alt=scoped(change.toString());alt.putAll(row("productId",product,"name","alternate product","baseUnit","BOX","decimalPlaces",0,"specificationVersionId",spec,"packagingVersionId",pack));insert("mulino_inventory_TradeItems",alt);}
+      default->throw new AssertionError(field);
+    }
+
+    var revised=purchase("revisePurchase",1,row("proposalId",p.get("proposalId"),"changes",Map.of(field,change),"reason","delivery approval invalidated"),id());assertEquals("APPLIED",revised.get("outcome"),revised.toString());
+    var c=deliveryContext();
+    var failure=assertThrows(DomainError.class,()->deliveryTransaction(()->purchaseDelivery.claimDelivery(c,"approval-worker","dispatchPurchaseOrder",new com.mulino.application.runtime.ExternalDeliveryAdapter.Support(false,false),3,Duration.ofSeconds(30))));
+    assertEquals("APPROVAL_NOT_CURRENT",failure.code(),field);
+    assertEquals("PENDING",jdbc.queryForObject("SELECT status FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=?",String.class,org,order.get("outboxId")));
+    assertEquals(0,jdbc.queryForObject("SELECT deliveryAttempts FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=?",Integer.class,org,order.get("outboxId")));
+    assertEquals(1,count("mulino_trade_purchase_Orders"));assertEquals(1,count("mulino_runtime_Outbox"));
+  }
+
 }

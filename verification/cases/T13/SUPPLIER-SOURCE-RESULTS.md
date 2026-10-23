@@ -67,3 +67,11 @@ backend source는 baseline과 동일하다. 타 tree의 JAR/generated를 복사�
 실모델/Haiku Workflow 및 실제 scenario runner는 실행하지 않았다.
 운영 supplier 전송·BTP·배포·API 과금·push·main/PR merge·Grok 알림도
 수행하지 않았다. 원래 135 assertion과 비대상 14 subcase는 보존했다.
+
+## 후속 delivery 구현과 계약 정정
+
+위 결과는 `64d74f90` 시점의 실행 기록이다. coordinator가 새
+missing-transmission probe의 기대를 철회하고 독립 사실 계약으로
+정정했으며, 후속 product delivery authorization을 구현했다.
+최신 변경·실행·남은 observer 실패는
+[delivery 인계](DELIVERY-AUTHORIZATION.md)에 기록한다.

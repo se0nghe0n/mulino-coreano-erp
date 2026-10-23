@@ -22,12 +22,14 @@ public class RuntimeService {
  /** Locks a deliverable row, records capability support and intent before network IO. */
  @Transactional public Optional<Map<String,Object>> claimDelivery(DomainContext c,String worker,String operation,ExternalDeliveryAdapter.Support support,int maxAttempts,Duration ttl){
   if(maxAttempts<1||maxAttempts>20||ttl.isNegative()||ttl.isZero()||ttl.compareTo(Duration.ofMinutes(5))>0)throw DomainError.invalid("Invalid delivery policy");
-  auth.fence(c,List.of());Instant now=clock.instant();
-  var rows=repository.db().queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND actorId=? AND stableRequestOwner=? AND operation=? AND status='PENDING' AND nextCheckAt<=? ORDER BY nextCheckAt,ID FOR UPDATE SKIP LOCKED LIMIT 1",c.organizationId(),c.actorId(),c.stableRequestOwner(),operation,at(now));
+  Instant now=clock.instant();
+  // Read without an outbox lock: command/domain -> policy -> identity -> outbox is the common order.
+  var candidates=repository.db().queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND actorId=? AND stableRequestOwner=? AND operation=? AND status='PENDING' AND nextCheckAt<=? ORDER BY nextCheckAt,ID LIMIT 1",c.organizationId(),c.actorId(),c.stableRequestOwner(),operation,at(now));
+  if(candidates.isEmpty())return Optional.empty();var candidate=candidates.getFirst();
+  authorizeDelivery(c,candidate);
+  var rows=repository.db().queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=? AND status='PENDING' AND nextCheckAt<=? FOR UPDATE SKIP LOCKED",c.organizationId(),candidate.get("id"),at(clock.instant()));
   if(rows.isEmpty())return Optional.empty();var row=rows.getFirst();
-  var payload=json.readValue((String)row.get("payloadjson"),Map.class);
-  if(!(payload.get("workId") instanceof String workId))throw DomainError.invalid("External delivery requires canonical work scope");
-  auth.authorizeScope(c,(String)row.get("operation"),"WORK",workId);
+  sameDelivery(candidate,row);
   int attempts=((Number)row.get("deliveryattempts")).intValue();
   if(attempts>=maxAttempts){repository.db().update("UPDATE mulino_runtime_Outbox SET status='EXHAUSTED',nextAction='Human must review exhausted delivery and retain responsibility' WHERE organizationId=? AND ID=?",c.organizationId(),row.get("id"));retainDuty(c,row,"Review exhausted external delivery");return Optional.empty();}
   long token=((Number)row.get("fencingtoken")).longValue()+1;
@@ -37,7 +39,7 @@ public class RuntimeService {
  @Transactional public void deliveryResult(DomainContext c,String id,long token,String worker,ExternalDeliveryAdapter.Result result,String evidence){
   if(evidence!=null&&!evidence.matches("[A-Za-z0-9._:/-]{1,160}"))throw DomainError.invalid("Invalid evidence reference");
   var rows=repository.db().queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=? FOR UPDATE",c.organizationId(),id);if(rows.size()!=1)throw DomainError.forbidden();var row=rows.getFirst();
-  if(!"IN_FLIGHT".equals(row.get("status"))||((Number)row.get("fencingtoken")).longValue()!=token||!Objects.equals(row.get("leaseowner"),worker)||!c.actorId().equals(row.get("actorid"))||!instant(row.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
+  if(!"IN_FLIGHT".equals(row.get("status"))||((Number)row.get("fencingtoken")).longValue()!=token||!Objects.equals(row.get("leaseowner"),worker)||!c.actorId().equals(row.get("actorid"))||!c.stableRequestOwner().equals(row.get("stablerequestowner"))||!instant(row.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
   if(result==ExternalDeliveryAdapter.Result.CONFIRMED_SUCCESS&&evidence!=null)externalEvidence.requireExternalResult(c,evidence,(String)row.get("externaloperationid"),"CONFIRMED_SUCCESS");
   String status=result==ExternalDeliveryAdapter.Result.CONFIRMED_SUCCESS&&evidence!=null?"SUCCEEDED":"UNKNOWN_EXTERNAL";
   // Even a synchronous failure needs explicit authoritative reconciliation before retry.
@@ -108,13 +110,32 @@ public class RuntimeService {
  @Transactional public void deliverUnderFence(DomainContext c,String id,long token,String worker,ExternalDeliveryAdapter adapter){
   var rows=repository.db().queryForList("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=?",c.organizationId(),id);if(rows.size()!=1)throw DomainError.forbidden();var row=rows.getFirst();
   if(!"IN_FLIGHT".equals(row.get("status"))||((Number)row.get("fencingtoken")).longValue()!=token||!worker.equals(row.get("leaseowner"))||!c.actorId().equals(row.get("actorid"))||!c.stableRequestOwner().equals(row.get("stablerequestowner"))||!instant(row.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
-  var payload=json.readValue((String)row.get("payloadjson"),Map.class);if(!(payload.get("workId") instanceof String work))throw DomainError.invalid("Canonical work required");
-  var guard=deliveryAuthorization.getIfAvailable();if(guard==null)throw DomainError.unsupported();guard.require(c,(String)row.get("commandid"),(String)row.get("operation"),payload);
-  auth.fence(c,List.of());auth.authorizeScope(c,(String)row.get("operation"),"WORK",work);
+  if(deliveryBarrier!=null)deliveryBarrier.reach("AFTER_INITIAL_READ_BEFORE_SCOPE_FENCE");
+  authorizeDelivery(c,row);
   var locked=repository.db().queryForMap("SELECT * FROM mulino_runtime_Outbox WHERE organizationId=? AND ID=? FOR UPDATE",c.organizationId(),id);
   if(!"IN_FLIGHT".equals(locked.get("status"))||((Number)locked.get("fencingtoken")).longValue()!=token||!worker.equals(locked.get("leaseowner"))||!instant(locked.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
+  sameDelivery(row,locked);
+  if(deliveryBarrier!=null)deliveryBarrier.reach("AFTER_AUTH_SCOPE_FENCE_ACQUIRED_BEFORE_EFFECT_COMMIT");
+  // Time may advance while an explicitly configured verification barrier is held.
+  if(!instant(locked.get("leaseexpiresat")).isAfter(clock.instant()))throw conflict();
+  authorizeDelivery(c,locked);
+  var payload=json.readValue((String)locked.get("payloadjson"),Map.class);
   ExternalDeliveryAdapter.Result result;try{result=adapter.deliver((String)row.get("operation"),(String)row.get("externaloperationid"),payload);}catch(RuntimeException timeout){result=ExternalDeliveryAdapter.Result.UNKNOWN;}
   // Adapter receipt without immutable verified evidence is held for canonical reconciliation.
   deliveryResult(c,id,token,worker,result,null);
  }
+ @org.springframework.beans.factory.annotation.Autowired(required=false)
+ private CommandBarrier deliveryBarrier;
+ private void authorizeDelivery(DomainContext c,Map<String,Object> row){
+  if(!c.actorId().equals(row.get("actorid"))||!c.stableRequestOwner().equals(row.get("stablerequestowner"))||!c.organizationId().equals(row.get("organizationid")))throw DomainError.forbidden();
+  String operation=(String)row.get("operation");
+  var guards=deliveryAuthorization.stream().filter(g->g.supports(operation)).toList();
+  if(guards.size()!=1)throw DomainError.unsupported();
+  var current=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),clock.instant(),clock.instant());
+  guards.getFirst().require(current,new ExternalDeliveryAuthorization.Delivery((String)row.get("id"),(String)row.get("commandid"),(String)row.get("externaloperationid"),operation,(String)row.get("actorid"),(String)row.get("stablerequestowner"),json.readValue((String)row.get("payloadjson"),Map.class)));
+ }
+ private void sameDelivery(Map<String,Object> before,Map<String,Object> after){
+  for(String field:List.of("organizationid","id","commandid","externaloperationid","operation","actorid","stablerequestowner","payloadjson"))if(!Objects.equals(before.get(field),after.get(field)))throw conflict();
+ }
+
 }

@@ -2,7 +2,13 @@ package com.mulino.application.runtime;
 
 import com.mulino.application.core.DomainContext;
 import java.util.Map;
-/** Domain/control rechecks original immutable command scope and current policy. */
+
+/** Handler-owned revalidation only: never re-executes or reconsumes the committed command. */
 public interface ExternalDeliveryAuthorization {
- void require(DomainContext context,String commandId,String operation,Map<String,Object> payload);
+ boolean supports(String operation);
+ void require(DomainContext context,Delivery delivery);
+ record Delivery(String outboxId,String commandId,String externalOperationId,String operation,
+                 String actorId,String stableRequestOwner,Map<String,Object> payload) {
+  public Delivery { payload=Map.copyOf(payload); }
+ }
 }

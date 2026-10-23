@@ -89,3 +89,20 @@ ACCEPT100/REJECT100/CHANGE80의 서로 다른 commitment, 주문100 보존,
 `SUPPLIER-SOURCE-RESULTS.md`에 기록한다. 원본 실패 JSON은
 `.local/t13-supplier-work/raw-source-bcac-scenarios.json`에 보존한다.
 실모델·Haiku dynamic Workflow·운영 공급자 전송·BTP·배포·merge는 NOT_RUN이다.
+
+## 2026-10-23 coordinator 정정과 delivery 후속 구현
+
+앞선 `missingTransmissionConfirmationCannotCreateCommitment`는 새 probe에
+잘못 추가한 기대였다. 계획 §6과 설계 철학은 공급자 회신·발주 전달·도착을
+각각 독립 사실로 규정한다. 전달 확인이 없다는 이유로 검증된 공급자 회신을
+막는 제품 guard는 추가하지 않는다. 그 새 probe만
+`verifiedReplyRemainsDistinctFromUnconfirmedTransmission`으로 교체했다.
+원래 135 assertion과 source ledger는 그대로 보존했다. 위 과거 제품 경계
+목록의 3번은 철회하며 이전 FAIL은 제품 결함으로 취급하지 않는다.
+
+후속 구현은 제품의 purchase delivery authorization이다. 외부 공급자
+연동을 구현하거나 verification responder를 운영 adapter로 바꾸지 않는다.
+원래 COMMITTED 명령과 immutable order/line/outbox의 identity를 확인하고,
+원 handler의 scope 및 현재 policy/grant/승인을 claim과 IO 직전에 재검증한다.
+검증된 supplier 회신은 여전히 전송·도착과 독립이며, responder 응답만으로
+SUCCEEDED가 되지 않는다. 상세 결과는 후속 delivery 인계 문서에 기록한다.

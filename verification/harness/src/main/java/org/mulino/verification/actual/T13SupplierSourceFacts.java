@@ -10,7 +10,7 @@ import java.util.*;
 /** Bounded deterministic T13 HTTP fixture probe; never a model/scenario runner or DB writer. */
 final class T13SupplierSourceFacts {
  final Path root;final ActualConfiguration config;final ObjectNode fixture,installed;final JsonNode aliases,sub;
- final Map<String,JsonNode> results=new LinkedHashMap<>();final HttpClient http=HttpClient.newHttpClient();
+ final Map<String,JsonNode> results=new LinkedHashMap<>();final List<JsonNode> httpReceipts=Collections.synchronizedList(new ArrayList<>());final HttpClient http=HttpClient.newHttpClient();
  T13SupplierSourceFacts(Path root,ActualConfiguration config,String subcase)throws Exception {
   this(root,config,subcase,f->{});
  }
@@ -26,10 +26,14 @@ final class T13SupplierSourceFacts {
   installed=ScenarioFixtureInstaller.install(config,root,bound,true);aliases=installed.path("aliasMap");
   post("/__verification/runtime/clock/fixture-start",Json.object().put("instant",fixture.path("clock").path("asOf").asText()),"procurement");
  }
- JsonNode post(String path,ObjectNode body,String actor)throws Exception {
+ JsonNode post(String path,ObjectNode body,String actor)throws Exception {return request(path,"POST",body,actor,null);}
+ JsonNode request(String path,String method,ObjectNode body,String actor,ObjectNode barrier)throws Exception {
   var credential=(ObjectNode)ActualFixtureBindings.credentialActor(root,config,fixture.path("actors").path(actor));credential.put("organizationAlias",installed.path("organizationExternalAlias").asText());
-  var r=http.send(HttpRequest.newBuilder(config.baseUri().resolve(path)).timeout(java.time.Duration.ofSeconds(60)).header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).header("Content-Type","application/json").POST(HttpRequest.BodyPublishers.ofString(body.toString())).build(),HttpResponse.BodyHandlers.ofString());
-  var response=Json.parse(r.body());var receipt=Json.object().put("httpStatus",r.statusCode()).put("driverStatus","EXECUTED");receipt.set("provenance",Json.object().put("scopeComplete",true).put("source","HTTP"));receipt.set("request",body);receipt.set("response",response);return receipt;
+  var builder=HttpRequest.newBuilder(config.baseUri().resolve(path)).timeout(java.time.Duration.ofSeconds(60)).header("Authorization","Bearer "+new JwtSigner(config).sign(credential)).header("Content-Type","application/json");
+  if(barrier!=null)builder.header("X-Mulino-Test-Barrier",barrier.toString());
+  if(method.equals("GET"))builder.GET();else builder.POST(HttpRequest.BodyPublishers.ofString(body.toString()));
+  var r=http.send(builder.build(),HttpResponse.BodyHandlers.ofString());
+  var response=Json.parse(r.body());var receipt=Json.object().put("httpStatus",r.statusCode()).put("driverStatus","EXECUTED");receipt.set("provenance",Json.object().put("scopeComplete",true).put("source","HTTP"));receipt.set("request",body==null?Json.object():body);receipt.set("response",response);receipt.set("transport",Json.object().put("method",method).put("path",path).put("actorRef",actor));httpReceipts.add(receipt);return receipt;
  }
  JsonNode call(String cap,ObjectNode request,String actor)throws Exception {return post("/api/ontology/"+(request.path("intentKind").asText().equals("RECORD")?"records/":"commands/")+cap,request,actor);}
  void executeThrough(String stop)throws Exception {executeThrough(stop,Set.of());}
@@ -55,5 +59,5 @@ final class T13SupplierSourceFacts {
     var rows=Json.array();try(var q=db.prepareStatement("SELECT * FROM "+table+" WHERE organizationId=?")){q.setString(1,aliases.path("ORG").asText());try(var result=q.executeQuery()){while(result.next()){var row=Json.object();for(int i=1;i<=result.getMetaData().getColumnCount();i++)row.put(result.getMetaData().getColumnLabel(i),result.getString(i));rows.add(row);}}}raw.set(table,rows);
    }
   }
-  r.set("rawRows",raw);r.set("installer",installed);r.set("commands",Json.MAPPER.valueToTree(results));Json.write(path,r);}
+  synchronized(httpReceipts){r.set("httpReceipts",Json.MAPPER.valueToTree(httpReceipts));}r.set("rawRows",raw);r.set("installer",installed);r.set("commands",Json.MAPPER.valueToTree(results));Json.write(path,r);}
 }
