@@ -160,12 +160,23 @@ class RecipientAcceptanceAssertionTest {
         for (JsonNode candidate : file.path("subcases"))
             if (candidate.path("id").asText().equals("cancel-after-shipment")) sub = candidate;
         assertNotNull(sub);
-        for (JsonNode action : sub.path("actions")) if (action.path("id").asText().equals("transfer")) {
-            assertEquals("B", action.path("actorRef").asText());
-            assertEquals("TRANSFERPROPOSAL", action.at("/request/slots/acceptanceEvidenceId/$alias").asText());
+        JsonNode proposal = null, acceptance = null;
+        for (JsonNode action : sub.path("actions")) {
+            if (action.path("id").asText().equals("transfer-proposal")) proposal = action;
+            if (action.path("id").asText().equals("transfer")) acceptance = action;
         }
+        assertNotNull(proposal); assertNotNull(acceptance);
+        assertEquals("A", proposal.path("actorRef").asText());
+        assertEquals("transferObligation", proposal.path("capabilityId").asText());
+        assertEquals("B", proposal.at("/request/slots/recipientId/$alias").asText());
+        assertEquals("B", acceptance.path("actorRef").asText());
+        assertEquals("acceptHandover", acceptance.path("capabilityId").asText());
+        assertEquals("transfer-proposal", acceptance.at("/request/slots/handoverId/$result/actionId").asText());
+        assertEquals("/response/effects/responsibility/ID", acceptance.at("/request/slots/handoverId/$result/pointer").asText());
+        assertFalse(acceptance.path("request").path("slots").has("acceptanceEvidenceId"));
         var rows = accepted("successful-transfer");
         ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("commandIdempotencyKey", "T11-cancel-after-shipment-transfer");
+        ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("capabilityId", "acceptHandover");
         JsonNode recipient = null, transaction = null;
         for (JsonNode a : sub.path("assertions")) {
             if (a.path("id").asText().equals("recipient-authenticated-acceptance")) recipient = a;
@@ -176,5 +187,13 @@ class RecipientAcceptanceAssertionTest {
         ((ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0")).put("actorId", "human-a");
         final JsonNode acceptanceAssertion = recipient;
         assertThrows(AssertionError.class, () -> engine.check(acceptanceAssertion, rows, aliases));
+        var audit = (ObjectNode) rows.get("after-db").at("/data/rawRows/audit/0");
+        audit.put("actorId", "human-b").put("capabilityId", "transferObligation");
+        assertThrows(AssertionError.class, () -> engine.check(acceptanceAssertion, rows, aliases));
+        audit.put("capabilityId", "acceptHandover");
+        engine.check(acceptanceAssertion, rows, aliases);
+        ((ObjectNode) rows.get("after-db").at("/data/rawRows/assignments/0")).put("createdTransactionId", "other-transaction");
+        final JsonNode atomicAssertion = transaction;
+        assertThrows(AssertionError.class, () -> engine.check(atomicAssertion, rows, aliases));
     }
 }

@@ -80,3 +80,16 @@ expected로 복사할 수 없다. 원래 단일 alias를 새 문서의 근거처
 기대한 검사 오류였다. 원래 null의 AssertionError 거부를 유지한 채
 타입별 경계를 정확히 검사했고 첫 원문도 보존했다. 이 참조 허용은
 업무 status oracle의 변경이나 실제 T17 인수가 아니다.
+
+## T11 결합 selftest 교정
+
+2342545e의 전체 harness는1019 executions 중933 PASS·1 FAIL·85
+opt-in SKIP, 오류0, source drift0이었다. 소유 DB 정리를 확인했다.
+원문은 같은 tree의 `.local/eligibility-source-full-harness/`에 보존한다.
+실패는 RecipientAcceptanceAssertionTest가 T11의 실제 제안·수락 분리
+이후에도 옛 acceptanceEvidenceId=TRANSFERPROPOSAL을 요구한 문제다.
+T11 case와 fixture는 바꾸지 않고 A의 transferObligation 제안과 B의
+acceptHandover, 실제 proposal 응답의 handover ID 연결을 검사하도록
+selftest를 맞췄다. B의 proposal을 수락 감사로 쓰는 오류와 transaction
+불일치도 거부한다. 수정 후 해당6개는 실패·오류·skip0으로 통과했다.
+이 집중 재검증을 새 전체 harness PASS로 표시하지 않는다.
