@@ -812,6 +812,54 @@
       "schemaVersion": "1.0.0",
       "semanticVersion": "PLAN-1.0",
       "contract": "Explicit dryRun/diff/authorized evidence/apply/recheck; no hidden bypass."
+    },
+    {
+      "id": "createObligation",
+      "kind": "COMMAND",
+      "implemented": true,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "1.0.0",
+      "contract": "Existing ResponsibilityCommands alias uses the same guarded duty path; GOAL_QUANTITY_SHORTFALL explicitly requires openObligation and cannot use this alias."
+    },
+    {
+      "id": "decideQualityDutyWaiver",
+      "kind": "COMMAND",
+      "implemented": true,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "1.0.0",
+      "contract": "Existing typed quality-duty waiver decision with current designated human authority, kind-specific catalog and policy guards; does not itself waive the assignment."
+    },
+    {
+      "id": "decideQuantityDutyWaiver",
+      "kind": "COMMAND",
+      "implemented": true,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "1.0.0",
+      "contract": "Existing typed quantity-duty waiver decision with current designated human authority, kind-specific catalog and policy guards; does not itself waive the assignment."
+    },
+    {
+      "id": "decideRecallDutyWaiver",
+      "kind": "COMMAND",
+      "implemented": true,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "1.0.0",
+      "contract": "Existing typed recall-duty waiver decision with current designated human authority, kind-specific catalog and policy guards; does not itself waive the assignment."
+    },
+    {
+      "id": "expireHandover",
+      "kind": "COMMAND",
+      "implemented": true,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "1.0.0",
+      "contract": "Existing ResponsibilityCommands expiration path; only an actually expired proposal can expire under current capability/scope authorization."
+    },
+    {
+      "id": "openObligation",
+      "kind": "COMMAND",
+      "implemented": true,
+      "schemaVersion": "1.0.0",
+      "semanticVersion": "1.0.0",
+      "contract": "Existing ResponsibilityCommands typed duty path; GOAL_QUANTITY_SHORTFALL requires current immutable proof and actual source command. Publication grants no actor authority."
     }
   ]
 }
