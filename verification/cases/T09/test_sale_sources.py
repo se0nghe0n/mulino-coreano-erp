@@ -36,6 +36,11 @@ class SaleSources(unittest.TestCase):
                 for field in fields[:-1]: target=target[field]
                 self.assertEqual(change['after'],target[fields[-1]])
                 target[fields[-1]]=change['before']
+            for change in inventory_scope_selectors(old):
+                if change['subcase'] != before['id']: continue
+                action=next(a for a in original_actions if a['id']==change['actionId'])
+                self.assertEqual(change['after'],action['request']['scope'])
+                action['request']['scope']=copy.deepcopy(change['before'])
             self.assertEqual(before['actions'],original_actions)
             if before['id'] not in SELECTED:self.assertEqual(before,after)
             else:
@@ -87,7 +92,7 @@ class SaleSources(unittest.TestCase):
         with self.assertRaises(ValueError):restore(mutated)
 
     def test_exact_envelope_changes_and_inverse(self):
-        current,_=authored();previous,_=authored(envelopes=False)
+        current,_=authored(inventory_scopes=False);previous,_=authored(envelopes=False,inventory_scopes=False)
         # Exact file hash from 1c2f40b2's strict ledger; no dependency on a
         # worker-only commit remaining reachable after coordinator integration.
         previous_bytes=(json.dumps(previous,ensure_ascii=False,indent=2)+'\n').encode()
@@ -101,11 +106,49 @@ class SaleSources(unittest.TestCase):
             self.assertEqual(change['sourceActionId'],pointer['actionId'])
             self.assertEqual(change['after'],pointer['pointer'])
             pointer['pointer']=change['before']
-            altered=copy.deepcopy(current)
+            altered=copy.deepcopy(authored()[0])
             target=next(s for s in altered['subcases'] if s['id']==change['subcase'])
             next(a for a in target['actions'] if a['id']==change['actionId'])['request']['slots']['allocationId']['$result']['pointer']='/response/effects/counterfeitId'
             with self.assertRaises(ValueError):restore(altered)
         self.assertEqual(previous,reverted)
+
+    def test_exact_three_work_authored_scope_changes_and_strict_inverse(self):
+        previous,_=authored(inventory_scopes=False)
+        current,_=authored()
+        original=json.loads(baseline('verification/cases/T09/case.json'))
+        changes=inventory_scope_selectors(original)
+        self.assertEqual([(SELECTED[0],'inventory'),(SELECTED[1],'initial'),(SELECTED[1],'final')],
+                         [(c['subcase'],c['actionId']) for c in changes])
+        self.assertEqual(5,len(expected_ledger()['protocolSelectors']))
+        reverted=copy.deepcopy(current)
+        for change in changes:
+            sub=next(s for s in reverted['subcases'] if s['id']==change['subcase'])
+            action=next(a for a in sub['actions'] if a['id']==change['actionId'])
+            self.assertEqual(change['after'],action['request']['scope'])
+            self.assertNotIn('placeId',change['before'])
+            action['request']['scope']=copy.deepcopy(change['before'])
+            for forged in (None,{'$alias':'TRANSIT'},{'$alias':'CUSTOMER'}):
+                altered=copy.deepcopy(current)
+                target=next(s for s in altered['subcases'] if s['id']==change['subcase'])
+                scope=next(a for a in target['actions'] if a['id']==change['actionId'])['request']['scope']
+                if forged is None: del scope['placeId']
+                else: scope['placeId']=forged
+                with self.assertRaises(ValueError):restore(altered)
+        self.assertEqual(previous,reverted)
+        self.assertEqual('4087ddd2e1e0eba0c24794852235e013c68be7f2e1624d488f9e351468976af4',
+            hashlib.sha256((json.dumps(previous,ensure_ascii=False,indent=2)+'\n').encode()).hexdigest())
+
+    def test_scope_generator_ignores_poisoned_oracles_and_checks_work_agreement(self):
+        original=json.loads(baseline('verification/cases/T09/case.json'))
+        expected=inventory_scope_selectors(original)
+        for sub in original['subcases']:
+            sub['assertions']=[{'expected':{'placeId':{'$alias':'POISON'},'heldQuantity':'999'}}]
+        self.assertEqual(expected,inventory_scope_selectors(original))
+        for sid in SELECTED:
+            changed=copy.deepcopy(original)
+            sub=next(s for s in changed['subcases'] if s['id']==sid)
+            next(a for a in sub['actions'] if a['id']=='state')['request']['slots']['destinationId']={'$alias':'TRANSIT'}
+            with self.assertRaises(ValueError):inventory_scope_selectors(changed)
 
     def test_ledger_itself_rejects_tampering(self):
         ledger=expected_ledger()

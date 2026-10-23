@@ -426,3 +426,92 @@ Task와 현재 Step은 OPEN이다. 남은 업무/조회 계약은 coordinator에
 최종 ReferenceResolver는 19 PASS, 생성기 재현과 prepare는 exit 0이다.
 휴대성 보완 뒤 Python 기록은 `.local/t09-envelope-python-portable.log`,
 최종 prepare 기록은 `.local/t09-envelope-prepare-final.log`다.
+
+## 기존 Work 장소와 세 inventory query의 범위 연결
+
+`905e04b8cf49b05818a9d9544066a42a50c34b30`에서 허용된 추가 변경은
+세 query의 `request.scope.placeId`뿐이다. cumulative의 `inventory`는
+원래 `state` Work의 `slots.placeId`를, exists의 `initial`과 `final`은
+원래 `exists` Work의 같은 slot을 복사한다. 생성기는 해당 subcase의
+모든 원래 createWork가 같은 placeId와 destinationId를 지정하며
+eligibilityAction이 PHYSICAL_HELD인지 먼저 확인한다. 기대 assertion,
+수량 또는 oracle의 장소값은 입력을 생성하는 원천이 아니다.
+
+strict ledger의 `inventoryScopeSelectors`는 세 scope의 정확한
+before/after, sourceWorkRequest와 대조한 Work ID를 기록한다.
+기존 revision 한 건과 allocation envelope 네 건은 그대로 유지한다.
+새 inverse는 세 place 추가까지 검증한 뒤 원래 place 없는 scope로
+복원하며 누락·TRANSIT·다른 place 위조를 거부한다. 원래 94개 assertion의
+raw bytes, 나머지 7개 subcase, 모든 기존 actor/grant, 원천 fixture와
+feature action 순서는 보존한다. 생성기의 poisoned oracle 독립성과
+재실행 무변경도 검증한다.
+
+앞 절의 item-only `heldQuantity=100`을 제품 계산 오류로 해석하지 않는다.
+기존 두 HTTP 원본은 이 작업의
+`.local/t09-place-scope/previous-global-evidence/`에 복사하고 원본 경로와
+SHA-256을 manifest.json에 남겼다. 해당 query는 place가 없으므로
+warehouse와 TRANSIT를 합한 전역 물량 100을 정확히 읽었다.
+
+한정 HTTP helper는 원래 query의 actor와 시각을 유지하면서 별도로
+place 없는 동일 query와 TRANSIT query를 읽는다. 독립 read-only
+REPEATABLE READ SQL snapshot에서 item의 전체 원행을 수집하고,
+세 query 전후 모든 조직 업무 테이블의 digest가 같은지 확인한다.
+이 SQL snapshot을 API 자체 transaction이라고 주장하지 않는다.
+원래 action 결과와 assertion은 별도 probe 결과로 대체하지 않는다.
+backend, 공유 resolver, 계약과 schema는 변경하지 않는다.
+
+### 장소 범위 보정의 실행 결과
+
+현재 branch `fix/t09-inventory-scope`, 별도 cwd
+`/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-50a2660a`에서
+실행했다. T3 thread configuration의 실제 선택은 provider `codex`,
+`gpt-6.1-sol`, `reasoningEffort=medium`, `serviceTier=ultrafast`다.
+설정 증거는 `.local/t09-place-scope/runtime-config.json`에 있다.
+
+`python3 verification/cases/T09/run_sale_source_pg_test.py`는 자체 checkout을
+빌드하고 자체 Spring/PG를 띄웠다. 전체 10 tests는 8 PASS / 2 FAIL,
+ERROR/SKIP 0, exit 1이다. 실패한 두 method는
+`completeCumulativeSources`와
+`completeExistsSourcesAndInternalAuthorizationSeam`이다.
+실행 경로는
+`.local/t09-sale-source-pg-53c0dcb4-440b-4969-b54c-164ac6f5d717/`다.
+
+- cumulative의 최종 W query는 40, 같은 시점 item-only는 100,
+  TRANSIT는 60이다. 원래 선택 oracle 28개는 16 PASS / 12 FAIL이다.
+- exists의 초기 W/item-only/TRANSIT는 100/100/0, 최종은 0/100/100이다.
+  원래 선택 oracle 19개는 11 PASS / 8 FAIL이다.
+- 세 query 모두 독립 SQL의 active 물량과 일치하고 query 전후 업무
+  row digest가 같다. helper의 `inventoryScopeAudits`에 원래 요청,
+  item-only/TRANSIT 요청과 응답, SQL·parameters·원행·snapshot을 남겼다.
+- 두 흐름의 원래 reserve, replay, pick, dispatch는 APPLIED다.
+  각 60/100 BOX의 allocation은 한 개이고 replay는 같은 ID다.
+  CONSUMED allocation, dispatch/cargo의 Work·고객·수량 연결도 통과했다.
+- 원래 입력의 적격 원천 부족 RED와 나머지 부정 권한·원천 반례를
+  유지했다. 원래 actor/grant/customer/Work target은 바꾸지 않았다.
+
+선택한 원래 47개 oracle 전체는 27 PASS / 20 FAIL / 0 NOT_RUN이다.
+나머지 7개 subcase의 47개 oracle는 NOT_RUN이다. 전체 Task/Step는
+OPEN이며 이 결과를 전체 인수 PASS로 표현하지 않는다.
+receive60/receive40은 APPLIED지만 contribution은 각각 0이고 excess는
+60/40이다. PO를 새로 만들지 않았다. 남은 FAIL은 receipt contribution과
+누락된 evaluatedQuantity, occurrenceId, movementId, goal projection,
+snapshotId 등이다. 각 47개 결과와 정확한 실패 문구는
+`.local/t09-place-scope/handoff.json`과 두 `original-oracles-*.json`에 있다.
+
+JAR SHA-256은
+`8c5df1dc212c3118fb5420958e5161b06a2dd4f1e2e25c609fbffa9ccd79690a`다.
+source baseline, diff SHA, Java source/compiled class SHA와 fixture SHA는
+`build-identity.json`, `compiled-test-identity.json`,
+`.local/t09-place-scope/preservation.json` 및 `handoff.json`에 기록했다.
+실행 후 Python envelope 위조 반례가 새 scope의 부재 때문에 우연히
+거부되지 않도록 현재 유효 case에서 위조하도록 보강했다. runtime Java와
+입력은 실행 때와 같은 hash다.
+
+정적 검사는 T09 Python 30 PASS, T11 parent 6 PASS, generator 재현과
+strict inverse PASS, `./verify prepare` exit 0이다. 명령과 결과는
+`.local/t09-place-scope/{python-final,t11-parent,prepare}.log` 및
+`preservation.json`에 있다. runner의 임시 key 두 개와 PostgreSQL
+container가 삭제됐고 자체 Spring port 52592의 종료를 확인했다.
+전체 backend/harness suite, scenario runner, 추가 모델·유료 API·BTP 실행,
+root/sibling 변경과 push는 수행하지 않았다. coordinator가 통합과
+최종 판단을 소유한다.

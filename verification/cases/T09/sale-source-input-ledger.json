@@ -13,7 +13,7 @@
     {
       "path": "verification/cases/T09/case.json",
       "beforeSha256": "ec7615fe952fdaac614e62d2f8b49fba56b87c506ff2dbf49ae5f5fb3e600885",
-      "afterSha256": "4087ddd2e1e0eba0c24794852235e013c68be7f2e1624d488f9e351468976af4"
+      "afterSha256": "2e4da355f86a728ecbc8f0d4ee4ab8caf8a83aeec3ab1e0c4db2889d82908019"
     },
     {
       "path": "verification/cases/T09/fixtures/cumulative-versus-state.json",
@@ -165,6 +165,145 @@
         "clock",
         "oracle",
         "expectedRevision"
+      ]
+    }
+  ],
+  "inventoryScopeSelectors": [
+    {
+      "subcase": "cumulative-versus-state",
+      "actionId": "inventory",
+      "field": "request.scope",
+      "before": {
+        "organizationId": {
+          "$alias": "ORG"
+        },
+        "itemId": {
+          "$alias": "P"
+        }
+      },
+      "after": {
+        "organizationId": {
+          "$alias": "ORG"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "placeId": {
+          "$alias": "W"
+        }
+      },
+      "sourceWorkRequest": {
+        "actionId": "state",
+        "field": "request.slots.placeId",
+        "value": {
+          "$alias": "W"
+        }
+      },
+      "verifiedWorkRequestIds": [
+        "cumulative",
+        "state"
+      ],
+      "rationale": "Query the same PHYSICAL_HELD place and destination already authored in the Work requests; item-only held100 remains correct globally",
+      "unchanged": [
+        "actorRef",
+        "asOf",
+        "knownAt",
+        "other request fields",
+        "action order",
+        "all original assertions",
+        "fixtures and original grants"
+      ]
+    },
+    {
+      "subcase": "exists-versus-end-throughout",
+      "actionId": "initial",
+      "field": "request.scope",
+      "before": {
+        "organizationId": {
+          "$alias": "ORG"
+        },
+        "itemId": {
+          "$alias": "P"
+        }
+      },
+      "after": {
+        "organizationId": {
+          "$alias": "ORG"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "placeId": {
+          "$alias": "W"
+        }
+      },
+      "sourceWorkRequest": {
+        "actionId": "exists",
+        "field": "request.slots.placeId",
+        "value": {
+          "$alias": "W"
+        }
+      },
+      "verifiedWorkRequestIds": [
+        "exists",
+        "state",
+        "throughout"
+      ],
+      "rationale": "Query the same PHYSICAL_HELD place and destination already authored in the Work requests; item-only held100 remains correct globally",
+      "unchanged": [
+        "actorRef",
+        "asOf",
+        "knownAt",
+        "other request fields",
+        "action order",
+        "all original assertions",
+        "fixtures and original grants"
+      ]
+    },
+    {
+      "subcase": "exists-versus-end-throughout",
+      "actionId": "final",
+      "field": "request.scope",
+      "before": {
+        "organizationId": {
+          "$alias": "ORG"
+        },
+        "itemId": {
+          "$alias": "P"
+        }
+      },
+      "after": {
+        "organizationId": {
+          "$alias": "ORG"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "placeId": {
+          "$alias": "W"
+        }
+      },
+      "sourceWorkRequest": {
+        "actionId": "exists",
+        "field": "request.slots.placeId",
+        "value": {
+          "$alias": "W"
+        }
+      },
+      "verifiedWorkRequestIds": [
+        "exists",
+        "state",
+        "throughout"
+      ],
+      "rationale": "Query the same PHYSICAL_HELD place and destination already authored in the Work requests; item-only held100 remains correct globally",
+      "unchanged": [
+        "actorRef",
+        "asOf",
+        "knownAt",
+        "other request fields",
+        "action order",
+        "all original assertions",
+        "fixtures and original grants"
       ]
     }
   ],

@@ -185,8 +185,41 @@ def envelope_selectors():
     return records
 
 
-def authored(protocol=True, envelopes=True):
+def inventory_scope_selectors(case):
+    """Copy an authored Work place, never an expected inventory quantity/place."""
+    records = []
+    for sid, source_id, queries, work_ids in (
+        (SELECTED[0], 'state', ('inventory',), ('cumulative', 'state')),
+        (SELECTED[1], 'exists', ('initial', 'final'), ('exists', 'state', 'throughout')),
+    ):
+        sub = next(s for s in case['subcases'] if s['id'] == sid)
+        actions = {a['id']: a for a in sub['actions']}
+        source = actions[source_id]
+        place = source['request']['slots']['placeId']
+        for work_id in work_ids:
+            work = actions[work_id]
+            slots = work['request']['slots']
+            if (work['capabilityId'] != 'createWork' or slots['placeId'] != place
+                    or slots['destinationId'] != place or slots['eligibilityAction'] != 'PHYSICAL_HELD'):
+                raise ValueError('T09 authored Work place/destination contract differs: '+work_id)
+        for query_id in queries:
+            action = actions[query_id]
+            scope = action['request']['scope']
+            if action['capabilityId'] != 'getInventory' or 'placeId' in scope:
+                raise ValueError('T09 original inventory scope differs: '+query_id)
+            records.append(dict(subcase=sid, actionId=query_id, field='request.scope',
+                before=copy.deepcopy(scope), after={**copy.deepcopy(scope), 'placeId':copy.deepcopy(place)},
+                sourceWorkRequest=dict(actionId=source_id, field='request.slots.placeId',
+                                       value=copy.deepcopy(place)),
+                verifiedWorkRequestIds=list(work_ids),
+                rationale='Query the same PHYSICAL_HELD place and destination already authored in the Work requests; item-only held100 remains correct globally',
+                unchanged=['actorRef','asOf','knownAt','other request fields','action order','all original assertions','fixtures and original grants']))
+    return records
+
+
+def authored(protocol=True, envelopes=True, inventory_scopes=True):
     case=json.loads(baseline('verification/cases/T09/case.json'))
+    scope_changes=inventory_scope_selectors(case)
     fixtures={}
     for sub in case['subcases']:
         if sub['id'] not in SELECTED: continue
@@ -212,6 +245,11 @@ def authored(protocol=True, envelopes=True):
                 for field in fields[:-1]: target=target[field]
                 assert target[fields[-1]] == change['before']
                 target[fields[-1]]=change['after']
+        if inventory_scopes:
+            for change in scope_changes:
+                if change['subcase'] == sub['id']:
+                    action=next(a for a in sub['actions'] if a['id']==change['actionId'])
+                    action['request']['scope']=copy.deepcopy(change['after'])
     return case,fixtures
 
 
@@ -238,9 +276,10 @@ def restore_fixture(value):
 def apply(value):
     new,_=authored()
     old=json.loads(baseline('verification/cases/T09/case.json'))
-    previous,_=authored(protocol=False, envelopes=False)
-    prior_revision,_=authored(envelopes=False)
-    if value != old and value != new and value != previous and value != prior_revision: raise ValueError('T09 sale-source authoring baseline drift')
+    previous,_=authored(protocol=False, envelopes=False, inventory_scopes=False)
+    prior_revision,_=authored(envelopes=False, inventory_scopes=False)
+    prior_scopes,_=authored(inventory_scopes=False)
+    if value not in (old,new,previous,prior_revision,prior_scopes): raise ValueError('T09 sale-source authoring baseline drift')
     return new
 
 
@@ -292,6 +331,7 @@ def expected_ledger():
             proofSource='.local/t09-sale-source-pg-54af05c6-d17c-4f1b-b4b6-4dc967c691c5/completeCumulativeSources-http.json',
             observed='Actual confirmReceipt leaf revision 0; original reserve metadata 1 is stale',
             unchanged=['slots','actorRef','quantity','clock','oracle','pick revision','dispatch revision'])]+envelope_selectors(),
+        inventoryScopeSelectors=inventory_scope_selectors(json.loads(baseline('verification/cases/T09/case.json'))),
         generatedActionIds={s['id']:[a['id'] for a in s['actions'] if a['id'].startswith('t09-sale-source-')] for s in case['subcases'] if s['id'] in SELECTED})
 
 
@@ -312,9 +352,10 @@ def main():
         before=baseline(path)
         after=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
         current=(ROOT/path).read_text()
-        previous=json.dumps(authored(protocol=False,envelopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
-        prior_revision=json.dumps(authored(envelopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
-        if current not in (before,after,previous,prior_revision): raise ValueError('Undeclared file drift: '+path)
+        previous=json.dumps(authored(protocol=False,envelopes=False,inventory_scopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        prior_revision=json.dumps(authored(envelopes=False,inventory_scopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        prior_scopes=json.dumps(authored(inventory_scopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        if current not in (before,after,previous,prior_revision,prior_scopes): raise ValueError('Undeclared file drift: '+path)
         records.append(dict(path=path,beforeSha256=hashlib.sha256(before.encode()).hexdigest(),
                             afterSha256=hashlib.sha256(after.encode()).hexdigest()))
         (ROOT/path).write_text(after)

@@ -122,6 +122,7 @@ class T09SaleSourceFactsPostgresTest {
         auditPhysicalDispatch(sid);
         f.save(out.resolve("physical-dispatch-"+sid+".json"));
         reached("after-db");
+        auditInventoryQueries(sid);
         BigDecimal remaining=BigDecimal.ZERO;
         for(var row:f.rows("mulino_inventory_QuantitySegments"))if(row.get("retiredat")==null&&f.aliases.path("W").asText().equals(row.get("placeid")))remaining=remaining.add((BigDecimal)row.get("quantity"));
         assertEquals(0,new BigDecimal(sid.equals("cumulative-versus-state")?"40":"0").compareTo(remaining));
@@ -133,6 +134,31 @@ class T09SaleSourceFactsPostgresTest {
         }
         Json.write(out.resolve("original-oracles-"+sid+".json"),checks);
         assertTrue(java.util.stream.StreamSupport.stream(checks.spliterator(),false).allMatch(x->"PASS".equals(x.path("status").asText())),checks.toPrettyString());
+    }
+    void auditInventoryQueries(String sid) {
+        var ids=sid.equals("cumulative-versus-state")?List.of("inventory"):List.of("initial","final");
+        assertEquals(new HashSet<>(ids),f.inventoryScopeAudits.keySet());
+        for(String id:ids) {
+            var audit=f.inventoryScopeAudits.get(id);
+            assertEquals(audit.path("businessDigestBefore"),audit.path("businessDigestAfter"),audit.toPrettyString());
+            BigDecimal warehouse=BigDecimal.ZERO,transit=BigDecimal.ZERO,total=BigDecimal.ZERO;
+            for(var row:audit.path("sqlRows"))if(row.path("retiredat").isNull()) {
+                var quantity=new BigDecimal(row.path("quantity").asText());total=total.add(quantity);
+                if(row.path("placeid").asText().equals(f.aliases.path("W").asText()))warehouse=warehouse.add(quantity);
+                if(row.path("placeid").asText().equals(f.aliases.path("TRANSIT").asText()))transit=transit.add(quantity);
+            }
+            assertEquals(0,new BigDecimal("100").compareTo(total));
+            assertEquals(0,total.compareTo(warehouse.add(transit)));
+            BigDecimal expectedWarehouse=new BigDecimal(id.equals("initial")?"100":sid.equals("cumulative-versus-state")?"40":"0");
+            assertEquals(0,expectedWarehouse.compareTo(warehouse));
+            for(String key:List.of("authoredResult","itemOnly","transit"))
+                assertEquals(200,audit.path(key).path("httpStatus").asInt(),audit.toPrettyString());
+            assertEquals(f.aliases.path("W"),audit.at("/authoredRequest/scope/placeId"));
+            assertFalse(audit.at("/itemOnly/request/scope").has("placeId"));
+            assertEquals(0,total.compareTo(new BigDecimal(audit.at("/itemOnly/response/data/heldQuantity").asText())));
+            assertEquals(0,warehouse.compareTo(new BigDecimal(audit.at("/authoredResult/response/data/heldQuantity").asText())));
+            assertEquals(0,transit.compareTo(new BigDecimal(audit.at("/transit/response/data/heldQuantity").asText())));
+        }
     }
     void auditPhysicalDispatch(String sid) throws Exception {
         String suffix=sid.equals("cumulative-versus-state")?"60":"";

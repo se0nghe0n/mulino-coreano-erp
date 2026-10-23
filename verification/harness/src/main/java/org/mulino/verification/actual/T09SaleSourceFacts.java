@@ -19,6 +19,7 @@ final class T09SaleSourceFacts {
     final JsonNode aliases, sub;
     final Map<String, JsonNode> results = new LinkedHashMap<>();
     final List<JsonNode> httpReceipts = new ArrayList<>();
+    final Map<String, JsonNode> inventoryScopeAudits = new LinkedHashMap<>();
     final HttpClient http = HttpClient.newHttpClient();
 
     T09SaleSourceFacts(Path root, ActualConfiguration config, String sid, boolean original,
@@ -80,6 +81,8 @@ final class T09SaleSourceFacts {
             result=call(action.path("capabilityId").asText(),request(id),action.path("actorRef").asText());
             if(before!=null && result.path("response").hasNonNull("snapshotRevision"))
                 ScenarioRevisionBinding.bind(config,id,before,result.at("/response/snapshotRevision").asText());
+            if(kind.equals("query") && action.path("capabilityId").asText().equals("getInventory"))
+                auditInventoryScope(id, action, result, before);
         } else if(kind.equals("control")) {
             var p=(ObjectNode)new ReferenceResolver(results,aliases).resolve(action.path("control").path("parameters"));
             result=post("/__verification/runtime/clock",Json.object().put("instant",p.path("instant").asText()),"A");
@@ -100,6 +103,36 @@ final class T09SaleSourceFacts {
             r.set("provenance",Json.object().put("scopeComplete",true).put("source","POSTGRESQL"));result=r;
         } else return null;
         results.put(id,result);return result;
+    }
+    /** Extra read-only probes preserve the original action, actor, clock and result. */
+    void auditInventoryScope(String id, JsonNode action, JsonNode authoredResult, String before) throws Exception {
+        var authored=request(id);
+        var global=authored.deepCopy();((ObjectNode)global.path("scope")).remove("placeId");
+        var transit=authored.deepCopy();((ObjectNode)transit.path("scope")).put("placeId",aliases.path("TRANSIT").asText());
+        var audit=Json.object();audit.set("authoredRequest",authored);audit.set("authoredResult",authoredResult);
+        audit.set("itemOnly",call("getInventory",global,action.path("actorRef").asText()));
+        audit.set("transit",call("getInventory",transit,action.path("actorRef").asText()));
+        String sql="SELECT id,itemid,placeid,quantity,unit,retiredat FROM mulino_inventory_QuantitySegments WHERE organizationid=? AND itemid=? ORDER BY id";
+        audit.put("sql",sql);audit.set("sqlParameters",Json.array().add(aliases.path("ORG").asText()).add(authored.path("scope").path("itemId").asText()));
+        try(var db=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+            db.setAutoCommit(false);db.setReadOnly(true);db.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            try(var statement=db.createStatement();var rs=statement.executeQuery("SELECT txid_current_snapshot()::text, current_timestamp::text")) {
+                rs.next();audit.put("independentSqlSnapshot",rs.getString(1));audit.put("independentSqlTime",rs.getString(2));
+            }
+            try(var s=db.prepareStatement(sql)) {
+                s.setString(1,aliases.path("ORG").asText());s.setString(2,authored.path("scope").path("itemId").asText());
+                var rows=Json.array();try(var rs=s.executeQuery()) {while(rs.next()) {
+                    var row=Json.object();for(int i=1;i<=rs.getMetaData().getColumnCount();i++) {
+                        String key=rs.getMetaData().getColumnLabel(i),value=rs.getString(i);
+                        if(value==null)row.putNull(key);else row.put(key,value);
+                    }rows.add(row);
+                }}audit.set("sqlRows",rows);
+            }
+            db.commit();
+        }
+        audit.put("businessDigestBefore",before);audit.put("businessDigestAfter",ScenarioRevisionBinding.digest(config));
+        audit.put("sqlIsSeparateReadOnlySnapshot",true);
+        inventoryScopeAudits.put(id,audit);
     }
     /** Stops at the first non-APPLIED command, retaining the exact HTTP receipt. */
     String through(String stop, Set<String> omitted) throws Exception {
@@ -177,6 +210,7 @@ final class T09SaleSourceFacts {
     void save(Path path) throws Exception {
         var data=Json.object();data.set("httpReceipts",Json.MAPPER.valueToTree(httpReceipts));
         data.set("commands",Json.MAPPER.valueToTree(results));data.set("installer",installed);
+        data.set("inventoryScopeAudits",Json.MAPPER.valueToTree(inventoryScopeAudits));
         var sql=Json.object();
         for(String table:List.of("mulino_inventory_QuantitySegments","mulino_inventory_ManufacturingLots",
             "mulino_inventory_DispositionBases","mulino_inventory_SegmentAllocations","mulino_inventory_QuantityMovements",
