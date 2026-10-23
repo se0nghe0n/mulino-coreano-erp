@@ -89,8 +89,9 @@ public final class NativeProductIntegration implements NativeClientIntegration {
     private final class ProductDriver implements AcceptanceDriver {
         private final ActualAcceptanceDriver actual;
         private final NativePhysicalObserver observer;
+        private final ModelFixtureInstaller modelFixtures;
         private JsonNode installedScope;
-        ProductDriver(ActualConfiguration config) {actual=new ActualAcceptanceDriver(root,config);observer=new NativePhysicalObserver(config,evidence);}
+        ProductDriver(ActualConfiguration config) {actual=new ActualAcceptanceDriver(root,config);observer=new NativePhysicalObserver(config,evidence);modelFixtures=new ModelFixtureInstaller(root,config,System.getProperty("verification.actual.blobRoot")==null?null:Path.of(System.getProperty("verification.actual.blobRoot")));}
         public Set<String> availableAdapters(){return Set.of("api","mcp","fixture","db");}
         public StepResult installFixture(String id,JsonNode bundle) {
             installedScope=null;
@@ -98,7 +99,18 @@ public final class NativeProductIntegration implements NativeClientIntegration {
             // S1/S2 fixture installer is reusable for its declared typed shape. Do not erase model-only facts.
             boolean typed=fixture.path("aliases").isObject()&&!fixture.path("aliases").isEmpty();
             for(JsonNode alias:fixture.path("aliases"))typed&=alias.isObject()&&alias.hasNonNull("type");
-            if(!typed||fixture.path("baseline").has("domainFacts"))return missing(id,"MODEL_FIXTURE_COMPLETE_MAPPING_NOT_IMPLEMENTED",bundle);
+            if(fixture.path("baseline").has("domainFacts")) {
+                try {
+                    var data=modelFixtures.install(bundle);
+                    installedScope=Json.object().put("organizationId",data.path("aliasMap").path("org").asText()).put("installationId",data.path("installationId").asText());
+                    var artifact=evidence.save("model-fixture-installation",data);
+                    var provenance=Json.object().put("adapter",ModelFixtureInstaller.VERSION).put("adapterVersion","1.0.0").put("buildVersion",System.getenv().getOrDefault("ACTUAL_BUILD_COMMIT","UNKNOWN")).putNull("authenticatedActor").put("source","JDBC_FIXTURE_INSTALL").put("independent",false).put("scopeComplete",data.path("fixtureComplete").asBoolean()).putNull("sourceQuery").putNull("snapshot");
+                    return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,null,null,provenance,List.of(artifact.path("path").asText()));
+                }catch(ModelFixtureInstaller.MappingException incomplete) {
+                    return missing(id,"MODEL_FIXTURE_EXPLICIT_INPUTS_REQUIRED",incomplete.inventory());
+                }catch(Exception failure){throw new IllegalStateException("Model fixture transaction failed",failure);}
+            }
+            if(!typed)return missing(id,"MODEL_FIXTURE_COMPLETE_MAPPING_NOT_IMPLEMENTED",bundle);
             StepResult result=actual.installFixture(id,bundle);
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED) {
                 String orgAlias=fixture.path("actors").elements().next().path("organizationAlias").asText();

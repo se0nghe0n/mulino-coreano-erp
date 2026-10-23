@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Explicit model installation envelope; closed typed row validation is implemented by ModelFixtureCatalog/Installer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "fixtureSha256",
+    "records",
+    "documentBytes",
+    "originalInputProvided",
+    "originalAuthorityClaimed",
+    "operatingApprovalClaimed"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "model-installation-inputs-v1"
+    },
+    "fixtureSha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "type",
+          "alias",
+          "id",
+          "fields",
+          "sourcePointer",
+          "part",
+          "originalInputProvided",
+          "originalAuthorityClaimed",
+          "operatingApprovalClaimed"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "alias": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "object"
+          },
+          "sourcePointer": {
+            "type": "string"
+          },
+          "part": {
+            "type": "string"
+          },
+          "originalInputProvided": {
+            "const": false
+          },
+          "originalAuthorityClaimed": {
+            "const": false
+          },
+          "operatingApprovalClaimed": {
+            "const": false
+          },
+          "activate": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "documentBytes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "originalInputProvided": {
+      "const": false
+    },
+    "originalAuthorityClaimed": {
+      "const": false
+    },
+    "operatingApprovalClaimed": {
+      "const": false
+    },
+    "authorityCorrection": {},
+    "typedReferences": {},
+    "logicalCustody": {},
+    "completionLedger": {},
+    "versionTranslations": {},
+    "templateArtifacts": {},
+    "grantContents": {},
+    "quantityCorrection": {},
+    "staticClaims": {},
+    "priorReceipt": {},
+    "physicalCorrection": {},
+    "readCompletion": {},
+    "receiptAuthority": {}
+  }
+}
