@@ -96,12 +96,16 @@ final class InputEncodingTest {
                     var response=Json.object().put("id",UUID.randomUUID().toString()).put("workId",UUID.randomUUID().toString())
                         .put("claimId",UUID.randomUUID().toString()).put("revision",1);
                     if(cap.equals("receiveProvisional")) {response.put("revision",0);response.set("effects",Json.object().put("receiptId",UUID.randomUUID().toString()));}
+                    if(cap.equals("confirmReceipt")) response.set("effects",Json.object()
+                        .put("receiptId",UUID.randomUUID().toString()).put("segmentId",UUID.randomUUID().toString()));
+                    if(Set.of("prepareRegulatoryProcedure","recordSubmission").contains(cap)) response.set("effects",Json.object()
+                        .put("procedureId",UUID.randomUUID().toString()).put("procedureVersionId",UUID.randomUUID().toString()));
                     captured.put(aid,Json.object().put("driverStatus","EXECUTED").set("response",response));
                     ((ObjectNode)captured.get(aid)).set("provenance",Json.object().put("scopeComplete",true));
                 }
             }
         }
-        assertEquals(10,receipts);assertEquals(19,events);
+        assertEquals(10,receipts);assertEquals(39,events);
     }
     @Test void schemaRestrictsEncoderToInputAndChecksNestedDeclarations() throws Exception {
         var root=java.nio.file.Path.of(System.getProperty("repo.root"));
