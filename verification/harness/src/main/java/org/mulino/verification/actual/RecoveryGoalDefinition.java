@@ -30,10 +30,15 @@ final class RecoveryGoalDefinition {
         content.set("verbs", verbs);
         var capabilities = (com.fasterxml.jackson.databind.node.ArrayNode)content.path("capabilities");
         for (JsonNode declared : contract.path("capabilities")) {
-            for (JsonNode existing : capabilities)
-                if (existing.path("capabilityId").equals(declared.path("capabilityId")))
-                    throw new IllegalArgumentException("definitionContract duplicates a capability");
-            capabilities.add(declared.deepCopy());
+            boolean present = false;
+            for (JsonNode existing : capabilities) {
+                if (!existing.path("capabilityId").equals(declared.path("capabilityId"))) continue;
+                if (!existing.equals(declared))
+                    throw new IllegalArgumentException("definitionContract conflicts with a capability");
+                present = true;
+            }
+            // Recovery contracts may repeat the exact runtime contract now supplied by the common package.
+            if (!present) capabilities.add(declared.deepCopy());
         }
         goals.add(template.deepCopy());
         content.set("goals", goals);
