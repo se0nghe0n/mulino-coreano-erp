@@ -169,11 +169,8 @@ public class InventoryQueries implements QueryHandler {
     data.put("impactStatus",uncertain ? "CANDIDATE_UNCERTAIN_MIXTURE" : "LINEAGE_ONLY"); data.put("confirmedDefectImpact",null); data.put("cleanSubsetSelectable",false);
     return result(data,q,uncertain ? List.of("PHYSICAL_SUBSET_NOT_IDENTIFIABLE","DEFECT_IMPACT_REQUIRES_EVIDENCE") : List.of("DEFECT_IMPACT_REQUIRES_EVIDENCE"));
   }
-  private boolean matches(Map<String,Object> row,Map<String,Object> scope) {return (!scope.containsKey("placeId")||Objects.equals(scope.get("placeId"),row.get("placeId"))) && (!scope.containsKey("lotId")||Objects.equals(scope.get("lotId"),row.get("lotId")));}
-  private boolean active(Map<String,Object> row,DomainContext c) {
-    if (time(row.get("validFrom")).isAfter(c.asOf())) return false;
-    return row.get("retiredAt")==null || time(row.get("retiredAt")).isAfter(c.asOf()) || time(row.get("retirementRecordedAt")).isAfter(c.knownAt());
-  }
+  private boolean matches(Map<String,Object> row,Map<String,Object> scope) {return InventoryReadCandidates.matches(row,scope);}
+  private boolean active(Map<String,Object> row,DomainContext c) {return InventoryReadCandidates.active(row,c);}
   private boolean interval(Map<String,Object> row,DomainContext c) {return !time(row.get("validFrom")).isAfter(c.asOf())&&(row.get("validUntil")==null||time(row.get("validUntil")).isAfter(c.asOf()));}
   private Instant time(Object value) {return value instanceof Instant i ? i : value instanceof java.sql.Timestamp t ? t.toInstant() : Instant.parse(value.toString());}
   private Map<String,Collection<String>> scopes(Map<String,Object> row) {
