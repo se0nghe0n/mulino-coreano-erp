@@ -44,7 +44,12 @@ final class ScenarioObservationProjection {
     }
 
     ArrayNode query(String table, String predicate, List<?> parameters) throws Exception {
-        String sql="SELECT r.* FROM "+table+" r WHERE "+predicate+(ScenarioJdbcObservation.columns(connection,table).contains("id")?" ORDER BY r.ID":"");
+        return query(table,predicate,parameters,false);
+    }
+
+    private ArrayNode query(String table, String predicate, List<?> parameters, boolean physicalVersion) throws Exception {
+        String select=physicalVersion?"r.*,r.xmin::text AS \"_tupleXmin\",pg_snapshot_xmax(pg_current_snapshot())::text AS \"_snapshotXmax\"":"r.*";
+        String sql="SELECT "+select+" FROM "+table+" r WHERE "+predicate+(ScenarioJdbcObservation.columns(connection,table).contains("id")?" ORDER BY r.ID":"");
         String key=sql+parameters;
         var statement=Json.object().put("table",table).put("sql",sql);
         statement.set("boundValues",Json.MAPPER.valueToTree(parameters.stream().map(Object::toString).toList()));
@@ -218,7 +223,7 @@ final class ScenarioObservationProjection {
                     if(release!=null&&requiredSame(row,release,"segmentId")&&row.path("id").equals(release.path("restrictionId"))&&"releaseHold".equals(release.path("operation").asText()))
                         copy(row,"releaseReason",release,"reason");
                 }
-                case "mulino_inventory_SegmentAllocations" -> allocationBasis(row);
+                case "mulino_inventory_SegmentAllocations" -> { allocationBasis(row); allocationAttribution(row); }
                 case "mulino_trade_sales_Orders" -> salesOrderLines(row);
                 case "mulino_work_read_GoalReferences" -> {
                     var slots=parse(row,"slotsJson");field(row,"slots",slots);
@@ -285,6 +290,110 @@ final class ScenarioObservationProjection {
         copy(order,"currentRevisionId",revision,"id");field(order,"currentLines",lines);
         order.put("orderLineBinding",lines.isEmpty()?"UNAVAILABLE":lines.size()==1?"SINGLE_LINE":"MULTIPLE_LINES");
         if(lines.size()==1)copy(order,"deliveryEndpoint",lines.get(0),"deliveryEndpoint");
+    }
+
+    /** Physical tuple attribution, deliberately separate from the allocation's retained creation commandId. */
+    private void allocationAttribution(ObjectNode row) throws Exception {
+        row.remove(List.of("lastCommandId","transactionId"));
+        var proof=Json.object().put("status","UNSUPPORTED").put("kind","POSTGRES_XMIN_CURRENT_TUPLE")
+            .put("historyComplete",false).put("knownAt",knownAt.toString());
+        if(asOf!=null)proof.put("asOf",asOf.toString());
+        row.set("atomicAttribution",proof);
+        var versions=query("mulino_inventory_SegmentAllocations","r.organizationId=? AND r.ID=?",
+            List.of(row.path("organizationId").asText(),row.path("id").asText()),true);
+        if(versions.size()!=1){proof.put("gap","ALLOCATION_VERSION_NOT_UNIQUE");return;}
+        var version=versions.get(0);String xid=version.path("_tupleXmin").asText();
+        proof.put("tupleXmin",xid).put("snapshotXmax",version.path("_snapshotXmax").asText());
+        // xmin is 32-bit, and frozen old tuples can retain their original xmin. Never
+        // guess its epoch. Only a cluster snapshot before its first billion XIDs is supported.
+        if(!unwrappedTupleXid(xid,version.path("_snapshotXmax").asText())){proof.put("gap","XID_EPOCH_OR_AGE_UNSUPPORTED");return;}
+        var candidates=query("mulino_commands_CommandRecords","r.organizationId=? AND r.xmin=?::xid",
+            List.of(row.path("organizationId").asText(),xid),true);
+        proof.put("candidateCount",candidates.size());
+        // Count before state/time/capability filtering: excluding a second command
+        // in the same changeset would manufacture uniqueness.
+        if(candidates.size()!=1){proof.put("gap",candidates.isEmpty()?"NO_COMMAND_IN_TUPLE_TRANSACTION":"AMBIGUOUS_COMMAND_TRANSACTION");return;}
+        var command=candidates.get(0);
+        if(!"COMMITTED".equals(command.path("state").asText())){proof.put("gap","COMMAND_NOT_COMMITTED");return;}
+        if(!attributionTime(command,"createdAt")||!attributionTime(command,"completedAt")){
+            proof.put("gap","COMMAND_OUTSIDE_TIME_BOUNDARY");return;
+        }
+        var intent=parse(command,"canonicalIntentJson");var result=parse(command,"resultJson");
+        String capability=command.path("capabilityId").asText();
+        if(!capability.equals(intent.path("capabilityId").asText())||!"APPLIED".equals(result.path("outcome").asText())
+            ||!command.path("id").equals(result.path("commandId"))||!allocationWriter(row,command,intent,result)) {
+            proof.put("gap","COMMAND_EFFECT_DOES_NOT_PROVE_ALLOCATION_WRITE");return;
+        }
+        // A technical XID, meaningful only in this database/snapshot and supported
+        // epoch window. It is not a durable business ID or a historical event ID.
+        copy(row,"lastCommandId",command,"id");row.put("transactionId",xid);
+        proof.put("status","PROVEN_CURRENT_TUPLE").put("commandId",command.path("id").asText());
+    }
+
+    static boolean unwrappedTupleXid(String xmin,String snapshotXmax) {
+        try {
+            long x=Long.parseLong(xmin),end=Long.parseLong(snapshotXmax);
+            return x>=3&&x<end&&end<1_000_000_000L;
+        } catch(NumberFormatException invalid){return false;}
+    }
+
+    private boolean attributionTime(JsonNode row,String field) {
+        if(!row.hasNonNull(field))return false;
+        try { var time=OffsetDateTime.parse(row.path(field).asText());return !time.isAfter(knownAt)&&(asOf==null||!time.isAfter(asOf)); }
+        catch(java.time.format.DateTimeParseException invalid){return false;}
+    }
+
+    private boolean allocationWriter(JsonNode row,JsonNode command,JsonNode intent,JsonNode result) throws Exception {
+        var slots=intent.path("slots");var effects=result.path("effects");String capability=command.path("capabilityId").asText();
+        if(!Set.of("reserveQuantity","replaceAllocation","releaseAllocation").contains(capability))return false;
+        if(!result.path("revision").equals(effects.path("revision")))return false;
+        if(capability.equals("replaceAllocation")&&row.path("id").equals(effects.path("predecessorId"))) {
+            // The old allocation is not the response row. Prove the actual named
+            // predecessor and revision transition, plus the actual successor's
+            // retained creation relation. A later release may change that successor's
+            // current xmin/state/revision; it does not rewrite this old tuple or the
+            // terminal immutable replacement result. Never reconstruct its old tuple.
+            if(!"REPLACED".equals(row.path("state").asText())||!row.path("id").equals(slots.path("allocationId"))
+                ||!row.path("id").equals(effects.path("fulfillmentBasis").path("replacedAllocationId"))
+                ||!nextAllocationRevision(row,intent)||!effects.path("commandId").equals(command.path("id")))return false;
+            var successors=query("mulino_inventory_SegmentAllocations","r.organizationId=? AND r.ID=?",
+                List.of(row.path("organizationId").asText(),effects.path("ID").asText()));
+            return successors.size()==1&&allocationIdentity(successors.get(0),effects)
+                &&"EXECUTABLE".equals(effects.path("state").asText())
+                &&requiredSame(row,effects,"organizationId","workId","orderLineId","customerId","unit");
+        }
+        if(!allocationEffect(row,effects))return false;
+        return switch(capability) {
+            case "reserveQuantity" -> row.path("commandId").equals(command.path("id"))
+                &&row.path("segmentId").equals(slots.path("segmentId"))&&row.path("orderLineId").equals(slots.path("salesLineId"))
+                &&"EXECUTABLE".equals(row.path("state").asText())&&row.path("revision").asInt(-1)==0;
+            case "replaceAllocation" -> row.path("commandId").equals(command.path("id"))
+                &&row.path("segmentId").equals(slots.path("segmentId"))&&row.hasNonNull("predecessorId")
+                &&row.path("predecessorId").equals(slots.path("allocationId"))
+                &&row.path("predecessorId").equals(effects.path("fulfillmentBasis").path("replacedAllocationId"))
+                &&"EXECUTABLE".equals(row.path("state").asText())&&row.path("revision").asInt(-1)==0;
+            case "releaseAllocation" -> row.path("id").equals(slots.path("allocationId"))
+                &&row.path("id").equals(effects.path("fulfillmentBasis").path("releasedAllocationId"))
+                &&"RELEASED".equals(row.path("state").asText())&&nextAllocationRevision(row,intent);
+            default -> false;
+        };
+    }
+
+    private static boolean nextAllocationRevision(JsonNode row,JsonNode intent) {
+        return row.path("revision").canConvertToInt()&&intent.path("expectedRevision").canConvertToInt()
+            &&(long)row.path("revision").asInt()==(long)intent.path("expectedRevision").asInt()+1;
+    }
+
+    private static boolean allocationEffect(JsonNode row,JsonNode effects) {
+        return allocationIdentity(row,effects)&&requiredSame(row,effects,"state","revision");
+    }
+
+    private static boolean allocationIdentity(JsonNode row,JsonNode effects) {
+        return row.hasNonNull("id")&&row.path("id").equals(effects.path("ID"))
+            &&requiredSame(row,effects,"organizationId","commandId","segmentId","workId","orderLineId","customerId","unit")
+            &&row.hasNonNull("predecessorId")==effects.hasNonNull("predecessorId")
+            &&(!row.hasNonNull("predecessorId")||row.path("predecessorId").equals(effects.path("predecessorId")))
+            &&decimalSame(row,effects,"quantity","startQuantity");
     }
 
     /** Immutable command proof belongs to this allocation, not merely to a command on the same ITEM. */
