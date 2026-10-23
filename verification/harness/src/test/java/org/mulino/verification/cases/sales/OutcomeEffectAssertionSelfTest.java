@@ -59,10 +59,10 @@ public final class OutcomeEffectAssertionSelfTest {
     }
     private Map<String,JsonNode> t17() {
         var rs=new HashMap<String,JsonNode>();
-        rs.put("reserve",capture("{\"allocationId\":\"old-allocation\"}","{}"));
-        rs.put("hold",capture("{\"restrictionId\":\"qc-hold\"}","{}"));
-        rs.put("replace",capture("{\"outcome\":\"APPLIED\",\"allocationId\":\"new-allocation\",\"commandId\":\"replace-command\",\"transactionId\":\"replace-tx\"}","{}"));
-        rs.put("release-hold",capture("{\"outcome\":\"APPLIED\",\"restrictionId\":\"qc-hold\"}","{}"));
+        rs.put("reserve",capture("{\"effects\":{\"allocationId\":\"old-allocation\"}}","{}"));
+        rs.put("hold",capture("{\"effects\":{\"restrictionId\":\"qc-hold\"}}","{}"));
+        rs.put("replace",capture("{\"outcome\":\"APPLIED\",\"effects\":{\"allocationId\":\"new-allocation\"},\"commandId\":\"replace-command\",\"transactionId\":\"replace-tx\"}","{}"));
+        rs.put("release-hold",capture("{\"outcome\":\"APPLIED\",\"effects\":{\"restrictionId\":\"qc-hold\"}}","{}"));
         rs.put("allocation-release",capture("{\"outcome\":\"APPLIED\",\"commandId\":\"release-command\",\"transactionId\":\"release-tx\"}","{}"));
         ObjectNode suspended=capture("{}","{\"rawRows\":{\"allocations\":[{\"id\":\"old-allocation\",\"status\":\"SUSPENDED\",\"quantity\":\"20\",\"unit\":\"BOX\"}],\"obligations\":[{\"id\":\"duty-one\",\"rootId\":\"root-one\",\"scopeId\":\"scope-one\",\"ownerId\":\"sales-human\"}]}}");
         rs.put("suspended-db",suspended);
@@ -134,7 +134,7 @@ public final class OutcomeEffectAssertionSelfTest {
         JsonNode sub=subcase("T17","replacement-no-revival");var valid=t17();checkAll(sub,valid);
         var rejected=cloneResults(valid);response(rejected,"release-hold").put("outcome","REJECTED");row(rejected,"released-db","restrictions",0).put("status","ACTIVE");checkOriginal(sub,rejected,14);fails(sub,rejected);
         var noop=cloneResults(valid);row(noop,"released-db","restrictions",0).put("status","ACTIVE");checkOriginal(sub,noop,14);fails(sub,noop);
-        var wrongTarget=cloneResults(valid);response(wrongTarget,"release-hold").put("restrictionId","other-hold");fails(sub,wrongTarget);
+        var wrongTarget=cloneResults(valid);((ObjectNode)response(wrongTarget,"release-hold").path("effects")).put("restrictionId","other-hold");fails(sub,wrongTarget);
         var wrongScope=cloneResults(valid);row(wrongScope,"released-db","restrictions",0).put("segmentId","segment-b");fails(sub,wrongScope);
         var oldRevival=cloneResults(valid);row(oldRevival,"released-db","allocations",0).put("status","EXECUTABLE");fails(sub,oldRevival);
     }

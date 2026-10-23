@@ -228,6 +228,7 @@ def repair_case(case, fixtures):
                     elif cap in ('placeHold','releaseHold') and p == '/response/restrictionId': r['pointer']='/response/effects/restrictionId'
                     elif cap == 'dispatchQuantity' and p == '/response/id': r['pointer']='/response/effects/dispatchId'
                     elif cap == 'dispatchQuantity' and p == '/response/cargoScope/id': r['pointer']='/response/effects/cargoScopeId'
+                    elif cap == 'recordDelivery' and p == '/response/id': r['pointer']='/response/effects/deliveryId'
                 for v in node.values(): fix(v)
             elif isinstance(node,list):
                 for v in node: fix(v)

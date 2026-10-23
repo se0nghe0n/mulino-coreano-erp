@@ -183,6 +183,186 @@
       }
     },
     {
+      "subcase": "late-restriction-actual-delivery",
+      "assertionId": "fact-not-permission-9",
+      "before": {
+        "id": "fact-not-permission-9",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-delivery-db",
+          "pointer": "/data/rawRows/deliveries",
+          "where": {
+            "id": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/id"
+              }
+            }
+          },
+          "field": "canonical"
+        },
+        "expected": [
+          true
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-delivery-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "late-restriction-actual-delivery"
+        },
+        "oracleExplanation": "fact-not-permission는 출고30 뒤 SELL 금지에도 확인 인도20과 운송10을 보존하고 위반·회수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.late-restriction-actual-delivery",
+          "observationNames": [
+            "fact-not-permission"
+          ]
+        }
+      },
+      "after": {
+        "id": "fact-not-permission-9",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-delivery-db",
+          "pointer": "/data/rawRows/deliveries",
+          "where": {
+            "id": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/effects/deliveryId"
+              }
+            }
+          },
+          "field": "canonical"
+        },
+        "expected": [
+          true
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-delivery-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "late-restriction-actual-delivery"
+        },
+        "oracleExplanation": "fact-not-permission는 출고30 뒤 SELL 금지에도 확인 인도20과 운송10을 보존하고 위반·회수 책임을 남긴다의 독립 고정값과 실제 원 행을 대조한다.",
+        "oracleRef": {
+          "oracleId": "T17.late-restriction-actual-delivery",
+          "observationNames": [
+            "fact-not-permission"
+          ]
+        }
+      }
+    },
+    {
+      "subcase": "post-dispatch-expiry",
+      "assertionId": "fact-not-permission-9",
+      "before": {
+        "id": "fact-not-permission-9",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-delivery-db",
+          "pointer": "/data/rawRows/deliveries",
+          "where": {
+            "id": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/id"
+              }
+            }
+          },
+          "field": "canonical"
+        },
+        "expected": [
+          true
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-delivery-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "post-dispatch-expiry"
+        },
+        "oracleExplanation": "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다.",
+        "oracleRef": {
+          "oracleId": "T17.late-restriction-actual-delivery",
+          "observationNames": [
+            "fact-not-permission"
+          ]
+        }
+      },
+      "after": {
+        "id": "fact-not-permission-9",
+        "op": "exactSet",
+        "source": {
+          "actionId": "after-delivery-db",
+          "pointer": "/data/rawRows/deliveries",
+          "where": {
+            "id": {
+              "$result": {
+                "actionId": "delivery",
+                "pointer": "/response/effects/deliveryId"
+              }
+            }
+          },
+          "field": "canonical"
+        },
+        "expected": [
+          true
+        ],
+        "requirementRefs": [
+          "D17"
+        ],
+        "evidenceRefs": [
+          "after-delivery-db:raw-rows"
+        ],
+        "scope": {
+          "organizationId": {
+            "$alias": "ORG"
+          },
+          "itemId": {
+            "$alias": "P"
+          },
+          "caseId": "T17",
+          "scenarioId": "post-dispatch-expiry"
+        },
+        "oracleExplanation": "만료 뒤 인도는 확정 사실이지만 정상 이행 허가가 아니다. 인도 원행은 canonical이고 인도 목표 판정은 UNSATISFIED다.",
+        "oracleRef": {
+          "oracleId": "T17.late-restriction-actual-delivery",
+          "observationNames": [
+            "fact-not-permission"
+          ]
+        }
+      }
+    },
+    {
       "subcase": "replacement-no-revival",
       "assertionId": "old-allocation-2",
       "before": {

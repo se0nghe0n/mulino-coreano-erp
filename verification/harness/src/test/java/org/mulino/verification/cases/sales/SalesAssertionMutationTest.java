@@ -47,7 +47,7 @@ public final class SalesAssertionMutationTest {
     @Test void consumedAllocationCannotBecomeExecutableForNormalDelivery() throws Exception {
         JsonNode a=assertion("T17","normal-consumed-delivery","allocation-still","exactSet",true);
         ObjectNode n=capture("{\"rawRows\":{\"allocations\":[{\"id\":\"allocation-one\",\"status\":\"CONSUMED\"}]}}");var rs=one(a,n);
-        ObjectNode reserve=capture("{}");reserve.set("response",Json.parse("{\"allocationId\":\"allocation-one\"}"));rs.put("reserve",reserve);check(a,rs);
+        ObjectNode reserve=capture("{}");reserve.set("response",Json.parse("{\"effects\":{\"allocationId\":\"allocation-one\"}}"));rs.put("reserve",reserve);check(a,rs);
         ((ObjectNode)n.path("data").path("rawRows").path("allocations").get(0)).put("status","EXECUTABLE");wrong(a,rs);
     }
     @Test void delivery20DoesNotEraseTransit10AfterSellIsDenied() throws Exception {
