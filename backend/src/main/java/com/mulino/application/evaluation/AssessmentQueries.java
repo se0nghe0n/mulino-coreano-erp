@@ -46,7 +46,7 @@ public class AssessmentQueries implements com.mulino.application.work.WorkAssess
    var candidates=rows.stream().filter(a->workId.equals(a.get("workId"))&&Objects.equals(work.get("currentGoalVersionId"),a.get("goalId"))).toList();
    var previous=new HashSet<Object>();candidates.forEach(a->{if(a.get("previousAssessmentId")!=null)previous.add(a.get("previousAssessmentId"));});
    var heads=candidates.stream().filter(a->!previous.contains(a.get("ID"))).toList();
-   if(heads.size()>1)throw new DomainError("CONFLICT","ASSESSMENT_CONFLICT","Immutable assessment chain has multiple visible heads");
+   if(heads.size()>1)throw new DomainError("HELD","ASSESSMENT_CONFLICT","Immutable assessment chain has multiple visible heads");
    if(!heads.isEmpty())assessment=heads.getFirst();
   }
   var scope=new LinkedHashMap<String,Object>(q.scope());scope.put("organizationId",c.organizationId());scope.put("workId",workId);scope.put("itemId",work.get("itemId"));

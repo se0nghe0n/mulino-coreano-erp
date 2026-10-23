@@ -425,6 +425,19 @@ class AssessmentPostgresTest {
   }finally{SecurityContextHolder.clearContext();}
  }
 
+ @Test void multipleVisibleAssessmentHeadsHoldTheReadWithoutChangingHistory()throws Exception {
+  readableWork();authorizeAssessmentRead();
+  try{
+   String first=((Map<?,?>)assess(t).get("assessment")).get("ID").toString();
+   var fork=new LinkedHashMap<>(jdbc.queryForMap("SELECT * FROM mulino_work_read_AssessmentReferences WHERE organizationId=? AND ID=?",org,first));
+   fork.put("id",id());insert("mulino_work_read_AssessmentReferences",fork);
+   var before=databaseState();
+   var held=assertThrows(DomainError.class,()->readAssessment(work,t,t.plusSeconds(1000)));
+   assertEquals("HELD",held.outcome());assertEquals("ASSESSMENT_CONFLICT",held.code());
+   assertEquals(first,data(readAssessment(first,t,t.plusSeconds(1000))).get("ID"),"An explicitly identified immutable assessment remains readable");
+   assertEquals(before,databaseState(),"Ambiguous current heads neither select a winner nor mutate assessment history");
+  }finally{SecurityContextHolder.clearContext();}
+ }
  @Test void directAssessmentRejectsUnsupportedPlaceAndCustomerScopes()throws Exception {
   readableWork();authorizeAssessmentRead();
   try{
