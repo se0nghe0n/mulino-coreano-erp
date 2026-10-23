@@ -114,6 +114,56 @@ class T11ParentContributionPostgresTest {
             world.execute("child30-close-current-work");world.execute("child30-close");assertEquals("HELD",world.results.get("child30-close").path("response").path("outcome").asText());
         }
     }
+    @ParameterizedTest @ValueSource(strings={"closeOnly","assessOnly","missingSourceWork","missingPlace","revokedGrant","staleRevision","correctedInput","policyChanged","callerPurpose"})
+    void closureUsesOnlyServerSelectedCurrentOperationAuthority(String variant) throws Exception {
+        try(var world=new T11ParentHttp("parent90-cancelled","closure-"+variant)) {
+            world.through("child30-assessment");world.execute("child30-close-current-work");
+            var close=(ObjectNode)new ReferenceResolver(world.results,world.aliases).resolve(world.action("child30-close").path("request"));
+            close.put("commandIdempotencyKey",UUID.randomUUID().toString());
+            String child=close.path("slots").path("workId").asText();
+            String actor="A";
+            if(variant.equals("closeOnly")) {
+                var assess=(ObjectNode)new ReferenceResolver(world.results,world.aliases).resolve(world.action("child30-assessment-evaluate").path("request"));assess.put("commandIdempotencyKey",UUID.randomUUID().toString());
+                var denied=world.send("close-actor-cannot-assess","A","/api/ontology/commands/assessGoal",assess);assertEquals("FORBIDDEN",denied.path("error").path("code").asText(),denied.toPrettyString());
+            }
+            if(variant.equals("assessOnly"))actor="assessmentEvaluator";
+            if(variant.equals("missingSourceWork")||variant.equals("missingPlace")) {
+                try(var q=world.db.prepareStatement("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId IN(SELECT ID FROM mulino_identity_Grants WHERE organizationId=? AND actorId=?)")) {q.setString(1,world.org);q.setString(2,world.org);q.setString(3,world.aliases.path("A").asText());assertTrue(q.executeUpdate()>0);}
+                try(var q=world.db.prepareStatement("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) SELECT organizationId,ID,?,? FROM mulino_identity_Grants WHERE organizationId=? AND actorId=?")) {
+                    for(var scope:List.of(List.of("WORK",child),List.of("ITEM",world.aliases.path("P").asText()))) {q.setString(1,scope.get(0));q.setString(2,scope.get(1));q.setString(3,world.org);q.setString(4,world.aliases.path("A").asText());q.executeUpdate();}
+                    if(variant.equals("missingPlace")){q.setString(1,"PLACE");q.setString(2,UUID.randomUUID().toString());q.setString(3,world.org);q.setString(4,world.aliases.path("A").asText());q.executeUpdate();}
+                }
+            }
+            if(variant.equals("revokedGrant"))try(var q=world.db.prepareStatement("UPDATE mulino_identity_Grants SET revokedAt=? WHERE organizationId=? AND actorId=?")){q.setObject(1,java.time.OffsetDateTime.parse("2026-10-07T02:00:00Z"));q.setString(2,world.org);q.setString(3,world.aliases.path("A").asText());assertTrue(q.executeUpdate()>0);}
+            if(variant.equals("staleRevision"))freshAssessment(world,"child30");
+            if(variant.equals("correctedInput")) {
+                // Immutable supersession requires strictly later recordedAt.
+                // Advance only this new negative test, keeping original case times intact.
+                String correctedAt=java.time.Instant.parse(world.fixture.path("clock").path("asOf").asText()).plusNanos(1_000).toString();
+                var advanced=world.send("correction-clock","A","/__verification/runtime/clock",Json.object().put("instant",correctedAt));assertEquals(correctedAt,advanced.path("instant").asText());
+                var correction=(ObjectNode)world.results.get("receive90-event").path("request").deepCopy();correction.put("capabilityId","correctEvidence");correction.put("commandIdempotencyKey",UUID.randomUUID().toString());
+                var slots=(ObjectNode)correction.path("slots");slots.put("supersedesId",world.results.get("receive90-event").path("response").path("id").asText());slots.put("sourceVersion","2");
+                var corrected=world.send("correct-source","A","/api/ontology/records/correctEvidence",correction);assertEquals("APPLIED",corrected.path("outcome").asText(),corrected.toPrettyString());
+                var currentQuery=(ObjectNode)new ReferenceResolver(world.results,world.aliases).resolve(world.action("child30-close-current-work").path("request"));currentQuery.put("asOf",correctedAt);currentQuery.put("knownAt",correctedAt);
+                var currentWork=world.send("child30-close-current-work","A","/api/ontology/queries/getWork",currentQuery);close.put("expectedRevision",currentWork.path("data").path("revision").asInt());
+            }
+            if(variant.equals("policyChanged"))try(var q=world.db.prepareStatement("DELETE FROM mulino_governance_ActivePolicies WHERE organizationId=? AND kind='EVIDENCE'")){q.setString(1,world.org);assertEquals(1,q.executeUpdate());}
+            if(variant.equals("callerPurpose"))((ObjectNode)close.path("slots")).put("evaluationPurpose","ASSESS_GOAL");
+            var allocations=world.rows("mulino_work_WorkContributions");var assessments=world.rows("mulino_work_read_AssessmentReferences");var obligations=world.rows("mulino_work_read_ObligationReferences");
+            var response=world.send("closure-attempt",actor,"/api/ontology/commands/closeWork",close);
+            if(variant.equals("closeOnly")){
+                assertEquals("APPLIED",response.path("outcome").asText(),response.toPrettyString());
+                try(var q=world.db.prepareStatement("SELECT actorId FROM mulino_work_WorkTransitions WHERE organizationId=? AND workId=? AND operation='closeWork'")){q.setString(1,world.org);q.setString(2,child);try(var r=q.executeQuery()){assertTrue(r.next());assertEquals(world.aliases.path("A").asText(),r.getString(1));}}
+            }else {
+                assertTrue(Set.of("REJECTED","CONFLICT","HELD").contains(response.path("outcome").asText()),response.toPrettyString());
+                assertEquals("ACTIVE",world.rows("mulino_work_read_Works").stream().filter(r->child.equals(r.get("id"))).findFirst().orElseThrow().get("status"));
+                if(variant.equals("staleRevision"))assertEquals("STALE_REVISION",response.path("error").path("code").asText());
+                assertEquals(obligations,world.rows("mulino_work_read_ObligationReferences"));
+            }
+            assertEquals(allocations,world.rows("mulino_work_WorkContributions"));assertEquals(assessments,world.rows("mulino_work_read_AssessmentReferences"));
+            for(String table:List.of("mulino_evidence_CanonicalOccurrences","mulino_trade_receipt_Receipts","mulino_inventory_QuantityMovements"))assertEquals(1,world.rows(table).size());
+        }
+    }
     private void freshAssessment(T11ParentHttp world,String name) throws Exception {
         world.execute(name+"-assessment-evaluation-work");
         var request=(ObjectNode)new ReferenceResolver(world.results,world.aliases).resolve(world.action(name+"-assessment-evaluate").path("request"));

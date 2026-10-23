@@ -42,7 +42,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
   public Map<String,Object> assessCreated(DomainContext c,String workId){return assess(c,workId);}
   public void requireSupportedGoal(DomainContext c,Map<String,Object> goal){definition(goal,c);}
   public void requireFulfilled(DomainContext c,Map<String,Object> w,Map<String,Object> goal){
-    var latest=latest(c,w.get("ID").toString(),goal.get("ID").toString());var current=calculate(c,w,goal);
+    var latest=latest(c,w.get("ID").toString(),goal.get("ID").toString());var current=calculate(c,w,goal,c.asOf(),CanonicalFactAdmission.Purpose.CLOSE_WORK);
     if(!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw new DomainError("HELD","POLICY_UNRESOLVED","Current evidence policy required for closure");
     if(latest==null||latest.get("inputSnapshotHash")==null||Boolean.TRUE.equals(latest.get("held"))||current.held||!"SATISFIED".equals(latest.get("outcome"))||current.result.truth().state()!=PredicateTruth.State.SATISFIED||current.result.truth().conflict()||!Objects.equals(latest.get("inputSnapshotHash"),current.hash))throw new DomainError("HELD","ASSESSMENT_NOT_CURRENT","Current immutable goal assessment and inputs required");
   }
@@ -59,6 +59,9 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     return calculate(c,w,goal,c.asOf());
   }
   private Calculation calculate(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Instant evaluationHorizon){
+    return calculate(c,w,goal,evaluationHorizon,CanonicalFactAdmission.Purpose.ASSESS_GOAL);
+  }
+  private Calculation calculate(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Instant evaluationHorizon,CanonicalFactAdmission.Purpose purpose){
     var slots=decode(goal.get("slotsJson"));
     if(!(slots.get("scope") instanceof Map<?,?> scope)||!Set.of("itemId","lotId","placeId","workId").containsAll(scope.keySet()))throw DomainError.invalid("Typed bounded goal scope required");
     if(scope.get("itemId")!=null&&!Objects.equals(scope.get("itemId"),w.get("itemId"))||scope.get("workId")!=null&&!Objects.equals(scope.get("workId"),w.get("ID")))throw DomainError.forbidden();
@@ -66,7 +69,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     try{d=definition(goal,c);}catch(DomainError|NoSuchElementException|IllegalStateException e){return held(goal,slots,"PINNED_CONTRACT_UNAVAILABLE");}
     var policy=policies.current(c.organizationId(),"EVIDENCE",c.asOf()).stream().filter(p->p.get("createdAt")!=null&&!instant(p.get("createdAt")).isAfter(c.knownAt())&&Objects.equals(slots.get("evidencePolicyVersion"),p.get("version"))).toList();
     if(policy.size()!=1)return held(goal,slots,"EVIDENCE_POLICY_UNRESOLVED");
-    var facts=provider.load(c,w,slots,d,goal.get("ID").toString(),evaluationHorizon);Map<String,Object> predicate=goalPredicate(d,slots);
+    var facts=provider.load(c,w,slots,d,goal.get("ID").toString(),evaluationHorizon,purpose);Map<String,Object> predicate=goalPredicate(d,slots);
     TypedPredicateEvaluator.Result result;
     String mode=slots.get("quantityMode").toString();
     if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"),!Boolean.FALSE.equals(slots.get("periodStartInclusive")),!Boolean.FALSE.equals(slots.get("periodEndInclusive")));

@@ -22,6 +22,10 @@ public class AssessmentFactProvider {
   /** The evidence cutoff can precede the real assessment horizon at an exclusive deadline.
    * STATE_AT keeps its fixed evaluationAt; only a genuinely future state is unknown. */
   public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId,Instant evaluationHorizon) {
+    return load(c,work,slots,definition,goalId,evaluationHorizon,CanonicalFactAdmission.Purpose.ASSESS_GOAL);
+  }
+  public EvaluationFacts load(DomainContext c,Map<String,Object> work,Map<String,Object> slots,Definition definition,String goalId,Instant evaluationHorizon,CanonicalFactAdmission.Purpose purpose) {
+    Objects.requireNonNull(purpose);
     var port=contributionPort.getIfAvailable();var credits=goalId==null||port==null?List.<Map<String,Object>>of():port.contributions(c,work.get("ID").toString(),goalId);
     Map<?,?> scope=slots.get("scope") instanceof Map<?,?> m?m:Map.of();
     Object lotScope=scope.get("lotId")!=null?scope.get("lotId"):work.get("lotId");
@@ -44,7 +48,7 @@ public class AssessmentFactProvider {
         var allocations=credits.stream().filter(x->Objects.equals(occurrence.get("ID"),x.get("occurrenceId"))).toList();
         if((!coverageAttribute&&!canonicalState&&!Objects.equals(work.get("ID"),occurrence.get("workId"))&&allocations.isEmpty())||!Objects.equals(work.get("itemId"),occurrence.get("itemId")))continue;
         var domainProviders=admissions.stream().filter(p->p.eventKinds().contains(occurrence.get("kind"))).toList();
-        var admission=domainProviders.size()==1?domainProviders.getFirst().admit(c,work.get("ID").toString(),goalId,occurrence):new CanonicalFactAdmission.Admission(!Set.of("PHYSICAL_RECEIPT","PHYSICAL_DELIVERY","RETURN_RECEIPT").contains(occurrence.get("kind"))&&domainProviders.isEmpty(),(java.math.BigDecimal)occurrence.get("quantity"),null,List.of());
+        var admission=domainProviders.size()==1?domainProviders.getFirst().admit(c,work.get("ID").toString(),goalId,occurrence,purpose):new CanonicalFactAdmission.Admission(!Set.of("PHYSICAL_RECEIPT","PHYSICAL_DELIVERY","RETURN_RECEIPT").contains(occurrence.get("kind"))&&domainProviders.isEmpty(),(java.math.BigDecimal)occurrence.get("quantity"),null,List.of());
         Object factLot=admission.lotId()!=null?admission.lotId():"LOT".equals(occurrence.get("subjectKind"))?occurrence.get("subjectId"):segments.stream().filter(x->Objects.equals(x.get("ID"),occurrence.get("physicalScopeId"))).map(x->x.get("lotId")).findFirst().orElse(null);
         if(lotScope!=null&&!Objects.equals(lotScope,factLot))continue;
         if(!coverageAttribute&&!CanonicalEventSemantics.matches(slots.get("eventKind"),occurrence.get("kind")))continue;

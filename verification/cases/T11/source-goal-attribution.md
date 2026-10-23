@@ -45,13 +45,29 @@ Goal ID가 contribution 또는 assessment snapshot에서 노출되지 않도록 
 실제 HTTP와 독립 SQL만 사용한다. model/scenario runner는 호출하지 않는다.
 원래 T11 입력·110 oracle·다른 9 subcase와 T09/T12는 수정하지 않는다.
 
-실제 실행에서 source pin 후 child30/60은 SATISFIED가 된다. 그러나 원래 A의
-closeWork 재판정은 ReceiptCanonicalFactAdmission의 `assessGoal` 권한 검사로
-HELD가 된다. A는 원래 closeWork 권한을, 평가 전용 actor는 assessGoal 권한을
-갖는다. 이 구현은 fixture grant를 추가하거나 현재 closure 검사를 우회하지
-않는다. 해당 별도 권한 계약 수정은 coordinator의 소유권 결정이 필요하다.
-원래 부족10 인계와 미배분90도 계속 별도 경계다.
+`863c61ec` 후속 변경은 서버 내부 `CanonicalFactAdmission.Purpose`를
+도입한다. 공개 assessGoal과 기존 호출은 ASSESS_GOAL을 사용하고,
+AssessmentService.requireFulfilled만 CLOSE_WORK를 선택한다. 요청 slot으로
+purpose를 받지 않는다. receipt admission은 같은 TARGET/ITEM/PLACE 조건을
+유지하며 요청 Work와 실제 원천 Work 각각에 해당 operation 권한을 요구한다.
+DeliveryAdmission은 공유 interface의 새 호출을 연결하는 데만 변경한다.
+
+목적은 snapshot에 저장하지 않는다. 성공한 두 operation은 같은 사실·증거를
+반환하므로 purpose만 바뀌어 input hash가 달라지지 않는다. 폐쇄는 여전히
+현재 원천·고정 Goal·최신 assessment·입력 hash·현재 정책을 다시 검증한다.
+actor를 바꾸거나 과거 snapshot을 현재 사실로 재사용하지 않는다.
+
+원래 A의 child30/60 폐쇄는 APPLIED로 진행한다. 원래 세 전체 흐름은 이후
+부족10의 obligationId를 얻지 못하며 alternative-close의 UNRESOLVED_DUTY가
+남는다. 원래 부족10 인계와 미배분90은 이 후속 수정의 범위 밖이다.
 
 명령·원실패·최종 검사 수·source/JAR hash·DB 정리 증거는
-`.local/t11-source-attribution/`에 둔다. schema manifest는 coordinator가
+`.local/t11-source-attribution/` 및 후속 `.local/t11-closure-purpose/`에 둔다. schema manifest는 coordinator가
 V40 및 다른 변경과 통합한 뒤 동기화한다.
+
+후속 검증에서 backend 집중 89개와 operation authority 재검사 6개가
+통과했다. 전체 T11 HTTP suite는 19 PASS / 3 FAIL이며 세 실패는 원래
+전체 흐름의 alternative-close에 남은 UNRESOLVED_DUTY다. 자식30/60의
+폐쇄, 부모90, 원래 단일 canonical/receipt/movement와 두 allocation은
+통과했다. 추가 정정 음성 검사는 기존 supersession 규칙에 맞게 검증
+시계만 1μs 전진시키며 원래 시나리오 시각은 바꾸지 않는다.

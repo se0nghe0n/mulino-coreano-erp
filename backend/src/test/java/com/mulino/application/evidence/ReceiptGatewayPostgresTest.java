@@ -266,4 +266,35 @@ class ReceiptGatewayPostgresTest {
   assertEquals("PHYSICAL_RECEIPT",jdbc.queryForObject("SELECT kind FROM mulino_evidence_CanonicalOccurrences WHERE ID=?",String.class,occurrence));
  }
 
+ @org.junit.jupiter.params.ParameterizedTest
+ @org.junit.jupiter.params.provider.ValueSource(strings={"closeOnly","assessOnly","missingSourceWork","missingPlace","missingTarget","revokedGrant"})
+ void operationAuthorityRequiresEveryActualSourceScope(String variant){
+  goalEvent("CONFIRMED_RECEIPT");ordered100Fixture();var a=provisional(uuid(),"60",true,null);String occurrence=canonical(a,null);
+  assertEquals("APPLIED",confirm(a,occurrence,uuid()).get("outcome"));
+  String requested=uuid();
+  jdbc.update("INSERT INTO mulino_work_read_Works(organizationId,ID,createdAt,recordedAt,effectiveAt,itemId,definitionVersionId,kind,status,ownerId,supervisorId,lifecycleMode) SELECT organizationId,?,createdAt,recordedAt,effectiveAt,itemId,definitionVersionId,kind,status,ownerId,supervisorId,lifecycleMode FROM mulino_work_read_Works WHERE ID=?",requested,WORK);
+  var assessed=request(()->admission.admit(auth.context(Instant.now(),Instant.now()),requested,null,repository.require("CanonicalOccurrences",ORG,occurrence)));
+  assertTrue(assessed.admitted());
+  if(!variant.equals("assessOnly")){
+   jdbc.update("INSERT INTO mulino_identity_CapabilityAssignments(organizationId,ID,actorId,capabilityId,scopeKind,scopeId,validFrom,validUntil) VALUES(?,?,?,'closeWork','ORGANIZATION',?,CURRENT_TIMESTAMP-INTERVAL '1 day',CURRENT_TIMESTAMP+INTERVAL '1 day')",ORG,uuid(),ACTOR,ORG);
+   jdbc.update("INSERT INTO mulino_identity_GrantActions VALUES(?,?,'closeWork')",ORG,GRANT);
+   jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE organizationId=? AND grantId=? AND capabilityId='assessGoal'",ORG,GRANT);
+  }
+  jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=?",ORG,GRANT);
+  for(var pair:List.of(List.of("TARGET",requested),List.of("WORK",requested),List.of("WORK",WORK),List.of("ITEM",ITEM),List.of("PLACE",PLACE)))jdbc.update("INSERT INTO mulino_identity_GrantScopes VALUES(?,?,?,?)",ORG,GRANT,pair.get(0),pair.get(1));
+  if(variant.equals("missingSourceWork"))jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=? AND scopeKind='WORK' AND scopeId=?",ORG,GRANT,WORK);
+  if(variant.equals("missingPlace"))jdbc.update("UPDATE mulino_identity_GrantScopes SET scopeId=? WHERE organizationId=? AND grantId=? AND scopeKind='PLACE'",TRANSIT,ORG,GRANT);
+  if(variant.equals("missingTarget"))jdbc.update("UPDATE mulino_identity_GrantScopes SET scopeId=? WHERE organizationId=? AND grantId=? AND scopeKind='TARGET'",uuid(),ORG,GRANT);
+  if(variant.equals("revokedGrant"))jdbc.update("UPDATE mulino_identity_Grants SET revokedAt=CURRENT_TIMESTAMP WHERE organizationId=? AND ID=?",ORG,GRANT);
+  request(()->{
+   var c=auth.context(Instant.now(),Instant.now());var fact=repository.require("CanonicalOccurrences",ORG,occurrence);
+   var result=admission.admit(c,requested,null,fact,com.mulino.domain.evaluation.CanonicalFactAdmission.Purpose.CLOSE_WORK);
+   assertEquals(variant.equals("closeOnly"),result.admitted(),variant);
+   assertEquals(variant.equals("assessOnly"),admission.admit(c,requested,null,fact).admitted(),"Legacy/default call stays assessGoal-only");
+   if(result.admitted()){assertEquals(0,new java.math.BigDecimal("60").compareTo(result.recognizedQuantity()));assertEquals(assessed,result,"Authorized purpose alone does not change admitted facts or hash inputs");}
+   return null;
+  });
+  assertEquals(1,count("mulino_trade_receipt_Receipts"));assertEquals(1,count("mulino_inventory_QuantityMovements"));
+ }
+
 }
