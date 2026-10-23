@@ -203,6 +203,8 @@ final class ScenarioObservationProjection {
                 case "mulino_trade_purchase_Approvals" -> field(row,"conditions",parse(row,"conditionsJson"));
                 case "mulino_work_read_Works" -> {
                     var wait=parse(row,"waitJson");copy(row,"waitReason",wait,"reason");
+                    // Names only: the current persisted wait contract owns these values.
+                    copy(row,"verifierId",wait,"verifier");copy(row,"overdueAction",wait,"overdueAction");
                     // A transition reason is usable only for this exact persisted revision and state.
                     if(!row.hasNonNull("waitReason")||!row.hasNonNull("closeReason")) {
                         var matches=query("mulino_work_WorkTransitions","r.organizationId=? AND r.workId=? AND r.revision=? AND r.state=? AND r.recordedAt<=?",

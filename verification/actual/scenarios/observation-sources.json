@@ -434,7 +434,7 @@
     "mulino_work_read_ObligationReferences": "current=valid, responsibleWorkId=workId, obligationId=rootId, sourceKind/sourceId from responsibility Roots",
     "mulino_commands_CommandRecords": "status=state, stableRequestOwnerId=stableRequestOwner",
     "mulino_inventory_SegmentAllocations": "status=state",
-    "mulino_work_read_Works": "state=status",
+    "mulino_work_read_Works": "state=status; waitReason=waitJson.reason; verifierId=waitJson.verifier; overdueAction=waitJson.overdueAction. verifierId and overdueAction use only the current stored Work waitJson; missing values are not filled from actors, supervisors or transition snapshots.",
     "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row; a row whose commandId is null or names no CommandRecords row (fixture-installed) carries commandIdempotencyKey NO_COMMAND_RECORD",
     "any row without a commandId column": "commandIdempotencyKey, capabilityId, stableRequestOwnerId of the earliest COMMITTED CommandRecords row whose resultJson (effects, *Id fields) names the row id (approximate creating command); otherwise commandIdempotencyKey NO_COMMAND_RECORD",
     "mulino_work_read_GoalReferences": "quantity=targetQuantity (target only); placeId/periodStart/periodEnd from immutable slotsJson; intervalStart/intervalEnd/startInclusive/endInclusive from period fields; eventKinds is the stored single eventKind list; distinctContributionScope=contributionScope, evaluationTime=evaluationAt, eligibilityAction=action, includeReservations=includeReserved. No nested expression search, default endpoints or policy versions",

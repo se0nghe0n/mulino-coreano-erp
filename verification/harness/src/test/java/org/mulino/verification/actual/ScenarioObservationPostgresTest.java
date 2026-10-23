@@ -550,4 +550,46 @@ class ScenarioObservationPostgresTest {
             try(var s=c.createStatement()){assertThrows(SQLException.class,()->s.executeUpdate("UPDATE mulino_work_read_Works SET status='DRAFT'"));}c.rollback();
         }
     }
+    // Source-row projection checks only; these do not execute a T11 scenario.
+    String storedWait(){return "{\"reason\":\"수령 근거 대기\",\"verifier\":\"1feb8408-bc65-434c-ba71-a26344b85651\",\"overdueAction\":\"ESCALATE_SUPERVISOR\"}";}
+    ObjectNode waitingWork(){return row(work).put("itemId",item).put("lotId",lot).put("revision",2).put("status","WAITING").put("supervisorId","different-supervisor");}
+    @Test void storedWaitFieldsProjectVerbatimFromCurrentWorkRevision() throws Exception {
+        var source=waitingWork().put("waitJson",storedWait());insert("mulino_work_read_Works",source);
+        var result=capture("works");var actual=result.path("rawRows").path("works").get(0);
+        assertEquals("1feb8408-bc65-434c-ba71-a26344b85651",actual.path("verifierId").asText());
+        assertEquals("ESCALATE_SUPERVISOR",actual.path("overdueAction").asText());
+        assertEquals(source.path("waitJson"),actual.path("waitJson"));assertEquals(2,actual.path("revision").asInt());
+        assertEquals("REPEATABLE_READ",result.path("snapshot").path("isolation").asText());
+        try(var q=writer.createStatement();var r=q.executeQuery("SELECT waitJson FROM mulino_work_read_Works WHERE ID='"+work+"'")) {
+            assertTrue(r.next());assertEquals(storedWait(),r.getString(1));assertFalse(r.next());
+        }
+    }
+    @ParameterizedTest @ValueSource(strings={"missing","malformed","partial","otherWork","otherRevision","otherOrganization","laterTransition"})
+    void missingWaitFieldsNeverBorrowFromActorSupervisorOrTransition(String variant) throws Exception {
+        var source=waitingWork();
+        if(variant.equals("malformed"))source.put("waitJson","not-json");
+        if(variant.equals("partial"))source.put("waitJson","{\"reason\":\"stored reason\"}");
+        insert("mulino_work_read_Works",source);
+        var snapshot=source.deepCopy().put("waitJson",storedWait());
+        var transition=Json.object().put("ID",id()).put("organizationId",org).put("workId",work)
+            .put("revision",2).put("state","WAITING").put("recordedAt",now).put("snapshotJson",snapshot.toString());
+        if(variant.equals("otherWork"))transition.put("workId",id());
+        if(variant.equals("otherRevision"))transition.put("revision",1);
+        if(variant.equals("otherOrganization"))transition.put("organizationId",id());
+        if(variant.equals("laterTransition"))transition.put("recordedAt",later);
+        insert("mulino_work_WorkTransitions",transition);
+        var actual=capture("works").path("rawRows").path("works").get(0);
+        assertFalse(actual.hasNonNull("verifierId"));assertFalse(actual.hasNonNull("overdueAction"));
+        assertEquals("WAITING",actual.path("status").asText());
+    }
+    @ParameterizedTest @ValueSource(strings={"otherWork","otherOrganization","laterWork"})
+    void waitFieldsRespectWorkOrganizationAndKnownAtScope(String variant) throws Exception {
+        var source=waitingWork().put("waitJson",storedWait());
+        if(variant.equals("otherWork"))source.put("ID",id());
+        if(variant.equals("otherOrganization"))source.put("organizationId",id());
+        if(variant.equals("laterWork"))source.put("recordedAt",later);
+        insert("mulino_work_read_Works",source);
+        assertTrue(capture("works").path("rawRows").path("works").isEmpty());
+    }
+
 }

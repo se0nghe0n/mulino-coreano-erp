@@ -54,4 +54,16 @@ class ScenarioObservationProjectionTest {
         }
     }
 
+    @Test void waitProjectionCopiesStoredNamesWithoutExpectedValueOrActorDefaults() throws Exception {
+        var row=Json.object().put("waitJson","{\"reason\":\"stored reason\",\"verifier\":\"unrelated-verifier\",\"overdueAction\":\"CUSTOM_STORED_ACTION\"}")
+            .put("supervisorId","supervisor").put("ownerId","actor").put("closeReason","existing");
+        var original=row.deepCopy();
+        var projection=new ScenarioObservationProjection(null,null,java.util.List.of(),java.util.List.of(),java.util.List.of(),java.util.List.of(),null);
+        projection.enrich("mulino_work_read_Works",Json.array().add(row));
+        assertEquals("unrelated-verifier",row.path("verifierId").asText());
+        assertEquals("CUSTOM_STORED_ACTION",row.path("overdueAction").asText());
+        assertEquals(original.path("waitJson"),row.path("waitJson"));assertFalse(row.has("state"));
+        assertTrue(projection.drainQueries().isEmpty());
+    }
+
 }
