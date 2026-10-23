@@ -83,3 +83,17 @@ catalog 대조 결과는 `query-catalog-diff.json`에 남겼다.
 제안만 담은 `proposed-query-entries.json`과
 `proposed-query-catalog.patch`도 같은 디렉터리에 있다. 이 patch는
 적용하지 않았다. catalog equality와 M05 재실행은 NOT_RUN이다.
+
+## Coordinator 통합
+
+2026-10-24 coordinator는 위 17개 QUERY entry를 원 계획 상태 그대로
+추가했다. 기존 entry와 원 case·fixture·oracle는 바꾸지 않았다. 실제
+등록 34개와 새 catalog 대조에서 누락은 0이다. 이는 등록 정합성이고
+전체 실행 인수 PASS가 아니다. NativeMcpTransport의 scope capture에도
+LOT·CUSTOMER·SUPPLIER를 추가했으며 UUID 검사와 NOT_ASSERTED 의미를
+유지했다. capture selftest 6개가 실패·오류·skip 없이 통과했다.
+
+증거는 `.local/resume-20261024/fix-until-done/identity-scope-integration/`
+아래 proof.json과 harness.log에 남겼다. 원 worker의 PG 27개 결과는
+archive SHA와 압축 JUnit을 직접 대조했다. V45+V46 결합 검사는 아직
+후속 작업이다.

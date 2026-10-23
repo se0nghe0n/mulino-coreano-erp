@@ -128,7 +128,7 @@ final class NativeMcpTransport {
                     for(JsonNode a:row.path("actions"))Json.required(a,"capabilityId");
                     for(JsonNode s:row.path("scopes")) {
                         String kind=Json.required(s,"scopeKind"),scopeId=Json.required(s,"scopeId");
-                        NativeClientPolicy.require(Set.of("ORGANIZATION","TARGET","WORK","ITEM","PLACE","SOURCE").contains(kind),"SERVER_CAPTURE_INCOMPLETE");
+                        NativeClientPolicy.require(Set.of("ORGANIZATION","TARGET","WORK","ITEM","PLACE","SOURCE","LOT","CUSTOMER","SUPPLIER").contains(kind),"SERVER_CAPTURE_INCOMPLETE");
                         // V3__identity: typed SOURCE scopeId is a nonblank namespace, VARCHAR(36).
                         // Other dimensions continue to require UUIDs; a namespace cannot become an ITEM/TARGET.
                         if(kind.equals("SOURCE"))NativeClientPolicy.require(scopeId.codePointCount(0,scopeId.length())<=36,"SERVER_CAPTURE_INCOMPLETE");
@@ -136,7 +136,7 @@ final class NativeMcpTransport {
                     }
                 } else if(table.equals("assignments")) {
                     Json.required(row,"capabilityId");String kind=Json.required(row,"scopeKind"),scopeId=Json.required(row,"scopeId");
-                    NativeClientPolicy.require(Set.of("ORGANIZATION","TARGET","WORK","ITEM","PLACE","SOURCE").contains(kind),"SERVER_CAPTURE_INCOMPLETE");
+                    NativeClientPolicy.require(Set.of("ORGANIZATION","TARGET","WORK","ITEM","PLACE","SOURCE","LOT","CUSTOMER","SUPPLIER").contains(kind),"SERVER_CAPTURE_INCOMPLETE");
                     if(kind.equals("SOURCE"))NativeClientPolicy.require(scopeId.codePointCount(0,scopeId.length())<=36,"SERVER_CAPTURE_INCOMPLETE");
                     else UUID.fromString(scopeId);
                 }

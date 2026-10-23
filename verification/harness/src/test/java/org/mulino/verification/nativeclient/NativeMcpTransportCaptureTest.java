@@ -103,6 +103,19 @@ class NativeMcpTransportCaptureTest {
   @Test void serverReceiptIsFetchedIndependentlyAndPersistedWithoutCredentialOrCallerAuthority()throws Exception {
     runTransport(true,false);
   }
+  @Test void typedTradeScopesAreCapturedAsObservationsWithStrictUuidIdentifiers() {
+    var rpc=rpc();String reply="{}";
+    for(String kind:List.of("LOT","CUSTOMER","SUPPLIER"))for(boolean assignment:List.of(false,true)) {
+      var c=capture(rpc,reply,NONCE,"2026-10-24T00:00:01Z","2026-10-24T00:00:02Z");
+      var scope=Json.object().put("scopeKind",kind).put("scopeId",ORG);
+      if(assignment){var a=((ObjectNode)c.path("memberships").get(0)).deepCopy().put("capabilityId","getObject");a.setAll(scope);((ArrayNode)c.path("assignments")).add(a);}
+      else ((ArrayNode)c.path("grants").get(0).path("scopes")).add(scope);
+      assertDoesNotThrow(()->validate(c,rpc,reply));
+      assertEquals("NOT_ASSERTED",c.path("actionAuthorization").asText());
+      if(assignment)((ObjectNode)c.path("assignments").get(0)).put("scopeId","carrier-it");else scope.put("scopeId","carrier-it");
+      assertThrows(RuntimeException.class,()->validate(c,rpc,reply));
+    }
+  }
   void runTransport(boolean enabled,boolean mismatch)throws Exception {
     var server=HttpServer.create(new InetSocketAddress("127.0.0.1",0),0);var snapshot=new ObjectNode[1];
     server.createContext("/mcp/ontology",exchange->{
