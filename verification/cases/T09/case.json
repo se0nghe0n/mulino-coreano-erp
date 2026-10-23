@@ -717,7 +717,8 @@
                   "actionId": "sale60",
                   "pointer": "/response/line/id"
                 }
-              }
+              },
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-cumulative-versus-state-reserve60",
@@ -730,7 +731,8 @@
               "quantity": "USER",
               "unit": "USER",
               "segmentId": "CONTEXT",
-              "salesLineId": "CONTEXT"
+              "salesLineId": "CONTEXT",
+              "startQuantity": "CONTEXT"
             }
           }
         },
@@ -8115,7 +8117,8 @@
                 }
               },
               "quantity": "100",
-              "unit": "BOX"
+              "unit": "BOX",
+              "startQuantity": "0"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-exists-versus-end-throughout-reserve",
@@ -8128,7 +8131,8 @@
               "segmentId": "CONTEXT",
               "salesLineId": "CONTEXT",
               "quantity": "USER",
-              "unit": "USER"
+              "unit": "USER",
+              "startQuantity": "CONTEXT"
             }
           }
         },

@@ -223,6 +223,10 @@ class SourceContracts(unittest.TestCase):
             # The subsequent receipt revision repair has its own strict check.
             original_actions = {a['id']: a for a in old['actions']}
             for action in restored['actions']:
+                if (old['id'], action['id']) in (('cumulative-versus-state', 'reserve60'),
+                                                ('exists-versus-end-throughout', 'reserve')):
+                    self.assertEqual('0', action['request']['slots'].pop('startQuantity'))
+                    self.assertEqual('CONTEXT', action['request']['provenance'].pop('startQuantity'))
                 if action.get('capabilityId') == 'confirmReceipt':
                     self.assertEqual({'$result': {'actionId': action['id'] + '-provisional',
                                                  'pointer': '/response/revision'}},
