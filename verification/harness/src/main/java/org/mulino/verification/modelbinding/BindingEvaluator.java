@@ -79,7 +79,11 @@ public final class BindingEvaluator {
                 PhysicalObservation.requireColumnCoverage(observation.path("data"),Json.required(m,"dataset"),Json.required(m,"attribute"));
                 BindingContract.require(observation.path("data").path("physicalCells").isArray(),"Independent raw rows scope unobserved");List<JsonNode> matches=new ArrayList<>();for(JsonNode row:observation.path("data").path("physicalCells")) {
                     if(row.path("dataset").equals(m.path("dataset"))&&row.path("attribute").equals(m.path("attribute"))) {
-                        for(String key:List.of("table","column","rowId")) Json.required(row,key);
+                        if(row.path("kind").asText().equals("DERIVED")) {
+                            BindingContract.require(row.path("recipe").path("id").asText().equals(PhysicalFactRecipes.recipeId(semantic)),"Derived recipe semantic path differs");
+                            PhysicalFactRecipes.validate(observation.path("data"),row,contract.validator.root());
+                            if(row.path("scopeOnly").asBoolean(false))continue;
+                        } else for(String key:List.of("table","column","rowId")) Json.required(row,key);
                         BindingContract.require(row.hasNonNull("value"),"Physical column null/missing "+semantic);matches.add(row);
                     }
                 }
@@ -119,7 +123,7 @@ public final class BindingEvaluator {
     private void checkExpectedUnit(String semantic,JsonNode execution,JsonNode observation,List<JsonNode> effects,String expected,CapturedApiObservation api){
         JsonNode m=contract.mapping(semantic);String type=m.path("evidenceClass").asText();
         if(type.equals("AUTHENTICATED_API")){String pointer=m.path("pointer").asText();int slash=pointer.lastIndexOf('/');BindingContract.require(api!=null,"API quantity has no captured source");BindingContract.require(api.response(semantic).at(pointer.substring("/response".length(),slash)+"/unit").asText().equals(expected),"API quantity unit mismatch");}
-        else if(type.equals("INDEPENDENT_DB_ROWS")){boolean found=false;for(JsonNode row:observation.path("data").path("physicalCells"))if(row.path("dataset").equals(m.path("dataset"))&&row.path("attribute").equals(m.path("attribute"))){found=true;BindingContract.require(row.path("unit").asText().equals(expected),"Independent quantity/currency unit mismatch");}if(!found)BindingContract.require(observation.path("data").path("data").path("units").path(m.path("dataset").asText()).asText().equals(expected),"Empty quantity scope lacks independently observed unit");}
+        else if(type.equals("INDEPENDENT_DB_ROWS")){boolean found=false;for(JsonNode row:observation.path("data").path("physicalCells"))if(row.path("dataset").equals(m.path("dataset"))&&row.path("attribute").equals(m.path("attribute"))&&!row.path("scopeOnly").asBoolean(false)){found=true;BindingContract.require(row.path("unit").asText().equals(expected),"Independent quantity/currency unit mismatch");}if(!found)BindingContract.require(observation.path("data").path("data").path("units").path(m.path("dataset").asText()).asText().equals(expected),"Empty quantity scope lacks independently observed unit");}
         else {String name=m.path("metric").asText(),kind=name.equals("newInventoryQuantity")?"INVENTORY":name.equals("newPhysicalQuantity")?"PHYSICAL":"CONFIRMED_PHYSICAL";BindingContract.require(observation.path("data").path("data").path("units").path(kind).asText().equals(expected),"Effect quantity dimension/unit absent");for(JsonNode e:effects)for(JsonNode q:e.path("measurements"))if(q.path("kind").asText().equals(kind))BindingContract.require(q.path("unit").asText().equals(expected),"Effect quantity unit mismatch");}
     }
     public void preserveObligations(JsonNode before,JsonNode after,List<JsonNode> effects){

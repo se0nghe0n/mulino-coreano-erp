@@ -1,76 +1,165 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "type": "object",
-  "additionalProperties": false,
-  "required": [
-    "recipe",
-    "actorId",
-    "asOf",
-    "knownAt",
-    "request",
-    "rows",
-    "objectRowPointer",
-    "relationDataset",
-    "revision",
-    "recipeSources"
-  ],
-  "properties": {
-    "recipe": {
-      "const": "APPLICATION_QUERIES_V1_SIMPLE_OBJECT"
-    },
-    "actorId": {
-      "type": "string",
-      "minLength": 1
-    },
-    "asOf": {
-      "type": "string",
-      "minLength": 1
-    },
-    "knownAt": {
-      "type": "string",
-      "minLength": 1
-    },
-    "request": {
-      "type": "object"
-    },
-    "rows": {
+  "oneOf": [
+    {
       "type": "object",
+      "additionalProperties": false,
       "required": [
-        "object",
-        "relations"
+        "recipe",
+        "actorId",
+        "asOf",
+        "knownAt",
+        "request",
+        "rows",
+        "objectRowPointer",
+        "relationDataset",
+        "revision",
+        "recipeSources"
       ],
       "properties": {
-        "object": {
+        "recipe": {
+          "const": "APPLICATION_QUERIES_V1_SIMPLE_OBJECT"
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asOf": {
+          "type": "string",
+          "minLength": 1
+        },
+        "knownAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "request": {
           "type": "object"
         },
-        "relations": {
-          "type": "array"
+        "rows": {
+          "type": "object",
+          "required": [
+            "object",
+            "relations"
+          ],
+          "properties": {
+            "object": {
+              "type": "object"
+            },
+            "relations": {
+              "type": "array"
+            }
+          }
+        },
+        "objectRowPointer": {
+          "type": "string",
+          "pattern": "^/rawRows/"
+        },
+        "relationDataset": {
+          "const": "mulino_inventory_ObjectRelations"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "recipeSources": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256",
+              "sizeBytes"
+            ]
+          }
         }
       }
     },
-    "objectRowPointer": {
-      "type": "string",
-      "pattern": "^/rawRows/"
-    },
-    "relationDataset": {
-      "const": "mulino_inventory_ObjectRelations"
-    },
-    "revision": {
-      "type": "string",
-      "pattern": "^[0-9a-f]{64}$"
-    },
-    "recipeSources": {
-      "type": "array",
-      "minItems": 4,
-      "maxItems": 4,
-      "items": {
-        "type": "object",
-        "required": [
-          "path",
-          "sha256",
-          "sizeBytes"
-        ]
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recipe",
+        "version",
+        "actorId",
+        "asOf",
+        "knownAt",
+        "request",
+        "parameters",
+        "revision",
+        "inputs",
+        "datasets",
+        "recipeSources",
+        "documents"
+      ],
+      "properties": {
+        "recipe": {
+          "const": "APPLICATION_QUERIES_V2_BUSINESS_WORLD"
+        },
+        "version": {
+          "const": "1"
+        },
+        "actorId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asOf": {
+          "type": "string"
+        },
+        "knownAt": {
+          "type": "string"
+        },
+        "request": {
+          "type": "object"
+        },
+        "parameters": {
+          "type": "object"
+        },
+        "revision": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "inputs": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "^/rawRows/[^/]+/[0-9]+/[^/]+$"
+          }
+        },
+        "datasets": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string"
+          }
+        },
+        "recipeSources": {
+          "type": "array",
+          "minItems": 20,
+          "maxItems": 20,
+          "items": {
+            "type": "object",
+            "required": [
+              "path",
+              "sha256",
+              "sizeBytes"
+            ]
+          }
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "documentId",
+              "status"
+            ]
+          }
+        }
       }
     }
-  }
+  ]
 }

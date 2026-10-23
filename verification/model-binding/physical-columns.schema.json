@@ -2,54 +2,188 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "array",
   "items": {
-    "type": "object",
-    "additionalProperties": false,
-    "required": [
-      "dataset",
-      "attribute",
-      "table",
-      "column",
-      "rowId",
-      "value"
-    ],
-    "properties": {
-      "dataset": {
-        "type": "string",
-        "minLength": 1
+    "oneOf": [
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "dataset",
+          "attribute",
+          "table",
+          "column",
+          "rowId",
+          "value"
+        ],
+        "properties": {
+          "dataset": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attribute": {
+            "type": "string",
+            "minLength": 1
+          },
+          "table": {
+            "type": "string",
+            "minLength": 1
+          },
+          "column": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rowId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entityId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {},
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "physicalScopeId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rawRowPointer": {
+            "type": "string",
+            "pattern": "^/rawRows/[^/]+/[0-9]+/[^/]+$"
+          },
+          "kind": {
+            "enum": [
+              "RAW"
+            ]
+          }
+        }
       },
-      "attribute": {
-        "type": "string",
-        "minLength": 1
-      },
-      "table": {
-        "type": "string",
-        "minLength": 1
-      },
-      "column": {
-        "type": "string",
-        "minLength": 1
-      },
-      "rowId": {
-        "type": "string",
-        "minLength": 1
-      },
-      "entityId": {
-        "type": "string",
-        "minLength": 1
-      },
-      "value": {},
-      "unit": {
-        "type": "string",
-        "minLength": 1
-      },
-      "physicalScopeId": {
-        "type": "string",
-        "minLength": 1
-      },
-      "rawRowPointer": {
-        "type": "string",
-        "pattern": "^/rawRows/[^/]+/[0-9]+/[^/]+$"
+      {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "kind",
+          "dataset",
+          "attribute",
+          "rowId",
+          "value",
+          "recipe",
+          "recipeIndex"
+        ],
+        "properties": {
+          "kind": {
+            "const": "DERIVED"
+          },
+          "dataset": {
+            "type": "string",
+            "minLength": 1
+          },
+          "attribute": {
+            "type": "string",
+            "minLength": 1
+          },
+          "rowId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "value": {},
+          "unit": {
+            "type": "string",
+            "minLength": 1
+          },
+          "physicalScopeId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "scopeOnly": {
+            "type": "boolean"
+          },
+          "recipeIndex": {
+            "type": "integer",
+            "minimum": -1
+          },
+          "recipe": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "version",
+              "snapshotId",
+              "parameters",
+              "inputs",
+              "datasets",
+              "sources",
+              "documents"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^state\\."
+              },
+              "version": {
+                "const": "1"
+              },
+              "snapshotId": {
+                "type": "string",
+                "minLength": 1
+              },
+              "parameters": {
+                "type": "object"
+              },
+              "inputs": {
+                "type": "array",
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "pattern": "^/rawRows/[^/]+/[0-9]+/[^/]+$"
+                }
+              },
+              "datasets": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "sources": {
+                "type": "array",
+                "minItems": 6,
+                "maxItems": 6,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "path",
+                    "sha256"
+                  ],
+                  "properties": {
+                    "path": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "type": "string",
+                      "pattern": "^[0-9a-f]{64}$"
+                    }
+                  }
+                }
+              },
+              "documents": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "documentId",
+                    "status"
+                  ]
+                }
+              }
+            }
+          }
+        }
       }
-    }
+    ]
   }
 }

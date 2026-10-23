@@ -11,6 +11,7 @@ public final class PhysicalObservation {
     public static void validate(ContractValidator validator, JsonNode observation) throws IOException {
         validator.schema("verification/model-binding/physical-columns.schema.json", observation.path("physicalCells"));
         validateLineage(observation);
+        for(JsonNode cell:observation.path("physicalCells"))if(cell.path("kind").asText().equals("DERIVED"))PhysicalFactRecipes.validate(observation,cell,validator.root());
     }
     /** A zero reduction is valid only for a completely observed, explicitly mapped empty scope. */
     public static void requireColumnCoverage(JsonNode envelope,String dataset,String attribute) {
@@ -19,6 +20,16 @@ public final class PhysicalObservation {
         String pointer=Json.required(evidence,"rowPointer");
         BindingContract.require(pointer.matches("^/rawRows/[^/]+$")&&envelope.at(pointer).isArray(),"Independent column scope lacks raw rows");
         int count=0;
+        List<JsonNode> derived=new ArrayList<>();
+        for(JsonNode cell:envelope.path("physicalCells"))if(cell.path("dataset").asText().equals(dataset)&&cell.path("attribute").asText().equals(attribute)&&cell.path("kind").asText().equals("DERIVED"))derived.add(cell);
+        if(!derived.isEmpty()) {
+            Set<Integer> indexes=new HashSet<>();JsonNode recipe=derived.getFirst().path("recipe");
+            var inputs=(com.fasterxml.jackson.databind.node.ObjectNode)envelope.deepCopy();inputs.set("sourceDocuments",recipe.path("documents"));
+            var actual=PhysicalFactRecipes.compute(Json.required(recipe,"id"),inputs,recipe.path("parameters"));
+            for(JsonNode cell:derived){BindingContract.require(cell.path("recipe").equals(recipe)&&indexes.add(cell.path("recipeIndex").asInt()),"Duplicate/mixed derived recipe scope");}
+            BindingContract.require(actual.facts().isEmpty()?derived.size()==1&&derived.getFirst().path("scopeOnly").asBoolean(false):indexes.size()==actual.facts().size()&&indexes.stream().allMatch(i->i>=0&&i<actual.facts().size()),"Derived recipe coverage incomplete");
+            return;
+        }
         for(JsonNode cell:envelope.path("physicalCells"))if(cell.path("dataset").asText().equals(dataset)&&cell.path("attribute").asText().equals(attribute)) {
             BindingContract.require(cell.path("rawRowPointer").asText().startsWith(pointer+"/"),"Physical cell escapes its complete scope");count++;
         }
@@ -29,6 +40,7 @@ public final class PhysicalObservation {
         BindingContract.require(observation.path("physicalCells").isArray(), "Physical cells unobserved");
         Set<String> identities = new HashSet<>();
         for (JsonNode cell : observation.path("physicalCells")) {
+            if(cell.path("kind").asText().equals("DERIVED"))continue;
             String pointer = Json.required(cell, "rawRowPointer");
             BindingContract.require(pointer.matches("^/rawRows/[^/]+/[0-9]+/[^/]+$"), "Invalid physical cell lineage");
             JsonNode value = observation.at(pointer);

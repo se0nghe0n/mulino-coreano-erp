@@ -4,10 +4,19 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.mulino.verification.Json;
 import org.mulino.verification.modelbinding.ProjectionRevisionObservation;
+import org.mulino.verification.modelbinding.BusinessProjectionRecipes;
 import java.util.*;
 
 /** Recomputes the factual simple-object subset from the same independent JDBC capture. */
 final class NativeProjectionObserver {
+    static ObjectNode prove(JsonNode capture,JsonNode request,String actor,JsonNode parameters,NativeIntegrationEvidence store) throws Exception {
+        String type=request.path("scope").path("objectType").asText();
+        if(request.path("operation").asText().equals("getObject")&&Set.of("Place","Product","Manufacturer").contains(type))return prove(capture.path("rawRows"),request,actor,Json.required(capture,"asOf"),Json.required(capture,"knownAt"),store);
+        var proof=Json.object().put("recipe",BusinessProjectionRecipes.ID).put("version",BusinessProjectionRecipes.VERSION).put("actorId",actor).put("asOf",Json.required(capture,"asOf")).put("knownAt",Json.required(capture,"knownAt"));
+        proof.set("request",request.deepCopy());proof.set("parameters",parameters.deepCopy());proof.set("documents",capture.path("sourceDocuments"));
+        var computed=BusinessProjectionRecipes.compute(capture,proof);proof.put("revision",computed.revision());proof.set("inputs",computed.rows().pointers());proof.set("datasets",computed.rows().datasets());
+        var sources=Json.array();for(String source:BusinessProjectionRecipes.SOURCES)sources.add(store.source(source));proof.set("recipeSources",sources);return proof;
+    }
     static ObjectNode prove(JsonNode raw,JsonNode request,String actor,String asOf,String knownAt,NativeIntegrationEvidence store) throws Exception {
         String type=Json.required(request.path("scope"),"objectType");
         String table=switch(type){case "Place"->"mulino_inventory_Places";case "Product"->"mulino_inventory_Products";

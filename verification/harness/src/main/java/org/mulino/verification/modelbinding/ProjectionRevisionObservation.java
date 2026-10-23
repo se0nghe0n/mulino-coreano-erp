@@ -34,7 +34,7 @@ public final class ProjectionRevisionObservation {
         BindingContract.require(!row.has("itemId"), "Simple projection unexpectedly contains item scope");
         String org=Json.required(scope,"organizationId"), actor=Json.required(proof,"actorId");
         String asOf=Instant.parse(Json.required(proof,"asOf")).toString(), knownAt=Instant.parse(Json.required(proof,"knownAt")).toString();
-        var state=(com.fasterxml.jackson.databind.node.ObjectNode)row.deepCopy();state.set("relations",Json.array());
+        var state=(com.fasterxml.jackson.databind.node.ObjectNode)row.deepCopy();state.remove(List.of("__xmin","__tableoid"));state.set("relations",Json.array());
         String raw=org+"|"+actor+"|"+asOf+"|"+knownAt+"|"+canonical(scope)+"|"+canonical(state);
         return Json.sha256Text(raw);
     }
@@ -56,6 +56,15 @@ public final class ProjectionRevisionObservation {
         BindingContract.require(requested.path("projectionRequest").isObject()
             &&requested.path("projectionRequest").equals(proof.path("request")),"Independent revision needs original authenticated query scope");
         BindingContract.require(requested.path("projectionActorId").equals(proof.path("actorId")),"Projection actor differs from authenticated query actor");
+        if(proof.path("recipe").asText().equals(BusinessProjectionRecipes.ID)) {
+            BindingContract.require(proof.path("parameters").equals(requested.path("observationScope"))&&observation.path("scope").equals(requested.path("scope"))&&capture.path("scope").equals(observation.path("scope"))&&capture.path("sourceEvidence").equals(observation.path("sourceEvidence")),"Business projection observation scope/source differs");
+            Set<String> sourcePaths=new HashSet<>();
+            for(JsonNode source:proof.path("recipeSources")){String name=Json.required(source,"path");BindingContract.require(BusinessProjectionRecipes.SOURCES.contains(name)&&sourcePaths.add(name)&&Json.sha256(validator.path(name)).equals(source.path("sha256").asText()),"Business projection source changed");}
+            BindingContract.require(sourcePaths.equals(new HashSet<>(BusinessProjectionRecipes.SOURCES)),"Business projection sources incomplete");
+            var recomputed=BusinessProjectionRecipes.compute(observation,proof);
+            BindingContract.require(proof.path("inputs").equals(recomputed.rows().pointers())&&proof.path("datasets").equals(recomputed.rows().datasets()),"Business projection raw operands incomplete");
+            BindingContract.require(proof.path("revision").asText().equals(recomputed.revision())&&observation.path("snapshotRevision").asText().equals(recomputed.revision())&&requested.path("snapshotRef").asText().equals(recomputed.revision()),"Independent business projection revision mismatch");return;
+        }
         BindingContract.require(capture.at(Json.required(proof,"objectRowPointer")).equals(proof.path("rows").path("object")),"Projection object is not the captured DB row");
         var relations=Json.array();for(JsonNode row:capture.path("rawRows").path(Json.required(proof,"relationDataset")))
             if(row.path("sourceId").equals(proof.path("request").path("id")))relations.add(row);

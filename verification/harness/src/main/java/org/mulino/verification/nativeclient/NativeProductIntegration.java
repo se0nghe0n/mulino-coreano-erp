@@ -143,11 +143,12 @@ public final class NativeProductIntegration implements NativeClientIntegration {
                     return StepResult.missing(id,"NATIVE_INSTALLATION_SCOPE_MISMATCH");
                 if(!request.path("scope").path("installationId").equals(installedScope.path("installationId")))
                     return StepResult.missing(id,"NATIVE_INSTALLATION_SCOPE_MISMATCH");
-                var capture=request.has("projectionRequest")
-                    ?observer.capture(request.path("scope"),Json.required(request,"asOf"),Json.required(request,"knownAt"),request.path("projectionRequest"),Json.required(request,"projectionActorId"))
-                    :observer.capture(request.path("scope"),Json.required(request,"asOf"),Json.required(request,"knownAt"));
-                return missing(id,"MODEL_BINDING_OBSERVATION_NOT_IMPLEMENTED",capture);
-            }catch(Exception failure){return StepResult.missing(id,"NATIVE_POSTGRESQL_OBSERVATION_UNAVAILABLE");}
+                return observer.observe(id,request);
+            }catch(Exception failure){
+                String reason=failure.getMessage();
+                if(reason==null||!reason.matches("[A-Z0-9_:.]+"))reason="NATIVE_POSTGRESQL_OBSERVATION_UNAVAILABLE";
+                return missing(id,reason,Json.object().put("errorType",failure.getClass().getSimpleName()));
+            }
         }
         public StepResult control(String id,JsonNode control){return actual.control(id,control);}
         public StepResult start(String id,String route,JsonNode actor,String capability,JsonNode request){return StepResult.missing(id,"NATIVE_ASYNC_NOT_IMPLEMENTED");}
