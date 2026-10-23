@@ -157,12 +157,75 @@ class T17SourceFactsPostgresTest {
         var result=Json.parse(response.body());var artifact=Json.object().put("httpStatus",response.statusCode()).put("actor",actor).put("capability",capability);artifact.set("request",request);artifact.set("response",result);
         Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-"+request.path("commandIdempotencyKey").asText(capability+"-"+request.path("id").asText())+".json"),artifact.toPrettyString());return result;
     }
+    // Plan §6: accepting a report is provisional; only canonical confirmation
+    // applies physical delivery. These expectations belong to the test helper,
+    // independently of the case's unchanged business assertions.
+    boolean observationAction(JsonNode action) {
+        String capability=action.path("capabilityId").asText();
+        return Set.of("recordDelivery","recordObservedMovement").contains(capability)
+            &&!action.at("/request/slots").hasNonNull("canonicalOccurrenceId");
+    }
+    ObjectNode deliveryState()throws Exception {
+        var state=Json.object();
+        for(String table:List.of("mulino_inventory_QuantitySegments","mulino_inventory_QuantityMovements","mulino_inventory_SegmentAllocations","mulino_inventory_Dispatches","mulino_inventory_CargoScopes","mulino_inventory_DeliveryTransfers","mulino_trade_sales_Deliveries","mulino_trade_sales_ExecutionEffects","mulino_work_WorkContributions","mulino_work_read_AssessmentReferences","mulino_evaluation_InputSnapshots")) {
+            var rows=state.putArray(table);
+            try(var q=connection.prepareStatement("SELECT row_to_json(t)::text FROM "+table+" t WHERE organizationId=? ORDER BY ID")){
+                q.setString(1,org);try(var r=q.executeQuery()){while(r.next())rows.add(Json.parse(r.getString(1)));}
+            }
+        }
+        return state;
+    }
+    JsonNode authoredAction(JsonNode action,ObjectNode request)throws Exception {
+        boolean observation=observationAction(action);
+        var before=observation?deliveryState():null;
+        var result=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),request);
+        if(observation) {
+            assertTrue(Set.of("claim","delivery-provisional").contains(action.path("id").asText()),"Declare the exact observation action contract");
+            assertPendingObservation(action,request,result,before);
+        } else if(action.path("kind").asText().equals("query"))assertTrue(result.path("data").hasNonNull("ID"),result.toPrettyString());
+        // These two actions also have explicit denied-authority controls; their
+        // callers assert the exact positive or negative outcome and DB effect.
+        else if(!action.path("id").asText().equals("dispatch")&&!action.path("capabilityId").asText().equals("placeHold"))assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());
+        return result;
+    }
+    void assertPendingObservation(JsonNode action,ObjectNode request,JsonNode result,ObjectNode before)throws Exception {
+        var after=deliveryState();var proof=Json.object();proof.set("before",before);proof.set("after",after);
+        Files.writeString(Path.of(System.getenv("T17_TEST_EVIDENCE")).resolve(testName+"-"+action.path("id").asText()+"-provisional-state.json"),proof.toPrettyString());
+        assertEquals("ACCEPTED_PENDING_EXTERNAL",result.path("outcome").asText(),result.toPrettyString());
+        assertEquals(1,result.path("revision").asInt());
+        var slots=request.path("slots");String observation=slots.path("observationId").asText();
+        assertFalse(observation.isBlank());assertEquals(UUID.fromString(observation).toString(),observation);
+        assertEquals(Json.object().put("observationId",observation).put("physicalQuantity","0").put("contributedQuantity","0"),result.path("effects"));
+        assertEquals(before,after,"Provisional intake preserves physical, allocation, contribution and assessment rows");
+        try(var q=connection.prepareStatement("SELECT state,revision,rangeRootId,claimedRangeRootId,claimPayloadJson,eventId,workId FROM mulino_trade_sales_Observations WHERE organizationId=? AND ID=?")){
+            q.setString(1,org);q.setString(2,observation);try(var r=q.executeQuery()){
+                assertTrue(r.next());assertEquals("PROVISIONAL",r.getString(1));assertEquals(1,r.getInt(2));assertNull(r.getString(3));
+                assertEquals(slots.path("rangeRootId").asText(),r.getString(4));assertEquals(slots,Json.parse(r.getString(5)));
+                assertEquals(slots.path("eventId").asText(),r.getString(6));assertEquals(slots.path("workId").asText(),r.getString(7));assertFalse(r.next());
+            }
+        }
+        try(var q=connection.prepareStatement("SELECT o.ownerId,p.intakeOwnerId,a.kind,o.supervisorId,p.supervisorId,o.nextAction,o.nextCheckAt,o.quantity,o.unit,d.sourceId,d.sourceKind,d.scopeJson FROM mulino_work_read_ObligationReferences o JOIN mulino_responsibility_Roots d ON d.organizationId=o.organizationId AND d.ID=o.rootId JOIN mulino_evidence_Events e ON e.organizationId=o.organizationId AND e.ID=? JOIN mulino_evidence_SourceProfiles p ON p.organizationId=e.organizationId AND p.ID=e.sourceProfileId JOIN mulino_identity_Actors a ON a.organizationId=o.organizationId AND a.ID=o.ownerId WHERE o.organizationId=? AND o.kind='DELIVERY_RECONCILIATION' AND o.valid AND o.status='OPEN' AND d.scopeJson::jsonb->>'domainSourceId'=?")){
+            q.setString(1,slots.path("eventId").asText());q.setString(2,org);q.setString(3,observation);try(var r=q.executeQuery()){
+                assertTrue(r.next(),"Exactly one source-owned reconciliation duty");assertEquals(r.getString(2),r.getString(1));assertEquals("HUMAN",r.getString(3));assertEquals(r.getString(5),r.getString(4));
+                assertEquals(slots.path("nextAction").asText(),r.getString(6));assertEquals(java.time.Instant.parse(slots.path("nextCheckAt").asText()),r.getTimestamp(7).toInstant());
+                assertEquals(0,new BigDecimal(slots.path("quantity").asText()).compareTo(r.getBigDecimal(8)));assertEquals(slots.path("unit").asText(),r.getString(9));
+                assertEquals(result.path("commandId").asText(),r.getString(10));assertEquals("DECISION",r.getString(11));var scope=Json.parse(r.getString(12));
+                assertEquals(observation,scope.path("physicalScopeId").asText());assertEquals(slots.path("workId").asText(),scope.path("originalWorkId").asText());assertFalse(r.next());
+            }
+        }
+        try(var q=connection.prepareStatement("SELECT state,resultJson,canonicalIntentJson,actorId,effectClass FROM mulino_commands_CommandRecords WHERE organizationId=? AND ID=? AND capabilityId=? AND commandIdempotencyKey=?")){
+            q.setString(1,org);q.setString(2,result.path("commandId").asText());q.setString(3,action.path("capabilityId").asText());q.setString(4,request.path("commandIdempotencyKey").asText());try(var r=q.executeQuery()){
+                assertTrue(r.next());assertEquals("COMMITTED",r.getString(1));var stored=Json.parse(r.getString(2));assertEquals("ACCEPTED_PENDING_EXTERNAL",stored.path("outcome").asText());assertEquals(result.path("effects"),stored.path("effects"));
+                assertEquals(slots,Json.parse(r.getString(3)).path("slots"));assertEquals(id(action.path("actorRef").asText()),r.getString(4));assertEquals("RECORD",r.getString(5));assertFalse(r.next());
+            }
+        }
+    }
     @Test void authoredNoDispatchObservationUsesRealGateway()throws Exception {
         var cases=Json.read(root.resolve("verification/cases/T17/case.json"));JsonNode selected=null;for(var s:cases.path("subcases"))if("claim-nopriordispatch".equals(s.path("id").asText()))selected=s;
         assertNotNull(selected);var results=new HashMap<String,JsonNode>();var resolver=new org.mulino.verification.ReferenceResolver(results,aliases);
         for(var action:selected.path("actions"))if(Set.of("claim-source-document","claim-source-event","claim").contains(action.path("id").asText())){
-            var request=(ObjectNode)resolver.resolve(action.path("request"));var result=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),request);
-            assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",result);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
+            var request=(ObjectNode)resolver.resolve(action.path("request"));var result=authoredAction(action,request);
+            var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",result);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
         }
         var claim=results.get("claim").path("response");assertEquals("0",claim.path("effects").path("physicalQuantity").asText());assertEquals("0",claim.path("effects").path("contributedQuantity").asText());
         try(var s=connection.prepareStatement("SELECT intakeOwnerId,sourceNamespace,externalEventId FROM mulino_evidence_InboxRecords WHERE organizationId=? AND eventId=?")){
@@ -195,10 +258,8 @@ class T17SourceFactsPostgresTest {
             }
             var resolved=(ObjectNode)resolver.resolve(action.path("request"));
             if(action.path("id").asText().equals("complete-order-delivery-goal"))assertGoalBinding(resolved);
-            last=gateway(action.path("actorRef").asText(),action.path("capabilityId").asText(),resolved);
+            last=authoredAction(action,resolved);
             var wrapped=Json.object().put("driverStatus","EXECUTED");wrapped.set("response",last);wrapped.set("provenance",Json.object().put("scopeComplete",true).put("source","ACTUAL_HTTP_COMMAND_GATEWAY").put("authenticatedActor",id(action.path("actorRef").asText())));results.put(action.path("id").asText(),wrapped);
-            if(action.path("kind").asText().equals("query"))assertTrue(last.path("data").hasNonNull("ID"),last.toPrettyString());
-            else if(!action.path("id").asText().equals("dispatch")&&!action.path("capabilityId").asText().equals("placeHold"))assertEquals("APPLIED",last.path("outcome").asText(),last.toPrettyString());
         }
         return last;
     }
@@ -305,7 +366,7 @@ class T17SourceFactsPostgresTest {
     @Test void explicitDispatchLateDelivery()throws Exception {actualDelivery("late-restriction-actual-delivery","20","0");}
     @Test void explicitDispatchExpiredDelivery()throws Exception {actualDelivery("post-dispatch-expiry","20","0");}
     void actualClaim(String sid)throws Exception {
-        var result=allCommands(sid);assertEquals("APPLIED",result.path("outcome").asText(),result.toPrettyString());
+        var result=allCommands(sid);assertEquals("ACCEPTED_PENDING_EXTERNAL",result.path("outcome").asText(),result.toPrettyString());
         assertEquals("0",result.path("effects").path("physicalQuantity").asText());assertEquals("0",result.path("effects").path("contributedQuantity").asText());
         assertEquals(1,count("mulino_trade_sales_Observations"));assertEquals(0,count("mulino_trade_sales_Deliveries"));assertEquals(1,count("mulino_inventory_Dispatches"));assertEquals(2,count("mulino_inventory_QuantityMovements"));
         var slots=actionRequest(sid,"claim").path("slots");
