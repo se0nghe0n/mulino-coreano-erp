@@ -6,10 +6,14 @@
     먼저 사례 파일 "verification/cases/T12/case.json"의 "no-receipt-evidence"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
+    만일 "A" 역할이 "initial-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "initial-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "A" 역할이 "claim" 행동을 수행한다
+    만일 "A" 역할이 "assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -31,11 +35,15 @@
     먼저 사례 파일 "verification/cases/T12/case.json"의 "insufficient-source-scope"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
+    만일 "A" 역할이 "initial-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "initial-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "A" 역할이 "claim-document" 행동을 수행한다
     만일 "A" 역할이 "claim" 행동을 수행한다
+    만일 "A" 역할이 "assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -57,6 +65,8 @@
     먼저 사례 파일 "verification/cases/T12/case.json"의 "wrong-warehouse"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
+    만일 "A" 역할이 "initial-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "initial-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
@@ -66,6 +76,8 @@
     만일 "receiptSource" 역할이 "receipt-match" 행동을 수행한다
     만일 "receiptSource" 역할이 "receipt-canonical" 행동을 수행한다
     만일 "A" 역할이 "receipt" 행동을 수행한다
+    만일 "A" 역할이 "assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -84,6 +96,8 @@
     먼저 사례 파일 "verification/cases/T12/case.json"의 "conflicting-claims"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
+    만일 "A" 역할이 "initial-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "initial-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
@@ -91,6 +105,8 @@
     만일 "A" 역할이 "claim" 행동을 수행한다
     만일 "A" 역할이 "conflicting-claim-document" 행동을 수행한다
     만일 "A" 역할이 "conflicting-claim" 행동을 수행한다
+    만일 "A" 역할이 "assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -118,16 +134,22 @@
     만일 "receiptSource" 역할이 "receipt-match" 행동을 수행한다
     만일 "receiptSource" 역할이 "receipt-canonical" 행동을 수행한다
     만일 "A" 역할이 "receipt" 행동을 수행한다
+    만일 "A" 역할이 "late-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "late-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "late-assessment" 행동을 수행한다
     만일 "A" 역할이 "late-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "late-db" 행동을 수행한다
     만일 "A" 역할이 "resolve-quantity-duty" 행동을 수행한다
     만일 "A" 역할이 "before-revision" 행동을 수행한다
     만일 "A" 역할이 "revision" 행동을 수행한다
+    만일 "A" 역할이 "revised-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "revised-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "revised-assessment" 행동을 수행한다
     만일 "A" 역할이 "revised-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "revised-db" 행동을 수행한다
     만일 "A" 역할이 "correction" 행동을 수행한다
+    만일 "A" 역할이 "corrected-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "corrected-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "corrected-assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다

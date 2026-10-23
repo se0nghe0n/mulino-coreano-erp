@@ -210,7 +210,8 @@ def repair_inputs(case, fixture):
                                 caps.append("attachEvidence")
             output.append(action)
         sub["actions"] = output
-    return connect_observations(connect_sources(case, fixture), fixture)
+    from assessment_contracts import apply
+    return apply(connect_observations(connect_sources(case, fixture), fixture), fixture)
 
 
 # Each receipt keeps its original final action ID. These are authoritative Work

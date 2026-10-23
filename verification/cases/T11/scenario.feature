@@ -15,11 +15,17 @@
     만일 "receiptSource" 역할이 "receive90-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive90" 행동을 수행한다
     만일 "A" 역할이 "child30-link" 행동을 수행한다
+    만일 "A" 역할이 "child30-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "child30-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "child30-assessment" 행동을 수행한다
     만일 "A" 역할이 "child30-close" 행동을 수행한다
     만일 "A" 역할이 "child60-link" 행동을 수행한다
+    만일 "A" 역할이 "child60-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "child60-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "child60-assessment" 행동을 수행한다
     만일 "A" 역할이 "child60-close" 행동을 수행한다
+    만일 "A" 역할이 "parent-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "parent-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "parent-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-transfer-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-transfer-db" 행동을 수행한다
@@ -63,11 +69,17 @@
     만일 "receiptSource" 역할이 "receive90-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive90" 행동을 수행한다
     만일 "A" 역할이 "child30-link" 행동을 수행한다
+    만일 "A" 역할이 "child30-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "child30-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "child30-assessment" 행동을 수행한다
     만일 "A" 역할이 "child30-close" 행동을 수행한다
     만일 "A" 역할이 "child60-link" 행동을 수행한다
+    만일 "A" 역할이 "child60-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "child60-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "child60-assessment" 행동을 수행한다
     만일 "A" 역할이 "child60-close" 행동을 수행한다
+    만일 "A" 역할이 "parent-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "parent-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "parent-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-transfer-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-transfer-db" 행동을 수행한다
@@ -111,11 +123,17 @@
     만일 "receiptSource" 역할이 "receive90-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive90" 행동을 수행한다
     만일 "A" 역할이 "child30-link" 행동을 수행한다
+    만일 "A" 역할이 "child30-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "child30-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "child30-assessment" 행동을 수행한다
     만일 "A" 역할이 "child30-close" 행동을 수행한다
     만일 "A" 역할이 "child60-link" 행동을 수행한다
+    만일 "A" 역할이 "child60-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "child60-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "child60-assessment" 행동을 수행한다
     만일 "A" 역할이 "child60-close" 행동을 수행한다
+    만일 "A" 역할이 "parent-assessment-evaluation-work" 행동을 수행한다
+    만일 "assessmentEvaluator" 역할이 "parent-assessment-evaluate" 행동을 수행한다
     만일 "A" 역할이 "parent-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-transfer-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-transfer-db" 행동을 수행한다

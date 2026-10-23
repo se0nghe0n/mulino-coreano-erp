@@ -33,6 +33,8 @@ class AssessmentPostgresTest {
  static final Path KEY,BLOBS;
  static {try{PG.start();var g=java.security.KeyPairGenerator.getInstance("RSA");g.initialize(2048);KEY=Files.createTempFile("eval-public-",".pem");Files.writeString(KEY,"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(g.generateKeyPair().getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");BLOBS=Files.createTempDirectory("eval-blobs-");}catch(Exception e){throw new ExceptionInInitializerError(e);}}
  @DynamicPropertySource static void props(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY::toString);r.add("JWT_ISSUER",()->"https://evaluation.invalid");r.add("JWT_AUDIENCE",()->"evaluation");r.add("mulino.evidence.blob-root",BLOBS::toString);}
+ @Autowired ApplicationQueries queries;
+ @Autowired ApplicationCommands commands;
  @Autowired DefinitionValidator definitionValidator;
  @Autowired com.mulino.domain.inventory.StockPrimitives stock;
  @Autowired com.mulino.application.evidence.EvidenceRecords records;
@@ -53,7 +55,7 @@ class AssessmentPostgresTest {
   for(var e:Map.of("SpecificationVersions",spec,"PackagingVersions",pack).entrySet()){var r=scoped(e.getValue());r.putAll(row("productId",product,"version","1","contentHash","a".repeat(64)));insert("mulino_inventory_"+e.getKey(),r);}
   var i=scoped(item);i.putAll(row("productId",product,"name","fixture","baseUnit","BOX","decimalPlaces",0,"specificationVersionId",spec,"packagingVersionId",pack));insert("mulino_inventory_TradeItems",i);
   var predicate=Map.<String,Object>of("operator","quantitySum","property","Receipt.quantity","minimum",Map.of("value","1","unit","BOX"),"unit","BOX","evidenceSelector","VERIFIED_DISTINCT");
-  var d=new Definition(org,definition,"fixture-v1",null,"PUBLISHED",null,"core-v1","1.0.0",List.of(new Definition.NounType("Receipt",true)),List.of(new Definition.Attribute("Receipt","quantity",Definition.ValueType.DECIMAL,null,"BOX",0,1,1,"READ",true)),List.of(),List.of(),List.of(new Definition.Goal("Arrival","CUMULATIVE_EVENT","ARRIVED","core-v1",predicate)),List.of(new Definition.Capability("getAssessment","1.0.0","core-v1","1.0.0","1.0.0",List.of())));String content=json.writeValueAsString(d);
+  var d=new Definition(org,definition,"fixture-v1",null,"PUBLISHED",null,"core-v1","1.0.0",List.of(new Definition.NounType("Receipt",true)),List.of(new Definition.Attribute("Receipt","quantity",Definition.ValueType.DECIMAL,null,"BOX",0,1,1,"READ",true)),List.of(),List.of(),List.of(new Definition.Goal("Arrival","CUMULATIVE_EVENT","ARRIVED","core-v1",predicate)),List.of(new Definition.Capability("getAssessment","1.0.0","core-v1","1.0.0","1.0.0",List.of()),new Definition.Capability("assessGoal","1.0.0","core-v1","1.0.0","1.0.0",List.of())));String content=json.writeValueAsString(d);
   insert("mulino_definitions_DefinitionVersions",row("organizationId",org,"ID",definition,"version","fixture-v1","state","PUBLISHED","contentHash",DefinitionRepository.sha256(content),"content",content,"evaluatorVersion","core-v1","schemaVersion","1.0.0","createdAt",Timestamp.from(t.minusSeconds(100))));
   var w=scoped(work);w.putAll(row("effectiveAt",Timestamp.from(t.minusSeconds(100)),"itemId",item,"definitionVersionId",definition,"kind","PURCHASE","status","ACTIVE","ownerId",actor,"supervisorId",actor,"lifecycleMode","COMMAND"));insert("mulino_work_read_Works",w);
   var g=scoped(goal);g.putAll(row("effectiveAt",Timestamp.from(t.minusSeconds(100)),"workId",work,"definitionVersionId",definition,"quantityMode","CUMULATIVE_EVENT","targetQuantity",new BigDecimal("100"),"unit","BOX","endpoint","ARRIVED","scopeJson","{}","slotsJson",json.writeValueAsString(slots())));insert("mulino_work_read_GoalReferences",g);jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=? WHERE organizationId=? AND ID=?",goal,org,work);
@@ -308,8 +310,10 @@ class AssessmentPostgresTest {
   assertEquals("UNSATISFIED",stateAt(t.plusSeconds(20),t.plusSeconds(20)),"Known zero disproves throughout even when coverage is incomplete");
  }
 
- @Test void reviewedStateObservationIntervalProvidesCoverageOnlyAfterCanonicalLink()throws Exception{
-  String place=physicalTwenty();stockGoal(place,"THROUGHOUT",t);authorizeObservations();
+ @org.junit.jupiter.params.ParameterizedTest
+ @org.junit.jupiter.params.provider.ValueSource(booleans={true,false})
+ void reviewedStateObservationIntervalProvidesCoverageOnlyAfterCanonicalLink(boolean complete)throws Exception{
+  String place=physicalTwenty();stockGoal(place,"THROUGHOUT",t);readableWork();authorizeAssessmentRead();configureAssessmentCommandPolicy();
   String segment=jdbc.queryForObject("SELECT ID FROM mulino_inventory_QuantitySegments WHERE organizationId=?",String.class,org);
   try{
    var subject=new com.mulino.domain.evidence.EvidenceTypes.Subject(com.mulino.domain.evidence.EvidenceTypes.SubjectKind.SEGMENT,segment);
@@ -317,19 +321,107 @@ class AssessmentPostgresTest {
    // 00:00:10 boundary; a prose assertion alone cannot verify its coverage.
    String payload=json.writeValueAsString(Map.of("activityKind","STATE_OBSERVATION",
      "segmentId",segment,"placeId",place,"quantity","20","unit","BOX",
-     "coverageStart",t.minusSeconds(10).toString(),"coverageEnd",t.plusSeconds(10).minusNanos(1000).toString(),
+     "coverageStart",t.minusSeconds(10).toString(),"coverageEnd",(complete?t.plusSeconds(10).minusNanos(1000):t.minusSeconds(10)).toString(),
      "occurredAt",t.plusSeconds(10).toString(),"sourceNamespace","fixture","sourceVersion","1"));
    byte[] original=payload.getBytes(java.nio.charset.StandardCharsets.UTF_8);
    String doc=evidenceCall(()->records.attachDocument(new com.mulino.application.evidence.EvidenceRecords.DocumentInput(subject,"fixture","INTERVAL-20","application/json",LocalBlobStore.hash(original),"explicit interval original",null),original)).get("id").toString();
-   String event=evidenceCall(()->records.recordActivity(new com.mulino.application.evidence.EvidenceRecords.EventInput(subject,"STATE_OBSERVATION","fixture","INTERVAL-20","1",new com.mulino.domain.evidence.EvidenceTypes.EffectiveTime(t.minusSeconds(10),t.plusSeconds(10),"UTC","SECOND"),com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,payload,null,null))).get("id").toString();
+   String event=evidenceCall(()->records.recordActivity(new com.mulino.application.evidence.EvidenceRecords.EventInput(subject,"STATE_OBSERVATION","fixture","INTERVAL-20","1",new com.mulino.domain.evidence.EvidenceTypes.EffectiveTime(t.minusSeconds(10),complete?t.plusSeconds(10):null,"UTC","SECOND"),com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,payload,null,null))).get("id").toString();
    String claim=evidenceCall(()->records.recordClaim(new com.mulino.application.evidence.EvidenceRecords.ClaimInput(event,doc,"Observed full identified segment interval","20","BOX",com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,null))).get("id").toString();
-   assertEquals("UNVERIFIED",stateAt(t.plusSeconds(601),t.plusSeconds(1000)));
+   assertEquals("UNVERIFIED",publicAssessmentOutcome());
    var review=evidenceCall(()->reconciliation.match(auth.context(t.plusSeconds(600),t.plusSeconds(600)),new com.mulino.application.evidence.EvidenceReconciliation.Review(claim,doc,segment,null,"fixture-evidence-v1","fixture:INTERVAL-20:1","20","BOX",t.minusSeconds(10),"Original interval and identified segment checked"),"matchSourceIdentity"));
    assertEquals("MATCHED",review.get("outcome"));
-   assertEquals("UNVERIFIED",stateAt(t.plusSeconds(601),t.plusSeconds(1000)));
+   assertEquals("UNVERIFIED",publicAssessmentOutcome());
    evidenceCall(()->reconciliation.link(auth.context(t.plusSeconds(600),t.plusSeconds(600)),review.get("id").toString()));
-   assertEquals("SATISFIED",stateAt(t.plusSeconds(601),t.plusSeconds(1000)));
+   assertEquals(complete?"SATISFIED":"UNVERIFIED",publicAssessmentOutcome(),"Only a verified covering interval proves throughout");
    assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_inventory_QuantityMovements WHERE organizationId=?",Integer.class,org));
+  }finally{SecurityContextHolder.clearContext();}
+ }
+
+ void configureAssessmentCommandPolicy()throws Exception {
+  String content=json.writeValueAsString(Map.of("rules",Map.of("assessGoal",Map.of("effectClass","ASSESSMENT"))));String policyId=id();
+  insert("mulino_governance_PolicyVersions",row("organizationId",org,"ID",policyId,"version","assessment-command-v1","kind","COMMAND","content",content,"contentHash",DefinitionRepository.sha256(content),"createdAt",Timestamp.from(t.minusSeconds(100)),"effectiveFrom",Timestamp.from(t.minusSeconds(100))));
+  insert("mulino_governance_ActivePolicies",row("organizationId",org,"kind","COMMAND","policyId",policyId,"revision",0));
+ }
+ String publicAssessmentOutcome(){
+  var result=runtime.requestContext().run(c->{return commands.execute(row("intentKind","COMMAND","definitionVersion",definition,"capabilityId","assessGoal","subjectRefs",List.of(),"slots",Map.of("workId",work),"provenance",Map.of("workId","CONTEXT"),"expectedRevision",jdbc.queryForObject("SELECT revision FROM mulino_work_read_Works WHERE ID=?",Integer.class,work),"commandIdempotencyKey",id()));});
+  assertEquals("APPLIED",result.get("outcome"),result::toString);
+  String assessment=((Map<?,?>)result.get("effects")).get("assessmentId").toString();
+  var before=databaseState();var response=readAssessment(assessment,t.plusSeconds(600),t.plusSeconds(1000));
+  assertEquals(before,databaseState(),"The query after a public assessment performs no writes");
+  assertEquals(assessment,data(response).get("ID"));assertEquals(false,data(response).get("held"));
+  return data(response).get("outcome").toString();
+ }
+ void readableWork()throws Exception {
+  var snapshot=jdbc.queryForMap("SELECT * FROM mulino_work_read_Works WHERE organizationId=? AND ID=?",org,work);
+  // WorkReadRepository replays production transition snapshots, with CDS field case.
+  var value=new LinkedHashMap<String,Object>();
+  value.putAll(row("ID",work,"organizationId",org,"itemId",item,"currentGoalVersionId",snapshot.get("currentgoalversionid"),"definitionVersionId",definition,"status","ACTIVE","ownerId",actor,"supervisorId",actor,"revision",snapshot.get("revision"),"lifecycleMode","COMMAND","effectiveAt",t.minusSeconds(100).toString()));
+  insert("mulino_work_WorkTransitions",row("organizationId",org,"ID",id(),"workId",work,"revision",snapshot.get("revision"),"operation","createWork","state","ACTIVE","actorId",actor,"recordedAt",Timestamp.from(t.minusSeconds(100)),"snapshotJson",json.writeValueAsString(value)));
+ }
+ void authorizeAssessmentRead(){
+  authorizeObservations();
+  String grant=jdbc.queryForObject("SELECT ID FROM mulino_identity_Grants WHERE organizationId=?",String.class,org);
+  for(String cap:List.of("getAssessment","assessGoal")){
+   insert("mulino_identity_CapabilityAssignments",row("organizationId",org,"ID",id(),"actorId",actor,"capabilityId",cap,"scopeKind","ORGANIZATION","scopeId",org,"validFrom",Timestamp.from(t.minusSeconds(3600)),"validUntil",Timestamp.from(t.plusSeconds(3600))));
+   insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId",cap));
+  }
+ }
+ Map<String,Object> readAssessment(String target,Instant at,Instant known){return readAssessment(target,at,known,Map.of(),null);}
+ Map<String,Object> readAssessment(String target,Instant at,Instant known,Map<String,Object> scope,String snapshot){
+  return runtime.requestContext().run(c->{return queries.query(new QueryRequest("getAssessment",target,scope,Map.of(),50,null,null,at,known,snapshot));});
+ }
+ Map<?,?> data(Map<String,Object> response){return (Map<?,?>)response.get("data");}
+ Map<String,Object> databaseState(){
+  var result=new LinkedHashMap<String,Object>();
+  for(String table:List.of("mulino_work_read_Works","mulino_work_read_GoalReferences","mulino_work_read_AssessmentReferences","mulino_evaluation_InputSnapshots","mulino_work_read_ObligationReferences","mulino_inventory_QuantityMovements","mulino_commands_CommandRecords","mulino_runtime_Outbox"))
+   result.put(table,jdbc.queryForList("SELECT row_to_json(r)::text AS row FROM "+table+" r WHERE organizationId=? ORDER BY row_to_json(r)::text",org));
+  return result;
+ }
+ @Test void applicationRegistryReadsPersistedAssessmentByWorkAndIdWithoutWrites()throws Exception{
+  readableWork();authorizeAssessmentRead();
+  try{
+   assertTrue(queries.operations().contains("getAssessment"));
+   var before=databaseState();var pending=readAssessment(work,t,t.plusSeconds(1000));
+   assertEquals(true,data(pending).get("pending"));assertFalse(data(pending).containsKey("outcome"));assertFalse(data(pending).containsKey("ID"));
+   assertEquals(before,databaseState());
+   occurrence(id(),"60",t.minusSeconds(10),"first");var assessed=(Map<?,?>)assess(t).get("assessment");
+   before=databaseState();
+   var current=readAssessment(work,t,t.plusSeconds(1000));var explicit=readAssessment(assessed.get("ID").toString(),t,t.plusSeconds(1000));
+   assertEquals("UNSATISFIED",data(current).get("outcome"));assertEquals(assessed.get("ID"),data(current).get("ID"));
+   assertEquals(goal,data(current).get("goalId"));assertEquals(definition,data(current).get("definitionVersionId"));assertEquals(policy,data(current).get("policyVersionId"));
+   assertEquals(data(current),data(explicit));assertEquals(current.get("snapshotRevision"),explicit.get("snapshotRevision"));
+   assertEquals(1,((List<?>)data(current).get("inputSnapshots")).size());assertFalse(((List<?>)data(current).get("conditionResults")).isEmpty());
+   readAssessment(work,t,t.plusSeconds(1000),Map.of(),current.get("snapshotRevision").toString());
+   var scoped=runtime.requestContext().run(c->{return queries.query(new QueryRequest("getAssessment",null,Map.of("workId",work),Map.of(),50,null,null,t,t.plusSeconds(1000),null));});
+   assertEquals(assessed.get("ID"),data(scoped).get("ID"));
+   assertEquals("SNAPSHOT_CHANGED",assertThrows(DomainError.class,()->readAssessment(work,t,t.plusSeconds(1000),Map.of(),"wrong-snapshot")).code());
+   assertEquals(before,databaseState(),"All public reads leave business rows, commands and outbox unchanged");
+  }finally{SecurityContextHolder.clearContext();}
+ }
+ @Test void assessmentReadsHonorBothTimeBoundsPendingGoalAndCurrentAllOfGrant()throws Exception{
+  readableWork();authorizeAssessmentRead();
+  try{
+   var first=(Map<?,?>)assess(t).get("assessment");String firstId=first.get("ID").toString();
+   assertEquals(true,data(readAssessment(work,t,t.plusSeconds(599))).get("pending"),"Assessment recorded at +600 is invisible before knownAt");
+   occurrence(id(),"100",t.plusSeconds(5),"later");var second=(Map<?,?>)assess(t.plusSeconds(10)).get("assessment");
+   assertEquals(firstId,data(readAssessment(work,t,t.plusSeconds(1000))).get("ID"),"asOf excludes a future assessment even when known");
+   assertEquals(second.get("ID"),data(readAssessment(work,t.plusSeconds(10),t.plusSeconds(1000))).get("ID"));
+   assertEquals("UNVERIFIED",data(readAssessment(firstId,t.plusSeconds(10),t.plusSeconds(1000))).get("outcome"));
+   var changed=scoped(id());changed.putAll(row("effectiveAt",Timestamp.from(t),"workId",work,"definitionVersionId",definition,"quantityMode","CUMULATIVE_EVENT","targetQuantity",new BigDecimal("100"),"unit","BOX","endpoint","ARRIVED","scopeJson","{}","slotsJson",json.writeValueAsString(slots()),"previousGoalId",goal,"goalVersion",2));
+   insert("mulino_work_read_GoalReferences",changed);jdbc.update("UPDATE mulino_work_read_Works SET currentGoalVersionId=?,pendingInvalidation=true WHERE ID=?",changed.get("ID"),work);
+   jdbc.update("UPDATE mulino_work_read_Works SET revision=revision+1 WHERE ID=?",work);readableWork();
+   var pending=readAssessment(work,t.plusSeconds(10),t.plusSeconds(1000));assertEquals(true,data(pending).get("pending"));assertEquals(changed.get("ID"),data(pending).get("goalId"));assertFalse(data(pending).containsKey("outcome"));
+   assertEquals(firstId,data(readAssessment(firstId,t.plusSeconds(10),t.plusSeconds(1000))).get("ID"));
+   assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readAssessment(firstId,t,t.plusSeconds(1000),Map.of("organizationId",id()),null)).code());
+   assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readAssessment(firstId,t,t.plusSeconds(1000),Map.of("workId",id()),null)).code());
+   String grant=jdbc.queryForObject("SELECT ID FROM mulino_identity_Grants WHERE organizationId=?",String.class,org);
+   insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grant,"scopeKind","WORK","scopeId",work));
+   insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grant,"scopeKind","ITEM","scopeId",id()));
+   assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readAssessment(firstId,t,t.plusSeconds(1000))).code(),"An OR over grant dimensions would leak this assessment");
+   jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND scopeKind='ITEM'",org);
+   assertEquals(firstId,data(readAssessment(firstId,t,t.plusSeconds(1000))).get("ID"));
+   jdbc.update("UPDATE mulino_identity_Grants SET revokedAt=? WHERE organizationId=?",Timestamp.from(t.plusSeconds(1)),org);
+   assertEquals("FORBIDDEN",assertThrows(DomainError.class,()->readAssessment(firstId,t,t.plusSeconds(1000))).code(),"Past query time does not revive a revoked current grant");
   }finally{SecurityContextHolder.clearContext();}
  }
 

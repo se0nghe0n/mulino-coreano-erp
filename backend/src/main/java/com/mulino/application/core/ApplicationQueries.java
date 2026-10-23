@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.*;
 
 @Service
 public class ApplicationQueries {
-  private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","getAssessment","traceLot","getTrace");
+  private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","traceLot","getTrace");
   private final Map<String,QueryHandler> handlers=new HashMap<>();
   private final Set<String> worldOperations=new HashSet<>(WORLD);
   private final Set<String> objectTypes=new HashSet<>(Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer"));

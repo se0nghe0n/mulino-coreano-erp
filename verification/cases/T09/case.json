@@ -1332,6 +1332,63 @@
           }
         },
         {
+          "id": "cumulative-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "cumulative-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "cumulative-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "cumulative-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "cumulative-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "cumulative-assessment-evaluate"
+          }
+        },
+        {
           "id": "cumulative-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -1353,7 +1410,70 @@
                 "actionId": "cumulative",
                 "pointer": "/response/workId"
               }
+            },
+            "id": {
+              "$result": {
+                "actionId": "cumulative-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
+              }
             }
+          }
+        },
+        {
+          "id": "state-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "state-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "state",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "state-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "state-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "state-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "state-assessment-evaluate"
           }
         },
         {
@@ -1377,6 +1497,12 @@
               "$result": {
                 "actionId": "state",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "state-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -1689,7 +1815,7 @@
           "op": "equals",
           "source": {
             "actionId": "cumulative-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "SATISFIED",
           "requirementRefs": [
@@ -1731,11 +1857,11 @@
               "id": {
                 "$result": {
                   "actionId": "cumulative-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "SATISFIED"
@@ -1768,7 +1894,7 @@
           "op": "equals",
           "source": {
             "actionId": "state-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNSATISFIED",
           "requirementRefs": [
@@ -1810,11 +1936,11 @@
               "id": {
                 "$result": {
                   "actionId": "state-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNSATISFIED"
@@ -1898,7 +2024,7 @@
                 }
               }
             },
-            "field": "quantity"
+            "field": "targetQuantity"
           },
           "expected": [
             "100"
@@ -2322,7 +2448,7 @@
                 }
               }
             },
-            "field": "quantity"
+            "field": "targetQuantity"
           },
           "expected": [
             "100"
@@ -6229,6 +6355,63 @@
           }
         },
         {
+          "id": "assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "assessment-evaluate"
+          }
+        },
+        {
           "id": "assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -6249,6 +6432,12 @@
               "$result": {
                 "actionId": "work",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -6332,7 +6521,7 @@
           "op": "equals",
           "source": {
             "actionId": "assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNVERIFIED",
           "requirementRefs": [
@@ -6374,11 +6563,11 @@
               "id": {
                 "$result": {
                   "actionId": "assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNVERIFIED"
@@ -6477,7 +6666,7 @@
               {
                 "$result": {
                   "actionId": "initial-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             ],
@@ -6487,7 +6676,7 @@
               {
                 "$result": {
                   "actionId": "final-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             ]
@@ -7191,6 +7380,63 @@
           }
         },
         {
+          "id": "assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "work",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "work",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "assessment-evaluate"
+          }
+        },
+        {
           "id": "assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -7211,6 +7457,12 @@
               "$result": {
                 "actionId": "work",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -7294,7 +7546,7 @@
           "op": "equals",
           "source": {
             "actionId": "assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "SATISFIED",
           "requirementRefs": [
@@ -7336,11 +7588,11 @@
               "id": {
                 "$result": {
                   "actionId": "assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "SATISFIED"
@@ -7439,7 +7691,7 @@
               {
                 "$result": {
                   "actionId": "initial-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             ],
@@ -7449,7 +7701,7 @@
               {
                 "$result": {
                   "actionId": "final-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             ]
@@ -7487,7 +7739,7 @@
               "id": {
                 "$result": {
                   "actionId": "initial-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             },
@@ -7524,7 +7776,7 @@
               "id": {
                 "$result": {
                   "actionId": "initial-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             },
@@ -7541,7 +7793,7 @@
               "id": {
                 "$result": {
                   "actionId": "final-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             },
@@ -7578,7 +7830,7 @@
               "id": {
                 "$result": {
                   "actionId": "final-observation",
-                  "pointer": "/response/activityId"
+                  "pointer": "/response/id"
                 }
               }
             },
@@ -7626,7 +7878,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -8285,6 +8537,63 @@
           }
         },
         {
+          "id": "exists-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "exists-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "exists",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "exists-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "exists-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "exists",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "exists-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "exists-assessment-evaluate"
+          }
+        },
+        {
           "id": "exists-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -8306,7 +8615,70 @@
                 "actionId": "exists",
                 "pointer": "/response/workId"
               }
+            },
+            "id": {
+              "$result": {
+                "actionId": "exists-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
+              }
             }
+          }
+        },
+        {
+          "id": "state-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "state-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "state",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "state-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "state-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "state",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "state-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "state-assessment-evaluate"
           }
         },
         {
@@ -8331,7 +8703,70 @@
                 "actionId": "state",
                 "pointer": "/response/workId"
               }
+            },
+            "id": {
+              "$result": {
+                "actionId": "state-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
+              }
             }
+          }
+        },
+        {
+          "id": "throughout-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "throughout-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "throughout",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "throughout-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "throughout-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "throughout",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "throughout-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "throughout-assessment-evaluate"
           }
         },
         {
@@ -8355,6 +8790,12 @@
               "$result": {
                 "actionId": "throughout",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "throughout-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -8561,7 +9002,7 @@
           "op": "equals",
           "source": {
             "actionId": "exists-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "SATISFIED",
           "requirementRefs": [
@@ -8603,11 +9044,11 @@
               "id": {
                 "$result": {
                   "actionId": "exists-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "SATISFIED"
@@ -8640,7 +9081,7 @@
           "op": "equals",
           "source": {
             "actionId": "state-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNSATISFIED",
           "requirementRefs": [
@@ -8682,11 +9123,11 @@
               "id": {
                 "$result": {
                   "actionId": "state-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNSATISFIED"
@@ -8719,7 +9160,7 @@
           "op": "equals",
           "source": {
             "actionId": "throughout-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNSATISFIED",
           "requirementRefs": [
@@ -8761,11 +9202,11 @@
               "id": {
                 "$result": {
                   "actionId": "throughout-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNSATISFIED"
@@ -8861,7 +9302,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "exists-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -8974,7 +9415,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "state-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -9087,7 +9528,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "throughout-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -9142,7 +9583,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "state-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -9179,7 +9620,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "exists-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -9196,7 +9637,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "throughout-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -9233,7 +9674,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "exists-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },

@@ -117,3 +117,77 @@ native dynamic Workflow로 실행해야 한다.
 기록의 저장 revision1 주석도 제거했다. 물리 입력·269개 assertion은
 보존했고 입력12개·prepare가 통과했다. 새43개 병렬 Haiku 실행에서
 확정 이후의 업무 효과를 확인한다.
+
+## 2026-10-23 평가 조회 계약 수정
+
+이 절은 위의 과거 byte 보존·원래 assertion pointer 보존 기록보다
+최신이다. 기준은 `2c290f81cd3c2b32d4abf6c48f8072e9ccb624ef`이고
+격리 경로는
+`/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-088a36fe`다.
+시나리오 실행이나 전체 인수 완료를 주장하지 않는다.
+
+`getAssessment`는 `WorkReadHandler`의 공개 registry에서
+`WorkAssessmentRead`를 통해 실제 `AssessmentQueries`에 위임한다.
+Work ID는 현재 GoalVersion의 최신 가시 판정을, Assessment ID는 해당
+불변 판정을 읽는다. `asOf`와 `knownAt`, 현재 조직/WORK/ITEM의 all-of
+권한을 적용한다. 가시 판정이 없으면 결과를 만들지 않고 pending을
+반환한다. 입력 snapshot과 저장된 조건·버전을 반환하며 조회로 판정을
+생성하지 않는다. Assessment의 snapshot hash는 주변 Work world가 아닌
+실제 반환 평가 내용에 묶는다. action별 공급 읽기는 그대로 유지한다.
+
+26개 fixture에는 기존 `SYNTHETIC-policy-v1`의 내용 그대로 EVIDENCE
+PolicyVersion alias를 추가했다. 10월 1일부터 31일까지 활성화하며,
+기존 GoalVersion의 정책 이름·관측 구간·원문·실물·업무 담당자는 바꾸지
+않았다. 미지원 evaluator 반례도 그대로다. 평가 조회 27개 앞에는
+현재 Work revision 조회와 `assessGoal` 명령을 추가한다. 원래 조회는
+명령의 실제 `effects.assessmentId`를 명시 ID로 읽는다. 별도 평가자는
+ORG/ITEM all-of 범위의 `assessGoal` 권한만 가진다.
+
+126개 구조 바인딩 수정은 `assessment-binding-corrections.json`에
+before/after와 경로를 기록한다. Assessment의 `result`는 `outcome`,
+조회 identity는 `data.ID`, recordActivity identity는 `id`, Goal의
+`quantity`는 `targetQuantity`, `version`은 `goalVersion`으로 연결한다.
+269개 assertion의 ID·operator·업무 expected 값·수량·시간·scope·
+cardinality·근거는 그대로다. 원래 hash와 새 hash를 모두 검사하고,
+허용된 구조 수정만 역변환한 payload를 기준 commit과 비교한다.
+모든 원래 action 순서·역할·feature 문장·fixture 실물도 별도로 검사한다.
+
+### 통합 owner에게 남기는 정확한 경계
+
+- `./verify prepare`는 현재 `Unknown public capability "assessGoal"`로
+  exit3이다. 제품의 capability slot/handler/명령 정책에는 존재하지만
+  공통 `contracts/acceptance-capabilities.json`에는 빠져 있다.
+  이 파일은 이번 소유 범위 밖이므로 수정하지 않았다.
+- 공통 `ReferenceResolver`의 identity whitelist는 실제 조회 필드
+  `/response/data/ID`를 받지 않는다. WorkAssertionTest의 기존 synthetic
+  assessment 응답도 `/response/id` 형태다. 실제 제품에 가짜 alias를
+  추가하거나 검사를 우회하지 않았으며, 공통 resolver/test owner의
+  정렬이 필요하다.
+- T09 `cumulative-versus-state`, `exists-versus-end-throughout`는
+  명령 시계를 04시로 전진한 뒤 원래 `asOf=02시`의 판정을 요구한다.
+  `assessGoal`은 현재 시점만 평가하므로 04시 판정을 02시에 존재했던
+  판정으로 읽을 수 없다. 원래 시간 경계는 바꾸지 않았다. 과거 시점
+  명시 평가 계약을 추가할지, 원래 clock sequencing을 조정할지는
+  coordinator의 계약 판단이 필요하다.
+- `assessmentInputs`는 실제 SQL에서 평가당 InputSnapshots 행이다.
+  조건별 `conditionId/evidenceIds` 열은 없다. 조건은 `conditionsJson`의
+  `truth/inputs/evidenceRefs`이며 `arrived-at-W`, `due-by-T` selector와
+  평면 `result/quantityKnowledge`는 현재 발행 정의에 없다. 이 WHERE를
+  느슨하게 하거나 다른 projection으로 대체하지 않았다.
+- `evaluatedQuantity`, Goal의 평면 기간·관측 정책, 문자열
+  definition/policy/evaluator version tuple은 기존 oracle에 남지만
+  실제 응답·SQL 필드가 아니다. 정밀한 독립 SQL lineage나 공개 계약
+  변경 없이 임의로 expected 값·selector를 바꾸지 않았다.
+- T11 `resume-without-proof`의 과거 raw PASS는
+  `resumeEvidenceIds` slot 거부다. 실제 proof guard의 성공 증거가
+  아니며 의미 인수에서 제외한다. fixture의 미발행 resume predicate까지
+  확인해야 하므로 unsupported slot만 바꿔 성공을 주장하지 않는다.
+- T11의 오래된 Work link/close 입력, `/response/workRevision`과
+  T12 정정·의무 연결 입력은 기존 frontier를 유지한다. 평가 조회를
+  고쳤다는 이유로 해당 업무 경로가 통과했다고 보지 않는다.
+
+Spring/PostgreSQL 검증은 ApplicationQueries registry를 통한 Work/ID
+조회, 시간·GoalVersion·현재 철회/all-of·snapshot, 조회 전후 업무/명령/
+outbox 무변경을 포함한다. 실제 원문→대조→canonical 연결 전후의
+명시 공개 assessGoal은 완전 구간만 SATISFIED이고 점 관측은 UNVERIFIED다.
+정확한 최종 command·exit·log는 worker의 인계 결과에 기록한다.

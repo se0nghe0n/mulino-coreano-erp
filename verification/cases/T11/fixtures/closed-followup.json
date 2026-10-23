@@ -496,6 +496,43 @@
     },
     "warehouse": {
       "type": "Human"
+    },
+    "syntheticPolicyVersion": {
+      "type": "PolicyVersion",
+      "kind": "EVIDENCE",
+      "version": "SYNTHETIC-policy-v1",
+      "content": {
+        "version": "SYNTHETIC-policy-v1",
+        "synthetic": true,
+        "source": "fixture-policy-only",
+        "intakeOwnerAlias": "intake",
+        "supervisorAlias": "supervisor",
+        "temperatureResponse": "outside_2_8_C",
+        "anomalyFollowupOwnerAlias": "A",
+        "intakeNextAction": "온도 이상 원자료 확인",
+        "intakeNextCheckAt": "2026-10-08T09:00:00Z",
+        "goalObservationPolicy": "complete-initial-and-final-ledger",
+        "requiredObservationIntervals": [
+          [
+            "2026-10-07T00:00:00Z",
+            "2026-10-07T02:00:00Z"
+          ]
+        ],
+        "approvalRequirementForHandover": "ACTUAL_RECIPIENT_ACCEPTANCE",
+        "obligationResolution": "VERIFIED_EVIDENCE",
+        "waiverKinds": [
+          "ADMIN_RESPONSE_EXCEPTION"
+        ],
+        "currentSaleConditions": {
+          "QC": "PASS",
+          "regulatory": "ALLOWED",
+          "disposition": "ALLOWED",
+          "customer": "ALLOWED"
+        }
+      },
+      "effectiveFrom": "2026-10-01T00:00:00Z",
+      "effectiveUntil": "2026-10-31T23:59:59Z",
+      "activate": true
     }
   },
   "baseline": {

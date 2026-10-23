@@ -746,6 +746,63 @@
           }
         },
         {
+          "id": "child30-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "child30-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "child30-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "child30-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "child30",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "child30-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "child30-assessment-evaluate"
+          }
+        },
+        {
           "id": "child30-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -766,6 +823,12 @@
               "$result": {
                 "actionId": "child30",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "child30-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -802,7 +865,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "child30-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -890,6 +953,63 @@
           }
         },
         {
+          "id": "child60-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "child60-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "child60-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "child60-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "child60",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "child60-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "child60-assessment-evaluate"
+          }
+        },
+        {
           "id": "child60-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -910,6 +1030,12 @@
               "$result": {
                 "actionId": "child60",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "child60-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -946,7 +1072,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "child60-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -970,6 +1096,63 @@
           }
         },
         {
+          "id": "parent-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "parent-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "parent-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "parent-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "parent-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "parent-assessment-evaluate"
+          }
+        },
+        {
           "id": "parent-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -990,6 +1173,12 @@
               "$result": {
                 "actionId": "parent",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "parent-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -1829,7 +2018,7 @@
           "op": "equals",
           "source": {
             "actionId": "parent-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNSATISFIED",
           "requirementRefs": [
@@ -1871,11 +2060,11 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNSATISFIED"
@@ -1992,7 +2181,7 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             }
@@ -2028,7 +2217,7 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             }
@@ -2945,6 +3134,63 @@
           }
         },
         {
+          "id": "child30-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "child30-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "child30-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "child30-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "child30",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "child30-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "child30-assessment-evaluate"
+          }
+        },
+        {
           "id": "child30-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -2965,6 +3211,12 @@
               "$result": {
                 "actionId": "child30",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "child30-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -3001,7 +3253,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "child30-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -3089,6 +3341,63 @@
           }
         },
         {
+          "id": "child60-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "child60-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "child60-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "child60-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "child60",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "child60-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "child60-assessment-evaluate"
+          }
+        },
+        {
           "id": "child60-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -3109,6 +3418,12 @@
               "$result": {
                 "actionId": "child60",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "child60-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -3145,7 +3460,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "child60-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -3169,6 +3484,63 @@
           }
         },
         {
+          "id": "parent-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "parent-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "parent-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "parent-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "parent-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "parent-assessment-evaluate"
+          }
+        },
+        {
           "id": "parent-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -3189,6 +3561,12 @@
               "$result": {
                 "actionId": "parent",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "parent-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -4028,7 +4406,7 @@
           "op": "equals",
           "source": {
             "actionId": "parent-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNSATISFIED",
           "requirementRefs": [
@@ -4070,11 +4448,11 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNSATISFIED"
@@ -4191,7 +4569,7 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             }
@@ -4227,7 +4605,7 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             }
@@ -5144,6 +5522,63 @@
           }
         },
         {
+          "id": "child30-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "child30-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "child30",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "child30-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "child30-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "child30",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "child30-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "child30-assessment-evaluate"
+          }
+        },
+        {
           "id": "child30-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -5164,6 +5599,12 @@
               "$result": {
                 "actionId": "child30",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "child30-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -5200,7 +5641,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "child30-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -5288,6 +5729,63 @@
           }
         },
         {
+          "id": "child60-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "child60-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "child60",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "child60-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "child60-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "child60",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "child60-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "child60-assessment-evaluate"
+          }
+        },
+        {
           "id": "child60-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -5308,6 +5806,12 @@
               "$result": {
                 "actionId": "child60",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "child60-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -5344,7 +5848,7 @@
               "assessmentId": {
                 "$result": {
                   "actionId": "child60-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
@@ -5368,6 +5872,63 @@
           }
         },
         {
+          "id": "parent-assessment-evaluation-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "evidenceRefs": [
+            "parent-assessment-evaluation-work:actual-artifact"
+          ],
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          }
+        },
+        {
+          "id": "parent-assessment-evaluate",
+          "kind": "invoke",
+          "actorRef": "assessmentEvaluator",
+          "route": "api",
+          "capabilityId": "assessGoal",
+          "evidenceRefs": [
+            "parent-assessment-evaluate:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "assessGoal",
+            "subjectRefs": [],
+            "slots": {
+              "workId": {
+                "$result": {
+                  "actionId": "parent",
+                  "pointer": "/response/workId"
+                }
+              }
+            },
+            "provenance": {
+              "workId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "parent-assessment-evaluation-work",
+                "pointer": "/response/data/revision"
+              }
+            },
+            "commandIdempotencyKey": "parent-assessment-evaluate"
+          }
+        },
+        {
           "id": "parent-assessment",
           "kind": "query",
           "evidenceRefs": [
@@ -5388,6 +5949,12 @@
               "$result": {
                 "actionId": "parent",
                 "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "parent-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
               }
             }
           }
@@ -6227,7 +6794,7 @@
           "op": "equals",
           "source": {
             "actionId": "parent-assessment",
-            "pointer": "/response/data/result"
+            "pointer": "/response/data/outcome"
           },
           "expected": "UNSATISFIED",
           "requirementRefs": [
@@ -6269,11 +6836,11 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             },
-            "field": "result"
+            "field": "outcome"
           },
           "expected": [
             "UNSATISFIED"
@@ -6390,7 +6957,7 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             }
@@ -6426,7 +6993,7 @@
               "id": {
                 "$result": {
                   "actionId": "parent-assessment",
-                  "pointer": "/response/id"
+                  "pointer": "/response/data/ID"
                 }
               }
             }
