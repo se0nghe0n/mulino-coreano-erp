@@ -37,18 +37,18 @@ SHA-256이다. 최초 command/sourceVersion, assessment/input hash, 정의와 �
 효과 없는 human-nextAction HELD로 현재 책임을 보존한다. 이 kind의 자동 해소,
 수동 해소 증거, waiver 권한은 정의하지 않았다. transfer/accept는 기존 경로다.
 
-## DB 불변성 미해결 경계
+## 첫 proof의 DB 불변성
 
-V10의 Roots는 `(organizationId,dutyKey)` UNIQUE, root/scope/assignment FK와
-지연 수량 보존 검사, DELETE 금지를 갖는다. 그러나 UPDATE 금지가 없다.
-실제 PG에서 새 GOAL_QUANTITY_SHORTFALL root의 sourceVersion UPDATE가 성공해
-`firstRootProofMustBeDatabaseImmutable`가 RED다. 진단 transaction은 rollback한다.
+f2139fe0의 실제 PG 검사에서 Roots.sourceVersion UPDATE가 성공하는 RED를
+보존했다. V42는 OLD 또는 NEW kind가 GOAL_QUANTITY_SHORTFALL인 모든
+UPDATE를 거부한다. kind 진입/이탈, org/ID 변경과 동일값 UPDATE도 포함한다.
+기존 DELETE guard, 다른 kind의 UPDATE, scope/assignment의 transfer는 유지한다.
+새 table/column/PK/FK나 backfill은 없다. V41→V42 및 fresh V42 검사에서 기존
+column/constraint inventory와 최초 root 값이 동일한지 확인한다.
 
-새 table/column/PK/FK는 필요하지 않다. 이 kind를 OLD 또는 NEW kind로 갖는
-Roots의 UPDATE를 거부하는 forward trigger면 최초 proof의 불변성을 보장할 수
-있다. 다른 kind의 의미나 기존 migration checksum은 바꾸지 않는다. migration
-번호가 승인되지 않아 이번 경계에서는 migration을 추가하지 않는다.
-이 DB 불변성 RED가 해소되기 전에는 새 제품 경로의 전체 인수를 주장하지 않는다.
+`AssessmentService.require`는 target minimum과 일치하는 quantitySum leaf를
+센 뒤 정확히 하나일 때만 proof를 인정한다. 같은 target leaf 두 개가 마지막
+leaf 선택으로 통과하던 HTTP/PG RED는 별도 artifact로 보존한다.
 
 ## 별도 남은90
 
@@ -58,16 +58,32 @@ Roots의 UPDATE를 거부하는 forward trigger면 최초 proof의 불변성을 
 원래 alternative-close까지의 통과를 주장하지 않는다. 다음 경계는 실제
 미배분90의 별도 담당·배분·해소 방식에 대한 coordinator의 명시적 결정이다.
 
-## 이번 집중 검증
+## 집중 검증과 별도 합성 반례
 
-- 관련 backend 112 PASS, Python T11/T09 보존/vocabulary 33 PASS,
-  prepare asset checks 12 PASS다.
-- 실제 Spring/PG 결합 26개 중 25 PASS, 1 FAIL이다. 실패는 위 root UPDATE
-  불변성이다. 기존 child30/60 CLOSED·parent90 보존 3개도 이26개에 포함된다.
-- commit 전 fault의 FIRED 상태와 rollback, 동시 새 key의 단일 root 반환은
-  보강한 단일 HTTP/PG 검사로 다시 PASS했다.
-- 실제 실행 원문·첫 setup 오류·직렬화/replay 수정 전 실패·최종 실패와
-  source/JAR hash·정리는 `.local/t11-goal-shortfall/`에 보존한다.
-- 부족량이 실제로 달라지는 추가 수령, nonquantity/모호한 조건, assessment
-  없음/UNVERIFIED head의 별도 PG 반례는 이번 실행에 포함하지 않았다.
-  전체 backend/harness 및 원래 full flow/실모델도 재실행하지 않았다.
+이전 실행은 `.local/t11-goal-shortfall/`, V42 후속은
+`.local/t11-goal-shortfall-v42/`에 원문·JUnit·source/JAR hash·SQL·정리를
+보존한다. 후속 검사는 기존26 HTTP/PG, 추가 합성 정의·평가·수령 반례,
+backend evaluator/책임/migration, Python 보존/vocabulary, prepare를 구분한다.
+
+별도 합성 정의는 원본 fixture의 메모리 사본에만 적용한다. 실제 평가에서
+중복 target leaf, 비수량 timeIn 실패, shortfall에 미지원인 any 조건을 확인하고
+효과0으로 거부한다. 평가 없음은 공개 createDraft→activateWork 경로를 사용한다.
+UNVERIFIED는 실제 source 없는 Work를 assessGoal로 평가한다.
+
+추가5 수령은 새 문서·event·provisional·동일성 대조·canonical·confirmReceipt를
+실행한 별도 합성 물리 사실이다. 원래90과 별개 range/canonical이며 실제 부모
+인식량95/목표100을 확인한다. 현재 부족5 요청과 과거 부족10 요청 모두 현재
+assignment를 보존하는 HELD이며 최초 root10을 바꾸지 않는다. 원래 두 allocation,
+종료된 자식, 원본 미배분90은 유지한다. 추가5를 원래 fixture 사실로 쓰지 않는다.
+
+source 정정, goal revision, 정책 변경, open grant 폐기는 실제 이전 후에 검사한다.
+현재 권한이 없으면 책임의 상세를 공개하지 않고, source/정책 변경 시 기존
+root와 유효한 후속 assignment를 구조화 HELD로 돌려준다. resolve/waiver 의미는
+추가하지 않는다. 전체 backend/harness 및 원래 full flow/실모델은 재실행하지 않는다.
+
+V42 후속 최종 집중 검증은 backend115, HTTP/PG36(기존26+신규10),
+Python33, prepare12가 모두 PASS다. precision/scale까지 포함한 migration2를
+추가로 재검사했고, HELD 응답4개는 읽기 전용 SQL의 현재 assignment와
+owner/supervisor/nextAction/nextCheckAt를 대조했다. 수정 전 중복 leaf의
+APPLIED 반례(2 PASS/1 FAIL)는 `ambiguous-red/`에 보존한다.
+Task/Step의 통합 gate와 미배분90의 별도 업무 결정은 계속 OPEN이다.

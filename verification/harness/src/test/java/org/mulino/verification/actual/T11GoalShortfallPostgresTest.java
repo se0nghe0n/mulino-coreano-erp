@@ -29,13 +29,16 @@ class T11GoalShortfallPostgresTest {
         try(var s=w.db.prepareStatement("INSERT INTO mulino_identity_Grants(organizationId,ID,actorId,delegatorId,validFrom,validUntil,revision,createdAt,recordedAt) VALUES (?,?,?,?,'2026-10-01T00:00:00Z','2026-11-01T00:00:00Z',1,'2026-10-07T02:00:00Z','2026-10-07T02:00:00Z')")){s.setString(1,w.org);s.setString(2,grant);s.setString(3,actor);s.setString(4,actor);s.executeUpdate();}
         try(var s=w.db.prepareStatement("INSERT INTO mulino_identity_GrantActions(organizationId,grantId,capabilityId) VALUES (?,?,'openObligation')")){s.setString(1,w.org);s.setString(2,grant);s.executeUpdate();}
         try(var s=w.db.prepareStatement("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES (?,?,?,?)")){
-            var target=work(w);for(var scope:List.of(List.of("WORK",parent(w)),List.of("TARGET",parent(w)),List.of("ITEM",target.get("itemid").toString()),List.of("PLACE",w.rows("mulino_trade_receipt_Receipts").getFirst().get("placeid").toString()))){s.setString(1,w.org);s.setString(2,grant);s.setString(3,scope.get(0));s.setString(4,scope.get(1));s.executeUpdate();}
+            var target=work(w);for(var scope:List.of(List.of("WORK",parent(w)),List.of("TARGET",parent(w)),List.of("ITEM",target.get("itemid").toString()),List.of("PLACE",Json.parse(w.rows("mulino_work_read_GoalReferences").stream().filter(g->Objects.equals(g.get("id"),target.get("currentgoalversionid"))).findFirst().orElseThrow().get("slotsjson").toString()).path("placeId").asText()))){s.setString(1,w.org);s.setString(2,grant);s.setString(3,scope.get(0));s.setString(4,scope.get(1));s.executeUpdate();}
         }
         Json.write(w.evidence.resolve("NEW-synthetic-open-grant.json"),Json.object().put("actorId",actor).put("grantId",grant).put("capability","openObligation").put("originalFixturesUnchanged",true));
     }
     static ObjectNode request(T11ParentHttp w) throws Exception {
         var assessment=w.results.get("parent-assessment-evaluate").path("response").path("assessment");String aid=assessment.path("ID").asText();
         var source=w.rows("mulino_commands_CommandRecords").stream().filter(r->"assessGoal".equals(r.get("capabilityid"))&&r.get("resultjson")!=null&&r.get("resultjson").toString().contains(aid)).findFirst().orElseThrow();
+        return request(w,source);
+    }
+    static ObjectNode request(T11ParentHttp w,Map<String,Object> source) throws Exception {
         var goal=w.rows("mulino_work_read_GoalReferences").stream().filter(r->Objects.equals(workUnchecked(w).get("currentgoalversionid"),r.get("id"))).findFirst().orElseThrow();
         var scope=(ObjectNode)Json.parse(goal.get("slotsjson").toString()).path("scope").deepCopy();scope.put("workId",parent(w)).put("goalVersionId",goal.get("id").toString()).put("conditionId","Receipt.quantity");
         var p=Json.object().put("kind","GOAL_QUANTITY_SHORTFALL").put("workId",parent(w)).put("sourceKind","DECISION").put("sourceId",source.get("id").toString()).put("sourceVersion",source.get("canonicalhash").toString()).put("scopeJson",scope.toString()).put("quantity","10").put("unit","BOX").put("nextAction","남은10상자 수령 확인").put("nextCheckAt","2026-10-08T09:00:00Z");

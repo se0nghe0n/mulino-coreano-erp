@@ -80,7 +80,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     Definition d=definition(goal,c);var predicate=goalPredicate(d,slots);var leaves=new LinkedHashMap<String,Map<String,Object>>();quantityLeaves(predicate,"root",leaves);
     String unit=slots.get("unit").toString(),property=GoalQuantityProperty.resolve(d,template(d,slots).predicate(),unit);
     var target=new java.math.BigDecimal(slots.get("targetQuantity").toString());if(target.signum()<=0)throw shortfallUnavailable();
-    TypedPredicateEvaluator.Condition chosen=null;
+    TypedPredicateEvaluator.Condition chosen=null;int targetLeaves=0;
     for(var entry:leaves.entrySet()){
       var condition=current.result.conditions().stream().filter(x->x.conditionId().equals(entry.getKey())).findFirst().orElseThrow(AssessmentService::shortfallUnavailable);
       var node=entry.getValue();
@@ -88,10 +88,10 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
         if(!property.equals(node.get("property"))||!unit.equals(node.get("unit"))||node.get("minimum")==null||node.get("maximum")!=null)throw shortfallUnavailable();
         Object bound=node.get("minimum") instanceof Map<?,?> m?m.get("value"):node.get("minimum");
         var minimum=new java.math.BigDecimal(bound.toString());if(minimum.compareTo(target)>0)throw shortfallUnavailable();
-        if(minimum.compareTo(target)==0)chosen=condition;
+        if(minimum.compareTo(target)==0){chosen=condition;targetLeaves++;}
       }else if(condition.truth().state()!=PredicateTruth.State.SATISFIED||condition.truth().conflict())throw shortfallUnavailable();
     }
-    if(chosen==null)throw shortfallUnavailable();
+    if(targetLeaves!=1||chosen==null)throw shortfallUnavailable();
     var amount=TypedPredicateEvaluator.quantity(chosen.inputs(),unit,true);
     if(amount.uncertain()||amount.conflict()||amount.total().signum()<0||amount.total().compareTo(target)>=0)throw shortfallUnavailable();
     var scope=new LinkedHashMap<String,Object>(map(slots.get("scope")));scope.put("workId",workId);scope.put("goalVersionId",goal.get("ID"));scope.put("conditionId",property);

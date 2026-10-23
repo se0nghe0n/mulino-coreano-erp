@@ -24,12 +24,16 @@ final class T11ParentHttp implements AutoCloseable {
     final HttpClient http=HttpClient.newBuilder().connectTimeout(Duration.ofSeconds(10)).build();
     final JwtSigner signer=new JwtSigner(config);
 
-    T11ParentHttp(String name,String test) throws Exception {
+    T11ParentHttp(String name,String test) throws Exception {this(name,test,fixture->{});}
+    T11ParentHttp(String name,String test,java.util.function.Consumer<ObjectNode> diagnosticFixture) throws Exception {
         evidence=Path.of(System.getenv("T11_TEST_EVIDENCE")).resolve(test+"-"+name);Files.createDirectories(evidence);
         var c=Json.read(root.resolve("verification/cases/T11/case.json"));
         subcase=java.util.stream.StreamSupport.stream(c.path("subcases").spliterator(),false).filter(s->s.path("id").asText().equals(name)).findFirst().orElseThrow();
         fixture=(ObjectNode)Json.read(root.resolve(subcase.path("fixtureRef").asText()));
-        var bundle=Json.object().put("fixtureHash",Json.sha256(root.resolve(subcase.path("fixtureRef").asText())));bundle.set("fixture",fixture);
+        var originalFixture=fixture.deepCopy();diagnosticFixture.accept(fixture);
+        String fixtureHash=Json.sha256(root.resolve(subcase.path("fixtureRef").asText()));
+        if(!originalFixture.equals(fixture)){Json.write(evidence.resolve("NEW-synthetic-fixture.json"),fixture);String originalHash=fixtureHash;fixtureHash=Json.sha256(evidence.resolve("NEW-synthetic-fixture.json"));Json.write(evidence.resolve("fixture-provenance.json"),Json.object().put("originalSha256",originalHash).put("diagnosticSha256",fixtureHash).put("originalFileUnchanged",true));}
+        var bundle=Json.object().put("fixtureHash",fixtureHash);bundle.set("fixture",fixture);
         var bound=ActualFixtureBindings.bind(root,bundle,config);
         installed=ScenarioFixtureInstaller.install(config,root,bound,true);aliases=(ObjectNode)installed.path("aliasMap");org=aliases.path("ORG").asText();
         db=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());

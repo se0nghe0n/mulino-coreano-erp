@@ -51,7 +51,8 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
    }
    throw failure;
   }
-  if(p.get("quantity")==null||quantity(p.get("quantity")).compareTo(proof.shortfall())!=0||!text(p,"unit").equals(proof.unit())||!canonicalScope(text(p,"scopeJson")).equals(canonicalScope(json(proof.scope()))))throw DomainError.invalid("Requested shortfall quantity, unit or immutable goal scope differs from proof");
+  if(!text(p,"unit").equals(proof.unit())||!canonicalScope(text(p,"scopeJson")).equals(canonicalScope(json(proof.scope()))))throw DomainError.invalid("Requested shortfall unit or immutable goal scope differs from proof");
+  if(p.get("quantity")==null)throw DomainError.invalid("Missing shortfall quantity");var requestedQuantity=quantity(p.get("quantity"));
   String key=hash(json(List.of(c.organizationId(),workId,proof.goalId(),proof.conditionId())));r.fence(c.organizationId(),key);
   var old=r.rootByDutyKey(c.organizationId(),key);
   if(old.isPresent()){
@@ -60,8 +61,10 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
    for(var assignment:current){var scopes=new LinkedHashMap<>(shortfalls.scopes(c,workId));scopes.put("WORK",List.of(text(assignment,"workId")));auth.authorizeScopes(c,"openObligation",scopes);}
    var stored=scopeMap(text(root,"scopeJson"));var first=scopeMap(json(stored.get("proof")));
    if(!"GOAL_QUANTITY_SHORTFALL".equals(root.get("kind"))||quantity(root.get("quantity")).compareTo(proof.shortfall())!=0||!Objects.equals(root.get("unit"),proof.unit())||!Objects.equals(first.get("inputSnapshotHash"),proof.provenance().get("inputSnapshotHash")))throw ObligationClosureCatalog.held(current.getFirst(),"openObligation");
+   if(requestedQuantity.compareTo(proof.shortfall())!=0)throw DomainError.invalid("Requested shortfall quantity differs from proof");
    return Map.of("rootId",root.get("ID"),"assignments",current);
   }
+  if(requestedQuantity.compareTo(proof.shortfall())!=0)throw DomainError.invalid("Requested shortfall quantity differs from proof");
   human(c,text(w,"ownerId"));human(c,text(w,"supervisorId"));String action=text(p,"nextAction");Instant next=at(text(p,"nextCheckAt"));
   if(!next.isAfter(clock.instant()))throw DomainError.invalid("Shortfall nextCheckAt must be future");
   var stored=new LinkedHashMap<String,Object>(proof.scope());stored.put("proof",proof.provenance());
