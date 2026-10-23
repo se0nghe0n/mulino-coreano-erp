@@ -14,12 +14,13 @@ import org.springframework.stereotype.Component;
 /** Validated fulfillment decisions become part of the transaction's durable command result. */
 @Component
 public final class FulfillmentBasis {
+ private final com.mulino.domain.trade.regulatory.RegulatoryRepository regulatory;
  private final InventoryRepository inventory;
  private final QualityEligibility quality;
  private final ReadAuthorizer auth;
  private final EvidenceRepository evidence;
  private final LocalBlobStore blobs;
- public FulfillmentBasis(InventoryRepository inventory,QualityEligibility quality,ReadAuthorizer auth,EvidenceRepository evidence,LocalBlobStore blobs){this.inventory=inventory;this.quality=quality;this.auth=auth;this.evidence=evidence;this.blobs=blobs;}
+ public FulfillmentBasis(InventoryRepository inventory,QualityEligibility quality,ReadAuthorizer auth,EvidenceRepository evidence,LocalBlobStore blobs,com.mulino.domain.trade.regulatory.RegulatoryRepository regulatory){this.regulatory=regulatory;this.inventory=inventory;this.quality=quality;this.auth=auth;this.evidence=evidence;this.blobs=blobs;}
 
  public record Reason(String value) {
   public static Reason required(Map<String,Object> slots,String name){
@@ -31,7 +32,7 @@ public final class FulfillmentBasis {
  }
 
  /** Only earlier, actionable, unreserved current warehouse stock participates in FEFO. */
- public Map<String,Object> allocation(DomainContext c,String capability,Map<String,Object> selected,Map<String,Object> line,Map<String,Object> replaced,Reason reason){
+ public Map<String,Object> allocation(DomainContext c,String capability,Map<String,Object> selected,Map<String,Object> line,Map<String,Object> replaced,Reason reason,FulfillmentEvidencePurpose purpose){
   var expiry=expiry(c,selected);var earlier=new ArrayList<Map<String,Object>>();
   var allocations=inventory.currentRows(c,"SegmentAllocations");
   for(var candidate:inventory.currentRows(c,"QuantitySegments")){
@@ -40,7 +41,7 @@ public final class FulfillmentBasis {
    if(!"INTERNAL_STORAGE".equals(inventory.current(c,"Places",(String)candidate.get("placeId")).get("kind"))||!inventory.internalCustodian(c,(String)candidate.get("custodianId")))continue;
    var scopes=Map.of("TARGET",List.of((String)candidate.get("ID")),"ITEM",List.of((String)candidate.get("itemId")),"PLACE",List.of((String)candidate.get("placeId")),"WORK",List.of((String)line.get("workId")));
    if(!auth.permittedScopes(c,capability,scopes))continue;
-   var free=quality.assess(c,candidate,"SELL",(String)line.get("customerId")).ranges();
+   var free=quality.assessForFulfillment(c,candidate,"SELL",(String)line.get("customerId"),purpose.forSegment(c,(String)candidate.get("ID"))).ranges();
    for(var allocation:allocations)if(candidate.get("ID").equals(allocation.get("segmentId"))&&Set.of("EXECUTABLE","SUSPENDED").contains(allocation.get("state"))&&(replaced==null||!replaced.get("ID").equals(allocation.get("ID")))){
     if(allocation.get("startQuantity")==null){free=List.of();break;}
     free=QualityRanges.subtract(free,List.of(QualityEligibility.range(allocation)));
@@ -73,6 +74,14 @@ public final class FulfillmentBasis {
    if(!original.isObject()||!original.path("witnessKind").isTextual()||!"replacement-proof".equals(original.path("witnessKind").asText()))throw unverified();
   }catch(java.io.IOException malformed){throw unverified();}
   return Map.of("evidenceId",id,"evidenceHash",doc.get("sha256"),"evidenceType","replacement-proof","subjectKind",doc.get("subjectKind"),"subjectId",doc.get("subjectId"),"replacedAllocationId",old.get("ID"));
+ }
+ /** Freeze the source graph and regulatory heads used for this item's eligibility/FEFO.
+  * New sources appearing between preparation passes change the fence set and force retry.
+  */
+ public void addEligibilityFences(DomainContext c,Map<String,Object> segment,Set<String> fences){
+  for(var doc:evidence.rows("DocumentVersions",c.organizationId()))if(segment.get("itemId").equals(doc.get("itemId")))addEvidenceFences(c,(String)doc.get("ID"),fences);
+  for(var source:inventory.currentRows(c,"QuantitySegments"))if(segment.get("itemId").equals(source.get("itemId")))fences.add("inventory/segment/"+source.get("ID"));
+  for(var proc:regulatory.rows(c,"Procedures"))if(segment.get("itemId").equals(proc.get("itemId")))fences.add("regulatory/"+proc.get("ID"));
  }
  public void addEvidenceFences(DomainContext c,String id,Set<String> fences){
   var doc=evidence.require("DocumentVersions",c.organizationId(),id);

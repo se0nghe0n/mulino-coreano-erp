@@ -15,7 +15,8 @@ public class EvidenceQueries implements QueryHandler {
   private final ReadAuthorizer auth;
   private final LocalBlobStore blobs;
   private final ExecutionClock clock;
-  public EvidenceQueries(EvidenceRepository r,ReadAuthorizer auth,LocalBlobStore blobs,ExecutionClock clock) { this.r=r; this.auth=auth; this.blobs=blobs; this.clock=clock; }
+  private final CanonicalEvidenceVerification verification;
+  public EvidenceQueries(EvidenceRepository r,ReadAuthorizer auth,LocalBlobStore blobs,ExecutionClock clock) { this.r=r; this.auth=auth; this.blobs=blobs; this.clock=clock; this.verification=new CanonicalEvidenceVerification(r,blobs,auth); }
   public Set<String> operations() { return Set.of("getEvidence","getInbox","getReconciliation"); }
   @Transactional(readOnly=true)
   public QueryResult query(DomainContext c,QueryRequest q) {
@@ -82,20 +83,9 @@ public class EvidenceQueries implements QueryHandler {
     return new QueryResult(q.id()==null?selected:selected.getFirst(),q.scope(),unknowns,conflicts,refs.stream().distinct().toList(),next);
   }
   public boolean verifiedAt(DomainContext c,String canonicalId) {
-    return r.rows("Verifications",c.organizationId()).stream().anyMatch(v->{
-      if(!canonicalId.equals(v.get("canonicalOccurrenceId"))||!"VERIFIED".equals(v.get("verdict"))||!visible(v,c))return false;
-      var claim=r.require("Claims",c.organizationId(),v.get("claimId").toString());
-      var event=r.require("Events",c.organizationId(),claim.get("eventId").toString());
-      var basis=r.require("DocumentVersions",c.organizationId(),v.get("basisDocumentId").toString());
-      if(!auth.permittedScopes(c,"getEvidence",scopes(claim))||!auth.permittedScopes(c,"getEvidence",scopes(event))||!auth.permittedScopes(c,"getEvidence",scopes(basis))
-          ||!"AVAILABLE".equals(basis.get("availability"))||basis.get("blobId")==null||!blobs.available(UUID.fromString(basis.get("blobId").toString()),basis.get("sha256").toString()))return false;
-      if(r.rows("Events",c.organizationId()).stream().anyMatch(x->visible(x,c)&&(event.get("ID").equals(x.get("invalidatesId"))||event.get("ID").equals(x.get("supersedesId")))))return false;
-      if(r.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->visible(x,c)&&basis.get("ID").equals(x.get("supersedesId"))))return false;
-      if(r.rows("Claims",c.organizationId()).stream().anyMatch(x->visible(x,c)&&claim.get("ID").equals(x.get("supersedesId"))))return false;
-      long variants=r.rows("InboxRecords",c.organizationId()).stream().filter(x->visible(x,c)&&Objects.equals(event.get("sourceNamespace"),x.get("sourceNamespace"))&&Objects.equals(event.get("externalEventId"),x.get("externalEventId"))&&Objects.equals(event.get("sourceVersion"),x.get("sourceVersion"))).count();
-      return variants==1;
-    });
+    return verification.verifiedForRead(c,canonicalId);
   }
+
   @Transactional(readOnly=true)
   public Download download(String id) {
     var now=clock.instant();DomainContext c=auth.context(now,now);

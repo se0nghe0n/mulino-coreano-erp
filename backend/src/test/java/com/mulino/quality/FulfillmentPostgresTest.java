@@ -12,6 +12,8 @@ import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -748,4 +750,162 @@ class FulfillmentPostgresTest {
   doThrow(new IllegalStateException("rollback release")).when(impact).invalidate(any(),anyString());assertThrows(IllegalStateException.class,()->apply(envelope("releaseAllocation",map("allocationId",a,"reason","Customer cancelled"),0)));assertEquals("EXECUTABLE",allocationState(a));reset(impact);
   var released=run("releaseAllocation",map("allocationId",a,"reason","Customer cancelled"),0);assertEquals("RELEASED",allocationState(a));String result=jdbc.queryForObject("SELECT c.resultJson FROM mulino_commands_CommandRecords c JOIN mulino_commands_CommandAudits a ON a.commandId=c.ID AND a.organizationId=c.organizationId WHERE c.ID=? AND a.outcome='APPLIED'",String.class,released.get("commandId"));assertEquals("Customer cancelled",json.readTree(result).path("effects").path("fulfillmentBasis").path("reason").asText());assertEquals(a,json.readTree(result).path("effects").path("fulfillmentBasis").path("releasedAllocationId").asText());}
 
+ // T09: internal fulfillment proof consumes real source facts independently of public evidence reads.
+  void noEvidenceRead() {
+    jdbc.update("DELETE FROM mulino_identity_CapabilityAssignments WHERE organizationId=? AND actorId=? AND capabilityId='getEvidence'",org,actor);
+    jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE organizationId=? AND grantId=? AND capabilityId='getEvidence'",org,grant);
+  }
+  String qualityDocument(){return jdbc.queryForObject("SELECT evidenceRef FROM mulino_inventory_DispositionBases WHERE category='QC' AND action='SELL' AND segmentId=?",String.class,segment);}
+  void assertPublicReadDenied(String document){
+    RuntimeException denied=assertThrows(RuntimeException.class,()->read("getEvidence",document,map("organizationId",org),now,now));
+    assertTrue(denied instanceof DomainError||denied instanceof org.springframework.security.access.AccessDeniedException,denied.toString());
+    assertThrows(RuntimeException.class,()->runtime.requestContext().run(ctx->{return evidenceQueries.download(document);}));
+  }
+  @org.springframework.beans.factory.annotation.Autowired com.mulino.application.evidence.EvidenceQueries evidenceQueries;
+  void assertNoStockEffect(){assertEquals(0,count("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations"));assertEquals(0,count("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements"));}
+  Map<String,Object> dispatchInput(String allocation){return envelope("dispatchQuantity",map("allocationId",allocation,"transitPlaceId",transit,"occurredAt",now.toString(),"evidenceRef","synthetic warehouse dispatch"),1);}
+
+  @Test void internalVerifiedFactsAllowReservePickDispatchWithoutPublicEvidenceRead(){
+    allow("100");allowDispatch();String document=qualityDocument();noEvidenceRead();assertPublicReadDenied(document);
+    // Read defaults keep their old semantics even when execution has its own proof path.
+    assertEquals(0,assess().eligibleQuantity().signum());
+    var query=read("getInventory",null,map("organizationId",org,"itemId",item),now,now);
+    assertEquals("0",((Map<?,?>)query.get("data")).get("eligibleQuantity"));
+    var input=envelope("reserveQuantity",reserveSlots(segment),0);
+    var validation=runtime.requestContext().run(ctx->{return gateway.validate(input);});assertEquals("VALIDATED",validation.get("outcome"));assertNoStockEffect();
+    var reserved=apply(input);
+    assertEquals("APPLIED",reserved.get("outcome"),reserved.toString());assertEquals(reserved.get("commandId"),apply(input).get("commandId"));
+    String a=effects(reserved).get("allocationId").toString();assertEquals(1,count("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations"));
+    run("pickQuantity",map("allocationId",a),0);now=now.plusSeconds(1);
+    var dispatched=apply(dispatchInput(a));assertEquals("APPLIED",dispatched.get("outcome"),dispatched.toString());
+    assertEquals("CONSUMED",allocationState(a));assertEquals(1,count("SELECT COUNT(*) FROM mulino_inventory_Dispatches"));
+    assertEquals(0,new java.math.BigDecimal("20").compareTo(sum("SELECT SUM(quantity) FROM mulino_inventory_QuantityMovements WHERE kind='DISPATCH'")));
+    assertFalse(dispatched.toString().contains("contentBase64"));assertFalse(dispatched.toString().contains("blobId"));assertPublicReadDenied(document);
+  }
+  @Test void internalSellFactsCannotAuthorizeDispatch(){
+    allow("100");noEvidenceRead();String a=reserve("0","20");run("pickQuantity",map("allocationId",a),0);
+    assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",code(apply(dispatchInput(a))));
+    assertEquals(0,count("SELECT COUNT(*) FROM mulino_inventory_Dispatches"));assertEquals("EXECUTABLE",allocationState(a));
+  }
+  @Test void internalFefoStillSeesEarlierEligibleStockWithoutPublicRead(){
+    allow("100");String earlier=earlierStock(true);noEvidenceRead();
+    assertEquals("TYPE_INVALID",code(apply(envelope("reserveQuantity",reserveSlots(segment),0))));assertNoStockEffect();
+    var slots=reserveSlots(segment);slots.put("FEFOExceptionReason","Customer selected later expiry");
+    var result=run("reserveQuantity",slots,0);assertTrue(effects(result).get("fulfillmentBasis").toString().contains(earlier));
+  }
+  @ParameterizedTest @ValueSource(strings={"TARGET","ITEM","PLACE","WORK","SOURCE"})
+  void internalAllOfRejectsWrongDimension(String wrong){
+    allow("100");noEvidenceRead();
+    jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE organizationId=? AND grantId=?",org,grant);
+    String saleWork=jdbc.queryForObject("SELECT workId FROM mulino_trade_sales_OrderLines WHERE ID=?",String.class,salesLine);
+    for(var e:map("TARGET",segment,"ITEM",item,"PLACE",place,"WORK",saleWork,"SOURCE",profile).entrySet())
+      insert("mulino_identity_GrantScopes",map("organizationId",org,"grantId",grant,"scopeKind",e.getKey(),"scopeId",e.getKey().equals(wrong)?id():e.getValue()));
+    if(!wrong.equals("WORK")&&!saleWork.equals(work))insert("mulino_identity_GrantScopes",map("organizationId",org,"grantId",grant,"scopeKind","WORK","scopeId",work));
+    assertNotEquals("APPLIED",apply(envelope("reserveQuantity",reserveSlots(segment),0)).get("outcome"));assertNoStockEffect();
+  }
+  @ParameterizedTest @ValueSource(strings={"assignment","action","membership","expired","delegator"})
+  void internalCurrentAuthorityStillRequired(String missing){
+    allow("100");noEvidenceRead();
+    switch(missing){
+      case "assignment"->jdbc.update("DELETE FROM mulino_identity_CapabilityAssignments WHERE actorId=? AND capabilityId='reserveQuantity'",actor);
+      case "action"->jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE grantId=? AND capabilityId='reserveQuantity'",grant);
+      case "membership"->jdbc.update("UPDATE mulino_identity_Memberships SET revokedAt=? WHERE actorId=?",Timestamp.from(now),actor);
+      case "expired"->jdbc.update("UPDATE mulino_identity_Grants SET validUntil=? WHERE ID=?",Timestamp.from(now),grant);
+      case "delegator"->jdbc.update("UPDATE mulino_identity_Grants SET delegatorId=? WHERE ID=?",manager,grant);
+    }
+    assertNotEquals("APPLIED",apply(envelope("reserveQuantity",reserveSlots(segment),0)).get("outcome"));assertNoStockEffect();
+  }
+  @ParameterizedTest @ValueSource(strings={"missing","raw","unverified","mismatch"})
+  void internalUnadmittedQualitySourceStaysEffectZero(String stage){
+    regulatory("100");basis("CUSTOMER","100");basis("COMMERCIAL","100");
+    if(!stage.equals("missing")){
+      var source=permission("recordDispositionBasis","QC","100");String bytes=write(source);
+      String doc=stage.equals("mismatch")?evidence(source,"QUALITY_QC"):attachJson(map("kind","SEGMENT","id",segment),bytes);
+      if(stage.equals("unverified"))run("recordActivity",map("subject",map("kind","SEGMENT","id",segment),"kind","QUALITY_DECISION_recordDispositionBasis_QC","sourceNamespace","quality-source","externalEventId",source.get("sourceDecisionId"),"sourceVersion","1","effectiveFrom",now.toString(),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","payload",bytes,"documentId",doc,"assertion","Unverified source","quantity","100","unit","EA"),null);
+      if(stage.equals("mismatch")){
+        source.remove("operation");source.remove("sourceDecisionId");source.remove("sourceVersion");source.putAll(map("quantity","99","evidenceId",doc,"reason","Mismatched source quantity","nextCheckAt",now.plusSeconds(60).toString()));
+        assertNotEquals("APPLIED",apply(envelope("recordDispositionBasis",source,0)).get("outcome"));
+      }
+    }
+    noEvidenceRead();assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",code(apply(envelope("reserveQuantity",reserveSlots(segment),0))));assertNoStockEffect();
+  }
+  @ParameterizedTest @ValueSource(strings={"document","event","claim","blob","variants","expired"})
+  void internalSupersededUnavailableOrConflictingSourcesStayEffectZero(String fault)throws Exception{
+    allow("100");String doc=qualityDocument();
+    var graph=jdbc.queryForMap("SELECT e.ID AS eventid,c.ID AS claimid,e.externalEventId,e.payload FROM mulino_evidence_Verifications v JOIN mulino_evidence_Claims c ON c.ID=v.claimId JOIN mulino_evidence_Events e ON e.ID=c.eventId WHERE v.basisDocumentId=?",doc);
+    if(Set.of("event","claim").contains(fault))now=now.plusSeconds(1);
+    if(fault.equals("document"))supersedeReplacementProof(doc);
+    if(fault.equals("event"))run("correctEvidence",map("evidenceType","EVENT","subject",map("kind","SEGMENT","id",segment),"kind","QUALITY_DECISION_recordDispositionBasis_QC","sourceNamespace","quality-source","externalEventId",graph.get("externaleventid"),"sourceVersion","2","effectiveFrom",now.toString(),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","payload",graph.get("payload"),"supersedesId",graph.get("eventid"),"documentId",doc,"assertion","Corrected source","quantity","100","unit","EA"),1);
+    if(fault.equals("claim"))run("correctEvidence",map("evidenceType","CLAIM","subject",map("kind","SEGMENT","id",segment),"sourceNamespace","quality-source","eventId",graph.get("eventid"),"documentId",doc,"assertion","Corrected claim","quantity","100","unit","EA","valueState","KNOWN","supersedesId",graph.get("claimid")),1);
+    if(fault.equals("blob"))Files.delete(BLOBS.resolve("objects").resolve(jdbc.queryForObject("SELECT blobId FROM mulino_evidence_DocumentVersions WHERE ID=?",String.class,doc)));
+    if(fault.equals("variants"))run("recordActivity",map("subject",map("kind","SEGMENT","id",segment),"kind","QUALITY_DECISION_recordDispositionBasis_QC","sourceNamespace","quality-source","externalEventId",graph.get("externaleventid"),"sourceVersion","1","effectiveFrom",now.toString(),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","payload","{\"conflictingSource\":true}","documentId",doc,"assertion","Conflicting source","quantity","100","unit","EA"),null);
+    if(fault.equals("expired"))now=now.plusSeconds(101);
+    noEvidenceRead();assertNotEquals("APPLIED",apply(envelope("reserveQuantity",reserveSlots(segment),0)).get("outcome"),fault);assertNoStockEffect();
+  }
+  @Test void internalDatabaseRejectsCanonicalAndVerificationTampering(){
+    allow("100");String doc=qualityDocument(),canonical=occurrence(doc);
+    for(var change:List.<Runnable>of(
+        ()->jdbc.update("DELETE FROM mulino_evidence_Verifications WHERE basisDocumentId=?",doc),
+        ()->jdbc.update("UPDATE mulino_evidence_Verifications SET identityMatched=false WHERE basisDocumentId=?",doc),
+        ()->jdbc.update("UPDATE mulino_evidence_CanonicalOccurrences SET quantity=99 WHERE ID=?",canonical),
+        ()->jdbc.update("UPDATE mulino_evidence_CanonicalOccurrences SET physicalScopeId=? WHERE ID=?",id(),canonical),
+        ()->jdbc.update("UPDATE mulino_evidence_Verifications SET policyVersion='other' WHERE basisDocumentId=?",doc)))
+      assertThrows(org.springframework.dao.DataIntegrityViolationException.class,change::run);
+    assertNoStockEffect();noEvidenceRead();assertNotNull(reserve("0","20"));
+  }
+  @ParameterizedTest @ValueSource(strings={"missing","prepared","unconfirmed"})
+  void internalRegulatorySourceMustBeComplete(String stage){
+    for(String category:List.of("QC","CUSTOMER","COMMERCIAL"))basis(category,"100");
+    if(!stage.equals("missing")){
+      String doc=evidence(map("purpose","Incomplete regulator submission"),"REG_PREPARATION");
+      var prepared=run("prepareRegulatoryProcedure",map("itemId",item,"lotId",lot,"physicalScopeId",segment,"workId",work,"policyId",regPolicy,"documentVersionId",doc),null);
+      if(stage.equals("unconfirmed"))run("recordSubmission",map("procedureId",effects(prepared).get("procedureId"),"occurredAt",now.toString()),1);
+    }
+    noEvidenceRead();assertNotEquals("APPLIED",apply(envelope("reserveQuantity",reserveSlots(segment),0)).get("outcome"),stage);assertNoStockEffect();
+  }
+  String otherSalesWork(){
+    var goal=map("quantityMode","CUMULATIVE_EVENT","targetQuantity","100","unit","EA","endpoint","ARRIVED","dueAt","2026-10-31T00:00:00Z","scope",Map.of("itemId",item),"timezone","UTC","evidencePolicyVersion","fixture-v1","periodStartInclusive",true,"periodEndInclusive",true,"periodStart","2026-10-01T00:00:00Z","periodEnd","2026-10-31T00:00:00Z","eventKind","RECEIPT","contributionScope",Map.of("itemId",item),"deduplication","CANONICAL_OCCURRENCE","conditions",List.of(Map.of("id","Arrival")),"evaluatorVersion","core-v1");
+    String otherWork=effects(run("createDraft",map("itemId",item,"lotId",lot,"definitionVersionId",definition,"kind","QUALITY","ownerId",actor,"supervisorId",actor,"goal",goal),0)).get("workId").toString();run("activateWork",map("workId",otherWork),0);
+    salesLine=effects(run("createSalesOrder",map("workId",otherWork,"customerId",customer,"itemId",item,"quantity","100","unit","EA","dueAt",now.plusSeconds(90).toString(),"destinationId",destination,"deliveryEndpoint","DELIVERED","qualityTerms","fixture","packageTerms","fixture"),null)).get("salesLineId").toString();
+    return otherWork;
+  }
+  @Test void internalSalesWorkGrantCannotBorrowUnrelatedSourceWork(){
+    allow("100");
+    String otherWork=otherSalesWork();
+    noEvidenceRead();jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE grantId=?",grant);
+    for(var e:map("TARGET",segment,"ITEM",item,"PLACE",place,"WORK",otherWork).entrySet())insert("mulino_identity_GrantScopes",map("organizationId",org,"grantId",grant,"scopeKind",e.getKey(),"scopeId",e.getValue()));
+    assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",code(apply(envelope("reserveQuantity",reserveSlots(segment),0))));assertNoStockEffect();
+  }
+  @Test void internalSourceGrantExpiryAtCommitRollsBackEffect(){
+    allow("100");String otherWork=otherSalesWork();noEvidenceRead();
+    jdbc.update("DELETE FROM mulino_identity_GrantScopes WHERE grantId=?",grant);
+    for(var e:map("TARGET",segment,"ITEM",item,"PLACE",place,"WORK",otherWork).entrySet())insert("mulino_identity_GrantScopes",map("organizationId",org,"grantId",grant,"scopeKind",e.getKey(),"scopeId",e.getValue()));
+    String sourceGrant=id();insert("mulino_identity_Grants",map("organizationId",org,"ID",sourceGrant,"actorId",actor,"delegatorId",actor,"validFrom",Timestamp.from(now.minusSeconds(10)),"validUntil",Timestamp.from(now.plusSeconds(1))));
+    insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",sourceGrant,"capabilityId","reserveQuantity"));
+    for(var e:map("TARGET",segment,"ITEM",item,"PLACE",place,"WORK",work).entrySet())insert("mulino_identity_GrantScopes",map("organizationId",org,"grantId",sourceGrant,"scopeKind",e.getKey(),"scopeId",e.getValue()));
+    doAnswer(call->{Object result=call.callRealMethod();now=now.plusSeconds(2);return result;}).when(impact).invalidate(any(),anyString());
+    var result=apply(envelope("reserveQuantity",reserveSlots(segment),0));assertEquals("FORBIDDEN",code(result),result.toString());assertNoStockEffect();
+    reset(impact);
+  }
+  @Test void internalPolicyChangeStillPreventsEffectAfterReservation(){
+    allow("100");allowDispatch();noEvidenceRead();String a=reserve("0","20");run("pickQuantity",map("allocationId",a),0);
+    jdbc.update("DELETE FROM mulino_governance_ActivePolicies WHERE kind='ELIGIBILITY'");
+    assertEquals("INSUFFICIENT_ELIGIBLE_QUANTITY",code(apply(dispatchInput(a))));
+    assertEquals("EXECUTABLE",allocationState(a));assertEquals(0,count("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements"));
+  }
+  @Test void internalReplacementKeepsExplicitOriginalReadAuthorization(){
+    allow("100");String a=reserve("0","20"),proof=replacementProof();noEvidenceRead();
+    // This explicitly supplied replacement document has its own existing authorization contract.
+    // Only eligibility canonical facts are consumed through the new internal witness.
+    assertEquals("FORBIDDEN",code(apply(envelope("replaceAllocation",replacementSlots(a,proof),0))));
+    assertEquals("EXECUTABLE",allocationState(a));assertEquals(1,count("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations"));
+  }
+  @Test void internalRollbackReplayAndRevocationKeepOneEffect(){
+    allow("100");noEvidenceRead();var input=envelope("reserveQuantity",reserveSlots(segment),0);
+    doThrow(new IllegalStateException("Synthetic reserve rollback")).when(impact).invalidate(any(),anyString());
+    assertThrows(IllegalStateException.class,()->apply(input));assertNoStockEffect();reset(impact);
+    assertEquals("APPLIED",apply(input).get("outcome"));assertEquals("APPLIED",apply(input).get("outcome"));
+    jdbc.update("UPDATE mulino_identity_CapabilityAssignments SET revokedAt=? WHERE actorId=? AND capabilityId='reserveQuantity'",Timestamp.from(now),actor);
+    assertNotEquals("APPLIED",apply(input).get("outcome"));assertEquals(1,count("SELECT COUNT(*) FROM mulino_inventory_SegmentAllocations"));assertEquals(0,count("SELECT COUNT(*) FROM mulino_inventory_QuantityMovements"));
+  }
 }

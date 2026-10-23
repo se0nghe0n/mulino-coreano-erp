@@ -19,6 +19,13 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
  public Set<String>operations(){return Set.of("evaluateEligibility");}
  public record Result(String state,BigDecimal eligibleQuantity,List<QualityRanges.Range>ranges,List<Map<String,Object>>conditions,List<String>evidenceRefs,List<String>unknowns,Instant nextValidityBoundary){}
  public Result assess(DomainContext c,Map<String,Object>segment,String action,String customerId){
+  return assess(c,segment,action,customerId,null);
+ }
+ public Result assessForFulfillment(DomainContext c,Map<String,Object>segment,String action,String customerId,com.mulino.application.inventory.FulfillmentEvidencePurpose purpose){
+  Objects.requireNonNull(purpose).requireAssessment(c,segment,action,customerId);
+  return assess(c,segment,action,customerId,purpose);
+ }
+ private Result assess(DomainContext c,Map<String,Object>segment,String action,String customerId,com.mulino.application.inventory.FulfillmentEvidencePurpose purpose){
   var unknowns=new TreeSet<String>();var refs=new TreeSet<String>();var conditions=new ArrayList<Map<String,Object>>();BigDecimal quantity=StockPrimitives.amount(segment);String id=(String)segment.get("ID");Instant at=c.asOf(),next=null;
   var allowed=List.of(new QualityRanges.Range(BigDecimal.ZERO,quantity));
   if(StockPrimitives.instant(segment.get("validFrom")).isAfter(at)||(segment.get("retiredAt")!=null&&!StockPrimitives.instant(segment.get("retiredAt")).isAfter(at)&&(segment.get("retirementRecordedAt")==null||!StockPrimitives.instant(segment.get("retirementRecordedAt")).isAfter(c.knownAt())))||!"CONFIRMED".equals(segment.get("identificationStatus"))||"UNCERTAIN_MIXTURE".equals(segment.get("mixtureStatus"))){unknowns.add("PHYSICAL_SUBSET_NOT_IDENTIFIABLE");allowed=List.of();}
@@ -31,12 +38,12 @@ public class QualityEligibility implements InventoryReadFacts,QueryHandler {
   for(String category:List.of("QC","CUSTOMER","COMMERCIAL")){
    var ranges=new ArrayList<QualityRanges.Range>();
    for(var b:bases)if(b.get("segmentId")!=null&&category.equals(b.get("category"))&&action.equals(b.get("action"))&&(b.get("customerId")==null||Objects.equals(customerId,b.get("customerId")))){
-    next=permissionBoundary(next,b,at);if(active(b,at,c.knownAt())&&evidence.valid(c,(String)b.get("evidenceRef"),(String)b.get("segmentId"))){ranges.addAll(PhysicalRanges.project(r.rows(c,"GenealogyEdges"),(String)b.get("segmentId"),id,range(b).start(),(BigDecimal)b.get("quantity")));refs.add((String)b.get("evidenceRef"));}
+    next=permissionBoundary(next,b,at);if(active(b,at,c.knownAt())&&(purpose==null?evidence.valid(c,(String)b.get("evidenceRef"),(String)b.get("segmentId")):evidence.valid(c,b,purpose))){ranges.addAll(PhysicalRanges.project(r.rows(c,"GenealogyEdges"),(String)b.get("segmentId"),id,range(b).start(),(BigDecimal)b.get("quantity")));refs.add((String)b.get("evidenceRef"));}
    }
    String state=ranges.isEmpty()?"UNKNOWN":"ALLOWED";if(ranges.isEmpty())unknowns.add(category+"_AUTHORITY_UNCONFIRMED");conditions.add(Map.of("condition",category,"state",state,"allowedRanges",dto(ranges)));
    allowed=QualityRanges.intersect(allowed,ranges);
   }
-  var reg=regulatory.assess(c,(String)segment.get("itemId"),(String)segment.get("lotId"),id,action,quantity,(String)segment.get("unit"));
+  var reg=purpose==null?regulatory.assess(c,(String)segment.get("itemId"),(String)segment.get("lotId"),id,action,quantity,(String)segment.get("unit")):regulatory.assessForFulfillment(c,(String)segment.get("itemId"),(String)segment.get("lotId"),id,action,quantity,(String)segment.get("unit"),purpose);
   conditions.add(Map.of("condition","REGULATORY","state",reg.state()));unknowns.addAll(reg.unknowns());refs.addAll(reg.evidenceRefs());next=minimum(next,reg.nextValidityBoundary());allowed=QualityRanges.intersect(allowed,reg.allowedRanges().stream().map(x->new QualityRanges.Range(x.start(),x.end())).toList());
   var blocks=new ArrayList<QualityRanges.Range>();boolean blocked=false;
   for(var hold:r.rows(c,"Restrictions"))if(Objects.equals(segment.get("controlScope"),hold.get("controlScope"))&&Set.of(action,"ALL").contains(hold.get("action"))){
