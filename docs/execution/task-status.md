@@ -1012,3 +1012,9 @@ T11의 실제 waitJson.verifier/overdueAction을 관찰값에 연결한24c96df0�
 observer PG64개와 unit6개가 모두 PASS했다. prepare 문제0과 자체 PG
 정리를 확인했다. [대기 필드 기록](t11-wait-projection.md)을 따른다.
 실제 T11 결과를 이번 집중 검증으로 PASS로 바꾸지 않았다.
+
+T17 canonical projection 초안a57bf46a는 검토 중이며 아직 통합하지 않았다.
+같은 canonical의 정상 재검증도 검증 행 수2개라는 이유로 생략하는
+문제를 보완한다. 실제 제품 gateway/PG 회귀1개는 검증 근거2개와
+canonical·인도·물리 이동 각각1개를 확인했다. 제품 코드는 변경하지
+않았으며 [재검증 근거](canonical-reverification-proof.md)를 따른다.
