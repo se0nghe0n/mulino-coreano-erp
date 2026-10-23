@@ -318,3 +318,41 @@ UTC 저장 보정, 지원 read의 별도 grant 보정 이전 실패 로그도 �
 후속 actual HTTP/PG 증거는 별도로 추가한다. 이전18개·21개 검증의
 manifest와 원 artifact는 유지한다. 전체 결합 epoch와 S5/S6 인수는
 coordinator의 별도 범위다.
+
+구현 commit은 `4de16a590def5418fde36f7e6e3fb4dc6da73cd7`이며,
+actual probe의 Invoice TIMESTAMP UTC 설치 보완은
+`e06aff0c`다. 마지막 실제 HTTP/PG probe는 이 두 commit 위에서
+exit0이며18개 관찰 항목이 모두 통과했다. 네 noun 모두 실제 응답의
+ID로 발견되었고 `discoveryGaps`는 빈 배열이다. 실제 non-UUID SOURCE
+namespace 원문을 보존하고, 그 grant가 일반 READ에 적용되지 않음을
+확인했다. 실제 서버 receipt를 복사한 missing dimension·wrong
+UUID dimension·oversize namespace·untyped object 반례4개도 거부했다.
+원본 receipt와 actionAuthorization=NOT_ASSERTED는 보존했다.
+
+새 epoch의 tests는 backend11개, native focused22개, actual HTTP/PG1개로
+총34개 PASS·0 FAIL·0 ERROR·0 skip이다.232개 raw MCP capture와
+서버 source descriptor를 확인해 hash drift0을 기록했다. 독립 PG
+anchor projection revision도 실제 capture와 일치했다. 원2068개 입력의
+hash drift는0이며 이전18개·21개 manifest의 SHA-256도 바뀌지 않았다.
+
+```text
+verification/harness/target/native-integration/
+  6e585795-6084-46a5-bacc-016e61ac4548/
+  direct-context-report-e7bebd6f-2ee2-4929-a8d6-162315d1bba4.json
+SHA-256 4faa005fda865321b46717956300921648cbb6f579a0117b5320509fc918ce18
+```
+
+같은 디렉터리의 fixture-start clock receipt는
+`fixture-start-clock-7f04fb4f-7a5e-458b-8da5-9d1affd18e0c.json`이며
+SHA-256은
+`aee56f4f157a5d6b2fa2f529d37077cbebae12e60fd159bc63b6b90dd178b8ed`다.
+앱 초기 authority는10월8일, probe의 선언과 reset 응답은10월7일09:00Z다.
+asOf/knownAt는 각각10월7일09:00Z와09:00:01Z를 유지했다.
+
+새 manifest는 `.local/s5-permitted-context/discovery/manifest.json`이다.
+실행 명령·선택 test XML·실행 class/JAR hash·raw descriptor·실패 로그와
+resource receipt를 연결한다. PostgreSQL tests의 자기 컨테이너와 공개
+키·blob 임시 경로를 정리했고, 두 actual 실행의 자기 서버·컨테이너·키도
+정리했다. Docker inspect와 PID 조회로 자기 actual 자원의 부재를 별도로
+확인했다. worktree와 무시된 증거 경로는 coordinator의 회수를 위해
+유지한다. 모델·scenario·Workflow 호출과 Task 통합은 수행하지 않았다.
