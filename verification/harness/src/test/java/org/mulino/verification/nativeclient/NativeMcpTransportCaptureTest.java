@@ -72,6 +72,34 @@ class NativeMcpTransportCaptureTest {
   @Test void absentOrMismatchedReceiptIsSavedAsUnavailableAndCannotReturnTransportSuccess()throws Exception {
     runTransport(false,false);runTransport(true,true);
   }
+  @Test void typedSourceNamespacesUseCurrentVarchar36ContractAndOtherDimensionsStillRequireUuid() {
+    var rpc=rpc();String reply="{}";
+    for(String namespace:List.of("carrier-it","SOURCE.v1:물류","n".repeat(36))) {
+      var c=capture(rpc,reply,NONCE,"2026-10-24T00:00:01Z","2026-10-24T00:00:02Z");
+      ((ArrayNode)c.path("grants").get(0).path("scopes")).add(Json.object().put("scopeKind","SOURCE").put("scopeId",namespace));
+      var assignment=((ObjectNode)c.path("memberships").get(0)).deepCopy().put("capabilityId","getEvidence").put("scopeKind","SOURCE").put("scopeId",namespace);
+      ((ArrayNode)c.path("assignments")).add(assignment);
+      assertDoesNotThrow(()->validate(c,rpc,reply));
+      assertEquals(namespace,c.path("grants").get(0).path("scopes").get(2).path("scopeId").asText());
+      assertEquals("NOT_ASSERTED",c.path("actionAuthorization").asText());
+    }
+    List<ObjectNode> bad=List.of(
+      Json.object().put("scopeKind","SOURCE"),Json.object().put("scopeId","carrier-it"),
+      Json.object().put("scopeKind","SOURCE").putNull("scopeId"),Json.object().put("scopeKind","SOURCE").put("scopeId",42),
+      Json.object().put("scopeKind","SOURCE").set("scopeId",Json.object().put("namespace","carrier-it")),
+      Json.object().put("SOURCE","carrier-it"),Json.object().put("scopeKind","SOURCE").put("scopeId"," "),
+      Json.object().put("scopeKind","SOURCE").put("scopeId","n".repeat(37)),
+      Json.object().put("scopeKind","source").put("scopeId","carrier-it"),
+      Json.object().put("scopeKind","NAMESPACE").put("scopeId",ORG));
+    var mutants=new ArrayList<ObjectNode>(bad);
+    for(String kind:List.of("ORGANIZATION","ITEM","WORK","PLACE","TARGET"))mutants.add(Json.object().put("scopeKind",kind).put("scopeId","carrier-it"));
+    for(var invalid:mutants)for(boolean assignment:List.of(false,true)){
+      var c=capture(rpc,reply,NONCE,"2026-10-24T00:00:01Z","2026-10-24T00:00:02Z");
+      if(assignment){var a=((ObjectNode)c.path("memberships").get(0)).deepCopy().put("capabilityId","getEvidence");a.setAll(invalid);((ArrayNode)c.path("assignments")).add(a);}
+      else ((ArrayNode)c.path("grants").get(0).path("scopes")).add(invalid);
+      assertThrows(RuntimeException.class,()->validate(c,rpc,reply),invalid.toString());
+    }
+  }
   @Test void serverReceiptIsFetchedIndependentlyAndPersistedWithoutCredentialOrCallerAuthority()throws Exception {
     runTransport(true,false);
   }

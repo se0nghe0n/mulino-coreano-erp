@@ -148,9 +148,34 @@ class NativePermittedContextTest {
         ((ObjectNode)s.path("grants").get(0)).set("scopes",Json.array().add(Json.object().put("scopeKind","SOURCE").put("scopeId",org)));
         var args=Json.object();var response=Json.object().set("data",Json.array().add(Json.object().put("ID",actorId).put("sourceProfileId",org)));
         assertEquals(grantId,NativePermittedContextCapture.identity(s,actor(),scope(),"getEvidence",args,response).path("grantId").asText());
+        // A syntactically valid but different namespace never inherits the observed SOURCE authority.
+        ((ObjectNode)s.path("grants").get(0).path("scopes").get(0)).put("scopeId","different-namespace");
+        assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getEvidence",args,response));
+        ((ObjectNode)s.path("grants").get(0).path("scopes").get(0)).put("scopeId",org);
         ((ObjectNode)response.path("data").get(0)).remove("sourceProfileId");
         assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getEvidence",args,response));
         ((ObjectNode)response).set("data",Json.array());assertTrue(NativePermittedContextGrants.emptyRead("getEvidence",args,response));
         assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getEvidence",args,response));
+    }
+    @Test void invoiceGrantAttributionUsesOnlyServerJoinedReadScopeAndRejectsMissingOrWrongDimension() {
+        var rpc=Json.object().put("method","tools/call");rpc.set("params",Json.object().put("name","getObject"));var s=server(rpc);
+        var grant=(ObjectNode)s.path("grants").get(0);grant.set("scopes",Json.array().add(Json.object().put("scopeKind","ITEM").put("scopeId",org)).add(Json.object().put("scopeKind","PLACE").put("scopeId",actorId)));
+        var args=Json.object().set("scope",Json.object().put("objectType","Invoice"));
+        var invoice=Json.object().put("ID",UUID.randomUUID().toString()).put("itemId",org).put("placeId",actorId);
+        var response=Json.object().set("data",invoice);
+        assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response));
+        var joined=invoice.putObject("readScope");joined.set("ITEM",Json.array().add(org));joined.set("WORK",Json.array().add(actorId));joined.set("PLACE",Json.array().add(actorId));
+        assertEquals(grantId,NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response).path("grantId").asText());
+        var correction=Json.object().put("ID",UUID.randomUUID().toString()).set("readScope",joined.deepCopy());invoice.set("corrections",Json.array().add(correction));
+        assertEquals(grantId,NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response).path("grantId").asText());
+        String otherPlace=UUID.randomUUID().toString();((ObjectNode)correction.path("readScope")).set("PLACE",Json.array().add(otherPlace));
+        assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response));
+        var second=grant.deepCopy().put("ID",UUID.randomUUID().toString());((ObjectNode)second.path("scopes").get(1)).put("scopeId",otherPlace);((ArrayNode)s.path("grants")).add(second);
+        assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response));
+        ((ArrayNode)s.path("grants")).remove(1);invoice.remove("corrections");
+        joined.set("PLACE",Json.array().add(UUID.randomUUID().toString()));
+        assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response));
+        joined.remove("PLACE");joined.set("SOURCE",Json.array().add(actorId));
+        assertThrows(IllegalStateException.class,()->NativePermittedContextCapture.identity(s,actor(),scope(),"getObject",args,response));
     }
 }

@@ -16,7 +16,8 @@ final class NativePermittedContext {
         "LogisticsUnit","Place","Manufacturer","Customer","SalesOrder","SalesOrderRevision","SalesOrderLine",
         "Delivery","DeliveryObservation","Shipment","Receipt","ReceiptObservation",
         "Return","Recall","RecallScope","Allocation","Restriction",
-        "DispositionBasis","Dispatch","ReturnAuthorization","Obligation","Handover");
+        "DispositionBasis","Dispatch","ReturnAuthorization","Obligation","Handover",
+        "PurchaseProposal","PurchaseOrder","Invoice","RegulatoryProcedure");
     static final int MAX_READS=1024,MAX_PAGES=20;
     @FunctionalInterface interface Reader { NativeMcpTransport.Capture read(String operation,JsonNode request) throws Exception; }
     record Collected(ObjectNode context,List<NativeMcpTransport.Capture> captures,NativeMcpTransport.Capture projection) {}
@@ -69,8 +70,7 @@ final class NativePermittedContext {
             .put("snapshotSemantics","PER_READ_REVISIONS; projectionReadRef identifies one exact read, not an atomic context snapshot")
             .put("asOf",Json.required(request,"asOf")).put("knownAt",Json.required(request,"knownAt"));
         context.set("scope",request.path("scope").deepCopy());context.set("reads",collector.reads);
-        context.set("discoveryGaps",Json.array().add("PurchaseProposal/PurchaseOrder/Invoice: current product read requires an ID; listing is unavailable")
-            .add("RegulatoryProcedure: current product list has no complete cursor contract"));
+        context.set("discoveryGaps",Json.array());
         ModelBindingRunner.checkContext(context);NativeClientPolicy.rejectSecrets(context);
         return new Collected(context,List.copyOf(collector.captures),collector.anchor);
     }

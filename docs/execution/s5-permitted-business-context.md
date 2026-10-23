@@ -13,9 +13,9 @@ branch는 `feat/s5-permitted-business-context`다. 시작 baseline은
 `ce9afb325df609b129a721636a6d10e738fd83e9`를 ff-only로 반영했다.
 자기 변경을 보존했으며 다른 worker의 미통합 변경은 가져오지 않았다.
 
-## 변경 경계
+## 최초 구현의 변경 경계
 
-새 helper는 `NativePermittedContext`와 `NativePermittedContextCapture`다.
+최초 baseline의 새 helper는 `NativePermittedContext`와 `NativePermittedContextCapture`다.
 기존 파일에서는 `NativeProductIntegration.ProductDriver.query`와
 `send`만 수정한다. installFixture·observe·requireReady·readiness·session,
 `NativeMcpTransport`, backend source·공개 query schema는 수정하지 않는다.
@@ -54,9 +54,9 @@ FORBIDDEN은 읽을 수 있는 사실로 넣지 않는다. 그 밖의 제품 오
 `ModelBindingRunner.checkContext`와 비밀 검사를 적용한다. 누설 금지
 필드를 제거해서 성공시키는 수선은 하지 않는다.
 
-## 실제 discovery의 남은 범위
+## 최초 baseline에서 관찰한 discovery 공백
 
-현재 `PurchaseQueries`와 `SettlementQueries`는 ID가 필요하다.
+최초 구현 baseline의 `PurchaseQueries`와 `SettlementQueries`는 ID가 필요했다.
 실제 `searchObjects(PurchaseProposal)`는
 `TYPE_INVALID: Purchase ID required`를 반환했다. PurchaseProposal,
 PurchaseOrder, Invoice의 목록을 지원한다고 표시하지 않는다.
@@ -269,3 +269,52 @@ resource receipt는
 별도 후속 증거 목록은 `.local/s5-permitted-context/followup/manifest.json`에
 둔다. 기존2068개 입력의 drift는0이고 original corpus·binding·fixture와
 공개 scenario oracle bytes는 보존했다.
+
+
+## 85f5d151 이후 승인된 discovery·SOURCE 구현
+
+coordinator가 세 provider와 새 `BusinessDiscoveryPostgresTest`,
+`NativeMcpTransport.validateServerCapture`의 SOURCE 검사만 추가 승인했다.
+baseline은 `85f5d1510a6b818175753132aa02ef62e10ea1f0`이며 다른 source는
+통합하지 않았다. ApplicationQueries·QueryRequests·public schema·쓰기
+handler·RuntimeService는 수정하지 않았다. 위 최초 baseline의 네 noun
+공백과 SOURCE UUID 제한은 이 후속 구현으로 대체한다.
+
+PurchaseProposal, PurchaseOrder, Invoice, RegulatoryProcedure를 기존
+`searchObjects`의 typed noun selector로 조회한다. 현재 인증 주체의
+실제 searchObjects 권한으로 각 후보를 인가하며 ID 순서로 정렬한다.
+인가된 limit+1번째 행이 있을 때만 마지막 반환 ID의 ReadCursor를
+발행한다. hidden 후보의 ID·count·cursor는 응답에 넣지 않는다.
+cursor는 조직·actor·업무 시각·지식 시각·operation·scope·filter에
+묶이며 다음 page에서도 현재 철회·만료를 다시 검사한다.
+
+Invoice는 실제 joined line·order·revision이 asOf/knownAt에 보일 때만
+반환한다. 같은 조직의 invoice 저장 item/work와 joined line의 item/work도
+일치해야 한다. 서버가 기존 SettlementCommands.scopes로 인가한
+ITEM·WORK·PLACE·CUSTOMER·SUPPLIER를 `readScope`로 관찰한다.
+correction도 같은 검사와 scope 관찰을 거친다. hidden correction이
+있는 Invoice를 부분 projection으로 노출하지 않고 FORBIDDEN으로 닫는다.
+helper는 이 실제 scope들만 사용하며 서로 다른 적용 grant가 필요하면
+계속 fail-closed다. fixture의 목적·예상 grant ID는 참조하지 않는다.
+
+SOURCE는 현재 IdentityCommands.text의 nonblank 문자열 조건과
+V3__identity의 scopeKind enum·scopeId VARCHAR(36)에 근거한다.
+명시적인 SOURCE scopeId에만36자 이하 namespace를 허용한다.
+다른 차원의 UUID 검사는 유지하며 누락·빈 값·숫자·object·미정의 차원은
+거부한다. 유효한 다른 namespace도 실제 evidence row의 SOURCE와
+일치하지 않으면 grant 후보가 될 수 없다. 이 검사는 서버 endpoint에서
+읽은 관찰의 typed shape 검사이며 임의 namespace를 action 승인으로
+바꾸지 않는다. 원 wire·서버 관찰과 actionAuthorization=NOT_ASSERTED를
+보존한다.
+
+직접 PostgreSQL tests8개는 네 noun의 stable cursor·all-of·현재 철회,
+knownAt·foreign/hidden·verb projection 동등성 및 Invoice의 joined
+revision/line/order와 hidden correction을 검증했다. 기존 구매 정책
+noun/verb2개와 Invoice noun/verb1개도 통과했다. native focused22개도
+exit0이다. 이 단계의 로그·XML은
+`.local/s5-permitted-context/discovery/`에 별도로 보존한다.
+fixture 설정 중 발견한 필수 열·approval 소비 정책 누락과 SQL TIMESTAMP
+UTC 저장 보정, 지원 read의 별도 grant 보정 이전 실패 로그도 남긴다.
+후속 actual HTTP/PG 증거는 별도로 추가한다. 이전18개·21개 검증의
+manifest와 원 artifact는 유지한다. 전체 결합 epoch와 S5/S6 인수는
+coordinator의 별도 범위다.

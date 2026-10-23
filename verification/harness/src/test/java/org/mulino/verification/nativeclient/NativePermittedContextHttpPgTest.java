@@ -21,7 +21,7 @@ class NativePermittedContextHttpPgTest {
     final Path root=Path.of(System.getProperty("repo.root")).toAbsolutePath().normalize();
     ActualConfiguration config;NativeIntegrationEvidence store;NativeMcpTransport transport;
     ObjectNode aliases,actor,scope,contextRequest;final ArrayNode checks=Json.array();
-    String work,obligation,document,foreignProduct,readGrant,sourceGrant;final Instant fact=Instant.parse("2026-10-07T09:00:00Z");
+    String work,obligation,document,foreignProduct,readGrant,sourceGrant;final Map<String,String> discovered=new LinkedHashMap<>();final Instant fact=Instant.parse("2026-10-07T09:00:00Z");
     Instant authority;
     static final List<String> READS=List.of("searchObjects","searchWorks","getObject","getWork","getInventory","getObligations","getEvidence","getAssessment");
     @Test void directCurrentProductContextAndAuthorityCounterexamples() throws Exception {
@@ -40,7 +40,7 @@ class NativePermittedContextHttpPgTest {
         execute("INSERT INTO mulino_identity_Grants(organizationId,ID,actorId,delegatorId,validFrom,validUntil,revision,createdAt,recordedAt) SELECT organizationId,?,actorId,delegatorId,validFrom,validUntil,revision,createdAt,recordedAt FROM mulino_identity_Grants WHERE organizationId=? AND ID=?",sourceGrant,id("ORG"),readGrant);
         execute("INSERT INTO mulino_identity_GrantActions(organizationId,grantId,capabilityId) SELECT organizationId,?,capabilityId FROM mulino_identity_GrantActions WHERE organizationId=? AND grantId=?",sourceGrant,id("ORG"),readGrant);
         execute("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES(?,?,?,?)",id("ORG"),sourceGrant,"ORGANIZATION",id("ORG"));
-        execute("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES(?,?,?,?)",id("ORG"),sourceGrant,"SOURCE",UUID.randomUUID().toString());
+        execute("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES(?,?,?,?)",id("ORG"),sourceGrant,"SOURCE","carrier-context-probe");
         execute("INSERT INTO mulino_identity_GrantScopes(organizationId,grantId,scopeKind,scopeId) VALUES(?,?,?,?)",id("ORG"),sourceGrant,"TARGET",id("W"));
         String originalSourceGrant=sourceFingerprint();
         var other=fixture("foreign-"+UUID.randomUUID());var otherBundle=bundle.deepCopy();otherBundle.set("fixture",other);otherBundle.put("fixtureHash",NativeClientPolicy.sha(other.toString())).put("organizationExternalAlias",other.path("probeExternalAlias").asText());
@@ -53,11 +53,23 @@ class NativePermittedContextHttpPgTest {
         assertEquals("48",sqlScalar("SELECT sum(quantity)::text FROM mulino_inventory_QuantitySegments WHERE organizationId=?",id("ORG")).replaceAll("\\.0+$",""));
         assertTrue(positive.context().path("reads").findValuesAsText("heldQuantity").contains("48"));
         assertEquals(before,businessFingerprint());check("positive-human-current-work-evidence-obligation-48BOX-and-duplicate-name",true);
+        for(var noun:discovered.entrySet()) {
+            boolean found=false;for(JsonNode read:positive.context().path("reads"))if(read.path("request").path("scope").path("objectType").asText().equals(noun.getKey()))
+                for(JsonNode row:read.path("response").path("data"))found|=row.path("ID").asText().equals(noun.getValue());
+            assertTrue(found,"Actual paged discovery missing "+noun.getKey());
+        }
+        assertTrue(positive.context().path("discoveryGaps").isEmpty());check("four-business-nouns-discovered-over-actual-authenticated-HTTP-PG",true);
         var result=NativePermittedContextCapture.result("positive-human",actor,scope,positive,store);
         assertEquals(StepResult.DriverStatus.EXECUTED,result.driverStatus());assertEquals("ACTUAL_AUTHENTICATED_TRANSPORT",result.provenance().path("source").asText());
         assertEquals(id("reader"),result.provenance().path("authenticatedActor").path("actorId").asText());
         assertEquals(id("ORG"),result.provenance().path("authenticatedActor").path("organizationId").asText());
         assertEquals(readGrant,result.provenance().path("authenticatedActor").path("grantId").asText());
+        var actualSource=positive.captures().getFirst().artifact();
+        var actualReceipt=Json.read(root.resolve(actualSource.path("path").asText()));
+        assertTrue(actualReceipt.path("serverAuthenticatedCapture").path("grants").toString().contains("carrier-context-probe"));
+        assertEquals("NOT_ASSERTED",actualReceipt.path("serverAuthenticatedCapture").path("actionAuthorization").asText());
+        validateActualSourceMutants(actualReceipt);
+        check("actual-non-UUID-typed-SOURCE-namespace-preserved-without-authority-widening",true);
         check("source-dimension-inapplicable-purpose-read-grant-is-actual-candidate",true);
         var wire=Json.read(root.resolve(result.data().path("projectionReadRef").asText()));
         new ContractValidator(root).schema("verification/model-binding/captured-api.schema.json",wire);
@@ -147,6 +159,38 @@ class NativePermittedContextHttpPgTest {
         String profile=UUID.randomUUID().toString();
         execute("INSERT INTO mulino_evidence_SourceProfiles(organizationId,ID,revision,createdAt,recordedAt,recordedBy,namespace,policyVersion,intakeOwnerId,supervisorId,nextAction,nextCheckAt) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",id("ORG"),profile,1,time,time,id("reader"),"direct-http-pg","synthetic-read-only-v1",id("reader"),id("supervisor"),"원문을 대조한다",time.plusDays(2));
         execute("INSERT INTO mulino_evidence_DocumentVersions(organizationId,ID,revision,createdAt,recordedAt,recordedBy,subjectKind,subjectId,itemId,workId,sha256,byteLength,mediaType,availability,sourceNamespace,sourceProfileId,sourceReference,provenance) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",id("ORG"),document,1,time,time,id("reader"),"WORK",work,id("P"),work,"b".repeat(64),0L,"text/plain","UNKNOWN","direct-http-pg",profile,"실제 서버 문서 metadata","{}");
+        seedDiscovery(time);
+    }
+    void seedDiscovery(OffsetDateTime time) throws Exception {
+        String supplier=UUID.randomUUID().toString(),proposal=UUID.randomUUID().toString(),approval=UUID.randomUUID().toString(),order=UUID.randomUUID().toString(),line=UUID.randomUUID().toString(),invoice=UUID.randomUUID().toString(),proc=UUID.randomUUID().toString();
+        insertTrade("Suppliers",supplier,time,"name","direct supplier");
+        insertTrade("Proposals",proposal,time,"workId",work,"currentRevision",1,"status","APPROVED");
+        insertTrade("ProposalRevisions",UUID.randomUUID().toString(),time,"proposalId",proposal,"workId",work,"itemId",id("P"),"supplierId",supplier,"destinationId",id("W"),"quantity",9,"unit","BOX","price",1,"currency","EUR","dueAt",time.plusDays(2),"endpoint","ARRIVED","quantityMode","CUMULATIVE_EVENT","proposalHash","a".repeat(64));
+        insertTrade("Approvals",approval,time,"proposalId",proposal,"proposalRevision",1,"proposalHash","a".repeat(64),"approverId",id("reader"),"policyHash","b".repeat(64),"consumptionPolicy","SINGLE_ORDER_REVISION","decision","APPROVE","conditionsJson","[]","decidedAt",time,"validUntil",time.plusDays(2));
+        insertTrade("Orders",order,time,"proposalId",proposal,"proposalRevision",1,"proposalHash","a".repeat(64),"approvalId",approval,"channel","synthetic","externalOperationId",UUID.randomUUID().toString(),"outboxId",UUID.randomUUID().toString(),"conditionAssessmentJson","{}");
+        insertTrade("OrderLines",line,time,"orderId",order,"proposalId",proposal,"proposalRevision",1,"workId",work,"itemId",id("P"),"destinationId",id("W"),"quantity",9,"unit","BOX","status","DISPATCH_PENDING");
+        execute("INSERT INTO mulino_trade_settlement_Invoices(organizationId,ID,revision,createdAt,recordedAt,effectiveAt,workId,itemId,lineId,referenceId,scopeKind,invoiceKind,sourceNamespace,sourceKey,sourceVersion,sourceHash,evidenceId,quantity,unit,unitPrice,originalAmount,currency) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",id("ORG"),invoice,1,time,time,time,work,id("P"),line,UUID.randomUUID().toString(),"PURCHASE","COMMERCIAL","direct-read",UUID.randomUUID().toString(),"1","c".repeat(64),document,9,"BOX",1,9,"EUR");
+        execute("INSERT INTO mulino_trade_regulatory_Procedures(organizationId,ID,revision,createdAt,recordedAt,recordedBy,itemId,physicalScopeId,workId) VALUES(?,?,?,?,?,?,?,?,?)",id("ORG"),proc,1,time,time,id("reader"),id("P"),id("A60"),work);
+        execute("INSERT INTO mulino_trade_regulatory_ProcedureVersions(organizationId,ID,revision,createdAt,recordedAt,recordedBy,procedureId,itemId,physicalScopeId,workId,status,documentVersionId) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)",id("ORG"),UUID.randomUUID().toString(),1,time,time,id("reader"),proc,id("P"),id("A60"),work,"PREPARING",document);
+        discovered.put("PurchaseProposal",proposal);discovered.put("PurchaseOrder",order);discovered.put("Invoice",invoice);discovered.put("RegulatoryProcedure",proc);
+    }
+    void insertTrade(String table,String target,OffsetDateTime time,Object...fields) throws Exception {
+        var values=new LinkedHashMap<String,Object>();values.put("organizationId",id("ORG"));values.put("ID",target);values.put("revision",1);values.put("createdAt",time);values.put("recordedAt",time);values.put("effectiveAt",time);
+        for(int i=0;i<fields.length;i+=2)values.put(fields[i].toString(),fields[i+1]);
+        execute("INSERT INTO mulino_trade_purchase_"+table+" ("+String.join(",",values.keySet())+") VALUES ("+String.join(",",Collections.nCopies(values.size(),"?"))+")",values.values().toArray());
+    }
+    void validateActualSourceMutants(JsonNode receipt) {
+        var server=receipt.path("serverAuthenticatedCapture");var rpc=receipt.path("request");String reply=receipt.path("response").toString();
+        java.util.function.Consumer<JsonNode> validate=c->NativeMcpTransport.validateServerCapture(c,server.path("captureId").asText(),server.path("requestNonce").asText(),rpc,reply,receipt.path("httpStatus").asInt(),actor,scope,receipt.path("requestSentAt").asText(),receipt.path("responseReceivedAt").asText());
+        assertDoesNotThrow(()->validate.accept(server));
+        for(String mode:List.of("missing","wrong-dimension","oversize","untyped")){
+            var mutated=server.deepCopy();boolean changed=false;
+            for(JsonNode g:mutated.path("grants"))for(JsonNode s:g.path("scopes"))if(s.path("scopeKind").asText().equals("SOURCE")){
+                var source=(ObjectNode)s;switch(mode){case "missing"->source.remove("scopeKind");case "wrong-dimension"->source.put("scopeKind","TARGET");case "oversize"->source.put("scopeId","n".repeat(37));default->source.set("scopeId",Json.object().put("namespace","carrier-context-probe"));}changed=true;
+            }
+            assertTrue(changed);assertThrows(RuntimeException.class,()->validate.accept(mutated));
+        }
+        check("actual-server-capture-missing-wrong-dimension-tampered-SOURCE-mutants-fail-closed",true);
     }
     NativePermittedContext.Collected collect(String action,JsonNode principal) throws Exception {
         var c=NativePermittedContext.collect(contextRequest,(op,q)->transport.send(action,"tools/call",op,q,principal,scope));
@@ -169,7 +213,7 @@ class NativePermittedContextHttpPgTest {
     void execute(String sql,Object...args) throws Exception {try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());var s=c.prepareStatement(sql)){for(int i=0;i<args.length;i++)s.setObject(i+1,args[i]);s.executeUpdate();}}
     String sqlScalar(String sql,Object...args) throws Exception {try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());var s=c.prepareStatement(sql)){for(int i=0;i<args.length;i++)s.setObject(i+1,args[i]);try(var r=s.executeQuery()){assertTrue(r.next());return r.getString(1);}}}
     String businessFingerprint() throws Exception {
-        var all=Json.object();for(String table:List.of("mulino_inventory_QuantitySegments","mulino_work_read_Works","mulino_work_read_ObligationReferences","mulino_evidence_DocumentVersions","mulino_commands_CommandRecords","mulino_runtime_Outbox"))
+        var all=Json.object();for(String table:List.of("mulino_inventory_QuantitySegments","mulino_work_read_Works","mulino_work_read_ObligationReferences","mulino_evidence_DocumentVersions","mulino_commands_CommandRecords","mulino_runtime_Outbox","mulino_trade_purchase_Proposals","mulino_trade_purchase_ProposalRevisions","mulino_trade_purchase_Orders","mulino_trade_purchase_OrderLines","mulino_trade_settlement_Invoices","mulino_trade_regulatory_Procedures","mulino_trade_regulatory_ProcedureVersions"))
             all.put(table,sqlScalar("SELECT md5(coalesce(string_agg(to_jsonb(r)::text,'|' ORDER BY ID),'')) FROM "+table+" r WHERE organizationId=?",id("ORG")));
         return NativeClientPolicy.sha(all.toString());
     }

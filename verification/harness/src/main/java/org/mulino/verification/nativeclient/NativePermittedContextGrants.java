@@ -41,8 +41,10 @@ final class NativePermittedContextGrants {
                 case "QuantitySegment" -> {add(s,"ITEM",row,"itemId");add(s,"PLACE",row,"placeId");}
                 case "Place" -> add(s,"PLACE",row,"ID");
                 case "PurchaseProposal","PurchaseOrder" -> {s.remove("TARGET");add(s,"ITEM",row,"itemId");add(s,"WORK",row,"workId");}
-                // SettlementQueries authorizes its joined line, whose place/customer/supplier are not yet in the response.
-                case "Invoice" -> throw new IllegalStateException("PERMITTED_CONTEXT_GRANT_SCOPE_RECIPE_UNAVAILABLE");
+                case "Invoice" -> {
+                    s.clear();s.putAll(invoiceScope(row));
+                    if(row.has("corrections")){require(row.path("corrections").isArray(),"PERMITTED_CONTEXT_GRANT_SCOPE_RECIPE_UNAVAILABLE");for(JsonNode correction:row.path("corrections"))out.add(invoiceScope(correction));}
+                }
                 case "RegulatoryProcedure" -> {add(s,"TARGET",row,"physicalScopeId");add(s,"ITEM",row,"itemId");add(s,"WORK",row,"workId");}
                 case "Recall","RecallScope" -> {add(s,"ITEM",row,"itemId");add(s,"WORK",row,"workId");}
                 case "Customer","SalesOrder","SalesOrderRevision","SalesOrderLine","Delivery","DeliveryObservation" -> {
@@ -101,6 +103,14 @@ final class NativePermittedContextGrants {
     static boolean active(JsonNode row,Instant now) {
         return !now.isBefore(Instant.parse(Json.required(row,"validFrom")))&&now.isBefore(Instant.parse(Json.required(row,"validUntil")))
             &&(!row.hasNonNull("revokedAt")||now.isBefore(Instant.parse(Json.required(row,"revokedAt"))));
+    }
+    private static Map<String,Set<String>> invoiceScope(JsonNode row) {
+        var joined=row.path("readScope");
+        require(joined.isObject()&&joined.path("ITEM").isArray()&&!joined.path("ITEM").isEmpty()
+            &&joined.path("WORK").isArray()&&!joined.path("WORK").isEmpty(),"PERMITTED_CONTEXT_GRANT_SCOPE_RECIPE_UNAVAILABLE");
+        require(Set.of("ITEM","WORK","PLACE","CUSTOMER","SUPPLIER").containsAll(NativePermittedContext.keys(joined)),"PERMITTED_CONTEXT_GRANT_SCOPE_RECIPE_UNAVAILABLE");
+        for(JsonNode ids:joined){require(ids.isArray()&&!ids.isEmpty(),"PERMITTED_CONTEXT_GRANT_SCOPE_RECIPE_UNAVAILABLE");for(JsonNode id:ids)UUID.fromString(id.asText());}
+        var scopes=new LinkedHashMap<String,Set<String>>();for(String dimension:List.of("ITEM","WORK","PLACE","CUSTOMER","SUPPLIER"))addArray(scopes,dimension,joined.path(dimension));return scopes;
     }
     private static void inventory(JsonNode block,List<Map<String,Set<String>>> out) {
         require(block.isObject()&&block.hasNonNull("itemId"),"PERMITTED_CONTEXT_GRANT_SCOPE_RECIPE_UNAVAILABLE");
