@@ -722,3 +722,61 @@ Haiku native dynamic Workflow로 병렬 실행 중이다. T17의 실제 적격�
 원천 fixture는 별도 Sol Ultrafast 작업으로 수정한다. 사용량 snapshot
 도구가 없어 정확한 잔여 한도는 알 수 없으며 두 작업만 분리했다.
 전체 Task와 현재 Step는 계속 열려 있다.
+
+
+## 2026-10-23 불변 판정 조회와 typed fixture 원천의 통합
+
+source dbc75fc6의 Haiku wf_a6ac9383-20e는43개 중9PASS·34FAIL이다.
+예상392개 assertion은122PASS·92FAIL·178미관찰이다. coordinator가
+원본 report·fixture·source·실행 jar와6개 실제 Haiku5.5 metadata를
+대조했다. 보고서의 terminal 행은 완전하지만 모든 전체 gate는 false다.
+미관찰 assertion을 실행한 NOT_RUN subcase로 세지 않는다.
+
+이 실행에서 T09 receive60, T11 수령5건과 T12 지연 수령은 실제 APPLIED로
+다음 단계까지 진행했다. T09 관측4건도 실제 canonical 연결을 통과했다.
+T09/T11의 확인된 전체 leaf 예약3건에는 startQuantity=0을 명시했다.
+남은 판정·발주·정책 입력 실패를 각 원인으로 나눠 수정했다.
+
+worker b9f3239f·60903408을1c8519c2·81412545로 통합했다. getAssessment의
+직접 조회는 실제 Work/Assessment ID와 고정 시각·현재 권한·GoalVersion·
+pending을 읽는다. 조회는 판정·의무·command·outbox를 쓰지 않는다.
+action을 가진 공급 평가는 기존 T01의 명사/업무 snapshot을 유지한다.
+미지원 장소/고객 scope는 무시하지 않고 명시 거부한다.
+26개 fixture에 원래 EVIDENCE 정책을 명시하고27개의 명시 평가와 현재
+revision 조회를 연결했다. 원래269개 assertion의 업무 기대값은 그대로며
+126개 구조 바인딩만 공개 ID/outcome/goalVersion 필드에 맞췄다.
+명시 평가는02시, 기존 knowledge 조회는04시라는 순서를 지켰다.
+
+T13 worker c5ffe116을636f294f로 통합했다. 외부 작업15개의 라벨을
+고정 UUIDv5로 연결하고 현재 개정 품목의 subject를 바로잡았다.
+공개 domain-vocabulary가 정한 승인 outcome10건은 HELD로 정렬하고
+정확한 APPROVAL_* code guard10개를 더했다. TYPE_INVALID 등 다른
+거부로 승인 보호가 통과한 것처럼 세지 않는다. 개정값은 실제 proposal
+조회로 대조하고 단위/통화2개도 별도로 검사한다. 기존123개 업무 조건을
+보존하며 총135개 assertion이다. 원래 raw JSON 불변 주장은 하지 않는다.
+
+T17의 전용 원천 actor·typed fictional policy·검증 체인과 LOT 만료
+fixture를 통합했다. 원문→event/claim→review→canonical→typed decision을
+실제 명령으로 거치며 ALLOWED/VERIFIED row를 직접 seed하지 않는다.
+원래 명시 기한이 달랐던 B/EARLY는 별도 LOT으로 연결했다. 누락된 정상
+기한은 coordinator가 합성 fixture 작성값으로 given 유효창 끝을,
+출고 후 만료 사례는09:05 경계를 새로 명시했다. 기존 입력에 이미
+있었거나 사용자가 실제 운영 기한을 승인했다고 표시하지 않는다.
+257개 assertion·feature 원문과 수량·시각·기존 업무 권한은 유지했다.
+만료 누락 copy와 UNKNOWN/CONFLICT 원천은 계속 fail-closed다.
+
+결합 backend156개가 한 번의 실행에서 통과했다. 전체 harness의4개
+오류는 registry 변경 뒤 self-test allowlist hash가 낡은 것이었다.
+고정 sample의 hash를 현재 registry와 맞춘 뒤 전체615개 중610PASS,
+명시 PG opt-in5개 SKIP·실패0개다. 별도 실제 HTTP/Spring/PostgreSQL
+검사5개는 모두 PASS다. T17 PG 검증은 현재 source를 먼저 package하고
+실행 jar hash를 남긴다. 입력 검사45개와 runtime package 정적 검사도
+통과했다. prepare는41 case·802 subcase·24,260 assertion·문제0개이며
+artifactCoverageStatus는 NOT_RUN이다. 결합 증거는
+`.local/resume-20261023/all-contracts-integration-proof.json`이다.
+
+source35234fa6을 고정한 새 Haiku5.5 native dynamic Workflow는 T01 회귀와
+T09/T11/T12/T13의 고유55개·예상529개 assertion을 병렬 실행 중이다.
+T17은 남은 공개 slot12건과 ALT 품목의 LOT 참조를 별도 Sol Ultrafast
+작업으로 수정한다. 이 실행 결과를 이전 source의 PASS 수와 합산하지 않는다.
+실모델 client 인수·규제·BTP 및 전체 Task/현재 Step는 계속 열려 있다.

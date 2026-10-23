@@ -313,3 +313,64 @@ T13은9ac49b39에서15개 양성 fixture에 품목별 관리 권한30행만 더�
 HTTP/actual scenario가 아니며 새43개 Haiku 실행에서 승인 frontier를 본다.
 T09/T11 예약 좌표·T12 판정 projection 등 남은 실패를 계속 추적한다.
 새 source의 실행 결과를 기다리며 이전 source의 실패 수를 섞지 않는다.
+
+
+## source dbc75fc6의 canonical·승인 wave
+
+native Workflow wf_a6ac9383-20e의6개 agent metadata는 모두 Haiku5.5다.
+coordinator가 고유 행·source/fixture·canonical run.sh·실행 jar·원본 보고서
+hash를 대조했다. 각 case는 한 번의 시도로 terminal report를 남겼다.
+
+| case | subcase PASS | FAIL | assertion PASS | FAIL | 미관찰 |
+|---|---:|---:|---:|---:|---:|
+| T09 | 5 | 4 | 34 | 13 | 47 |
+| T11 | 3 | 9 | 31 | 8 | 71 |
+| T12 | 0 | 5 | 14 | 35 | 16 |
+| T13 | 1 | 16 | 43 | 36 | 44 |
+| 합계 | 9 | 34 | 122 | 92 | 178 |
+
+모든9PASS 행은 전체 assertion·runtimeComplete·빈 missingAdapters를
+만족한다. 다만 T11 resume-without-proof는 미지원 slot의 TYPE_INVALID로
+거부된 약한 PASS이며 실제 증거 guard의 인수로 쓰지 않는다.
+실행 전체와 모든 profile gate는 미완료다. 독립 증거는
+`.local/resume-20261023/canonical-approval-wave-coordinator-proof.json`이다.
+manifest의 runEvidenceDir는 copied evidence 상위 경로였으므로 실제
+execution tree의 고유 actual-scenarios-run 디렉터리까지 대조했다.
+미관찰178개는 수행한 NOT_RUN scenario가 아니라 assertion 미관찰이다.
+
+수령 revision 수정은 실제 효과까지 진행했다. T09 receive60과 T11
+receive90/receipt/receive60은 APPLIED였고 T12 지연 수령도 APPLIED였다.
+T09 두 기간 사례의 관측4개도 실제 canonical 연결을 통과했다.
+후속 예약3건은 좌표가 없어 TYPE_INVALID였으므로 전체 leaf 근거를
+대조해 startQuantity=0을 명시했다. 잘못된 창고 수령은 계속 거부됐다.
+
+새로 드러난 getAssessment는 Work data를 반환하고 원래 pinned 정책이
+설치되지 않아 기존 판정을 보류하고 있었다. 실제 불변 판정 read와
+명시 assessGoal, 현재 revision 조회, 원래 EVIDENCE 정책을 연결했다.
+126개 구조 바인딩은 ledger의 역변환으로 원래269개 업무 기대값과
+대조한다. 현재 시간·snapshot·인가를 속이는 adapter alias는 만들지 않았다.
+T01 공급 평가의 noun snapshot 회귀와 미지원 scope 거부도 실제 backend
+검사에 포함했다. 미발행 arrived-at-W/due-by-T 조건은 그대로 실패 경계다.
+
+T13의 stable external operation UUID, 현재 proposal 조회와 품목 subject를
+교정했다. 공개 vocabulary에 직접 명시된 승인 HELD만 정렬하고 정확한
+code guard를 더해 slot validation의 우연한 거부로 통과하지 못하게 했다.
+135개 assertion은 원래123개의 수량·단위·승인 결합·외부 효과0·감사 조건을
+보존한다. policy content/hash·미지원 conditional·취소 PO 정보·공급자와
+부분 수령의 후속 원천은 여전히 별도 실패 경계다.
+
+T17은 source profile370개를 설치 필드에 맞추고 새 원천 전용 profile과
+실제 typed QC/규제/라벨 판단 체인을 더했다. 기한이 다른 명시 segment는
+동일 LOT에 덮어쓰지 않고 별도 typed LOT으로 분리했다. coordinator의
+새 합성 기한 convention과 모든 old→new 참조를 역변환 ledger로 남긴다.
+운영 기한·공식 규제 승인 근거가 아니며 실제 제품 guard를 우회하지 않는다.
+source35234fa6의 결합 backend156개, 전체 harness610개가 통과했다.
+harness에서 별도 opt-in인 PG5개는 SKIP이고 실제 HTTP/Spring/PG 실행
+5개는 따로 모두 통과했다. 입력 검사45개도 PASS다. prepare는
+41 case·802 subcase·24,260 assertion·문제0개이며 실행 인수는 아니다.
+증거는 `.local/resume-20261023/all-contracts-integration-proof.json`이다.
+
+이 source에서 T01/T09/T11/T12/T13의55개·예상529개 assertion을 새
+Haiku5.5 native dynamic Workflow로 병렬 실행 중이다. T17은 공개 slot와
+ALT 품목 LOT 연결의 남은 입력 계약을 별도 수정하며 이번 wave에서 제외한다.
+기존 실패를 비대상으로 바꾸지 않으며 전체 Step는 열려 있다.
