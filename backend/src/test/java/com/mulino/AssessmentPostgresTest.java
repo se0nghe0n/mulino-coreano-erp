@@ -313,9 +313,15 @@ class AssessmentPostgresTest {
   String segment=jdbc.queryForObject("SELECT ID FROM mulino_inventory_QuantitySegments WHERE organizationId=?",String.class,org);
   try{
    var subject=new com.mulino.domain.evidence.EvidenceTypes.Subject(com.mulino.domain.evidence.EvidenceTypes.SubjectKind.SEGMENT,segment);
-   byte[] original="Observed 20 BOX continuously from 23:59:50Z through 00:00:10Z (exclusive)".getBytes();
-   String doc=evidenceCall(()->records.attachDocument(new com.mulino.application.evidence.EvidenceRecords.DocumentInput(subject,"fixture","INTERVAL-20","text/plain",LocalBlobStore.hash(original),"explicit interval original",null),original)).get("id").toString();
-   String event=evidenceCall(()->records.recordActivity(new com.mulino.application.evidence.EvidenceRecords.EventInput(subject,"STATE_OBSERVATION","fixture","INTERVAL-20","1",new com.mulino.domain.evidence.EvidenceTypes.EffectiveTime(t.minusSeconds(10),t.plusSeconds(10),"UTC","SECOND"),com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,"Explicit 20 BOX coverage interval",null,null))).get("id").toString();
+   // The source's closed microsecond end preserves the original exclusive
+   // 00:00:10 boundary; a prose assertion alone cannot verify its coverage.
+   String payload=json.writeValueAsString(Map.of("activityKind","STATE_OBSERVATION",
+     "segmentId",segment,"placeId",place,"quantity","20","unit","BOX",
+     "coverageStart",t.minusSeconds(10).toString(),"coverageEnd",t.plusSeconds(10).minusNanos(1000).toString(),
+     "occurredAt",t.plusSeconds(10).toString(),"sourceNamespace","fixture","sourceVersion","1"));
+   byte[] original=payload.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+   String doc=evidenceCall(()->records.attachDocument(new com.mulino.application.evidence.EvidenceRecords.DocumentInput(subject,"fixture","INTERVAL-20","application/json",LocalBlobStore.hash(original),"explicit interval original",null),original)).get("id").toString();
+   String event=evidenceCall(()->records.recordActivity(new com.mulino.application.evidence.EvidenceRecords.EventInput(subject,"STATE_OBSERVATION","fixture","INTERVAL-20","1",new com.mulino.domain.evidence.EvidenceTypes.EffectiveTime(t.minusSeconds(10),t.plusSeconds(10),"UTC","SECOND"),com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,payload,null,null))).get("id").toString();
    String claim=evidenceCall(()->records.recordClaim(new com.mulino.application.evidence.EvidenceRecords.ClaimInput(event,doc,"Observed full identified segment interval","20","BOX",com.mulino.domain.evidence.EvidenceTypes.ValueState.KNOWN,null))).get("id").toString();
    assertEquals("UNVERIFIED",stateAt(t.plusSeconds(601),t.plusSeconds(1000)));
    var review=evidenceCall(()->reconciliation.match(auth.context(t.plusSeconds(600),t.plusSeconds(600)),new com.mulino.application.evidence.EvidenceReconciliation.Review(claim,doc,segment,null,"fixture-evidence-v1","fixture:INTERVAL-20:1","20","BOX",t.minusSeconds(10),"Original interval and identified segment checked"),"matchSourceIdentity"));
