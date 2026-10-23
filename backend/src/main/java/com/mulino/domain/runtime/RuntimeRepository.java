@@ -17,6 +17,12 @@ public class RuntimeRepository implements CommandLeasePort,TransactionalOutboxPo
   private final ObjectMapper json=new ObjectMapper();
   public RuntimeRepository(JdbcTemplate db,ExecutionClock clock){this.db=db;this.clock=clock;}
   public JdbcTemplate db(){return db;}
+  /** Bind the actual application clock before each recovery statement in its parent transaction. */
+  public int recoveryWrite(String sql,Object... parameters){
+    transaction();
+    db.queryForObject("SELECT set_config('mulino.recovery_recorded_at',?,true)",String.class,clock.instant().toString());
+    return db.update(sql,parameters);
+  }
   public static Timestamp at(Instant i){return i==null?null:Timestamp.from(i);}
   public static Instant instant(Object value){return value instanceof Timestamp t?t.toInstant():value instanceof java.time.OffsetDateTime t?t.toInstant():Instant.parse(value.toString());}
   public static void transaction(){if(!TransactionSynchronizationManager.isActualTransactionActive())throw new IllegalStateException("Runtime persistence requires parent transaction");}

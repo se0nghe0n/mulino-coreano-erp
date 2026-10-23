@@ -73,5 +73,62 @@ class RuntimeIntakePostgresTest {
   var duplicate=cds.requestContext().run(ctx->{return commands.executeClaimed(intent,claim);});assertEquals(command,duplicate.get("commandId"));assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_runtime_Outbox WHERE organizationId=?",Integer.class,org));
   for(var declared:List.of(Map.of("type","Work","id",work),Map.of("type","WORK","id",linked))){String key="wrong-subject-"+id();var wrong=new LinkedHashMap<String,Object>(intent);wrong.put("commandIdempotencyKey",key);wrong.put("subjectRefs",List.of(declared));var wrongClaim=cds.requestContext().run(ctx->{return runtime.claim(c,linked,"fixtureExternalEffect",key,"fixture-producer",Duration.ofSeconds(5));}).orElseThrow();var denied=cds.requestContext().run(ctx->{return commands.executeClaimed(wrong,wrongClaim);});assertEquals("REJECTED",denied.get("outcome"));assertEquals("TYPE_INVALID",((Map<?,?>)denied.get("error")).get("code"));}assertEquals(1,db.queryForObject("SELECT count(*) FROM mulino_runtime_Outbox WHERE organizationId=?",Integer.class,org));
  }
+ @Autowired com.mulino.domain.runtime.RuntimeRepository repository;
+ @Autowired org.springframework.transaction.PlatformTransactionManager transactions;
+ void transaction(Runnable action){new org.springframework.transaction.support.TransactionTemplate(transactions).executeWithoutResult(status->action.run());}
+ List<Map<String,Object>> history(String source){return db.queryForList("SELECT * FROM mulino_runtime_RecoveryObservationHistory WHERE organizationId=? AND sourceId=? ORDER BY ID",org,source);}
+ @Test void recoveryScheduleRecordsEveryTransitionAndRollbackWithTheApplicationClock(){
+  var c=new DomainContext(org,actor,stableOwner,clock.instant(),clock.instant());
+  runtime.schedule(c,work,"WORK_RECHECK",clock.instant(),null,true,actor,actor,"Inspect original work");
+  var row=db.queryForMap("SELECT * FROM mulino_runtime_RecoverySchedules WHERE organizationId=? AND workId=?",org,work);String source=row.get("id").toString();
+  var recorded=clock.instant();runtime.manualRecovery(row,"FORBIDDEN","Review held work",c);
+  runtime.schedule(c,work,"WORK_RECHECK",clock.instant().plusSeconds(30),null,true,actor,actor,"Reschedule original work");
+  runtime.completedRecovery(row,"CHECKED");
+  assertEquals(4,history(source).size());
+  long previous=-1;for(var h:history(source)){assertEquals(recorded,((java.sql.Timestamp)h.get("recordedat")).toInstant());assertTrue((Boolean)h.get("historycomplete"));assertTrue((Boolean)h.get("scopecomplete"));assertEquals(item,h.get("itemid"));assertEquals(work,h.get("workid"));long seq=((Number)h.get("id")).longValue();assertTrue(seq>previous);previous=seq;}
+  assertEquals(1,history(source).get(2).get("sourcerevision"));
+  assertThrows(RuntimeException.class,()->transaction(()->{runtime.manualRecovery(row,"ROLLBACK","Must rollback",c);throw new RuntimeException("rollback injection");}));
+  assertEquals(4,history(source).size());assertEquals("CHECKED",db.queryForObject("SELECT recoveryStatus FROM mulino_runtime_RecoverySchedules WHERE ID=?",String.class,source));
+  clock.advance(clock.instant().plusSeconds(1));runtime.removeSchedule(c,work,"WORK_RECHECK");
+  assertEquals("DELETE",history(source).getLast().get("operation"));assertTrue(history(source).getLast().get("snapshotjson").toString().contains("CHECKED"));
+  assertEquals(0,db.queryForObject("SELECT count(*) FROM mulino_runtime_RecoverySchedules WHERE ID=?",Integer.class,source));
+ }
+ @Test void historyRejectsDirectMutationsMissingClockAndScopeChanges(){
+  var c=new DomainContext(org,actor,stableOwner,clock.instant(),clock.instant());runtime.schedule(c,work,"WORK_RECHECK",clock.instant(),null,true,actor,actor,"Inspect");
+  var source=db.queryForObject("SELECT ID FROM mulino_runtime_RecoverySchedules WHERE organizationId=?",String.class,org);
+  assertThrows(org.springframework.dao.DataAccessException.class,()->db.update("UPDATE mulino_runtime_RecoverySchedules SET nextAction='unclocked' WHERE ID=?",source));
+  assertThrows(org.springframework.dao.DataAccessException.class,()->db.update("UPDATE mulino_runtime_RecoveryObservationHistory SET snapshotJson='{}' WHERE organizationId=?",org));
+  assertThrows(org.springframework.dao.DataAccessException.class,()->db.update("DELETE FROM mulino_runtime_RecoveryObservationHistory WHERE organizationId=?",org));
+  assertThrows(org.springframework.dao.DataAccessException.class,()->db.execute("TRUNCATE mulino_runtime_RecoveryObservationHistory"));
+  assertThrows(org.springframework.dao.DataAccessException.class,()->db.execute("TRUNCATE mulino_runtime_RecoverySchedules"));
+  assertThrows(org.springframework.dao.DataAccessException.class,()->transaction(()->repository.recoveryWrite("UPDATE mulino_runtime_RecoverySchedules SET workId=? WHERE ID=?",id(),source)));
+  assertEquals(1,history(source).size());
+ }
+ @Test void intakeRecoveryWritersRetainOriginalEventAndScopeAcrossLinking(){
+  tick();assertTrue(history(inbox).size()>=2);assertTrue(history(inbox).stream().anyMatch(h->h.get("snapshotjson").toString().contains("HELD_LINK")));
+  insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","createObligation"));clock.advance(clock.instant().plusSeconds(2));tick();
+  var rows=history(inbox);assertTrue(rows.getLast().get("snapshotjson").toString().contains("LINKED"));
+  for(var h:rows){assertEquals(work,h.get("workid"));assertEquals(item,h.get("itemid"));assertTrue((Boolean)h.get("scopecomplete"));assertTrue((Boolean)h.get("historycomplete"));assertTrue(h.get("snapshotjson").toString().contains(event));}
+  assertEquals(db.queryForObject("SELECT to_jsonb(r)::text FROM mulino_runtime_IntakeRecoveries r WHERE ID=?",String.class,inbox),rows.getLast().get("snapshotjson"));
+ }
+ @Autowired RuntimeIntakeService intakeService;
+ @Test void intakeClaimPolicyDraftAndControlInvalidationAreAllRecorded(){
+  intakeService.due();var row=db.queryForMap("SELECT * FROM mulino_runtime_IntakeRecoveries WHERE ID=?",inbox);
+  var c=new DomainContext(org,actor,stableOwner,clock.instant(),clock.instant());
+  assertTrue(intakeService.claimCreate(c,row,Map.of("commandIdempotencyKey","history-claim")).isPresent());
+  intakeService.policy(row,id(),"a".repeat(64));intakeService.created(row,id());
+  intakeService.hold(row,"POLICY_UNRESOLVED","Human policy review");
+  assertEquals(5,history(inbox).size());
+  db.update("INSERT INTO mulino_identity_AuthorityInvalidations(organizationId,ID,actorId,nextCheckAt,reason,revision) VALUES(?,?,?,?,?,0)",org,id(),actor,Timestamp.from(clock.instant()),"TEST_CHANGE");
+  runtime.captureControlInvalidations();assertEquals(6,history(inbox).size());
+  assertEquals("PENDING",db.queryForObject("SELECT state FROM mulino_runtime_IntakeRecoveries WHERE ID=?",String.class,inbox));
+  assertTrue(history(inbox).get(1).get("snapshotjson").toString().contains("history-claim"));
+  assertEquals(1,((Number)db.queryForMap("SELECT * FROM mulino_runtime_IntakeRecoveries WHERE ID=?",inbox).get("fencingtoken")).intValue());
+ }
+ @AfterEach void saveHistory(TestInfo info)throws Exception {
+  String directory=System.getProperty("recovery.evidence");if(directory==null)return;
+  var rows=db.queryForList("SELECT row_to_json(h)::text FROM mulino_runtime_RecoveryObservationHistory h WHERE organizationId=? ORDER BY ID",String.class,org);
+  Files.createDirectories(Path.of(directory));Files.writeString(Path.of(directory).resolve(info.getTestMethod().orElseThrow().getName()+"-history.json"),"["+String.join(",",rows)+"]");
+ }
  @AfterAll static void cleanup()throws Exception{PG.stop();Files.deleteIfExists(KEY);try(var paths=Files.walk(BLOBS)){for(var path:paths.sorted(Comparator.reverseOrder()).toList())Files.delete(path);}}
 }

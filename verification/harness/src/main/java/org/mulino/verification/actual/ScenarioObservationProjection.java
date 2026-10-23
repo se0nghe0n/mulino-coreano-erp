@@ -174,7 +174,7 @@ final class ScenarioObservationProjection {
                 var out=Json.array();for(var row:read("mulino_work_read_AssessmentReferences"))out.addAll(conditionRows(row,parse(row,"conditionsJson")));yield out;
             }
             case "@observationCoverage" -> verifiedObservations();
-            case "@supervisionIssues" -> emptySupervisionIssues();
+            case "@supervisionIssues" -> supervisionIssues();
             case "@assessmentInputs" -> {
                 var out=Json.array();for(var snapshot:read("mulino_evaluation_InputSnapshots")) {
                     var content=parse(snapshot,"contentJson");var conditions=conditionRows(snapshot,content.path("conditions"));
@@ -186,30 +186,41 @@ final class ScenarioObservationProjection {
         };
     }
 
-    /**
-     * Absence in an organization superset proves absence in every narrower scope in this MVCC snapshot.
-     * Neither recovery table stores recordedAt history. A nonempty superset cannot prove historical
-     * issues (or their absence), even when its current rows have another work, state or future due time.
-     */
-    private ArrayNode emptySupervisionIssues() throws SQLException {
-        long total=0;
+    /** Independently reconstruct the latest committed source state known at the requested instant. */
+    private ArrayNode supervisionIssues() throws Exception {
+        String history="mulino_runtime_RecoveryObservationHistory";
+        var organization=new StringBuilder();var orgParams=new ArrayList<Object>();
+        in(organization,"r.organizationId",orgs,orgParams);
+        var incompleteParams=new ArrayList<Object>(orgParams);incompleteParams.add(knownAt);
+        var incomplete=query(history,organization+" AND (NOT r.historyComplete OR (NOT r.scopeComplete AND r.recordedAt<=?))",incompleteParams);
+        // An old installation may contain rows with no INSERT history. Never backdate their current state.
         for(String table:List.of("mulino_runtime_RecoverySchedules","mulino_runtime_IntakeRecoveries")) {
-            var predicate=new StringBuilder();var parameters=new ArrayList<Object>();
-            in(predicate,"r.organizationId",orgs,parameters);
-            String sql="SELECT count(*) FROM "+table+" r WHERE "+predicate;
-            long count;
-            try(var statement=connection.prepareStatement(sql)) {
-                for(int i=0;i<parameters.size();i++)statement.setObject(i+1,parameters.get(i));
-                try(var rows=statement.executeQuery()){rows.next();count=rows.getLong(1);}
-            }
-            var proof=Json.object().put("table",table).put("sql",sql).put("observedRowCount",count)
-                .put("proofKind","CURRENT_SNAPSHOT_ORGANIZATION_SUPERSET_EMPTY")
-                .put("note","Counts all rows of the requested organizations in the same read-only REPEATABLE_READ snapshot. Zero proves this narrower scope empty in that snapshot only; it does not reconstruct knownAt history, deleted rows, states or business issues.");
-            proof.set("boundValues",Json.MAPPER.valueToTree(parameters));queries.add(proof);
-            total+=count;
+            String predicate=organization+" AND NOT EXISTS (SELECT 1 FROM "+history+" h WHERE h.organizationId=r.organizationId AND h.sourceTable=? AND h.sourceId=r.ID AND h.operation<>'DELETE' AND h.snapshotJson::jsonb=to_jsonb(r) AND NOT EXISTS (SELECT 1 FROM "+history+" later WHERE later.organizationId=h.organizationId AND later.sourceTable=h.sourceTable AND later.sourceId=h.sourceId AND later.ID>h.ID))";
+            var params=new ArrayList<Object>(orgParams);params.add(table.toLowerCase(Locale.ROOT));
+            var missing=query(table,predicate,params);
+            if(!missing.isEmpty())throw new UnsupportedOperationException("Recovery organization superset is nonempty without complete source history; requested supervisionIssues scope/knownAt is unknown");
         }
-        if(total!=0)throw new UnsupportedOperationException("Recovery organization superset is nonempty in the current snapshot; no recordedAt history proves the requested supervisionIssues scope/knownAt");
-        return Json.array();
+        if(!incomplete.isEmpty())
+            throw new UnsupportedOperationException("Recovery historical source or immutable scope binding is incomplete; supervisionIssues is unknown");
+        var params=new ArrayList<Object>(orgParams);
+        var predicate=new StringBuilder(organization).append(" AND r.recordedAt<=?");params.add(knownAt);
+        predicate.append(" AND NOT EXISTS (SELECT 1 FROM ").append(history).append(" later WHERE later.organizationId=r.organizationId AND later.sourceTable=r.sourceTable AND later.sourceId=r.sourceId AND later.recordedAt<=? AND (later.recordedAt>r.recordedAt OR (later.recordedAt=r.recordedAt AND later.ID>r.ID)))");params.add(knownAt);
+        predicate.append(" AND r.operation<>'DELETE'");
+        if(!items.isEmpty()){predicate.append(" AND ");in(predicate,"r.itemId",items,params);}
+        if(!works.isEmpty()){predicate.append(" AND ");in(predicate,"r.workId",works,params);}
+        if(!lots.isEmpty()){predicate.append(" AND ");in(predicate,"r.lotId",lots,params);}
+        predicate.append(" AND ((r.sourceTable='mulino_runtime_recoveryschedules' AND r.snapshotJson::jsonb->>'recoverystatus'='HELD_MANUAL') OR (r.sourceTable='mulino_runtime_intakerecoveries' AND r.snapshotJson::jsonb->>'state' IN ('HELD_POLICY','HELD_LINK','HELD_MANUAL')))");
+        var out=Json.array();
+        for(var historyRow:query(history,predicate.toString(),params)) {
+            var stored=Json.parse(historyRow.path("snapshotJson").asText());var row=Json.object();
+            String table=historyRow.path("sourceTable").asText();var names=ScenarioJdbcObservation.names(root,table);
+            for(var it=stored.fields();it.hasNext();){var field=it.next();String name=names.getOrDefault(field.getKey(),field.getKey());row.set(name.equals("ID")?"id":name,field.getValue());}
+            row.set("status",row.path(table.endsWith("recoveryschedules")?"recoveryStatus":"state"));
+            if(table.endsWith("intakerecoveries"))row.set("ownerId",row.path("intakeOwnerId"));
+            for(String field:List.of("workId","itemId","lotId","recordedAt","transactionId"))row.set(field,historyRow.path(field));
+            row.set("historyId",historyRow.path("id"));row.put("sourceTable",table);out.add(row);
+        }
+        return out;
     }
 
     /** Verified DB identity chain; no claim payload alone can certify a state observation or quantity. */

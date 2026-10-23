@@ -166,15 +166,12 @@ class ScenarioObservationPostgresTest {
         var raw=result.path("rawRows");assertTrue(raw.path("supervisionIssues").isArray());assertTrue(raw.path("supervisionIssues").isEmpty());
         assertEquals(1,raw.path("works").size());assertEquals(1,raw.path("goalVersions").size());assertEquals(1,raw.path("conditionResults").size());
         var proofs=Json.parse(result.path("sourceEvidence").path("supervisionIssues").path("sourceQuery").path("sql").asText()).get(0).path("queries");
-        assertEquals(2,proofs.size());var tables=new HashSet<String>();
+        assertEquals(4,proofs.size());
         for(var proof:proofs) {
-            tables.add(proof.path("table").asText());assertEquals(0,proof.path("observedRowCount").asLong());
-            assertEquals("CURRENT_SNAPSHOT_ORGANIZATION_SUPERSET_EMPTY",proof.path("proofKind").asText());
-            assertEquals(List.of(org),Json.MAPPER.convertValue(proof.path("boundValues"),List.class));
-            assertEquals("SELECT count(*) FROM "+proof.path("table").asText()+" r WHERE r.organizationId IN (?)",proof.path("sql").asText());
-            assertTrue(proof.path("note").asText().contains("does not reconstruct knownAt history"));
+            assertTrue(proof.path("sql").asText().contains("?"));
+            assertTrue(proof.path("boundValues").toString().contains(org));
         }
-        assertEquals(Set.of("mulino_runtime_RecoverySchedules","mulino_runtime_IntakeRecoveries"),tables);
+        assertTrue(proofs.get(3).path("sql").asText().contains("recordedAt<=?"));
         assertEquals(now,result.path("knownAt").asText());assertEquals("REPEATABLE_READ",result.path("snapshot").path("isolation").asText());
     }
 
@@ -210,9 +207,92 @@ class ScenarioObservationPostgresTest {
             ObserverSnapshot.token(c); // Establish the snapshot before the independent writer commits.
             insert("mulino_runtime_IntakeRecoveries",Json.object().put("ID",id()).put("organizationId",org).put("state","HELD_SOURCE"));
             var projection=new ScenarioObservationProjection(c,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
-            assertTrue(projection.virtual("@supervisionIssues").isEmpty());assertEquals(2,projection.drainQueries().size());c.rollback();
+            assertTrue(projection.virtual("@supervisionIssues").isEmpty());assertEquals(4,projection.drainQueries().size());c.rollback();
         }
         assertThrows(UnsupportedOperationException.class,()->capture("supervisionIssues"));
+    }
+
+    void installHistory() throws Exception {
+        try(var st=writer.createStatement()){
+            st.execute("DROP TABLE mulino_runtime_RecoveryObservationHistory");
+            st.execute(Files.readString(root.resolve("database/migrations/V39__recovery_observation_history.sql")));
+        }
+    }
+    void change(String time,String sql,Object... args) throws Exception {
+        writer.setAutoCommit(false);
+        try {
+            try(var st=writer.prepareStatement("SELECT set_config('mulino.recovery_recorded_at',?,true)")){st.setString(1,time);st.execute();}
+            try(var st=writer.prepareStatement(sql)){for(int n=0;n<args.length;n++)st.setObject(n+1,args[n]);st.executeUpdate();}
+            writer.commit();
+        }catch(Exception failure){writer.rollback();throw failure;}finally{writer.setAutoCommit(true);}
+    }
+    String schedule(String time,String source,String selectedWork) throws Exception {
+        change(time,"INSERT INTO mulino_runtime_RecoverySchedules(organizationId,ID,workId,revision,recoveryStatus,ownerId,supervisorId,nextAction,nextCheckAt) VALUES(?,?,?,0,'HELD_MANUAL',?,?,'Stored human action',?)",org,source,selectedWork,id(),id(),OffsetDateTime.parse(time));return source;
+    }
+    JsonNode at(String time,ObjectNode selectedScope) throws Exception {
+        var request=request(selectedScope,"supervisionIssues");request.put("knownAt",time);
+        var result=ScenarioJdbcObservation.capture(config,root,request);
+        if(System.getenv("OBSERVER_TEST_EVIDENCE")!=null)Json.write(Path.of(System.getenv("OBSERVER_TEST_EVIDENCE")).resolve(testName+"-"+(++captures)+".json"),result);
+        return result;
+    }
+    @Test void realHistoryReconstructsHeldCompletedAndDeletedSourcesAtKnownAt() throws Exception {
+        base();installHistory();String source=schedule(now,id(),work);
+        var observed=at(now,scope());assertFalse(observed.path("sourceEvidence").path("supervisionIssues").path("approximateMapping").asBoolean());
+        var held=observed.path("rawRows").path("supervisionIssues");assertEquals(1,held.size());assertEquals(source,held.get(0).path("id").asText());assertEquals("HELD_MANUAL",held.get(0).path("status").asText());assertEquals("Stored human action",held.get(0).path("nextAction").asText());assertEquals(item,held.get(0).path("itemId").asText());
+        change(later,"UPDATE mulino_runtime_RecoverySchedules SET recoveryStatus='CHECKED',revision=revision+1 WHERE ID=?",source);
+        assertEquals(1,at(now,scope()).path("rawRows").path("supervisionIssues").size());assertTrue(at(later,scope()).path("rawRows").path("supervisionIssues").isEmpty());
+        change(later,"UPDATE mulino_runtime_RecoverySchedules SET recoveryStatus='HELD_MANUAL',revision=revision+1 WHERE ID=?",source);
+        assertEquals(2,at(later,scope()).path("rawRows").path("supervisionIssues").get(0).path("revision").asInt());
+        change(later,"DELETE FROM mulino_runtime_RecoverySchedules WHERE ID=?",source);
+        assertTrue(at(later,scope()).path("rawRows").path("supervisionIssues").isEmpty());assertEquals(1,at(now,scope()).path("rawRows").path("supervisionIssues").size());
+        assertTrue(at(before,scope()).path("rawRows").path("supervisionIssues").isEmpty());
+    }
+    @Test void historyScopeTimeMvccAndReadOnlyAreIndependentOfCurrentSource() throws Exception {
+        base();installHistory();String source=schedule(now,id(),work);
+        for(String field:List.of("organizationId","itemId","workId","lotId"))assertTrue(at(now,scope().put(field,id())).path("rawRows").path("supervisionIssues").isEmpty(),field);
+        assertTrue(at(before,scope()).path("rawRows").path("supervisionIssues").isEmpty());
+        try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+            c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(c);
+            change(later,"DELETE FROM mulino_runtime_RecoverySchedules WHERE ID=?",source);
+            var p=new ScenarioObservationProjection(c,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(later));assertEquals(1,p.virtual("@supervisionIssues").size());
+            try(var st=c.createStatement()){assertThrows(SQLException.class,()->st.executeUpdate("DELETE FROM mulino_runtime_RecoveryObservationHistory"));}c.rollback();
+        }
+        assertTrue(at(later,scope()).path("rawRows").path("supervisionIssues").isEmpty());
+    }
+    @Test void preMigrationRowsStayUnknownEvenAfterUpdateOrDeletion() throws Exception {
+        base();String source=id();insert("mulino_runtime_RecoverySchedules",Json.object().put("organizationId",org).put("ID",source).put("workId",work).put("revision",0).put("recoveryStatus","READY"));installHistory();
+        assertThrows(UnsupportedOperationException.class,()->at(now,scope()));
+        change(now,"UPDATE mulino_runtime_RecoverySchedules SET recoveryStatus='HELD_MANUAL' WHERE ID=?",source);assertThrows(UnsupportedOperationException.class,()->at(now,scope()));
+        change(later,"DELETE FROM mulino_runtime_RecoverySchedules WHERE ID=?",source);assertThrows(UnsupportedOperationException.class,()->at(later,scope()));
+    }
+
+    @Test void intakeHistoryUsesImmutableEventScopeAndPreservesOriginalResponsibility() throws Exception {
+        base();String event=id(),inbox=id(),owner=id(),supervisor=id();
+        // An explicit Work relation proves its item/LOT even when the event omits the redundant item field.
+        insert("mulino_evidence_Events",row(event).put("workId",work).put("subjectKind","WORK").put("subjectId",work));
+        insert("mulino_evidence_InboxRecords",row(inbox).put("eventId",event));installHistory();
+        change(now,"INSERT INTO mulino_runtime_IntakeRecoveries(organizationId,ID,eventId,sourceProfileId,intakeOwnerId,supervisorId,nextAction,nextCheckAt,state,revision) VALUES(?,?,?,?,?,?,'Resolve actual source',?,'HELD_POLICY',3)",org,inbox,event,id(),owner,supervisor,OffsetDateTime.parse(now));
+        var issue=at(now,scope()).path("rawRows").path("supervisionIssues").get(0);assertEquals(inbox,issue.path("id").asText());assertEquals(owner,issue.path("ownerId").asText());assertEquals(supervisor,issue.path("supervisorId").asText());assertEquals("HELD_POLICY",issue.path("state").asText());assertEquals(3,issue.path("revision").asInt());
+        change(later,"UPDATE mulino_runtime_IntakeRecoveries SET state='LINKED',linkedWorkId=?,revision=revision+1 WHERE ID=?",id(),inbox);
+        assertEquals(1,at(now,scope()).path("rawRows").path("supervisionIssues").size());assertTrue(at(later,scope()).path("rawRows").path("supervisionIssues").isEmpty());
+        var sql=at(now,scope()).path("sourceEvidence").path("supervisionIssues").path("sourceQuery").path("sql").asText();assertTrue(sql.contains("boundValues"));assertTrue(sql.contains("recordedAt<=?"));assertTrue(sql.contains("r.itemId IN (?)"));assertTrue(sql.contains("r.workId IN (?)"));assertTrue(sql.contains("r.lotId IN (?)"));
+    }
+    @Test void sourceAndHistoryRollbackTogetherAndUncommittedStateStaysInvisible() throws Exception {
+        base();installHistory();String source=schedule(now,id(),work);
+        writer.setAutoCommit(false);
+        try {
+            try(var st=writer.prepareStatement("SELECT set_config('mulino.recovery_recorded_at',?,true)")){st.setString(1,later);st.execute();}
+            try(var st=writer.prepareStatement("UPDATE mulino_runtime_RecoverySchedules SET recoveryStatus='CHECKED' WHERE ID=?")){st.setString(1,source);st.executeUpdate();}
+            assertEquals(1,at(later,scope()).path("rawRows").path("supervisionIssues").size());writer.rollback();
+        }finally{writer.setAutoCommit(true);}
+        assertEquals(1,at(later,scope()).path("rawRows").path("supervisionIssues").size());
+        try(var st=writer.createStatement();var r=st.executeQuery("SELECT count(*) FROM mulino_runtime_RecoveryObservationHistory")){r.next();assertEquals(1,r.getInt(1));}
+    }
+
+    @Test void aProvenFutureInsertDoesNotInventPastPresenceEvenWhenItsScopeIsUnknown() throws Exception {
+        base();installHistory();schedule(later,id(),id());
+        assertTrue(at(now,scope()).path("rawRows").path("supervisionIssues").isEmpty());
+        assertThrows(UnsupportedOperationException.class,()->at(later,scope()));
     }
 
     @Test void unsupportedVirtualScopeFailsClosedAndNoDatabaseWritesAreAllowed() throws Exception {

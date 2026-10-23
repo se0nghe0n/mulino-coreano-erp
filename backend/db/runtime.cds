@@ -49,3 +49,14 @@ entity IntakeRecoveries {
  leaseOwner: String(160); fencingToken: Integer64 not null; leaseExpiresAt: Timestamp;
  attempts: Integer not null; lastCode: String(80);
 }
+
+// Append-only trigger-owned snapshot; sequence ID orders changes at the same ExecutionClock instant.
+entity RecoveryObservationHistory {
+ key organizationId: UUID; key ID: Integer64;
+ sourceTable: String(80) not null; sourceId: UUID not null;
+ sourceRevision: Integer not null; recordedAt: Timestamp not null;
+ transactionId: String(40) not null; operation: String(10) not null;
+ historyComplete: Boolean not null; scopeComplete: Boolean not null;
+ workId: UUID; itemId: UUID; lotId: UUID;
+ snapshotJson: LargeString not null;
+}

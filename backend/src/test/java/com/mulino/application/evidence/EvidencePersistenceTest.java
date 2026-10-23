@@ -40,9 +40,15 @@ class EvidencePersistenceTest {
   @Autowired JdbcTemplate jdbc; @Autowired IdentityAuthorization auth; @Autowired EvidenceRecords records;
   @Autowired EvidenceQueries queries; @Autowired EvidenceRepository repository; @Autowired LocalBlobStore blobs;
   @Autowired CdsRuntime runtime; @Autowired PlatformTransactionManager tx;
+  @Autowired com.mulino.domain.runtime.RuntimeRepository recoveryRepository;
   static String uuid(){return UUID.randomUUID().toString();}
   @BeforeEach void seed() {
     for(String directory:List.of("objects","staging"))try(var files=Files.list(BLOBS.resolve(directory))){for(Path file:files.toList())Files.delete(file);}catch(Exception e){throw new IllegalStateException(e);}
+    // Keep the product's append-only recovery history while resetting this synthetic fixture.
+    new TransactionTemplate(tx).executeWithoutResult(status->{
+      recoveryRepository.recoveryWrite("DELETE FROM mulino_runtime_RecoverySchedules");
+      recoveryRepository.recoveryWrite("DELETE FROM mulino_runtime_IntakeRecoveries");
+    });
     jdbc.execute("TRUNCATE mulino_evidence_SourceProfiles, mulino_inventory_TradeItems,mulino_identity_Organizations CASCADE");
     jdbc.update("INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,'ORG-A'),(?,'ORG-B')",ORG,OTHER);
     jdbc.update("INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES(?,?,'HUMAN',?)",ORG,ACTOR,OWNER);
