@@ -200,6 +200,7 @@ final class ScenarioObservationProjection {
                     copy(row,"startInclusive",slots,"periodStartInclusive");copy(row,"endInclusive",slots,"periodEndInclusive");
                     copy(row,"evidencePolicyVersion",slots,"evidencePolicyVersion");
                 }
+                case "mulino_trade_sales_Deliveries" -> canonicalDelivery(row);
                 case "mulino_trade_purchase_Approvals" -> field(row,"conditions",parse(row,"conditionsJson"));
                 case "mulino_work_read_Works" -> {
                     var wait=parse(row,"waitJson");copy(row,"waitReason",wait,"reason");
@@ -238,6 +239,136 @@ final class ScenarioObservationProjection {
                 default -> {}
             }
         }
+    }
+
+    /** A persisted physical fact binding, never SELL permission or a contribution judgment. */
+    private void canonicalDelivery(ObjectNode delivery) throws Exception {
+        // The observer must not retain an unverified caller/column marker.
+        delivery.remove(List.of("canonical","canonicalSource"));
+        var occurrence=linked("mulino_evidence_CanonicalOccurrences",delivery,delivery.path("canonicalOccurrenceId").asText(null));
+        var observation=linked("mulino_trade_sales_Observations",delivery,delivery.path("observationId").asText(null));
+        var dispatch=linked("mulino_inventory_Dispatches",delivery,delivery.path("dispatchId").asText(null));
+        if(!deliveryScope(delivery,occurrence,observation,dispatch)||!coversDelivery(occurrence,delivery)
+            ||java.time.Instant.parse(delivery.path("occurredAt").asText()).isAfter(knownAt.toInstant()))return;
+        var owners=query("mulino_trade_sales_Deliveries","r.organizationId=? AND r.canonicalOccurrenceId=? AND r.recordedAt<=?",
+            List.of(delivery.path("organizationId").asText(),occurrence.path("id").asText(),knownAt));
+        if(owners.size()!=1||!owners.get(0).path("id").equals(delivery.path("id")))return;
+        if(superseded("mulino_evidence_CanonicalOccurrences",occurrence,"supersedesId"))return;
+        var verifications=query("mulino_evidence_Verifications","r.organizationId=? AND r.canonicalOccurrenceId=? AND r.recordedAt<=?",
+            List.of(delivery.path("organizationId").asText(),occurrence.path("id").asText(),knownAt));
+        var chains=Json.array();
+        for(var verification:verifications) {
+            if(!"VERIFIED".equals(verification.path("verdict").asText())
+                ||!List.of("sourceMatched","identityMatched","quantityMatched","timeMatched","duplicateChecked").stream()
+                    .allMatch(k->verification.path(k).isBoolean()&&verification.path(k).booleanValue()))continue;
+            var claim=linked("mulino_evidence_Claims",delivery,verification.path("claimId").asText(null));
+            var event=claim==null?null:linked("mulino_evidence_Events",delivery,claim.path("eventId").asText(null));
+            var document=linked("mulino_evidence_DocumentVersions",delivery,verification.path("basisDocumentId").asText(null));
+            if(!deliverySource(delivery,occurrence,observation,claim,event,document)
+                ||!coversDelivery(claim,delivery)||!coversDelivery(event,delivery)||!deliveryOriginal(event,document))continue;
+            var profile=linked("mulino_evidence_SourceProfiles",delivery,event.path("sourceProfileId").asText(null));
+            if(profile==null||!requiredSame(profile,verification,"policyVersion")||!profile.path("namespace").equals(event.path("sourceNamespace")))continue;
+            var inbox=query("mulino_evidence_InboxRecords","r.organizationId=? AND r.sourceNamespace=? AND r.externalEventId=? AND r.sourceVersion=? AND r.recordedAt<=?",
+                List.of(delivery.path("organizationId").asText(),event.path("sourceNamespace").asText(),event.path("externalEventId").asText(),event.path("sourceVersion").asText(),knownAt));
+            if(inbox.size()!=1||"CONFLICT".equals(inbox.get(0).path("state").asText())
+                ||!inbox.get(0).path("eventId").equals(event.path("id"))||!requiredSame(inbox.get(0),event,"payloadHash"))continue;
+            if(superseded("mulino_evidence_Events",event,"supersedesId","invalidatesId")
+                ||superseded("mulino_evidence_Claims",claim,"supersedesId")
+                ||superseded("mulino_evidence_DocumentVersions",document,"supersedesId"))continue;
+            chains.add(Json.object().put("canonicalOccurrenceId",occurrence.path("id").asText())
+                .put("observationId",observation.path("id").asText()).put("dispatchId",dispatch.path("id").asText())
+                .put("verificationId",verification.path("id").asText()).put("claimId",claim.path("id").asText())
+                .put("eventId",event.path("id").asText()).put("documentVersionId",document.path("id").asText())
+                .put("sourceProfileId",profile.path("id").asText()).put("inboxId",inbox.get(0).path("id").asText()));
+        }
+        // Multiple independently linked candidates need reconciliation; do not choose an arbitrary first row.
+        if(chains.size()==1){delivery.put("canonical",true);delivery.set("canonicalSource",chains.get(0));}
+    }
+
+    /** Read only the explicitly configured immutable local object; unavailable bytes remain unknown. */
+    static boolean deliveryOriginal(JsonNode event,JsonNode document) {
+        String configured=System.getProperty("verification.actual.blobRoot");
+        if(configured==null)return false;
+        try {
+            String id=UUID.fromString(document.path("blobId").asText()).toString();
+            Path objects=Path.of(configured).toAbsolutePath().normalize().resolve("objects");
+            Path file=objects.resolve(id);
+            if(java.nio.file.Files.isSymbolicLink(objects)||java.nio.file.Files.isSymbolicLink(file)
+                ||!java.nio.file.Files.isRegularFile(file)||java.nio.file.Files.size(file)>16*1024*1024)return false;
+            byte[] bytes=java.nio.file.Files.readAllBytes(file);
+            String hash=HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes));
+            return hash.equals(document.path("sha256").asText())&&bytes.length==document.path("byteLength").asLong(-1)
+                &&Json.parse(new String(bytes,java.nio.charset.StandardCharsets.UTF_8)).equals(parse(event,"payload"));
+        }catch(Exception unavailable){return false;}
+    }
+
+    static boolean deliveryScope(JsonNode d,JsonNode fact,JsonNode observation,JsonNode dispatch) {
+        if(fact==null||observation==null||dispatch==null)return false;
+        try {
+            if(!"PHYSICAL_DELIVERY".equals(fact.path("kind").asText())||!"KNOWN".equals(fact.path("valueState").asText())
+                ||!"COMPLETE".equals(fact.path("reassessmentState").asText())
+                ||!d.path("canonicalOccurrenceId").equals(fact.path("id"))
+                ||!d.path("observationId").equals(fact.path("physicalScopeId"))
+                ||!d.path("observationId").equals(observation.path("id"))||!d.path("dispatchId").equals(dispatch.path("id"))
+                ||!requiredSame(d,fact,"organizationId","workId","itemId","placeId","unit")||!decimalSame(d,fact,"quantity")
+                ||!instantSame(d,"occurredAt",fact,"effectiveFrom")
+                ||!requiredSame(d,observation,"organizationId","dispatchId","cargoScopeId","salesLineId","workId","customerId","itemId","lotId","rangeRootId","unit","placeId")
+                ||(observation.hasNonNull("claimedRangeRootId")&&!observation.path("claimedRangeRootId").equals(d.path("rangeRootId")))
+                ||!decimalSame(d,observation,"quantity","startQuantity")||!instantSame(d,"occurredAt",observation,"occurredAt")
+                ||!requiredSame(d,dispatch,"organizationId","cargoScopeId","salesLineId","workId","customerId","itemId","lotId","rangeRootId","unit")
+                ||!d.path("placeId").equals(dispatch.path("destinationId")))return false;
+            var start=new java.math.BigDecimal(d.path("startQuantity").asText());
+            var quantity=new java.math.BigDecimal(d.path("quantity").asText());
+            var dispatchStart=new java.math.BigDecimal(dispatch.path("startQuantity").asText());
+            return quantity.signum()>0&&start.compareTo(dispatchStart)>=0
+                &&start.add(quantity).compareTo(dispatchStart.add(new java.math.BigDecimal(dispatch.path("quantity").asText())))<=0
+                &&!java.time.Instant.parse(d.path("occurredAt").asText()).isBefore(java.time.Instant.parse(dispatch.path("occurredAt").asText()));
+        }catch(RuntimeException invalid){return false;}
+    }
+
+    static boolean deliverySource(JsonNode d,JsonNode fact,JsonNode observation,JsonNode claim,JsonNode event,JsonNode document) {
+        if(claim==null||event==null||document==null)return false;
+        if(!"KNOWN".equals(claim.path("valueState").asText())||!"KNOWN".equals(event.path("valueState").asText())
+            ||!"PHYSICAL_DELIVERY".equals(event.path("kind").asText())||!"DISPATCH".equals(fact.path("subjectKind").asText())
+            ||!fact.path("subjectId").equals(d.path("dispatchId"))||!event.path("id").equals(observation.path("eventId"))
+            ||!requiredSame(d,claim,"organizationId","itemId","workId","placeId","unit")||!decimalSame(d,claim,"quantity")
+            ||!instantSame(d,"occurredAt",claim,"effectiveFrom")||!instantSame(d,"occurredAt",event,"effectiveFrom")
+            ||!requiredSame(claim,fact,"subjectKind","subjectId","sourceProfileId")
+            ||!requiredSame(claim,event,"organizationId","subjectKind","subjectId","sourceProfileId","itemId","workId","placeId")
+            ||!requiredSame(claim,document,"organizationId","subjectKind","subjectId","sourceProfileId","itemId","workId","placeId")
+            ||!claim.path("documentVersionId").equals(document.path("id"))||!"AVAILABLE".equals(document.path("availability").asText())
+            ||!document.hasNonNull("blobId")||!document.path("sha256").asText().matches("[0-9a-f]{64}")
+            ||!requiredSame(event,document,"sourceNamespace")
+            ||!event.path("externalEventId").equals(document.path("sourceReference")))return false;
+        var payload=parse(event,"payload");
+        if(!payload.isObject()||payload.hasNonNull("correctionOfDeliveryId")
+            ||!payload.path("deliveryEventId").equals(fact.path("occurrenceIdentity"))
+            ||!payload.path("physicalScopeId").equals(d.path("observationId")))return false;
+        return requiredSame(d,payload,"dispatchId","cargoScopeId","salesLineId","customerId","itemId","lotId","rangeRootId","unit","placeId")
+            &&decimalSame(d,payload,"quantity","startQuantity")&&instantSame(d,"occurredAt",payload,"occurredAt");
+    }
+
+    private static boolean coversDelivery(JsonNode source,JsonNode delivery) {
+        if(source==null)return false;
+        try{return !source.hasNonNull("effectiveUntil")||java.time.Instant.parse(delivery.path("occurredAt").asText())
+            .isBefore(java.time.Instant.parse(source.path("effectiveUntil").asText()));}
+        catch(RuntimeException invalid){return false;}
+    }
+
+    private static boolean requiredSame(JsonNode a,JsonNode b,String... fields) {
+        for(String field:fields)if(!a.hasNonNull(field)||!b.hasNonNull(field)
+            ||a.path(field).asText().isBlank()||!a.path(field).equals(b.path(field)))return false;
+        return true;
+    }
+
+    private static boolean decimalSame(JsonNode a,JsonNode b,String... fields) {
+        try{for(String field:fields)if(!a.hasNonNull(field)||!b.hasNonNull(field)
+            ||new java.math.BigDecimal(a.path(field).asText()).compareTo(new java.math.BigDecimal(b.path(field).asText()))!=0)return false;return true;}
+        catch(RuntimeException invalid){return false;}
+    }
+    private static boolean instantSame(JsonNode a,String af,JsonNode b,String bf) {
+        try{return java.time.Instant.parse(a.path(af).asText()).equals(java.time.Instant.parse(b.path(bf).asText()));}
+        catch(RuntimeException invalid){return false;}
     }
 
     private void version(ObjectNode row,String target,String table,String idField) throws Exception {

@@ -66,4 +66,22 @@ class ScenarioObservationProjectionTest {
         assertTrue(projection.drainQueries().isEmpty());
     }
 
+    @Test void canonicalIdOrUntrustedMarkerWithoutSourceCannotCertifyDelivery() throws Exception {
+        var row=Json.object().put("canonicalOccurrenceId","stored-id").put("canonical",true).put("quantity","20").put("legitimateQuantity","0");
+        row.set("canonicalSource",Json.object().put("verificationId","untrusted"));
+        var projection=new ScenarioObservationProjection(null,null,java.util.List.of(),java.util.List.of(),java.util.List.of(),java.util.List.of(),null);
+        projection.enrich("mulino_trade_sales_Deliveries",Json.array().add(row));
+        assertFalse(row.has("canonical"));assertFalse(row.has("canonicalSource"));
+        assertEquals("20",row.path("quantity").asText());assertEquals("0",row.path("legitimateQuantity").asText());
+    }
+
+    @Test void missingOrMalformedCanonicalSourcesAreUnknownRatherThanFalseFacts() {
+        var d=Json.object().put("canonicalOccurrenceId","id").put("quantity","20");
+        assertFalse(ScenarioObservationProjection.deliveryScope(d,null,Json.object(),Json.object()));
+        assertFalse(ScenarioObservationProjection.deliveryScope(d,Json.object(),Json.object(),Json.object()));
+        assertFalse(ScenarioObservationProjection.deliverySource(d,Json.object(),Json.object(),null,null,null));
+        assertFalse(ScenarioObservationProjection.deliveryOriginal(Json.object(),Json.object().put("blobId","../foreign")));
+        assertFalse(d.has("canonical"));assertEquals("20",d.path("quantity").asText());
+    }
+
 }
