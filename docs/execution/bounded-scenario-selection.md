@@ -28,3 +28,15 @@ selected/started/completed는 실제 선택한 수다. 명시적으로 모든 su
 원본 discovery·hash 보존과 잘못된 selector 거부를 확인했다.
 로그와 JUnit은 `.local/resume-20261023/subcase-selection/`에 보존한다.
 새 실제 T17 실행은 Haiku native Workflow가 수행한다.
+
+고정 `27ec8cc3`의 전체 harness는732 PASS·80 opt-in SKIP이며 실패와
+오류는0이다. 실제 observer PG101개를 포함하고 소스3,163개의 hash
+drift0과 자체 PG 제거를 확인했다. prepare는41 case·802 subcase·
+24,260 assertion·문제0·asset12 PASS다. 결합 증거는
+`.local/resume-20261023/subcase-selection-integrated/proof.json`이다.
+
+같은 commit의 전용 tree5개에서 locked npm ci와 사전 검사를 통과했다.
+Workflow `wf_62923727-846`은 Haiku5.5 medium의 최대 동시3개 node로
+원래 T17의15 subcase·257 assertions를 실행한다. 시작 turn의 종료는
+Workflow 완료가 아니며 실제 결과·모델 metadata·정리 증거는 회수 전이다.
+이전600초 종료의 부분 로그와 NOT_RUN 기록도 보존한다.

@@ -1052,3 +1052,10 @@ background task는 이미 사라졌으며 원래 부분 로그는 보존했다.
 꺼진 로컬 Docker daemon을 다시 시작했고, 원본 case를 보존하는
 subcase 선택으로 실제 실행을 나누는 runner를 구현했다.
 [분할 실행 계약](bounded-scenario-selection.md)을 따른다.
+
+고정27ec8cc3의 전체 harness는732 PASS·80 opt-in SKIP·실패/오류0이다.
+observer PG101개, 소스3,163개 hash drift0과 자체 PG 정리를 확인했다.
+prepare는41 case·802 subcase·24,260 assertions·문제0·asset12 PASS다.
+Haiku native Workflow wf_62923727-846이 준비된5개 tree에서 원래 T17의
+15 subcase·257 assertions를 최대 동시3개로 실행 중이다. 실행 결과와
+모델 metadata는 아직 회수 전이며 Task와 현재 Step은 OPEN이다.
