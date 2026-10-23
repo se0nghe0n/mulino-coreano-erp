@@ -142,3 +142,28 @@ transit10/customer20을 확인한 한정 gateway/실제 PG 증거다.
 보존한다. observer의 재검증 집합은 위 별도 합성 PG 검사로 검증했다.
 이 한정 제품 test도 T17 actual 257 assertions의 실행은 아니므로
 다섯 assertion의 actual 인수는 NOT_RUN이며 Task/Step는 OPEN이다.
+
+## Task branch 통합 검증
+
+coordinator가 초기5개 파일과 보완4개 파일을 검토하고 worker의 두
+commit을44b9b6d3·1b41e17f로 통합했다. worker 최종 source·JUnit hash,
+원래 T17의71개 파일·257 assertions 보존과 자체 container 부재를
+독립 대조했다. 정상 재검증을 conflict로 취급한 초안의 오류와 RED는
+삭제하지 않고 앞 절의 기록과 원로그에 보존한다.
+
+고정1b41e17f의 전체 `./verify harness`는804개 중724 PASS·80 opt-in
+SKIP이며 실패·오류0, exit0이다. 실제 PG observer101개에는 기존64개와
+canonical37개가 포함된다. 별도 projection unit8개도 모두 PASS다.
+기존 HTTP source-row replay는 원래 캡처를 새 PG에서 읽은 검사이며
+제품 command 재실행이 아니다. source3,162개의 실행 중 hash drift는0이고
+projection 및 새 PG test class bytes는 worker의 검증본과 일치한다.
+
+`./verify prepare`는41 case·802 subcase·24,260 assertion·문제0·asset12
+PASS이며 gateComplete=false다. 자체 PG container 삭제와 부재를
+확인했다. 명령·JUnit·소스/class hash·정리 증거는
+`.local/resume-20261023/canonical-integrated/proof.json`과 같은 경로의
+원로그에 있다. 전체 backend를 다시 실행한 것으로 표시하지 않는다.
+
+기존 Haiku T09/T17 native Workflow는7e1236bf 기준이므로 이번 canonical
+수정을 포함하지 않는다. 다섯 assertion의 새 actual 인수는 NOT_RUN이며
+Task와 현재 Step은 OPEN이다. Ultrafast는 사용하지 않았다.

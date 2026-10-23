@@ -1013,8 +1013,18 @@ observer PG64개와 unit6개가 모두 PASS했다. prepare 문제0과 자체 PG
 정리를 확인했다. [대기 필드 기록](t11-wait-projection.md)을 따른다.
 실제 T11 결과를 이번 집중 검증으로 PASS로 바꾸지 않았다.
 
-T17 canonical projection 초안a57bf46a는 검토 중이며 아직 통합하지 않았다.
-같은 canonical의 정상 재검증도 검증 행 수2개라는 이유로 생략하는
-문제를 보완한다. 실제 제품 gateway/PG 회귀1개는 검증 근거2개와
-canonical·인도·물리 이동 각각1개를 확인했다. 제품 코드는 변경하지
-않았으며 [재검증 근거](canonical-reverification-proof.md)를 따른다.
+T17 canonical projection의 a57bf46a와 정상 재검증 보완016360ee를
+44b9b6d3·1b41e17f에 통합했다. 검증 근거가 여러 개여도 같은 인도량을
+중복 계산하지 않고 모든 유효 원천 ID를 보존한다. 서로 경쟁하는
+canonical과 원천 불일치는 계속 거부한다. 실제 제품 gateway/PG 회귀
+1개는 검증 근거2개와 canonical·인도·물리 이동 각각1개를 확인했다.
+제품 코드는 변경하지 않았으며 [재검증 근거](canonical-reverification-proof.md)를 따른다.
+
+고정1b41e17f의 전체 harness는724 PASS·80 opt-in SKIP·실패/오류0이다.
+실제 observer PG101개를 포함하며 소스3,162개의 hash drift0과 자체 PG
+정리를 확인했다. prepare는41 case·802 subcase·24,260 assertion·문제0·
+asset12 PASS다. T17 원본71개 파일·257 assertions는 보존했다.
+[canonical 통합·실행 경계](t17-canonical-delivery-projection.md)를 따른다.
+다섯 assertion의 새 actual 인수는 NOT_RUN이며 gate는 false다.
+기존 Haiku T09/T17 실행은7e1236bf 기준이므로 이번 변경을 포함하지 않는다.
+Task와 현재 Step은 OPEN이다.
