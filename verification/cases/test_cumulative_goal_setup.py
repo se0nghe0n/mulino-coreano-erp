@@ -5,6 +5,8 @@ with javac/java 21, using the published installer definition/context defaults.
 The locked pre-fix document hashes preserve the earlier period-only patch proof.
 T09/test_source_contracts.py separately protects all 269 current assertions while
 the source-input remediation is allowed to change other authored actions.
+T13's lock includes the reviewed response-reference correction 7b617659;
+T13/test_contract_refs.py retains its original 66e4d068 assertion/action proof.
 """
 import copy
 import hashlib
@@ -17,7 +19,7 @@ from pathlib import Path
 from author_cumulative_goal_setup import ROOT, SELECTION, repair
 from request_contract import Contracts
 
-BASELINE_HASHES = {'T09': '81c675f9714cb6709799d846f9bd1403e91293344081b2597c3d2274acb2161a', 'T11': '1a2af9f1cbe362ff6a7c5ac8684d3d5eb2c9eabfb3202024f495c2e36be3d987', 'T12': 'bba001ff8f9c22e41fb158e3d9375fd7b6eb6ccf562e617ca652ae6aa42ef29d', 'T13': 'cce3d8adaf965c5d53f717ad6b7d061054fd561840f3f540b9828f34621f6302'}
+BASELINE_HASHES = {'T09': '81c675f9714cb6709799d846f9bd1403e91293344081b2597c3d2274acb2161a', 'T11': '1a2af9f1cbe362ff6a7c5ac8684d3d5eb2c9eabfb3202024f495c2e36be3d987', 'T12': 'bba001ff8f9c22e41fb158e3d9375fd7b6eb6ccf562e617ca652ae6aa42ef29d', 'T13': '01bcb415dfcd8486b537d6aab9869a1f47a60124e98c2b47ad82d4805dae2d18'}
 
 
 def digest(value):

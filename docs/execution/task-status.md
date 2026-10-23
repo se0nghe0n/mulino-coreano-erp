@@ -625,3 +625,24 @@ T11 재실행도 source d3d4c2df에서 완료했다. 같은 source의 네 case43
 `harness-default-definition-integrated.log`,
 `default-definition-backend-integrated.log`,
 `prepare-default-definition-integrated.log`다.
+
+## 2026-10-23 공통 정의 후속 실제 실행과 입력 참조 통합
+
+source66e4d068의 Haiku native Workflow 여섯 병렬 실행을 독립 대조했다.
+고유70개는20PASS·50FAIL이며 assertion774개 중209PASS·49FAIL·
+516미관찰이다. T01은12개·125assertion·원천 연결96개가 다시 통과했다.
+T12의 child NOT_RUN 집계는 원본 FAIL로 바로잡았고, T17의 잘못된 jar
+경로 표기는 canonical 실행 script·hash·runtime 로그로 대조했다.
+모든 gateComplete는 false다. [원본과 후속 수정](scenario-triage-20261023.md)에
+한계와 artifact를 기록했다.
+
+setup45개 중 목표35개는APPLIED,3개는 앞선 수령 실패로 미도달이다.
+예약7개는 좌표 검사 다음 판매 적격성 판정에서 거부됐다. fixture의
+누락된 적격성 원천 사실을 성공으로 가정하지 않는다.
+
+T13 응답 참조 worker73a64ccd를7b617659, T09·T11·T12 원천 입력
+worker d4884b90를d9faa36a로 통합했다. assertion392개와 부정 probe를
+보존했다. coordinator의 집중 검사14개와 prepare가 통과했다.
+양성 수령10개의 source graph와 상태/기간 definition은 여전히 미완료다.
+정적 builder와 새 입력을 실제 scenario PASS로 집계하지 않는다.
+현재 통합 Step와 전체 Task는 열려 있고 실모델·규제·BTP 인수는 미실행이다.

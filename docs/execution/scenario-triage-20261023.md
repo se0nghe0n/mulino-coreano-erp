@@ -97,3 +97,83 @@ actual action178개이며 assertion392개 중73개가 기록됐다. 나머지319
 앞선 action 실패로 미관찰이며 성공으로 집계하지 않는다. 앞선 부분 실행의
 12NOT_RUN 기록은 보존한다. T11에서도 공통 정의 검증 거부와 별도 slot·
 조건 오류가 드러났다. 전체 gate는 여전히 미완료다.
+
+## 공통 정의·예약 입력 통합 후 70개 실제 실행
+
+clean source `66e4d068017753147017f5d08062ba460e4e385c`에서
+native Workflow `wf_38ad6525-680`이 여섯 case를 병렬 실행했다.
+각 실행은 별도 worktree에서 정상 빌드했고 실제 agent metadata14개가
+모두 Haiku5.5다. coordinator가 case/fixture/report hash, source commit,
+실행 jar hash, 원본 assertion ID와 runtimeComplete를 독립 대조했다.
+
+| case | subcase PASS | subcase FAIL | assertion PASS | assertion FAIL | 미관찰 |
+|---|---:|---:|---:|---:|---:|
+| T01 | 12 | 0 | 125 | 0 | 0 |
+| T09 | 5 | 4 | 34 | 0 | 60 |
+| T11 | 3 | 9 | 29 | 3 | 78 |
+| T12 | 0 | 5 | 10 | 26 | 29 |
+| T13 | 0 | 17 | 4 | 3 | 116 |
+| T17 | 0 | 15 | 7 | 17 | 233 |
+| 합계 | 20 | 50 | 209 | 49 | 516 |
+
+고유 subcase70개와 예상 assertion774개는 누락·중복 없이 일치한다.
+PASS20개는 각각 필요한 assertion이 모두 기록됐고 runtimeComplete=true,
+missingAdapters=[]다. 나머지516개 assertion은 미관찰이며 성공이나 효과0이
+아니다. 모든 실행이 explicit selection·partialFixtures=true·relaxWire=false이고
+gateComplete=false다. 따라서 전체802개 인수 비율로 환산하지 않는다.
+T01 source verifier도 원천 연결96개를 다시 통과했다.
+
+T12의 child aggregate는 NOT_RUN으로 표시했지만 원본 scenarios.json의
+status는 FAIL이고 다섯 subcase가 실제 실행됐다. 위 표는 원본을 따른다.
+T17의 child result는 executedJarPath에 harness jar를 잘못 적었다.
+보존된 canonical run.sh의 backend jar 복사·hash·실행 순서, runtime 시작
+로그와 새 backend jar hash가 모두 일치해 제품 실행을 확인했다.
+T13의 jar 경로 누락도 같은 hash·시작 로그 연결로 확인했다.
+원본 child artifact는 덮어쓰지 않는다.
+
+원본은 `t3-e936866a/.local/definition-reserve-wave-20261023/`의
+aggregate.json이 가리키는 여섯 scenarios.json이다. coordinator의 보정·
+원본 hash·jar binding·실패 위치는
+`.local/resume-20261023/definition-reserve-wave-coordinator-proof.json`에
+보존했다. 이 검사는 새 acceptance receipt를 발행하지 않는다.
+
+이전에 수정한 setup45개도 별도로 추적했다. 목표 요청38개는
+35APPLIED·3미도달이며 같은 d3d4c2df source의 이전 실행과 비교하면
+32개가 HELD에서 APPLIED로 바뀌었다. 세 미도달은 T11의 앞선 수령
+실패 뒤 followup이다. 예약7개는 startQuantity 형식 거부를 지나
+INSUFFICIENT_ELIGIBLE_QUANTITY에 도달했다. 해당 fixture의
+baseline.conditions와 sourceProvenance가 설치되지 않은 사실을 확인했다.
+좌표 수정으로 판매 적격성까지 증명한 것은 아니다.
+
+T09 lot-not-yet-required와 receipt-missing-lot 두 subcase는 FAIL에서
+PASS로 바뀌었다. 다른 failure frontier는 공개되지 않은 수령/관측 slot,
+T13의 잘못된 goal ID 참조, 누락된 상태·기간 definition, 조회/독립 관찰
+projection이다. 첫 실패 해소와 전체 subcase PASS를 구별한다.
+
+## 후속 입력·참조 수정의 통합
+
+T13 worker73a64ccd를 7b617659로 통합했다. 구매 제안16개는 생성 응답의
+goalVersionId와 최신 revision을 참조하고, 공급자 답변3개는 주문 ID와
+revision을 참조한다. 미공개 originalQuantity 사본은 기존 주문에서 읽도록
+요청에서 제거했다. 주문 물량·답변·문서·actor·grant와 assertion123개는
+그대로다. 집중 검사4개가 통과했고 실제 실행 결과는 아직 없다.
+
+T09·T11·T12 worker d4884b90를 d9faa36a로 통합했다. 관측9개를 공개
+EVENT 형식으로 옮기고 원문이 있는8개는 attachEvidence를 먼저 보낸다.
+문서 없는 반례는 계속 문서가 없다. 별도 고객 인도 Place와 명시적 period를
+보완했다. assertion269개와 기존 action·음성 probe는 보존했다.
+양성 수령10개의 실제 source graph 연결은 아직 완료하지 않았다.
+동적 ID를 원문 JSON·bytes·hash로 만드는 runner 경계와 상태/기간
+definition, 확인 수령 event 의미를 연결해야 한다.
+[정확한 입력 경계](../../verification/cases/T09/source-contract-frontier.md)를
+보존하며 builder의 정적 검사를 실제 실행으로 표시하지 않는다.
+
+coordinator의 결합 검사는 원천 mapping6개·기간4개·T13 참조4개가
+통과했다. 실제 receipt matcher는 원문을 허용하고 필수 필드 누락·불일치
+18개를 거부했다. prepare는 계속41 case·802 subcase·24,248 assertion이다.
+T13의 승인된 참조 수정에 맞춰 기간 검사 hash lock만 갱신하고, 별도
+T13 검사에서 이전 source와 assertion/action의 차이를 계속 제한한다.
+backend와 harness source는 바뀌지 않아 앞선 통과 검사를 반복하지 않았다.
+
+현재 통합 Step는 열려 있다. 실제 source graph·typed definition·적격성
+prerequisite와 재실행 증거를 결합한 뒤 다음 gate를 판단한다.
