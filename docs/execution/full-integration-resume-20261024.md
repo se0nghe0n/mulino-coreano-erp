@@ -125,3 +125,62 @@ S1의 별도 delivery Work 등 누락 입력은 coordinator가 합성 선택으�
 PUBLIC_CONTRACT_DRIFT가 검출됐다. 원로그를 보존한 뒤 기존 generator로
 해당 pin 하나를 갱신해6 packages·12 discovery links·13 files의 정적
 검사를 통과했다. 모델 본문 loading·tool 실행은 여전히 NOT_RUN이다.
+# 2026-10-24 07:50 이후 통합 갱신
+
+e995595a의 backend 전체 검사는 945 PASS, failures 0, errors 0,
+skipped 0, exit 0으로 끝났다. 101개 JUnit report의 hash와 source
+drift 0을 primary가 확인했다. 실행 전후 product class342개의 hash가
+같으며 자기 container47개, key와 기록된 임시 자원을 정리했다.
+증거는 `.local/resume-20261024/fix-until-done/backend-final-e995595a/`의
+`proof.json`, `product-classes-before-tests.json`, `key-cleanup.json`이다.
+
+이후 bdb25025까지 Task branch를 fast-forward했다. 업무 noun discovery,
+현재 read target에 맞는 grant 관찰, SOURCE namespace 검사, 독립 host
+extractor process, 실제 FOLLOWUP descendant 관찰을 포함한다. backend
+945개는 e995595a의 결과이며 후속 query 세 개의 변경을 포함한 전체
+backend 결과로 바꾸지 않는다.
+
+통합된 후속 근거는 다음과 같다.
+
+- context discovery worker의 34개 검사와 실제 HTTP/PG 관찰을
+  대조했다. 최신 manifest의 artifact273개 hash는 drift 0이다.
+  이전85f5d151 source hash는 해당 commit으로 대조했으며, 새 build가
+  덮어쓴 과거 class 세 개를 현재 실행의 증거로 재사용하지 않았다.
+- 별도 extractor JVM을 실제 실행한 새5개를 포함해25개를 통과했다.
+  전체 host acceptance mapping과 arbitrary prose 의미 검증은 아직
+  NOT_IMPLEMENTED다. model self-label을 인수 사실로 사용하지 않는다.
+- descendant 실제 PG 새5개와 기존 회귀는76개 통과, optional1개
+  skip, 실패·오류0, exit0이다. skip은 T09_GOAL_INPUT_SOURCE가 없는
+  기존 source replay 검사다. 제품 쓰기 제약이나 scenario 인수를
+  대신하는 증거가 아니다.
+
+bdb25025의 별도 통합 worktree에서 전체 harness r3와 T09/T11/T13/T17,
+observer, S5 authenticated transport·permitted context opt-in을 실행
+중이다. 경로는 `coordinator-native-final-response-e995595a`의
+`.local/combined-harness-r3/`다. 같은 source를 고정하며 완료 전에는
+전체 harness PASS를 주장하지 않는다.
+
+Haiku native Workflow는 별도 e995595a lane을 유지한다.
+wf_525b9bc6-5dd는 setup의 정확한 JAR 경로가 없어 runner0으로 끝났다.
+그 원문을 보존하고 검증한 JAR을 별도 복사한 뒤 wf_d9d83469-004를
+새로 시작했다. script SHA는
+`45d7e28d28b9aaed78a4428a437dad9f6f1dd50e72e3d1590e5fb78edd2cec08`다.
+setup70개 통과와 실제 Haiku5.5 runner 세 개의 foreground Bash 호출을
+primary가 대조했다. 145개 group은 원802 subcase·24437 assertion을
+disjoint하게 나눈다. 각 group의 raw FAIL·NOT_RUN, 최초 exit와 cleanup을
+보존하고 재시도나 expected 교체로 덮지 않는다. 전체 gate는 OPEN이다.
+
+S5 installer의 실제 원권한403·보정권한200, 원 DOC hash를 유지한
+UNKNOWN metadata200·content EVIDENCE_UNAVAILABLE, M50의 실제 선행
+수령·동일 body replay·changed-payload conflict를 별도로 보존한다.
+M50 원 fixture의 고정 A UUID와 제품 API 생성 UUID는 양립하지 않아
+그 case만 새 typed correction layer에서 원 A를 reference-only로
+보존하고 actual leaf UUID를 별도로 연결한다. 원본 그대로의 physical
+identity 인수는 차단 상태이며 보정 Given 인수와 구별한다.
+
+남은 제품 공백은 구매·정산 typed grant 차원, 실제 mutable 행의
+불변 history, 정확한 replay witness, 장소·ITEM 단위 stocktake와
+시나리오의 미구현 source 관찰이다. model fixture·binding bridge,
+전체 final-response 의미 검증·실 client·S6도 완료하지 않았다.
+Grok 또는 외부 메시지는 이 통합에서 보내지 않았다.
+

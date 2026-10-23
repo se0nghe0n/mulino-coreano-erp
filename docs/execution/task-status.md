@@ -11,17 +11,18 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | a7f18cc8: 전체 명령908 PASS·실패/오류/skip0·exit0이다. source drift0과 소유 container45개·key/blob 부재를 확인했다. Surefire의 test 종료 뒤 shutdown timeout 원문도 보존한다. |
+| Backend 전체 | e995595a: 945 PASS·실패/오류/skip0·exit0이다. source drift0, 실행 전후 product class342개 hash 일치, 자기 container47개와 key·임시 경로 부재를 확인했다. 101개 JUnit report hash도 대조했다. 후속 bdb25025의 새 query 변경은 이 실행에 포함되지 않는다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | a7f18cc8의 첫 전체 opt-in 실행은1210 중1063 PASS·147 ERROR·exit1이었다. identity-binding/blob-root JVM 설정 누락을 보존했고 환경 보정 r2는1185 PASS·17 FAIL·8 ERROR·skip0·exit1이다. source drift0과 정리를 확인했고 실제 제품·helper 실패의 집중 수정을 통합했고 새 전체 검사는 남았다. |
-| Prepare | a7f18cc8: 41 case·802 subcase·24437 assertions, PREPARED·preparationProblems0·exit0이다. T17 원301·read 엄격125·책임 범위8을 합성했고 기존 fixed oracle을 보존한다. |
+| Harness 전체 | a7f18cc8 r2는1185 PASS·17 FAIL·8 ERROR·skip0·exit1이다. 원문과 정리를 보존했다. 후속 수정과 S5 discovery·extractor process·descendant 관찰을 합친 bdb25025에서 새 전체 opt-in r3를 실행 중이다. 아직 PASS로 세지 않는다. |
+| Prepare | e995595a: 41 case·802 subcase·24437 assertions, PREPARED·preparationProblems0·exit0이다. T17 원301·read 엄격125·책임 범위8을 합성했고 기존 fixed oracle을 보존한다. |
 | 최근 실제 T09 | fa316f01: 9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. 최신 결합 Haiku 실행의 동일 product class335개와 소유 DB12개 부재를 primary가 대조했다. |
 | 최근 실제 T11 | fa316f01: 110 assertions 중94 PASS·2 FAIL·14 미관찰이다. |
 | 최근 실제 T17 | fa316f01: 301 assertions 중268 PASS·33 FAIL·미관찰0이다. |
 | 최근 native 재실행 | wf_17cd7443-f63: 36 subcase 중20 PASS·16 FAIL, 505 assertions 중456 PASS·35 FAIL·14 미관찰이다. 실제 Haiku14 node·120 assistant records와 source/JAR/cleanup을 primary가 대조했다. |
+| 현재 전체 native 실행 | e995595a를 고정한 wf_d9d83469-004에서 Haiku5.5 dynamic Workflow를 실행 중이다. setup70개를 통과했고 3개 lane이145개의 disjoint group을 차례로 실행한다. 첫 실제 실패와 미관찰을 보존하며 전체 인수로 승격하지 않는다. |
 | 현재 제품 통합 | a7f18cc8에 T11 명시 Given32b7973f·부모 link40c6bf0b·승계 원자성dd6a219b와 T17 공개 read eaee3408을 통합했다. T17 Python51·T11 Python26, late-hold 원26+범위8의 실제 대조와 공개 read 실제 HTTP/PG7이 통과했다. T11 부모 재평가 수정a1f0dee6를3b2a0a2c에 통합했고 전체 재검사는 남았다. |
 | 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
-| S5 실 client·운영 인수 | skills 계약/hash 수정575ba1e6와 서버 인증 capture ce9afb32를 통합했다. capture 집중31 PASS를 primary가 대조했다. 업무 context f9241580도 집중17·실제1 PASS로 통합했다. 실제 model fixture/context/독립 semantic observation 구현을 계속한다. 실제 업무 client/model·S6·BTP gate는 OPEN이다. |
+| S5 실 client·운영 인수 | bdb25025에 업무 discovery와 SOURCE namespace capture를 통합했다. worker focused34 및 실제 HTTP/PG 증거273개 hash를 대조했다. 독립 extractor process 관련25 PASS, descendant 관련76 PASS·optional1 SKIP을 별도 검증했다. fixture 설치와 독립 semantic observation을 계속 구현한다. 실제 업무 client/model·S6·BTP gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
 
 현재 전체 실행과 중단된 Workflow의 경계는
