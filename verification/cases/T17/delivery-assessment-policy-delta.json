@@ -1,0 +1,536 @@
+{
+  "baseline": "a6e1197705351dbfb69f283c2922a28e4825906d",
+  "fixtureSubcases": [
+    "normal-consumed-delivery",
+    "late-restriction-actual-delivery",
+    "post-dispatch-expiry",
+    "claim-falseclaim",
+    "claim-unidentifiedscope",
+    "claim-conflictingquantity",
+    "claim-scopeoverflow"
+  ],
+  "assertionsChanged": false,
+  "existingFixtureInputsChanged": false,
+  "goalChanges": {
+    "normal-consumed-delivery": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    },
+    "late-restriction-actual-delivery": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    },
+    "post-dispatch-expiry": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    },
+    "claim-falseclaim": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    },
+    "claim-unidentifiedscope": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    },
+    "claim-conflictingquantity": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    },
+    "claim-scopeoverflow": {
+      "beforeSha256": "10ff4d5ed5da3a9e64a53fb0e31cbc64f2d57fce73255235f6246639b079988f",
+      "afterSha256": "23f1974f249699f2323359a0556d3ff1c1340d27cfb4ccb1082588223ffd36c5",
+      "changes": [
+        {
+          "path": "evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersion",
+          "hadBefore": true,
+          "before": "fixture-v1",
+          "after": "t17-synthetic-v1"
+        },
+        {
+          "path": "defaultContext/evidencePolicyVersionId",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "$alias": "t17DeliveryAssessmentPolicy"
+          }
+        },
+        {
+          "path": "defaultContext/deliveryAssessmentPolicyAuthoring",
+          "hadBefore": false,
+          "before": null,
+          "after": {
+            "synthetic": true,
+            "originalAuthorityClaimed": false,
+            "operatingApprovalClaimed": false,
+            "selection": "Independent EVIDENCE policy; source identity policy remains unchanged",
+            "policyAlias": "t17DeliveryAssessmentPolicy",
+            "policyKind": "EVIDENCE",
+            "policyVersion": "t17-synthetic-v1",
+            "policyContentHash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "effectiveFrom": "2026-10-07T09:00:00Z"
+          }
+        },
+        {
+          "path": "defaultContext/fieldProvenance/evidencePolicyVersion/source",
+          "hadBefore": true,
+          "before": "installed immutable EVIDENCE policy",
+          "after": "explicit synthetic EVIDENCE PolicyVersion t17DeliveryAssessmentPolicy"
+        }
+      ]
+    }
+  },
+  "fixtureChanges": {
+    "T17-normal-consumed-delivery": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "9b7eaab4775ea67180a86550ac40016bcadb252377fccf83c1cfb48d90a0cff1"
+    },
+    "T17-late-restriction-actual-delivery": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "20513a43eabf5c1ec8cb95f9a3ae2b33b98f3977140b7f13f8cfe856abb1675c"
+    },
+    "T17-post-dispatch-expiry": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "8726f2e1f986f4ba431522292e420c0d51130686407da4268261dd4f5cc98944"
+    },
+    "T17-claim-falseclaim": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "744000923c5f9abad7fd565108d796d06e2713811e12a04d5f0c3b46e4257f90"
+    },
+    "T17-claim-unidentifiedscope": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "379a9df110e17144ee8825c1ad68e9920557174f8c008794ca39277dd89726ad"
+    },
+    "T17-claim-conflictingquantity": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "956bb372df35009e90d21886cc55bb3a1d8786867d6861dab736085ed7942ae4"
+    },
+    "T17-claim-scopeoverflow": {
+      "alias": {
+        "type": "PolicyVersion",
+        "kind": "EVIDENCE",
+        "version": "t17-synthetic-v1",
+        "content": {},
+        "activate": true,
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false
+      },
+      "metadata": {
+        "synthetic": true,
+        "originalAuthorityClaimed": false,
+        "operatingApprovalClaimed": false,
+        "policyAlias": "t17DeliveryAssessmentPolicy",
+        "policyKind": "EVIDENCE",
+        "policyVersion": "t17-synthetic-v1",
+        "contentSha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "effectiveFrom": "2026-10-07T09:00:00Z",
+        "sourceProfilePolicyChanged": false
+      },
+      "beforeSha256": "37e0200369c494bc352ceaecfebe81e4096ecb7254ed4fc93b5bd63e916b7dd4"
+    }
+  }
+}

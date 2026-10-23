@@ -119,6 +119,9 @@ def restore_case(case):
 
 def restore_fixture(f):
     import importlib.util
+    spec=importlib.util.spec_from_file_location('t17_sales_inputs',HERE/'author_sales_contract_inputs.py')
+    sales=importlib.util.module_from_spec(spec);spec.loader.exec_module(sales)
+    f=sales.restore_policy_fixture(f)
     spec=importlib.util.spec_from_file_location('t17_recall_inputs',HERE/'author_recall_inputs.py')
     recall=importlib.util.module_from_spec(spec);spec.loader.exec_module(recall)
     f=recall.restore_fixture(f)

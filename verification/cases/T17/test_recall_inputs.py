@@ -1,5 +1,6 @@
 """명시적 조사 준비만 추가하며 원본 257 assertion과 다른 fixture bytes를 보존한다."""
 import copy
+import author_sales_contract_inputs as SALES
 import hashlib
 import importlib.util
 import json
@@ -42,7 +43,7 @@ class RecallInputsTest(unittest.TestCase):
         before = load_original(HERE / 'case.json')
         old = {p.stem: load_original(p) for p in (HERE / 'fixtures').glob('*.json')}
         after, fixtures = RECALL.apply(before, old)
-        current = CONDITION.restore_case(json.loads((HERE / 'case.json').read_text()))
+        current = CONDITION.restore_case(SALES.restore_policy_case(json.loads((HERE / 'case.json').read_text())))
         self.assertEqual(after, current)
         self.assertEqual(before, RECALL.restore_case(after))
         self.assertEqual((after, fixtures), RECALL.apply(after, fixtures))
@@ -57,12 +58,12 @@ class RecallInputsTest(unittest.TestCase):
         ledger = json.loads(RECALL.LEDGER.read_text())
         self.assertEqual(2, len(ledger['fixtureChanges']))
         for path in sorted((HERE / 'fixtures').glob('*.json')):
-            current = json.loads(path.read_text())
+            current = SALES.restore_policy_fixture(json.loads(path.read_text()))
             self.assertEqual(fixtures[path.stem], current)
             self.assertEqual(RECALL.original(path), RECALL.bytes_of(RECALL.restore_fixture(current)))
-            self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), ledger['fixtureHashes'][path.stem]['after'])
+            self.assertEqual(hashlib.sha256(RECALL.bytes_of(current)).hexdigest(), ledger['fixtureHashes'][path.stem]['after'])
             if path.stem != RECALL.SID:
-                self.assertEqual(RECALL.original(path), path.read_bytes())
+                self.assertEqual(RECALL.original(path), RECALL.bytes_of(current))
         f = fixtures[RECALL.SID]
         for key in ('actors', 'clock', 'responsibilities', 'evidence'):
             self.assertEqual(old[RECALL.SID][key], f[key])
@@ -79,7 +80,7 @@ class RecallInputsTest(unittest.TestCase):
         path.write_text(json.dumps(proof, indent=2) + '\n')
 
     def test_event_range_time_owner_and_current_authority_are_explicit(self):
-        case = json.loads((HERE / 'case.json').read_text())
+        case = SALES.restore_policy_case(json.loads((HERE / 'case.json').read_text()))
         fixture = json.loads((HERE / 'fixtures' / (RECALL.SID + '.json')).read_text())
         sub = next(s for s in case['subcases'] if s['id'] == RECALL.SID)
         actions = {a['id']: a for a in sub['actions']}
@@ -110,7 +111,7 @@ class RecallInputsTest(unittest.TestCase):
         fixture['baseline']['works'][-1]['ownerAlias'] = 'sales'
         with self.assertRaises(ValueError):
             RECALL.restore_fixture(fixture)
-        case = json.loads((HERE / 'case.json').read_text())
+        case = SALES.restore_policy_case(json.loads((HERE / 'case.json').read_text()))
         sub = next(s for s in case['subcases'] if s['id'] == RECALL.SID)
         next(a for a in sub['actions'] if a['id'] == 'open-recall-investigation')['request']['slots']['quantity'] = '29'
         with self.assertRaises(ValueError):

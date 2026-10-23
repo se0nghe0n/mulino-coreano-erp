@@ -260,6 +260,7 @@ def generate(case, fixtures):
 
 
 def restore_case(case):
+    case=sales_inputs.restore_policy_case(case)
     case=recall_inputs.restore_case(case)
     case=first_failure.restore_case(completion.restore_case(delivery.restore_case(goal.restore_case(case))))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
@@ -342,6 +343,7 @@ if __name__ == '__main__':
     case,authored=goal.apply(case,authored,sys.modules[__name__])
     case=sales_inputs.apply(case)
     case,authored=recall_inputs.apply(case,authored)
+    authored=sales_inputs.apply_policy_fixtures(case,authored)
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
     feature_path.write_text(sales_inputs.condition_oracle.apply_feature(feature_lines(feature,before,case)))

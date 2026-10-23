@@ -18,6 +18,7 @@ class DeliveryGoalInputsTest(unittest.TestCase):
         before=json.loads(original(HERE/'case.json'));old={p.stem:json.loads(original(p)) for p in (HERE/'fixtures').glob('*.json')}
         case,fixtures=NEW.apply(copy.deepcopy(before),copy.deepcopy(old),PUBLIC)
         self.assertEqual(PUBLIC.sales_inputs.apply(case),PUBLIC.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text())));self.assertEqual(before,NEW.restore_case(case))
+        fixtures=PUBLIC.sales_inputs.apply_policy_fixtures(case,fixtures)
         for sid,f in fixtures.items():
             self.assertEqual(f,PUBLIC.recall_inputs.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text())));self.assertEqual(old[sid],NEW.restore_fixture(f))
             for field in ('clock','evidence','responsibilities'):self.assertEqual(old[sid][field],f[field])
@@ -30,7 +31,7 @@ class DeliveryGoalInputsTest(unittest.TestCase):
         self.assertEqual(original(HERE/'scenario.feature').decode(),NEW.restore_feature((HERE/'scenario.feature').read_text()))
 
     def test_exact_binding_original_goal_references_and_minimum_grant(self):
-        for s in json.loads((HERE/'case.json').read_text())['subcases']:
+        for s in PUBLIC.sales_inputs.restore_policy_case(json.loads((HERE/'case.json').read_text()))['subcases']:
             f=json.loads((HERE/'fixtures'/f'{s["id"]}.json').read_text());old=json.loads(original(HERE/'fixtures'/f'{s["id"]}.json'))
             if NEW.META not in f['baseline']['policy']:self.assertEqual(old,f);continue
             a={a['id']:a for a in s['actions']};goal=a['complete-order-delivery-goal']['request']['slots']['goal']
