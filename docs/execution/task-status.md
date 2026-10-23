@@ -11,14 +11,15 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | 08e2a7a5: 827 PASS, 실패·오류·skip0, exit0. f8bb11e9까지 backend/database bytes 동일, 실행 JUnit90개와 소유 자원 정리를 대조했다. |
+| Backend 전체 | 08e2a7a5: 827 PASS, 실패·오류·skip0, exit0. 1692f74f까지 backend/database bytes 동일, 실행 JUnit90개와 소유 자원 정리를 대조했다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | f8bb11e9: 986 executions 중906 PASS·기존80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
-| Prepare | 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
+| Harness 전체 | 1692f74f: 1000 executions 중920 PASS·기존80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
+| Prepare | 1692f74f: 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
 | 최근 실제 T09 | f8bb11e9: 94 assertions 중86 PASS·8 FAIL·미관찰0이다. |
 | 최근 실제 T11 | f8bb11e9: 110 assertions 중35 PASS·4 FAIL·71 미관찰이다. |
 | 최근 실제 T17 | f8bb11e9: 257 assertions 중165 PASS·92 FAIL·미관찰0이다. |
 | 최근 native 재실행 | wf_88ab8831-3ac: 36 subcase 중11 PASS·25 FAIL, 461 assertions 중286 PASS·104 FAIL·71 미관찰이다. 실제 Haiku14 node·228 assistant records, 동일 product class330개와 소유 DB12개 부재를 대조했다. |
+| T09 재실행 | 1692f74f의 격리 tree3개에서 원본9 subcase·94 assertions를 실행할 Haiku 5.5 medium dynamic Workflow를 위임했다. 실제 결과는 아직 미확정이다. |
 | 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
@@ -63,6 +64,23 @@ T09 기여·평가 원천과 T17 적격성·claim·책임의 실패를 병렬 �
 2026-10-24 사용자 지시의 실제 위임은 codex_2/Sol/xhigh/priority다.
 세 writer는 b4772eb6에서 각자 worktree를 사용하고 coordinator만 통합한다.
 과거 실패와 미관찰 결과는 보존하며 새 actual 재실행 전에는 해소로 세지 않는다.
+observer worker의 bfe9b6ef를 dac285c4로 통합했다. T09의 직접 수령은
+실제 Receipts에서 읽고, fixture movement는 별도 사전 관찰과 비교한다.
+marker의 명시적 null, T11의 실제 물량 구간, T17의 별도 배송 관측도
+포함한다. 원래461 assertion의 ID·기대값·unit·oracle과 fixture를
+보존했다. [수정 인계](fix-wave-20261024-observer.md)를 따른다.
+첫 결합 harness는918 PASS·2 FAIL·80 SKIP이었다. 두 실패는 canned
+receipt selftest가 기존 contributions 구조를 사용한 문제였다.
+coordinator가 별도 tree에서 receipt source와 음성 검사의 mutation
+대상을 맞추고, 기존 음성 검사 전 양성 검증도 추가했다. 13개 집중
+검사와 1692f74f의 전체 harness920 PASS·80 SKIP, prepare exit0을
+확인했다. 첫 실패 원문은 `fix-until-done/harness-full/`, 수정 후
+JUnit·source drift·DB 정리 증거는 `fix-until-done/harness-corrected/`에
+있다. 두 경로의 기준은 `.local/resume-20261024/`다. Backend와
+database는 기존827 PASS 실행의 bytes와 동일하다. T09 재실행은 이
+1692f74f에 고정하고, T11·Sales writer는 각자의 소유 파일에서 계속
+수정한다. 수량 대조 의무의 해소와 제한 위반 후속 책임을 구별하며,
+배송 확정의 인과 재평가는 통합 후 같은 command 권한으로 검증한다.
 primary의 7개 변경 파일 일치·원본 case/database 보존과 규제 결합 검증은
 `.local/resume-20261024/atomic-regulatory-combined/`에 남겼다.
 처음 Docker socket을 찾지 못한 환경 오류도 보존했고 실제 OrbStack
