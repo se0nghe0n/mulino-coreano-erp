@@ -414,3 +414,40 @@ claim pending outcome을 각각 수정 대상으로 남긴다. 독립 증거는
 `.local/resume-20261023/t17-public-wave-coordinator-proof.json`이다.
 후속 원천 수정에서 추가하는 DISPATCH/보류 기간은 명시적인 새 합성
 fixture 결정이며 기존 given 또는 실제 운영 허용이라고 주장하지 않는다.
+
+
+## source35234fa6의 판정·승인 통합 wave
+
+native wf_a269a513-c5c의 실제7개 agent metadata는 모두 Haiku5.5다.
+coordinator가 각 case의 새 clean tree·고정 source·원본/고유 run report와
+fixture·실행 jar hash·기동을 대조했다. 각 case는1회 실행했고 retry는 없다.
+
+| case | subcase PASS | FAIL | assertion PASS | FAIL | 미관찰 |
+|---|---:|---:|---:|---:|---:|
+| T01 | 12 | 0 | 125 | 0 | 0 |
+| T09 | 5 | 4 | 38 | 9 | 47 |
+| T11 | 3 | 9 | 31 | 8 | 71 |
+| T12 | 0 | 5 | 24 | 25 | 16 |
+| T13 | 3 | 14 | 92 | 16 | 27 |
+| 합계 | 23 | 32 | 310 | 58 | 161 |
+
+예상 assertion은529개다. 모든23PASS 행은 전체 assertion·runtimeComplete·
+빈 missingAdapters를 만족한다. T01의12개 회귀는 전부 통과했다.
+명시 case 선택·partial fixture이므로 전체 gate는 false다. top-level
+reportComplete key가 없다는 사실을 false나 전체 runtime 실패와 혼동하지
+않는다. 원본 증거는
+`.local/resume-20261023/assessment-purchase-wave-coordinator-proof.json`이다.
+
+T13의 개정7건은 정확한 APPROVAL_NOT_CURRENT code와 금지 효과0·감사가
+모두 통과했다. 남은 approval-binding 실패의 정확한 원인은 원행의
+consumptionPolicy 필드 누락이다. T09의 기간·coverage·활동 수량,
+T11 waitReason, T12의 불변 버전·goal·조건/input snapshot 관찰 필드를
+같은 DB snapshot에서 읽도록 한정 보완한다. 초기 movement1개나 미발행
+조건 이름처럼 실제 불일치인 것은 observer에서 숨기거나 만들지 않는다.
+
+기여 startQuantity 누락, unsupported resumeEvidenceIds/originalEvidenceId,
+판매 적격 원천, 정책·공급자·취소·부분 수령 입력은 별도 실패다.
+T11 unsupported-evaluator의 제품 HELD/VERSION_UNSUPPORTED는 공개 어휘와
+같다. 기존 REJECTED outcome/audit oracle은 protocol 정렬이 필요하며
+근거 없이 제품을 바꾸지 않는다. observer writer와 T17 원천 writer를
+분리해 진행하며 전체 Step는 계속 열려 있다.

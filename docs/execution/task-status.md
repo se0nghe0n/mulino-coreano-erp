@@ -839,3 +839,32 @@ conditions와 effectLedger 관찰 경로, claim pending outcome도 남았다.
 명시하며 원래 given이나 사용자 운영 승인으로 소급 표시하지 않는다.
 원래 수량·시각·업무 grant·257개 조건과 UNKNOWN/CONFLICT를 보존한다.
 전체 Task/현재 Step와 실모델 client·규제·BTP 인수는 계속 열려 있다.
+
+
+## 2026-10-23 불변 판정·승인 통합 source의 실제55개 검증
+
+source35234fa6의 Haiku native Workflow wf_a269a513-c5c는 고유55개 중
+23PASS·32FAIL이다. 예상529개 assertion은310PASS·58FAIL·161미관찰이다.
+T01 회귀12개·125개 assertion은 모두 PASS이며 각 행의 runtimeComplete도
+true다. reportComplete라는 top-level key는 없으며 이를 false로 단정하지
+않는다. 명시 case 선택·partial fixture 실행의 전체 gate는 모두 false다.
+
+coordinator가 실제7개 Haiku5.5 metadata와 case별 새 실행 tree의 source,
+fixture·원본/고유 run report·실행 jar hash·기동·clean 상태를 대조했다.
+모든 case는1회 실행했고 retry는 없었다. agent shell prelude와 실제
+harness stdout을 구별해 원본과 hash가 같은지 확인했다. 독립 증거는
+`.local/resume-20261023/assessment-purchase-wave-coordinator-proof.json`이다.
+
+T13 개정7건은 실제 HELD/APPROVAL_NOT_CURRENT, 발주·outbox·segment 효과0과
+감사 조건까지 통과했고 원행 consumptionPolicy 필드 누락만 남았다.
+T09 기간/coverage, T11 waitReason, T12 불변 버전·입력 snapshot과 조건의
+관찰 공백을 실제 업무 실패와 구별한다. 실제 INITIAL_BALANCE row를
+숨기거나 미발행 condition/evaluator 이름을 기대값으로 채우지 않는다.
+unsupported evaluator의 HELD는 공개 VERSION_UNSUPPORTED 계약과 같으며
+기존 REJECTED oracle은 별도 protocol 교정 대상으로 남긴다.
+
+자유 문자열 기여 범위, 미지원 resume/correction slot, 판매/출고 원천,
+정책·공급자·부분 수령 입력과 claim pending 경계는 계속 열려 있다.
+원행 observer의 한정 보완은 별도 Sol Ultrafast worktree에서 진행하며
+T17 원천 writer와 파일 소유권을 분리했다. 새 source의 결합 검증과 Haiku
+재실행 전에는 이55개 결과를 최신 제품 전체 인수로 승격하지 않는다.
