@@ -32,6 +32,9 @@ class RuntimePostgresTest {
   jdbc.execute("DROP SCHEMA public CASCADE");jdbc.execute("CREATE SCHEMA public");
   jdbc.execute("CREATE TABLE mulino_evidence_InboxRecords(ID varchar(36) PRIMARY KEY)");jdbc.execute("CREATE TABLE mulino_evidence_Events(ID varchar(36) PRIMARY KEY)");
   jdbc.execute(Files.readString(Path.of("../database/migrations/V13__runtime.sql")));
+  // The lease-focused fixture supplies only the current recovery history selector columns.
+  // Full migration/trigger chronology is exercised by RecoveryClockBoundaryPostgresTest.
+  jdbc.execute("CREATE TABLE mulino_runtime_RecoveryObservationHistory(organizationId varchar(36),sourceTable varchar(80),sourceId varchar(36),recordedAt timestamptz)");
   jdbc.execute("CREATE TABLE fixture_effect(ID text PRIMARY KEY, quantity integer NOT NULL)");
   now=new AtomicReference<>(T);repo=new RuntimeRepository(jdbc,new ExecutionClock(){@Override public Instant instant(){return now.get();}});
  }

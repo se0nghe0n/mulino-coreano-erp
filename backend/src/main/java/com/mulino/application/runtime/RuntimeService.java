@@ -77,7 +77,10 @@ public class RuntimeService {
  /** Discovery only: predicates/current grants must be rechecked by the original command. */
  @Transactional public List<Map<String,Object>> dueSchedules(int limit){
   if(limit<1||limit>1000)throw DomainError.invalid("Invalid sweep bound");
-  return repository.db().queryForList("SELECT * FROM mulino_runtime_RecoverySchedules WHERE recoveryStatus='READY' AND (nextCheckAt<=? OR nextValidityBoundary<=? OR pendingAssessment=true) ORDER BY nextCheckAt,ID FOR UPDATE SKIP LOCKED LIMIT ?",at(clock.instant()),at(clock.instant()),limit);
+  // A persisted future revision is not yet current. Keep its immutable history intact;
+  // one row beyond this clock must not abort unrelated currently due recovery/delivery.
+  Instant now=clock.instant();
+  return repository.db().queryForList("SELECT s.* FROM mulino_runtime_RecoverySchedules s WHERE recoveryStatus='READY' AND (nextCheckAt<=? OR nextValidityBoundary<=? OR pendingAssessment=true) AND NOT EXISTS (SELECT 1 FROM mulino_runtime_RecoveryObservationHistory h WHERE h.organizationId=s.organizationId AND h.sourceTable='mulino_runtime_recoveryschedules' AND h.sourceId=s.ID AND h.recordedAt>?) ORDER BY nextCheckAt,ID FOR UPDATE OF s SKIP LOCKED LIMIT ?",at(now),at(now),at(now),limit);
  }
  @Transactional public void removeSchedule(DomainContext c,String work,String kind){repository.recoveryWrite("DELETE FROM mulino_runtime_RecoverySchedules WHERE organizationId=? AND workId=? AND kind=?",c.organizationId(),work,kind);}
  public Instant nextAuthorityBoundary(DomainContext c,String owner){
