@@ -177,3 +177,30 @@ backend와 harness source는 바뀌지 않아 앞선 통과 검사를 반복하�
 
 현재 통합 Step는 열려 있다. 실제 source graph·typed definition·적격성
 prerequisite와 재실행 증거를 결합한 뒤 다음 gate를 판단한다.
+
+## 동적 원문과 실제 수령 명령 graph 연결
+
+source ad80e1bc 기준 worker9888f36a를17f9bf7d로 통합했다. 수령9개는
+원문 첨부·PHYSICAL_RECEIPT EVENT·임시 수령·원천 대조·canonical 연결·
+확정 요청으로 구성한다. LOT 없는1개는 원문/event/임시 수령 뒤 원래의
+부정 probe를 보낸다. 양성 명령 구성이 실제 인수 PASS를 뜻하지 않는다.
+
+입력 전용 `$encode`는 실제 alias/result identity를 해석한 뒤 같은
+정렬 JSON의 UTF-8 bytes에서 payload·base64·SHA256을 만든다.
+65,536 bytes·깊이32·node4,096 상한을 두며 assertion expected/identity,
+관측 business 값 복사와 임의 실행·산술·중첩 변환은 허용하지 않는다.
+새 synthetic receiptSource actor는 ITEM=P all-of scope와 원천 처리6개
+capability만 갖고 원래 확정 actor의 권한을 대신하지 않는다.
+
+coordinator가27개 변경 파일을 검토했다. assertion269개의 원문 block,
+기존 business actor/grant·실물 사실·evidence·책임과 feature 줄을 보존했고
+T13 tree도 불변이다. 대조는
+`.local/resume-20261023/source-graph-integration-proof.json`에 남겼다.
+
+prepare가 임시 수령의 운송 정보를 추적하지 못한 한 건은 worker의
+한정 후속eb503e55를fd6bfb4f로 통합해 해결했다. 엄격한 선행 순차 명령
+참조만 인정하고 직접 수령·위조·미래·병렬 참조의 거부는 유지한다.
+coordinator의 전체 harness601개와 source mapping8개 검사가 통과했다.
+prepare도41 case·802 subcase·24,248 assertion에서 문제0개로 통과했다.
+이는 단위·계약 검사이며 새 source의 실제 scenario 실행은 아직 없다.
+공통 상태/기간 definition과 확인 수령의 목표 의미 연결은 별도 구현 중이다.

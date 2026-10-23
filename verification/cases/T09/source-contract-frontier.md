@@ -70,10 +70,10 @@ observation ID는 `/response/effects/receiptId`, 확정 segment는
 
 ## 다음 actual 이전에 필요한 통합
 
-- prepare의 custody 검사는 현재 confirmReceipt의 옛 inline 물리 slot만
-  읽는다. 연결된 receiveProvisional의 transitSegmentId를 추적하지 않아
-  T09 receive60을 직접 수령으로 오판한다. 해당 validator 소유자의
-  한정 수정과 기존 custody 반례의 회귀 검증이 필요하다.
+- prepare의 custody 검사는 선행 receiveProvisional의 엄격한 receiptId
+  참조에서 운송 leaf·수량·LOT·장소를 추적한다. 직접 수령·위조·미래·
+  병렬 참조와 다른 custodian을 넣는 반례는 계속 거부한다. 이 검사 통과는
+  실제 수령·보관·인가 효과의 증거가 아니다.
 - T09 STATE_AT/EXISTS_IN/THROUGHOUT은 현행 fixture 기본 definition에
   대응 goal template이 없다. 기본 definition에는 누적 `arrived`와
   `delivered`만 있다. 존재하지 않는 condition ID를 넣어 통과시키지

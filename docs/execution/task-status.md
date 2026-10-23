@@ -646,3 +646,19 @@ worker d4884b90를d9faa36a로 통합했다. assertion392개와 부정 probe를
 양성 수령10개의 source graph와 상태/기간 definition은 여전히 미완료다.
 정적 builder와 새 입력을 실제 scenario PASS로 집계하지 않는다.
 현재 통합 Step와 전체 Task는 열려 있고 실모델·규제·BTP 인수는 미실행이다.
+
+## 2026-10-23 실제 수령 graph 입력의 연결
+
+worker9888f36a와 custody 후속eb503e55를17f9bf7d·fd6bfb4f로 통합했다.
+수령9개의 원문·관측·임시 수령·대조·canonical·확정 명령을 실제 입력
+참조로 연결했고 LOT 없는1개의 부정 probe는 유지했다. assertion269개,
+기존 business grant와 실물 사실을 보존했다. 입력 전용 encoding은
+assertion이나 관측 business 값에서 원문을 만들 수 없다.
+
+coordinator의 전체 harness601개와 원천 mapping8개 검사가 통과했다.
+prepare도41 case·802 subcase·24,248 assertion에서 문제0개로 통과했다.
+로그는 `harness-source-graph-integrated.log`와
+`source-graph-source-integrated.log`, `prepare-source-graph-integrated.log`다.
+새로운 실제 source의 scenario
+PASS는 아직 주장하지 않는다. 상태/기간 목표와 확인 수령 의미를 별도
+통합한 뒤 결합 gate를 판단한다. 현재 Step는 계속 열려 있다.
