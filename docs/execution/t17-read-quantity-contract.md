@@ -110,7 +110,7 @@ SalesQueries의 eager constructor 주입은 EvidenceRepository와 cycle을
 
 이 문서의 집중 JUnit/HTTP/SQL 결과는 시나리오 profile의 coverage PASS를
 대신하지 않는다. `./verify scenarios --actual`은 실행하지 않는다.
-최종 source가 clean인 상태의 집중 실행과 증거 경로를 후속 기록한다.
+최종 source가 clean인 상태의 집중 실행 결과를 아래에 기록한다.
 
 실행 command는 아래와 같다. 자체 JDK21과 자체 checkout에서 설치한
 CDS dependency·컴파일 산출물을 사용한다.
@@ -142,3 +142,63 @@ root는 통합된 현재 source에서 위 신규 집중 검사와 전체 backend
 새로 실행하고, Haiku native Workflow로 원래 시나리오 전체를 검증한다.
 root의 RESPONSE_SCOPE·policy·observer 변경은 이 실행의 인수 범위가
 아니다. Task/S5/S6, 전체 시나리오, 실모델·규제·BTP 인수는 닫지 않는다.
+
+
+## 최종 집중 실행 결과
+
+실행 commit은 `13990f614527f5c92f4b169fc98b6c439b752c55`다.
+다음 표는 한정된 집중 검사 결과이며 전체 Task/시나리오 PASS가 아니다.
+
+| 검사 | 관찰 결과 | exit |
+|---|---|---|
+| Python 가역·원문·fixture 보존 | 46 tests, 실패 0이다 | 0 |
+| T17 계약 validation | PREPARATION_SCHEMA_VALID다 | 0 |
+| assertion engine/원래 조건 회귀 | 7 tests, 실패·오류·skip 0이다 | 0 |
+| 전체 Spring context/실제 Dispatch/current all-of | 9 tests, 실패·오류·skip 0이다 | 0 |
+| 자체 JAR + HTTP + PG | 7 tests, 226 assertion을 확인했다 | 0 |
+
+실제 HTTP/PG 226개에는 대상 원래 13개와 추가 엄격 proof 125개가 모두
+들어 있다. 나머지는 기존 보유/적격/미예약 aggregate, 다섯 조건 status,
+근거 출처, FEFO, 포장 거부와 인도 끝점의 관련 검사다. 원래 301개의
+scenario assertion 전체를 이 집중 실행에서 관찰했다는 뜻은 아니다.
+
+- 요약: `.local/t17-read-contract/final-focused-summary.json`이다.
+- 집중 log와 JUnit 사본은 `.local/t17-read-contract/`의
+  `python-final.log`, `validate-final.log`, `harness-focused-final.log`,
+  `backend-focused-final.log`, `final-backend-junit/`,
+  `final-harness-junit/`이다.
+- HTTP/PG artifact는
+  `.local/t17-source-pg-fb28c58a-25ff-49aa-a8f6-c152c15f19af/`다.
+  `read-contract-custody.json`에 전후 clean, source byte 불변,
+  fixture 불변이 모두 true로 기록됐다. `build-identity.json`, `junit/`,
+  subcase별 원래 요청/응답·SQL snapshot·226 assertion 관찰도 같은 곳이다.
+- 최종 container·server·private/public key·blob은 모두 정리됐다.
+  backend test container 두 개의 제거 관찰은
+  `.local/t17-read-contract/backend-cleanup-observed.json`이다.
+- 개발 중 HTTP 7개에서 추가 물리 proof 4개가 실패한 기록은
+  `.local/t17-source-pg-cb084300-65a0-4aca-958a-49d070479c50/`다.
+  원인은 observer attribution의 변경과 nullable ownerId의 strict scalar
+  projection이었다. 실제 물리 열 비교 및 nullable JDBC 전후 비교로
+  수정했으며, 원래 fixed expected를 바꾸지 않았다. 초기 cycle 실패도
+  앞 절의 경로에 그대로 남아 있다.
+
+최종 실행은 자체 JDK `21.0.12.1`, Maven `3.9.16`, Node `24.16.0`을
+썼다. Node는 platform 기록의 `24.19.0`과 다르며 이를 exact version
+동일 인수로 주장하지 않는다. 자체 package-lock으로 CDS를 설치하고
+자체 checkout에서 253 product source를 컴파일했다. runtime version
+전체는 custody의 `versions`에 있다. 다른 worktree의 산출물은 복사하지
+않았다.
+
+710개 source 파일의 경로별 SHA-256 map을 정렬한 결합 hash는 다음과
+같다. 개별 fixture hash와 build hash도 같은 custody에 보존한다.
+
+```text
+source = 619dbec477b66c4060b7016643bf14e50ac3764e73a282e563ad16b79832bbf0
+fixture-set = a7e2a7d75e4af8a05e8374ec16b4631031bf8bf5e5639cd93cf6589ca68216d3
+executed-jar = 6d1cd34f4af6b7eaf5e8d7ae15a7c2d90c614dce4f764dd31db708ed95c308d7
+```
+
+이 절의 후속 commit은 문서 증거만 추가한다. 실제 실행 source byte는
+위 commit/hash에 고정한다. root는 별도 RESPONSE_SCOPE 8개와 합쳐
+434개, 정확 inverse 조합, 신규 집중 회귀와 전체 backend를 현재 통합
+source로 확인해야 한다. 새 Haiku Workflow와 S5/S6 통합 gate는 남는다.
