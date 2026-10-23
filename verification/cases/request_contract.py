@@ -30,7 +30,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 UUID_RE = re.compile(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$')
-REFERENCE_KEYS = ('$alias', '$result', '$transform')
+REFERENCE_KEYS = ('$alias', '$result', '$transform', '$encode')
 CASE_NAMESPACE = ('caseId', 'subcaseId', 'scenarioId', 'caseNamespace', 'caseKey')
 BARRIER_KEYS = {'testTransactionId': 'transactionId', 'testParticipantId': 'participantId', 'testBarrierId': 'barrierId', 'testBarrierPoint': 'point'}
 # Query parameters that only narrowed a case's own reading and that the product answers without (the response
@@ -179,6 +179,15 @@ class Placeholders:
         self.seen = {}
 
     def __call__(self, node, key=None):
+        if isinstance(node, dict) and '$encode' in node:
+            spec = node['$encode']
+            if set(node) != {'$encode'} or not isinstance(spec, dict) or set(spec) != {'source', 'encoding'}:
+                raise ValueError('Input encoding accepts source/encoding only')
+            if spec['encoding'] not in ('json', 'base64', 'sha256') or not isinstance(spec['source'], dict):
+                raise ValueError('Invalid input encoding or non-object source')
+            payload = json.dumps(self(spec['source']), ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode()
+            return (payload.decode() if spec['encoding'] == 'json' else base64.b64encode(payload).decode()
+                    if spec['encoding'] == 'base64' else hashlib.sha256(payload).hexdigest())
         if is_ref(node):
             if key in ('expectedRevision', 'proposalRevision'):
                 return 0

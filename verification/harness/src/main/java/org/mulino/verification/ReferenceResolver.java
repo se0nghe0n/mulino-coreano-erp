@@ -4,6 +4,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import java.util.Base64;
+import java.util.TreeSet;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.HexFormat;
 import java.util.Set;
 
 /** Strict identity bindings and bounded input mutation. No evaluation or business arithmetic. */
@@ -26,6 +31,11 @@ public final class ReferenceResolver {
             JsonNode value=new AssertionEngine().select(ref,results,false);
             if(identity) checkIdentityValue(ref.path("pointer").asText(),value);
             return value.deepCopy();
+        }
+        if(node.isObject() && node.has("$encode")) {
+            require(!identity,"Input encoders cannot bind assertion expected values or identities");
+            require(node.size()==1,"Encoding reference allows only $encode");
+            return encode(node.path("$encode"));
         }
         if(node.isObject() && node.has("$transform")) {
             require(!identity,"Assertion identity bindings cannot transform expected values");
@@ -90,6 +100,52 @@ public final class ReferenceResolver {
             default: throw new IllegalArgumentException("Unknown bounded transform operation "+op);
         }
     }
-    private static boolean containsReference(JsonNode n){if(n.isObject() && (n.has("$result") || n.has("$alias") || n.has("$transform"))) return true;if(n.isContainerNode()) for(JsonNode child:n) if(containsReference(child)) return true;return false;}
+    /** INPUT only: one bounded JSON object, with references resolved before its UTF-8 encoding.
+     * Keys are sorted recursively by Java String order, arrays retain order, and scalar
+     * types are unchanged. This is deterministic JSON, not a business-value transform.
+     * A result reference inside the document may bind identity only, never an observed
+     * quantity/status used to manufacture an expected source statement.
+     */
+    private JsonNode encode(JsonNode specification) {
+        require(specification.isObject() && specification.size()==2
+            && specification.has("source") && specification.path("encoding").isTextual(),
+            "Input encoding accepts source/encoding only");
+        String encoding=specification.path("encoding").asText();
+        require(Set.of("json","base64","sha256").contains(encoding),"Unknown input encoding "+encoding);
+        JsonNode source=specification.path("source");
+        require(source.isObject(),"Input encoding source must be a JSON object");
+        bounded(source,0,new int[]{0});
+        JsonNode resolved=resolve(source,true);
+        require(resolved.isObject(),"Resolved input encoding source must remain a JSON object");
+        bounded(resolved,0,new int[]{0});
+        byte[] bytes=canonical(resolved).toString().getBytes(StandardCharsets.UTF_8);
+        require(bytes.length<=65536,"Input encoding exceeds 65536 UTF-8 bytes");
+        String value;
+        switch(encoding) {
+            case "json" -> value=new String(bytes,StandardCharsets.UTF_8);
+            case "base64" -> value=Base64.getEncoder().encodeToString(bytes);
+            case "sha256" -> {
+                try {value=HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(bytes));}
+                catch(NoSuchAlgorithmException impossible) {throw new IllegalStateException(impossible);}
+            }
+            default -> throw new IllegalArgumentException("Unknown input encoding");
+        }
+        return Json.MAPPER.valueToTree(value);
+    }
+    private static void bounded(JsonNode node,int depth,int[] count) {
+        require(depth<=32 && ++count[0]<=4096,"Input encoding exceeds depth/node bound");
+        if(node.isTextual()) require(node.textValue().length()<=65536,"Input encoding string exceeds bound");
+        if(node.isObject()) node.fieldNames().forEachRemaining(k->require(k.length()<=1024,"Input encoding key exceeds bound"));
+        if(node.isContainerNode()) for(JsonNode child:node) bounded(child,depth+1,count);
+    }
+    private static JsonNode canonical(JsonNode node) {
+        if(node.isObject()) {
+            var keys=new TreeSet<String>();node.fieldNames().forEachRemaining(keys::add);
+            var result=Json.object();for(String key:keys) result.set(key,canonical(node.get(key)));return result;
+        }
+        if(node.isArray()) {var result=Json.array();node.forEach(child->result.add(canonical(child)));return result;}
+        return node.deepCopy();
+    }
+    private static boolean containsReference(JsonNode n){if(n.isObject() && (n.has("$result") || n.has("$alias") || n.has("$transform") || n.has("$encode"))) return true;if(n.isContainerNode()) for(JsonNode child:n) if(containsReference(child)) return true;return false;}
     private static void require(boolean ok,String reason){if(!ok)throw new IllegalArgumentException(reason);}
 }

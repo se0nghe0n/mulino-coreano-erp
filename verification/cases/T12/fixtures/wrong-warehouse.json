@@ -393,6 +393,40 @@
         "validUntil": "2026-10-31T23:59:59Z",
         "revision": 1
       }
+    },
+    "receiptSource": {
+      "issuer": "synthetic-test-issuer",
+      "subject": "T12-wrong-warehouse-receipt-source",
+      "audience": "isolated-ontology",
+      "organizationAlias": "ORG",
+      "roleCapabilities": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "getEvidence"
+      ],
+      "grant": {
+        "delegatorAlias": "receiptSource",
+        "actions": [
+          "attachEvidence",
+          "recordActivity",
+          "receiveProvisional",
+          "matchSourceIdentity",
+          "linkCanonicalOccurrence",
+          "getEvidence"
+        ],
+        "scope": {
+          "organizationAlias": "ORG",
+          "itemAliases": [
+            "P"
+          ]
+        },
+        "validFrom": "2026-10-01T00:00:00Z",
+        "validUntil": "2026-10-31T23:59:59Z",
+        "revision": 1
+      }
     }
   },
   "aliases": {
@@ -496,6 +530,9 @@
     },
     "warehouse": {
       "type": "Human"
+    },
+    "receiptSource": {
+      "type": "Human"
     }
   },
   "baseline": {
@@ -576,6 +613,13 @@
           "EXISTS_IN",
           "THROUGHOUT"
         ]
+      }
+    ],
+    "sourceProfiles": [
+      {
+        "namespace": "synthetic-receipt",
+        "policyVersion": "SYNTHETIC-policy-v1",
+        "reconciliationOwnerAlias": "receiptSource"
       }
     ]
   },

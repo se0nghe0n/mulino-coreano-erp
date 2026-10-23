@@ -40,7 +40,7 @@
           }
         }
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -76,7 +76,7 @@
         },
         "canonicalOccurrenceKey": "late-100"
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -99,7 +99,7 @@
         "quantity",
         "workId"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "deadline-revision-and-correction",
@@ -113,7 +113,7 @@
         "quantity",
         "workId"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "deadline-revision-and-correction",
@@ -140,5 +140,5 @@
       "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
     }
   ],
-  "note": "This is authored input classification, not a runtime receipt. Read T09/source-contract-frontier.md for the unimplemented binding boundary."
+  "note": "The originalPhysicalInput and unsupportedSlots fields preserve the pre-graph input inventory. Current cases bind real input source graphs; no actual scenario was run. See T09/source-contract-frontier.md for remaining integration gates."
 }

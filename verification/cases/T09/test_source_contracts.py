@@ -10,7 +10,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from source_contracts import ROOT, CASES, document_and_event, receipt_chain, repair_inputs
+from source_contracts import ROOT, CASES, document_and_event, receipt_chain, repair_inputs, SOURCE_ACTOR, SOURCE_CAPABILITIES
 
 spec = importlib.util.spec_from_file_location('request_contract', ROOT / 'verification/cases/request_contract.py')
 rc = importlib.util.module_from_spec(spec)
@@ -77,9 +77,10 @@ class SourceContracts(unittest.TestCase):
         self.assertEqual(['attachEvidence', 'recordActivity', 'receiveProvisional',
                           'matchSourceIdentity', 'linkCanonicalOccurrence', 'confirmReceipt'],
                          [a['capabilityId'] for a in graph])
-        original = base64.b64decode(graph[0]['request']['slots']['contentBase64'])
-        self.assertEqual(hashlib.sha256(original).hexdigest(), graph[0]['request']['slots']['expectedHash'])
-        self.assertEqual(json.loads(original), json.loads(graph[1]['request']['slots']['payload']))
+        resolved = rc.Placeholders()(graph)
+        original = base64.b64decode(resolved[0]['request']['slots']['contentBase64'])
+        self.assertEqual(hashlib.sha256(original).hexdigest(), resolved[0]['request']['slots']['expectedHash'])
+        self.assertEqual(json.loads(original), json.loads(resolved[1]['request']['slots']['payload']))
         self.assertEqual(self.binding['workId'], json.loads(original)['workId'])
         self.assertEqual('60', graph[2]['request']['slots']['quantity'])
         self.assertEqual('60', graph[3]['request']['slots']['quantity'])
@@ -113,13 +114,81 @@ class SourceContracts(unittest.TestCase):
         self.assertNotIn('documentId', no['request']['slots'])
         self.assertEqual([], no['request']['evidenceRefs'])
         scope = next(a for a in subs['insufficient-source-scope']['actions'] if a['id'] == 'claim')
-        self.assertEqual({'fixtureAlias': 'PORT'}, json.loads(scope['request']['slots']['payload'])['reportedScope']['placeId'])
+        self.assertEqual({'$alias': 'PORT'}, scope['request']['slots']['payload']['$encode']['source']['reportedScope']['placeId'])
         claims = [a for a in subs['conflicting-claims']['actions'] if a.get('capabilityId') == 'recordActivity']
         self.assertEqual(['100', '98'], [a['request']['slots']['quantity'] for a in claims])
         self.assertEqual(['synthetic-warehouse', 'synthetic-carrier'], [a['request']['slots']['sourceNamespace'] for a in claims])
-        self.assertEqual('claim', json.loads(claims[1]['request']['slots']['payload'])['samePhysicalReceiptCandidate']['priorSourceAction'])
+        self.assertEqual({'$result': {'actionId': 'claim', 'pointer': '/response/id'}}, claims[1]['request']['slots']['payload']['$encode']['source']['samePhysicalReceiptCandidate'])
         for sub in (subs[x] for x in ('no-receipt-evidence', 'insufficient-source-scope', 'conflicting-claims')):
             self.assertFalse(any(a.get('capabilityId') in ('confirmReceipt', 'linkCanonicalOccurrence') for a in sub['actions']))
+
+    def test_all_ten_receipts_are_connected_and_keep_original_physical_inputs(self):
+        total = 0
+        contract = rc.Contracts(ROOT)
+        for case_id in CASES:
+            case = json.loads((ROOT / f'verification/cases/{case_id}/case.json').read_text())
+            frontier = json.loads((ROOT / f'verification/cases/{case_id}/source-contract-frontier.json').read_text())
+            for entry in frontier['unresolvedReceiptInputs']:
+                total += 1
+                sub = next(s for s in case['subcases'] if s['id'] == entry['subcase'])
+                aid = entry['action']
+                graph = [a for a in sub['actions'] if a['id'] == aid or a['id'].startswith(aid + '-')]
+                # No current business assertion supplies a source fact or input.
+                expected = ['attachEvidence', 'recordActivity', 'receiveProvisional']
+                if sub['id'] != 'receipt-missing-lot':
+                    expected += ['matchSourceIdentity', 'linkCanonicalOccurrence']
+                expected += ['confirmReceipt']
+                self.assertEqual(expected, [a['capabilityId'] for a in graph])
+                original = entry['originalPhysicalInput']
+                doc, event, observation = [a['request']['slots'] for a in graph[:3]]
+                source = event['payload']['$encode']['source']
+                self.assertEqual(source, doc['contentBase64']['$encode']['source'])
+                self.assertEqual(source, doc['expectedHash']['$encode']['source'])
+                self.assertEqual('PHYSICAL_RECEIPT', event['kind'])
+                self.assertEqual(original['quantity']['value'], source['quantity'])
+                self.assertEqual(original['quantity']['unit'], source['unit'])
+                for key in ('occurredAt', 'placeId', 'lotId'):
+                    if key in original:
+                        self.assertEqual(original[key], source[key])
+                        self.assertEqual(original[key], observation[key])
+                for action in graph:
+                    problems, known = contract.command_problems(action, sub)
+                    self.assertEqual([], problems, (case_id, sub['id'], action['id']))
+                    if sub['id'] == 'receipt-missing-lot' and action['id'] == aid:
+                        self.assertEqual({'canonicalOccurrenceId', 'lotId'}, {k.split(':')[0].removeprefix('/slots/') for k in known})
+                    else:
+                        self.assertEqual([], known, (case_id, sub['id'], action['id']))
+                self.assertEqual({'$result': {'actionId': aid + '-provisional', 'pointer': '/response/effects/receiptId'}}, graph[-1]['request']['slots']['receiptId'])
+                self.assertEqual(1, graph[-1]['request']['expectedRevision'])
+                if sub['id'] == 'receipt-missing-lot':
+                    self.assertNotIn('lotId', observation)
+                    self.assertNotIn('lotId', graph[-1]['request']['slots'])
+                    self.assertNotIn('canonicalOccurrenceId', graph[-1]['request']['slots'])
+                if 'segmentId' in original:
+                    self.assertEqual(original['segmentId'], observation['transitSegmentId'])
+                self.assertTrue(all(a['actorRef'] == SOURCE_ACTOR for a in graph[:-1]))
+        self.assertEqual(10, total)
+
+    def test_new_source_identity_does_not_broaden_business_grants_or_erase_facts(self):
+        for case_id in CASES:
+            case = json.loads((ROOT / f'verification/cases/{case_id}/case.json').read_text())
+            for sub in case['subcases']:
+                ref = sub['fixtureRef']
+                current = json.loads((ROOT / ref).read_text())
+                before = json.loads(subprocess.check_output(['git', 'show', 'ad80e1bc:' + ref], cwd=ROOT))
+                for name, actor in before['actors'].items():
+                    self.assertEqual(actor, current['actors'][name], (ref, name))
+                for key in ('segments', 'works', 'documents', 'lots', 'purchaseOrders'):
+                    self.assertEqual(before['baseline'].get(key), current['baseline'].get(key), (ref, key))
+                if SOURCE_ACTOR in current['actors']:
+                    actor = current['actors'][SOURCE_ACTOR]
+                    self.assertEqual(SOURCE_CAPABILITIES, actor['roleCapabilities'])
+                    self.assertEqual(SOURCE_CAPABILITIES, actor['grant']['actions'])
+                    self.assertEqual({'organizationAlias': 'ORG', 'itemAliases': ['P']}, actor['grant']['scope'])
+                    self.assertNotIn('confirmReceipt', actor['grant']['actions'])
+                    profile = next(p for p in current['baseline']['sourceProfiles'] if p['namespace'] == 'synthetic-receipt')
+                    self.assertEqual(SOURCE_ACTOR, profile['reconciliationOwnerAlias'])
+                    self.assertEqual('SYNTHETIC-policy-v1', profile['policyVersion'])
 
     def test_actual_receipt_matcher_rejects_source_mutations(self):
         """Execute the product's matcher source, not a Python facsimile of it."""
@@ -127,7 +196,7 @@ class SourceContracts(unittest.TestCase):
         method = source.split('  private static boolean receiptPayloadMatches', 1)[1].split('  private static boolean sameQuantity', 1)[0]
         method = '  private static boolean receiptPayloadMatches' + method
         graph = receipt_chain('r', 'A', self.binding, '60', '2026-10-07T01:00:00Z')
-        payload = graph[1]['request']['slots']['payload']
+        payload = rc.Placeholders()(graph[1]['request']['slots']['payload'])
         jars = []
         for name in ('jackson-databind', 'jackson-core', 'jackson-annotations'):
             choices = sorted((Path.home() / '.m2/repository/com/fasterxml/jackson/core' / name).glob('*/*.jar'))

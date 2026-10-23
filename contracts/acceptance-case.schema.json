@@ -153,7 +153,8 @@
           "minLength": 1
         },
         "request": {
-          "type": "object"
+          "type": "object",
+          "$ref": "#/$defs/inputEncodingValue"
         },
         "observation": {
           "type": "object",
@@ -1026,6 +1027,9 @@
               "baselineUnitSource"
             ]
           }
+        },
+        {
+          "$ref": "#/$defs/noInputEncoding"
         }
       ]
     },
@@ -1195,6 +1199,139 @@
           ]
         }
       }
+    },
+    "inputEncodingReference": {
+      "type": "object",
+      "required": [
+        "$encode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "$encode": {
+          "type": "object",
+          "required": [
+            "source",
+            "encoding"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "source": {
+              "type": "object",
+              "$ref": "#/$defs/encodingSource"
+            },
+            "encoding": {
+              "enum": [
+                "json",
+                "base64",
+                "sha256"
+              ]
+            }
+          }
+        }
+      },
+      "description": "INPUT only. Resolve alias/result identities, sort object keys, retain arrays/scalars, serialize compact JSON as UTF-8 (65536 bytes, depth 32, 4096 nodes), return JSON text/base64/SHA-256. No evaluation or arithmetic."
+    },
+    "encodingSource": {
+      "allOf": [
+        {
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "$encode"
+                  ]
+                },
+                {
+                  "required": [
+                    "$transform"
+                  ]
+                }
+              ]
+            },
+            "additionalProperties": {
+              "$ref": "#/$defs/encodingSource"
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "array"
+          },
+          "then": {
+            "items": {
+              "$ref": "#/$defs/encodingSource"
+            }
+          }
+        }
+      ]
+    },
+    "inputEncodingValue": {
+      "allOf": [
+        {
+          "if": {
+            "type": "object",
+            "required": [
+              "$encode"
+            ]
+          },
+          "then": {
+            "$ref": "#/$defs/inputEncodingReference"
+          }
+        },
+        {
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "additionalProperties": {
+              "$ref": "#/$defs/inputEncodingValue"
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "array"
+          },
+          "then": {
+            "items": {
+              "$ref": "#/$defs/inputEncodingValue"
+            }
+          }
+        }
+      ]
+    },
+    "noInputEncoding": {
+      "allOf": [
+        {
+          "if": {
+            "type": "object"
+          },
+          "then": {
+            "not": {
+              "required": [
+                "$encode"
+              ]
+            },
+            "additionalProperties": {
+              "$ref": "#/$defs/noInputEncoding"
+            }
+          }
+        },
+        {
+          "if": {
+            "type": "array"
+          },
+          "then": {
+            "items": {
+              "$ref": "#/$defs/noInputEncoding"
+            }
+          }
+        }
+      ]
     }
   }
 }

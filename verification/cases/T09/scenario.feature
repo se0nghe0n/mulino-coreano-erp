@@ -7,6 +7,11 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "cumulative" 행동을 수행한다
     만일 "A" 역할이 "state" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-canonical" 행동을 수행한다
     만일 "warehouse" 역할이 "receive60" 행동을 수행한다
     만일 "A" 역할이 "sale60" 행동을 수행한다
     만일 "warehouse" 역할이 "reserve60" 행동을 수행한다
@@ -14,6 +19,11 @@
     만일 "시스템" 역할이 "clock-dispatch60" 행동을 수행한다
     만일 "warehouse" 역할이 "dispatch60" 행동을 수행한다
     만일 "시스템" 역할이 "clock-receive40" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive40-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive40-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive40-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive40-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive40-canonical" 행동을 수행한다
     만일 "warehouse" 역할이 "receive40" 행동을 수행한다
     만일 "시스템" 역할이 "clock-known" 행동을 수행한다
     만일 "A" 역할이 "cumulative-assessment" 행동을 수행한다
@@ -119,6 +129,9 @@
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
     만일 "A" 역할이 "draft" 행동을 수행한다
     만일 "A" 역할이 "activate" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-provisional" 행동을 수행한다
     만일 "A" 역할이 "receipt" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다

@@ -197,62 +197,422 @@
           }
         },
         {
-          "id": "receive60",
+          "id": "receive60-event-document",
           "kind": "invoke",
-          "evidenceRefs": [
-            "receive60:actual-artifact"
-          ],
-          "actorRef": "warehouse",
+          "actorRef": "receiptSource",
           "route": "api",
-          "capabilityId": "confirmReceipt",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "receive60-event-document:actual-artifact"
+          ],
           "request": {
-            "intentKind": "COMMAND",
+            "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
-            "capabilityId": "confirmReceipt",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "cumulative",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-receipt",
+              "sourceReference": "receive60",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "quantity": "60",
+                    "segmentId": {
+                      "$alias": "A60"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-05T09:00:00Z",
+                    "canonicalOccurrenceKey": "receipt-A60",
+                    "purchaseOrderId": {
+                      "$alias": "PO"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "cumulative",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "A60"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "quantity": "60",
+                    "segmentId": {
+                      "$alias": "A60"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-05T09:00:00Z",
+                    "canonicalOccurrenceKey": "receipt-A60",
+                    "purchaseOrderId": {
+                      "$alias": "PO"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "cumulative",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "A60"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
                 }
               }
-            ],
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receive60-event-document"
+          }
+        },
+        {
+          "id": "receive60-event",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "evidenceRefs": [
+            "receive60-event:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
             "slots": {
-              "quantity": {
-                "value": "60",
-                "unit": "BOX"
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "cumulative",
+                    "pointer": "/response/workId"
+                  }
+                }
               },
-              "segmentId": {
-                "$alias": "A60"
+              "kind": "PHYSICAL_RECEIPT",
+              "sourceNamespace": "synthetic-receipt",
+              "externalEventId": "receive60",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-05T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "quantity": "60",
+                    "segmentId": {
+                      "$alias": "A60"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-05T09:00:00Z",
+                    "canonicalOccurrenceKey": "receipt-A60",
+                    "purchaseOrderId": {
+                      "$alias": "PO"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "cumulative",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "A60"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
               },
-              "lotId": {
-                "$alias": "LOT"
+              "quantity": "60",
+              "unit": "BOX",
+              "documentId": {
+                "$result": {
+                  "actionId": "receive60-event-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receive60-event"
+          }
+        },
+        {
+          "id": "receive60-provisional",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "receiveProvisional",
+          "evidenceRefs": [
+            "receive60-provisional:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "receiveProvisional",
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P"
               },
               "placeId": {
                 "$alias": "W"
               },
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              },
+              "rangeRootId": {
+                "$alias": "A60"
+              },
+              "startQuantity": "0",
+              "quantity": "60",
+              "unit": "BOX",
               "occurredAt": "2026-10-05T09:00:00Z",
-              "canonicalOccurrenceKey": "receipt-A60",
-              "purchaseOrderId": {
-                "$alias": "PO"
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "eventId": {
+                "$result": {
+                  "actionId": "receive60-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "원천 수령 범위와 증빙을 대조한다",
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "transitSegmentId": {
+                "$alias": "A60"
               }
             },
-            "expectedRevision": 1,
-            "commandIdempotencyKey": "T09-cumulative-versus-state-receive60",
-            "evidenceRefs": [
-              {
-                "$alias": "DOC"
-              }
-            ],
             "provenance": {
-              "quantity": "USER",
-              "segmentId": "CONTEXT",
-              "lotId": "CONTEXT",
+              "itemId": "CONTEXT",
               "placeId": "CONTEXT",
-              "occurredAt": "USER",
-              "canonicalOccurrenceKey": "USER",
-              "purchaseOrderId": "CONTEXT"
-            }
+              "workId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "lotId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "transitSegmentId": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receive60-provisional"
+          }
+        },
+        {
+          "id": "receive60-match",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "evidenceRefs": [
+            "receive60-match:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "receive60-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "receive60-event-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "A60"
+              },
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "sourceIdentity": "synthetic-receipt:receive60:1",
+              "quantity": "60",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-05T09:00:00Z",
+              "reason": "원문·관측·실제 수령 범위의 동일성을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receive60-event",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "receive60-match"
+          }
+        },
+        {
+          "id": "receive60-canonical",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "evidenceRefs": [
+            "receive60-canonical:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "receive60-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receive60-match",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "receive60-canonical"
+          }
+        },
+        {
+          "id": "receive60",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "evidenceRefs": [
+            "receive60:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [],
+            "slots": {
+              "receiptId": {
+                "$result": {
+                  "actionId": "receive60-provisional",
+                  "pointer": "/response/effects/receiptId"
+                }
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "receive60-canonical",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "receiptId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "canonicalOccurrenceId": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T09-cumulative-versus-state-receive60"
           }
         },
         {
@@ -340,7 +700,7 @@
               "segmentId": {
                 "$result": {
                   "actionId": "receive60",
-                  "pointer": "/response/segmentId"
+                  "pointer": "/response/effects/segmentId"
                 }
               },
               "salesLineId": {
@@ -514,62 +874,422 @@
           }
         },
         {
-          "id": "receive40",
+          "id": "receive40-event-document",
           "kind": "invoke",
-          "evidenceRefs": [
-            "receive40:actual-artifact"
-          ],
-          "actorRef": "warehouse",
+          "actorRef": "receiptSource",
           "route": "api",
-          "capabilityId": "confirmReceipt",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "receive40-event-document:actual-artifact"
+          ],
           "request": {
-            "intentKind": "COMMAND",
+            "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
-            "capabilityId": "confirmReceipt",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "cumulative",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-receipt",
+              "sourceReference": "receive40",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "quantity": "40",
+                    "segmentId": {
+                      "$alias": "B40"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-07T01:30:00Z",
+                    "canonicalOccurrenceKey": "receipt-B40",
+                    "purchaseOrderId": {
+                      "$alias": "PO"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "cumulative",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "B40"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "quantity": "40",
+                    "segmentId": {
+                      "$alias": "B40"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-07T01:30:00Z",
+                    "canonicalOccurrenceKey": "receipt-B40",
+                    "purchaseOrderId": {
+                      "$alias": "PO"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "cumulative",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "B40"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
                 }
               }
-            ],
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receive40-event-document"
+          }
+        },
+        {
+          "id": "receive40-event",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "evidenceRefs": [
+            "receive40-event:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
             "slots": {
-              "quantity": {
-                "value": "40",
-                "unit": "BOX"
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "cumulative",
+                    "pointer": "/response/workId"
+                  }
+                }
               },
-              "segmentId": {
-                "$alias": "B40"
+              "kind": "PHYSICAL_RECEIPT",
+              "sourceNamespace": "synthetic-receipt",
+              "externalEventId": "receive40",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T01:30:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "quantity": "40",
+                    "segmentId": {
+                      "$alias": "B40"
+                    },
+                    "lotId": {
+                      "$alias": "LOT"
+                    },
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "occurredAt": "2026-10-07T01:30:00Z",
+                    "canonicalOccurrenceKey": "receipt-B40",
+                    "purchaseOrderId": {
+                      "$alias": "PO"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "workId": {
+                      "$result": {
+                        "actionId": "cumulative",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "B40"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
               },
-              "lotId": {
-                "$alias": "LOT"
+              "quantity": "40",
+              "unit": "BOX",
+              "documentId": {
+                "$result": {
+                  "actionId": "receive40-event-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receive40-event"
+          }
+        },
+        {
+          "id": "receive40-provisional",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "receiveProvisional",
+          "evidenceRefs": [
+            "receive40-provisional:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "receiveProvisional",
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P"
               },
               "placeId": {
                 "$alias": "W"
               },
+              "workId": {
+                "$result": {
+                  "actionId": "cumulative",
+                  "pointer": "/response/workId"
+                }
+              },
+              "rangeRootId": {
+                "$alias": "B40"
+              },
+              "startQuantity": "0",
+              "quantity": "40",
+              "unit": "BOX",
               "occurredAt": "2026-10-07T01:30:00Z",
-              "canonicalOccurrenceKey": "receipt-B40",
-              "purchaseOrderId": {
-                "$alias": "PO"
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "eventId": {
+                "$result": {
+                  "actionId": "receive40-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "원천 수령 범위와 증빙을 대조한다",
+              "nextCheckAt": "2026-10-08T09:00:00Z",
+              "transitSegmentId": {
+                "$alias": "B40"
               }
             },
-            "expectedRevision": 1,
-            "commandIdempotencyKey": "T09-cumulative-versus-state-receive40",
-            "evidenceRefs": [
-              {
-                "$alias": "DOC"
-              }
-            ],
             "provenance": {
-              "quantity": "USER",
-              "segmentId": "CONTEXT",
-              "lotId": "CONTEXT",
+              "itemId": "CONTEXT",
               "placeId": "CONTEXT",
-              "occurredAt": "USER",
-              "canonicalOccurrenceKey": "USER",
-              "purchaseOrderId": "CONTEXT"
-            }
+              "workId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "lotId": "CONTEXT",
+              "eventId": "CONTEXT",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT",
+              "transitSegmentId": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receive40-provisional"
+          }
+        },
+        {
+          "id": "receive40-match",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "evidenceRefs": [
+            "receive40-match:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "receive40-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "receive40-event-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "B40"
+              },
+              "policyVersion": "SYNTHETIC-policy-v1",
+              "sourceIdentity": "synthetic-receipt:receive40:1",
+              "quantity": "40",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T01:30:00Z",
+              "reason": "원문·관측·실제 수령 범위의 동일성을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receive40-event",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "receive40-match"
+          }
+        },
+        {
+          "id": "receive40-canonical",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "evidenceRefs": [
+            "receive40-canonical:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "receive40-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receive40-match",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "receive40-canonical"
+          }
+        },
+        {
+          "id": "receive40",
+          "kind": "invoke",
+          "actorRef": "warehouse",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "evidenceRefs": [
+            "receive40:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [],
+            "slots": {
+              "receiptId": {
+                "$result": {
+                  "actionId": "receive40-provisional",
+                  "pointer": "/response/effects/receiptId"
+                }
+              },
+              "lotId": {
+                "$alias": "LOT"
+              },
+              "canonicalOccurrenceId": {
+                "$result": {
+                  "actionId": "receive40-canonical",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "receiptId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "canonicalOccurrenceId": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T09-cumulative-versus-state-receive40"
           }
         },
         {
@@ -4119,54 +4839,285 @@
           }
         },
         {
-          "id": "receipt",
+          "id": "receipt-event-document",
           "kind": "invoke",
-          "evidenceRefs": [
-            "receipt:actual-artifact"
-          ],
-          "actorRef": "A",
+          "actorRef": "receiptSource",
           "route": "api",
-          "capabilityId": "confirmReceipt",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "receipt-event-document:actual-artifact"
+          ],
           "request": {
-            "intentKind": "COMMAND",
+            "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
-            "capabilityId": "confirmReceipt",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "WORK",
                 "id": {
-                  "$alias": "P"
+                  "$result": {
+                    "actionId": "draft",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-receipt",
+              "sourceReference": "receipt",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "quantity": "100",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotIdentification": "MISSING",
+                    "occurredAt": "2026-10-07T01:00:00Z",
+                    "workId": {
+                      "$result": {
+                        "actionId": "draft",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "Q"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "quantity": "100",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotIdentification": "MISSING",
+                    "occurredAt": "2026-10-07T01:00:00Z",
+                    "workId": {
+                      "$result": {
+                        "actionId": "draft",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "Q"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
                 }
               }
-            ],
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receipt-event-document"
+          }
+        },
+        {
+          "id": "receipt-event",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "evidenceRefs": [
+            "receipt-event:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
             "slots": {
-              "quantity": {
-                "value": "100",
-                "unit": "BOX"
+              "subject": {
+                "kind": "WORK",
+                "id": {
+                  "$result": {
+                    "actionId": "draft",
+                    "pointer": "/response/workId"
+                  }
+                }
+              },
+              "kind": "PHYSICAL_RECEIPT",
+              "sourceNamespace": "synthetic-receipt",
+              "externalEventId": "receipt",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T01:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "quantity": "100",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "itemId": {
+                      "$alias": "P"
+                    },
+                    "lotIdentification": "MISSING",
+                    "occurredAt": "2026-10-07T01:00:00Z",
+                    "workId": {
+                      "$result": {
+                        "actionId": "draft",
+                        "pointer": "/response/workId"
+                      }
+                    },
+                    "rangeRootId": {
+                      "$alias": "Q"
+                    },
+                    "startQuantity": "0",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "quantity": "100",
+              "unit": "BOX",
+              "documentId": {
+                "$result": {
+                  "actionId": "receipt-event-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "receipt-event"
+          }
+        },
+        {
+          "id": "receipt-provisional",
+          "kind": "invoke",
+          "actorRef": "receiptSource",
+          "route": "api",
+          "capabilityId": "receiveProvisional",
+          "evidenceRefs": [
+            "receipt-provisional:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "receiveProvisional",
+            "subjectRefs": [],
+            "slots": {
+              "itemId": {
+                "$alias": "P"
               },
               "placeId": {
                 "$alias": "W"
               },
-              "itemId": {
-                "$alias": "P"
+              "workId": {
+                "$result": {
+                  "actionId": "draft",
+                  "pointer": "/response/workId"
+                }
               },
-              "lotIdentification": "MISSING",
-              "occurredAt": "2026-10-07T01:00:00Z"
+              "rangeRootId": {
+                "$alias": "Q"
+              },
+              "startQuantity": "0",
+              "quantity": "100",
+              "unit": "BOX",
+              "occurredAt": "2026-10-07T01:00:00Z",
+              "eventId": {
+                "$result": {
+                  "actionId": "receipt-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "ownerId": {
+                "$alias": "A"
+              },
+              "supervisorId": {
+                "$alias": "supervisor"
+              },
+              "nextAction": "원천 수령 범위와 증빙을 대조한다",
+              "nextCheckAt": "2026-10-08T09:00:00Z"
+            },
+            "provenance": {
+              "itemId": "CONTEXT",
+              "placeId": "CONTEXT",
+              "workId": "CONTEXT",
+              "rangeRootId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "eventId": "CONTEXT",
+              "ownerId": "CONTEXT",
+              "supervisorId": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             },
             "expectedRevision": 1,
-            "commandIdempotencyKey": "T09-receipt-missing-lot-receipt",
-            "evidenceRefs": [
-              {
-                "$alias": "DOC"
+            "commandIdempotencyKey": "receipt-provisional"
+          }
+        },
+        {
+          "id": "receipt",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "confirmReceipt",
+          "evidenceRefs": [
+            "receipt:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "confirmReceipt",
+            "subjectRefs": [],
+            "slots": {
+              "receiptId": {
+                "$result": {
+                  "actionId": "receipt-provisional",
+                  "pointer": "/response/effects/receiptId"
+                }
               }
-            ],
+            },
             "provenance": {
-              "quantity": "USER",
-              "placeId": "CONTEXT",
-              "itemId": "CONTEXT",
-              "lotIdentification": "USER",
-              "occurredAt": "USER"
-            }
+              "receiptId": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "T09-receipt-missing-lot-receipt"
           }
         },
         {
@@ -4752,9 +5703,49 @@
               "sourceNamespace": "synthetic-warehouse",
               "sourceReference": "T09-throughout-gap-initial-observation",
               "mediaType": "application/json",
-              "expectedHash": "06910a032a72393c5c9ccf04acc46762795666b0ddd25aef7036f65e8c13bc54",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T01:00:00Z",
+                    "coverageStart": "2026-10-07T00:00:00Z",
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "1",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
               "provenance": "SYNTHETIC source observation; no legal approval or verification",
-              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMTowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjEiLCJ1bml0IjoiQk9YIn0="
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T01:00:00Z",
+                    "coverageStart": "2026-10-07T00:00:00Z",
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "1",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
+                }
+              }
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -4798,7 +5789,27 @@
               "timeZone": "UTC",
               "timePrecision": "SECOND",
               "valueState": "KNOWN",
-              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T01:00:00Z\",\"coverageStart\":\"2026-10-07T00:00:00Z\",\"occurredAt\":\"2026-10-07T00:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"1\",\"unit\":\"BOX\"}",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T01:00:00Z",
+                    "coverageStart": "2026-10-07T00:00:00Z",
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "1",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
+              },
               "quantity": "100",
               "unit": "BOX",
               "documentId": {
@@ -4861,9 +5872,49 @@
               "sourceNamespace": "synthetic-warehouse",
               "sourceReference": "T09-throughout-gap-final-observation",
               "mediaType": "application/json",
-              "expectedHash": "239a6182e8ef157bde62a139dc6fb5a01174407be4ecfc89e2a138f46b170a40",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T02:00:00Z",
+                    "coverageStart": "2026-10-07T02:00:00Z",
+                    "occurredAt": "2026-10-07T02:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "2",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
               "provenance": "SYNTHETIC source observation; no legal approval or verification",
-              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjIiLCJ1bml0IjoiQk9YIn0="
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T02:00:00Z",
+                    "coverageStart": "2026-10-07T02:00:00Z",
+                    "occurredAt": "2026-10-07T02:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "2",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
+                }
+              }
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -4907,7 +5958,27 @@
               "timeZone": "UTC",
               "timePrecision": "SECOND",
               "valueState": "KNOWN",
-              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T02:00:00Z\",\"coverageStart\":\"2026-10-07T02:00:00Z\",\"occurredAt\":\"2026-10-07T02:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"2\",\"unit\":\"BOX\"}",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T02:00:00Z",
+                    "coverageStart": "2026-10-07T02:00:00Z",
+                    "occurredAt": "2026-10-07T02:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "2",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
+              },
               "quantity": "100",
               "unit": "BOX",
               "documentId": {
@@ -5402,9 +6473,49 @@
               "sourceNamespace": "synthetic-warehouse",
               "sourceReference": "T09-throughout-complete-initial-observation",
               "mediaType": "application/json",
-              "expectedHash": "06910a032a72393c5c9ccf04acc46762795666b0ddd25aef7036f65e8c13bc54",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T01:00:00Z",
+                    "coverageStart": "2026-10-07T00:00:00Z",
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "1",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
               "provenance": "SYNTHETIC source observation; no legal approval or verification",
-              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMTowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjEiLCJ1bml0IjoiQk9YIn0="
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T01:00:00Z",
+                    "coverageStart": "2026-10-07T00:00:00Z",
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "1",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
+                }
+              }
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -5448,7 +6559,27 @@
               "timeZone": "UTC",
               "timePrecision": "SECOND",
               "valueState": "KNOWN",
-              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T01:00:00Z\",\"coverageStart\":\"2026-10-07T00:00:00Z\",\"occurredAt\":\"2026-10-07T00:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"1\",\"unit\":\"BOX\"}",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T01:00:00Z",
+                    "coverageStart": "2026-10-07T00:00:00Z",
+                    "occurredAt": "2026-10-07T00:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "1",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
+              },
               "quantity": "100",
               "unit": "BOX",
               "documentId": {
@@ -5511,9 +6642,49 @@
               "sourceNamespace": "synthetic-warehouse",
               "sourceReference": "T09-throughout-complete-final-observation",
               "mediaType": "application/json",
-              "expectedHash": "777c92119e790dc733bbf5b5dd49e75481a75d6b36f603c9f3299f923ff24e1b",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T02:00:00Z",
+                    "coverageStart": "2026-10-07T01:00:00Z",
+                    "occurredAt": "2026-10-07T02:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "2",
+                    "unit": "BOX"
+                  },
+                  "encoding": "sha256"
+                }
+              },
               "provenance": "SYNTHETIC source observation; no legal approval or verification",
-              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMTowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjIiLCJ1bml0IjoiQk9YIn0="
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T02:00:00Z",
+                    "coverageStart": "2026-10-07T01:00:00Z",
+                    "occurredAt": "2026-10-07T02:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "2",
+                    "unit": "BOX"
+                  },
+                  "encoding": "base64"
+                }
+              }
             },
             "provenance": {
               "subject": "CONTEXT",
@@ -5557,7 +6728,27 @@
               "timeZone": "UTC",
               "timePrecision": "SECOND",
               "valueState": "KNOWN",
-              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T02:00:00Z\",\"coverageStart\":\"2026-10-07T01:00:00Z\",\"occurredAt\":\"2026-10-07T02:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"2\",\"unit\":\"BOX\"}",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "activityKind": "STATE_OBSERVATION",
+                    "coverageEnd": "2026-10-07T02:00:00Z",
+                    "coverageStart": "2026-10-07T01:00:00Z",
+                    "occurredAt": "2026-10-07T02:00:00Z",
+                    "placeId": {
+                      "$alias": "W"
+                    },
+                    "quantity": "100",
+                    "segmentId": {
+                      "$alias": "Q"
+                    },
+                    "sourceNamespace": "synthetic-warehouse",
+                    "sourceVersion": "2",
+                    "unit": "BOX"
+                  },
+                  "encoding": "json"
+                }
+              },
               "quantity": "100",
               "unit": "BOX",
               "documentId": {

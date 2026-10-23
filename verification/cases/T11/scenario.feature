@@ -8,6 +8,11 @@
     만일 "A" 역할이 "parent" 행동을 수행한다
     만일 "A" 역할이 "child30" 행동을 수행한다
     만일 "A" 역할이 "child60" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive90" 행동을 수행한다
     만일 "A" 역할이 "child30-link" 행동을 수행한다
     만일 "A" 역할이 "child30-assessment" 행동을 수행한다
@@ -51,6 +56,11 @@
     만일 "A" 역할이 "parent" 행동을 수행한다
     만일 "A" 역할이 "child30" 행동을 수행한다
     만일 "A" 역할이 "child60" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive90" 행동을 수행한다
     만일 "A" 역할이 "child30-link" 행동을 수행한다
     만일 "A" 역할이 "child30-assessment" 행동을 수행한다
@@ -94,6 +104,11 @@
     만일 "A" 역할이 "parent" 행동을 수행한다
     만일 "A" 역할이 "child30" 행동을 수행한다
     만일 "A" 역할이 "child60" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive90-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive90" 행동을 수행한다
     만일 "A" 역할이 "child30-link" 행동을 수행한다
     만일 "A" 역할이 "child30-assessment" 행동을 수행한다
@@ -189,6 +204,11 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-canonical" 행동을 수행한다
     만일 "A" 역할이 "receipt" 행동을 수행한다
     만일 "A" 역할이 "confirmed-before-correction-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "confirmed-before-correction-db" 행동을 수행한다
@@ -280,6 +300,11 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "parent-one" 행동을 수행한다
     만일 "A" 역할이 "parent-two" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receive60-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive60" 행동을 수행한다
     만일 "A" 역할이 "parent-one-link" 행동을 수행한다
     만일 "A" 역할이 "parent-two-link" 행동을 수행한다

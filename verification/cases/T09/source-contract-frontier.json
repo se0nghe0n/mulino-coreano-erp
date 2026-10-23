@@ -51,7 +51,7 @@
           "$alias": "PO"
         }
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -84,7 +84,7 @@
           "$alias": "PO"
         }
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -111,7 +111,7 @@
         "lotIdentification": "MISSING",
         "occurredAt": "2026-10-07T01:00:00Z"
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "MISSING_LOT_NEGATIVE_PROBE_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -135,7 +135,7 @@
         "quantity",
         "segmentId"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "cumulative-versus-state",
@@ -149,7 +149,7 @@
         "quantity",
         "segmentId"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "receipt-missing-lot",
@@ -162,8 +162,8 @@
         "placeId",
         "quantity"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "MISSING_LOT_NEGATIVE_PROBE_NOT_RUN"
     }
   ],
-  "note": "This is authored input classification, not a runtime receipt. Read T09/source-contract-frontier.md for the unimplemented binding boundary."
+  "note": "The originalPhysicalInput and unsupportedSlots fields preserve the pre-graph input inventory. Current cases bind real input source graphs; no actual scenario was run. See T09/source-contract-frontier.md for remaining integration gates."
 }

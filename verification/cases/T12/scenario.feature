@@ -60,6 +60,11 @@
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-canonical" 행동을 수행한다
     만일 "A" 역할이 "receipt" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
@@ -107,6 +112,11 @@
     먼저 사례 파일 "verification/cases/T12/case.json"의 "deadline-revision-and-correction"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "work" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event-document" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-event" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-provisional" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-match" 행동을 수행한다
+    만일 "receiptSource" 역할이 "receipt-canonical" 행동을 수행한다
     만일 "A" 역할이 "receipt" 행동을 수행한다
     만일 "A" 역할이 "late-assessment" 행동을 수행한다
     만일 "A" 역할이 "late-db-snapshot" 행동을 수행한다

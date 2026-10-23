@@ -32,7 +32,7 @@
         "occurredAt": "2026-10-07T01:00:00Z",
         "canonicalOccurrenceKey": "receipt90"
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -62,7 +62,7 @@
         "occurredAt": "2026-10-07T01:00:00Z",
         "canonicalOccurrenceKey": "receipt90"
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -92,7 +92,7 @@
         "occurredAt": "2026-10-07T01:00:00Z",
         "canonicalOccurrenceKey": "receipt90"
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -124,7 +124,7 @@
           "$alias": "SOURCE"
         }
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -153,7 +153,7 @@
         },
         "occurredAt": "2026-10-07T01:00:00Z"
       },
-      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN",
       "requiredCommands": [
         "attachEvidence",
         "recordActivity",
@@ -176,7 +176,7 @@
         "placeId",
         "quantity"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "parent90-cancelled",
@@ -227,7 +227,7 @@
         "placeId",
         "quantity"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "parent90-impossible",
@@ -278,7 +278,7 @@
         "placeId",
         "quantity"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "parent90-superseded",
@@ -338,7 +338,7 @@
         "quantity",
         "workId"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "pending-correction",
@@ -382,7 +382,7 @@
         "placeId",
         "quantity"
       ],
-      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+      "classification": "BOUND_INPUT_GRAPH_NOT_RUN"
     },
     {
       "subcase": "closed-followup",
@@ -398,5 +398,5 @@
       "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
     }
   ],
-  "note": "This is authored input classification, not a runtime receipt. Read T09/source-contract-frontier.md for the unimplemented binding boundary."
+  "note": "The originalPhysicalInput and unsupportedSlots fields preserve the pre-graph input inventory. Current cases bind real input source graphs; no actual scenario was run. See T09/source-contract-frontier.md for remaining integration gates."
 }
