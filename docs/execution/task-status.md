@@ -11,21 +11,21 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | 08e2a7a5: 827 PASS, 실패·오류·skip0, exit0. 1692f74f까지 backend/database bytes 동일, 실행 JUnit90개와 소유 자원 정리를 대조했다. |
+| Backend 전체 | 과거08e2a7a5의827 PASS는 보존한다. 새 d0885a80 초기 실행은899개 중664 PASS·3 FAIL·232 ERROR, skip0·exit1이다. JWT 공개키 설정을 보완한 같은 source의15 suites·232개는 전부 PASS, source drift0·소유 DB9개와 임시 key 정리를 확인했다. 초기 실패를 별도 성공으로 덮지 않는다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | 1692f74f: 1000 executions 중920 PASS·기존80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
-| Prepare | 1692f74f: 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
-| 최근 실제 T09 | f8bb11e9: 94 assertions 중86 PASS·8 FAIL·미관찰0이다. |
+| Harness 전체 | fa316f01: 1025 executions 중938 PASS·87 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
+| Prepare | fa316f01: 41 case·802 subcase·24304 assertions, PREPARED·preparationProblems0·exit0이다. 조건 검증44개를 추가했고 기존 업무 oracle은 유지했다. |
+| 최근 실제 T09 | 1692f74f: 원본9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. primary가 실제 Haiku5 node·assistant85 records·동일 product class330개와 소유 DB3개 부재를 대조했다. |
 | 최근 실제 T11 | f8bb11e9: 110 assertions 중35 PASS·4 FAIL·71 미관찰이다. |
 | 최근 실제 T17 | f8bb11e9: 257 assertions 중165 PASS·92 FAIL·미관찰0이다. |
 | 최근 native 재실행 | wf_88ab8831-3ac: 36 subcase 중11 PASS·25 FAIL, 461 assertions 중286 PASS·104 FAIL·71 미관찰이다. 실제 Haiku14 node·228 assistant records, 동일 product class330개와 소유 DB12개 부재를 대조했다. |
-| T09 재실행 | 1692f74f의 격리 tree3개에서 원본9 subcase·94 assertions를 실행할 Haiku 5.5 medium dynamic Workflow를 위임했다. 실제 결과는 아직 미확정이다. |
+| 현재 제품 통합 | Sales·T11 제품을 d0885a80까지, 조건 observer·receipt resolver·T11 selftest·원래10 조건 oracle·상충 근거 설치·witness grant 복원 검사를 fa316f01까지 통합했다. 정상/제한 인도의 자동 판정2개와 worker 실제 PG14·권한26 PASS를 대조했다. delivery rollback2개와 formal recall 입력은 별도 Sol/xhigh/priority writer가 수정한다. 새 결합 harness·prepare는 통과했고 Haiku용12개 tree·36 subcase·505 assertions는 준비만 완료했다. |
 | 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
 
 Harness 수는 실행 횟수이며 상속된 observer 회귀의 반복 실행을 포함한다.
-80개 opt-in SKIP과 native raw gateComplete=false를 PASS로 바꾸지 않는다.
+최신87개 opt-in SKIP과 native raw gateComplete=false를 PASS로 바꾸지 않는다.
 T17 공개 조회(64b0cfb7), T11 V44 동일 시각 정정과 재평가 보류·해제
 (9bbe2b88·74d48220·06704d35), Work PG 자원 분리(e4946ddf)를 통합했다.
 새 observer 주문 line 관계(e5a672d6)도 결합 harness에서 검증했다.
@@ -81,6 +81,27 @@ database는 기존827 PASS 실행의 bytes와 동일하다. T09 재실행은 이
 1692f74f에 고정하고, T11·Sales writer는 각자의 소유 파일에서 계속
 수정한다. 수량 대조 의무의 해소와 제한 위반 후속 책임을 구별하며,
 배송 확정의 인과 재평가는 통합 후 같은 command 권한으로 검증한다.
+[T09 실제 회귀](t09-observer-haiku-acceptance.md)는 primary 대조까지
+완료했다. 1692f74f의 이전8개 실패가 모두 해소됐으며 raw gateComplete는
+false다. 이 실행 뒤 바뀐 T11·Sales 제품의 회귀를 대신하지 않는다.
+조건 원천 observer와 원래10 조건 oracle·실제 상충 근거 설치를 통합했다.
+원본257 T17 ID·op·oracleRef, 원래105 업무 status tuple과 fixture15개를
+대조했고, 다른247개 assertion은 전체 내용을 보존했다. 실제 근거·receipt
+검사44개를 추가해 T17은301 assertions다. 원본110 T11 ID와 fixture12개도
+보존했다. [조건 원천](eligibility-observer-source-links.md)과
+[oracle 계약](t17-condition-oracle-contract.md)을 따른다.
+새 backend 초기 실행과 환경 보정은 각각
+`.local/resume-20261024/fix-until-done/backend-full/`과
+`fix-until-done/backend-platform-env/`에 보존한다. 뒤 경로의 기준도
+`.local/resume-20261024/`다. [grant 복원 검사](causal-witness-combined-fix.md)는
+제품을 바꾸지 않았으며 마지막 실제 명령 직전 원래 all-of scope를 복원한다.
+fa316f01의 전체 harness·JUnit·source drift·생성 DB 정리 증거는
+`.local/resume-20261024/fix-until-done/condition-combined-harness/`에 있다.
+같은 source의 prepare와24304개 assertion 준비 결과는
+`fix-until-done/condition-prepare/`에 있다. 이 경로의 기준도
+`.local/resume-20261024/`다. 새 Haiku 실행을 위한 원본461 ID·순서와
+추가44개 검증의 보존을12개 격리 tree에서 확인했다. 새 실제 결과는
+아직 NOT_RUN이며 이전 raw 보고서를 덮지 않는다.
 primary의 7개 변경 파일 일치·원본 case/database 보존과 규제 결합 검증은
 `.local/resume-20261024/atomic-regulatory-combined/`에 남겼다.
 처음 Docker socket을 찾지 못한 환경 오류도 보존했고 실제 OrbStack
