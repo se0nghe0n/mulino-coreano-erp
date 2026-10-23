@@ -84,8 +84,9 @@ captured-api artifact를 가리킨다. 합친 context를 hash해 제품 revision
 서버가 이미 검증한 `SERVER_AUTHENTICATED_MCP_CAPTURE_V1` API를 소비한다.
 artifact SHA, 원 request/response, RPC/tool, 조직과 서버 주체를 대조한다.
 payload의 actor·role·grant는 이 주체와 grant의 출처가 아니다.
-서버가 현재 관찰한 활성 grant 후보가 해당 capability에 정확히 하나일
-때만 그 ID를 기록한다. 여러 후보 중 사용 grant를 추측하지 않는다.
+서버가 현재 관찰한 capability·유효기간·assignment와 실제 read 대상의
+all-of scope를 대조해 후보가 정확히 하나일 때만 그 ID를 기록한다.
+여러 후보 중 사용 grant를 추측하지 않는다.
 hook의 `actionAuthorization=NOT_ASSERTED` 의미도 유지한다.
 
 실제 capture를 모두 갖춘 결과만
@@ -178,3 +179,93 @@ surefire XML은 focused 검증의 별도 증거다.
 2068개의 SHA-256을 시작 때 고정했다. baseline 갱신 뒤에도 drift는0이다.
 각 실행은 자기 서버·컨테이너·임시 키를 정리한 receipt를 남긴다.
 실모델·전체 model-binding 관찰·Scenario 재실행·S5/S6 인수는 NOT_RUN이다.
+
+## fea71358 이후 grant 적용 범위와 fixture clock 보완
+
+후속 baseline은 `fea71358747e08962f450470159790b6982eb67f`다.
+다른 worker의 미통합 변경과 root dirty tree는 가져오지 않았다.
+기존 query/send/helper 소유권 안에서 `NativePermittedContextGrants`를
+추가했다. 제품의 현재 read handler가 인가하는 대상 차원을 실제 서버
+응답에서 재구성하는 관찰 recipe다. 제품의 인가를 대신하지 않는다.
+
+일반 Place·item·segment·Work read에는 SOURCE 차원이 없다.
+SOURCE와 TARGET을 함께 요구하는 grant는 TARGET이 맞더라도 제외한다.
+evidence read의 SOURCE는 현재 `EvidenceTypes.scopes`와 같이 실제 응답
+행의 sourceProfileId에서만 읽는다. client가 임의로 붙인 SOURCE/role,
+fixture의 원 grant alias나 purpose grant 이름으로 후보를 고르지 않는다.
+ID가 다른 여러 반환 대상에서 서로 다른 grant가 적용되거나 같은
+대상에 여러 grant가 적용되면 전체 attribution을 차단한다.
+현재 assignment의 capability·scope·만료·철회도 대조한다.
+
+빈 목록과 FORBIDDEN read에는 사용된 업무 대상 grant를 주장하지 않는다.
+그 read의 원 인증 capture를 보존하고 read plan에
+`NO_BUSINESS_TARGET_ASSERTED`를 기록한다. anchor와 사실을 반환하는
+read는 실제 대상이 관찰돼야 한다. 알 수 없는 대상 recipe를 빈 목록으로
+해석하지 않는다. `actionAuthorization=NOT_ASSERTED`는 유지한다.
+
+`NativePermittedContextHttpPgTest`는 자기 synthetic 설치 뒤 인증된
+`/__verification/runtime/clock/fixture-start`를 호출하고 실제 HTTP200,
+authorityClock=true, instant 일치를 확인한 receipt를 저장한다.
+권한 유효기간도 선언한 `MULINO_VERIFICATION_INSTANT`를 기준으로
+설치한다. business asOf/knownAt은 바꾸지 않는다. 앞선 suite class가
+시계를 전진시켰어도 자기 probe가 시작 시각을 확립한다.
+
+별도 read grant와 SOURCE+TARGET grant를 함께 설치한 실제 probe에서
+read grant를 선택하고 SOURCE grant의 행·actions·scope·시간 불변을
+검증한다. 적용 가능한 두 read grant의 실제 HTTP 반례도 계속
+`PERMITTED_CONTEXT_GRANT_ATTRIBUTION_UNAVAILABLE`이다. 모델 호출은0이다.
+
+coordinator에게 제안한 backend 소유 범위는 다음 네 경로다.
+
+- `backend/src/main/java/com/mulino/application/trade/purchase/PurchaseQueries.java`:
+  PurchaseProposal/PurchaseOrder의 기존 `searchObjects`를 완전한
+  현재 scope 인가·knownAt·안정된 ID/cursor 목록으로 제공한다.
+- `backend/src/main/java/com/mulino/application/trade/settlement/SettlementQueries.java`:
+  Invoice 목록을 같은 방식으로 제공한다. 기존 joined line 인가의
+  PLACE/CUSTOMER/SUPPLIER 차원을 추측하지 않도록 실제 line의 read scope를
+  서버가 계산한 응답에 연결한다. 공개 입력 schema와 쓰기 경로는 유지한다.
+- `backend/src/main/java/com/mulino/application/trade/regulatory/RegulatoryQueries.java`:
+  기존 목록에 ID 순서와 query-bound cursor를 제공한다.
+- `backend/src/test/java/com/mulino/core/BusinessDiscoveryPostgresTest.java`:
+  네 noun의 paging·직접 조회 일치·권한·foreign/hidden·knownAt 반례를
+  검증하는 새 focused test다.
+
+이 문서 갱신 시점에는 위 backend 소유권을 요청했으며 수정하지 않았다.
+Invoice의 joined line 범위가 응답에서 관찰되지 않는 동안 그 grant
+recipe는 fail-closed다. root의 RuntimeService 파일도 수정하지 않는다.
+
+추가로 transport 소유자에게 다음 기존 계약 차이를 알렸다.
+`ModelFixtureInstaller.grantChildren`은 SOURCE scopeId에36자 이하의
+namespace를 저장하지만 현재 `NativeMcpTransport.validateServerCapture`는
+SOURCE까지 UUID로 검사한다. SOURCE만 제품의 실제 bounded string
+계약으로 검사하고 나머지 ID 차원의 UUID 검사를 유지하는 수정이
+필요하다. 이 worker는 소유권 밖인 NativeMcpTransport를 수정하지 않았다.
+실제 probe는 이 차이와 별도로 UUID 형태의 SOURCE 값을 사용하며,
+namespace 문자열 반례는 helper unit에서 검증한다.
+
+후속 focused 명령은 기존 명령과 같고 tests20개(PermittedContext11,
+integration5, transport capture4)가 exit0으로 통과했다.
+실제 HTTP/PG probe1개도 exit0이며15개 관찰 항목을 통과했다.
+앱은 command-line 초기 시각을 `2026-10-08T09:00:00Z`로 띄웠고,
+probe의 선언 환경은 `2026-10-07T09:00:00Z`였다. 저장한 fixture-start
+receipt의 실제 응답 instant는 후자와 같다. 기존 expiry/revocation
+assertion은 유지했다.
+
+후속 실제 보고서는 다음 경로에 보존한다.
+
+```text
+verification/harness/target/native-integration/
+  81eca9c5-3160-461a-8e38-888942621d8f/
+  direct-context-report-55d871f8-5eb5-411b-8ad9-7266a3673714.json
+SHA-256 8448cc4ce5b12a2eb60fce62b920cf9254d89065f8b0954efadd244ac36b64f4
+```
+
+같은 디렉터리의 clock receipt
+`fixture-start-clock-a1ab2eb7-f472-4a4a-9338-f78a3b20cab9.json`의 SHA-256은
+`e4904688f844b81a60484dde0344ab65944c259b1699934ebf110ba499cf09e0`이다.
+resource receipt는
+`.local/s5-permitted-context/proof/33e9a21d-5bfb-4e17-b31f-a073a981f193/`
+아래에 있으며 자기 서버·컨테이너·임시 키 정리는 모두 true다.
+별도 후속 증거 목록은 `.local/s5-permitted-context/followup/manifest.json`에
+둔다. 기존2068개 입력의 drift는0이고 original corpus·binding·fixture와
+공개 scenario oracle bytes는 보존했다.

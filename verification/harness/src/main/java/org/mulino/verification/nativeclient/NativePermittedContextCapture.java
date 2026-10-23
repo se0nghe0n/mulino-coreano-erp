@@ -8,22 +8,28 @@ import java.time.Instant;
 import java.util.*;
 import static org.mulino.verification.nativeclient.NativePermittedContext.require;
 
-/** Consumes the pending transport's validated SERVER_AUTHENTICATED_MCP_CAPTURE_V1 artifact API.
+/** Consumes the transport's validated SERVER_AUTHENTICATED_MCP_CAPTURE_V1 artifact API.
  * Never promotes a client-signed JWT or declared grant to server authentication evidence. */
 final class NativePermittedContextCapture {
     static StepResult result(String id,JsonNode actor,JsonNode scope,NativePermittedContext.Collected collected,
                              NativeIntegrationEvidence store) throws Exception {
-        var refs=new ArrayList<String>();var wires=new ArrayList<ObjectNode>();ObjectNode anchorWire=null,anchorAuth=null;
+        var refs=new ArrayList<String>();var wires=new ArrayList<ObjectNode>();var unattributed=Json.array();ObjectNode anchorWire=null,anchorAuth=null;
         String unavailable=null;JsonNode principal=null;Instant authorityAt=null;
         for(var capture:collected.captures()) {
             refs.add(Json.required(capture.artifact(),"path"));
             try {
                 var receipt=receipt(capture,store);var server=receipt.path("serverAuthenticatedCapture");
-                var auth=identity(server,actor,scope,capture.request().path("params").path("name").asText());
-        // All constituent reads must use the same actual server identity.
+                principal(server,actor,scope);
+                // All constituent reads must use the same actual server identity.
                 var current=server.path("identity");
                 if(principal==null){principal=current;authorityAt=Instant.parse(Json.required(server,"authorityAsOf"));}
                 require(principal.equals(current),"PERMITTED_CONTEXT_PRINCIPAL_CHANGED");
+                String operation=capture.request().path("params").path("name").asText();
+                if(!NativePermittedContext.success(capture)||NativePermittedContextGrants.emptyRead(operation,capture.request().path("params").path("arguments"),capture.businessResponse())) {
+                    // Empty/denied reads expose no business target. Preserve raw authentication without inventing a used grant.
+                    unattributed.add(Json.object().put("rawWireArtifactRef",capture.artifact().path("path").asText()).put("grantAttribution","NO_BUSINESS_TARGET_ASSERTED"));continue;
+                }
+                var auth=identity(server,actor,scope,operation,capture.request().path("params").path("arguments"),capture.businessResponse());
                 // Capture each current authority observation; no assumption of a shared DB transaction.
                 var wire=wire(id,scope,capture,receipt,auth);wires.add(wire);
                 if(capture==collected.projection()){anchorWire=wire;anchorAuth=auth;}
@@ -42,14 +48,15 @@ final class NativePermittedContextCapture {
         for(var wire:wires){var artifact=store.save("permitted-context-api",wire);String ref=Json.required(artifact,"path");refs.add(ref);if(wire==anchorWire)projectionRef=ref;}
         var manifest=store.base("ACTUAL_PERMITTED_CONTEXT_READ_PLAN",scope).put("actionId",id)
             .put("projectionReadRef",projectionRef).put("actualModelCalls",0).put("authorityAsOf",authorityAt.toString());
-        manifest.set("readArtifacts",Json.MAPPER.valueToTree(refs));refs.add(store.save("permitted-context-plan",manifest).path("path").asText());
+        manifest.set("readArtifacts",Json.MAPPER.valueToTree(refs));manifest.set("unattributedEmptyOrDeniedReads",unattributed);
+        refs.add(store.save("permitted-context-plan",manifest).path("path").asText());
         var response=collected.projection().businessResponse();
         var data=Json.object().put("projectionReadRef",projectionRef);data.set("snapshotRevision",response.path("snapshotRevision"));
         data.set("permittedContext",collected.context());
         return new StepResult(id,StepResult.DriverStatus.EXECUTED,data,response,null,provenance(anchorAuth,response,anchorWire),refs);
     }
     static StepResult ordinary(String id,JsonNode actor,JsonNode scope,NativeMcpTransport.Capture capture,NativeIntegrationEvidence store) throws Exception {
-        var receipt=receipt(capture,store);var auth=identity(receipt.path("serverAuthenticatedCapture"),actor,scope,capture.request().path("params").path("name").asText());
+        var receipt=receipt(capture,store);var auth=identity(receipt.path("serverAuthenticatedCapture"),actor,scope,capture.request().path("params").path("name").asText(),capture.request().path("params").path("arguments"),capture.businessResponse());
         var wire=wire(id,scope,capture,receipt,auth);var artifact=store.save("authenticated-api",wire);
         var data=Json.object().put("httpStatus",capture.status()).put("projectionReadRef",artifact.path("path").asText());
         if(capture.businessResponse().hasNonNull("snapshotRevision"))data.set("snapshotRevision",capture.businessResponse().path("snapshotRevision"));
@@ -80,19 +87,23 @@ final class NativePermittedContextCapture {
             &&server.path("actionAuthorization").asText().equals("NOT_ASSERTED"),"PERMITTED_CONTEXT_CAPTURE_PHASE_INVALID");
         return receipt;
     }
-    static ObjectNode identity(JsonNode server,JsonNode requested,JsonNode scope,String operation) {
+    private static void principal(JsonNode server,JsonNode requested,JsonNode scope) {
         var identity=server.path("identity");
         for(String field:List.of("issuer","subject"))require(identity.path(field).equals(requested.path(field)),"PERMITTED_CONTEXT_IDENTITY_MISMATCH");
         require(identity.path("organizationId").equals(scope.path("organizationId")),"PERMITTED_CONTEXT_IDENTITY_MISMATCH");
         require(identity.path("audiences").isArray(),"PERMITTED_CONTEXT_IDENTITY_MISSING");
         boolean audience=false;for(JsonNode a:identity.path("audiences"))audience|=a.equals(requested.path("audience"));
         require(audience,"PERMITTED_CONTEXT_IDENTITY_MISMATCH");UUID.fromString(Json.required(identity,"actorId"));
+    }
+    static ObjectNode identity(JsonNode server,JsonNode requested,JsonNode scope,String operation,JsonNode request,JsonNode response) {
+        principal(server,requested,scope);var identity=server.path("identity");
         Instant now=Instant.parse(Json.required(server,"authorityAsOf"));
         var grants=new ArrayList<JsonNode>();require(server.path("grants").isArray(),"PERMITTED_CONTEXT_GRANTS_MISSING");
-        for(JsonNode grant:server.path("grants")) {
+        if(NativePermittedContextGrants.READS.contains(operation))grants.addAll(NativePermittedContextGrants.applicable(server,operation,NativePermittedContextGrants.targets(operation,request,response)));
+        else for(JsonNode grant:server.path("grants")) {
             require(grant.path("actorId").equals(identity.path("actorId")),"PERMITTED_CONTEXT_GRANT_ACTOR_MISMATCH");
             boolean action=false;for(JsonNode a:grant.path("actions"))action|=operation.equals(a.path("capabilityId").asText());
-            if(action&&active(grant,now))grants.add(grant);
+            if(action&&NativePermittedContextGrants.active(grant,now))grants.add(grant);
         }
         // The hook observes candidates, not which of several grants authorized a row. Do not guess from actor payload.
         require(grants.size()==1,"PERMITTED_CONTEXT_GRANT_ATTRIBUTION_UNAVAILABLE");
@@ -102,10 +113,6 @@ final class NativePermittedContextCapture {
             .put("organizationRef",scope.path("organizationId").asText()).put("grantId",grant).put("authorizationGrantRef",grant)
             .put("actorId",Json.required(identity,"actorId"));
         if(grants.getFirst().hasNonNull("delegatorId"))auth.set("delegatorId",grants.getFirst().path("delegatorId"));return auth;
-    }
-    private static boolean active(JsonNode row,Instant now) {
-        return !now.isBefore(Instant.parse(Json.required(row,"validFrom")))&&now.isBefore(Instant.parse(Json.required(row,"validUntil")))
-            &&(!row.hasNonNull("revokedAt")||now.isBefore(Instant.parse(Json.required(row,"revokedAt"))));
     }
     private static ObjectNode wire(String id,JsonNode scope,NativeMcpTransport.Capture c,JsonNode receipt,JsonNode auth) {
         var wire=Json.object().put("evidenceClass",receipt.path("evidenceClass").asText().equals("ACTUAL_MCP_TRANSPORT")
