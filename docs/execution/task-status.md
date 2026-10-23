@@ -1101,3 +1101,22 @@ observer의 원래 asOf 전달도 연결했다. backend 집중6개가 PASS했다
 [공통 캡처 기록](shared-evidence-capture.md)을 따른다.
 직접 수령 목표 기여와 WorkContributions의 원천 불일치, 실제
 INITIAL_BALANCE1과 원래 movement0 기대의 차이는 그대로 OPEN이다.
+
+고정28ecbd76의 전체 harness는801 PASS·80 opt-in SKIP·실패/오류0이다.
+이 실행 수에는 새 observer class가 상속한 기존64개 검사의 반복이 포함된다.
+소스3,175개 hash drift0과 자체 PG 부재를 확인했다. 같은 소스의 전체
+backend770개는767 PASS·1 FAIL·2 ERROR였다. schema inventory15개
+누락과 시점 provenance를 포함한 close hash 비교의 두 회귀를 발견했다.
+335a8ec0를5bcb46b5에 통합한 뒤 root의 관련40개 실제 PG·unit 검사가
+실패·오류·skip0으로 통과했다. 저장 hash·과거 원문은 보존하고 현재
+원천·정정·정책 검증은 유지한다. 수정 소스의 전체 backend는 재검사 중이다.
+
+T17의 native Workflow wf_62923727-846은15 subcase·257 assertions를
+모두 기록했다. assertions79 PASS·178 FAIL이며 PASS subcase는 없다.
+primary가 원래 ID 합집합과7개 실제 Haiku node·실행 JAR·소스·정리를
+대조했다. [T17 분할 인수 기록](t17-five-shard-acceptance.md)을 따른다.
+
+수정5bcb46b5의 package와 prepare 문제0·asset12 PASS를 확인했다.
+새 native Workflow wf_8af75b88-62f가 같은 소스의 T09 전체9개와
+수정된 T11 세 subcase, 합계12개·107 assertions를 실행 중이다.
+아직 실제 결과를 PASS로 표시하지 않으며 Task와 현재 Step은 OPEN이다.
