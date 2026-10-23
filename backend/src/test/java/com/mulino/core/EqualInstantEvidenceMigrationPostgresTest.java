@@ -26,6 +26,8 @@ class EqualInstantEvidenceMigrationPostgresTest {
    append(ds,org,actor,profile,subject,prior,null,1,AT,"ITEM");var frozen=db.queryForList("SELECT * FROM mulino_evidence_Events");
    var inventory=inventory(db);
    if(upgrade){var denied=assertThrows(SQLException.class,()->append(ds,org,actor,profile,subject,id(),prior,2,AT,"ITEM"));assertEquals("23514",denied.getSQLState());assertTrue(denied.getMessage().contains("Invalid immutable supersession"));System.out.println("V43_EXPECTED_RED equal recordedAt: "+denied.getSQLState()+" "+denied.getMessage());var v44=Flyway.configure().dataSource(ds).target("44").load();assertEquals(1,v44.migrate().migrationsExecuted);v44.validate();assertEquals(inventory,inventory(db));assertEquals(frozen,db.queryForList("SELECT * FROM mulino_evidence_Events"));}
+   scopeLookupCounterexample(ds);
+   System.out.println("ACTUAL_EVENT_PK "+db.queryForObject("SELECT pg_get_constraintdef(oid) FROM pg_constraint WHERE conrelid='mulino_evidence_events'::regclass AND contype='p'",String.class));
    String next=id();append(ds,org,actor,profile,subject,next,prior,2,AT,"ITEM");String third=id();append(ds,org,actor,profile,subject,third,next,3,AT,"ITEM");assertTrue(db.queryForList("SELECT * FROM mulino_evidence_Events").containsAll(frozen));
    for(String bad:List.of("earlier","missing","org","subject","kind","revision","self")){
     String row=id();var failure=assertThrows(SQLException.class,()->append(ds,bad.equals("org")?id():org,actor,profile,bad.equals("subject")?id():subject,row,bad.equals("missing")?id():bad.equals("self")?row:third,bad.equals("revision")?5:4,bad.equals("earlier")?AT.minusNanos(1000):AT,bad.equals("kind")?"WORK":"ITEM"));assertEquals("23514",failure.getSQLState(),bad+": "+failure);assertTrue(failure.getMessage().contains("Invalid immutable supersession"),bad);
@@ -43,6 +45,22 @@ class EqualInstantEvidenceMigrationPostgresTest {
    }finally{pool.shutdownNow();}
    assertEquals(4,db.queryForObject("SELECT count(*) FROM mulino_evidence_Events",Integer.class));assertTrue(db.queryForList("SELECT * FROM mulino_evidence_Events").containsAll(frozen));
    System.out.println("V44_PROOF "+(upgrade?"upgrade43-44":"fresh44")+" postgres="+db.queryForObject("SHOW server_version",String.class)+" originalBytesPreserved=true noDDLInventoryChange=true equalInstantChainRevisions=1,2,3,4 duplicateBranchSQLSTATE=23505 container="+pg.getContainerId());
+  }
+ }
+ // The current product PK(ID) prevents duplicate tenant IDs. This isolated PG
+ // table additionally proves the actual generic trigger function is tenant-bound
+ // even when a composite-key caller legitimately holds identical UUIDs.
+ static void scopeLookupCounterexample(javax.sql.DataSource ds)throws SQLException{
+  try(var c=ds.getConnection();var s=c.createStatement()){
+   s.execute("CREATE TEMP TABLE verification_scoped_evidence(organizationId varchar(36),ID varchar(36),subjectId varchar(36),subjectKind varchar(20),revision integer,recordedAt timestamptz,supersedesId varchar(36),PRIMARY KEY(organizationId,ID))");
+   s.execute("CREATE TRIGGER verification_scope_guard BEFORE INSERT ON verification_scoped_evidence FOR EACH ROW EXECUTE FUNCTION mulino_evidence_validate_supersession()");
+   String own=id(),foreign=id(),same=id(),foreignOnly=id(),subject=id();
+   try(var q=c.prepareStatement("INSERT INTO verification_scoped_evidence VALUES(?,?,?,'ITEM',?,?,?)")){
+    // Foreign first reproduces the prior unscoped heap lookup counterexample.
+    for(var v:List.of(new Object[]{foreign,same,subject,7,Timestamp.from(AT.plusSeconds(1)),null},new Object[]{own,same,subject,1,Timestamp.from(AT),null},new Object[]{foreign,foreignOnly,subject,1,Timestamp.from(AT),null},new Object[]{own,id(),subject,2,Timestamp.from(AT),same})){for(int i=0;i<v.length;i++)q.setObject(i+1,v[i]);assertEquals(1,q.executeUpdate());}
+    q.setString(1,own);q.setString(2,id());q.setString(3,subject);q.setInt(4,2);q.setTimestamp(5,Timestamp.from(AT));q.setString(6,foreignOnly);var missing=assertThrows(SQLException.class,q::executeUpdate);assertEquals("23514",missing.getSQLState());
+   }
+   System.out.println("TENANT_BOUND_FUNCTION ownPriorPlusForeignSameID=ACCEPTED foreignOnly=23514 temporaryTable=true productDDLUnchanged=true");
   }
  }
  static Map<String,Object> inventory(JdbcTemplate db){return Map.of("columns",db.queryForList("SELECT table_name,ordinal_position,column_name,data_type,is_nullable,column_default FROM information_schema.columns WHERE table_schema='public' ORDER BY 1,2"),"constraints",db.queryForList("SELECT conrelid::regclass::text,conname,pg_get_constraintdef(oid) FROM pg_constraint WHERE connamespace='public'::regnamespace ORDER BY 1,2"),"triggers",db.queryForList("SELECT tgrelid::regclass::text,tgname,pg_get_triggerdef(oid) FROM pg_trigger WHERE NOT tgisinternal ORDER BY 1,2"),"indexes",db.queryForList("SELECT tablename,indexname,indexdef FROM pg_indexes WHERE schemaname='public' ORDER BY 1,2"));}

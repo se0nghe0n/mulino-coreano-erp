@@ -7,9 +7,9 @@ DECLARE prior_org varchar(36); prior_subject varchar(36); prior_kind varchar(20)
         prior_recorded timestamptz; prior_revision integer;
 BEGIN
   IF NEW.supersedesId IS NOT NULL THEN
-    EXECUTE format('SELECT organizationId, subjectId, subjectKind, recordedAt, revision FROM %I WHERE ID=$1', TG_TABLE_NAME)
+    EXECUTE format('SELECT organizationId, subjectId, subjectKind, recordedAt, revision FROM %I WHERE organizationId=$1 AND ID=$2', TG_TABLE_NAME)
       INTO prior_org, prior_subject, prior_kind, prior_recorded, prior_revision
-      USING NEW.supersedesId;
+      USING NEW.organizationId, NEW.supersedesId;
     IF prior_revision IS NULL OR NEW.revision IS NULL
       OR prior_recorded IS NULL OR NEW.recordedAt IS NULL
       OR NEW.ID = NEW.supersedesId
