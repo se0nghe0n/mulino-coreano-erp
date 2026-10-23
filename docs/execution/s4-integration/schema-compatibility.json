@@ -1150,7 +1150,7 @@
   ],
   "baseline": "4be9480d",
   "observedColumnCount": 1958,
-  "observedArtifactSha256": "5705b287b0547e7dc9343fd296e4ce51877e460fcb48eb5a637258d4d98ae665",
+  "observedArtifactSha256": "db7c5d17150f7922b2f7dc893dd5c47cafe13398df3e6f3feebeea4470523a2c",
   "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled; V40 adds nullable original claim capture and makes the existing verified observation root nullable before confirmation; V28 foreign keys and confirmed delivery integrity remain unchanged; V41 adds three nullable immutable source Work/Goal/condition pins without legacy backfill or duplicate allocations",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
