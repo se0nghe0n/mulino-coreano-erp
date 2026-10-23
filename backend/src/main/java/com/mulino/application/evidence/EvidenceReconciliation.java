@@ -60,6 +60,7 @@ public class EvidenceReconciliation {
     boolean external="EXTERNAL_RESULT".equals(event.get("kind"));
     boolean response="RESPONSE_COMPLETED".equals(event.get("kind"));
     boolean receipt="PHYSICAL_RECEIPT".equals(event.get("kind"));
+    boolean observation="STATE_OBSERVATION".equals(event.get("kind"));
     boolean sameQuantity=external?quantity==null&&claim.get("quantity")==null:quantity!=null&&claim.get("quantity") instanceof BigDecimal q&&quantity.compareTo(q)==0&&Objects.equals(input.unit(),claim.get("unit"));
     boolean original=!r.rows("DocumentVersions",c.organizationId()).stream().anyMatch(x->doc.get("ID").equals(x.get("supersedesId")))&&"AVAILABLE".equals(doc.get("availability"))&&doc.get("blobId")!=null&&blobs.available(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString());
     var tradeProviders=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();
@@ -109,6 +110,9 @@ public class EvidenceReconciliation {
         default -> false;
       };
     }
+    if(observation)identity &= input.physicalScopeId()!=null&&original&&ObservationCoverage.matches(claim,event,doc,
+      r.subject(c.organizationId(),"SEGMENT",uuid(input.physicalScopeId())),
+      blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()),clock.instant());
     String decision=variants>1||"CONFLICT".equals(event.get("valueState"))?"CONFLICT":"UNVERIFIED";
     if(current&&variants==1&&identity&&original&&sameQuantity&&"KNOWN".equals(claim.get("valueState"))&&"KNOWN".equals(event.get("valueState"))
        &&Objects.equals(input.sourceIdentity(),event.get("sourceNamespace")+":"+event.get("externalEventId")+":"+event.get("sourceVersion"))
@@ -118,11 +122,15 @@ public class EvidenceReconciliation {
       var canonicalIds=r.rows("Verifications",c.organizationId()).stream().filter(x->relatedClaims.contains(x.get("claimId"))&&"VERIFIED".equals(x.get("verdict"))).map(x->x.get("canonicalOccurrenceId").toString()).collect(java.util.stream.Collectors.toSet());
       if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->canonicalIds.contains(x.get("ID"))&&!input.physicalScopeId().equals(x.get("physicalScopeId"))))decision="CONFLICT";
       Set<String> overlapping=external||response||receipt||trade?Set.of(input.physicalScopeId()):r.overlappingScopes(c.organizationId(),input.physicalScopeId());
-      if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->x.get("physicalScopeId")!=null&&!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))))decision="CONFLICT";
+      if(r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->x.get("physicalScopeId")!=null&&!input.physicalScopeId().equals(x.get("physicalScopeId"))&&overlapping.contains(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&(!observation||ObservationCoverage.overlaps(claim,x))))decision="CONFLICT";
     }
-    if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
-    if(!trade&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
+    if(!trade&&!observation&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))&&!input.effectiveFrom().equals(instant(x.get("effectiveFrom")))))decision="CONFLICT";
+    if(!trade&&!observation&&input.physicalScopeId()!=null && r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
         &&(!Objects.equals(claim.get("effectiveUntil"),x.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),x.get("timePrecision")))))decision="CONFLICT";
+    if(observation&&input.physicalScopeId()!=null&&r.rows("CanonicalOccurrences",c.organizationId()).stream()
+        .anyMatch(x->input.physicalScopeId().equals(x.get("physicalScopeId"))&&event.get("kind").equals(x.get("kind"))
+          &&ObservationCoverage.overlaps(claim,x)&&(!sameQuantity(quantity,x.get("quantity"))
+          ||!Objects.equals(claim.get("unit"),x.get("unit"))||!Objects.equals(claim.get("placeId"),x.get("placeId")))))decision="CONFLICT";
     String correctionPrior=deliveryCorrectionPrior(c,event,claim,input.physicalScopeId());
     if(correctionPrior!=null&&!Objects.equals(r.require("CanonicalOccurrences",c.organizationId(),correctionPrior).get("occurrenceIdentity"),trustedTrade.get("occurrenceIdentity")))throw DomainError.invalid("Delivery correction must preserve original occurrence identity");
     if(trade&&trustedTrade.get("occurrenceIdentity")!=null&&r.rows("CanonicalOccurrences",c.organizationId()).stream().anyMatch(x->trustedTrade.get("occurrenceIdentity").equals(x.get("occurrenceIdentity"))&&event.get("kind").equals(x.get("kind"))&&!correctionAncestor(c,correctionPrior,x.get("ID").toString())&&(!Objects.equals(trustedTrade.get("occurrenceSemanticHash"),x.get("occurrenceSemanticHash"))||!Objects.equals(input.physicalScopeId(),x.get("physicalScopeId"))||!sameQuantity(quantity,x.get("quantity"))||!Objects.equals(input.unit(),x.get("unit"))||!input.effectiveFrom().equals(instant(x.get("effectiveFrom"))))))decision="CONFLICT";
@@ -130,7 +138,8 @@ public class EvidenceReconciliation {
     if(input.existingCanonicalId()!=null) {
       var canonical=r.require("CanonicalOccurrences",c.organizationId(),uuid(input.existingCanonicalId()));auth.authorizeScopes(c,capability,scopes(canonical));
       if(!Objects.equals(input.physicalScopeId(),canonical.get("physicalScopeId"))||!Objects.equals(claim.get("subjectId"),canonical.get("subjectId"))||!Objects.equals(event.get("kind"),canonical.get("kind"))
-          ||!sameQuantity(quantity,canonical.get("quantity"))||!Objects.equals(input.unit(),canonical.get("unit"))||!input.effectiveFrom().equals(instant(canonical.get("effectiveFrom"))))decision="CONFLICT";
+          ||!sameQuantity(quantity,canonical.get("quantity"))||!Objects.equals(input.unit(),canonical.get("unit"))||!input.effectiveFrom().equals(instant(canonical.get("effectiveFrom")))
+          ||observation&&(!Objects.equals(claim.get("effectiveUntil"),canonical.get("effectiveUntil"))||!Objects.equals(claim.get("timePrecision"),canonical.get("timePrecision"))))decision="CONFLICT";
     }
     var row=new LinkedHashMap<String,Object>();row.put("ID",UUID.randomUUID().toString());row.put("organizationId",c.organizationId());row.put("revision",1);var now=clock.instant();row.put("createdAt",now);row.put("recordedAt",now);row.put("recordedBy",c.actorId());
     for(String field:List.of("subjectKind","subjectId","itemId","placeId","workId","sourceProfileId"))if(claim.get(field)!=null)row.put(field,claim.get(field));
@@ -172,6 +181,9 @@ public class EvidenceReconciliation {
   public Map<String,Object> link(DomainContext c,String reconciliationId) {
     var review=review(c,reconciliationId);var claim=claim(c,review.get("claimId").toString());authorizeReviewer(c,"linkCanonicalOccurrence",claim);
     if(!"MATCHED".equals(review.get("decision")))throw new DomainError("HELD","EVIDENCE_UNVERIFIED","Reconciliation remains unresolved");
+    var sourceEvent=r.require("Events",c.organizationId(),claim.get("eventId").toString());
+    if("STATE_OBSERVATION".equals(sourceEvent.get("kind")))
+      r.sourceFence(c.organizationId(),"canonical",review.get("physicalScopeId").toString(),"STATE_OBSERVATION");
     // Recheck all source, policy, original, identity and quantity checks at the current commit fence.
     var checked=match(c,new Review(review.get("claimId").toString(),review.get("basisDocumentId").toString(),review.get("physicalScopeId").toString(),Objects.toString(review.get("existingCanonicalId"),null),
       review.get("policyVersion").toString(),review.get("sourceIdentity").toString(),Objects.toString(review.get("quantity"),null),Objects.toString(review.get("unit"),null),instant(review.get("effectiveFrom")),review.get("reason").toString()),"linkCanonicalOccurrence",false);
@@ -182,7 +194,7 @@ public class EvidenceReconciliation {
     String correctionPrior=deliveryCorrectionPrior(c,event,claim,physical);
     if(correctionPrior!=null&&existing!=null)throw DomainError.invalid("Correction creates a new canonical revision; it cannot relink the old fact");
     if(existing==null&&correctionPrior==null) {
-      var providers=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();Map<String,Object> semantic=Map.of();if(providers.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());semantic=tradeFields(providers.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString())),event);}final var typedIdentity=semantic.get("occurrenceIdentity");
+      var providers=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();Map<String,Object> semantic=Map.of();if(providers.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());semantic=tradeFields(providers.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString())),event);}if("STATE_OBSERVATION".equals(event.get("kind")))semantic=ObservationCoverage.canonicalFields(c.organizationId(),physical,claim);final var typedIdentity=semantic.get("occurrenceIdentity");
       var candidates=r.rows("CanonicalOccurrences",c.organizationId()).stream().filter(x->event.get("kind").equals(x.get("kind"))&&(typedIdentity!=null?typedIdentity.equals(x.get("occurrenceIdentity")):physical.equals(x.get("physicalScopeId"))&&instant(claim.get("effectiveFrom")).equals(instant(x.get("effectiveFrom"))))).toList();
       if(candidates.size()==1)existing=candidates.getFirst().get("ID").toString();
       if(candidates.size()>1)throw new DomainError("HELD","EVIDENCE_CONFLICT","Canonical scope has competing revisions");
@@ -191,6 +203,7 @@ public class EvidenceReconciliation {
     Map<String,Object> result;
     var tradeProviders=tradeScopes.stream().filter(p->p.eventKinds().contains(event.get("kind"))).toList();
     if(tradeProviders.size()==1){var doc=r.require("DocumentVersions",c.organizationId(),review.get("basisDocumentId").toString());var scope=tradeProviders.getFirst().require(c,physical,claim,event,doc,blobs.read(UUID.fromString(doc.get("blobId").toString()),doc.get("sha256").toString()));auth.authorizeScopes(c,"linkCanonicalOccurrence",scope.scopes());result=records.verifyReviewedReceiptCanonical(canonicalInput,tradeFields(scope,event));}
+    else if("STATE_OBSERVATION".equals(event.get("kind")))result=records.verifyReviewedReceiptCanonical(canonicalInput,ObservationCoverage.canonicalFields(c.organizationId(),physical,claim));
     else if("PHYSICAL_RECEIPT".equals(event.get("kind"))){var providers=receiptScopes.stream().toList();if(providers.size()!=1)throw new DomainError("HELD","POLICY_UNRESOLVED","Receipt identity provider unavailable");var range=providers.getFirst().require(c,physical);var trusted=new LinkedHashMap<String,Object>();trusted.put("itemId",range.itemId());trusted.put("placeId",range.placeId());if(range.workId()!=null)trusted.put("workId",range.workId());result=records.verifyReviewedReceiptCanonical(canonicalInput,trusted);}else result=records.verifyReviewedCanonical(canonicalInput);
     completion.publish(c,result.get("id").toString(),claim.get("ID").toString(),review.get("basisDocumentId").toString());
     var impact=impacts.getIfAvailable();
