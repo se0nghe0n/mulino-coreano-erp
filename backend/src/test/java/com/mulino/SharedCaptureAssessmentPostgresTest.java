@@ -114,8 +114,12 @@ class SharedCaptureAssessmentPostgresTest {
   var first=rows.getFirst();assertThrows(org.springframework.dao.DataAccessException.class,()->jdbc.update("UPDATE mulino_evaluation_InputSnapshots SET evidenceCaptureId=NULL WHERE ID=?",first.get("id")));
   assertThrows(org.springframework.dao.DataAccessException.class,()->jdbc.update("DELETE FROM mulino_evaluation_EvidenceCaptures WHERE ID=?",capture));
   int before=jdbc.queryForObject("SELECT count(*) FROM mulino_evaluation_EvidenceCaptures WHERE organizationId=?",Integer.class,org);
+  int assessmentCount=jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE organizationId=?",Integer.class,org);
+  var workBefore=jdbc.queryForMap("SELECT * FROM mulino_work_read_Works WHERE ID=?",rows.getFirst().get("workid"));
   assertThrows(IllegalStateException.class,()->runtime.requestContext().run(r->{return new TransactionTemplate(tx).execute(status->{service.assess(new DomainContext(org,actor,actor,t.plusSeconds(1),t.plusSeconds(1000)),rows.getFirst().get("workid").toString());throw new IllegalStateException("rollback capture + assessment + Work together");});}));
   assertEquals(before,jdbc.queryForObject("SELECT count(*) FROM mulino_evaluation_EvidenceCaptures WHERE organizationId=?",Integer.class,org));
+  assertEquals(assessmentCount,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE organizationId=?",Integer.class,org));
+  assertEquals(workBefore,jdbc.queryForMap("SELECT * FROM mulino_work_read_Works WHERE ID=?",rows.getFirst().get("workid")));
   if(System.getProperty("capture.evidence")!=null){var dest=java.nio.file.Path.of(System.getProperty("capture.evidence"));java.nio.file.Files.createDirectories(dest);java.nio.file.Files.writeString(dest.resolve("three-modes-cap-jdbc.json"),json.writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("captureId",capture,"envelopes",rows,"movementId",movement,"segmentId",segment)));}
  }
 
