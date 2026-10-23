@@ -14,7 +14,7 @@ ROOT=HERE.parents[2]
 
 class ResponseScopeTest(unittest.TestCase):
     def setUp(self):
-        self.case=SALES.restore_policy_case(json.loads((HERE/'case.json').read_text()))
+        self.case=SALES.restore_policy_case(SALES.read_quantity.restore_case(json.loads((HERE/'case.json').read_text())))
         self.before=json.loads(subprocess.check_output(['git','show','fb58d866:verification/cases/T17/case.json'],cwd=ROOT))
         self.sub=next(s for s in self.case['subcases'] if s['id']==SCOPE.SID)
 
@@ -60,7 +60,7 @@ class ResponseScopeTest(unittest.TestCase):
             elif field=='open-is-current':next(a for a in sub['assertions'] if a['id']=='fact-not-permission-11')['source']['where'].pop('status')
             else:next(a for a in sub['assertions'] if a['id']=='response-scope-whole-item-row-count')['expected']=2
             with self.subTest(tamper=field),self.assertRaises(ValueError):SCOPE.restore_case(broken)
-        feature=(HERE/'scenario.feature').read_text()
+        feature=SALES.read_quantity.restore_feature((HERE/'scenario.feature').read_text())
         self.assertEqual(feature,SCOPE.apply_feature(SCOPE.restore_feature(feature)))
         baseline=subprocess.check_output(['git','show','fb58d866:verification/cases/T17/scenario.feature'],cwd=ROOT).decode()
         self.assertEqual(baseline,SCOPE.restore_feature(feature))

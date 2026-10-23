@@ -1,4 +1,5 @@
 """고정 업무 tuple과 독립 원천 identity를 결합하는 가역 T17 계약이다."""
+import importlib.util
 import copy
 import hashlib
 import json
@@ -6,6 +7,10 @@ import subprocess
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+_read_spec = importlib.util.spec_from_file_location('t17_read_quantity', HERE/'author_read_quantity_contract.py')
+read_quantity = importlib.util.module_from_spec(_read_spec)
+_read_spec.loader.exec_module(read_quantity)
+
 BASE = 'd0885a8031eb754e42f35f998a6d7f970b059cee'
 LEDGER = HERE / 'condition-oracle-delta.json'
 FIELDS = ['segmentId', 'conditionId', 'status', 'evaluatorVersion']
@@ -22,6 +27,7 @@ def alias(name):
 
 
 def restore_case(case):
+    case = read_quantity.restore_case(case)
     case = copy.deepcopy(case)
     if not LEDGER.exists():
         return case
@@ -205,6 +211,7 @@ def apply_feature(text):
 
 
 def restore_feature(text):
+    text = read_quantity.restore_feature(text)
     for role, name in [('observer', 'eligibility-alt'), ('시스템', 'eligibility-alt-db')]:
         text = text.replace(f'    만일 "{role}" 역할이 "{name}" 행동을 수행한다\n', '')
     return ''.join(line for line in text.splitlines(keepends=True) if not line.startswith('    그러면 "condition-source-'))

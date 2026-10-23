@@ -2,6 +2,7 @@
 
 조건 layer 뒤에 합성한다. 기존 책임·grant·257 oracle는 변경하지 않는다.
 """
+import importlib.util
 import copy
 import hashlib
 import json
@@ -9,6 +10,9 @@ import subprocess
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+_read_spec = importlib.util.spec_from_file_location('t17_read_quantity', HERE/'author_read_quantity_contract.py')
+read_quantity = importlib.util.module_from_spec(_read_spec)
+_read_spec.loader.exec_module(read_quantity)
 ROOT = HERE.parents[2]
 BASE = 'd0885a8031eb754e42f35f998a6d7f970b059cee'
 SID = 'late-restriction-actual-delivery'
@@ -87,6 +91,7 @@ def apply(case, fixtures):
 
 
 def restore_case(case):
+    case = read_quantity.restore_case(case)
     case = copy.deepcopy(case)
     if not LEDGER.exists():
         return case
@@ -126,6 +131,7 @@ def apply_feature(text):
 
 
 def restore_feature(text):
+    text = read_quantity.restore_feature(text)
     actions = json.loads(LEDGER.read_text())['actionChanges']
     lines = ''.join(f'    만일 "admin" 역할이 "{a["id"]}" 행동을 수행한다\n' for a in actions)
     return text.replace(lines, '')
@@ -148,6 +154,8 @@ if __name__ == '__main__':
     current = json.loads((HERE / 'case.json').read_text())
     current_fixtures = {p.stem: json.loads(p.read_text()) for p in sorted((HERE / 'fixtures').glob('*.json'))}
     after, authored = apply(current, current_fixtures)
+    if read_quantity.marked(current):
+        after = read_quantity.apply(after)
     feature = (HERE / 'scenario.feature').read_text()
     actions, work = additions(fixtures[SID])
     ledger = {'baseline': BASE, 'subcase': SID, 'originalAssertionCount': 257,

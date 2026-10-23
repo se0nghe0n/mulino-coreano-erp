@@ -13,6 +13,10 @@ from pathlib import Path
 from uuid import UUID, uuid5
 
 HERE = Path(__file__).resolve().parent
+_read_spec = importlib.util.spec_from_file_location('t17_read_quantity', HERE/'author_read_quantity_contract.py')
+read_quantity = importlib.util.module_from_spec(_read_spec)
+_read_spec.loader.exec_module(read_quantity)
+
 _spec=importlib.util.spec_from_file_location('t17_first_failure',HERE/'author_first_failure_inputs.py')
 first_failure=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(first_failure)
 _completion_spec=importlib.util.spec_from_file_location('t17_completion',HERE/'author_completion_inputs.py')
@@ -261,6 +265,7 @@ def generate(case, fixtures):
 
 def restore_case(case):
     case=sales_inputs.response_scope.restore_case(case)
+    case = read_quantity.restore_case(case)
     case=sales_inputs.restore_policy_case(case)
     case=recall_inputs.restore_case(case)
     case=first_failure.restore_case(completion.restore_case(delivery.restore_case(goal.restore_case(case))))
@@ -309,6 +314,7 @@ def feature_lines(feature, before, after):
 
 def restore_feature(feature):
     feature=sales_inputs.response_scope.restore_feature(feature)
+    feature = read_quantity.restore_feature(feature)
     feature=recall_inputs.restore_feature(feature)
     feature=first_failure.restore_feature(completion.restore_feature(delivery.restore_feature(goal.restore_feature(feature))))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
@@ -349,7 +355,9 @@ if __name__ == '__main__':
     case=sales_inputs.response_scope.apply(case)
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
-    feature_path.write_text(sales_inputs.response_scope.apply_feature(sales_inputs.condition_oracle.apply_feature(feature_lines(feature,before,case))))
+    composed_feature = sales_inputs.response_scope.apply_feature(sales_inputs.condition_oracle.apply_feature(feature_lines(feature,before,case)))
+    feature_path.write_text(read_quantity.apply_feature(composed_feature, case, read_quantity.apply(case)))
+    case = read_quantity.apply(case)
     for path,value in [(case_path,case),(HERE/'public-contract-delta.json',ledger)]+[(HERE/'fixtures'/f'{sid}.json',f) for sid,f in authored.items()]:
         data=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
         if not path.exists() or path.read_text()!=data: path.write_text(data)

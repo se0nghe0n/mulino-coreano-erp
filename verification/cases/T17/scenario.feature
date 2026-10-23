@@ -46,6 +46,19 @@
     그러면 "delivered-before-observation-17" assertion으로 "delivered-before-observation"를 확인한다
     그러면 "dispatch-allocation-18" assertion으로 "dispatch-allocation"를 확인한다
     그러면 "dispatch-allocation-19" assertion으로 "dispatch-allocation"를 확인한다
+    그러면 "read-quantity-physical-identities" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-raw-physical-tuples" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-allowed-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-eligible-quantity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-evaluator" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-held-conserved" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocation-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
 
   시나리오: 출고30의 CONSUMED 배분을 참조한 정상 인도30은 신규 출고를 만들지 않는다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "normal-consumed-delivery"를 준비한다
@@ -332,7 +345,11 @@
     만일 "receiver" 역할이 "claim-source-event" 행동을 수행한다
     만일 "receiver" 역할이 "claim" 행동을 수행한다
     만일 "observer" 역할이 "after-claim" 행동을 수행한다
+    만일 "observer" 역할이 "read-quantity-prior-dispatch" 행동을 수행한다
     만일 "시스템" 역할이 "after-claim-db" 행동을 수행한다
+    만일 "receiver" 역할이 "read-quantity-confirm-without-dispatch" 행동을 수행한다
+    만일 "observer" 역할이 "read-quantity-after-confirm" 행동을 수행한다
+    만일 "시스템" 역할이 "read-quantity-after-confirm-db" 행동을 수행한다
     그러면 "claim-inventory-effects-1" assertion으로 "claim-inventory-effects"를 확인한다
     그러면 "claim-inventory-effects-2" assertion으로 "claim-inventory-effects"를 확인한다
     그러면 "claim-inventory-effects-3" assertion으로 "claim-inventory-effects"를 확인한다
@@ -357,6 +374,16 @@
     그러면 "no-prior-dispatch-22" assertion으로 "no-prior-dispatch"를 확인한다
     그러면 "no-prior-dispatch-23" assertion으로 "no-prior-dispatch"를 확인한다
     그러면 "no-prior-dispatch-24" assertion으로 "no-prior-dispatch"를 확인한다
+    그러면 "read-quantity-prior-check-exact" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-prior-observation-identity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-held" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-code" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-segments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-movements-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-allocations-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-deliveries-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-receiptContributions-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-confirmation-assessments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
 
   시나리오: 원천 scopeOverflow 보고는 주장만 접수하며 정상 인도 효과0과 접수 책임을 남긴다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "claim-scopeoverflow"를 준비한다
@@ -484,6 +511,28 @@
     그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
     그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
     그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
+    그러면 "read-quantity-unknown-candidate-set" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-unknown-not-allowed" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-unknown-ranges-empty" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-not-allowed" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-ranges-empty" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-identities" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-raw-physical-tuples" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-early-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-allowed-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-eligible-quantity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-evaluator" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-held-conserved" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocation-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-segments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-movements-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 CONFLICT 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-conflict"를 준비한다
@@ -516,6 +565,26 @@
     그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
     그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
     그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
+    그러면 "read-quantity-unknown-candidate-set" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-not-allowed" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-ranges-empty" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-identities" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-raw-physical-tuples" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-early-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-allowed-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-eligible-quantity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-evaluator" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-held-conserved" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocation-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-segments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-movements-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-no-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-no-reason"를 준비한다
@@ -553,6 +622,26 @@
     그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
     그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
     그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
+    그러면 "read-quantity-unknown-candidate-set" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-not-allowed" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-ranges-empty" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-identities" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-raw-physical-tuples" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-early-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-allowed-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-eligible-quantity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-evaluator" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-held-conserved" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocation-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-segments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-movements-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-with-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-with-reason"를 준비한다
@@ -584,6 +673,26 @@
     그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
     그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
     그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
+    그러면 "read-quantity-unknown-candidate-set" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-not-allowed" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-ranges-empty" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-identities" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-raw-physical-tuples" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-early-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-allowed-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-eligible-quantity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-evaluator" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-held-conserved" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocation-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-segments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-movements-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 packaging-unapproved 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-packaging-unapproved"를 준비한다
@@ -630,3 +739,23 @@
     그러면 "condition-source-alt-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
     그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
     그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
+    그러면 "read-quantity-unknown-candidate-set" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-not-allowed" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-unknown-ranges-empty" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-identities" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-raw-physical-tuples" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-b-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-early-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-u-quantity-present" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-allowed-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-eligible-quantity" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-a-evaluator" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-physical-held-conserved" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-segments-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-complete" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocations-source-sql" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-allocation-range" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-segments-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다
+    그러면 "read-quantity-reserve-movements-unchanged" assertion으로 "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다."를 확인한다

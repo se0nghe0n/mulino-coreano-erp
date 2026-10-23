@@ -1228,20 +1228,19 @@
           "id": "eligible-after-reserve-4",
           "op": "sumEquals",
           "source": {
-            "actionId": "reserved-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "active": true
-            },
-            "field": "quantity"
+              "eligibilityStatus": "ALLOWED"
+            }
           },
           "expected": "60",
           "requirementRefs": [
             "D17"
           ],
           "evidenceRefs": [
-            "reserved-db:raw-rows"
+            "reserved:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -1262,12 +1261,11 @@
           },
           "unit": "BOX",
           "unitSource": {
-            "actionId": "reserved-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
             "field": "unit",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "active": true
+              "eligibilityStatus": "ALLOWED"
             }
           }
         },
@@ -1312,21 +1310,19 @@
           "id": "unreserved-after-reserve-6",
           "op": "sumEquals",
           "source": {
-            "actionId": "reserved-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "unreservedEligibleQuantity",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "unreserved": true,
-              "active": true
-            },
-            "field": "quantity"
+              "eligibilityStatus": "ALLOWED"
+            }
           },
           "expected": "0",
           "requirementRefs": [
             "D17"
           ],
           "evidenceRefs": [
-            "reserved-db:raw-rows"
+            "reserved:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -1347,8 +1343,12 @@
           },
           "unit": "BOX",
           "unitSource": {
-            "actionId": "reserved-db",
-            "pointer": "/data/data/unit"
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "unit",
+            "where": {
+              "eligibilityStatus": "ALLOWED"
+            }
           }
         },
         {
@@ -1947,6 +1947,570 @@
             "oracleId": "T17.reserve-pick-dispatch",
             "observationNames": [
               "dispatch-allocation"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "segmentId"
+          },
+          "expected": [
+            {
+              "$alias": "A"
+            },
+            {
+              "$alias": "B"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-raw-physical-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit",
+              "active"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "60",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "B"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "40",
+              "BOX",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-allowed-range",
+          "op": "equals",
+          "source": {
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "startQuantity": "0",
+                "quantity": "60"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-eligible-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "60"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "reserved",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "evaluatorVersion",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "quality-eligibility-v1"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-held-conserved",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": "100",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "reserved-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$alias": "A"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/sourceEvidence/segments/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/sourceEvidence/segments/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/sourceEvidence/allocations/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/sourceEvidence/allocations/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocation-range",
+          "op": "relationSet",
+          "source": {
+            "actionId": "reserved-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "startQuantity",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              },
+              {
+                "$alias": "A"
+              },
+              "0",
+              "60",
+              "BOX",
+              "EXECUTABLE"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "reserved-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "reserve-pick-dispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.reserve-pick-dispatch",
+            "observationNames": [
+              "held-after-reserve"
             ]
           }
         }
@@ -27792,6 +28356,35 @@
           ]
         },
         {
+          "id": "read-quantity-prior-dispatch",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "DeliveryObservation"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$result": {
+                "actionId": "claim",
+                "pointer": "/response/effects/observationId"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "read-quantity-prior-dispatch:api-response"
+          ]
+        },
+        {
           "id": "after-claim-db",
           "kind": "observe",
           "observation": {
@@ -27830,6 +28423,103 @@
             "after-claim-db:raw-rows",
             "after-claim-db:source-query",
             "after-claim-db:snapshot"
+          ]
+        },
+        {
+          "id": "read-quantity-confirm-without-dispatch",
+          "kind": "invoke",
+          "actorRef": "receiver",
+          "route": "api",
+          "capabilityId": "recordDelivery",
+          "evidenceRefs": [
+            "read-quantity-confirm-without-dispatch:api-response"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordDelivery",
+            "subjectRefs": [],
+            "slots": {
+              "observationId": {
+                "$result": {
+                  "actionId": "claim",
+                  "pointer": "/response/effects/observationId"
+                }
+              },
+              "canonicalOccurrenceId": "b5bde020-c8dc-5e55-b793-b2649d95b7bb"
+            },
+            "expectedRevision": 1,
+            "provenance": {
+              "observationId": "CONTEXT",
+              "canonicalOccurrenceId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-claim-nopriordispatch-confirm-no-dispatch"
+          }
+        },
+        {
+          "id": "read-quantity-after-confirm",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "id": {
+              "$alias": "P"
+            }
+          },
+          "evidenceRefs": [
+            "read-quantity-after-confirm:api-response"
+          ]
+        },
+        {
+          "id": "read-quantity-after-confirm-db",
+          "kind": "observe",
+          "observation": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "caseId": "T17",
+              "scenarioId": "claim-nopriordispatch"
+            },
+            "snapshotRef": {
+              "$result": {
+                "actionId": "read-quantity-after-confirm",
+                "pointer": "/response/snapshotRevision"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z",
+            "sources": [
+              "segments",
+              "movements",
+              "allocations",
+              "deliveries",
+              "deliveryObservations",
+              "receiptContributions",
+              "assessments",
+              "obligations",
+              "audit",
+              "outbox"
+            ]
+          },
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:raw-rows",
+            "read-quantity-after-confirm-db:source-query",
+            "read-quantity-after-confirm-db:snapshot"
           ]
         }
       ],
@@ -28784,15 +29474,15 @@
           "id": "no-prior-dispatch-24",
           "op": "equals",
           "source": {
-            "actionId": "after-claim",
-            "pointer": "/response/data/normalSaleAuthorization"
+            "actionId": "read-quantity-prior-dispatch",
+            "pointer": "/response/data/priorDispatchCheck/status"
           },
           "expected": "DENIED",
           "requirementRefs": [
             "D17"
           ],
           "evidenceRefs": [
-            "after-claim:actual-response-or-host-artifact"
+            "read-quantity-prior-dispatch:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -28810,6 +29500,356 @@
             "observationNames": [
               "no-prior-dispatch"
             ]
+          }
+        },
+        {
+          "id": "read-quantity-prior-check-exact",
+          "op": "equals",
+          "source": {
+            "actionId": "read-quantity-prior-dispatch",
+            "pointer": "/response/data/priorDispatchCheck"
+          },
+          "expected": {
+            "status": "DENIED",
+            "linkedDispatchId": null,
+            "salesLineId": null,
+            "reasonCode": "PRIOR_DISPATCH_MISSING",
+            "required": true
+          },
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-prior-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-prior-observation-identity",
+          "op": "equals",
+          "source": {
+            "actionId": "read-quantity-prior-dispatch",
+            "pointer": "/response/data/ID"
+          },
+          "expected": "85e61a00-08ef-5ee0-bbb2-bf6b736fc825",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-prior-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-held",
+          "op": "equals",
+          "source": {
+            "actionId": "read-quantity-confirm-without-dispatch",
+            "pointer": "/response/outcome"
+          },
+          "expected": "HELD",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-confirm-without-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-code",
+          "op": "equals",
+          "source": {
+            "actionId": "read-quantity-confirm-without-dispatch",
+            "pointer": "/response/error/code"
+          },
+          "expected": "DELIVERY_UNMATCHED",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-confirm-without-dispatch:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "read-quantity-after-confirm-db",
+            "pointer": "/data/rawRows/segments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-claim-db",
+            "pointer": "/data/rawRows/segments"
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "read-quantity-after-confirm-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-claim-db",
+            "pointer": "/data/rawRows/movements"
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-allocations-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "read-quantity-after-confirm-db",
+            "pointer": "/data/rawRows/allocations"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-claim-db",
+            "pointer": "/data/rawRows/allocations"
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-deliveries-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "read-quantity-after-confirm-db",
+            "pointer": "/data/rawRows/deliveries"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-claim-db",
+            "pointer": "/data/rawRows/deliveries"
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-receiptContributions-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "read-quantity-after-confirm-db",
+            "pointer": "/data/rawRows/receiptContributions"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-claim-db",
+            "pointer": "/data/rawRows/receiptContributions"
+          }
+        },
+        {
+          "id": "read-quantity-confirmation-assessments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "read-quantity-after-confirm-db",
+            "pointer": "/data/rawRows/assessments"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "read-quantity-after-confirm-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "claim-nopriordispatch"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.false-or-unmatched-delivery",
+            "observationNames": [
+              "claim-inventory-effects"
+            ]
+          },
+          "baseline": {
+            "actionId": "after-claim-db",
+            "pointer": "/data/rawRows/assessments"
           }
         }
       ],
@@ -36963,11 +38003,13 @@
           "id": "eligibility-response-3",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "regulatoryStatus": "UNKNOWN"
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
             }
           },
           "expected": 0,
@@ -36975,7 +38017,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -36999,10 +38041,10 @@
           "id": "eligibility-positive-control",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "id": {
+              "segmentId": {
                 "$alias": "A"
               },
               "eligibilityStatus": "ALLOWED"
@@ -37013,7 +38055,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -38041,6 +39083,994 @@
               "eligibility-response"
             ]
           }
+        },
+        {
+          "id": "read-quantity-unknown-candidate-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/conditionResults",
+            "field": "segmentId",
+            "where": {
+              "conditionId": "REGULATORY",
+              "status": "UNKNOWN"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "B"
+            },
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-unknown-not-allowed",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-unknown-ranges-empty",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            []
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-not-allowed",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-ranges-empty",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            []
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "segmentId"
+          },
+          "expected": [
+            {
+              "$alias": "A"
+            },
+            {
+              "$alias": "B"
+            },
+            {
+              "$alias": "EARLY"
+            },
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-raw-physical-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit",
+              "active"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "B"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_B"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "EARLY"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_EARLY"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "U"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-early-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "EARLY"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-allowed-range",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "startQuantity": "0",
+                "quantity": "20"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-eligible-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "20"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "evaluatorVersion",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "quality-eligibility-v1"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-held-conserved",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$alias": "A"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocation-range",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "startQuantity",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              },
+              {
+                "$alias": "A"
+              },
+              "0",
+              "20",
+              "BOX",
+              "EXECUTABLE"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-unknown"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 조건별 근거·FEFO·인도 끝점과 UNKNOWN 실행 경계를 확인한다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -39034,11 +41064,13 @@
           "id": "eligibility-response-3",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "regulatoryStatus": "UNKNOWN"
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
             }
           },
           "expected": 0,
@@ -39046,7 +41078,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -39070,10 +41102,10 @@
           "id": "eligibility-positive-control",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "id": {
+              "segmentId": {
                 "$alias": "A"
               },
               "eligibilityStatus": "ALLOWED"
@@ -39084,7 +41116,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -40215,6 +42247,913 @@
               "eligibility-response"
             ]
           }
+        },
+        {
+          "id": "read-quantity-unknown-candidate-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/conditionResults",
+            "field": "segmentId",
+            "where": {
+              "conditionId": "REGULATORY",
+              "status": "UNKNOWN"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-not-allowed",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-ranges-empty",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            []
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "segmentId"
+          },
+          "expected": [
+            {
+              "$alias": "A"
+            },
+            {
+              "$alias": "B"
+            },
+            {
+              "$alias": "EARLY"
+            },
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-raw-physical-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit",
+              "active"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "B"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_B"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "EARLY"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_EARLY"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "U"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-early-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "EARLY"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-allowed-range",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "startQuantity": "0",
+                "quantity": "20"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-eligible-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "20"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "evaluatorVersion",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "quality-eligibility-v1"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-held-conserved",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$alias": "A"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocation-range",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "startQuantity",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              },
+              {
+                "$alias": "A"
+              },
+              "0",
+              "20",
+              "BOX",
+              "EXECUTABLE"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-conflict"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 조건별 근거·FEFO·인도 끝점과 CONFLICT 실행 경계를 확인한다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -41208,11 +44147,13 @@
           "id": "eligibility-response-3",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "regulatoryStatus": "UNKNOWN"
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
             }
           },
           "expected": 0,
@@ -41220,7 +44161,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -41244,10 +44185,10 @@
           "id": "eligibility-positive-control",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "id": {
+              "segmentId": {
                 "$alias": "A"
               },
               "eligibilityStatus": "ALLOWED"
@@ -41258,7 +44199,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -42572,6 +45513,897 @@
               "eligibility-response"
             ]
           }
+        },
+        {
+          "id": "read-quantity-unknown-candidate-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/conditionResults",
+            "field": "segmentId",
+            "where": {
+              "conditionId": "REGULATORY",
+              "status": "UNKNOWN"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-not-allowed",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-ranges-empty",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            []
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "segmentId"
+          },
+          "expected": [
+            {
+              "$alias": "A"
+            },
+            {
+              "$alias": "B"
+            },
+            {
+              "$alias": "EARLY"
+            },
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-raw-physical-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit",
+              "active"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "B"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_B"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "EARLY"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_EARLY"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "U"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-early-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "EARLY"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-allowed-range",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "startQuantity": "0",
+                "quantity": "20"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-eligible-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "20"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "evaluatorVersion",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "quality-eligibility-v1"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-held-conserved",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$alias": "A"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocation-range",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "startQuantity",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-no-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 조건별 근거·FEFO·인도 끝점과 FEFO-no-reason 실행 경계를 확인한다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -43567,11 +47399,13 @@
           "id": "eligibility-response-3",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "regulatoryStatus": "UNKNOWN"
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
             }
           },
           "expected": 0,
@@ -43579,7 +47413,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -43603,10 +47437,10 @@
           "id": "eligibility-positive-control",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "id": {
+              "segmentId": {
                 "$alias": "A"
               },
               "eligibilityStatus": "ALLOWED"
@@ -43617,7 +47451,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -44692,6 +48526,913 @@
               "eligibility-response"
             ]
           }
+        },
+        {
+          "id": "read-quantity-unknown-candidate-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/conditionResults",
+            "field": "segmentId",
+            "where": {
+              "conditionId": "REGULATORY",
+              "status": "UNKNOWN"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-not-allowed",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-ranges-empty",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            []
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "segmentId"
+          },
+          "expected": [
+            {
+              "$alias": "A"
+            },
+            {
+              "$alias": "B"
+            },
+            {
+              "$alias": "EARLY"
+            },
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-raw-physical-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit",
+              "active"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "B"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_B"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "EARLY"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_EARLY"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "U"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-early-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "EARLY"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-allowed-range",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "startQuantity": "0",
+                "quantity": "20"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-eligible-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "20"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "evaluatorVersion",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "quality-eligibility-v1"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-held-conserved",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$alias": "A"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocation-range",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "startQuantity",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/effects/allocationId"
+                }
+              },
+              {
+                "$alias": "B"
+              },
+              "0",
+              "20",
+              "BOX",
+              "EXECUTABLE"
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-fefo-with-reason"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          }
         }
       ],
       "oracleExplanation": "가상 fixture는 선행 실물·정책·증거 입력만 설치한다. 검증하는 주문·승인·예약·출고·인도·반품·회수·정정 효과는 각각 공개 명령으로 실행한다. 조건별 근거·FEFO·인도 끝점과 FEFO-with-reason 실행 경계를 확인한다의 수량과 책임은 고정 기대값과 원 행·응답을 함께 검증한다."
@@ -45744,11 +50485,13 @@
           "id": "eligibility-response-3",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "eligibilityStatus": "ALLOWED",
-              "regulatoryStatus": "UNKNOWN"
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
             }
           },
           "expected": 0,
@@ -45756,7 +50499,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -45780,10 +50523,10 @@
           "id": "eligibility-positive-control",
           "op": "count",
           "source": {
-            "actionId": "after-reserve-db",
-            "pointer": "/data/rawRows/segments",
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
             "where": {
-              "id": {
+              "segmentId": {
                 "$alias": "A"
               },
               "eligibilityStatus": "ALLOWED"
@@ -45794,7 +50537,7 @@
             "D17"
           ],
           "evidenceRefs": [
-            "after-reserve-db:raw-rows"
+            "after-reserve:api-response"
           ],
           "scope": {
             "organizationId": {
@@ -47596,6 +52339,897 @@
             "observationNames": [
               "eligibility-response"
             ]
+          }
+        },
+        {
+          "id": "read-quantity-unknown-candidate-set",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/conditionResults",
+            "field": "segmentId",
+            "where": {
+              "conditionId": "REGULATORY",
+              "status": "UNKNOWN"
+            }
+          },
+          "expected": [
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-not-allowed",
+          "op": "count",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              },
+              "eligibilityStatus": "ALLOWED"
+            }
+          },
+          "expected": 0,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-unknown-ranges-empty",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            []
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-identities",
+          "op": "exactSet",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "segmentId"
+          },
+          "expected": [
+            {
+              "$alias": "A"
+            },
+            {
+              "$alias": "B"
+            },
+            {
+              "$alias": "EARLY"
+            },
+            {
+              "$alias": "U"
+            }
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-raw-physical-tuples",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "placeId",
+              "quantity",
+              "unit",
+              "active"
+            ]
+          },
+          "expected": [
+            [
+              {
+                "$alias": "A"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "B"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_B"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "EARLY"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L_EARLY"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ],
+            [
+              {
+                "$alias": "U"
+              },
+              {
+                "$alias": "P"
+              },
+              {
+                "$alias": "L"
+              },
+              {
+                "$alias": "W"
+              },
+              "20",
+              "BOX",
+              true
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-b-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "B"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-early-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "EARLY"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-u-quantity-present",
+          "op": "fieldsPresent",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "where": {
+              "segmentId": {
+                "$alias": "U"
+              }
+            }
+          },
+          "expected": [
+            "segmentId",
+            "unit",
+            "eligibilityStatus",
+            "eligibleQuantity",
+            "unreservedEligibleQuantity",
+            "allowedRanges",
+            "conditionResults",
+            "evaluatorVersion"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-allowed-range",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "allowedRanges",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            [
+              {
+                "startQuantity": "0",
+                "quantity": "20"
+              }
+            ]
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-eligible-quantity",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "eligibleQuantity",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "20"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-a-evaluator",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve",
+            "pointer": "/response/data/segmentEligibility",
+            "field": "evaluatorVersion",
+            "where": {
+              "segmentId": {
+                "$alias": "A"
+              }
+            }
+          },
+          "expected": [
+            "quality-eligibility-v1"
+          ],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-physical-held-conserved",
+          "op": "sumEquals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "quantity",
+            "where": {
+              "active": true
+            }
+          },
+          "expected": "80",
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "unit": "BOX",
+          "unitSource": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": "unit",
+            "where": {
+              "id": {
+                "$alias": "A"
+              }
+            }
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-segments-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/segments/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-complete",
+          "op": "equals",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/complete"
+          },
+          "expected": true,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocations-source-sql",
+          "op": "present",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/sourceEvidence/allocations/sourceQuery/sql"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-allocation-range",
+          "op": "relationSet",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/allocations",
+            "field": [
+              "id",
+              "segmentId",
+              "startQuantity",
+              "quantity",
+              "unit",
+              "status"
+            ]
+          },
+          "expected": [],
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-segments-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/segments",
+            "field": [
+              "id",
+              "itemId",
+              "lotId",
+              "quantity",
+              "unit",
+              "placeId",
+              "custodianId",
+              "active"
+            ]
+          }
+        },
+        {
+          "id": "read-quantity-reserve-movements-unchanged",
+          "op": "sameAs",
+          "source": {
+            "actionId": "after-reserve-db",
+            "pointer": "/data/rawRows/movements"
+          },
+          "expected": null,
+          "requirementRefs": [
+            "D17"
+          ],
+          "evidenceRefs": [
+            "after-reserve-db:actual-response-or-host-artifact"
+          ],
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "caseId": "T17",
+            "scenarioId": "eligibility-packaging-unapproved"
+          },
+          "oracleExplanation": "공개 수량과 물리 원행·좌표·조건 출처·배분의 독립 대조를 유지한다.",
+          "oracleRef": {
+            "oracleId": "T17.eligibility-fefo-contract",
+            "observationNames": [
+              "eligibility-response"
+            ]
+          },
+          "baseline": {
+            "actionId": "before-reserve-db",
+            "pointer": "/data/rawRows/movements"
           }
         }
       ],

@@ -59,10 +59,10 @@ class T17ConditionOracleAssertionTest {
             assertThrows(AssertionError.class,()->check("eligibility-response-2",wrong,source));
         }
     }
-    @Test void featureDeclaresEveryActionInOrderAndAll309Assertions()throws Exception {
+    @Test void featureDeclaresEveryActionInOrderAndAll434Assertions()throws Exception {
         Path path=root.resolve("verification/cases/T17/case.json");var data=Json.read(path);
         assertEquals(List.of(),new PreparationValidator(root).feature(path,data));
-        int count=0;for(var sub:data.path("subcases"))count+=sub.path("assertions").size();assertEquals(309,count);
+        int count=0,original=0;for(var sub:data.path("subcases"))for(var a:sub.path("assertions")){count++;if(!a.path("id").asText().startsWith("read-quantity-")&&!a.path("id").asText().startsWith("response-scope-"))original++;}assertEquals(434,count);assertEquals(301,original);
     }
     @Test void conflictRequiresTwoDistinctDeclaredSourceAliasesAndOriginalProvenance()throws Exception {
         var f=(ObjectNode)Json.read(root.resolve("verification/cases/T17/fixtures/eligibility-conflict.json"));T17SourceFacts.validate(f);
