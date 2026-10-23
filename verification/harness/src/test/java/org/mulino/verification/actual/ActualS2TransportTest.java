@@ -31,7 +31,10 @@ final class ActualS2TransportTest {
         var generator=KeyPairGenerator.getInstance("RSA");generator.initialize(2048);var keys=generator.generateKeyPair();
         Files.writeString(pem,"-----BEGIN PRIVATE KEY-----\n"+Base64.getEncoder().encodeToString(keys.getPrivate().getEncoded())+"\n-----END PRIVATE KEY-----\n");
         server.start();
+        String priorIdentityBinding=System.getProperty("verification.actual.identityBinding");
         try {
+            // The standalone transport root has no real-fixture identity mapping.
+            System.clearProperty("verification.actual.identityBinding");
             var config=new ActualConfiguration(URI.create("http://127.0.0.1:"+server.getAddress().getPort()),"jdbc:postgresql://localhost/unused","unused","unused",pem,"https://mulino-native.invalid","isolated-ontology","test-source");
             var driver=new ActualAcceptanceDriver(root,config);var actor=Json.parse("{\"subject\":\"actor\",\"organizationAlias\":\"ORG\"}");
             var command=Json.parse("{\"intentKind\":\"COMMAND\",\"commandIdempotencyKey\":\"key-1\",\"slots\":{\"quantity\":\"10\"}}");
@@ -51,6 +54,7 @@ final class ActualS2TransportTest {
             assertTrue(bodies.contains(command.toString()));assertTrue(bodies.contains(record.toString()));
             assertThrows(IllegalArgumentException.class,()->driver.await("unknown",Json.MAPPER.getNodeFactory().textNode("missing"),1));
         }finally {
+            if(priorIdentityBinding==null)System.clearProperty("verification.actual.identityBinding");else System.setProperty("verification.actual.identityBinding",priorIdentityBinding);
             release.countDown();server.stop(0);executor.shutdownNow();
             try(var files=Files.walk(root)){for(Path path:files.sorted(Comparator.reverseOrder()).toList())Files.delete(path);}
         }

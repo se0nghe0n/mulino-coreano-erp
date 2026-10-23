@@ -18,7 +18,7 @@ final class ActualWorkerTransportTest {
     @TempDir Path root;
     private HttpServer server;
     private ActualAcceptanceDriver driver;
-    private String oldSuite;
+    private String oldSuite, oldIdentityBinding;
     private final AtomicReference<JsonNode> received=new AtomicReference<>();
     private final AtomicReference<String> authorization=new AtomicReference<>();
     private final AtomicReference<String> path=new AtomicReference<>();
@@ -30,6 +30,9 @@ final class ActualWorkerTransportTest {
 
     @BeforeEach void setup() throws Exception {
         oldSuite=System.getProperty("verification.actual.suiteIsolation");
+        oldIdentityBinding=System.getProperty("verification.actual.identityBinding");
+        // This transport double has its own temporary root and no authored identity manifest.
+        System.clearProperty("verification.actual.identityBinding");
         System.setProperty("verification.actual.suiteIsolation","true");
         var generator=KeyPairGenerator.getInstance("RSA");generator.initialize(2048);
         Path pem=root.resolve("private.pem");
@@ -50,6 +53,7 @@ final class ActualWorkerTransportTest {
         var installed=ActualAcceptanceDriver.class.getDeclaredField("externalOrganization");installed.setAccessible(true);installed.set(driver,"ORG");
     }
     @AfterEach void cleanup() {
+        if(oldIdentityBinding==null)System.clearProperty("verification.actual.identityBinding");else System.setProperty("verification.actual.identityBinding",oldIdentityBinding);
         if(server!=null)server.stop(0);
         if(oldSuite==null)System.clearProperty("verification.actual.suiteIsolation");else System.setProperty("verification.actual.suiteIsolation",oldSuite);
     }
