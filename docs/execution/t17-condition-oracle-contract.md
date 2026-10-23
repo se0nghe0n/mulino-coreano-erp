@@ -134,10 +134,11 @@ Java21.0.12.1, Maven3.9.16, locked PostgreSQL image를 사용했다. Node는
 
 - Python38개는 실제 generator 고정점·정확한 inverse·원래 tuple/ID/fixture
   보존과 기존 의미 있는 회귀를 검사한다.
-- focused JUnit9개는 기존 source validation6개와 새 condition assertion3개다.
+- focused JUnit10개는 기존 source validation6개와 새 condition assertion4개다.
   새 검사는 조건 삭제, UNKNOWN/CONFLICT/DENIED를 ALLOWED로 변경,
   evaluator 바꿔치기, duplicate, hold 누락, alias/foreign proof, 원본
-  conflict alias 중복·provenance 누락을 거부한다. controlled witness이며
+  conflict alias 중복·provenance 누락을 거부한다. feature의 전체 action 순서·301개 assertion membership도 검사한다.
+  controlled witness이며
   제품 runtime 인수로 세지 않는다.
 - 실제 HTTP/PostgreSQL2개는 원본 conflict fixture의 두 verified chain,
   원본 blob bytes/hash·source provenance·scope/수량/시간·current head를

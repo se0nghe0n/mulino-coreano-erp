@@ -178,6 +178,21 @@ def apply_feature(text):
         if not new['id'].startswith('eligibility-'):
             continue
         additions[new['id']] = (old['assertions'][-1]['id'], [a['id'] for a in new['assertions'] if a['id'].startswith('condition-source-')])
+    def explanation(name):
+        if name.endswith('installed-identities'):
+            return '실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다'
+        if name.endswith('typed-links'):
+            return '실제 typed 원천 행과 검증 chain을 보존한다'
+        if name.endswith('permission-and-hold'):
+            return '허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다'
+        return {
+            'condition-source-conflict-decisions': '원래 두 alias가 ALLOWED와 REVOKED의 두 독립 원본에 각각 연결된다',
+            'condition-source-no-singleton-conflict': '상충한 두 결정에는 단일 canonical 근거를 만들지 않는다',
+            'condition-source-alt-business-status': 'ALT OTHERPACK의 QC·규제·표시·처분·고객 조건 다섯 개는 ALLOWED다',
+            'condition-source-alt-source-equivalence': 'ALT OTHERPACK 공개 조회의 실제 근거가 독립 원천과 같다',
+            'condition-source-receipt-original-pointers': '원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다',
+            'condition-source-unknown-uninstalled': 'UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다',
+        }[name]
     output = []
     scenario = None
     for line in text.splitlines(keepends=True):
@@ -185,7 +200,7 @@ def apply_feature(text):
             scenario = line.split('의 "', 1)[1].split('"', 1)[0]
         output.append(line)
         if scenario in additions and line.startswith('    그러면 "' + additions[scenario][0] + '" assertion'):
-            output.extend(f'    그러면 "{name}" assertion으로 "eligibility-response"를 확인한다\n' for name in additions[scenario][1])
+            output.extend(f'    그러면 "{name}" assertion으로 "{explanation(name)}"를 확인한다\n' for name in additions[scenario][1])
     return ''.join(output)
 
 

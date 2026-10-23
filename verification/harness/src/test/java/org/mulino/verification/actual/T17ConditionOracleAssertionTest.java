@@ -59,6 +59,11 @@ class T17ConditionOracleAssertionTest {
             assertThrows(AssertionError.class,()->check("eligibility-response-2",wrong,source));
         }
     }
+    @Test void featureDeclaresEveryActionInOrderAndAll301Assertions()throws Exception {
+        Path path=root.resolve("verification/cases/T17/case.json");var data=Json.read(path);
+        assertEquals(List.of(),new PreparationValidator(root).feature(path,data));
+        int count=0;for(var sub:data.path("subcases"))count+=sub.path("assertions").size();assertEquals(301,count);
+    }
     @Test void conflictRequiresTwoDistinctDeclaredSourceAliasesAndOriginalProvenance()throws Exception {
         var f=(ObjectNode)Json.read(root.resolve("verification/cases/T17/fixtures/eligibility-conflict.json"));T17SourceFacts.validate(f);
         var conflict=(ObjectNode)f.at("/baseline/conditions/6");conflict.set("evidenceAliases",Json.array().add("agency-proof").add("agency-proof"));assertThrows(IllegalArgumentException.class,()->T17SourceFacts.validate(f));

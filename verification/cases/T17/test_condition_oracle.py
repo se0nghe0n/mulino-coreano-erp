@@ -58,6 +58,9 @@ class ConditionOracleTest(unittest.TestCase):
         feature = (HERE/'scenario.feature').read_text()
         self.assertEqual(original(HERE/'scenario.feature').decode(), ORACLE.restore_feature(feature))
         self.assertEqual(feature, ORACLE.apply_feature(feature))
+        for line in feature.splitlines():
+            if line.startswith('    그러면 "condition-source-'):
+                self.assertNotIn('assertion으로 "eligibility-response"', line)
 
     def test_alt_and_permission_hold_remain_separate_and_no_live_status_references(self):
         case = json.loads((HERE/'case.json').read_text())

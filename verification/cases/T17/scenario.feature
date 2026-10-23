@@ -464,13 +464,13 @@
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "실제 typed 원천 행과 검증 chain을 보존한다"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 CONFLICT 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-conflict"를 준비한다
@@ -494,15 +494,15 @@
     그러면 "eligibility-response-4" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-conflict-decisions" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-no-singleton-conflict" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-conflict-decisions" assertion으로 "원래 두 alias가 ALLOWED와 REVOKED의 두 독립 원본에 각각 연결된다"를 확인한다
+    그러면 "condition-source-no-singleton-conflict" assertion으로 "상충한 두 결정에는 단일 canonical 근거를 만들지 않는다"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "실제 typed 원천 행과 검증 chain을 보존한다"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-no-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-no-reason"를 준비한다
@@ -533,13 +533,13 @@
     그러면 "eligibility-response-11" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-12" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-13" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "실제 typed 원천 행과 검증 chain을 보존한다"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-with-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-with-reason"를 준비한다
@@ -564,13 +564,13 @@
     그러면 "eligibility-response-5" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-6" assertion으로 "eligibility-response"를 확인한다
     그러면 "eligibility-response-7" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "실제 typed 원천 행과 검증 chain을 보존한다"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
 
   시나리오: 조건별 근거·FEFO·인도 끝점과 packaging-unapproved 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-packaging-unapproved"를 준비한다
@@ -603,17 +603,17 @@
     그러면 "unauthorized-packaging-fulfilment-11" assertion으로 "unauthorized-packaging-fulfilment"를 확인한다
     그러면 "unauthorized-packaging-fulfilment-12" assertion으로 "unauthorized-packaging-fulfilment"를 확인한다
     그러면 "unauthorized-packaging-fulfilment-13" assertion으로 "unauthorized-packaging-fulfilment"를 확인한다
-    그러면 "condition-source-p-installed-identities" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-typed-links" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-business-status" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-source-equivalence" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-installed-identities" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-typed-links" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-qc-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-disposition-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-alt-customer_contract-permission-and-hold" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-receipt-original-pointers" assertion으로 "eligibility-response"를 확인한다
-    그러면 "condition-source-unknown-uninstalled" assertion으로 "eligibility-response"를 확인한다
+    그러면 "condition-source-p-installed-identities" assertion으로 "실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다"를 확인한다
+    그러면 "condition-source-p-typed-links" assertion으로 "실제 typed 원천 행과 검증 chain을 보존한다"를 확인한다
+    그러면 "condition-source-p-qc-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-disposition-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-p-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-alt-business-status" assertion으로 "ALT OTHERPACK의 QC·규제·표시·처분·고객 조건 다섯 개는 ALLOWED다"를 확인한다
+    그러면 "condition-source-alt-source-equivalence" assertion으로 "ALT OTHERPACK 공개 조회의 실제 근거가 독립 원천과 같다"를 확인한다
+    그러면 "condition-source-alt-installed-identities" assertion으로 "실제 SELL 문서와 canonical 원본 ID가 설치 receipt와 정확히 같다"를 확인한다
+    그러면 "condition-source-alt-typed-links" assertion으로 "실제 typed 원천 행과 검증 chain을 보존한다"를 확인한다
+    그러면 "condition-source-alt-qc-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-alt-disposition-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-alt-customer_contract-permission-and-hold" assertion으로 "허용 permission과 현재 제한의 ALLOWED·DENIED를 독립 검증한다"를 확인한다
+    그러면 "condition-source-receipt-original-pointers" assertion으로 "원래 condition pointer·given과 설치 scope·수량·기간이 정확히 같다"를 확인한다
+    그러면 "condition-source-unknown-uninstalled" assertion으로 "UNKNOWN에는 양의 판매 허용 근거를 설치하지 않는다"를 확인한다
