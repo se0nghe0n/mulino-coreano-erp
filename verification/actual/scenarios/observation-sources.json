@@ -1,6 +1,6 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.10.0",
+  "schemaVersion": "1.11.0",
   "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED. Recovery issues are independent SQL projections of trigger-owned, application-clock history; incomplete legacy history is unsupported.",
   "measurementMetadata": "data.unit and itemId derive only via unfiltered single-row derivations from measurementMetadataRows: actual TradeItems id, organizationId, baseUnit, recordedAt and createdAt read for exactly one requested organization and ITEM, with recordedAt and createdAt <= knownAt in the same read-only REPEATABLE_READ snapshot. snapshot.measurementMetadataQueries records exact SQL and bound values. Semantic validation checks scope/time/SQL, exact item/unit identities, and persisted snapshot artifact equality. This companion is never an invented requested business source: all other derivations must use requested rawRows with complete sourceEvidence. Missing unit or row yields no value; ambiguous rows are unsupported.",
   "sources": {
@@ -380,6 +380,12 @@
     ],
     "deliveryObservations": [
       "mulino_trade_sales_Observations"
+    ],
+    "sellConditionSourceRefs": [
+      "@sellConditionSourceRefs"
+    ],
+    "sellConditionSourceLinks": [
+      "@sellConditionSourceLinks"
     ]
   },
   "approximate": [
@@ -459,7 +465,9 @@
     "@supervisionIssues": "Latest RecoveryObservationHistory row per original source at recordedAt <= knownAt, with ID ordering for same-instant changes. Only stored HELD_MANUAL schedules and HELD_POLICY/HELD_LINK/HELD_MANUAL intakes are issues. Original source fields and immutable organization/item/work/LOT binding are retained; DELETE is a tombstone. Current sources must match their last history snapshot; missing legacy history or unproven scope is refused. All SQL uses the same read-only REPEATABLE_READ transaction and bound parameters.",
     "@domainRecords": "Refused: no complete per-table item/work/lot/time binding is available.",
     "@observationCoverage": "STATE_OBSERVATION Events joined to their actual Claims, VERIFIED Verifications, CanonicalOccurrences and available DocumentVersions. Closed coverage endpoints come from the matching persisted payload; this is not responsibility CompletionCoverages.",
-    "@assessmentInputs": "For new envelopes, one row per distinct immutable capture source relationship (one capture row if none), with snapshotId=actual EvidenceCaptures.ID and inputEnvelopeId=actual InputSnapshots.ID. Same-organization FK/time/hash/boundary/facts binding is independently checked in the read-only snapshot. segmentId/movementId require physicalScopeId=sourceId=stored movement.sourceId plus movement.ID in the Fact evidenceRefs, never live joins or first-candidate fallback. Authored conditions and full AST diagnostics remain nested. Older envelopes retain their original identity with no capture backfill. Separate WORK_PENDING_INPUT markers reference an immutable latest-known WorkTransition and, where one exists, its actual prior assessment. An unassessed Work uses assessmentBinding=UNASSESSED with no assessment/condition/envelope/capture identity and only its validated actual goal binding. Ambiguous assessment heads are unsupported. Markers neither mutate envelopes nor invent capture IDs. UNASSESSED markers expose assessmentId as explicit null so strict identity filters can exclude a known absence; omitted source columns still fail."
+    "@assessmentInputs": "For new envelopes, one row per distinct immutable capture source relationship (one capture row if none), with snapshotId=actual EvidenceCaptures.ID and inputEnvelopeId=actual InputSnapshots.ID. Same-organization FK/time/hash/boundary/facts binding is independently checked in the read-only snapshot. segmentId/movementId require physicalScopeId=sourceId=stored movement.sourceId plus movement.ID in the Fact evidenceRefs, never live joins or first-candidate fallback. Authored conditions and full AST diagnostics remain nested. Older envelopes retain their original identity with no capture backfill. Separate WORK_PENDING_INPUT markers reference an immutable latest-known WorkTransition and, where one exists, its actual prior assessment. An unassessed Work uses assessmentBinding=UNASSESSED with no assessment/condition/envelope/capture identity and only its validated actual goal binding. Ambiguous assessment heads are unsupported. Markers neither mutate envelopes nor invent capture IDs. UNASSESSED markers expose assessmentId as explicit null so strict identity filters can exclude a known absence; omitted source columns still fail.",
+    "@sellConditionSourceRefs": "Current direct-leaf SELL source relationships in the same read-only snapshot: actual ITEM/LOT and policies, typed disposition/hold/decision/label rows, current procedure heads, verified canonical/document/event/inbox chains and immutable blob bytes. Source references only; no eligibility status, evaluatorVersion or final permission is inferred. Genealogy and customer-specific input context are refused until separately supported.",
+    "@sellConditionSourceLinks": "Current direct-leaf SELL source relationships in the same read-only snapshot: actual ITEM/LOT and policies, typed disposition/hold/decision/label rows, current procedure heads, verified canonical/document/event/inbox chains and immutable blob bytes. Source references only; no eligibility status, evaluatorVersion or final permission is inferred. Genealogy and customer-specific input context are refused until separately supported."
   },
   "unmapped": {
     "locks": "the product keeps no durable record of fence/lock acquisitions (advisory locks are transaction-scoped); T04/T16/V3 read acquisitionOrdinal, lockedRevision, scopeFenceId of each acquisition",

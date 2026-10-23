@@ -89,7 +89,7 @@ final class ScenarioJdbcObservation {
                         ObjectNode statement=statements.get(key);
                         if(tableRows==null) {
                             statement=Json.object().put("table",table);
-                            if(Set.of("@conditionResults","@observationCoverage","@assessmentInputs","@supervisionIssues").contains(table)) {
+                            if(Set.of("@conditionResults","@observationCoverage","@assessmentInputs","@supervisionIssues","@sellConditionSourceRefs","@sellConditionSourceLinks").contains(table)) {
                                 tableRows=projection.virtual(table);statement.set("queries",projection.drainQueries());
                             } else {
                                 if(!items.isEmpty()||!works.isEmpty()||!lots.isEmpty())throw new UnsupportedOperationException("No item/work/lot binding for virtual source "+table);

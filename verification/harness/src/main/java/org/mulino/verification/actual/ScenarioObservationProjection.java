@@ -19,6 +19,8 @@ final class ScenarioObservationProjection {
     private final Map<String,ArrayNode> cache = new HashMap<>();
     private ArrayNode observationQueries;
     private ArrayNode measurementRows;
+    private ScenarioEligibilitySources eligibilitySources;
+    private ArrayNode eligibilityRefs;
 
     ScenarioObservationProjection(Connection connection, Path root, List<String> orgs, List<String> items,
                                   List<String> works, List<String> lots, OffsetDateTime knownAt) {
@@ -613,6 +615,10 @@ final class ScenarioObservationProjection {
 
     ArrayNode virtual(String source) throws Exception {
         return switch(source) {
+            case "@sellConditionSourceRefs", "@sellConditionSourceLinks" -> {
+                if(eligibilitySources==null){eligibilitySources=new ScenarioEligibilitySources(this,knownAt,asOf);eligibilityRefs=eligibilitySources.read();}
+                yield source.equals("@sellConditionSourceRefs")?eligibilityRefs.deepCopy():eligibilitySources.links();
+            }
             case "@conditionResults" -> {
                 var out=Json.array();for(var row:read("mulino_work_read_AssessmentReferences"))out.addAll(assessmentConditions(row));yield out;
             }
