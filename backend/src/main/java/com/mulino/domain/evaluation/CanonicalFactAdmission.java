@@ -8,7 +8,7 @@ import java.util.*;
 public interface CanonicalFactAdmission {
   /** Internal operation selected by the evaluator entrypoint, never a request slot. */
   enum Purpose {
-    ASSESS_GOAL("assessGoal"), CLOSE_WORK("closeWork");
+    ASSESS_GOAL("assessGoal"), CLOSE_WORK("closeWork"), OPEN_OBLIGATION("openObligation");
     private final String capability;
     Purpose(String capability){this.capability=capability;}
     public String capability(){return capability;}

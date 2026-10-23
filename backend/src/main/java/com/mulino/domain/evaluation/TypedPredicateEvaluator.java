@@ -34,16 +34,9 @@ public final class TypedPredicateEvaluator {
       boolean uncertain=inputs.isEmpty()||values.size()!=inputs.size();
       if(op.equals("exists")) result=new PredicateTruth(!values.isEmpty()?SATISFIED:UNVERIFIED,conflict);
       else if(op.equals("quantitySum")||op.equals("stateQuantity")) {
-        var scopes=new HashMap<String,Fact>();boolean duplicateConflict=false;
-        for(Fact f:values) {
-          String key=op.equals("quantitySum")?f.physicalScopeId():f.sourceId();
-          if(key==null||op.equals("quantitySum")&&f.canonicalId()==null){uncertain=true;continue;}
-          Fact previous=scopes.putIfAbsent(key,f);
-          if(previous!=null&&!Objects.equals(previous.value(),f.value()))duplicateConflict=true;
-        }
-        BigDecimal total=BigDecimal.ZERO;
-        for(Fact f:scopes.values()){ if(!Objects.equals(n.get("unit"),f.unit())){uncertain=true;continue;} total=total.add(decimal(f.value())); }
-        result=uncertain||duplicateConflict?new PredicateTruth(UNVERIFIED,conflict||duplicateConflict):new PredicateTruth(bounds(total,n),conflict);
+        var quantity=quantity(values,n.get("unit"),op.equals("quantitySum"));
+        result=uncertain||quantity.uncertain()?new PredicateTruth(UNVERIFIED,conflict||quantity.conflict()):new PredicateTruth(bounds(quantity.total(),n),conflict);
+
       } else if(op.equals("cardinality")) {
         long total=values.stream().filter(f->covers(f,at)).map(Fact::value).distinct().count();
         result=uncertain?new PredicateTruth(UNVERIFIED,conflict):new PredicateTruth(bounds(BigDecimal.valueOf(total),n),conflict);
@@ -64,6 +57,21 @@ public final class TypedPredicateEvaluator {
       }
     }
     out.add(new Condition(id,result,List.copyOf(inputs),inputs.stream().flatMap(f->f.evidenceRefs().stream()).distinct().sorted().toList(),VERSION));return result;
+  }
+  /** Shared quantity proof: uses the same distinct physical scopes and uncertainty as evaluation. */
+  public record Quantity(BigDecimal total,boolean uncertain,boolean conflict) {}
+  public static Quantity quantity(List<Fact> values,Object unit,boolean cumulative) {
+    var scopes=new HashMap<String,Fact>();boolean uncertain=values.isEmpty(),conflict=false;
+    for(Fact f:values){
+      if(f.state()!=State.KNOWN||!f.verified()){uncertain=true;conflict|=f.state()==State.CONFLICT;continue;}
+      String key=cumulative?f.physicalScopeId():f.sourceId();
+      if(key==null||cumulative&&f.canonicalId()==null){uncertain=true;continue;}
+      Fact previous=scopes.putIfAbsent(key,f);
+      if(previous!=null&&!Objects.equals(previous.value(),f.value()))conflict=true;
+    }
+    BigDecimal total=BigDecimal.ZERO;
+    for(Fact f:scopes.values()){if(!Objects.equals(unit,f.unit())){uncertain=true;continue;}total=total.add(decimal(f.value()));}
+    return new Quantity(total,uncertain||conflict,conflict);
   }
   public Result evaluateInterval(Map<String,Object> node,EvaluationFacts facts,Instant start,Instant end,Instant known,boolean throughout) {
     return evaluateInterval(node,facts,start,end,known,throughout,true,false);

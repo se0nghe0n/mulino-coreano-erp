@@ -24,6 +24,7 @@ public final class ObligationClosureCatalog {
  private static final Map<String,Closure> KINDS=new TreeMap<>();
  private static void kind(String kind,String resolution,String auto,String waiver,String next){KINDS.put(kind,new Closure(kind,resolution,auto,waiver,next));}
  static {
+  kind("GOAL_QUANTITY_SHORTFALL",null,null,null,"고정 목표의 부족 물량 책임을 유지하고 다음 행동과 담당 인계를 명시한다");
   kind("WORK_NEXT_ACTION",null,"closeWork of the source Work (UD-2 initial duty)",null,"업무의 다음 행동을 수행하고 업무를 종료한다");
   kind("FOLLOWUP_REVIEW","verified RESPONSE_COMPLETED covering the exact duty root range",null,null,"검증된 대응 완료 증거로 해소하거나 계속 대응한다");
   kind("QUALITY_REVIEW","QC releaseHold decision of the exact referenced restriction","releaseHold of the referenced restriction",null,"참조 제한의 QC 해제 결정으로만 해소한다");

@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 /** Invoked only inside the common command or runtime transaction, never commits independently. */
 @Service
 public class ResponsibilityService implements WorkResponsibility, com.mulino.application.runtime.IntakeDutyPort, com.mulino.application.runtime.RuntimeDutyPort {
+ @org.springframework.beans.factory.annotation.Autowired private com.mulino.application.evaluation.GoalShortfallProof shortfalls;
  private final ResponsibilityRepository r; private final WorkAccess work;
  private final ExecutionClock clock; private final IdentityRepository identities; private final IdentityAuthorization auth; private final ResponsibilityEvidence evidence;
  public ResponsibilityService(ResponsibilityRepository r,@org.springframework.context.annotation.Lazy WorkAccess work,IdentityRepository identities,IdentityAuthorization auth,ResponsibilityEvidence evidence,ExecutionClock clock){this.r=r;this.work=work;this.identities=identities;this.auth=auth;this.evidence=evidence;this.clock=clock;}
@@ -32,7 +33,45 @@ public class ResponsibilityService implements WorkResponsibility, com.mulino.app
  public void followup(DomainContext c,String original,String target,Map<String,Object>p){/* Creating a follow-up is not recipient acceptance. */ work.require(c,original,true);work.require(c,target,true);}
  private List<Map<String,Object>> assignments(DomainContext c,String workId){return r.rows("Assignments",c.organizationId()).stream().filter(x->workId.equals(x.get("workId"))).toList();}
  private static boolean open(Map<String,Object>x){return "OPEN".equals(x.get("status"))&&!Boolean.FALSE.equals(x.get("valid"));}
- public Map<String,Object> openDuty(DomainContext c,Map<String,Object>p){return recordDuty(c,p,false);}
+ public Map<String,Object> openDuty(DomainContext c,Map<String,Object>p){return "GOAL_QUANTITY_SHORTFALL".equals(p.get("kind"))?openGoalShortfall(c,p):recordDuty(c,p,false);}
+ private Map<String,Object> openGoalShortfall(DomainContext c,Map<String,Object> p){
+  String workId=text(p,"workId");r.fence(c.organizationId(),workId);var w=work.require(c,workId,true);
+  if(!Set.of("ACTIVE","WAITING").contains(w.get("status")))throw DomainError.invalid("Shortfall duty needs active Work");
+  if(!"DECISION".equals(p.get("sourceKind")))throw DomainError.invalid("Shortfall source must be the committed assessment command");
+  var command=r.requireSource(c.organizationId(),"DECISION",text(p,"sourceId"));
+  if(!text(p,"sourceVersion").equals(command.get("canonicalHash")))throw DomainError.invalid("Assessment command version mismatch");
+  com.mulino.application.evaluation.GoalShortfallProof.Proof proof;
+  try{proof=shortfalls.require(c,workId,command);}catch(DomainError failure){
+   if("ASSESSMENT_NOT_CURRENT".equals(failure.code())){
+    var prior=r.rows("Roots",c.organizationId()).stream().filter(x->"GOAL_QUANTITY_SHORTFALL".equals(x.get("kind"))).filter(x->{var scope=scopeMap(text(x,"scopeJson"));return workId.equals(scope.get("workId"))&&Objects.equals(w.get("currentGoalVersionId"),scope.get("goalVersionId"));}).toList();
+    if(prior.size()==1){r.fence(c.organizationId(),text(prior.getFirst(),"ID"));var retained=r.currentAssignments(c.organizationId(),text(prior.getFirst(),"ID"));
+     for(var assignment:retained){var scopes=new LinkedHashMap<>(shortfalls.scopes(c,workId));scopes.put("WORK",List.of(text(assignment,"workId")));auth.authorizeScopes(c,"openObligation",scopes);}
+     if(!retained.isEmpty())throw ObligationClosureCatalog.held(retained.getFirst(),"openObligation");
+    }
+   }
+   throw failure;
+  }
+  if(p.get("quantity")==null||quantity(p.get("quantity")).compareTo(proof.shortfall())!=0||!text(p,"unit").equals(proof.unit())||!canonicalScope(text(p,"scopeJson")).equals(canonicalScope(json(proof.scope()))))throw DomainError.invalid("Requested shortfall quantity, unit or immutable goal scope differs from proof");
+  String key=hash(json(List.of(c.organizationId(),workId,proof.goalId(),proof.conditionId())));r.fence(c.organizationId(),key);
+  var old=r.rootByDutyKey(c.organizationId(),key);
+  if(old.isPresent()){
+   var root=old.get();r.fence(c.organizationId(),text(root,"ID"));var current=r.currentAssignments(c.organizationId(),text(root,"ID"));
+   if(current.isEmpty())throw DomainError.invalid("Shortfall root has no current responsibility");
+   for(var assignment:current){var scopes=new LinkedHashMap<>(shortfalls.scopes(c,workId));scopes.put("WORK",List.of(text(assignment,"workId")));auth.authorizeScopes(c,"openObligation",scopes);}
+   var stored=scopeMap(text(root,"scopeJson"));var first=scopeMap(json(stored.get("proof")));
+   if(!"GOAL_QUANTITY_SHORTFALL".equals(root.get("kind"))||quantity(root.get("quantity")).compareTo(proof.shortfall())!=0||!Objects.equals(root.get("unit"),proof.unit())||!Objects.equals(first.get("inputSnapshotHash"),proof.provenance().get("inputSnapshotHash")))throw ObligationClosureCatalog.held(current.getFirst(),"openObligation");
+   return Map.of("rootId",root.get("ID"),"assignments",current);
+  }
+  human(c,text(w,"ownerId"));human(c,text(w,"supervisorId"));String action=text(p,"nextAction");Instant next=at(text(p,"nextCheckAt"));
+  if(!next.isAfter(clock.instant()))throw DomainError.invalid("Shortfall nextCheckAt must be future");
+  var stored=new LinkedHashMap<String,Object>(proof.scope());stored.put("proof",proof.provenance());
+  var root=row(c,UUID.randomUUID().toString());root.putAll(Map.of("dutyKey",key,"sourceId",text(command,"ID"),"sourceKind","DECISION","sourceVersion",text(command,"canonicalHash"),"kind","GOAL_QUANTITY_SHORTFALL","scopeJson",canonicalScope(json(stored)),"quantity",proof.shortfall(),"unit",proof.unit()));r.insert("Roots",root);
+  var scope=row(c,UUID.randomUUID().toString());scope.putAll(Map.of("rootId",root.get("ID"),"startQuantity",BigDecimal.ZERO,"quantity",proof.shortfall(),"unit",proof.unit(),"scopeJson",root.get("scopeJson"),"leaf",true));r.insert("Scopes",scope);
+  var assignment=assignment(c,root,scope,w,action,next,null);r.insert("Assignments",assignment);return Map.of("rootId",root.get("ID"),"assignments",List.of(assignment));
+ }
+ private static String json(Object value){try{return new com.fasterxml.jackson.databind.ObjectMapper().findAndRegisterModules().writeValueAsString(TransportValues.normalize(value));}catch(Exception failure){throw DomainError.invalid("Shortfall proof serialization failed");}}
+ private static Map<String,Object> scopeMap(String value){try{return new com.fasterxml.jackson.databind.ObjectMapper().readValue(value,Map.class);}catch(Exception failure){throw DomainError.invalid("Shortfall proof unavailable");}}
+
  private Map<String,Object> recordDuty(DomainContext c,Map<String,Object>p,boolean rawSource){String workId=text(p,"workId");r.fence(c.organizationId(),workId);var w=work.require(c,workId,true);if(!Set.of("ACTIVE","WAITING").contains(w.get("status")))throw DomainError.invalid("Duty needs active work");human(c,text(w,"ownerId"));human(c,text(w,"supervisorId"));String kind=text(p,"kind");if(!ObligationClosureCatalog.known(kind))throw DomainError.invalid("Unknown obligation kind");String scope=text(p,"scopeJson"),source=text(p,"sourceId"),version=text(p,"sourceVersion"),sourceKind=text(p,"sourceKind");if(!(rawSource?Set.of("EVENT","CLAIM","DOCUMENT"):Set.of("OCCURRENCE","DECISION")).contains(sourceKind))throw DomainError.invalid("Unsupported duty source");var sourceRow=r.requireSource(c.organizationId(),sourceKind,source);String trustedVersion=sourceRow.get("canonicalHash")!=null?sourceRow.get("canonicalHash").toString():String.valueOf(sourceRow.getOrDefault("revision",0));if(!version.equals(trustedVersion))throw DomainError.invalid("Source occurrence or decision version mismatch");scope=canonicalScope(scope);String key=hash(sourceKind+"|"+source+"|"+version+"|"+kind+"|"+scope);r.fence(c.organizationId(),key);var old=r.rows("Roots",c.organizationId()).stream().filter(x->key.equals(x.get("dutyKey"))).findFirst();if(old.isPresent())return Map.of("rootId",old.get().get("ID"),"assignments",r.rows("Assignments",c.organizationId()).stream().filter(x->old.get().get("ID").equals(x.get("rootId"))&&!Boolean.FALSE.equals(x.get("valid"))).toList());
  var root=row(c,UUID.randomUUID().toString());root.putAll(Map.of("dutyKey",key,"sourceId",source,"sourceKind",sourceKind,"sourceVersion",version,"kind",kind,"scopeJson",scope));BigDecimal q=p.get("quantity")==null?null:quantity(p.get("quantity"));if(q!=null){root.put("quantity",q);root.put("unit",text(p,"unit"));}r.insert("Roots",root);
  var s=row(c,UUID.randomUUID().toString());s.putAll(Map.of("rootId",root.get("ID"),"startQuantity",BigDecimal.ZERO,"quantity",q==null?BigDecimal.ONE:q,"scopeJson",scope,"leaf",true));if(q!=null)s.put("unit",root.get("unit"));r.insert("Scopes",s);var a=assignment(c,root,s,w,text(p,"nextAction"),at(p.get("nextCheckAt")),null);r.insert("Assignments",a);return a;}

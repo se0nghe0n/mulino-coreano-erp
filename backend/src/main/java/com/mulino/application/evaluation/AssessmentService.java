@@ -13,9 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
+public class AssessmentService implements CommandHandler,WorkAssessmentGuard,GoalShortfallProof {
   private final WorkAccess work;private final AssessmentRepository repository;private final DefinitionRepository definitions;
   private final ExecutionClock clock;private final DefinitionValidator validator;private final AssessmentFactProvider provider;private final PolicyRepository policies;
+  @org.springframework.beans.factory.annotation.Autowired private ReadAuthorizer authority;
   private final TypedPredicateEvaluator evaluator=new TypedPredicateEvaluator();
   private final ObjectMapper json=new ObjectMapper().findAndRegisterModules().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
   public AssessmentService(WorkAccess work,AssessmentRepository repository,DefinitionRepository definitions,DefinitionValidator validator,AssessmentFactProvider provider,PolicyRepository policies,ExecutionClock clock){this.clock=clock;this.work=work;this.repository=repository;this.definitions=definitions;this.validator=validator;this.provider=provider;this.policies=policies;}
@@ -46,6 +47,67 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard {
     if(!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw new DomainError("HELD","POLICY_UNRESOLVED","Current evidence policy required for closure");
     if(latest==null||latest.get("inputSnapshotHash")==null||Boolean.TRUE.equals(latest.get("held"))||current.held||!"SATISFIED".equals(latest.get("outcome"))||current.result.truth().state()!=PredicateTruth.State.SATISFIED||current.result.truth().conflict()||!Objects.equals(latest.get("inputSnapshotHash"),current.hash))throw new DomainError("HELD","ASSESSMENT_NOT_CURRENT","Current immutable goal assessment and inputs required");
   }
+  /** Scope selection uses immutable snapshot lineage; execution revalidates every admitted source. */
+  public Map<String,List<String>> scopes(DomainContext c,String workId){
+    var w=work.require(c,workId,false);var goal=work.currentGoal(c,workId);
+    var selected=latest(c,workId,goal.get("ID").toString());
+    var scopes=new LinkedHashMap<String,List<String>>();scopes.put("TARGET",List.of(workId));scopes.put("ITEM",List.of(w.get("itemId").toString()));
+    var works=new TreeSet<String>();works.add(workId);var places=new TreeSet<String>();
+    if(selected!=null){var snapshot=proofSnapshot(c,selected);var facts=map(snapshot.get("facts"));var sources=map(facts.get("sources"));
+      if(sources.get("evidence.CanonicalOccurrences") instanceof List<?> rows)for(Object row:rows){var actual=map(row);if(actual.get("workId")!=null)works.add(actual.get("workId").toString());if(actual.get("placeId")!=null)places.add(actual.get("placeId").toString());}
+    }
+    scopes.put("WORK",List.copyOf(works));if(!places.isEmpty())scopes.put("PLACE",List.copyOf(places));return scopes;
+  }
+  public GoalShortfallProof.Proof require(DomainContext c,String workId,Map<String,Object> command){
+    var w=work.require(c,workId,true);var goal=work.currentGoal(c,workId);var latest=latest(c,workId,goal.get("ID").toString());
+    if(latest==null||Boolean.TRUE.equals(w.get("pendingInvalidation"))||Boolean.TRUE.equals(latest.get("held"))||Boolean.TRUE.equals(latest.get("conflict"))||!"UNSATISFIED".equals(latest.get("outcome")))throw shortfallUnavailable();
+    if(!"COMMITTED".equals(command.get("state"))||!"assessGoal".equals(command.get("capabilityId"))||!c.organizationId().equals(command.get("organizationId"))||command.get("completedAt")==null||instant(command.get("completedAt")).isAfter(c.knownAt()))throw shortfallUnavailable();
+    var result=decode(command.get("resultJson"));var recorded=map(result.get("assessment"));var effects=map(result.get("effects"));
+    if(!"APPLIED".equals(result.get("outcome"))||!Objects.equals(effects.get("assessmentId"),latest.get("ID"))||!workId.equals(effects.get("workId")))throw shortfallUnavailable();
+    for(String key:List.of("ID","workId","goalId","inputSnapshotHash","outcome","definitionVersionId","policyVersionId","conditionsJson"))if(!Objects.equals(recorded.get(key),latest.get(key)))throw shortfallUnavailable();
+    var original=decode(command.get("canonicalIntentJson"));
+    if(!"assessGoal".equals(original.get("capabilityId"))||!workId.equals(map(original.get("slots")).get("workId"))||!Objects.equals(CommandRequests.hash(original),command.get("canonicalHash")))throw shortfallUnavailable();
+    var snapshot=proofSnapshot(c,latest);var slots=decode(goal.get("slotsJson"));
+    if(!"CUMULATIVE_EVENT".equals(slots.get("quantityMode"))||slots.get("targetQuantity")==null||slots.get("unit")==null||slots.get("periodStart")==null||slots.get("periodEnd")==null||!Objects.equals(goal.get("ID"),snapshot.get("goalId")))throw shortfallUnavailable();
+    var current=calculate(c,w,goal,c.asOf(),CanonicalFactAdmission.Purpose.OPEN_OBLIGATION);
+    if(current.held||current.result.truth().state()!=PredicateTruth.State.UNSATISFIED||current.result.truth().conflict()||!Objects.equals(current.hash,latest.get("inputSnapshotHash"))||!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw shortfallUnavailable();
+    // IdentityAuthorization's WORK list is any-of. Check each endpoint separately.
+    var sourceFacts=map(map(snapshot.get("facts")).get("sources"));
+    if(!(sourceFacts.get("evidence.CanonicalOccurrences") instanceof List<?> actuals)||actuals.isEmpty())throw shortfallUnavailable();
+    for(Object value:actuals){var actual=map(value);if(actual.get("workId")==null||actual.get("placeId")==null||!Objects.equals(actual.get("itemId"),w.get("itemId")))throw shortfallUnavailable();
+      for(String endpoint:new LinkedHashSet<>(List.of(workId,actual.get("workId").toString())))authority.authorizeScopes(c,"openObligation",Map.of("TARGET",List.of(workId),"WORK",List.of(endpoint),"ITEM",List.of(w.get("itemId").toString()),"PLACE",List.of(actual.get("placeId").toString())));
+    }
+    Definition d=definition(goal,c);var predicate=goalPredicate(d,slots);var leaves=new LinkedHashMap<String,Map<String,Object>>();quantityLeaves(predicate,"root",leaves);
+    String unit=slots.get("unit").toString(),property=GoalQuantityProperty.resolve(d,template(d,slots).predicate(),unit);
+    var target=new java.math.BigDecimal(slots.get("targetQuantity").toString());if(target.signum()<=0)throw shortfallUnavailable();
+    TypedPredicateEvaluator.Condition chosen=null;
+    for(var entry:leaves.entrySet()){
+      var condition=current.result.conditions().stream().filter(x->x.conditionId().equals(entry.getKey())).findFirst().orElseThrow(AssessmentService::shortfallUnavailable);
+      var node=entry.getValue();
+      if("quantitySum".equals(node.get("operator"))){
+        if(!property.equals(node.get("property"))||!unit.equals(node.get("unit"))||node.get("minimum")==null||node.get("maximum")!=null)throw shortfallUnavailable();
+        Object bound=node.get("minimum") instanceof Map<?,?> m?m.get("value"):node.get("minimum");
+        var minimum=new java.math.BigDecimal(bound.toString());if(minimum.compareTo(target)>0)throw shortfallUnavailable();
+        if(minimum.compareTo(target)==0)chosen=condition;
+      }else if(condition.truth().state()!=PredicateTruth.State.SATISFIED||condition.truth().conflict())throw shortfallUnavailable();
+    }
+    if(chosen==null)throw shortfallUnavailable();
+    var amount=TypedPredicateEvaluator.quantity(chosen.inputs(),unit,true);
+    if(amount.uncertain()||amount.conflict()||amount.total().signum()<0||amount.total().compareTo(target)>=0)throw shortfallUnavailable();
+    var scope=new LinkedHashMap<String,Object>(map(slots.get("scope")));scope.put("workId",workId);scope.put("goalVersionId",goal.get("ID"));scope.put("conditionId",property);
+    var proof=new LinkedHashMap<String,Object>();proof.put("assessmentId",latest.get("ID"));proof.put("inputSnapshotHash",current.hash);proof.put("definitionVersionId",goal.get("definitionVersionId"));proof.put("definitionHash",snapshot.get("definitionHash"));proof.put("policyVersionId",current.policy);proof.put("policy",snapshot.get("policy"));proof.put("goalSlots",slots);proof.put("targetQuantity",target);proof.put("recognizedQuantity",amount.total());proof.put("shortfallQuantity",target.subtract(amount.total()));proof.put("unit",unit);proof.put("conditionId",property);proof.put("inputs",normalize(chosen.inputs()));proof.put("asOf",c.asOf());proof.put("knownAt",c.knownAt());
+    return new GoalShortfallProof.Proof(workId,goal.get("ID").toString(),property,target,amount.total(),target.subtract(amount.total()),unit,Map.copyOf(scope),Map.copyOf(proof));
+  }
+  private Map<String,Object> proofSnapshot(DomainContext c,Map<String,Object> assessment){
+    var snapshots=repository.rows(c,"mulino.evaluation.InputSnapshots").stream().filter(x->Objects.equals(assessment.get("ID"),x.get("assessmentId"))).toList();
+    if(snapshots.size()!=1)throw shortfallUnavailable();var row=snapshots.getFirst();
+    if(!Objects.equals(row.get("contentHash"),assessment.get("inputSnapshotHash"))||!Objects.equals(DefinitionRepository.sha256(row.get("contentJson").toString()),row.get("contentHash")))throw shortfallUnavailable();return decode(row.get("contentJson"));
+  }
+  private static void quantityLeaves(Map<String,Object> node,String path,Map<String,Map<String,Object>> leaves){
+    if("all".equals(node.get("operator"))){if(!(node.get("children") instanceof List<?> children))throw shortfallUnavailable();for(int i=0;i<children.size();i++)quantityLeaves((Map<String,Object>)children.get(i),path+"."+i,leaves);}
+    else if(Set.of("any","not","stateQuantity").contains(node.get("operator")))throw shortfallUnavailable();else leaves.put(path,node);
+  }
+  private static DomainError shortfallUnavailable(){return new DomainError("HELD","ASSESSMENT_NOT_CURRENT","A current unambiguous immutable quantity shortfall proof is required");}
   public void requireResume(DomainContext c,Map<String,Object> w,Map<String,Object> wait,Map<String,Object> evidence){
     var goal=work.currentGoal(c,w.get("ID").toString());Definition d=definition(goal,c);var predicate=map(wait.get("resumePredicate"));if(!"VALID".equals(validator.validatePredicate(d,predicate).outcome()))throw DomainError.invalid("Unsupported resume predicate");
     var result=evaluator.evaluate(predicate,provider.load(c,w,decode(goal.get("slotsJson")),d,goal.get("ID").toString()),c.asOf(),c.knownAt());

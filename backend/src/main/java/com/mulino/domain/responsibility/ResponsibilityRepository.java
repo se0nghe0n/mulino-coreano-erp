@@ -24,5 +24,7 @@ public class ResponsibilityRepository {
     if(found.isEmpty()&&"DECISION".equals(kind))found=evidenceRows("Commands",org).stream().filter(x->id.equals(x.get("ID"))).findFirst();
     return found.orElseThrow(DomainError::forbidden);
   }
-  public void fence(String org,String key){if(!TransactionSynchronizationManager.isActualTransactionActive())throw new IllegalStateException("Responsibility requires parent transaction");jdbc.queryForList("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",org+"|responsibility|"+key);}
+  public Optional<Map<String,Object>> rootByDutyKey(String org,String key){return rows("Roots",org).stream().filter(x->key.equals(x.get("dutyKey"))).findFirst();}
+ public List<Map<String,Object>> currentAssignments(String org,String root){return rows("Assignments",org).stream().filter(x->root.equals(x.get("rootId"))&&Boolean.TRUE.equals(x.get("valid"))&&"OPEN".equals(x.get("status"))).sorted(Comparator.comparing(x->x.get("ID").toString())).toList();}
+ public void fence(String org,String key){if(!TransactionSynchronizationManager.isActualTransactionActive())throw new IllegalStateException("Responsibility requires parent transaction");jdbc.queryForList("SELECT pg_advisory_xact_lock(hashtextextended(?,0))",org+"|responsibility|"+key);}
 }
