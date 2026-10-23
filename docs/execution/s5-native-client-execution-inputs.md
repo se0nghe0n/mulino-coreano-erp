@@ -303,3 +303,97 @@ evaluator·capability/input-output schema·prompt/tool/package version과
 이번 실행은 corpus 무결성 검사와 로그인/버전 조회·source 대조에
 한정된다. 업무 model 호출·시나리오·Workflow·실배포·외부 메시지는0이다.
 발견한 skills 실패는 그대로 인계하며 이 준비 문서로 S5를 닫지 않는다.
+
+## 2026-10-24 package 계약 drift의 한정 수정
+
+준비 commit `647660866b67f594f7fcedbe173b2ff1fa6efdfc` 뒤에 별도 branch
+`fix/s5-runtime-package-contract-a7f18cc8`에서 수정했다. 제품 code의
+기준선은 계속 `a7f18cc8`이며 root에는 아직 통합하지 않았다.
+이번 thread의 실제 modelSelection은 `codex_2/gpt-6.1-sol`,
+`reasoningEffort=xhigh`, `serviceTier=priority`로 확인했다.
+`proof/package-fix/runtime-selection.json`에 실제 응답을 보존했다.
+catalog의 지원값과 thread의 선택값을 각각 확인했으며 대체하지 않았다.
+
+`ontology-work-coordinator/references/capabilities.json`에 공개 계약의
+`createFollowup.sourceEventId` slot 한 개를 같은 순서로 추가했다.
+slot 목록은 필수값 목록이 아니며, 기존 서버의 선택 입력을 reference에
+빠짐없이 싣는 수정이다. 새로운 행동·권한·업무 의미를 추가하지 않았다.
+이전 준비 단계의 exit1 로그와 manifest/reference bytes는 보존했다.
+
+기존 `verification/native-client/validate-runtime-skills.py --refresh`를
+그대로 사용해 manifest의 reference file/package/전체 skill hash와
+source pin13개를 현재 bytes로 갱신했다. generator 코드 변경은 없다.
+현재 generator는 version을 갱신하지 않으며 기존 hash 동기화에서도
+version `1.0.0`을 유지했다. 이번에도 manifestVersion, aggregate version,
+여섯 package version과 capabilitySemanticVersion은 모두 유지한다.
+기존 공개 schema/capability 의미의 누락을 고치는 범위이므로 새 의미
+버전을 발행하지 않는다. 실제 bytes 변경은 아래 SHA로 구별한다.
+
+| 대상 | 수정 후 SHA-256 |
+|---|---|
+| coordinator `references/capabilities.json` | `80cbadb5d2e05c384d906612eb6cf512dd1a49cacddd553a34c5b10d9000e52d` |
+| coordinator package | `3768d64002fe400accc9387e9541e3fcb9618a04b702492d42c2740f7eeeaf12` |
+| 전체 skill bytes | `3966173e4bb7ec7ac03cbdd285042aeddafdc124963adecb225d3b1eb169786c` |
+| runtime package manifest 파일 | `fa21fffaca3f77321e547c3acd66603ffaaa84429c2a401af0d17547c9224cca` |
+
+다른 다섯 package entry, coordinator의 capability 목록·provider·metadata,
+sourceBaseline, historical validatedClients와 승인 pin은 그대로다.
+discovery symlink와 tracked mode도 바꾸지 않았다. source hash37개 중
+13개만 달랐으며 나머지24개는 그대로다. 모든 source bytes는 a7과 같다.
+
+### 13개 stale source pin의 원인과 현재 authoritative hash
+
+각 pin이 가리키던 새 온톨로지 source bytes의 commit을 찾아 현재 a7
+bytes와 비교했다. 아래는 이미 통합된 변경 때문에 pin이 낡은 원인이다.
+이 변경들의 제품 동작을 이번에 새로 인수했다는 뜻은 아니다.
+`proof/package-fix/source-drifts.json`에 전체 경로, 이전/현재 SHA,
+pin 원본 commit, 관련 commit과 실제 source diff/hash를 보존했다.
+`authoritative-sources.json`에는 현재 source37개의 SHA/bytes를 남겼다.
+마지막 manifest 갱신 commit은 `08e2a7a5`이며 모든 pin이 그 commit의
+source를 가리킨다고 추정하지 않았다. 옛 ERP 이력은 사용하지 않았다.
+
+아래 Java 경로는 `backend/src/main/java/com/mulino/` 기준이다.
+
+| source | pin 이후 반영된 원인과 관련 commit | a7 authoritative SHA-256 |
+|---|---|---|
+| `application/evaluation/AssessmentService.java` | closeWork 현재 권한, 현재 목표 부족 의무, 공통 capture와 불변 평가, capture 시점 대조, 종료 뒤 후속 책임을 연결했다. `1f0e9dd6`, `37cb940e`, `e8c66499`, `29e724f5`, `5bcb46b5`, `83639692`다 | `4db2bc66936b1ebde34691d6ab01d357fd45d52477693e57928e23ee81f17a8c` |
+| `application/evidence/EvidenceQueries.java` | `CanonicalEvidenceVerification.verifiedForRead`로 조회 검증을 연결하고 실행 적격성의 내부 증거 검증과 분리했다. `e2fc92af`다 | `501fb4c4993e207ae5e026676e1fe4acffcd840f884718d84464005fa32c93e4` |
+| `application/inventory/FulfillmentCommands.java` | 실행 목적의 증거 검증·fence를 사용하고 출고 응답에 실제 물리 이동 ID를 연결했다. `e2fc92af`, `b59ce369`다 | `235481c8b741cc334777a3da7910e2aed1754324c9385d742e1a0d5932b67213` |
+| `application/inventory/InventoryQueries.java` | 품목 범위 적격성 조회와 조건별 evaluator 결과를 공개 조회에 연결했다. `905e04b8`, `fc58924f`다 | `ffc6006e744a821e037d0f5312470cfec5830267d86b181adae24adbcdf56e9e` |
+| `application/quality/QualityEligibility.java` | 실행용 증거 검증, 품목별 물리 범위 조회, QC/규제/처분/고객 조건별 결과를 연결했다. `e2fc92af`, `905e04b8`, `fc58924f`다 | `17ef097867d771a2aa47bfafe69741bcb11f66acdc24b310c23e1eef1bea00df` |
+| `application/responsibility/ResponsibilityCommands.java` | 현재 목표 부족 근거와 obligation 응답을 연결하고 이전·인수의 ITEM scope와 책임을 보존했다. `37cb940e`, `83639692`다 | `084c71f4d2aea47ebdd3e32b8fc0bcccfab17fbd0c658003f7358c37110a6688` |
+| `application/trade/purchase/PurchaseCommands.java` | 외부 발주 전달 시 원 명령·확정 효과·현재 승인/권한을 재검증하는 `verifyDelivery`를 추가했다. `00cedd66`다 | `4a3f661358e601f2c6132b80caeed7d4a3374f4f7ae9a5696c84493740e5cf85` |
+| `application/trade/receipt/ReceiptCommands.java` | 확정 수령과 중복 응답에 저장된 canonical occurrence ID를 연결하고 임시 접수와 구별했다. `f4852678`다 | `9ea8337968bfb5f5c31494b02b85384a5cead3755effe6fda9b5be32ffd5f637` |
+| `application/trade/sales/DeliveryCommands.java` | 미확인 보고와 확정 재고 참조를 분리하고 pending external 응답, 원천 scope와 실제 인도의 인과 재평가를 연결했다. `e33e69d5`, `64054871`, `fc58924f`다 | `0b59f4f0a21f95da5fcbe92e31ec1c226daebdc13b4839617ac84052f0858b67` |
+| `application/trade/sales/SalesQueries.java` | 미확인 인도 관측, 원천에 묶인 world ledger, 실제 인도 근거와 수량 조회를 연결했다. `e33e69d5`, `64b0cfb7`, `fc58924f`, `eaee3408`다 | `c0adc44566c2cf380ce62536d9eb4e2bc212256cc417ebb9f4dda6638c4fb1d3` |
+| `application/work/WorkLifecycle.java` | 기여 구간의 source 목표를 고정하고 sourceEventId로 종료 뒤 후속 업무의 근거·멱등 연결을 지원했다. `4be9480d`, `83639692`다 | `8bcbdeebdfbd512dbd7b7e0d963c7d70622ee80b671da93628f3938083be192c` |
+| `domain/work/read/WorkReadHandler.java` | source 목표 구간, 공통 capture의 관찰 시점과 실제 원천 world ledger의 업무 조회를 연결했다. `4be9480d`, `6c3310a3`, `64b0cfb7`다 | `e2dcd8506136e46d8de2c42d2aa11d52b33dc10ec3092145ff71dd4ea996a10f` |
+| `contracts/capability-slots.json` | `createFollowup`의 허용 slot에 sourceEventId를 추가했으나 package reference가 뒤따르지 않았다. `83639692`다 | `eb6a2c56d5561066a8079f3e5439a3d933c6e0a6c3960072a0b5b1df804640a1` |
+
+### 이번 집중 실행 증거
+
+다음 명령만 이번 변경의 집중 검사로 실행했다. 실제 argv·exit·stdout/
+stderr와 원 JUnit을 `proof/package-fix/`에 보존했다.
+
+```sh
+python3 -I verification/native-client/validate-runtime-skills.py --refresh
+python3 -I verification/native-client/validate-runtime-skills.py
+python3 -I verification/native-client/validate-runtime-skills.py --refresh
+./mvnw -B -ntp -f verification/harness/pom.xml \
+  '-Dtest=NativeClientContractTest#runtimePackagesHaveDirectDiscoveryLinksAndMatchingContentHashes' \
+  test
+```
+
+세 Python 실행은 모두 exit0이며 STATIC_PACKAGE_DISCOVERY의
+packages6/discoveryLinks12/files13을 확인했다. 두 번째 refresh가 만든
+manifest는 첫 refresh와 byte 단위로 같다. Java runtime의 package 파일
+검색·symlink·SHA 결합을 확인하는 기존 unit method 한 개도 exit0이며
+tests1/failures0/errors0/skipped0이다. 모델/계정/서버를 호출하는 method는
+선택하지 않았다. 원 generator·제품·contracts·fixtures·검증 source는
+변경하지 않았다.
+
+이 결과는 static package 계약 복구다. 본문/reference의 실제 loading,
+업무 client/model/tool 효과, 전체 scenario·규제·배포는 계속 NOT_RUN이다.
+앞 절의 준비 시점 실패를 소급해 PASS로 바꾸지 않는다. root 통합 뒤
+source가 달라지면 root가 그 시점의 source pin을 다시 대조해야 한다.
+Task·S5·S6는 OPEN이다.
