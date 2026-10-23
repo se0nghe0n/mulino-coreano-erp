@@ -27,6 +27,390 @@
           ]
         },
         {
+          "id": "hold-B40-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "B"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "6389c22e-cc0d-52fd-aa25-3602ce88d875",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "B"
+                      },
+                      "quantity": "40",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_REVIEW",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "B",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "40",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "B"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "40",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-B"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "8013c96f0238acfc1d03cba0b8116f3d4f33980d3f117bc62769c944b6a586e7",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-reserve-pick-dispatch-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "6389c22e-cc0d-52fd-aa25-3602ce88d875",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "B"
+                      },
+                      "quantity": "40",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_REVIEW",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "B",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "40",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "B"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "40",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-B"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "8013c96f0238acfc1d03cba0b8116f3d4f33980d3f117bc62769c944b6a586e7",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-reserve-pick-dispatch-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "6389c22e-cc0d-52fd-aa25-3602ce88d875",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-reserve-pick-dispatch-hold-B40-source-document"
+          },
+          "evidenceRefs": [
+            "hold-B40-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "hold-B40-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "B"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "6389c22e-cc0d-52fd-aa25-3602ce88d875",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "B"
+                      },
+                      "quantity": "40",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_REVIEW",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "B",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "40",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "B"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "40",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-B"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "8013c96f0238acfc1d03cba0b8116f3d4f33980d3f117bc62769c944b6a586e7",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-reserve-pick-dispatch-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "6389c22e-cc0d-52fd-aa25-3602ce88d875",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "hold-B40-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "40",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-reserve-pick-dispatch-hold-B40-source-event"
+          },
+          "evidenceRefs": [
+            "hold-B40-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "hold-B40-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "hold-B40-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "hold-B40-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "B"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:6389c22e-cc0d-52fd-aa25-3602ce88d875:1",
+              "quantity": "40",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-reserve-pick-dispatch-hold-B40-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "hold-B40-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "hold-B40-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "hold-B40-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-reserve-pick-dispatch-hold-B40-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "hold-B40-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "hold-B40",
           "kind": "invoke",
           "actorRef": "qc",
@@ -53,8 +437,19 @@
               "action": "SELL",
               "reason": "QC_REVIEW",
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "hold-B40-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-B"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-reserve-pick-dispatch-hold-B40",
@@ -69,7 +464,13 @@
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -3126,6 +3527,449 @@
           ]
         },
         {
+          "id": "late-hold-source-scope",
+          "kind": "query",
+          "actorRef": "observer",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "dispatch",
+                "pointer": "/response/effects/transitSegmentId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "QuantitySegment"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "late-hold-source-scope:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "late-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$result": {
+                    "actionId": "late-hold-source-scope",
+                    "pointer": "/response/data/ID"
+                  }
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "30ef9358-512b-5fdf-a43c-cab941e36b24",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "quantity": "30",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "RECALL_INVESTIGATION",
+                      "evidenceId": {
+                        "$alias": "recall-proof"
+                      },
+                      "segmentId": {
+                        "$result": {
+                          "actionId": "late-hold-source-scope",
+                          "pointer": "/response/data/ID"
+                        }
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "A",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "30",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "late-hold-source-scope",
+                        "pointer": "/response/data/ID"
+                      }
+                    },
+                    "action": "SELL",
+                    "category": "RECALL",
+                    "startQuantity": "0",
+                    "quantity": "30",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-A"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "recall-proof",
+                      "sha256": "aeb73e7118a5a6ee76f5ae8bacbc4044da7b62736330f937a030faf0cfef1e77",
+                      "sourceNamespace": "SYNTHETIC-recall-proof",
+                      "externalEventId": "T17-late-restriction-actual-delivery-recall-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "recall-proof"
+                    },
+                    "sourceDecisionId": "30ef9358-512b-5fdf-a43c-cab941e36b24",
+                    "sourceVersion": "1",
+                    "originalRequestJson": "{\"quantity\":\"30\",\"unit\":\"BOX\",\"action\":\"SELL\",\"reason\":\"RECALL_INVESTIGATION\",\"evidenceId\":{\"$alias\":\"recall-proof\"},\"segmentId\":{\"$result\":{\"actionId\":\"dispatch\",\"pointer\":\"/response/effects/transitSegmentId\"}}}"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "quantity": "30",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "RECALL_INVESTIGATION",
+                      "evidenceId": {
+                        "$alias": "recall-proof"
+                      },
+                      "segmentId": {
+                        "$result": {
+                          "actionId": "late-hold-source-scope",
+                          "pointer": "/response/data/ID"
+                        }
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "A",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "30",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "late-hold-source-scope",
+                        "pointer": "/response/data/ID"
+                      }
+                    },
+                    "action": "SELL",
+                    "category": "RECALL",
+                    "startQuantity": "0",
+                    "quantity": "30",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-A"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "recall-proof",
+                      "sha256": "aeb73e7118a5a6ee76f5ae8bacbc4044da7b62736330f937a030faf0cfef1e77",
+                      "sourceNamespace": "SYNTHETIC-recall-proof",
+                      "externalEventId": "T17-late-restriction-actual-delivery-recall-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "recall-proof"
+                    },
+                    "sourceDecisionId": "30ef9358-512b-5fdf-a43c-cab941e36b24",
+                    "sourceVersion": "1",
+                    "originalRequestJson": "{\"quantity\":\"30\",\"unit\":\"BOX\",\"action\":\"SELL\",\"reason\":\"RECALL_INVESTIGATION\",\"evidenceId\":{\"$alias\":\"recall-proof\"},\"segmentId\":{\"$result\":{\"actionId\":\"dispatch\",\"pointer\":\"/response/effects/transitSegmentId\"}}}"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-late-hold-source-document"
+          },
+          "evidenceRefs": [
+            "late-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "late-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$result": {
+                    "actionId": "late-hold-source-scope",
+                    "pointer": "/response/data/ID"
+                  }
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_RECALL",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "30ef9358-512b-5fdf-a43c-cab941e36b24",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "quantity": "30",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "RECALL_INVESTIGATION",
+                      "evidenceId": {
+                        "$alias": "recall-proof"
+                      },
+                      "segmentId": {
+                        "$result": {
+                          "actionId": "late-hold-source-scope",
+                          "pointer": "/response/data/ID"
+                        }
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "A",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "30",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$result": {
+                        "actionId": "late-hold-source-scope",
+                        "pointer": "/response/data/ID"
+                      }
+                    },
+                    "action": "SELL",
+                    "category": "RECALL",
+                    "startQuantity": "0",
+                    "quantity": "30",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-A"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "recall-proof",
+                      "sha256": "aeb73e7118a5a6ee76f5ae8bacbc4044da7b62736330f937a030faf0cfef1e77",
+                      "sourceNamespace": "SYNTHETIC-recall-proof",
+                      "externalEventId": "T17-late-restriction-actual-delivery-recall-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "recall-proof"
+                    },
+                    "sourceDecisionId": "30ef9358-512b-5fdf-a43c-cab941e36b24",
+                    "sourceVersion": "1",
+                    "originalRequestJson": "{\"quantity\":\"30\",\"unit\":\"BOX\",\"action\":\"SELL\",\"reason\":\"RECALL_INVESTIGATION\",\"evidenceId\":{\"$alias\":\"recall-proof\"},\"segmentId\":{\"$result\":{\"actionId\":\"dispatch\",\"pointer\":\"/response/effects/transitSegmentId\"}}}"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "late-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "30",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-late-hold-source-event"
+          },
+          "evidenceRefs": [
+            "late-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "late-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "late-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "late-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$result": {
+                  "actionId": "late-hold-source-scope",
+                  "pointer": "/response/data/ID"
+                }
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:30ef9358-512b-5fdf-a43c-cab941e36b24:1",
+              "quantity": "30",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-late-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "late-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "late-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "late-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-late-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "late-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "late-hold",
           "kind": "invoke",
           "actorRef": "admin",
@@ -3149,19 +3993,30 @@
               "action": "SELL",
               "reason": "RECALL_INVESTIGATION",
               "evidenceId": {
-                "$alias": "recall-proof"
+                "$result": {
+                  "actionId": "late-hold-source-document",
+                  "pointer": "/response/id"
+                }
               },
               "segmentId": {
                 "$result": {
                   "actionId": "dispatch",
                   "pointer": "/response/effects/transitSegmentId"
                 }
-              }
+              },
+              "category": "RECALL",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-A"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "dispatch",
-                "pointer": "/response/revision"
+                "actionId": "late-hold-source-scope",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T17-late-restriction-actual-delivery-late-hold",
@@ -3176,7 +4031,13 @@
               "action": "USER",
               "reason": "USER",
               "evidenceId": "CONTEXT",
-              "segmentId": "CONTEXT"
+              "segmentId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -14982,6 +15843,381 @@
           ]
         },
         {
+          "id": "hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "A"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "d393ef6d-0bed-5583-b23b-60bf7f407e87",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "A"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_REVIEW"
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "A",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-A"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "a9ae3beedfee02655b4c2edc07c502f3d392a16d63d8d06e0cf2325cb22040ce",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-replacement-no-revival-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "d393ef6d-0bed-5583-b23b-60bf7f407e87",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "A"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_REVIEW"
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "A",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-A"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "a9ae3beedfee02655b4c2edc07c502f3d392a16d63d8d06e0cf2325cb22040ce",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-replacement-no-revival-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "d393ef6d-0bed-5583-b23b-60bf7f407e87",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-hold-source-document"
+          },
+          "evidenceRefs": [
+            "hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "A"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "d393ef6d-0bed-5583-b23b-60bf7f407e87",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "A"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_REVIEW"
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "A",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "A"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-A"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "a9ae3beedfee02655b4c2edc07c502f3d392a16d63d8d06e0cf2325cb22040ce",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-replacement-no-revival-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "d393ef6d-0bed-5583-b23b-60bf7f407e87",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-hold-source-event"
+          },
+          "evidenceRefs": [
+            "hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "A"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:d393ef6d-0bed-5583-b23b-60bf7f407e87:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-replacement-no-revival-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -15006,7 +16242,21 @@
               "quantity": "20",
               "unit": "BOX",
               "action": "SELL",
-              "reason": "QC_REVIEW"
+              "reason": "QC_REVIEW",
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-A"
+              },
+              "evidenceId": {
+                "$result": {
+                  "actionId": "hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": {
               "$result": {
@@ -15025,7 +16275,14 @@
               "quantity": "USER",
               "unit": "USER",
               "action": "USER",
-              "reason": "USER"
+              "reason": "USER",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "evidenceId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -16536,6 +17793,390 @@
           ]
         },
         {
+          "id": "early-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "08de5afb-8aae-5851-9372-40014aee4400",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "3cc5f562acb9972631cb766b71c0a4331bd096e73d746dcaa8d375a03d6bf999",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-unknown-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "08de5afb-8aae-5851-9372-40014aee4400",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "3cc5f562acb9972631cb766b71c0a4331bd096e73d746dcaa8d375a03d6bf999",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-unknown-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "08de5afb-8aae-5851-9372-40014aee4400",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-unknown-early-hold-source-document"
+          },
+          "evidenceRefs": [
+            "early-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "08de5afb-8aae-5851-9372-40014aee4400",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "3cc5f562acb9972631cb766b71c0a4331bd096e73d746dcaa8d375a03d6bf999",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-unknown-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "08de5afb-8aae-5851-9372-40014aee4400",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-unknown-early-hold-source-event"
+          },
+          "evidenceRefs": [
+            "early-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "early-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "EARLY"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:08de5afb-8aae-5851-9372-40014aee4400:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-unknown-early-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "early-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-unknown-early-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "early-hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -16562,8 +18203,19 @@
               "action": "SELL",
               "reason": "QC_DENIED",
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-EARLY"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-unknown-early-hold",
@@ -16578,7 +18230,13 @@
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -17359,6 +19017,390 @@
           ]
         },
         {
+          "id": "early-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "422c022f-8644-550b-b307-b4bad48fbd95",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "466d8d1e6dde34feceed5d2fb25a250b48686655d3334ef6aeca42a5fe595532",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-conflict-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "422c022f-8644-550b-b307-b4bad48fbd95",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "466d8d1e6dde34feceed5d2fb25a250b48686655d3334ef6aeca42a5fe595532",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-conflict-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "422c022f-8644-550b-b307-b4bad48fbd95",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-conflict-early-hold-source-document"
+          },
+          "evidenceRefs": [
+            "early-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "422c022f-8644-550b-b307-b4bad48fbd95",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "466d8d1e6dde34feceed5d2fb25a250b48686655d3334ef6aeca42a5fe595532",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-conflict-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "422c022f-8644-550b-b307-b4bad48fbd95",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-conflict-early-hold-source-event"
+          },
+          "evidenceRefs": [
+            "early-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "early-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "EARLY"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:422c022f-8644-550b-b307-b4bad48fbd95:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-conflict-early-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "early-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-conflict-early-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "early-hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -17385,8 +19427,19 @@
               "action": "SELL",
               "reason": "QC_DENIED",
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-EARLY"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-conflict-early-hold",
@@ -17401,7 +19454,13 @@
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -18182,6 +20241,390 @@
           ]
         },
         {
+          "id": "early-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "ea280642-305c-5f58-90f5-681220bda806",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "5afdc6195de0e23e164c5c5097c0fdbf96e830693cb40336127ef6eb9d1b9b3f",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-fefo-no-reason-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "ea280642-305c-5f58-90f5-681220bda806",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "5afdc6195de0e23e164c5c5097c0fdbf96e830693cb40336127ef6eb9d1b9b3f",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-fefo-no-reason-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "ea280642-305c-5f58-90f5-681220bda806",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-early-hold-source-document"
+          },
+          "evidenceRefs": [
+            "early-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "ea280642-305c-5f58-90f5-681220bda806",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "5afdc6195de0e23e164c5c5097c0fdbf96e830693cb40336127ef6eb9d1b9b3f",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-fefo-no-reason-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "ea280642-305c-5f58-90f5-681220bda806",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-early-hold-source-event"
+          },
+          "evidenceRefs": [
+            "early-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "early-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "EARLY"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:ea280642-305c-5f58-90f5-681220bda806:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-early-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "early-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-early-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "early-hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -18208,8 +20651,19 @@
               "action": "SELL",
               "reason": "QC_DENIED",
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-EARLY"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-fefo-no-reason-early-hold",
@@ -18224,7 +20678,13 @@
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -19279,6 +21739,390 @@
           ]
         },
         {
+          "id": "early-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "2afcb8d5-65bd-5025-909e-109b2122c4f8",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "5c0cc9e6bdb29fad20437cea5ab73ecc1e336bbf7b871f609c9c4ce1b3912c57",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-fefo-with-reason-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "2afcb8d5-65bd-5025-909e-109b2122c4f8",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "5c0cc9e6bdb29fad20437cea5ab73ecc1e336bbf7b871f609c9c4ce1b3912c57",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-fefo-with-reason-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "2afcb8d5-65bd-5025-909e-109b2122c4f8",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-early-hold-source-document"
+          },
+          "evidenceRefs": [
+            "early-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "2afcb8d5-65bd-5025-909e-109b2122c4f8",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "5c0cc9e6bdb29fad20437cea5ab73ecc1e336bbf7b871f609c9c4ce1b3912c57",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-fefo-with-reason-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "2afcb8d5-65bd-5025-909e-109b2122c4f8",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-early-hold-source-event"
+          },
+          "evidenceRefs": [
+            "early-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "early-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "EARLY"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:2afcb8d5-65bd-5025-909e-109b2122c4f8:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-early-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "early-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-early-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "early-hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -19305,8 +22149,19 @@
               "action": "SELL",
               "reason": "QC_DENIED",
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-EARLY"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-fefo-with-reason-early-hold",
@@ -19321,7 +22176,13 @@
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [
@@ -20139,6 +23000,390 @@
           ]
         },
         {
+          "id": "early-hold-source-document",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "sourceReference": "d0007b81-303d-5bc0-86be-94d086826242",
+              "mediaType": "application/json",
+              "expectedHash": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "4bbc08357df89c21b74664da945c672904dd7712268303da5b52636859d95a45",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-packaging-unapproved-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "d0007b81-303d-5bc0-86be-94d086826242",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "sha256"
+                }
+              },
+              "contentBase64": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "4bbc08357df89c21b74664da945c672904dd7712268303da5b52636859d95a45",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-packaging-unapproved-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "d0007b81-303d-5bc0-86be-94d086826242",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "base64"
+                }
+              },
+              "provenance": "NEW_COORDINATOR_SYNTHETIC_HOLD_WINDOW; originalRequest preserved; operatingApprovalClaimed=false"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "contentBase64": "CONTEXT",
+              "provenance": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-early-hold-source-document"
+          },
+          "evidenceRefs": [
+            "early-hold-source-document:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-event",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "recordActivity",
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "recordActivity",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "EARLY"
+                }
+              },
+              "kind": "QUALITY_DECISION_placeHold_QC",
+              "sourceNamespace": "synthetic-t17-eligibility",
+              "externalEventId": "d0007b81-303d-5bc0-86be-94d086826242",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": {
+                "$encode": {
+                  "source": {
+                    "synthetic": true,
+                    "authoredBy": "coordinator-selected-fixture",
+                    "operatingApprovalClaimed": false,
+                    "originalAuthorityClaimed": false,
+                    "originalRequest": {
+                      "segmentId": {
+                        "$alias": "EARLY"
+                      },
+                      "quantity": "20",
+                      "unit": "BOX",
+                      "action": "SELL",
+                      "reason": "QC_DENIED",
+                      "evidenceId": {
+                        "$alias": "qc-proof"
+                      }
+                    },
+                    "validityAuthoring": {
+                      "synthetic": true,
+                      "authoredBy": "coordinator-selected-fixture",
+                      "operatingApprovalClaimed": false,
+                      "originalAuthorityClaimed": false,
+                      "selection": "NEW_HOLD_WINDOW_FROM_ORIGINAL_QC_CONDITION",
+                      "originalCondition": {
+                        "segmentAlias": "EARLY",
+                        "conditionId": "QC",
+                        "status": "ALLOWED",
+                        "synthetic": true,
+                        "evidenceAlias": "qc-proof",
+                        "validFrom": "2026-10-01T00:00:00Z",
+                        "validUntil": "2026-10-31T23:59:59Z",
+                        "quantity": "20",
+                        "unit": "BOX"
+                      }
+                    },
+                    "operation": "placeHold",
+                    "segmentId": {
+                      "$alias": "EARLY"
+                    },
+                    "action": "SELL",
+                    "category": "QC",
+                    "startQuantity": "0",
+                    "quantity": "20",
+                    "unit": "BOX",
+                    "validFrom": "2026-10-07T09:00:00Z",
+                    "validUntil": "2026-10-31T23:59:59Z",
+                    "workId": {
+                      "$alias": "t17SourceWork-EARLY"
+                    },
+                    "originalEvidenceDescriptor": {
+                      "alias": "qc-proof",
+                      "sha256": "4bbc08357df89c21b74664da945c672904dd7712268303da5b52636859d95a45",
+                      "sourceNamespace": "SYNTHETIC-qc-proof",
+                      "externalEventId": "T17-eligibility-packaging-unapproved-qc-proof",
+                      "sourceVersion": "1",
+                      "occurredAt": "2026-10-07T09:00:00Z",
+                      "recordedAt": "2026-10-07T09:00:01Z"
+                    },
+                    "originalEvidenceId": {
+                      "$alias": "qc-proof"
+                    },
+                    "sourceDecisionId": "d0007b81-303d-5bc0-86be-94d086826242",
+                    "sourceVersion": "1"
+                  },
+                  "encoding": "json"
+                }
+              },
+              "documentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Original hold request with explicitly new synthetic validity; no operating approval or category grant is claimed",
+              "quantity": "20",
+              "unit": "BOX"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-early-hold-source-event"
+          },
+          "evidenceRefs": [
+            "early-hold-source-event:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-match",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "matchSourceIdentity",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "matchSourceIdentity",
+            "subjectRefs": [],
+            "slots": {
+              "claimId": {
+                "$result": {
+                  "actionId": "early-hold-source-event",
+                  "pointer": "/response/claimId"
+                }
+              },
+              "basisDocumentId": {
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "physicalScopeId": {
+                "$alias": "EARLY"
+              },
+              "policyVersion": "t17-synthetic-v1",
+              "sourceIdentity": "synthetic-t17-eligibility:d0007b81-303d-5bc0-86be-94d086826242:1",
+              "quantity": "20",
+              "unit": "BOX",
+              "effectiveFrom": "2026-10-07T09:00:00Z",
+              "reason": "원래 보류 요청의 수량·범위·증거와 명시한 synthetic 기간을 대조한다"
+            },
+            "provenance": {
+              "claimId": "CONTEXT",
+              "basisDocumentId": "CONTEXT",
+              "physicalScopeId": "CONTEXT",
+              "policyVersion": "CONTEXT",
+              "sourceIdentity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "reason": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-early-hold-source-match",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-match:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "early-hold-source-canonical",
+          "kind": "invoke",
+          "actorRef": "t17Source",
+          "route": "api",
+          "capabilityId": "linkCanonicalOccurrence",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "linkCanonicalOccurrence",
+            "subjectRefs": [],
+            "slots": {
+              "reconciliationId": {
+                "$result": {
+                  "actionId": "early-hold-source-match",
+                  "pointer": "/response/id"
+                }
+              }
+            },
+            "provenance": {
+              "reconciliationId": "CONTEXT"
+            },
+            "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-early-hold-source-canonical",
+            "expectedRevision": 1
+          },
+          "evidenceRefs": [
+            "early-hold-source-canonical:actual-command-artifact"
+          ]
+        },
+        {
           "id": "early-hold",
           "kind": "invoke",
           "actorRef": "qc",
@@ -20165,8 +23410,19 @@
               "action": "SELL",
               "reason": "QC_DENIED",
               "evidenceId": {
-                "$alias": "qc-proof"
-              }
+                "$result": {
+                  "actionId": "early-hold-source-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "category": "QC",
+              "startQuantity": "0",
+              "validFrom": "2026-10-07T09:00:00Z",
+              "validUntil": "2026-10-31T23:59:59Z",
+              "workId": {
+                "$alias": "t17SourceWork-EARLY"
+              },
+              "nextCheckAt": "2026-10-07T10:00:00Z"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T17-eligibility-packaging-unapproved-early-hold",
@@ -20181,7 +23437,13 @@
               "unit": "USER",
               "action": "USER",
               "reason": "USER",
-              "evidenceId": "CONTEXT"
+              "evidenceId": "CONTEXT",
+              "category": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "validFrom": "CONTEXT",
+              "validUntil": "CONTEXT",
+              "workId": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
             }
           },
           "evidenceRefs": [

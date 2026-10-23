@@ -5,12 +5,16 @@
 미검증 claim은 관찰 접수에 머무르며 검증 결과를 미리 작성하지 않는다.
 """
 import copy
+import importlib.util
+import sys
 import json
 from decimal import Decimal
 from pathlib import Path
 from uuid import UUID, uuid5
 
 HERE = Path(__file__).resolve().parent
+_spec=importlib.util.spec_from_file_location('t17_first_failure',HERE/'author_first_failure_inputs.py')
+first_failure=importlib.util.module_from_spec(_spec);_spec.loader.exec_module(first_failure)
 ROOT = HERE.parents[2]
 META = 'publicContractAuthoring'
 NAMESPACE = 'synthetic-t17-eligibility'
@@ -112,7 +116,7 @@ DELIVERY_CASES = {'normal-consumed-delivery', 'late-restriction-actual-delivery'
 
 
 def restore_fixture(f):
-    f = copy.deepcopy(f)
+    f = first_failure.restore_fixture(f)
     meta = f['baseline']['policy'].pop(META, None)
     if meta:
         for change in reversed(meta['changes']):
@@ -245,7 +249,7 @@ def generate(case, fixtures):
 
 
 def restore_case(case):
-    case=copy.deepcopy(case)
+    case=first_failure.restore_case(case)
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     for sub in case['subcases']:
         changes={d['actionId']:d for d in ledger['changes'] if d['subcase']==sub['id']}
@@ -290,6 +294,7 @@ def feature_lines(feature, before, after):
 
 
 def restore_feature(feature):
+    feature=first_failure.restore_feature(feature)
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     additions={d['actionId'] for d in ledger['changes'] if d['before'] is None}
     return ''.join(line for line in feature.splitlines(keepends=True)
@@ -316,6 +321,9 @@ if __name__ == '__main__':
             if a!=b:assertions.append({'subcase':sub['id'],'assertionId':a['id'],'before':b,'after':a})
     ledger={'baseline':baseline,'businessAssertionsChanged':False,'assertionChanges':assertions,
             'originalFeatureLinesChanged':False,'changes':changes}
+    # Compose the newer bounded input layer after computing this layer's ledger.
+    # Its separate reversible ledger preserves all fifteen root pointer fixes.
+    case,authored=first_failure.apply(copy.deepcopy(case),copy.deepcopy(authored),sys.modules[__name__])
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
     feature_path.write_text(feature_lines(feature,before,case))

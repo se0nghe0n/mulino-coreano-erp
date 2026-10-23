@@ -5,6 +5,10 @@
   시나리오: 100 보유 중 적격60의 예약·피킹·출고와 중복 배분을 대조한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "reserve-pick-dispatch"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-B40-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-B40-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-B40-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-B40-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "hold-B40" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "sales" 역할이 "reserve" 행동을 수행한다
@@ -78,6 +82,11 @@
     만일 "sales" 역할이 "reserve" 행동을 수행한다
     만일 "sales" 역할이 "pick" 행동을 수행한다
     만일 "sales" 역할이 "dispatch" 행동을 수행한다
+    만일 "observer" 역할이 "late-hold-source-scope" 행동을 수행한다
+    만일 "t17Source" 역할이 "late-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "late-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "late-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "late-hold-source-canonical" 행동을 수행한다
     만일 "admin" 역할이 "late-hold" 행동을 수행한다
     만일 "observer" 역할이 "before-delivery" 행동을 수행한다
     만일 "시스템" 역할이 "before-delivery-db" 행동을 수행한다
@@ -337,6 +346,10 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "sales" 역할이 "reserve" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "hold" 행동을 수행한다
     만일 "observer" 역할이 "suspended" 행동을 수행한다
     만일 "시스템" 역할이 "suspended-db" 행동을 수행한다
@@ -376,6 +389,10 @@
   시나리오: 조건별 근거·FEFO·인도 끝점과 UNKNOWN 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-unknown"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "early-hold" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "observer" 역할이 "eligibility" 행동을 수행한다
@@ -395,6 +412,10 @@
   시나리오: 조건별 근거·FEFO·인도 끝점과 CONFLICT 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-conflict"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "early-hold" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "observer" 역할이 "eligibility" 행동을 수행한다
@@ -414,6 +435,10 @@
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-no-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-no-reason"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "early-hold" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "observer" 역할이 "eligibility" 행동을 수행한다
@@ -440,6 +465,10 @@
   시나리오: 조건별 근거·FEFO·인도 끝점과 FEFO-with-reason 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-fefo-with-reason"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "early-hold" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "observer" 역할이 "eligibility" 행동을 수행한다
@@ -460,6 +489,10 @@
   시나리오: 조건별 근거·FEFO·인도 끝점과 packaging-unapproved 실행 경계를 확인한다
     먼저 사례 파일 "verification/cases/T17/case.json"의 "eligibility-packaging-unapproved"를 준비한다
     만일 "시스템" 역할이 "setup" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-document" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-event" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-match" 행동을 수행한다
+    만일 "t17Source" 역할이 "early-hold-source-canonical" 행동을 수행한다
     만일 "qc" 역할이 "early-hold" 행동을 수행한다
     만일 "sales" 역할이 "order" 행동을 수행한다
     만일 "observer" 역할이 "eligibility" 행동을 수행한다

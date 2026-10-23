@@ -1,0 +1,248 @@
+{
+  "recordType": "T17_BOUNDED_SOURCE_INPUT_REPAIR",
+  "recordedAt": "2026-10-23T02:43:50.042464+00:00",
+  "base": "20c2666848b89b3ab7b4a1b1598e58cb408d13c4",
+  "branch": "fix/t17-source-inputs",
+  "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a",
+  "wholeTask": "OPEN",
+  "wholeStep": "OPEN",
+  "actualScenarioRuns": 0,
+  "actualModelClientCalls": 0,
+  "businessOracleAcceptance": false,
+  "modelRuntime": "codex/gpt-6.1-sol high; serviceTier=ultrafast (coordinator-confirmed)",
+  "preservation": {
+    "baseline": "20c2666848b89b3ab7b4a1b1598e58cb408d13c4",
+    "oracleCount": 257,
+    "rawAssertionBlockSha256": [
+      "303079434a9f709dd35d886deb3d5eb738fa75f48bd283792f3dca14a8a73ecd",
+      "a5917a5054da6324885be9389fb2e137401963bbc36365e5f517b6072f72c249",
+      "2d687664e5dcff2c2b7dff6125398d2df2cd1602f517b8c115e2bb06ae8dbd29",
+      "c970c99da58ea8eda9a3c1d2513b8e3e5638d61eac973ef0ae8fb249db7d57d6",
+      "375e7decbd6789106fa1cf85111a8f990883e9119ddde0d075e107a9391e8612",
+      "6aa84f1f3ac8c5951090f4aaf42211d5744873367231c8e759217fd37940da77",
+      "37203907224d34b24f27982d0e17f0026a2edf03d0c65092af316128398b240a",
+      "542cabad77eec09a1d4b43cf5d4ec14f8e21fb3df381526eea24ef6ee8ed8dac",
+      "8f747249abfa2ad617ba464592a3f95115ad6319730015eb57c52baf3bca8c93",
+      "582753723a5a46aea1c0c4b9b767568a9870bd44338c0f0503eea9ddd0de0222",
+      "f1d4dd4b402e6dd9e520d54a6bfff522a2a4339d767401c64451731ad198bc66",
+      "00f53a9620b5e603c8b846bda83f0d2f87fed59a49f71733f56398243f53f5ac",
+      "78f9a79d78406d7fb7d88966808543763b501a001dea287e181fdb3ddd32e49d",
+      "028da8a2e28108cac062a7ca5b7c7d017b4a156e2f15a064c039e272affe26f6",
+      "f2e98192a848210cf017d35de16682106d3f10d5af96ca2d22c17b1edbe63f60"
+    ],
+    "publicLedgerSha256": "c1b0a65a6396821093e541e9892806d423d6ac3646322786d11d39bee1e24d76",
+    "caseSha256": "8cbd4a6e8722c949ccf4fae44b23a3b49f1768a805bc6ce375cf2048d74a4b35",
+    "featureSha256": "400a280ce8b84f4fcc86710a1e856042c132cb2760098e29e5729ecaccddd720"
+  },
+  "sourceSnapshot": {
+    "base": "20c2666848b89b3ab7b4a1b1598e58cb408d13c4",
+    "branch": "fix/t17-source-inputs",
+    "worktree": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a",
+    "sourceTreeDirty": true,
+    "files": {
+      "verification/cases/T17/author_first_failure_inputs.py": "96807ac3b40d5ae4a7db9f64b22323512758ea080fcdc767838529e2450346d0",
+      "verification/cases/T17/author_public_contracts.py": "2574c76eeffd0dd9e11ea0f0c1c33c9cd38cd06f29e3ccd6306ecef30c98bc0c",
+      "verification/cases/T17/case.json": "8cbd4a6e8722c949ccf4fae44b23a3b49f1768a805bc6ce375cf2048d74a4b35",
+      "verification/cases/T17/first-failure-input-delta.json": "d3c39b4b52aed6df92ed1dcfa927ad3fc751c9e7bd3af3512ad4e02d74869ef5",
+      "verification/cases/T17/fixtures/claim-conflictingquantity.json": "fe1e4ba2c616778dcb6e5f43849d7da84f9b090ef3268104658652afd5f34a6f",
+      "verification/cases/T17/fixtures/claim-falseclaim.json": "471798f4519317d041e91550d2a3a0b3815605e656b3d93708ab486263ca20df",
+      "verification/cases/T17/fixtures/claim-scopeoverflow.json": "4298571d7609e8476d1b59d1f418cc69bc26e0445078a4706356808c9f1828da",
+      "verification/cases/T17/fixtures/claim-unidentifiedscope.json": "a6885f43cb93b42e9ea8013bdddd3dca5d877b0f6658c852fced41a8fbf27a7a",
+      "verification/cases/T17/fixtures/eligibility-conflict.json": "16a0cbc6ca5c7b02f2d8d5f82ab168723f79ecac205268e311f0a690d8c99e5e",
+      "verification/cases/T17/fixtures/eligibility-fefo-no-reason.json": "029f0a8b5a35800d9480954facc9bd5c3309312bce5fcecd6b7b33ec935d4ca0",
+      "verification/cases/T17/fixtures/eligibility-fefo-with-reason.json": "17c1fa1663cac385e4623ed89b7dd3b1550af1655977a20ae7059709c2736aa8",
+      "verification/cases/T17/fixtures/eligibility-packaging-unapproved.json": "44147d58004c195dcf693096b092eb96e612e512f2c00a88538a73df0ad27588",
+      "verification/cases/T17/fixtures/eligibility-unknown.json": "c06e9b2842698ef4e053c97969a03ff03a03613f5e090452e8b69100f0e90138",
+      "verification/cases/T17/fixtures/late-restriction-actual-delivery.json": "a793fde11f4f9f0147877bec784e7b907a9a2c43add712f1f672be00f2dafdd7",
+      "verification/cases/T17/fixtures/normal-consumed-delivery.json": "e9a3f506e389cfb0a149005d8275a35a826871069a00b91b6f6d5b1d525355c2",
+      "verification/cases/T17/fixtures/post-dispatch-expiry.json": "7611225528299da8ca0a30d2a6cfcd6546639c8e3e905f5d02927bd979e4ef72",
+      "verification/cases/T17/fixtures/replacement-no-revival.json": "a409f43646504e7349e89b16a72875ac7b135024dcba4020ac737d683706cd80",
+      "verification/cases/T17/fixtures/reserve-pick-dispatch.json": "31add844767294dbe259bf0795cb97e68a99aec0060fa0d80dacb467f902d4ad",
+      "verification/cases/T17/scenario.feature": "400a280ce8b84f4fcc86710a1e856042c132cb2760098e29e5729ecaccddd720",
+      "verification/cases/T17/test_first_failure_inputs.py": "b95bf906b99e7ee262442166af645a963c1e7e7e11f8dc174adcbb47d21931c1",
+      "verification/cases/T17/test_public_contracts.py": "9c0c53f402641106ecf863d2f9279d33668998a7bbf907d518c99d477257efc3",
+      "verification/harness/src/main/java/org/mulino/verification/actual/T17SourceFacts.java": "c92749ec9acfd5eba657ed5958e6cece273c07f64b06b9160cf9a8ae35def91c",
+      "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsPostgresTest.java": "1d3944331d45b1e42c38403b2a773ab70eeb1b83c27c1094ed998f4c9c51a42a",
+      "verification/harness/src/test/java/org/mulino/verification/actual/T17SourceFactsTest.java": "a7e54e92311cf0649d6b0bbd69df2d974f53cab3be5cd2fad5e068b1b42af71e"
+    },
+    "runnerSha256": "b415b93321b1baa2c22b8a5069b553291b0cf6fadf44eb3253c34baf3a32c99c"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "verification/cases/T17",
+        "-p",
+        "test_*.py"
+      ],
+      "exitCode": 0,
+      "passed": 21,
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-first-failure-checks/python.log",
+        "sha256": "2aa827dfe7304239de346242dc4c7baf8d946881253f305ad4ef8ca8c7e0fac6"
+      }
+    },
+    {
+      "command": [
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-f",
+        "verification/harness/pom.xml",
+        "test"
+      ],
+      "exitCode": 0,
+      "total": 630,
+      "passed": 613,
+      "skippedPgOptIn": 17,
+      "failed": 0,
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-first-failure-checks/harness.log",
+        "sha256": "68d91f42d4b5d7bff1d84ded642755f5e132a460a52d9b80bb03d1561041778c"
+      }
+    },
+    {
+      "command": [
+        "./verify",
+        "prepare"
+      ],
+      "exitCode": 0,
+      "status": "PREPARED",
+      "cases": 41,
+      "subcases": 802,
+      "assertions": 24260,
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-first-failure-checks/prepare.log",
+        "sha256": "af1c5d8391f04dd67dc1a34b2aac1401f5c43d0634941d7921d536f700035480"
+      }
+    },
+    {
+      "command": [
+        "python3",
+        "verification/cases/T17/run_source_pg_test.py"
+      ],
+      "exitCode": 0,
+      "passed": 17,
+      "failed": 0,
+      "skipped": 0,
+      "scope": "fresh build + real HTTP/Spring/PostgreSQL source and precondition tests; no scenarios",
+      "log": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-d4e1558d-8293-4b93-adf3-dc31ab3c0718/test.log",
+        "sha256": "323ddc80c728fcc64ee13e31bf3ae30d11f54988cd3b470984bb5a43c4de3caf"
+      },
+      "allCommands": {
+        "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-d4e1558d-8293-4b93-adf3-dc31ab3c0718/commands.json",
+        "sha256": "30e4c02d7eccf1c6a99f63b8323f744b26b7ab46419c13883682b3bc66a905c3"
+      },
+      "buildIdentity": {
+        "sourceCommit": "20c2666848b89b3ab7b4a1b1598e58cb408d13c4",
+        "productJar": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/backend/target/ontology-0.1.0-SNAPSHOT.jar",
+        "productJarSha256": "a882b17fe45ddb9746b6ce5712f5c2dff0104f4d3acf988ec0ca139d65f6736d"
+      }
+    }
+  ],
+  "compiledProbes": {
+    "commands": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-first-failure-checks/commands.json",
+      "sha256": "76744f356c022284c9322acb152fd6d3072852031df3ba2cd307b492fe80ab5c"
+    },
+    "inputCheck": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-public-contracts/compiled-input-check.json",
+      "sha256": "d3a60a43be3cbacea71467238382f7aa568babe0a752b2a3c597fb9f4429b576"
+    },
+    "mappingLog": {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-first-failure-checks/probe-2.log",
+      "sha256": "dfbd31ec0a52a4f638e73ae7e83aeb446c24c10b58af291b1d485e148f7345f8"
+    }
+  },
+  "observedBoundaries": {
+    "sellOnlyDispatch": "REJECTED INSUFFICIENT_ELIGIBLE_QUANTITY; Current dispatch authority denied",
+    "explicitDispatch": "APPLIED exactly 30 BOX; unchanged source range and grants",
+    "unknownDeniedConflict": "no positive DISPATCH authority installed; eligibility zero",
+    "holdB40": "source document/event/review/canonical APPLIED; qc placeHold REJECTED FORBIDDEN; restriction rows 0",
+    "lateHold": "actual transit noun query/source document/event/review/canonical APPLIED; admin placeHold REJECTED FORBIDDEN; restriction rows 0",
+    "negativeInputs": "wrong range/scope/interval, unverified evidence and cross-organization evidence cannot add permission rows or dispatch effects"
+  },
+  "remainingFrontiers": [
+    {
+      "kind": "ORIGINAL_DUE_AT_ABSENT",
+      "requests": [
+        {
+          "subcase": "reserve-pick-dispatch",
+          "actionId": "second-order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        },
+        {
+          "subcase": "replacement-no-revival",
+          "actionId": "order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        },
+        {
+          "subcase": "eligibility-unknown",
+          "actionId": "order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        },
+        {
+          "subcase": "eligibility-conflict",
+          "actionId": "order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        },
+        {
+          "subcase": "eligibility-fefo-no-reason",
+          "actionId": "order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        },
+        {
+          "subcase": "eligibility-fefo-with-reason",
+          "actionId": "order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        },
+        {
+          "subcase": "eligibility-packaging-unapproved",
+          "actionId": "order",
+          "reason": "ORIGINAL_DUE_AT_ABSENT_NO_VALUE_AUTHORED"
+        }
+      ]
+    },
+    {
+      "kind": "CATEGORY_AUTHORITY",
+      "detail": "Original qc lacks decideQuality and admin lacks decideRecallRestriction. Supporting t17Source decisions do not substitute for current caller authorization. No grant or product guard changes made."
+    },
+    {
+      "kind": "FOLLOWUP_INPUT",
+      "detail": "replacement release-hold still lacks reason and an operation-specific canonical release source; blocked earlier by absent dueAt and hold category authority."
+    },
+    {
+      "kind": "OBSERVER",
+      "detail": "conditions SQL/raw observer gaps remain coordinator-owned. All original 257 assertions remain, with no waiver."
+    },
+    {
+      "kind": "ACTUAL_ACCEPTANCE",
+      "detail": "Haiku native dynamic Workflow scenarios and model-client acceptance were not run by this worker."
+    }
+  ],
+  "priorAttempts": [
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-6813b6bd-3c5f-489b-8258-c2a24c22e045",
+      "result": "build prerequisite missing cds; repaired with npm ci --prefix backend"
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-8bb75452-7ccd-4298-831c-987750c42d54",
+      "result": "14 tests: 3 helper provenance failures; fixed without changing business oracles"
+    },
+    {
+      "path": "/Users/se0nghe0n/.t3/worktrees/mulino-coreano-erp/t3-e5d6325a/.local/t17-source-pg-dac66722-f4bc-426d-813b-3bdc55e57d60",
+      "result": "16 tests: 1 missing sourceDecisionId UUID failure; fixed in explicit synthetic hold source inputs"
+    }
+  ],
+  "cleanup": {
+    "ownedPostgresContainerRemoved": true,
+    "ephemeralSigningKeysRemoved": true,
+    "coordinatorRunnerUnchanged": true
+  },
+  "prohibitedActionsTaken": []
+}

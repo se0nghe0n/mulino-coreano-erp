@@ -32,6 +32,7 @@ class PublicContractTests(unittest.TestCase):
         before=json.loads(original(HERE/'case.json'))
         fixtures={p.stem:json.loads(original(p)) for p in (HERE/'fixtures').glob('*.json')}
         generated,changed=PUBLIC.generate(before,fixtures)
+        generated,changed=PUBLIC.first_failure.apply(generated,changed,PUBLIC)
         actual=json.loads((HERE/'case.json').read_text())
         self.assertEqual(generated,actual)
         self.assertEqual(before,PUBLIC.restore_case(actual))
@@ -126,7 +127,7 @@ class PublicContractTests(unittest.TestCase):
     def test_delta_tampering_and_nonleaf_coordinates_rejected(self):
         case=json.loads((HERE/'case.json').read_text());case['subcases'][0]['actions'][1]['request']['slots']['quantity']='999'
         # Exact preservation catches even an unchanged action outside the authored ledger.
-        with self.assertRaises(AssertionError):self.assertEqual(json.loads(original(HERE/'case.json')),PUBLIC.restore_case(case))
+        with self.assertRaises((AssertionError,ValueError)):self.assertEqual(json.loads(original(HERE/'case.json')),PUBLIC.restore_case(case))
         fixture=json.loads(original(HERE/'fixtures/normal-consumed-delivery.json'))
         action={'request':{'slots':{'segmentId':{'$alias':'A'},'quantity':'30','unit':'BOX'},'provenance':{}}}
         fixture['aliases']['A']['startQuantity']='1'

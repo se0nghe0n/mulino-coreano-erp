@@ -1327,6 +1327,19 @@
     "t17LotManufacturer": {
       "type": "Manufacturer",
       "name": "Synthetic T17 original-L manufacturer"
+    },
+    "t17DispatchRegulatoryPolicy": {
+      "type": "RegulatoryPolicy",
+      "actorAlias": "t17Source",
+      "version": "t17-synthetic-v1",
+      "authority": "FICTIONAL_T17_GIVEN_AUTHORITY",
+      "sourceNamespace": "synthetic-t17-eligibility",
+      "action": "DISPATCH",
+      "validFrom": "2026-10-01T00:00:00Z",
+      "validUntil": "2026-10-31T23:59:59Z",
+      "fictional": true,
+      "status": "ACTIVE",
+      "requiresLabel": true
     }
   },
   "baseline": {
@@ -1413,6 +1426,14 @@
             "after": "2026-10-31T23:59:59Z"
           }
         ]
+      },
+      "firstFailureInputAuthoring": {
+        "synthetic": true,
+        "authoredBy": "coordinator-selected-fixture",
+        "operatingApprovalClaimed": false,
+        "originalAuthorityClaimed": false,
+        "selection": "NEW_ACTION_SPECIFIC_DISPATCH_SOURCE_INPUTS",
+        "preserved": "original condition scope, quantity, unit, status, evidence and interval"
       }
     },
     "segments": [
@@ -2354,7 +2375,8 @@
           "QUALITY_DECISION_recordDispositionBasis_COMMERCIAL",
           "REGULATORY_SUBMISSION",
           "REGULATORY_DECISION",
-          "LABEL_VERIFICATION"
+          "LABEL_VERIFICATION",
+          "QUALITY_DECISION_placeHold_QC"
         ]
       }
     ],
@@ -2389,7 +2411,108 @@
       "workAliases": {
         "A": "t17SourceWork-A",
         "B": "t17SourceWork-B"
-      }
+      },
+      "dispatchPolicyAlias": "t17DispatchRegulatoryPolicy",
+      "dispatchSegmentAliases": [
+        "A"
+      ],
+      "dispatchInputs": [
+        {
+          "synthetic": true,
+          "authoredBy": "coordinator-selected-fixture",
+          "operatingApprovalClaimed": false,
+          "originalAuthorityClaimed": false,
+          "action": "DISPATCH",
+          "originalConditionPointer": "/baseline/conditions/0",
+          "originalCondition": {
+            "segmentAlias": "A",
+            "conditionId": "QC",
+            "status": "ALLOWED",
+            "synthetic": true,
+            "evidenceAlias": "qc-proof",
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "quantity": "60",
+            "unit": "BOX"
+          }
+        },
+        {
+          "synthetic": true,
+          "authoredBy": "coordinator-selected-fixture",
+          "operatingApprovalClaimed": false,
+          "originalAuthorityClaimed": false,
+          "action": "DISPATCH",
+          "originalConditionPointer": "/baseline/conditions/1",
+          "originalCondition": {
+            "segmentAlias": "A",
+            "conditionId": "REGULATORY",
+            "status": "ALLOWED",
+            "synthetic": true,
+            "evidenceAlias": "agency-proof",
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "quantity": "60",
+            "unit": "BOX"
+          }
+        },
+        {
+          "synthetic": true,
+          "authoredBy": "coordinator-selected-fixture",
+          "operatingApprovalClaimed": false,
+          "originalAuthorityClaimed": false,
+          "action": "DISPATCH",
+          "originalConditionPointer": "/baseline/conditions/2",
+          "originalCondition": {
+            "segmentAlias": "A",
+            "conditionId": "LABEL",
+            "status": "ALLOWED",
+            "synthetic": true,
+            "evidenceAlias": "agency-proof",
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "quantity": "60",
+            "unit": "BOX"
+          }
+        },
+        {
+          "synthetic": true,
+          "authoredBy": "coordinator-selected-fixture",
+          "operatingApprovalClaimed": false,
+          "originalAuthorityClaimed": false,
+          "action": "DISPATCH",
+          "originalConditionPointer": "/baseline/conditions/3",
+          "originalCondition": {
+            "segmentAlias": "A",
+            "conditionId": "DISPOSITION",
+            "status": "ALLOWED",
+            "synthetic": true,
+            "evidenceAlias": "agency-proof",
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "quantity": "60",
+            "unit": "BOX"
+          }
+        },
+        {
+          "synthetic": true,
+          "authoredBy": "coordinator-selected-fixture",
+          "operatingApprovalClaimed": false,
+          "originalAuthorityClaimed": false,
+          "action": "DISPATCH",
+          "originalConditionPointer": "/baseline/conditions/4",
+          "originalCondition": {
+            "segmentAlias": "A",
+            "conditionId": "CUSTOMER_CONTRACT",
+            "status": "ALLOWED",
+            "synthetic": true,
+            "evidenceAlias": "agency-proof",
+            "validFrom": "2026-10-01T00:00:00Z",
+            "validUntil": "2026-10-31T23:59:59Z",
+            "quantity": "60",
+            "unit": "BOX"
+          }
+        }
+      ]
     }
   },
   "evidence": [

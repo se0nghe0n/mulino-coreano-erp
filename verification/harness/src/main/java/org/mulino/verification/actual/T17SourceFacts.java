@@ -10,14 +10,14 @@ import java.time.*;
 import java.util.*;
 import java.math.BigDecimal;
 
-/** T17 given facts become originals and public command results, never seeded permission/verdict rows. */
+/** Declared T17 facts and explicit new synthetic action inputs use public source chains, never seeded permission/verdict rows. */
 final class T17SourceFacts {
     private final ActualConfiguration config;
     private final ObjectNode fixture, aliases;
     private final String external, actor, namespace, policyVersion;
     private final HttpClient http=HttpClient.newHttpClient();
     private final JwtSigner signer;
-    private final ArrayNode commands=Json.array(), conditions=Json.array(), provenance=Json.array(), uninstalled=Json.array();
+    private final ArrayNode commands=Json.array(), conditions=Json.array(), provenance=Json.array(), uninstalled=Json.array(), dispatchConditions=Json.array();
     record Source(String document,String event,String review,String canonical) {}
     static boolean enabled(JsonNode f){return f.path("fixtureId").asText().startsWith("T17-")&&f.path("baseline").path("t17SourceFacts").path("version").asInt()==1;}
     static void validate(JsonNode f){
@@ -40,6 +40,20 @@ final class T17SourceFacts {
             var from=Instant.parse(Json.required(row,"validFrom"));var until=Instant.parse(Json.required(row,"validUntil"));
             if(!until.isAfter(from)||from.isAfter(Instant.parse(f.path("clock").path("asOf").asText())))throw new IllegalArgumentException("Source interval is not a past/current given");
             if(!Set.of("QC","CUSTOMER_CONTRACT","DISPOSITION","REGULATORY","LABEL").contains(Json.required(row,"conditionId"))||!Set.of("ALLOWED","UNKNOWN","CONFLICT","DENIED").contains(Json.required(row,"status")))throw new IllegalArgumentException("Unsupported source condition");
+        }
+        if(spec.has("dispatchInputs")) {
+            var dispatchPolicy=f.path("aliases").path(Json.required(spec,"dispatchPolicyAlias"));
+            var expected=policy.deepCopy();((ObjectNode)expected).put("action","DISPATCH");
+            if(!dispatchPolicy.equals(expected))throw new IllegalArgumentException("Explicit DISPATCH policy must preserve original policy scope and interval");
+            var scopes=new HashSet<String>();for(var scope:spec.path("dispatchSegmentAliases"))if(!scopes.add(scope.asText())||!spec.path("workAliases").has(scope.asText()))throw new IllegalArgumentException("Exact declared DISPATCH segment required");
+            int expectedCount=0;for(var row:f.path("baseline").path("conditions"))if(scopes.contains(row.path("segmentAlias").asText()))expectedCount++;
+            if(scopes.isEmpty()||spec.path("dispatchInputs").size()!=expectedCount)throw new IllegalArgumentException("Every selected original condition status must be preserved in DISPATCH input");
+            var pointers=new HashSet<String>();
+            for(var input:spec.path("dispatchInputs")) {
+                String pointer=Json.required(input,"originalConditionPointer");
+                if(!pointers.add(pointer)||!pointer.matches("/baseline/conditions/[0-9]+")||!scopes.contains(input.path("originalCondition").path("segmentAlias").asText()))throw new IllegalArgumentException("Duplicate or out-of-scope DISPATCH input");
+                if(!input.path("synthetic").asBoolean()||input.path("operatingApprovalClaimed").asBoolean(true)||input.path("originalAuthorityClaimed").asBoolean(true)||!"coordinator-selected-fixture".equals(input.path("authoredBy").asText())||!"DISPATCH".equals(input.path("action").asText())||!input.path("originalCondition").equals(f.at(pointer)))throw new IllegalArgumentException("DISPATCH input must preserve exact original condition and synthetic provenance");
+            }
         }
         for(var row:f.path("baseline").path("sourceProvenance")) {
             var physical=f.path("aliases").path(Json.required(row,"segmentAlias"));
@@ -66,6 +80,25 @@ final class T17SourceFacts {
             }
             receipt.put("pointer","/baseline/conditions/"+index);receipt.set("given",row.deepCopy());conditions.add(receipt);
         }
+        var spec=fixture.path("baseline").path("t17SourceFacts");
+        var dispatchProcedures=new HashMap<String,JsonNode>();
+        int dispatchIndex=0;
+        for(var input:spec.path("dispatchInputs")) {
+            var row=input.path("originalCondition");String kind=Json.required(row,"conditionId"),segment=Json.required(row,"segmentAlias");
+            String pointer="/baseline/t17SourceFacts/dispatchInputs/"+dispatchIndex;
+            if(!"ALLOWED".equals(row.path("status").asText())) {
+                uninstalled.add(Json.object().put("pointer",pointer).put("action","DISPATCH").put("reason","Explicit synthetic DISPATCH input preserves original "+row.path("status").asText()+"; no positive authority installed"));dispatchIndex++;continue;
+            }
+            ObjectNode receipt;
+            if(Set.of("QC","CUSTOMER_CONTRACT","DISPOSITION").contains(kind))receipt=quality(row,dispatchIndex,"DISPATCH",input);
+            else {
+                JsonNode proc=dispatchProcedures.get(segment);
+                if(proc==null){proc=procedure(segment,row,Json.required(spec,"dispatchPolicyAlias"));dispatchProcedures.put(segment,proc);}
+                receipt=regulatory(row,dispatchIndex,proc,"DISPATCH",Json.required(spec,"dispatchPolicyAlias"),input);
+                if(kind.equals("REGULATORY"))dispatchProcedures.put(segment,receipt.path("procedure"));
+            }
+            receipt.put("pointer",pointer).put("action","DISPATCH");receipt.set("authoredInput",input.deepCopy());dispatchConditions.add(receipt);dispatchIndex++;
+        }
         int index=0;
         for(var row:fixture.path("baseline").path("sourceProvenance")){
             String segment=Json.required(row,"segmentAlias");var physical=fixture.path("aliases").path(segment);
@@ -74,48 +107,56 @@ final class T17SourceFacts {
             var receipt=receipt(source).put("pointer","/baseline/sourceProvenance/"+index++).put("typedSupplierRelationInstalled",false).put("supplierRelationshipVerified",false);receipt.set("given",row.deepCopy());provenance.add(receipt);
         }
         var out=Json.object().put("verificationPath","ACTUAL_HTTP_COMMAND_GATEWAY").put("seededVerificationRows",0).put("seededPermissionRows",0).put("legalComplianceClaimed",false);
-        out.set("conditions",conditions);out.set("uninstalledConditions",uninstalled);out.set("sourceProvenance",provenance);out.set("commands",commands);
+        out.set("dispatchConditions",dispatchConditions);out.set("conditions",conditions);out.set("uninstalledConditions",uninstalled);out.set("sourceProvenance",provenance);out.set("commands",commands);
         out.put("provenanceLimitation","The original supplier assertion has a generic exact-segment canonical record, not verified supplier/LOT semantics; no published relationship command exists, so baseline.sourceProvenance stays omitted.");
         return out;
     }
     private String work(String segment){return id(fixture.path("baseline").path("t17SourceFacts").path("workAliases").path(segment).asText());}
-    private ObjectNode quality(JsonNode row,int index)throws Exception {
+    private ObjectNode quality(JsonNode row,int index)throws Exception {return quality(row,index,"SELL",null);}
+    private ObjectNode quality(JsonNode row,int index,String action,JsonNode authoredInput)throws Exception {
         String segment=Json.required(row,"segmentAlias"),category=switch(Json.required(row,"conditionId")){case "QC"->"QC";case "CUSTOMER_CONTRACT"->"CUSTOMER";default->"COMMERCIAL";};
-        var original=Json.object().put("segmentId",id(segment)).put("sourceDecisionId",identity("quality-"+index)).put("sourceVersion","1").put("workId",work(segment)).put("operation","recordDispositionBasis").put("action","SELL").put("category",category).put("startQuantity","0").put("quantity",Json.required(row,"quantity")).put("unit",Json.required(row,"unit")).put("validFrom",Json.required(row,"validFrom")).put("validUntil",Json.required(row,"validUntil")).put("givenEvidenceAlias",Json.required(row,"evidenceAlias"));
+        var original=Json.object().put("segmentId",id(segment)).put("sourceDecisionId",identity("quality-"+(action.equals("SELL")?"":action+"-")+index)).put("sourceVersion","1").put("workId",work(segment)).put("operation","recordDispositionBasis").put("action",action).put("category",category).put("startQuantity","0").put("quantity",Json.required(row,"quantity")).put("unit",Json.required(row,"unit")).put("validFrom",Json.required(row,"validFrom")).put("validUntil",Json.required(row,"validUntil")).put("givenEvidenceAlias",Json.required(row,"evidenceAlias"));
+        if(authoredInput!=null)original.set("syntheticActionInput",authoredInput.deepCopy());
         Source source=publish(segment,"QUALITY_DECISION_recordDispositionBasis_"+category,original,row.path("validFrom").asText(),row.path("quantity").asText(),row.path("unit").asText());
-        var slots=original.deepCopy();slots.remove(List.of("operation","sourceDecisionId","sourceVersion","givenEvidenceAlias"));slots.put("evidenceId",source.document()).put("reason","Synthetic original T17 given condition "+index).put("nextCheckAt",Instant.parse(fixture.path("clock").path("asOf").asText()).plusSeconds(3600).toString());
+        var slots=original.deepCopy();slots.remove(List.of("operation","sourceDecisionId","sourceVersion","givenEvidenceAlias","syntheticActionInput"));slots.put("evidenceId",source.document()).put("reason",authoredInput==null?"Synthetic original T17 given condition "+index:"New coordinator synthetic DISPATCH input "+index).put("nextCheckAt",Instant.parse(fixture.path("clock").path("asOf").asText()).plusSeconds(3600).toString());
         var applied=invoke("recordDispositionBasis",slots,1);return receipt(source).put("typedDecisionId",Json.required(applied,"dispositionBasisId"));
     }
-    private JsonNode procedure(String segment,JsonNode row)throws Exception {
+    private JsonNode procedure(String segment,JsonNode row)throws Exception {return procedure(segment,row,fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText());}
+    private JsonNode procedure(String segment,JsonNode row,String policyAlias)throws Exception {
         var a=fixture.path("aliases").path(segment);var original=Json.object().put("purpose","Synthetic T17 procedure source for declared given").put("segmentId",id(segment)).put("givenEvidenceAlias",Json.required(row,"evidenceAlias"));
+        if("DISPATCH".equals(fixture.path("aliases").path(policyAlias).path("action").asText()))original.set("syntheticActionInput",Json.object().put("action","DISPATCH").put("authoredBy","coordinator-selected-fixture").put("operatingApprovalClaimed",false).put("originalAuthorityClaimed",false).set("originalCondition",row.deepCopy()));
         Source source=publish(segment,"T17_REGULATORY_PREPARATION",original,fixture.path("clock").path("asOf").asText(),a.path("quantity").asText(),a.path("unit").asText());
-        return invoke("prepareRegulatoryProcedure",Json.object().put("itemId",id(Json.required(a,"itemAlias"))).put("lotId",id(Json.required(a,"lotAlias"))).put("physicalScopeId",id(segment)).put("workId",work(segment)).put("policyId",id(fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText())).put("documentVersionId",source.document()),null);
+        return invoke("prepareRegulatoryProcedure",Json.object().put("itemId",id(Json.required(a,"itemAlias"))).put("lotId",id(Json.required(a,"lotAlias"))).put("physicalScopeId",id(segment)).put("workId",work(segment)).put("policyId",id(policyAlias)).put("documentVersionId",source.document()),null);
     }
-    private ObjectNode regulatory(JsonNode row,int index,JsonNode prepared)throws Exception {
+    private ObjectNode regulatory(JsonNode row,int index,JsonNode prepared)throws Exception {return regulatory(row,index,prepared,"SELL",fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText(),null);}
+    private ObjectNode regulatory(JsonNode row,int index,JsonNode prepared,String action,String policyAlias,JsonNode authoredInput)throws Exception {
         String segment=Json.required(row,"segmentAlias");JsonNode proc=prepared;var a=fixture.path("aliases").path(segment);
         if(row.path("conditionId").asText().equals("REGULATORY")){
-            var original=regOriginal(segment,proc).put("occurredAt",Json.required(row,"validFrom"));
+            var original=regOriginal(segment,proc,policyAlias).put("occurredAt",Json.required(row,"validFrom"));
+            if(authoredInput!=null)original.set("syntheticActionInput",authoredInput.deepCopy());
             var source=publish(segment,"REGULATORY_SUBMISSION",original,row.path("validFrom").asText(),null,null);
             proc=invoke("recordSubmission",Json.object().put("procedureId",Json.required(proc,"procedureId")).put("occurredAt",row.path("validFrom").asText()).put("occurrenceId",source.canonical()),proc.path("revision").asInt());
         }
-        boolean label=row.path("conditionId").asText().equals("LABEL");var original=regOriginal(segment,proc).put("decision",label?"VERIFIED":"ALLOWED").put("validFrom",Json.required(row,"validFrom")).put("validUntil",Json.required(row,"validUntil"));
+        boolean label=row.path("conditionId").asText().equals("LABEL");var original=regOriginal(segment,proc,policyAlias).put("decision",label?"VERIFIED":"ALLOWED").put("validFrom",Json.required(row,"validFrom")).put("validUntil",Json.required(row,"validUntil"));
         if(label){original.put("packagingVersionId",itemField(id(Json.required(a,"itemAlias")),"packagingVersionId")).put("specificationVersionId",itemField(id(Json.required(a,"itemAlias")),"specificationVersionId"));}
-        else original.put("action","SELL").put("startQuantity","0").put("quantity",Json.required(row,"quantity")).put("unit",Json.required(row,"unit"));
+        else original.put("action",action).put("startQuantity","0").put("quantity",Json.required(row,"quantity")).put("unit",Json.required(row,"unit"));
+        if(authoredInput!=null)original.set("syntheticActionInput",authoredInput.deepCopy());
         Source source=publish(segment,label?"LABEL_VERIFICATION":"REGULATORY_DECISION",original,row.path("validFrom").asText(),label?null:row.path("quantity").asText(),label?null:row.path("unit").asText());
-        var slots=original.deepCopy();slots.remove(List.of("procedureVersionId","itemId","lotId","physicalScopeId","authority","policyVersion","regulatoryEventId"));slots.put("occurrenceId",source.canonical());
+        var slots=original.deepCopy();slots.remove(List.of("procedureVersionId","itemId","lotId","physicalScopeId","authority","policyVersion","regulatoryEventId","syntheticActionInput"));slots.put("occurrenceId",source.canonical());
         var applied=invoke(label?"verifyLabel":"recordRegulatoryDecision",slots,proc.path("revision").asInt());
         var result=receipt(source).put("typedDecisionId",Json.required(applied,"versionId"));result.set("procedure",applied);return result;
     }
-    private ObjectNode regOriginal(String segment,JsonNode proc){var a=fixture.path("aliases").path(segment);var policy=fixture.path("aliases").path(fixture.path("baseline").path("t17SourceFacts").path("policyAlias").asText());return Json.object().put("procedureId",Json.required(proc,"procedureId")).put("procedureVersionId",Json.required(proc,"procedureVersionId")).put("regulatoryEventId",UUID.randomUUID().toString()).put("itemId",id(Json.required(a,"itemAlias"))).put("lotId",id(Json.required(a,"lotAlias"))).put("physicalScopeId",id(segment)).put("authority",Json.required(policy,"authority")).put("policyVersion",policyVersion);}
+    private ObjectNode regOriginal(String segment,JsonNode proc,String policyAlias){var a=fixture.path("aliases").path(segment);var policy=fixture.path("aliases").path(policyAlias);return Json.object().put("procedureId",Json.required(proc,"procedureId")).put("procedureVersionId",Json.required(proc,"procedureVersionId")).put("regulatoryEventId",UUID.randomUUID().toString()).put("itemId",id(Json.required(a,"itemAlias"))).put("lotId",id(Json.required(a,"lotAlias"))).put("physicalScopeId",id(segment)).put("authority",Json.required(policy,"authority")).put("policyVersion",policyVersion);}
     Source publish(String segment,String kind,ObjectNode original,String effective,String quantity,String unit)throws Exception {
+        boolean authored=original.has("syntheticActionInput");
         byte[] bytes=original.toString().getBytes(StandardCharsets.UTF_8);String eventKey=original.path("sourceDecisionId").asText(UUID.randomUUID().toString());
         var subject=Json.object().put("kind","SEGMENT").put("id",id(segment));
-        var upload=Json.object().put("sourceNamespace",namespace).put("sourceReference",eventKey).put("mediaType","application/json").put("expectedHash",HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes))).put("provenance","SYNTHETIC_T17_GIVEN_SOURCE_NOT_REGULATORY_APPROVAL").put("contentBase64",Base64.getEncoder().encodeToString(bytes));upload.set("subject",subject);
+        var upload=Json.object().put("sourceNamespace",namespace).put("sourceReference",eventKey).put("mediaType","application/json").put("expectedHash",HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(bytes))).put("provenance",authored?"NEW_COORDINATOR_SYNTHETIC_DISPATCH_INPUT_NOT_ORIGINAL_AUTHORITY_OR_OPERATING_APPROVAL":"SYNTHETIC_T17_GIVEN_SOURCE_NOT_REGULATORY_APPROVAL").put("contentBase64",Base64.getEncoder().encodeToString(bytes));upload.set("subject",subject);
         String doc=Json.required(invoke("attachEvidence",upload,null),"id");
-        var observation=Json.object().put("kind",kind).put("sourceNamespace",namespace).put("externalEventId",eventKey).put("sourceVersion","1").put("effectiveFrom",effective).put("timeZone","UTC").put("timePrecision","SECOND").put("valueState","KNOWN").put("payload",original.toString()).put("documentId",doc).put("assertion","Synthetic given source; original scope must pass current server verification");observation.set("subject",subject);
+        var observation=Json.object().put("kind",kind).put("sourceNamespace",namespace).put("externalEventId",eventKey).put("sourceVersion","1").put("effectiveFrom",effective).put("timeZone","UTC").put("timePrecision","SECOND").put("valueState","KNOWN").put("payload",original.toString()).put("documentId",doc).put("assertion",authored?"New coordinator-authored DISPATCH source; original scope/status/interval preserved; operatingApprovalClaimed=false":"Synthetic given source; original scope must pass current server verification");observation.set("subject",subject);
         if(quantity!=null)observation.put("quantity",quantity).put("unit",unit);
         var event=invoke("recordActivity",observation,null);
-        var review=Json.object().put("claimId",Json.required(event,"claimId")).put("basisDocumentId",doc).put("physicalScopeId",id(segment)).put("policyVersion",policyVersion).put("sourceIdentity",namespace+":"+eventKey+":1").put("effectiveFrom",effective).put("reason","Original T17 given source and exact physical scope reconciliation");
+        var review=Json.object().put("claimId",Json.required(event,"claimId")).put("basisDocumentId",doc).put("physicalScopeId",id(segment)).put("policyVersion",policyVersion).put("sourceIdentity",namespace+":"+eventKey+":1").put("effectiveFrom",effective).put("reason",authored?"New synthetic DISPATCH input and exact original physical scope reconciliation":"Original T17 given source and exact physical scope reconciliation");
         if(quantity!=null)review.put("quantity",quantity).put("unit",unit);
         var matched=invoke("matchSourceIdentity",review,1);
         if(!"MATCHED".equals(matched.path("evidenceStatus").asText()))throw new IllegalStateException("T17 source did not match: "+matched);
