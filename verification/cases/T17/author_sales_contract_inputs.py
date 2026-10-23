@@ -4,15 +4,18 @@ W40과 원본 257 oracle ID, fixture/grant/clock은 보존한다. 관측 결과�
 예상값으로 복사하거나 품질·회수·목표의 미실행을 성공으로 바꾸지 않는다.
 """
 import copy
+import importlib.util
 import json
 import subprocess
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-import importlib.util
 _condition_spec = importlib.util.spec_from_file_location('t17_condition_oracle', HERE/'author_condition_oracle.py')
 condition_oracle = importlib.util.module_from_spec(_condition_spec)
 _condition_spec.loader.exec_module(condition_oracle)
+_recall_spec = importlib.util.spec_from_file_location('t17_recall_inputs', HERE/'author_recall_inputs.py')
+recall_inputs = importlib.util.module_from_spec(_recall_spec)
+_recall_spec.loader.exec_module(recall_inputs)
 BASE = 'b4772eb6'
 LEDGER = HERE / 'sales-contract-input-delta.json'
 
@@ -60,6 +63,7 @@ def apply(case):
 
 
 def restore_case(case):
+    case = recall_inputs.restore_case(case)
     case = condition_oracle.restore_case(case)
     if not LEDGER.exists():
         return case
@@ -99,6 +103,7 @@ def apply_feature(text):
 
 
 def restore_feature(text):
+    text = recall_inputs.restore_feature(text)
     return condition_oracle.restore_feature(text).replace('    만일 "observer" 역할이 "dispatched-item" 행동을 수행한다\n','')
 
 

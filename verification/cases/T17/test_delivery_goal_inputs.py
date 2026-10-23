@@ -17,9 +17,9 @@ class DeliveryGoalInputsTest(unittest.TestCase):
     def test_roundtrip_and_prior_bytes(self):
         before=json.loads(original(HERE/'case.json'));old={p.stem:json.loads(original(p)) for p in (HERE/'fixtures').glob('*.json')}
         case,fixtures=NEW.apply(copy.deepcopy(before),copy.deepcopy(old),PUBLIC)
-        self.assertEqual(PUBLIC.sales_inputs.apply(case),json.loads((HERE/'case.json').read_text()));self.assertEqual(before,NEW.restore_case(case))
+        self.assertEqual(PUBLIC.sales_inputs.apply(case),PUBLIC.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text())));self.assertEqual(before,NEW.restore_case(case))
         for sid,f in fixtures.items():
-            self.assertEqual(f,json.loads((HERE/'fixtures'/f'{sid}.json').read_text()));self.assertEqual(old[sid],NEW.restore_fixture(f))
+            self.assertEqual(f,PUBLIC.recall_inputs.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text())));self.assertEqual(old[sid],NEW.restore_fixture(f))
             for field in ('clock','evidence','responsibilities'):self.assertEqual(old[sid][field],f[field])
             for field in ('segments','conditions','sourceProfiles','sourceProvenance'):self.assertEqual(old[sid]['baseline'][field],f['baseline'][field])
         from test_public_contracts import assertion_blocks

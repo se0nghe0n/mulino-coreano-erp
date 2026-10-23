@@ -1,0 +1,269 @@
+{
+  "baseline": "d0885a8031eb754e42f35f998a6d7f970b059cee",
+  "subcase": "late-restriction-actual-delivery",
+  "originalAssertionCount": 257,
+  "businessAssertionsChanged": false,
+  "grantClockResponsibilitiesChanged": false,
+  "composition": "condition layer -> recall.apply(case, fixtures); recall inverse first",
+  "actionChanges": [
+    {
+      "id": "open-recall-investigation",
+      "before": null,
+      "after": {
+        "id": "open-recall-investigation",
+        "kind": "invoke",
+        "actorRef": "admin",
+        "route": "api",
+        "capabilityId": "openInvestigation",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "openInvestigation",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            },
+            {
+              "type": "Work",
+              "id": {
+                "$alias": "t17FormalRecallWork"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$alias": "t17FormalRecallWork"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "lotId": {
+              "$alias": "L"
+            },
+            "segmentId": {
+              "$result": {
+                "actionId": "late-hold-source-scope",
+                "pointer": "/response/data/ID"
+              }
+            },
+            "startQuantity": "0",
+            "quantity": "30",
+            "unit": "BOX",
+            "basisEvidenceId": {
+              "$result": {
+                "actionId": "late-hold-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "occurredAt": "2026-10-07T09:00:00Z",
+            "nextAction": "미확인 실물과 회수 근거를 확인한다",
+            "nextCheckAt": "2026-10-07T10:00:00Z"
+          },
+          "provenance": {
+            "workId": "CONTEXT",
+            "itemId": "CONTEXT",
+            "lotId": "CONTEXT",
+            "segmentId": "CONTEXT",
+            "startQuantity": "CONTEXT",
+            "quantity": "CONTEXT",
+            "unit": "CONTEXT",
+            "basisEvidenceId": "CONTEXT",
+            "occurredAt": "CONTEXT",
+            "nextAction": "CONTEXT",
+            "nextCheckAt": "CONTEXT"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "late-hold",
+              "pointer": "/response/revision"
+            }
+          },
+          "commandIdempotencyKey": "T17-late-restriction-actual-delivery-open-recall-investigation"
+        },
+        "evidenceRefs": [
+          "open-recall-investigation:actual-command-artifact"
+        ]
+      }
+    },
+    {
+      "id": "formal-recall-work",
+      "before": null,
+      "after": {
+        "id": "formal-recall-work",
+        "kind": "query",
+        "actorRef": "admin",
+        "route": "api",
+        "capabilityId": "getWork",
+        "request": {
+          "id": {
+            "$alias": "t17FormalRecallWork"
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            }
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z"
+        },
+        "evidenceRefs": [
+          "formal-recall-work:actual-query-artifact"
+        ]
+      }
+    },
+    {
+      "id": "formal-recall-basis",
+      "before": null,
+      "after": {
+        "id": "formal-recall-basis",
+        "kind": "query",
+        "actorRef": "admin",
+        "route": "api",
+        "capabilityId": "getEvidence",
+        "request": {
+          "id": {
+            "$result": {
+              "actionId": "late-hold-source-event",
+              "pointer": "/response/id"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "kind": "EVENT"
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z"
+        },
+        "evidenceRefs": [
+          "formal-recall-basis:actual-query-artifact"
+        ]
+      }
+    },
+    {
+      "id": "formal-recall-investigation",
+      "before": null,
+      "after": {
+        "id": "formal-recall-investigation",
+        "kind": "query",
+        "actorRef": "admin",
+        "route": "api",
+        "capabilityId": "getObject",
+        "request": {
+          "id": {
+            "$result": {
+              "actionId": "open-recall-investigation",
+              "pointer": "/response/effects/investigationId"
+            }
+          },
+          "scope": {
+            "organizationId": {
+              "$alias": "ORG"
+            },
+            "itemId": {
+              "$alias": "P"
+            },
+            "objectType": "Recall"
+          },
+          "asOf": "2026-10-07T09:00:00Z",
+          "knownAt": "2026-10-07T09:00:01Z"
+        },
+        "evidenceRefs": [
+          "formal-recall-investigation:actual-query-artifact"
+        ]
+      }
+    }
+  ],
+  "fixtureChanges": [
+    {
+      "pointer": "/aliases/t17FormalRecallWork",
+      "before": null,
+      "after": {
+        "type": "Work"
+      }
+    },
+    {
+      "pointer": "/baseline/works/1",
+      "before": null,
+      "after": {
+        "alias": "t17FormalRecallWork",
+        "itemAlias": "P",
+        "lotAlias": "L",
+        "ownerAlias": "admin",
+        "supervisorAlias": "supervisor",
+        "kind": "RECALL",
+        "status": "ACTIVE",
+        "revision": 1
+      }
+    }
+  ],
+  "fixtureHashes": {
+    "claim-conflictingquantity": {
+      "before": "956bb372df35009e90d21886cc55bb3a1d8786867d6861dab736085ed7942ae4",
+      "after": "956bb372df35009e90d21886cc55bb3a1d8786867d6861dab736085ed7942ae4"
+    },
+    "claim-falseclaim": {
+      "before": "744000923c5f9abad7fd565108d796d06e2713811e12a04d5f0c3b46e4257f90",
+      "after": "744000923c5f9abad7fd565108d796d06e2713811e12a04d5f0c3b46e4257f90"
+    },
+    "claim-nopriordispatch": {
+      "before": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d",
+      "after": "3c3e464e40fdf5b59d51c0034e8f81d2adefb25a0d853e73cdbb4d633ac68f9d"
+    },
+    "claim-scopeoverflow": {
+      "before": "37e0200369c494bc352ceaecfebe81e4096ecb7254ed4fc93b5bd63e916b7dd4",
+      "after": "37e0200369c494bc352ceaecfebe81e4096ecb7254ed4fc93b5bd63e916b7dd4"
+    },
+    "claim-unidentifiedscope": {
+      "before": "379a9df110e17144ee8825c1ad68e9920557174f8c008794ca39277dd89726ad",
+      "after": "379a9df110e17144ee8825c1ad68e9920557174f8c008794ca39277dd89726ad"
+    },
+    "eligibility-conflict": {
+      "before": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2",
+      "after": "4c2a9c445160b8b97dc9f23ad2b45750a60292838c4559fc5dc1a8c1bfb60ff2"
+    },
+    "eligibility-fefo-no-reason": {
+      "before": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9",
+      "after": "7db2f8a90eb91054f310c1d7ce211d3023036bcb7837b0832deb58d6783ffcf9"
+    },
+    "eligibility-fefo-with-reason": {
+      "before": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c",
+      "after": "a023821475e8d56c73fb6cbd094cbe6173c1f499cfac5919e427a6206dd7823c"
+    },
+    "eligibility-packaging-unapproved": {
+      "before": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f",
+      "after": "277507a43cd59b109bdb0d53e73c2da6645e8348be72d953a420434115fd5a7f"
+    },
+    "eligibility-unknown": {
+      "before": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b",
+      "after": "84bdab65076b5fa3339834937222ab2e9e2fc81f36a6005aa07fb57b39b7f96b"
+    },
+    "late-restriction-actual-delivery": {
+      "before": "20513a43eabf5c1ec8cb95f9a3ae2b33b98f3977140b7f13f8cfe856abb1675c",
+      "after": "81d0ca37af98d56bb6f7df4d067b8121eb5dad621398e726f63cdbf9897d693e"
+    },
+    "normal-consumed-delivery": {
+      "before": "9b7eaab4775ea67180a86550ac40016bcadb252377fccf83c1cfb48d90a0cff1",
+      "after": "9b7eaab4775ea67180a86550ac40016bcadb252377fccf83c1cfb48d90a0cff1"
+    },
+    "post-dispatch-expiry": {
+      "before": "8726f2e1f986f4ba431522292e420c0d51130686407da4268261dd4f5cc98944",
+      "after": "8726f2e1f986f4ba431522292e420c0d51130686407da4268261dd4f5cc98944"
+    },
+    "replacement-no-revival": {
+      "before": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0",
+      "after": "e235e249f22ef39d40f49078b811564e018243d602c3e777c497c3abc0eae8c0"
+    },
+    "reserve-pick-dispatch": {
+      "before": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52",
+      "after": "17a87702e884d02cb1e0e06a5fed450543ef9fefbb27ead3699b0ac144cdef52"
+    }
+  }
+}

@@ -118,6 +118,10 @@ def restore_case(case):
 
 
 def restore_fixture(f):
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('t17_recall_inputs',HERE/'author_recall_inputs.py')
+    recall=importlib.util.module_from_spec(spec);spec.loader.exec_module(recall)
+    f=recall.restore_fixture(f)
     f=copy.deepcopy(f);d=ledger()['fixtureChanges'].get(f['fixtureId'])
     if d:
         if f['actors']['t17Source']!=d['afterActor'] or f['aliases'].get(DEFINITION_ALIAS)!=d['definitionBinding'] or f['baseline']['policy'].get(META)!=d['metadata']:

@@ -100,6 +100,10 @@
     만일 "t17Source" 역할이 "late-hold-source-match" 행동을 수행한다
     만일 "t17Source" 역할이 "late-hold-source-canonical" 행동을 수행한다
     만일 "admin" 역할이 "late-hold" 행동을 수행한다
+    만일 "admin" 역할이 "open-recall-investigation" 행동을 수행한다
+    만일 "admin" 역할이 "formal-recall-work" 행동을 수행한다
+    만일 "admin" 역할이 "formal-recall-basis" 행동을 수행한다
+    만일 "admin" 역할이 "formal-recall-investigation" 행동을 수행한다
     만일 "observer" 역할이 "before-delivery" 행동을 수행한다
     만일 "시스템" 역할이 "before-delivery-db" 행동을 수행한다
     만일 "observer" 역할이 "delivery-source-dispatch" 행동을 수행한다

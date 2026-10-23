@@ -8643,6 +8643,164 @@
           ]
         },
         {
+          "id": "open-recall-investigation",
+          "kind": "invoke",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "openInvestigation",
+          "request": {
+            "intentKind": "COMMAND",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "openInvestigation",
+            "subjectRefs": [
+              {
+                "type": "TradeItem",
+                "id": {
+                  "$alias": "P"
+                }
+              },
+              {
+                "type": "Work",
+                "id": {
+                  "$alias": "t17FormalRecallWork"
+                }
+              }
+            ],
+            "slots": {
+              "workId": {
+                "$alias": "t17FormalRecallWork"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "lotId": {
+                "$alias": "L"
+              },
+              "segmentId": {
+                "$result": {
+                  "actionId": "late-hold-source-scope",
+                  "pointer": "/response/data/ID"
+                }
+              },
+              "startQuantity": "0",
+              "quantity": "30",
+              "unit": "BOX",
+              "basisEvidenceId": {
+                "$result": {
+                  "actionId": "late-hold-source-event",
+                  "pointer": "/response/id"
+                }
+              },
+              "occurredAt": "2026-10-07T09:00:00Z",
+              "nextAction": "미확인 실물과 회수 근거를 확인한다",
+              "nextCheckAt": "2026-10-07T10:00:00Z"
+            },
+            "provenance": {
+              "workId": "CONTEXT",
+              "itemId": "CONTEXT",
+              "lotId": "CONTEXT",
+              "segmentId": "CONTEXT",
+              "startQuantity": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "basisEvidenceId": "CONTEXT",
+              "occurredAt": "CONTEXT",
+              "nextAction": "CONTEXT",
+              "nextCheckAt": "CONTEXT"
+            },
+            "expectedRevision": {
+              "$result": {
+                "actionId": "late-hold",
+                "pointer": "/response/revision"
+              }
+            },
+            "commandIdempotencyKey": "T17-late-restriction-actual-delivery-open-recall-investigation"
+          },
+          "evidenceRefs": [
+            "open-recall-investigation:actual-command-artifact"
+          ]
+        },
+        {
+          "id": "formal-recall-work",
+          "kind": "query",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "id": {
+              "$alias": "t17FormalRecallWork"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              }
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "formal-recall-work:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "formal-recall-basis",
+          "kind": "query",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "getEvidence",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "late-hold-source-event",
+                "pointer": "/response/id"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "kind": "EVENT"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "formal-recall-basis:actual-query-artifact"
+          ]
+        },
+        {
+          "id": "formal-recall-investigation",
+          "kind": "query",
+          "actorRef": "admin",
+          "route": "api",
+          "capabilityId": "getObject",
+          "request": {
+            "id": {
+              "$result": {
+                "actionId": "open-recall-investigation",
+                "pointer": "/response/effects/investigationId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              },
+              "itemId": {
+                "$alias": "P"
+              },
+              "objectType": "Recall"
+            },
+            "asOf": "2026-10-07T09:00:00Z",
+            "knownAt": "2026-10-07T09:00:01Z"
+          },
+          "evidenceRefs": [
+            "formal-recall-investigation:actual-query-artifact"
+          ]
+        },
+        {
           "id": "before-delivery",
           "kind": "query",
           "actorRef": "observer",

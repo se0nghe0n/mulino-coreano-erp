@@ -17,7 +17,7 @@ class SalesContractInputTest(unittest.TestCase):
     def test_exact_257_ids_oracles_fixtures_grants_and_clock_survive(self):
         before = json.loads(subprocess.check_output(
             ['git', 'show', INPUTS.BASE+':verification/cases/T17/case.json'], cwd=ROOT))
-        actual = json.loads((HERE/'case.json').read_text())
+        actual = INPUTS.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text()))
         self.assertEqual(INPUTS.apply(before), actual)
         self.assertEqual(before, INPUTS.restore_case(actual))
         self.assertEqual(actual, INPUTS.apply(actual))
@@ -30,7 +30,8 @@ class SalesContractInputTest(unittest.TestCase):
             self.assertEqual([x['oracleRef'] for x in a['assertions']], [x['oracleRef'] for x in b['assertions']])
             self.assertEqual([x.get('actorRef') for x in a['actions']], [x.get('actorRef') for x in b['actions'] if x['id'] in {r['id'] for r in a['actions']}])
         for path in sorted((HERE/'fixtures').glob('*.json')):
-            self.assertEqual(subprocess.check_output(['git', 'show', INPUTS.BASE+':'+str(path.relative_to(ROOT))], cwd=ROOT), path.read_bytes())
+            restored = INPUTS.recall_inputs.bytes_of(INPUTS.recall_inputs.restore_fixture(json.loads(path.read_bytes())))
+            self.assertEqual(subprocess.check_output(['git', 'show', INPUTS.BASE+':'+str(path.relative_to(ROOT))], cwd=ROOT), restored)
         self.assertEqual(subprocess.check_output(['git', 'show', INPUTS.BASE+':verification/cases/T17/scenario.feature'], cwd=ROOT), INPUTS.restore_feature((HERE/'scenario.feature').read_text()).encode())
 
     def test_warehouse_scope_and_report_source_are_explicit_and_open_duty_keeps_business_checks(self):

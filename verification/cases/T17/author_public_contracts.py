@@ -23,6 +23,8 @@ _goal_spec=importlib.util.spec_from_file_location('t17_goal',HERE/'author_delive
 goal=importlib.util.module_from_spec(_goal_spec);_goal_spec.loader.exec_module(goal)
 _sales_spec=importlib.util.spec_from_file_location('t17_sales_inputs',HERE/'author_sales_contract_inputs.py')
 sales_inputs=importlib.util.module_from_spec(_sales_spec);_sales_spec.loader.exec_module(sales_inputs)
+_recall_spec=importlib.util.spec_from_file_location('t17_recall_inputs',HERE/'author_recall_inputs.py')
+recall_inputs=importlib.util.module_from_spec(_recall_spec);_recall_spec.loader.exec_module(recall_inputs)
 ROOT = HERE.parents[2]
 META = 'publicContractAuthoring'
 NAMESPACE = 'synthetic-t17-eligibility'
@@ -124,6 +126,7 @@ DELIVERY_CASES = {'normal-consumed-delivery', 'late-restriction-actual-delivery'
 
 
 def restore_fixture(f):
+    f = recall_inputs.restore_fixture(f)
     f = first_failure.restore_fixture(completion.restore_fixture(delivery.restore_fixture(goal.restore_fixture(f))))
     meta = f['baseline']['policy'].pop(META, None)
     if meta:
@@ -257,6 +260,7 @@ def generate(case, fixtures):
 
 
 def restore_case(case):
+    case=recall_inputs.restore_case(case)
     case=first_failure.restore_case(completion.restore_case(delivery.restore_case(goal.restore_case(case))))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     for sub in case['subcases']:
@@ -302,6 +306,7 @@ def feature_lines(feature, before, after):
 
 
 def restore_feature(feature):
+    feature=recall_inputs.restore_feature(feature)
     feature=first_failure.restore_feature(completion.restore_feature(delivery.restore_feature(goal.restore_feature(feature))))
     ledger=json.loads((HERE/'public-contract-delta.json').read_text())
     additions={d['actionId'] for d in ledger['changes'] if d['before'] is None}
@@ -336,6 +341,7 @@ if __name__ == '__main__':
     case,authored=delivery.apply(case,authored,sys.modules[__name__])
     case,authored=goal.apply(case,authored,sys.modules[__name__])
     case=sales_inputs.apply(case)
+    case,authored=recall_inputs.apply(case,authored)
     feature_path=HERE/'scenario.feature'
     feature=subprocess.check_output(['git','show',baseline+':'+str(feature_path.relative_to(ROOT))],cwd=ROOT).decode()
     feature_path.write_text(sales_inputs.condition_oracle.apply_feature(feature_lines(feature,before,case)))

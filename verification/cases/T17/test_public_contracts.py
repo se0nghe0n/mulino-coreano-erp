@@ -37,11 +37,11 @@ class PublicContractTests(unittest.TestCase):
         generated,changed=PUBLIC.delivery.apply(generated,changed,PUBLIC)
         generated,changed=PUBLIC.goal.apply(generated,changed,PUBLIC)
         generated=PUBLIC.sales_inputs.apply(generated)
-        actual=json.loads((HERE/'case.json').read_text())
+        actual=PUBLIC.recall_inputs.restore_case(json.loads((HERE/'case.json').read_text()))
         self.assertEqual(generated,actual)
         self.assertEqual(before,PUBLIC.restore_case(actual))
         for sid,f in changed.items():
-            self.assertEqual(f,json.loads((HERE/'fixtures'/f'{sid}.json').read_text()))
+            self.assertEqual(f,PUBLIC.recall_inputs.restore_fixture(json.loads((HERE/'fixtures'/f'{sid}.json').read_text())))
             self.assertEqual(fixtures[sid],PUBLIC.restore_fixture(f))
             self.assertEqual(fixtures[sid]['actors'],PUBLIC.completion.restore_fixture(PUBLIC.delivery.restore_fixture(PUBLIC.goal.restore_fixture(f)))['actors'])
             self.assertEqual(fixtures[sid]['baseline']['segments'],f['baseline']['segments'])
