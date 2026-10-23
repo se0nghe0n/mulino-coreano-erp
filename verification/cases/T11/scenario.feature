@@ -293,6 +293,7 @@
     만일 "시스템" 역할이 "setup" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "A" 역할이 "temperature-document" 행동을 수행한다
     만일 "A" 역할이 "temperature" 행동을 수행한다
     만일 "A" 역할이 "followup" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다

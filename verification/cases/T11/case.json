@@ -5691,7 +5691,8 @@
               "period": {
                 "start": "2026-10-05T09:00:00Z",
                 "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -8655,7 +8656,11 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "destinationId": {
+                "$alias": "CUSTOMER_PLACE"
+              },
+              "packageTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-cancel-after-shipment-sale",
@@ -8672,7 +8677,9 @@
               "workId": "CONTEXT",
               "deliveryEndpoint": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "destinationId": "CONTEXT",
+              "packageTerms": "CONTEXT"
             }
           }
         },
@@ -10778,6 +10785,47 @@
           }
         },
         {
+          "id": "temperature-document",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "temperature-document:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
+              },
+              "sourceNamespace": "synthetic-warehouse",
+              "sourceReference": "post-close-temp",
+              "mediaType": "application/json",
+              "expectedHash": "566684c1d98b9f7e762263beaca5fc25b6b11216d9f7066a5cda4704f86e08cf",
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJURU1QRVJBVFVSRV9PQlNFUlZBVElPTiIsImV4dGVybmFsRXZlbnRJZCI6InBvc3QtY2xvc2UtdGVtcCIsIm9jY3VycmVkQXQiOiIyMDI2LTEwLTA3VDAxOjAwOjAwWiIsInNlZ21lbnRJZCI6eyJmaXh0dXJlQWxpYXMiOiJRIn0sInNvdXJjZU5hbWVzcGFjZSI6InN5bnRoZXRpYy13YXJlaG91c2UiLCJzb3VyY2VWZXJzaW9uIjoiMSIsInRlbXBlcmF0dXJlIjp7InVuaXQiOiJDRUxTSVVTIiwidmFsdWUiOiIxMiJ9fQ=="
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "temperature-document"
+          }
+        },
+        {
           "id": "temperature",
           "kind": "invoke",
           "evidenceRefs": [
@@ -10790,44 +10838,55 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
-              }
-            ],
+            "subjectRefs": [],
             "slots": {
-              "activityKind": "TEMPERATURE_OBSERVATION",
-              "segmentId": {
-                "$alias": "Q"
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
               },
-              "temperature": {
-                "value": "12",
-                "unit": "CELSIUS"
-              },
-              "occurredAt": "2026-10-07T01:00:00Z",
+              "kind": "TEMPERATURE_OBSERVATION",
               "sourceNamespace": "synthetic-warehouse",
               "externalEventId": "post-close-temp",
-              "sourceVersion": "1"
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T01:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": "{\"activityKind\":\"TEMPERATURE_OBSERVATION\",\"externalEventId\":\"post-close-temp\",\"occurredAt\":\"2026-10-07T01:00:00Z\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"1\",\"temperature\":{\"unit\":\"CELSIUS\",\"value\":\"12\"}}",
+              "documentId": {
+                "$result": {
+                  "actionId": "temperature-document",
+                  "pointer": "/response/id"
+                }
+              },
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T11-closed-followup-temperature",
             "evidenceRefs": [
               {
-                "$alias": "DOC"
+                "$result": {
+                  "actionId": "temperature-document",
+                  "pointer": "/response/id"
+                }
               }
-            ],
-            "provenance": {
-              "activityKind": "USER",
-              "segmentId": "CONTEXT",
-              "temperature": "USER",
-              "occurredAt": "USER",
-              "sourceNamespace": "USER",
-              "externalEventId": "USER",
-              "sourceVersion": "USER"
-            }
+            ]
           }
         },
         {

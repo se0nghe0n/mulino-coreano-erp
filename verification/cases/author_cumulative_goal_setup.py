@@ -8,6 +8,7 @@ T09/T11/T12/T13은 hand-authored case다(과거 round7/8/9 author 주석).
 후속 reviseGoal/revisePurchase와 불완전 초안, 미지원 evaluator는 보존한다.
 """
 import json
+import argparse
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -69,7 +70,11 @@ def repair(case, root=ROOT):
 
 
 def main():
-    for case_id in SELECTION:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--cases', nargs='+', choices=SELECTION,
+                        default=['T09', 'T11', 'T12'],
+                        help='T13은 소유자가 명시적으로 선택할 때만 쓴다.')
+    for case_id in parser.parse_args().cases:
         path = ROOT / 'verification/cases' / case_id / 'case.json'
         case = repair(json.loads(path.read_text()))
         path.write_text(json.dumps(case, ensure_ascii=False, indent=2) + '\n')

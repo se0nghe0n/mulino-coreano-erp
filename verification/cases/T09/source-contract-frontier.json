@@ -1,0 +1,169 @@
+{
+  "recordType": "INPUT_REMEDIATION_HANDOFF",
+  "baseline": "66e4d068017753147017f5d08062ba460e4e385c",
+  "caseId": "T09",
+  "actualScenariosRun": false,
+  "acceptanceComplete": false,
+  "assertionsUnchanged": 94,
+  "changedActions": [
+    "cumulative-versus-state/cumulative",
+    "cumulative-versus-state/state",
+    "cumulative-versus-state/sale60",
+    "missing-quantity/draft",
+    "missing-dueAt/draft",
+    "missing-endpoint/draft",
+    "throughout-gap/work",
+    "throughout-gap/initial-observation-document",
+    "throughout-gap/initial-observation",
+    "throughout-gap/final-observation-document",
+    "throughout-gap/final-observation",
+    "throughout-complete/work",
+    "throughout-complete/initial-observation-document",
+    "throughout-complete/initial-observation",
+    "throughout-complete/final-observation-document",
+    "throughout-complete/final-observation",
+    "exists-versus-end-throughout/exists",
+    "exists-versus-end-throughout/state",
+    "exists-versus-end-throughout/throughout",
+    "exists-versus-end-throughout/sale"
+  ],
+  "unresolvedReceiptInputs": [
+    {
+      "subcase": "cumulative-versus-state",
+      "action": "receive60",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "60",
+          "unit": "BOX"
+        },
+        "segmentId": {
+          "$alias": "A60"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-05T09:00:00Z",
+        "canonicalOccurrenceKey": "receipt-A60",
+        "purchaseOrderId": {
+          "$alias": "PO"
+        }
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "cumulative-versus-state",
+      "action": "receive40",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "40",
+          "unit": "BOX"
+        },
+        "segmentId": {
+          "$alias": "B40"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T01:30:00Z",
+        "canonicalOccurrenceKey": "receipt-B40",
+        "purchaseOrderId": {
+          "$alias": "PO"
+        }
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "receipt-missing-lot",
+      "action": "receipt",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "100",
+          "unit": "BOX"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotIdentification": "MISSING",
+        "occurredAt": "2026-10-07T01:00:00Z"
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    }
+  ],
+  "otherUnpublishedInputs": [
+    {
+      "subcase": "cumulative-versus-state",
+      "action": "receive60",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "canonicalOccurrenceKey",
+        "occurredAt",
+        "placeId",
+        "purchaseOrderId",
+        "quantity",
+        "segmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "cumulative-versus-state",
+      "action": "receive40",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "canonicalOccurrenceKey",
+        "occurredAt",
+        "placeId",
+        "purchaseOrderId",
+        "quantity",
+        "segmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "receipt-missing-lot",
+      "action": "receipt",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "itemId",
+        "lotIdentification",
+        "occurredAt",
+        "placeId",
+        "quantity"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    }
+  ],
+  "note": "This is authored input classification, not a runtime receipt. Read T09/source-contract-frontier.md for the unimplemented binding boundary."
+}

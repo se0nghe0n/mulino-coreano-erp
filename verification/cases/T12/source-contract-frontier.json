@@ -1,0 +1,144 @@
+{
+  "recordType": "INPUT_REMEDIATION_HANDOFF",
+  "baseline": "66e4d068017753147017f5d08062ba460e4e385c",
+  "caseId": "T12",
+  "actualScenariosRun": false,
+  "acceptanceComplete": false,
+  "assertionsUnchanged": 65,
+  "changedActions": [
+    "no-receipt-evidence/claim",
+    "insufficient-source-scope/claim-document",
+    "insufficient-source-scope/claim",
+    "conflicting-claims/claim-document",
+    "conflicting-claims/claim",
+    "conflicting-claims/conflicting-claim-document",
+    "conflicting-claims/conflicting-claim"
+  ],
+  "unresolvedReceiptInputs": [
+    {
+      "subcase": "wrong-warehouse",
+      "action": "receipt",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "100",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "PORT"
+        },
+        "occurredAt": "2026-10-07T01:00:00Z",
+        "workId": {
+          "$result": {
+            "actionId": "work",
+            "pointer": "/response/workId"
+          }
+        }
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "deadline-revision-and-correction",
+      "action": "receipt",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "100",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T02:00:00Z",
+        "workId": {
+          "$result": {
+            "actionId": "work",
+            "pointer": "/response/workId"
+          }
+        },
+        "canonicalOccurrenceKey": "late-100"
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    }
+  ],
+  "otherUnpublishedInputs": [
+    {
+      "subcase": "wrong-warehouse",
+      "action": "receipt",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "workId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "deadline-revision-and-correction",
+      "action": "receipt",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "canonicalOccurrenceKey",
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "workId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "deadline-revision-and-correction",
+      "action": "resolve-quantity-duty",
+      "capability": "resolveObligation",
+      "unsupportedSlots": [
+        "reason",
+        "resolutionKind"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "deadline-revision-and-correction",
+      "action": "correction",
+      "capability": "correctEvidence",
+      "unsupportedSlots": [
+        "correctedQuantity",
+        "occurredAt",
+        "originalEvidenceId",
+        "reason",
+        "recordedAt",
+        "supersedesOccurrenceId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    }
+  ],
+  "note": "This is authored input classification, not a runtime receipt. Read T09/source-contract-frontier.md for the unimplemented binding boundary."
+}

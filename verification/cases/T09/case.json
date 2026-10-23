@@ -64,7 +64,8 @@
               "period": {
                 "start": "2026-10-05T09:00:00Z",
                 "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -147,7 +148,8 @@
               "period": {
                 "start": "2026-10-05T09:00:00Z",
                 "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -281,14 +283,15 @@
                 "$alias": "CUSTOMER"
               },
               "destinationId": {
-                "$alias": "CUSTOMER"
+                "$alias": "CUSTOMER_PLACE"
               },
               "dueAt": "2026-10-06T09:00:00Z",
               "deliveryEndpoint": "DELIVERED",
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "packageTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-cumulative-versus-state-sale60",
@@ -305,7 +308,8 @@
               "dueAt": "USER",
               "deliveryEndpoint": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "packageTerms": "CONTEXT"
             }
           }
         },
@@ -2498,7 +2502,8 @@
               "period": {
                 "start": "2026-10-05T09:00:00Z",
                 "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -3004,7 +3009,8 @@
               "period": {
                 "start": "2026-10-05T09:00:00Z",
                 "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -3510,7 +3516,8 @@
               "period": {
                 "start": "2026-10-05T09:00:00Z",
                 "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -4673,7 +4680,8 @@
               "period": {
                 "start": "2026-10-07T00:00:00Z",
                 "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -4721,6 +4729,47 @@
           }
         },
         {
+          "id": "initial-observation-document",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "initial-observation-document:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
+              },
+              "sourceNamespace": "synthetic-warehouse",
+              "sourceReference": "T09-throughout-gap-initial-observation",
+              "mediaType": "application/json",
+              "expectedHash": "06910a032a72393c5c9ccf04acc46762795666b0ddd25aef7036f65e8c13bc54",
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMTowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjEiLCJ1bml0IjoiQk9YIn0="
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "initial-observation-document"
+          }
+        },
+        {
           "id": "initial-observation",
           "kind": "invoke",
           "evidenceRefs": [
@@ -4733,49 +4782,100 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
-              }
-            ],
+            "subjectRefs": [],
             "slots": {
-              "activityKind": "STATE_OBSERVATION",
-              "segmentId": {
-                "$alias": "Q"
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
               },
+              "kind": "STATE_OBSERVATION",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "T09-throughout-gap-initial-observation",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T00:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T01:00:00Z\",\"coverageStart\":\"2026-10-07T00:00:00Z\",\"occurredAt\":\"2026-10-07T00:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"1\",\"unit\":\"BOX\"}",
               "quantity": "100",
               "unit": "BOX",
-              "placeId": {
-                "$alias": "W"
+              "documentId": {
+                "$result": {
+                  "actionId": "initial-observation-document",
+                  "pointer": "/response/id"
+                }
               },
-              "occurredAt": "2026-10-07T00:00:00Z",
-              "coverageStart": "2026-10-07T00:00:00Z",
-              "coverageEnd": "2026-10-07T01:00:00Z",
-              "sourceNamespace": "synthetic-warehouse",
-              "sourceVersion": "1"
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-gap-initial-observation",
             "evidenceRefs": [
               {
-                "$alias": "DOC"
+                "$result": {
+                  "actionId": "initial-observation-document",
+                  "pointer": "/response/id"
+                }
               }
-            ],
+            ]
+          }
+        },
+        {
+          "id": "final-observation-document",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "final-observation-document:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
+              },
+              "sourceNamespace": "synthetic-warehouse",
+              "sourceReference": "T09-throughout-gap-final-observation",
+              "mediaType": "application/json",
+              "expectedHash": "239a6182e8ef157bde62a139dc6fb5a01174407be4ecfc89e2a138f46b170a40",
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjIiLCJ1bml0IjoiQk9YIn0="
+            },
             "provenance": {
-              "activityKind": "USER",
-              "segmentId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "placeId": "CONTEXT",
-              "occurredAt": "USER",
-              "coverageStart": "USER",
-              "coverageEnd": "USER",
-              "sourceNamespace": "USER",
-              "sourceVersion": "USER"
-            }
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "final-observation-document"
           }
         },
         {
@@ -4791,49 +4891,59 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
-              }
-            ],
+            "subjectRefs": [],
             "slots": {
-              "activityKind": "STATE_OBSERVATION",
-              "segmentId": {
-                "$alias": "Q"
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
               },
+              "kind": "STATE_OBSERVATION",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "T09-throughout-gap-final-observation",
+              "sourceVersion": "2",
+              "effectiveFrom": "2026-10-07T02:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T02:00:00Z\",\"coverageStart\":\"2026-10-07T02:00:00Z\",\"occurredAt\":\"2026-10-07T02:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"2\",\"unit\":\"BOX\"}",
               "quantity": "100",
               "unit": "BOX",
-              "placeId": {
-                "$alias": "W"
+              "documentId": {
+                "$result": {
+                  "actionId": "final-observation-document",
+                  "pointer": "/response/id"
+                }
               },
-              "occurredAt": "2026-10-07T02:00:00Z",
-              "coverageStart": "2026-10-07T02:00:00Z",
-              "coverageEnd": "2026-10-07T02:00:00Z",
-              "sourceNamespace": "synthetic-warehouse",
-              "sourceVersion": "2"
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-gap-final-observation",
             "evidenceRefs": [
               {
-                "$alias": "DOC"
+                "$result": {
+                  "actionId": "final-observation-document",
+                  "pointer": "/response/id"
+                }
               }
-            ],
-            "provenance": {
-              "activityKind": "USER",
-              "segmentId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "placeId": "CONTEXT",
-              "occurredAt": "USER",
-              "coverageStart": "USER",
-              "coverageEnd": "USER",
-              "sourceNamespace": "USER",
-              "sourceVersion": "USER"
-            }
+            ]
           }
         },
         {
@@ -5220,7 +5330,8 @@
               "period": {
                 "start": "2026-10-07T00:00:00Z",
                 "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -5268,6 +5379,47 @@
           }
         },
         {
+          "id": "initial-observation-document",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "initial-observation-document:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
+              },
+              "sourceNamespace": "synthetic-warehouse",
+              "sourceReference": "T09-throughout-complete-initial-observation",
+              "mediaType": "application/json",
+              "expectedHash": "06910a032a72393c5c9ccf04acc46762795666b0ddd25aef7036f65e8c13bc54",
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMTowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMDowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjEiLCJ1bml0IjoiQk9YIn0="
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "initial-observation-document"
+          }
+        },
+        {
           "id": "initial-observation",
           "kind": "invoke",
           "evidenceRefs": [
@@ -5280,49 +5432,100 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
-              }
-            ],
+            "subjectRefs": [],
             "slots": {
-              "activityKind": "STATE_OBSERVATION",
-              "segmentId": {
-                "$alias": "Q"
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
               },
+              "kind": "STATE_OBSERVATION",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "T09-throughout-complete-initial-observation",
+              "sourceVersion": "1",
+              "effectiveFrom": "2026-10-07T00:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T01:00:00Z\",\"coverageStart\":\"2026-10-07T00:00:00Z\",\"occurredAt\":\"2026-10-07T00:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"1\",\"unit\":\"BOX\"}",
               "quantity": "100",
               "unit": "BOX",
-              "placeId": {
-                "$alias": "W"
+              "documentId": {
+                "$result": {
+                  "actionId": "initial-observation-document",
+                  "pointer": "/response/id"
+                }
               },
-              "occurredAt": "2026-10-07T00:00:00Z",
-              "coverageStart": "2026-10-07T00:00:00Z",
-              "coverageEnd": "2026-10-07T01:00:00Z",
-              "sourceNamespace": "synthetic-warehouse",
-              "sourceVersion": "1"
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-complete-initial-observation",
             "evidenceRefs": [
               {
-                "$alias": "DOC"
+                "$result": {
+                  "actionId": "initial-observation-document",
+                  "pointer": "/response/id"
+                }
               }
-            ],
+            ]
+          }
+        },
+        {
+          "id": "final-observation-document",
+          "kind": "invoke",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "attachEvidence",
+          "evidenceRefs": [
+            "final-observation-document:actual-artifact"
+          ],
+          "request": {
+            "intentKind": "RECORD",
+            "definitionVersion": "definition-v1",
+            "capabilityId": "attachEvidence",
+            "subjectRefs": [],
+            "slots": {
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
+              },
+              "sourceNamespace": "synthetic-warehouse",
+              "sourceReference": "T09-throughout-complete-final-observation",
+              "mediaType": "application/json",
+              "expectedHash": "777c92119e790dc733bbf5b5dd49e75481a75d6b36f603c9f3299f923ff24e1b",
+              "provenance": "SYNTHETIC source observation; no legal approval or verification",
+              "contentBase64": "eyJhY3Rpdml0eUtpbmQiOiJTVEFURV9PQlNFUlZBVElPTiIsImNvdmVyYWdlRW5kIjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJjb3ZlcmFnZVN0YXJ0IjoiMjAyNi0xMC0wN1QwMTowMDowMFoiLCJvY2N1cnJlZEF0IjoiMjAyNi0xMC0wN1QwMjowMDowMFoiLCJwbGFjZUlkIjp7ImZpeHR1cmVBbGlhcyI6IlcifSwicXVhbnRpdHkiOiIxMDAiLCJzZWdtZW50SWQiOnsiZml4dHVyZUFsaWFzIjoiUSJ9LCJzb3VyY2VOYW1lc3BhY2UiOiJzeW50aGV0aWMtd2FyZWhvdXNlIiwic291cmNlVmVyc2lvbiI6IjIiLCJ1bml0IjoiQk9YIn0="
+            },
             "provenance": {
-              "activityKind": "USER",
-              "segmentId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "placeId": "CONTEXT",
-              "occurredAt": "USER",
-              "coverageStart": "USER",
-              "coverageEnd": "USER",
-              "sourceNamespace": "USER",
-              "sourceVersion": "USER"
-            }
+              "subject": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "sourceReference": "CONTEXT",
+              "mediaType": "CONTEXT",
+              "expectedHash": "CONTEXT",
+              "provenance": "CONTEXT",
+              "contentBase64": "CONTEXT"
+            },
+            "expectedRevision": 1,
+            "commandIdempotencyKey": "final-observation-document"
           }
         },
         {
@@ -5338,49 +5541,59 @@
             "intentKind": "RECORD",
             "definitionVersion": "definition-v1",
             "capabilityId": "recordActivity",
-            "subjectRefs": [
-              {
-                "type": "TradeItem",
-                "id": {
-                  "$alias": "P"
-                }
-              }
-            ],
+            "subjectRefs": [],
             "slots": {
-              "activityKind": "STATE_OBSERVATION",
-              "segmentId": {
-                "$alias": "Q"
+              "subject": {
+                "kind": "SEGMENT",
+                "id": {
+                  "$alias": "Q"
+                }
               },
+              "kind": "STATE_OBSERVATION",
+              "sourceNamespace": "synthetic-warehouse",
+              "externalEventId": "T09-throughout-complete-final-observation",
+              "sourceVersion": "2",
+              "effectiveFrom": "2026-10-07T02:00:00Z",
+              "timeZone": "UTC",
+              "timePrecision": "SECOND",
+              "valueState": "KNOWN",
+              "payload": "{\"activityKind\":\"STATE_OBSERVATION\",\"coverageEnd\":\"2026-10-07T02:00:00Z\",\"coverageStart\":\"2026-10-07T01:00:00Z\",\"occurredAt\":\"2026-10-07T02:00:00Z\",\"placeId\":{\"fixtureAlias\":\"W\"},\"quantity\":\"100\",\"segmentId\":{\"fixtureAlias\":\"Q\"},\"sourceNamespace\":\"synthetic-warehouse\",\"sourceVersion\":\"2\",\"unit\":\"BOX\"}",
               "quantity": "100",
               "unit": "BOX",
-              "placeId": {
-                "$alias": "W"
+              "documentId": {
+                "$result": {
+                  "actionId": "final-observation-document",
+                  "pointer": "/response/id"
+                }
               },
-              "occurredAt": "2026-10-07T02:00:00Z",
-              "coverageStart": "2026-10-07T01:00:00Z",
-              "coverageEnd": "2026-10-07T02:00:00Z",
-              "sourceNamespace": "synthetic-warehouse",
-              "sourceVersion": "2"
+              "assertion": "Synthetic original observation; subject to source reconciliation"
+            },
+            "provenance": {
+              "subject": "CONTEXT",
+              "kind": "CONTEXT",
+              "sourceNamespace": "CONTEXT",
+              "externalEventId": "CONTEXT",
+              "sourceVersion": "CONTEXT",
+              "effectiveFrom": "CONTEXT",
+              "timeZone": "CONTEXT",
+              "timePrecision": "CONTEXT",
+              "valueState": "CONTEXT",
+              "payload": "CONTEXT",
+              "quantity": "CONTEXT",
+              "unit": "CONTEXT",
+              "documentId": "CONTEXT",
+              "assertion": "CONTEXT"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-throughout-complete-final-observation",
             "evidenceRefs": [
               {
-                "$alias": "DOC"
+                "$result": {
+                  "actionId": "final-observation-document",
+                  "pointer": "/response/id"
+                }
               }
-            ],
-            "provenance": {
-              "activityKind": "USER",
-              "segmentId": "CONTEXT",
-              "quantity": "USER",
-              "unit": "USER",
-              "placeId": "CONTEXT",
-              "occurredAt": "USER",
-              "coverageStart": "USER",
-              "coverageEnd": "USER",
-              "sourceNamespace": "USER",
-              "sourceVersion": "USER"
-            }
+            ]
           }
         },
         {
@@ -5916,7 +6129,8 @@
               "period": {
                 "start": "2026-10-07T00:00:00Z",
                 "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -5997,9 +6211,10 @@
               "endpoint": "ARRIVED",
               "quantityMode": "STATE_AT",
               "period": {
-                "start": "2026-10-05T09:00:00Z",
-                "end": "2026-10-07T01:30:00Z",
-                "endInclusive": true
+                "start": "2026-10-07T00:00:00Z",
+                "end": "2026-10-07T02:00:00Z",
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -6017,11 +6232,6 @@
               },
               "supervisorId": {
                 "$alias": "supervisor"
-              },
-              "interval": {
-                "start": "2026-10-07T00:00:00Z",
-                "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
               }
             },
             "expectedRevision": 1,
@@ -6047,8 +6257,7 @@
               "eligibilityAction": "USER",
               "includeReservations": "USER",
               "ownerId": "CONTEXT",
-              "supervisorId": "CONTEXT",
-              "interval": "USER"
+              "supervisorId": "CONTEXT"
             }
           }
         },
@@ -6088,7 +6297,8 @@
               "period": {
                 "start": "2026-10-07T00:00:00Z",
                 "end": "2026-10-07T02:00:00Z",
-                "endInclusive": true
+                "endInclusive": true,
+                "startInclusive": true
               },
               "eventKinds": [
                 "CONFIRMED_RECEIPT"
@@ -6239,7 +6449,11 @@
               "itemId": {
                 "$alias": "P"
               },
-              "qualityTerms": "STANDARD"
+              "qualityTerms": "STANDARD",
+              "destinationId": {
+                "$alias": "CUSTOMER_PLACE"
+              },
+              "packageTerms": "STANDARD"
             },
             "expectedRevision": 1,
             "commandIdempotencyKey": "T09-exists-versus-end-throughout-sale",
@@ -6255,7 +6469,9 @@
               "dueAt": "USER",
               "deliveryEndpoint": "USER",
               "itemId": "CONTEXT",
-              "qualityTerms": "USER"
+              "qualityTerms": "USER",
+              "destinationId": "CONTEXT",
+              "packageTerms": "CONTEXT"
             }
           }
         },

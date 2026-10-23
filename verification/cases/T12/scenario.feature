@@ -34,6 +34,7 @@
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "A" 역할이 "claim-document" 행동을 수행한다
     만일 "A" 역할이 "claim" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
@@ -81,7 +82,9 @@
     만일 "A" 역할이 "initial-assessment" 행동을 수행한다
     만일 "A" 역할이 "before-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "before-db" 행동을 수행한다
+    만일 "A" 역할이 "claim-document" 행동을 수행한다
     만일 "A" 역할이 "claim" 행동을 수행한다
+    만일 "A" 역할이 "conflicting-claim-document" 행동을 수행한다
     만일 "A" 역할이 "conflicting-claim" 행동을 수행한다
     만일 "A" 역할이 "assessment" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다

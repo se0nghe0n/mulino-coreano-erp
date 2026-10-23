@@ -1,0 +1,402 @@
+{
+  "recordType": "INPUT_REMEDIATION_HANDOFF",
+  "baseline": "66e4d068017753147017f5d08062ba460e4e385c",
+  "caseId": "T11",
+  "actualScenariosRun": false,
+  "acceptanceComplete": false,
+  "assertionsUnchanged": 110,
+  "changedActions": [
+    "draft-cancel/draft",
+    "cancel-after-shipment/sale",
+    "closed-followup/temperature-document",
+    "closed-followup/temperature"
+  ],
+  "unresolvedReceiptInputs": [
+    {
+      "subcase": "parent90-cancelled",
+      "action": "receive90",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "90",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T01:00:00Z",
+        "canonicalOccurrenceKey": "receipt90"
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "parent90-impossible",
+      "action": "receive90",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "90",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T01:00:00Z",
+        "canonicalOccurrenceKey": "receipt90"
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "parent90-superseded",
+      "action": "receive90",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "90",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T01:00:00Z",
+        "canonicalOccurrenceKey": "receipt90"
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "pending-correction",
+      "action": "receipt",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "100",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T00:00:00Z",
+        "workId": {
+          "$alias": "SOURCE"
+        }
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    },
+    {
+      "subcase": "shared-distinct60",
+      "action": "receive60",
+      "originalPhysicalInput": {
+        "quantity": {
+          "value": "60",
+          "unit": "BOX"
+        },
+        "itemId": {
+          "$alias": "P"
+        },
+        "lotId": {
+          "$alias": "LOT"
+        },
+        "placeId": {
+          "$alias": "W"
+        },
+        "occurredAt": "2026-10-07T01:00:00Z"
+      },
+      "classification": "NOT_RUN_SOURCE_GRAPH_BINDING_REQUIRED",
+      "requiredCommands": [
+        "attachEvidence",
+        "recordActivity",
+        "receiveProvisional",
+        "matchSourceIdentity",
+        "linkCanonicalOccurrence",
+        "confirmReceipt"
+      ]
+    }
+  ],
+  "otherUnpublishedInputs": [
+    {
+      "subcase": "parent90-cancelled",
+      "action": "receive90",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "canonicalOccurrenceKey",
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-cancelled",
+      "action": "child30-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "assessmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-cancelled",
+      "action": "child60-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "assessmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-cancelled",
+      "action": "deficit-transfer",
+      "capability": "transferObligation",
+      "unsupportedSlots": [
+        "acceptanceEvidenceId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-cancelled",
+      "action": "alternative-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "decisionEvidenceId",
+        "reasonText",
+        "successorWorkId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-impossible",
+      "action": "receive90",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "canonicalOccurrenceKey",
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-impossible",
+      "action": "child30-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "assessmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-impossible",
+      "action": "child60-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "assessmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-impossible",
+      "action": "deficit-transfer",
+      "capability": "transferObligation",
+      "unsupportedSlots": [
+        "acceptanceEvidenceId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-impossible",
+      "action": "alternative-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "decisionEvidenceId",
+        "reasonText",
+        "successorWorkId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-superseded",
+      "action": "receive90",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "canonicalOccurrenceKey",
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-superseded",
+      "action": "child30-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "assessmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-superseded",
+      "action": "child60-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "assessmentId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-superseded",
+      "action": "deficit-transfer",
+      "capability": "transferObligation",
+      "unsupportedSlots": [
+        "acceptanceEvidenceId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "parent90-superseded",
+      "action": "alternative-close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "decisionEvidenceId",
+        "reasonText",
+        "successorWorkId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "wait-timeout",
+      "action": "resume-without-proof",
+      "capability": "resumeWork",
+      "unsupportedSlots": [
+        "resumeEvidenceIds"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "pending-correction",
+      "action": "receipt",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity",
+        "workId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "pending-correction",
+      "action": "correction",
+      "capability": "correctEvidence",
+      "unsupportedSlots": [
+        "correctedQuantity",
+        "occurredAt",
+        "originalEvidenceId",
+        "reason",
+        "supersedesVersion"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "cancel-after-shipment",
+      "action": "transfer",
+      "capability": "transferObligation",
+      "unsupportedSlots": [
+        "acceptanceEvidenceId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "cancel-after-shipment",
+      "action": "close",
+      "capability": "closeWork",
+      "unsupportedSlots": [
+        "decisionEvidenceId",
+        "reasonText"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "shared-distinct60",
+      "action": "receive60",
+      "capability": "confirmReceipt",
+      "unsupportedSlots": [
+        "itemId",
+        "occurredAt",
+        "placeId",
+        "quantity"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    },
+    {
+      "subcase": "closed-followup",
+      "action": "followup",
+      "capability": "createFollowup",
+      "unsupportedSlots": [
+        "nextAction",
+        "nextCheckAt",
+        "ownerId",
+        "sourceOccurrenceId",
+        "supervisorId"
+      ],
+      "classification": "RETAINED_UNRESOLVED_ORACLE_INPUT"
+    }
+  ],
+  "note": "This is authored input classification, not a runtime receipt. Read T09/source-contract-frontier.md for the unimplemented binding boundary."
+}
