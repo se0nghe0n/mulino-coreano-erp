@@ -43,9 +43,9 @@ public class WorkAssertionTest {
         rows.put("receive60", identity("occurrenceId", "receipt60-id"));
         rows.put("receive40", identity("occurrenceId", "receipt40-id"));
         rows.put("after-db", captured("""
-            {"rawRows":{"contributions":[
-              {"workId":"cumulative-id","occurrenceId":"receipt60-id","quantity":"60","unit":"BOX"},
-              {"workId":"cumulative-id","occurrenceId":"receipt40-id","quantity":"40","unit":"BOX"}]}}
+            {"rawRows":{"receipts":[
+              {"workId":"cumulative-id","canonicalOccurrenceId":"receipt60-id","quantity":"60","unit":"BOX"},
+              {"workId":"cumulative-id","canonicalOccurrenceId":"receipt40-id","quantity":"40","unit":"BOX"}]}}
             """));
         return rows;
     }
@@ -56,24 +56,27 @@ public class WorkAssertionTest {
     }
     @Test void quantityMutationFailsRatherThanReadingExpectedOutput() throws Exception {
         var rows = cumulativeSample();
-        ((ObjectNode) rows.get("after-db").at("/data/rawRows/contributions/1")).put("quantity","39");
+        engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases);
+        ((ObjectNode) rows.get("after-db").at("/data/rawRows/receipts/1")).put("quantity","39");
         assertThrows(AssertionError.class, () -> engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases));
     }
     @Test void unitMutationFailsEvenWithUnchanged100() throws Exception {
         var rows = cumulativeSample();
-        ((ObjectNode) rows.get("after-db").at("/data/rawRows/contributions/1")).put("unit","KG");
+        engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases);
+        ((ObjectNode) rows.get("after-db").at("/data/rawRows/receipts/1")).put("unit","KG");
         assertThrows(AssertionError.class, () -> engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases));
     }
     @Test void duplicatePhysicalOccurrenceFailsEvenWhenSumStill100() throws Exception {
         var rows = cumulativeSample();
-        ((ObjectNode) rows.get("after-db").at("/data/rawRows/contributions/1")).put("occurrenceId","receipt60-id");
+        ((ObjectNode) rows.get("after-db").at("/data/rawRows/receipts/1")).put("canonicalOccurrenceId","receipt60-id");
         engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases);
         assertThrows(AssertionError.class, () -> engine.check(assertion("T09","cumulative-versus-state","arrival-distinct-identities"), rows, aliases));
     }
     @Test void unknownAndMissingQuantityCannotPassAsZero() throws Exception {
         for (String mutation : new String[]{"UNKNOWN","CONFLICT","MISSING"}) {
             var rows = cumulativeSample();
-            var row = (ObjectNode) rows.get("after-db").at("/data/rawRows/contributions/1");
+            engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases);
+            var row = (ObjectNode) rows.get("after-db").at("/data/rawRows/receipts/1");
             if (mutation.equals("MISSING")) row.remove("quantity"); else row.put("quantity",mutation);
             assertThrows(AssertionError.class, () -> engine.check(assertion("T09","cumulative-versus-state","raw-receipt-sum100"), rows, aliases));
         }
