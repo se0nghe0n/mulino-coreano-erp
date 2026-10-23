@@ -14,15 +14,19 @@ final class ScenarioObservationProjection {
     private final Connection connection;
     private final Path root;
     private final List<String> orgs, items, works, lots;
-    private final OffsetDateTime knownAt;
+    private final OffsetDateTime knownAt, asOf;
     private final ArrayNode queries = Json.array();
     private final Map<String,ArrayNode> cache = new HashMap<>();
     private ArrayNode observationQueries;
 
     ScenarioObservationProjection(Connection connection, Path root, List<String> orgs, List<String> items,
                                   List<String> works, List<String> lots, OffsetDateTime knownAt) {
+        this(connection,root,orgs,items,works,lots,knownAt,null);
+    }
+    ScenarioObservationProjection(Connection connection, Path root, List<String> orgs, List<String> items,
+                                  List<String> works, List<String> lots, OffsetDateTime knownAt, OffsetDateTime asOf) {
         this.connection=connection; this.root=root; this.orgs=orgs; this.items=items;
-        this.works=works; this.lots=lots; this.knownAt=knownAt;
+        this.works=works; this.lots=lots; this.knownAt=knownAt; this.asOf=asOf;
     }
 
     ArrayNode drainQueries() { var copy=queries.deepCopy(); queries.removeAll(); return copy; }
@@ -224,7 +228,7 @@ final class ScenarioObservationProjection {
                     copy(row,"result",row,"outcome");copy(row,"goalVersionId",row,"goalId");
                     version(row,"definitionVersion","mulino_definitions_DefinitionVersions","definitionVersionId");
                     version(row,"policyVersion","mulino_governance_PolicyVersions","policyVersionId");
-                    field(row,"conditionResults",conditionRows(row,parse(row,"conditionsJson")));
+                    field(row,"conditionResults",assessmentConditions(row));
                     var snapshots=query("mulino_evaluation_InputSnapshots","r.organizationId=? AND r.assessmentId=? AND r.workId=? AND r.goalId=? AND r.contentHash=? AND r.recordedAt<=?",
                         List.of(row.path("organizationId").asText(),row.path("id").asText(),row.path("workId").asText(),row.path("goalId").asText(),row.path("inputSnapshotHash").asText(),knownAt));
                     var ids=Json.array();for(var snapshot:snapshots)ids.add(snapshot.path("id"));field(row,"inputSnapshotIds",ids);
@@ -390,7 +394,7 @@ final class ScenarioObservationProjection {
     ArrayNode virtual(String source) throws Exception {
         return switch(source) {
             case "@conditionResults" -> {
-                var out=Json.array();for(var row:read("mulino_work_read_AssessmentReferences"))out.addAll(conditionRows(row,parse(row,"conditionsJson")));yield out;
+                var out=Json.array();for(var row:read("mulino_work_read_AssessmentReferences"))out.addAll(assessmentConditions(row));yield out;
             }
             case "@observationCoverage" -> verifiedObservations();
             case "@supervisionIssues" -> supervisionIssues();
@@ -404,13 +408,98 @@ final class ScenarioObservationProjection {
                     var siblings=query("mulino_evaluation_InputSnapshots","r.organizationId=? AND r.assessmentId=? AND r.recordedAt<=?",
                         List.of(snapshot.path("organizationId").asText(),snapshot.path("assessmentId").asText(),knownAt));
                     if(siblings.size()!=1)throw new UnsupportedOperationException("Ambiguous immutable assessment input snapshot");
-                    var conditions=conditionRows(snapshot,content.path("conditions"));
-                    if(conditions.isEmpty()){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"snapshotId",snapshot,"id");copy(row,"goalVersionId",snapshot,"goalId");out.add(row);}
-                    else for(var condition:conditions){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"snapshotId",snapshot,"id");copy(row,"goalVersionId",snapshot,"goalId");for(String key:List.of("conditionId","evidenceIds","inputs","result","conflict","evaluatorVersion"))copy(row,key,condition,key);out.add(row);}
-                }yield out;
+                    JsonNode capture=null;
+                    if(snapshot.hasNonNull("evidenceCaptureId")) {
+                        capture=linked("mulino_evaluation_EvidenceCaptures",snapshot,snapshot.path("evidenceCaptureId").asText());
+                        validateCapture(snapshot,content,capture);
+                    }
+                    out.addAll(inputRows(snapshot,content,capture));
+                }
+                out.addAll(pendingInputMarkers());yield out;
             }
             default -> throw new UnsupportedOperationException("No scoped virtual projection for "+source);
         };
+    }
+
+    /** Pending is a Work-transition marker, not a mutation of a historical envelope. */
+    private ArrayNode pendingInputMarkers() throws Exception {
+        var out=Json.array();if(asOf==null)return out; // No historical state claim without the request's effective-time fence.
+        for(var work:read("mulino_work_read_Works")) {
+            var history=query("mulino_work_WorkTransitions","r.organizationId=? AND r.workId=? AND r.recordedAt<=? AND (r.snapshotJson::jsonb->>'effectiveAt')::timestamptz<=?",List.of(work.path("organizationId").asText(),work.path("id").asText(),knownAt,asOf));
+            JsonNode latest=null;for(var row:history) {
+                var state=parse(row,"snapshotJson");
+                try{if(java.time.Instant.parse(state.path("effectiveAt").asText()).isAfter(asOf.toInstant()))continue;}catch(RuntimeException invalid){throw new UnsupportedOperationException("Missing effective time in pending Work history",invalid);}
+                if(latest!=null&&row.path("revision").equals(latest.path("revision")))throw new UnsupportedOperationException("Ambiguous pending Work history");
+                if(latest==null||row.path("revision").asInt()>latest.path("revision").asInt())latest=row;
+            }
+            if(latest==null)continue;var state=parse(latest,"snapshotJson");
+            if(!state.path("ID").equals(work.path("id"))||!state.path("organizationId").equals(work.path("organizationId"))||!state.path("revision").equals(latest.path("revision")))throw new UnsupportedOperationException("Pending Work history scope/revision mismatch");
+            if(!state.path("pendingInvalidation").asBoolean(false))continue;
+            var assessments=query("mulino_work_read_AssessmentReferences","r.organizationId=? AND r.workId=? AND r.recordedAt<=?",List.of(work.path("organizationId").asText(),work.path("id").asText(),knownAt));
+            var priorIds=new HashSet<String>();for(var row:assessments)if(row.hasNonNull("previousAssessmentId"))priorIds.add(row.path("previousAssessmentId").asText());
+            var heads=new ArrayList<JsonNode>();for(var row:assessments)if(!priorIds.contains(row.path("id").asText()))heads.add(row);
+            if(heads.size()!=1)continue; // No invented assessment identifier for an unassessed Work.
+            var named=assessmentConditions(heads.getFirst());if(named.size()!=1)continue;
+            var marker=(ObjectNode)named.get(0).deepCopy();marker.put("status","PENDING").put("rowKind","WORK_PENDING_INPUT");
+            marker.set("transitionId",latest.path("id"));marker.set("pendingWorkSnapshot",parse(latest,"snapshotJson"));out.add(marker);
+        }
+        return out;
+    }
+
+    private ArrayNode assessmentConditions(JsonNode assessment) throws Exception {
+        var snapshots=query("mulino_evaluation_InputSnapshots","r.organizationId=? AND r.assessmentId=? AND r.workId=? AND r.goalId=? AND r.contentHash=? AND r.recordedAt<=?",
+            List.of(assessment.path("organizationId").asText(),assessment.path("id").asText(),assessment.path("workId").asText(),assessment.path("goalId").asText(),assessment.path("inputSnapshotHash").asText(),knownAt));
+        if(snapshots.size()==1) {
+            var snapshot=snapshots.get(0);var content=parse(snapshot,"contentJson");
+            validateInputSnapshot(snapshot,content,assessment);
+            if(content.path("publicConditions").isArray())return conditionRows(assessment,content.path("publicConditions"));
+        }
+        return conditionRows(assessment,parse(assessment,"conditionsJson"));
+    }
+
+    static void validateCapture(JsonNode snapshot,JsonNode envelope,JsonNode capture) throws Exception {
+        if(capture==null)throw new UnsupportedOperationException("Missing shared evidence capture");
+        var content=parse(capture,"contentJson");
+        String hash=java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(capture.path("contentJson").asText().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        for(var source:content.path("facts").path("sources")) {
+            var ids=new HashMap<String,JsonNode>();for(var row:source) {
+                if(row.hasNonNull("organizationId")&&!row.path("organizationId").equals(snapshot.path("organizationId")))throw new UnsupportedOperationException("Foreign source in shared capture");
+                if(row.hasNonNull("ID")){var previous=ids.putIfAbsent(row.path("ID").asText(),row);if(previous!=null&&!previous.equals(row))throw new UnsupportedOperationException("Conflicting immutable source identity");}
+            }
+        }
+        if(!snapshot.path("evidenceCaptureId").equals(capture.path("id"))||!hash.equals(capture.path("contentHash").asText())
+            ||!same(snapshot,capture,"organizationId","asOf","knownAt")||!content.path("boundary").equals(envelope.path("captureBoundary"))
+            ||!content.path("facts").equals(envelope.path("facts"))||!content.path("boundary").path("organizationId").equals(snapshot.path("organizationId")))
+            throw new UnsupportedOperationException("Shared evidence capture scope/time/hash/envelope mismatch");
+    }
+
+    /** One row per immutable source relationship, never one duplicate tuple per AST condition. */
+    static ArrayNode inputRows(JsonNode snapshot,JsonNode content,JsonNode capture) {
+        var authored=content.path("publicConditions");
+        if(capture==null&&!authored.isArray()) {
+            var conditions=conditionRows(snapshot,content.path("conditions"));var out=Json.array();
+            if(conditions.isEmpty()){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"snapshotId",snapshot,"id");row.put("status","RECORDED");out.add(row);}
+            else for(var condition:conditions){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"snapshotId",snapshot,"id");copy(row,"goalVersionId",snapshot,"goalId");row.put("status","RECORDED");for(String key:List.of("conditionId","evidenceIds","inputs","result","conflict","evaluatorVersion"))copy(row,key,condition,key);out.add(row);}
+            return out;
+        }
+        var base=(ObjectNode)snapshot.deepCopy();field(base,"inputSnapshot",content);copy(base,"inputEnvelopeId",snapshot,"id");copy(base,"goalVersionId",snapshot,"goalId");
+        field(base,"snapshotId",capture==null?snapshot.path("id"):capture.path("id"));base.put("status","RECORDED").put("rowKind","CAPTURE_SOURCE_RELATION");
+        field(base,"conditions",authored);field(base,"internalDiagnostics",content.path("conditions"));
+        if(authored.size()==1){var named=conditionRows(snapshot,authored).get(0);for(String key:List.of("conditionId","evidenceIds","inputs","result","conflict","evaluatorVersion"))copy(base,key,named,key);}
+        var pairs=new TreeMap<String,ObjectNode>();var facts=content.path("facts");
+        for(var property:facts.path("properties"))for(var fact:property)for(var movement:facts.path("sources").path("inventory.QuantityMovements")) {
+            if(!fact.hasNonNull("physicalScopeId")||!fact.path("physicalScopeId").equals(fact.path("sourceId"))||!fact.path("physicalScopeId").equals(movement.path("sourceId")))continue;
+            boolean referenced=false;for(var ref:fact.path("evidenceRefs"))if(ref.equals(movement.path("ID")))referenced=true;
+            if(!referenced||!snapshot.path("organizationId").equals(movement.path("organizationId")))continue;
+            try{if(java.time.Instant.parse(movement.path("recordedAt").asText()).isAfter(java.time.Instant.parse(snapshot.path("knownAt").asText()))||java.time.Instant.parse(fact.path("recordedAt").asText()).isAfter(java.time.Instant.parse(snapshot.path("knownAt").asText())))throw new UnsupportedOperationException("Future source in immutable input capture");}
+            catch(java.time.format.DateTimeParseException invalid){throw new UnsupportedOperationException("Missing source observation time in immutable input capture",invalid);}
+            var pair=Json.object();pair.set("segmentId",fact.path("physicalScopeId"));pair.set("movementId",movement.path("ID"));
+            pairs.put(pair.toString(),pair);
+        }
+        var out=Json.array();
+        if(pairs.isEmpty()){base.set("sourceRelations",Json.array());out.add(base);}
+        else for(var pair:pairs.values()){var row=base.deepCopy();row.set("segmentId",pair.path("segmentId"));row.set("movementId",pair.path("movementId"));row.set("sourceRelations",Json.array().add(pair));out.add(row);}
+        return out;
     }
 
     /** Independently reconstruct the latest committed source state known at the requested instant. */

@@ -58,7 +58,17 @@ public class AssessmentQueries implements com.mulino.application.work.WorkAssess
    data.putAll(assessment);
    try{data.put("conditionResults",json.readValue(Objects.toString(data.remove("conditionsJson"),"[]"),Object.class));}
    catch(Exception failure){throw new IllegalStateException("Invalid stored assessment conditions",failure);}
-   data.put("inputSnapshots",repository.rows(c,"mulino.evaluation.InputSnapshots").stream().filter(s->Objects.equals(data.get("ID"),s.get("assessmentId"))&&visible(c,s)).toList());
+   var snapshots=repository.rows(c,"mulino.evaluation.InputSnapshots").stream().filter(s->Objects.equals(data.get("ID"),s.get("assessmentId"))&&visible(c,s)).toList();
+   data.put("inputSnapshots",snapshots);
+   if(snapshots.size()==1){
+    var stored=snapshots.getFirst();
+    if(!Objects.equals(stored.get("contentHash"),assessment.get("inputSnapshotHash"))||!Objects.equals(stored.get("contentHash"),com.mulino.domain.definitions.DefinitionRepository.sha256(stored.get("contentJson").toString())))throw new IllegalStateException("Invalid immutable assessment envelope hash");
+    try{var envelope=json.readValue(stored.get("contentJson").toString(),Map.class);
+     if(envelope.get("publicConditions") instanceof List<?> authored)data.put("conditionResults",authored);
+     if(envelope.get("quantityEvaluation") instanceof Map<?,?> proof&&proof.get("evaluatedQuantity")!=null&&proof.get("unit")!=null){data.put("evaluatedQuantity",proof.get("evaluatedQuantity"));data.put("unit",proof.get("unit"));data.put("quantityEvaluation",proof);}
+     if(stored.get("evidenceCaptureId")!=null)data.put("evidenceCaptureId",stored.get("evidenceCaptureId"));
+    }catch(java.io.IOException failure){throw new IllegalStateException("Invalid immutable assessment envelope",failure);}
+   }
    boolean pending=explicit.isEmpty()&&Boolean.TRUE.equals(work.get("pendingInvalidation"));data.put("pending",pending);
    if(pending)unknowns.add("ASSESSMENT_PENDING");
    if(Boolean.TRUE.equals(assessment.get("held")))unknowns.add("PINNED_CONTRACT_UNAVAILABLE");

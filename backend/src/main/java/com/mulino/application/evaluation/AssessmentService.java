@@ -17,6 +17,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
   private final WorkAccess work;private final AssessmentRepository repository;private final DefinitionRepository definitions;
   private final ExecutionClock clock;private final DefinitionValidator validator;private final AssessmentFactProvider provider;private final PolicyRepository policies;
   @org.springframework.beans.factory.annotation.Autowired private ReadAuthorizer authority;
+  @org.springframework.beans.factory.annotation.Autowired private EvidenceCaptureRepository captures;
   private final TypedPredicateEvaluator evaluator=new TypedPredicateEvaluator();
   private final ObjectMapper json=new ObjectMapper().findAndRegisterModules().configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS,true);
   public AssessmentService(WorkAccess work,AssessmentRepository repository,DefinitionRepository definitions,DefinitionValidator validator,AssessmentFactProvider provider,PolicyRepository policies,ExecutionClock clock){this.clock=clock;this.work=work;this.repository=repository;this.definitions=definitions;this.validator=validator;this.provider=provider;this.policies=policies;}
@@ -37,6 +38,11 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     var a=new LinkedHashMap<String,Object>();a.put("organizationId",c.organizationId());a.put("ID",assessmentId);a.put("revision",0);a.put("createdAt",now);a.put("recordedAt",now);a.put("effectiveAt",c.asOf());a.put("workId",workId);a.put("goalId",goal.get("ID"));a.put("outcome",calculation.result.truth().state().name());a.put("evaluatorVersion",Objects.toString(decode(goal.get("slotsJson")).get("evaluatorVersion"),"UNAVAILABLE"));a.put("assessedAt",now);a.put("conditionsJson",encode(calculation.result.conditions()));a.put("definitionVersionId",goal.get("definitionVersionId"));a.put("policyVersionId",calculation.policy);a.put("knownAt",c.knownAt());a.put("asOf",c.asOf());a.put("previousAssessmentId",previous==null?null:previous.get("ID"));a.put("inputSnapshotHash",calculation.hash);a.put("conflict",calculation.result.truth().conflict());a.put("held",calculation.held);
     boolean violated=previous!=null&&Boolean.TRUE.equals(previous.get("deadlineViolated"))||deadline(c,w,goal,calculation);a.put("deadlineViolated",violated);
     var s=new LinkedHashMap<String,Object>();s.put("organizationId",c.organizationId());s.put("ID",UUID.randomUUID().toString());s.put("assessmentId",assessmentId);s.put("workId",workId);s.put("goalId",goal.get("ID"));s.put("recordedAt",now);s.put("asOf",c.asOf());s.put("knownAt",c.knownAt());s.put("contentHash",calculation.hash);s.put("contentJson",calculation.snapshot);
+    if(calculation.capturePayload!=null){
+      var boundary=map(decode(calculation.capturePayload).get("boundary"));
+      String capture=captures.acquire(c.organizationId(),encode(boundary.get("scope")),c.asOf(),c.knownAt(),c.asOf(),"ASSESS_GOAL",calculation.capturePayload,now);
+      s.put("evidenceCaptureId",capture);
+    }
     repository.save(a,s);work.markInvalidation(c,workId,calculation.held);
     return Map.of("outcome",calculation.held?"HELD":"APPLIED","effects",Map.of("assessmentId",assessmentId,"workId",workId),"assessment",TransportValues.normalize(a),"quantityEffects",List.of());
   }
@@ -116,7 +122,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
   public void goalChanged(DomainContext c,String workId,String previousGoalId,String newGoalId){/* WorkLifecycle records pending flag with the new goal in its own atomic transition. */}
   /** Evidence correction is pending in the same transaction; past assessment rows are never rewritten. */
   public void invalidate(DomainContext c,String workId){work.require(c,workId,true);work.markInvalidation(c,workId,true);}
-  private record Calculation(TypedPredicateEvaluator.Result result,String hash,String snapshot,String policy,boolean held){}
+  private record Calculation(TypedPredicateEvaluator.Result result,String hash,String snapshot,String policy,boolean held,String capturePayload){}
   private Calculation calculate(DomainContext c,Map<String,Object> w,Map<String,Object> goal){
     return calculate(c,w,goal,c.asOf());
   }
@@ -136,13 +142,25 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     String mode=slots.get("quantityMode").toString();
     if(mode.equals("EXISTS_IN")||mode.equals("THROUGHOUT"))result=evaluator.evaluateInterval(predicate,facts,instant(slots.get("periodStart")),instant(slots.get("periodEnd")),c.knownAt(),mode.equals("THROUGHOUT"),!Boolean.FALSE.equals(slots.get("periodStartInclusive")),!Boolean.FALSE.equals(slots.get("periodEndInclusive")));
     else result=evaluator.evaluate(predicate,facts,mode.equals("STATE_AT")?instant(slots.get("evaluationAt")):c.asOf(),c.knownAt());
+    var rawResult=result;
+    var publicConditions=AssessmentPresentation.authored(template(d,slots).name(),rawResult);
+    var quantityEvaluation=AssessmentPresentation.quantity(predicate,rawResult,mode);
     if(usesStock(template(d,slots).predicate())){
       String name=template(d,slots).name();
       result=new TypedPredicateEvaluator.Result(result.truth(),result.conditions().stream().map(condition->new TypedPredicateEvaluator.Condition(
         condition.conditionId().replaceFirst("^root",java.util.regex.Matcher.quoteReplacement(name)),condition.truth(),condition.inputs(),condition.evidenceRefs(),condition.evaluatorVersion())).toList());
     }
-    var snapshot=new LinkedHashMap<String,Object>();snapshot.put("goalId",goal.get("ID"));snapshot.put("goal",goal);snapshot.put("definitionId",d.id());snapshot.put("definitionHash",d.contentHash());snapshot.put("goalSlots",slots);snapshot.put("policy",policy.getFirst());snapshot.put("facts",facts);snapshot.put("conditions",result.conditions());String payload=encode(snapshot);
-    return new Calculation(result,DefinitionRepository.sha256(payload),payload,policy.getFirst().get("ID").toString(),false);
+    var snapshot=new LinkedHashMap<String,Object>();snapshot.put("goalId",goal.get("ID"));snapshot.put("goal",goal);snapshot.put("definitionId",d.id());snapshot.put("definitionHash",d.contentHash());snapshot.put("goalSlots",slots);snapshot.put("policy",policy.getFirst());snapshot.put("facts",facts);snapshot.put("conditions",result.conditions());
+    snapshot.put("publicConditions",publicConditions);quantityEvaluation.ifPresent(proof->snapshot.put("quantityEvaluation",proof));
+    var captureScope=new TreeMap<String,Object>();captureScope.putAll((Map<String,Object>)scope);captureScope.put("itemId",w.get("itemId"));
+    if(!captureScope.containsKey("lotId")&&w.get("lotId")!=null)captureScope.put("lotId",w.get("lotId"));
+    if(!captureScope.containsKey("placeId")&&slots.get("placeId")!=null)captureScope.put("placeId",slots.get("placeId"));
+    var boundary=new TreeMap<String,Object>();boundary.put("organizationId",c.organizationId());boundary.put("scope",captureScope);boundary.put("asOf",c.asOf());boundary.put("knownAt",c.knownAt());boundary.put("evaluationHorizon",evaluationHorizon);boundary.put("admissionPurpose","ASSESS_GOAL");boundary.put("admissionContract","canonical-admission-v1");boundary.put("definitionHash",d.contentHash());boundary.put("definitionId",d.id());boundary.put("evaluatorVersion",d.evaluatorVersion());boundary.put("policyHash",policy.getFirst().get("contentHash"));boundary.put("policyId",policy.getFirst().get("ID"));boundary.put("policyVersion",policy.getFirst().get("version"));
+    for(String key:List.of("action","includeReserved","evaluationAt","eventKind","evidenceSource","periodStart","periodEnd","periodStartInclusive","periodEndInclusive"))if(slots.containsKey(key))boundary.put(key,slots.get(key));
+    // Purpose is checked by the provider. Only ASSESS_GOAL creates persisted captures;
+    // read-only guard calculations must keep their existing envelope hash semantics.
+    snapshot.put("captureBoundary",boundary);String payload=encode(snapshot);
+    return new Calculation(result,DefinitionRepository.sha256(payload),payload,policy.getFirst().get("ID").toString(),false,encode(Map.of("boundary",boundary,"facts",facts)));
   }
   private Definition definition(Map<String,Object> goal,DomainContext c){var slots=decode(goal.get("slotsJson"));if(!TypedPredicateEvaluator.VERSION.equals(slots.get("evaluatorVersion")))throw new DomainError("HELD","VERSION_UNSUPPORTED","Pinned evaluator unsupported");Definition d=definitions.get(c.organizationId(),goal.get("definitionVersionId").toString());var template=template(d,slots);validateConditions(slots,template);
     if(Set.of("EXISTS_IN","THROUGHOUT").contains(slots.get("quantityMode"))&&usesStock(template.predicate())){
@@ -181,7 +199,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
   }
 
   private Definition.Goal template(Definition d,Map<String,Object> slots){var candidates=d.goals().stream().filter(g->Objects.equals(g.endpoint(),slots.get("endpoint"))&&Objects.equals(g.quantityMode(),slots.get("quantityMode"))).toList();if(candidates.size()!=1)throw new DomainError("HELD","VERSION_UNSUPPORTED","Unique pinned goal template required");return candidates.getFirst();}
-  private Calculation held(Map<String,Object> goal,Map<String,Object> slots,String reason){String payload=encode(Map.of("goalId",goal.get("ID"),"goal",goal,"slots",slots,"unknown",reason));return new Calculation(new TypedPredicateEvaluator.Result(new PredicateTruth(PredicateTruth.State.UNVERIFIED,false),List.of()),DefinitionRepository.sha256(payload),payload,null,true);}
+  private Calculation held(Map<String,Object> goal,Map<String,Object> slots,String reason){String payload=encode(Map.of("goalId",goal.get("ID"),"goal",goal,"slots",slots,"unknown",reason));return new Calculation(new TypedPredicateEvaluator.Result(new PredicateTruth(PredicateTruth.State.UNVERIFIED,false),List.of()),DefinitionRepository.sha256(payload),payload,null,true,null);}
   private boolean deadline(DomainContext c,Map<String,Object> w,Map<String,Object> goal,Calculation current){var slots=decode(goal.get("slotsJson"));if(slots.get("dueAt")==null||c.asOf().isBefore(instant(slots.get("dueAt")))||current.held)return false;if(c.asOf().equals(instant(slots.get("dueAt")))&&Boolean.TRUE.equals(slots.get("deadlineInclusive")))return false;Instant boundary=instant(slots.get("dueAt"));if(Boolean.FALSE.equals(slots.get("deadlineInclusive")))boundary=boundary.minusNanos(1);var deadlineContext=new DomainContext(c.organizationId(),c.actorId(),c.stableRequestOwner(),boundary,c.knownAt());var atDeadline=calculate(deadlineContext,w,goal,c.asOf());return !atDeadline.held&&atDeadline.result.truth().state()==PredicateTruth.State.UNSATISFIED;}
   private Map<String,Object> latest(DomainContext c,String workId,String goalId){
     var all=repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(a->workId.equals(a.get("workId"))).toList();
