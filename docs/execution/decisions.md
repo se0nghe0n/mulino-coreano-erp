@@ -16,6 +16,17 @@
 이 기록은 모델 실행·배포 성공을 주장하지 않는다. 실제 결과는 해당
 실행 artifact와 통합 기록으로 연결한다.
 
+## 2026-10-23 Sol Fast service tier
+
+사용자가 Sol을 쓰는 작업을 Fast service tier로 계속하도록 지정했다.
+현재 T3 catalog에서 codex/gpt-6.1-sol의 Fast 값이 priority임을 확인했다.
+현재 thread의 실제 선택은 Sol/xhigh/serviceTier=priority다. 이후 Sol
+위임은 기존 선택한 effort를 유지하고 serviceTier=priority를 명시한다.
+기존 Sol thread를 재개할 때도 먼저 실제 설정을 확인·적용한다.
+
+이 선택은 Sol의 이전 default 지시보다 우선한다. 종료된 실행의 실제
+tier 기록과 Haiku native Workflow 실행 방식은 바꾸지 않는다.
+
 ## R2: 로컬 추적 확정
 
 | 항목 | 확정 값 |

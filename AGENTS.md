@@ -162,6 +162,12 @@ catalog에서 `gpt-6.1-sol`의 `serviceTier=ultrafast` 지원을 확인했다.
 선택이 위의 Ultrafast 지시보다 우선하며 모델 선택과 Haiku dynamic
 Workflow 방식은 유지한다. 종료된 실행의 실제 tier 기록은 바꾸지 않는다.
 
+같은 날 사용자가 Sol 작업을 Fast service tier로 계속하도록 지정했다.
+이후 새 Sol 위임과 기존 Sol thread의 재개는 runtime에서
+`serviceTier=priority`를 명시한다. 이 선택이 Sol의 이전 default 지시보다
+우선한다. 현재 catalog의 Fast 값은 priority이며 Ultrafast와 구별한다.
+다른 모델의 tier와 Haiku dynamic Workflow 방식은 이 지시로 바꾸지 않는다.
+
 ## 병렬 작업과 Git
 
 독립 작업은 native subagent로 병렬화한다. code writer마다 같은
