@@ -40,7 +40,7 @@ class DeliveryClaimMigrationPostgresTest {
    var before=db.queryForMap("SELECT * FROM mulino_trade_sales_Observations WHERE ID=?",legacy);
    var foreignKeys=db.queryForList("SELECT conname,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid IN ('mulino_trade_sales_observations'::regclass,'mulino_trade_sales_deliveries'::regclass) AND contype='f' ORDER BY conname");
    var checksums=db.queryForList("SELECT version,checksum FROM flyway_schema_history WHERE success ORDER BY installed_rank");
-   var upgrade=Flyway.configure().dataSource(source).locations("filesystem:../database/migrations").load();assertEquals(1,upgrade.migrate().migrationsExecuted);upgrade.validate();
+   var upgrade=Flyway.configure().dataSource(source).locations("filesystem:../database/migrations").target(MigrationVersion.fromVersion("40")).load();assertEquals(1,upgrade.migrate().migrationsExecuted);upgrade.validate();
    var after=db.queryForMap("SELECT * FROM mulino_trade_sales_Observations WHERE ID=?",legacy);assertNull(after.remove("claimedrangerootid"));assertNull(after.remove("claimpayloadjson"));assertEquals(before,after);
    assertEquals(foreignKeys,db.queryForList("SELECT conname,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid IN ('mulino_trade_sales_observations'::regclass,'mulino_trade_sales_deliveries'::regclass) AND contype='f' ORDER BY conname"));
    assertEquals(checksums,db.queryForList("SELECT version,checksum FROM flyway_schema_history WHERE success AND version<>'40' ORDER BY installed_rank"));

@@ -19,7 +19,7 @@ class RecoveryHistoryMigrationPostgresTest {
    Flyway.configure().dataSource(source).locations("filesystem:../database/migrations").target(MigrationVersion.fromVersion("38")).load().migrate();
    String org=UUID.randomUUID().toString(),id=UUID.randomUUID().toString();var now=Timestamp.from(Instant.parse("2026-10-07T02:00:00Z"));
    db.update("INSERT INTO mulino_runtime_RecoverySchedules(organizationId,ID,workId,kind,nextCheckAt,ownerId,supervisorId,nextAction) VALUES(?,?,?,'LEGACY',?,?,?,'Existing source')",org,id,UUID.randomUUID().toString(),now,UUID.randomUUID().toString(),UUID.randomUUID().toString());
-   var upgraded=Flyway.configure().dataSource(source).locations("filesystem:../database/migrations").load();assertEquals(1,upgraded.migrate().migrationsExecuted);upgraded.validate();
+   var upgraded=Flyway.configure().dataSource(source).locations("filesystem:../database/migrations").target(MigrationVersion.fromVersion("39")).load();assertEquals(1,upgraded.migrate().migrationsExecuted);upgraded.validate();
    assertEquals(0,db.queryForObject("SELECT count(*) FROM mulino_runtime_RecoveryObservationHistory",Integer.class));
    assertEquals("Existing source",db.queryForObject("SELECT nextAction FROM mulino_runtime_RecoverySchedules WHERE ID=?",String.class,id));
    var tx=new org.springframework.transaction.support.TransactionTemplate(new org.springframework.jdbc.datasource.DataSourceTransactionManager(source));

@@ -3,7 +3,7 @@
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V40 PostgreSQL comparison: exact 1955 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V41 PostgreSQL comparison: exact 1958 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -1148,10 +1148,10 @@
     "mulino_trade_shipment_shipments.revision",
     "mulino_trade_shipment_shipments.state"
   ],
-  "baseline": "6197f791a15fa41dd36483731b1386597a531677",
-  "observedColumnCount": 1955,
+  "baseline": "4be9480d",
+  "observedColumnCount": 1958,
   "observedArtifactSha256": "5705b287b0547e7dc9343fd296e4ce51877e460fcb48eb5a637258d4d98ae665",
-  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled; V40 adds nullable original claim capture and makes the existing verified observation root nullable before confirmation; V28 foreign keys and confirmed delivery integrity remain unchanged",
+  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled; V40 adds nullable original claim capture and makes the existing verified observation root nullable before confirmation; V28 foreign keys and confirmed delivery integrity remain unchanged; V41 adds three nullable immutable source Work/Goal/condition pins without legacy backfill or duplicate allocations",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5946,6 +5946,21 @@
       "migration": "database/migrations/V40__delivery_claim_identity.sql",
       "cds": "backend/db/sales.cds",
       "nullableReason": "공개 관측 입력의 모든 slot을 JSON으로 보존한다. legacy 행의 원래 입력은 확인할 수 없어 NULL로 남기며 원천 document/event는 수정하지 않는다."
+    },
+    "mulino_work_workcontributions.sourceworkid": {
+      "migration": "database/migrations/V41__immutable_source_goal_contributions.sql",
+      "cds": "backend/db/work.cds",
+      "nullableReason": "source Work를 실제 link와 같은 조직·품목의 고정 endpoint로 기록하며 legacy source를 추정하지 않는다."
+    },
+    "mulino_work_workcontributions.sourcegoalversionid": {
+      "migration": "database/migrations/V41__immutable_source_goal_contributions.sql",
+      "cds": "backend/db/work.cds",
+      "nullableReason": "allocation을 생성한 시점의 불변 source GoalVersion에 고정하며 현재 목표로 소급 연결하지 않는다."
+    },
+    "mulino_work_workcontributions.sourceconditionid": {
+      "migration": "database/migrations/V41__immutable_source_goal_contributions.sql",
+      "cds": "backend/db/work.cds",
+      "nullableReason": "발행 정의의 source quantity condition에 고정하며 legacy 조건을 추정하지 않는다."
     }
   },
   "exactColumnInventory": [
@@ -7883,6 +7898,9 @@
     "mulino_work_workcontributions.organizationid",
     "mulino_work_workcontributions.quantity",
     "mulino_work_workcontributions.recordedat",
+    "mulino_work_workcontributions.sourceconditionid",
+    "mulino_work_workcontributions.sourcegoalversionid",
+    "mulino_work_workcontributions.sourceworkid",
     "mulino_work_workcontributions.startquantity",
     "mulino_work_workcontributions.targetworkid",
     "mulino_work_workcontributions.unit",
@@ -8385,5 +8403,19 @@
     "upgradeComparison": "backend/src/test/java/com/mulino/application/trade/sales/DeliveryClaimMigrationPostgresTest.java#v39UpgradePreservesLegacyAndVerifiedForeignKeysWithoutInventingOriginalClaims",
     "previousObservedArtifactSha256": "dbed9a723234801d615cd23ff660d3e0133f0ae28517bca50864f2d954717ff7",
     "legacyClaimBackfilled": false
+  },
+  "v41Evidence": {
+    "previousColumnCount": 1955,
+    "columnCount": 1958,
+    "addedColumns": [
+      "mulino_work_workcontributions.sourceworkid",
+      "mulino_work_workcontributions.sourcegoalversionid",
+      "mulino_work_workcontributions.sourceconditionid"
+    ],
+    "migration": "database/migrations/V41__immutable_source_goal_contributions.sql",
+    "schemaComparison": "backend/src/test/java/com/mulino/core/S1ReadIntegrationTest.java#freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening",
+    "upgradeComparison": "backend/src/test/java/com/mulino/core/SourceGoalContributionMigrationPostgresTest.java#v40LegacyRemainsUnknownAndNewBindingsAreImmutable",
+    "previousObservedArtifactSha256": "5705b287b0547e7dc9343fd296e4ce51877e460fcb48eb5a637258d4d98ae665",
+    "legacySourcePinsBackfilled": false
   }
 }

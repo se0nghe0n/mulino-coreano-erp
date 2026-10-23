@@ -12,12 +12,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.testcontainers.postgresql.PostgreSQLContainer;
 
-/** Real V39 -> V41 upgrade: V40 is reserved and not present in this isolated checkout. */
+/** Real V40 -> V41 upgrade after the integrated delivery claim migration. */
 class SourceGoalContributionMigrationPostgresTest {
- @Test void v39LegacyRemainsUnknownAndNewBindingsAreImmutable() throws Exception {
+ @Test void v40LegacyRemainsUnknownAndNewBindingsAreImmutable() throws Exception {
   try(var pg=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280")){
    pg.start();var ds=new DriverManagerDataSource(pg.getJdbcUrl(),pg.getUsername(),pg.getPassword());var db=new JdbcTemplate(ds);
-   Flyway.configure().dataSource(ds).locations("filesystem:../database/migrations").target(MigrationVersion.fromVersion("39")).load().migrate();
+   Flyway.configure().dataSource(ds).locations("filesystem:../database/migrations").target(MigrationVersion.fromVersion("40")).load().migrate();
    String org=id(),actor=id(),item=id(),product=id(),spec=id(),pack=id(),definition=id(),source=id(),target=id(),sg=id(),tg=id(),canonical=id(),profile=id(),link=id(),allocation=id();var at=Timestamp.from(Instant.parse("2026-10-07T02:00:00Z"));
    db.update("INSERT INTO mulino_identity_Organizations(ID,externalAlias) VALUES(?,?)",org,org);
    db.update("INSERT INTO mulino_identity_Actors(organizationId,ID,kind,stableRequestOwner) VALUES(?,?,'HUMAN',?)",org,actor,id());
@@ -58,7 +58,7 @@ class SourceGoalContributionMigrationPostgresTest {
    var keys=db.queryForList("SELECT a.attname FROM pg_index i JOIN pg_attribute a ON a.attrelid=i.indrelid AND a.attnum=ANY(i.indkey) WHERE i.indrelid='mulino_work_workcontributions'::regclass AND i.indisprimary ORDER BY a.attnum",String.class);assertEquals(List.of("organizationid","id"),keys);
    var constraints=db.queryForList("SELECT conname,contype,pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid='mulino_work_workcontributions'::regclass ORDER BY conname");
    assertTrue(constraints.stream().anyMatch(c->"work_contribution_source_goal_fk".equals(c.get("conname"))&&c.get("definition").toString().contains("sourcegoalversionid, sourceworkid")));
-   String evidence=System.getProperty("contribution.evidence");if(evidence!=null){Path out=Path.of(evidence);Files.createDirectories(out);Files.writeString(out.resolve("schema-upgrade.json"),new tools.jackson.databind.ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("upgrade","39->41 (V40 absent)","unchangedBaselineColumns",beforeColumns,"legacySourcePinsRemainNull",true,"columns",columns,"primaryKey",keys,"constraints",constraints,"postgresVersion",db.queryForObject("SHOW server_version",String.class))));}
+   String evidence=System.getProperty("contribution.evidence");if(evidence!=null){Path out=Path.of(evidence);Files.createDirectories(out);Files.writeString(out.resolve("schema-upgrade.json"),new tools.jackson.databind.ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(Map.of("upgrade","40->41","unchangedBaselineColumns",beforeColumns,"legacySourcePinsRemainNull",true,"columns",columns,"primaryKey",keys,"constraints",constraints,"postgresVersion",db.queryForObject("SHOW server_version",String.class))));}
   }
  }
  private static String id(){return UUID.randomUUID().toString();}
