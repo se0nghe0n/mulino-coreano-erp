@@ -204,3 +204,112 @@ coordinator의 전체 harness601개와 source mapping8개 검사가 통과했다
 prepare도41 case·802 subcase·24,248 assertion에서 문제0개로 통과했다.
 이는 단위·계약 검사이며 새 source의 실제 scenario 실행은 아직 없다.
 공통 상태/기간 definition과 확인 수령의 목표 의미 연결은 별도 구현 중이다.
+
+## 입력 참조 수정 source의 43개 실제 결과
+
+source `ad80e1bc821746b7b2c82782421d5ced7bfbcbc3`의 native Workflow
+`wf_6c6fbaf8-81f`와 T13 재실행 `wf_814e7a4c-83c`가 완료됐다.
+metadata12개는 모두 Haiku5.5다. coordinator가 원본·source·fixture·
+실행 jar hash와 고유43개 및 assertion392개를 독립 대조했다.
+
+| case | subcase PASS | subcase FAIL | assertion PASS | assertion FAIL | 미관찰 |
+|---|---:|---:|---:|---:|---:|
+| T09 | 5 | 4 | 34 | 0 | 60 |
+| T11 | 3 | 9 | 29 | 3 | 78 |
+| T12 | 0 | 5 | 14 | 35 | 16 |
+| T13 | 1 | 16 | 10 | 3 | 110 |
+| 합계 | 9 | 34 | 87 | 41 | 264 |
+
+PASS9개는 각각 모든 assertion을 관찰했고 runtimeComplete=true다.
+실행 전체의 runtime/prerequisite/gateComplete는 false다. T13의
+decision-unauthorized가 새로 통과했지만 양성 manager 승인은 권한에서
+거부됐다. T09·T11은 예약 좌표 누락, T12는 판정 조회 projection 등
+후속 실패를 드러냈다. 이 source에는 수령 graph와 새 목표 정의가 아직
+없었으므로 최신 통합 구현의 실패 수로 옮기지 않는다.
+
+T13 첫 attempt는 실행 agent가22초 만에 종료하면서 진행 중이던 Maven
+프로세스가 SIGTERM·exit143으로 끝났다. 제품 실패가 아닌 ENV이며 원본을
+보존했다. 같은 source의 한 번 허용된 재실행이17개 terminal report를
+생성했다. validator는 assertion110개 미관찰을 reportComplete=false로
+잘못 표시했다. 모든 행이 있는 report와 runtime/gate 완료를 구별한다.
+T13 실행 jar hash도 coordinator가 직접 재계산해 일치를 확인했다.
+
+원본은 `t3-6f9c71e3/.local/input-contract-wave-20261023/`이고 독립
+검사는 `.local/resume-20261023/input-contract-wave-coordinator-proof.json`이다.
+custom watcher 두 개는 child가 중단했으며 새 실행에서는 native 완료
+알림과 foreground terminal 대기를 사용한다.
+
+## 상태·기간 목표와 확인 수령 의미의 통합
+
+worker180918d4를31e9a4f3로 통합하고7d22ce26에서 입력을 결합했다.
+기존 누적 template·capability·policy를 보존하고 held-at·held-exists·
+held-throughout typed template을 추가했다. T09의 목표6개는 selector를,
+기간 목표4개는 관측 정책을 명시한다. 기존 API의 유일 template 문맥
+선택은 모든 mode에서 유지하며 추가 필수 입력 제한을 도입하지 않았다.
+
+기간 목표에도 원래 요청 수량을 적용하고 경계별 판정·근거를 합친다.
+현재 재고·검증 관측 구간·실제 retirement 원장을 구별하며 point나
+관측 공백으로 연속 coverage를 만들지 않는다. CONFIRMED_RECEIPT 목표는
+PHYSICAL_RECEIPT 원천을 읽되 기존 receipt admission의 확정 transaction을
+통과한 물량만 세고, 중복이나 확인 전 원천으로 실적을 만들지 않는다.
+정정 영향도 같은 event 의미를 사용한다.
+
+coordinator의 backend72개가 한 번의 재실행에서 통과했다. 앞선20개
+ApplicationContext 오류는 JWT_PUBLIC_KEY 누락이었으며 첫 로그를
+보존하고 기존 로컬 검증 공개키로 재실행했다. assertion 실패는 없었다.
+전체 harness601개·입력9개·runtime package6개/발견 link12개·prepare도
+통과했다. prepare는41 case·802 subcase·24,248 assertion·문제0개다.
+로그는 `.local/resume-20261023/`의 backend-temporal-integrated-auth-retry,
+harness-temporal-graph-combined, temporal-source-setup,
+runtime-packages-temporal, prepare-temporal-graph-combined 로그다.
+
+source7d22ce26의 T01·T09·T11·T12, 고유38개·예상 assertion394개를
+새 Haiku dynamic Workflow로 실행했다. T01은 공통 정의와 harness
+변경의 회귀를 포함한다. 당시 관측 source의 canonical 연결은 미완성이며
+아래 후속 결과와 구분한다. 원문 주장만으로 검증 구간을 만들지 않는다.
+현재 통합 Step와 전체 gate는 계속 열려 있다.
+
+
+## 실제 수령 frontier의 재확인과 관측 graph 결합
+
+source7d22ce26, Workflow wf_9c782f6d-e35의4 case가 모두 terminal report를
+남겼다. 고유38개 중20PASS·18FAIL이고 예상394 assertion은204PASS·
+56FAIL·134미관찰이다. T01은12PASS/125assertion, T09는5PASS4FAIL/
+34PASS13FAIL47미관찰, T11은3PASS9FAIL/31PASS8FAIL71미관찰,
+T12는0PASS5FAIL/14PASS35FAIL16미관찰이다. retry는0회다.
+
+coordinator가 원본 report·fixture·source·실행 jar hash와10개 실제
+Haiku5.5 metadata를 대조했다. 모든 PASS 행은 전체 assertion을 관찰하고
+runtimeComplete=true·missingAdapters=[]다. report의 모든 행이 terminal인
+것과 전체 runtime/gate 완료는 다르며 전체 gate는 false다.
+독립 증거는 `.local/resume-20261023/temporal-receipt-wave-coordinator-proof.json`이다.
+
+T09 receive60·T11 receive90·T12 receipt는 실제 대조와 canonical 연결
+후 STALE_REVISION으로 거부됐다. 원본 wireRequest는 expectedRevision=1,
+제품 Observations와 공개 임시 수령 응답은0이다. 이전 입력 helper의
+"저장 revision1" 주석이 틀렸다. dbc75fc6에서10개 확정 요청을 실제
+임시 수령 응답 revision 참조로 바꿨다. 물리 사실·행동 ID·순서·269개
+assertion은 그대로다. 입력 검사12개와 prepare가 통과했다.
+
+관측 backend76fe11e2·graph61aa091b는 b2cf0466·409c9228로 통합했다.
+원문/claim/실제 segment 범위·수량·단위·구간을 대조하며 중복 interval은
+하나의 canonical identity로 연결하고 겹치는 상충 관측은 보류한다.
+원문 보고 시각과 coverage 유효 구간을 구별한다. 닫힌 끝은 명시적으로
+PostgreSQL microsecond 후속점으로 저장하고 point에 tail을 만들지 않는다.
+source 전용 ITEM reviewer의5개 capability만 추가했으며 WORK 차원을
+더하면 all-of로 거부되는 PG 반례도 통과했다. 기존 business grant와
+269개 assertion 원문은 보존했다. feature 역할 변경8줄과 보조 행동8개가
+승인된 범위이며 나머지 원본 줄을 보존했다.
+
+coordinator의 결합134개 backend가04af8e3c에서 모두 통과했다.
+첫133PASS/1FAIL은 새 기간 테스트의 설명 문장 source였으며 경계와
+기대 결과를 보존해 JSON 원문으로 수정했다. 원래 실패 로그도 남겼다.
+source12개·prepare도 통과했다. 로그는 backend-observation-temporal-combined,
+backend-observation-temporal-corrected, receipt-revision-source-corrected,
+prepare-receipt-revision-combined이다.
+
+T13은9ac49b39에서15개 양성 fixture에 품목별 관리 권한30행만 더했다.
+기존 business grant와123개 assertion은 보존했다. authorization probe는
+HTTP/actual scenario가 아니며 새43개 Haiku 실행에서 승인 frontier를 본다.
+T09/T11 예약 좌표·T12 판정 projection 등 남은 실패를 계속 추적한다.
+새 source의 실행 결과를 기다리며 이전 source의 실패 수를 섞지 않는다.

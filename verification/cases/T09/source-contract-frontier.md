@@ -74,23 +74,24 @@ observation ID는 `/response/effects/receiptId`, 확정 segment는
   참조에서 운송 leaf·수량·LOT·장소를 추적한다. 직접 수령·위조·미래·
   병렬 참조와 다른 custodian을 넣는 반례는 계속 거부한다. 이 검사 통과는
   실제 수령·보관·인가 효과의 증거가 아니다.
-- T09 STATE_AT/EXISTS_IN/THROUGHOUT은 현행 fixture 기본 definition에
-  대응 goal template이 없다. 기본 definition에는 누적 `arrived`와
-  `delivered`만 있다. 존재하지 않는 condition ID를 넣어 통과시키지
-  않았다. 원래 상태/관측 공백 oracle에 맞는 typed template과 명시적
-  conditions·observationPolicy가 필요하다.
-- 원래 assertion은 누적 eventKinds에 `CONFIRMED_RECEIPT`를 요구하지만
-  실제 ReceiptFactAdmission은 `PHYSICAL_RECEIPT` canonical을 받는다.
-  문자열만 바꾸면 assertion을 위반한다. 제품의 public goal event 의미와
-  canonical kind의 연결을 해결해야 한다.
+- STATE_AT/EXISTS_IN/THROUGHOUT의 typed template을 발행했고 T09 입력6개가
+  실제 selector를 명시한다. 기간 입력4개에는 관측 정책도 명시한다.
+  기존의 유일한 published endpoint/mode template 문맥 선택은 보존한다.
+  THROUGHOUT의 관측4개는 원문→EVENT/claim→대조→canonical 연결을 추가했다.
+  source payload만으로 검증 구간을 만들지 않으며 point와 공백은 유지한다.
+  새 source의 실제 Haiku 실행은 아직 완료되지 않았다.
+- `CONFIRMED_RECEIPT` 목표와 `PHYSICAL_RECEIPT` 원천의 의미를 연결했다.
+  물리 수령·이동·기여 transaction을 통과한 사실만 세며 원천 종류를
+  바꾸지 않는다. 확인 전 원천과 중복 보고는 별도 수령 실적이 아니다.
+  정정 영향도 같은 의미를 사용한다. 새 source의 실제 실행은 아직 필요하다.
 - T12 미근거·불충분 범위·상충 주장은 여전히 확인 수령이 아니다.
   관측 저장 성공이 해당 주장의 판정/상충 flag 반영을 증명하지 않는다.
 - 수령 후 T11 Work 기여 범위/참조, T11·T12 수령 정정, T12 기한 변경의
   공개 입력도 남는다. JSON 목록은 관련 unpublished input을 기록한다.
   미구현 의미를 기존 primitive의 비슷한 입력으로 바꾸지 않았다.
 
-첫 actual frontier는 T09 `cumulative-versus-state/state`의 definition과
-연결된 `receive60` source graph의 서버 실행이다. T11은 `parent90-*/receive90`, T12는
+첫 actual frontier는 연결된 `receive60` source graph의 서버 실행이다.
+T11은 `parent90-*/receive90`, T12는
 음성 주장 저장 후 판정 및 `wrong-warehouse/receipt` graph를 확인한다.
 이후 실패도 기존 assertion으로 판정한다.
 
@@ -108,3 +109,11 @@ ReferenceResolver unit은 새 UUID binding과 실행 순서, 원문 bytes/hash,
 전체 로그는 ignored `.local/source-graph/`에 둔다.
 actual scenario는 실행하지 않는다. 통합 후 coordinator가 Haiku 5.5
 native dynamic Workflow로 실행해야 한다.
+
+
+2026-10-23 source7d22ce26의 실제 수령 graph는 canonical까지 진행한 뒤
+확정 입력 revision1과 임시 수령 row0의 차이로 거부됐다. dbc75fc6에서
+확정10개 입력을 실제 provisional 응답 revision으로 연결했다. 당시
+기록의 저장 revision1 주석도 제거했다. 물리 입력·269개 assertion은
+보존했고 입력12개·prepare가 통과했다. 새43개 병렬 Haiku 실행에서
+확정 이후의 업무 효과를 확인한다.

@@ -662,3 +662,63 @@ prepare도41 case·802 subcase·24,248 assertion에서 문제0개로 통과했�
 새로운 실제 source의 scenario
 PASS는 아직 주장하지 않는다. 상태/기간 목표와 확인 수령 의미를 별도
 통합한 뒤 결합 gate를 판단한다. 현재 Step는 계속 열려 있다.
+
+## 2026-10-23 상태·기간 목표의 결합 검증
+
+worker180918d4를31e9a4f3로 통합하고7d22ce26에서 T09 입력을 결합했다.
+상태·기간의 typed template을 공개하고 요청 수량·관측 구간·실제 재고
+원장을 판정에 연결했다. 확인 전 원천은 누적 수령으로 세지 않으며
+PHYSICAL_RECEIPT 원천과 CONFIRMED_RECEIPT 목표 의미를 구별한다.
+기존 유일 template의 문맥 선택 동작과 business oracle는 보존했다.
+
+coordinator의 backend72개·전체 harness601개·입력9개·runtime package
+6개/발견 link12개와 prepare가 통과했다. backend 첫 시도의20개
+ApplicationContext 오류는 로컬 공개키 환경 누락이었고 보정 후 한 번의
+전체72개 실행이 통과했다. 원래 오류 로그도 보존했다.
+
+이전 sourcead80e1bc의 Haiku43개 결과는9PASS·34FAIL이다. 예상
+assertion392개 중87PASS·41FAIL·264미관찰이고 모든 gate는 미완료다.
+최신 구현의 인수 수치로 섞지 않는다. T13 첫 ENV 시도와 한 번의
+정상 재실행을 보존하고 원본 jar까지 대조했다.
+
+source7d22ce26의 수령·목표 결합38개를 Haiku native dynamic Workflow로
+실행했다. 아래 후속 결과와 구분하며 전체 Task·현재 Step·실모델/규제/
+BTP 인수는 열려 있다.
+
+
+## 2026-10-23 관측 원천·승인 범위와 수령 revision의 통합
+
+T09의 두 기간 관측을 원문→EVENT/claim→대조→canonical graph로 연결했다.
+worker76fe11e2·61aa091b를 b2cf0466·409c9228로 통합했다. source 전용
+ITEM=P actor를 더하고 기존 business grant를 보존했다. feature 역할
+표기8줄과 보조 행동8개만 바꾸며269개 assertion 원문을 유지했다.
+원문 보고 시각과 coverage 구간을 구별하고 PostgreSQL microsecond
+격자의 닫힌 끝점을 저장한다. gap의 최종 point는 구간으로 늘리지 않는다.
+
+worker65095c42를9ac49b39로 통합해 T13 양성 fixture15개의 manager에
+품목P/P-alt의 approvePurchase 관리 권한을 추가했다. 기존 grant·업무
+사실·case123개 assertion은 그대로다. 실제 compiled authorization
+probe195개를 포함한 입력 검사5개가 통과했으며 HTTP 인수는 아니다.
+
+04af8e3c의 coordinator backend 결합134개가 한 번의 실행에서 모두
+통과했다. 앞선 실행은133PASS·1FAIL이며 설명 문장만 사용하던 새 기간
+테스트가 원인이다. 같은 시간 경계·기대 결과를 구조화된 원문에 연결해
+고쳤고 첫 실패 로그도 보존했다. 실제 시나리오 oracle는 줄이지 않았다.
+
+source7d22ce26의 Haiku Workflow wf_9c782f6d-e35는38개 중20PASS·18FAIL이다.
+예상394개 assertion은204PASS·56FAIL·134미관찰이다. coordinator가
+고유 행·source/fixture·실행 jar와10개 Haiku metadata를 대조했다.
+모든20PASS 행은 전체 assertion·runtimeComplete·adapter 조건을 만족한다.
+명시 subset·partial fixture이므로 전체 gate는 false다.
+
+이 실행은 수령 확정 입력의 revision1이 실제 임시 수령 revision0과
+불일치함을 드러냈다. dbc75fc6에서 T09/T11/T12의10개 확정 요청을 실제
+임시 수령 응답 revision 참조로 고쳤다. 입력 검사12개와 prepare가
+통과했다. prepare는41 case·802 subcase·24,248 assertion·문제0개이며
+실제 실행을 뜻하지 않는다.
+
+새 source dbc75fc6의 T09/T11/T12/T13, 고유43개·예상392개 assertion을
+Haiku native dynamic Workflow로 병렬 실행 중이다. T17의 실제 적격성
+원천 fixture는 별도 Sol Ultrafast 작업으로 수정한다. 사용량 snapshot
+도구가 없어 정확한 잔여 한도는 알 수 없으며 두 작업만 분리했다.
+전체 Task와 현재 Step는 계속 열려 있다.
