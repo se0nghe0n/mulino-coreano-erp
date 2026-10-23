@@ -179,9 +179,98 @@ class ScenarioObservationPostgresTest {
         try(var s=writer.createStatement();var rows=s.executeQuery("SELECT count(*) FROM mulino_trade_purchase_SupplierReplies")){assertTrue(rows.next());assertEquals(2,rows.getInt(1));}
     }
 
+    @Test void goalInputProjectionReplaysCapturedImmutableRowsInFreshPostgres() throws Exception {
+        String directory=System.getenv("T09_GOAL_INPUT_SOURCE");
+        Assumptions.assumeTrue(directory!=null,"Optional source-row replay requires T09_GOAL_INPUT_SOURCE");
+        for(String file:List.of("completeCumulativeSources-http.json","completeExistsSourcesAndInternalAuthorizationSeam-http.json")) {
+            var artifact=Json.read(Path.of(directory).resolve(file));
+            var tables=Map.of("goalReferences","mulino_work_read_GoalReferences","assessmentReferences","mulino_work_read_AssessmentReferences","assessmentInputSnapshots","mulino_evaluation_InputSnapshots");
+            var seen=new HashSet<String>();String organization=null;int snapshots=0;
+            for(var receipt:artifact.path("httpReceipts"))for(var entry:tables.entrySet())for(var source:receipt.path("response").path("data").path(entry.getKey())) {
+                if(!seen.add(entry.getKey()+source.path("ID").asText()))continue;
+                var row=Json.object();var names=ScenarioJdbcObservation.names(root,entry.getValue());
+                for(var fields=source.fields();fields.hasNext();) {
+                    var field=fields.next();String name=field.getKey();
+                    if(name.equals("conditionResults"))name="conditionsJson";
+                    if(Set.of("slots","scope","provenance","conditions").contains(name))name+="Json";
+                    if(!names.containsValue(name))continue;
+                    row.set(name,field.getValue().isContainerNode()?Json.MAPPER.valueToTree(field.getValue().toString()):field.getValue());
+                }
+                insert(entry.getValue(),row);organization=source.path("organizationId").asText();
+                if(entry.getKey().equals("assessmentInputSnapshots"))snapshots++;
+            }
+            assertNotNull(organization);assertTrue(snapshots>0);
+            var result=ScenarioJdbcObservation.capture(config,root,request(Json.object().put("organizationId",organization),"goalVersions","assessmentInputs").put("knownAt","2026-10-07T04:00:00Z"));
+            var actualIds=new HashSet<String>();for(var input:result.path("rawRows").path("assessmentInputs")) {
+                actualIds.add(input.path("snapshotId").asText());assertEquals(input.path("id"),input.path("snapshotId"));
+                assertEquals(input.path("contentHash").asText(),inputHash(input.path("contentJson").asText()));
+            }
+            assertEquals(snapshots,actualIds.size());
+            if(System.getenv("OBSERVER_TEST_EVIDENCE")!=null)Json.write(Path.of(System.getenv("OBSERVER_TEST_EVIDENCE")).resolve(file+"-fresh-pg-projection.json"),result);
+        }
+    }
+
+    static String inputHash(String content) throws Exception {
+        return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(content.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+    }
+    ObjectNode inputFixture() throws Exception {
+        base();String assessment=id();
+        var content=Json.object().put("goalId",goal);content.set("conditions",Json.parse(conditions()));
+        String text=content.toString(),hash=inputHash(text);
+        insert("mulino_work_read_AssessmentReferences",assessment(assessment,work,now,conditions()).put("asOf",now).put("knownAt",now).put("inputSnapshotHash",hash));
+        var snapshot=Json.object().put("ID",id()).put("organizationId",org).put("recordedAt",now).put("assessmentId",assessment).put("workId",work).put("goalId",goal).put("asOf",now).put("knownAt",now).put("contentHash",hash).put("contentJson",text);
+        insert("mulino_evaluation_InputSnapshots",snapshot);return snapshot;
+    }
+    @Test void goalInputProjectionKeepsActualSnapshotAndGoalSlots() throws Exception {
+        var snapshot=inputFixture();
+        String slots="{\"periodStart\":\"2026-10-07T00:00:00Z\",\"periodEnd\":\"2026-10-07T02:00:00Z\",\"placeId\":\"stored-place\",\"eventKind\":\"CONFIRMED_RECEIPT\",\"contributionScope\":\"stored-scope\",\"evaluationAt\":\"2026-10-07T02:00:00Z\",\"action\":\"PHYSICAL_HELD\",\"includeReserved\":false}";
+        changeSupplier("mulino_work_read_GoalReferences",row(goal),"slotsJson",slots);
+        changeSupplier("mulino_work_read_GoalReferences",row(goal),"targetQuantity",new java.math.BigDecimal("123.75"));
+        var result=capture("goalVersions","assessmentInputs");var g=result.at("/rawRows/goalVersions/0");
+        assertEquals("stored-place",g.path("placeId").asText());assertEquals(Json.parse(slots).path("periodStart"),g.path("periodStart"));
+        assertEquals(g.path("targetQuantity"),g.path("quantity"));assertFalse(g.path("includeReservations").asBoolean());
+        assertEquals("CONFIRMED_RECEIPT",g.path("eventKinds").get(0).asText());assertEquals("stored-scope",g.path("distinctContributionScope").asText());
+        for(var input:result.path("rawRows").path("assessmentInputs")) {
+            assertEquals(snapshot.path("ID"),input.path("snapshotId"));assertEquals(input.path("id"),input.path("snapshotId"));
+            assertEquals(snapshot.path("contentJson"),input.path("contentJson"));assertFalse(input.has("segmentId"));assertFalse(input.has("movementId"));
+        }
+        assertTrue(result.path("sourceEvidence").toString().contains("assessmentId=?"));
+    }
+    @Test void goalInputProjectionRetainsReadOnlyRepeatableReadAndKnownAtFence() throws Exception {
+        var snapshot=inputFixture();
+        try(var reader=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+            reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(reader);
+            insert("mulino_evaluation_InputSnapshots",snapshot.deepCopy().put("ID",id()));
+            var projection=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
+            assertEquals(1,projection.virtual("@assessmentInputs").size());
+            try(var statement=reader.createStatement();var state=statement.executeQuery("SHOW transaction_read_only")){assertTrue(state.next());assertEquals("on",state.getString(1));}
+            reader.rollback();
+        }
+        assertThrows(UnsupportedOperationException.class,()->capture("assessmentInputs"));
+        var beforeRequest=request(scope(),"assessmentInputs").put("knownAt",before);
+        assertTrue(ScenarioJdbcObservation.capture(config,root,beforeRequest).path("rawRows").path("assessmentInputs").isEmpty());
+    }
+
+    @ParameterizedTest @ValueSource(strings={"organizationId","workId","goalId","contentHash","knownAt","conditions","missingAssessment","duplicateSnapshot"})
+    void goalInputProjectionRejectsUnboundOrTamperedSnapshots(String field) throws Exception {
+        var snapshot=inputFixture();
+        switch(field) {
+            case "missingAssessment" -> changeSupplier("mulino_evaluation_InputSnapshots",snapshot,"assessmentId",id());
+            case "duplicateSnapshot" -> insert("mulino_evaluation_InputSnapshots",snapshot.deepCopy().put("ID",id()));
+            case "conditions" -> changeSupplier("mulino_evaluation_InputSnapshots",snapshot,"contentJson","{\"goalId\":\""+goal+"\",\"conditions\":[]}");
+            case "knownAt" -> changeSupplier("mulino_work_read_AssessmentReferences",row(snapshot.path("assessmentId").asText()),field,later);
+            case "organizationId","workId" -> changeSupplier("mulino_work_read_AssessmentReferences",row(snapshot.path("assessmentId").asText()),field,id());
+            default -> changeSupplier("mulino_evaluation_InputSnapshots",snapshot,field,id());
+        }
+        assertThrows(UnsupportedOperationException.class,()->capture("assessmentInputs"));
+    }
+
     @Test void historicalVersionsAndImmutableInputDetailsKeepTheirStoredIdentities() throws Exception {
-        base();String assessment=id(),snapshot=id();insert("mulino_work_read_AssessmentReferences",assessment(assessment,work,now,conditions()));
-        var input=row(snapshot);input.remove("createdAt");insert("mulino_evaluation_InputSnapshots",input.put("assessmentId",assessment).put("workId",work).put("goalId",goal).put("contentHash","snapshot-hash").put("contentJson","{\"conditions\":"+conditions()+",\"goalId\":\""+goal+"\"}"));
+        base();String assessment=id(),snapshot=id();
+        String content="{\"conditions\":"+conditions()+",\"goalId\":\""+goal+"\"}";
+        String hash=inputHash(content);
+        insert("mulino_work_read_AssessmentReferences",assessment(assessment,work,now,conditions()).put("asOf",now).put("knownAt",now).put("inputSnapshotHash",hash));
+        var input=row(snapshot);input.remove("createdAt");insert("mulino_evaluation_InputSnapshots",input.put("assessmentId",assessment).put("workId",work).put("goalId",goal).put("asOf",now).put("knownAt",now).put("contentHash",hash).put("contentJson",content));
         var newer=row(id());newer.remove("recordedAt");insert("mulino_definitions_DefinitionVersions",newer.put("version","definition-current"));
         var result=capture("assessments","assessmentInputs","conditionResults","goalVersions","goals");var raw=result.path("rawRows");var actual=raw.path("assessments").get(0);
         assertEquals("definition-original",actual.path("definitionVersion").asText());assertEquals("policy-original",actual.path("policyVersion").asText());assertEquals("core-v1",actual.path("evaluatorVersion").asText());

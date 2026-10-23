@@ -195,6 +195,7 @@ final class ScenarioObservationProjection {
             switch(table) {
                 case "mulino_work_read_GoalReferences" -> {
                     var slots=parse(row,"slotsJson");field(row,"slots",slots);
+                    goalFields(row,slots);
                     copy(row,"intervalStart",slots,"periodStart");copy(row,"intervalEnd",slots,"periodEnd");
                     copy(row,"startInclusive",slots,"periodStartInclusive");copy(row,"endInclusive",slots,"periodEndInclusive");
                     copy(row,"evidencePolicyVersion",slots,"evidencePolicyVersion");
@@ -251,9 +252,17 @@ final class ScenarioObservationProjection {
             case "@supervisionIssues" -> supervisionIssues();
             case "@assessmentInputs" -> {
                 var out=Json.array();for(var snapshot:read("mulino_evaluation_InputSnapshots")) {
-                    var content=parse(snapshot,"contentJson");var conditions=conditionRows(snapshot,content.path("conditions"));
-                    if(conditions.isEmpty()){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"goalVersionId",snapshot,"goalId");out.add(row);}
-                    else for(var condition:conditions){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"goalVersionId",snapshot,"goalId");for(String key:List.of("conditionId","evidenceIds","inputs","result","conflict","evaluatorVersion"))copy(row,key,condition,key);out.add(row);}
+                    var content=parse(snapshot,"contentJson");
+                    var assessment=linked("mulino_work_read_AssessmentReferences",snapshot,snapshot.path("assessmentId").asText(null));
+                    validateInputSnapshot(snapshot,content,assessment);
+                    if(OffsetDateTime.parse(snapshot.path("knownAt").asText()).isAfter(knownAt))
+                        throw new UnsupportedOperationException("Immutable assessment input knownAt is in the future");
+                    var siblings=query("mulino_evaluation_InputSnapshots","r.organizationId=? AND r.assessmentId=? AND r.recordedAt<=?",
+                        List.of(snapshot.path("organizationId").asText(),snapshot.path("assessmentId").asText(),knownAt));
+                    if(siblings.size()!=1)throw new UnsupportedOperationException("Ambiguous immutable assessment input snapshot");
+                    var conditions=conditionRows(snapshot,content.path("conditions"));
+                    if(conditions.isEmpty()){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"snapshotId",snapshot,"id");copy(row,"goalVersionId",snapshot,"goalId");out.add(row);}
+                    else for(var condition:conditions){var row=(ObjectNode)snapshot.deepCopy();field(row,"inputSnapshot",content);copy(row,"snapshotId",snapshot,"id");copy(row,"goalVersionId",snapshot,"goalId");for(String key:List.of("conditionId","evidenceIds","inputs","result","conflict","evaluatorVersion"))copy(row,key,condition,key);out.add(row);}
                 }yield out;
             }
             default -> throw new UnsupportedOperationException("No scoped virtual projection for "+source);
@@ -348,6 +357,36 @@ final class ScenarioObservationProjection {
         var parts=new ArrayList<String>();for(String column:columns)parts.add("r."+column+"=?");
         var params=new ArrayList<Object>();params.add(row.path("organizationId").asText());params.add(knownAt);for(String ignored:columns)params.add(row.path("id").asText());
         return !query(table,"r.organizationId=? AND r.recordedAt<=? AND ("+String.join(" OR ",parts)+")",params).isEmpty();
+    }
+
+    /** Explicit inverse of persisted Goal slots; quantity is the target, never an evaluated amount. */
+    static void goalFields(ObjectNode row,JsonNode slots) {
+        for(String key:List.of("placeId","periodStart","periodEnd"))copy(row,key,slots,key);
+        copy(row,"quantity",row,"targetQuantity");
+        copy(row,"evaluationTime",slots,"evaluationAt");
+        copy(row,"eligibilityAction",slots,"action");
+        copy(row,"includeReservations",slots,"includeReserved");
+        copy(row,"distinctContributionScope",slots,"contributionScope");
+        if(slots.path("eventKind").isTextual())field(row,"eventKinds",Json.array().add(slots.path("eventKind")));
+    }
+
+    /** No mutable facts are joined into an immutable assessment input. */
+    static void validateInputSnapshot(JsonNode snapshot,JsonNode content,JsonNode assessment) throws Exception {
+        String hash=java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+            .digest(snapshot.path("contentJson").asText().getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        if(assessment==null||!snapshot.hasNonNull("id")||!content.isObject()
+            ||!hash.equals(snapshot.path("contentHash").asText())
+            ||!snapshot.path("contentHash").equals(assessment.path("inputSnapshotHash"))
+            ||!same(snapshot,assessment,"organizationId","workId","goalId","asOf","knownAt")
+            ||!snapshot.path("assessmentId").equals(assessment.path("id"))
+            ||!snapshot.path("goalId").equals(content.path("goalId"))
+            ||!parse(assessment,"conditionsJson").equals(content.path("conditions")))
+            throw new UnsupportedOperationException("Immutable assessment input identity/hash/conditions/time binding is unknown");
+        var goal=content.path("goal");
+        if(!goal.isMissingNode()&&(!same(snapshot,goal,"organizationId","workId")
+            ||!snapshot.path("goalId").equals(goal.path("ID"))
+            ||!parse(goal,"slotsJson").equals(content.path("goalSlots"))))
+            throw new UnsupportedOperationException("Immutable assessment input Goal binding is unknown");
     }
 
     static ArrayNode conditionRows(JsonNode owner,JsonNode conditions) {
