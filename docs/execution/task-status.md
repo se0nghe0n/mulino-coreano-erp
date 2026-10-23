@@ -11,9 +11,9 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | 64054871: 807 PASS, 실패·오류·skip0, exit0, source3189개 drift0, 정리45개·별도 기록 경로5개 부재 확인 |
+| Backend 전체 | 08e2a7a5: 827 PASS, 실패·오류·skip0, exit0. f8bb11e9까지 backend/database bytes 동일, 실행 JUnit90개와 소유 자원 정리를 대조했다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | 64054871+관찰 계약 보정 patch: 926 executions 중846 PASS·80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
+| Harness 전체 | f8bb11e9: 986 executions 중906 PASS·기존80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
 | Prepare | 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
 | 실제 T09/T11 부분 | 5bcb46b5: native Haiku 12 subcase·107 assertions, 100 PASS·7 FAIL·미관찰0; subcase7 PASS·5 FAIL |
 | 실제 T17 전체 | 27ec8cc3: native Haiku 15 subcase·257 assertions, 79 PASS·178 FAIL·미관찰0; 모든 subcase FAIL |
@@ -46,7 +46,15 @@ primary가 12개 shard의 commit·원본 case·source3189개·동일 product cla
 `.local/resume-20261023/native-measurement-schema-b507aa8a-audit/`에 있다.
 [allocation 원행 귀속](observer-atomic-attribution.md)과
 [규제 중첩 상태](regulatory-conflict-state.md)의 집중 증거는 native 업무
-인수와 구별한다. allocation API transactionId 응답 공백도 아직 열려 있다.
+인수와 구별한다. allocation API transactionId 응답 공백은 실제 DB transaction ID 저장과
+최초 결과 replay로 보완했다. [명령 거래 증거](command-transaction-proof.md)와
+[metadata 원행 derivation](observer-measurement-derivations.md)을 통합했다.
+primary 전체 backend827 PASS, harness906 PASS·80 opt-in SKIP, prepare exit0을
+확인했다. 증거는 `.local/resume-20261024/transaction-backend-full/`과
+`.local/resume-20261024/semantic-integrated-full/`에 있다.
+새 f8bb11e9 기준선의 12개 격리 tree에서 원래36 subcase·461 assertions를
+실행하도록 Haiku dynamic Workflow를 요청했다. 최대 동시3개이며, 실제
+완료 통지와 원문을 대조하기 전에는 native 재인수 결과를 주장하지 않는다.
 primary의 7개 변경 파일 일치·원본 case/database 보존과 규제 결합 검증은
 `.local/resume-20261024/atomic-regulatory-combined/`에 남겼다.
 처음 Docker socket을 찾지 못한 환경 오류도 보존했고 실제 OrbStack
