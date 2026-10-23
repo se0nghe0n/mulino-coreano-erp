@@ -921,3 +921,26 @@ T17 원래257개 assertion의 byte block과 이전 ledger는 독립 대조했다
 원래 Work에 명시적 합성 준비 입력을 작성하며 T11 물량 범위와 제품
 전송 권한도 병렬 수정한다. 새 source의 결합·실제 인수 전까지 전체
 Task와 현재 Step은 OPEN이다.
+
+## 2026-10-23 구간 기여·인도 claim·전송 경계 결합 검증
+
+T17 실제 Work/목표 입력과 미확인 인도 claim 접수, T13 공개 공급자
+원천과 현재 전송 권한·최종 lease, T11 공개 물량 범위와 불변 source
+목표 고정을 통합했다. 기존 업무 oracle와 이전 RED를 보존한다.
+
+고정 source e9327108의 전체 backend는 한 번의 실행에서 666 PASS이며
+실패·오류·SKIP은 0개다. 결합 harness는 658 PASS·59개 별도 HTTP/PG
+opt-in SKIP·실패 0개며 실제 PostgreSQL observer42개를 포함한다.
+V38→39→40→41과 exact schema 1,958열·PK 대조 4개도 PASS다.
+prepare는 41 case·802 subcase·24,260 assertion·문제 0개다.
+
+worker의 별도 fresh HTTP/PG T13 20개와 T17 34개를 원본 JUnit·source·
+JAR hash로 감사했다. 이 결과를 전체 실제 시나리오·실모델 인수로
+승격하지 않는다. [통합·증거 기록](resume-contribution-delivery-integration.md)을
+따른다. 전체 Task와 현재 Step은 계속 OPEN이다.
+
+T11 폐쇄 재판정의 권한 목적, 부족10/미배분90 책임과 T09 판매 원천·
+내부 적격성 권한을 후속 수정한다. T09 입력/제품 writer는 같은
+e9327108의 별도 worktree에서 Sol Ultrafast로 실행한다. 기존 사업 권한과
+94개 oracle를 보존하며 새 fictional fixture 선택을 별도로 기록한다.
+다음 실제 시나리오는 Haiku5.5 native dynamic Workflow로 병렬 실행한다.
