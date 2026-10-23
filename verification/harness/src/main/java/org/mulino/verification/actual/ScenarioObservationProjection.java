@@ -314,6 +314,8 @@ final class ScenarioObservationProjection {
         for(var node:rows) {
             var row=(ObjectNode)node;
             switch(table) {
+                case "mulino_commands_CommandAudits" -> acceptanceAuditAttribution(row);
+                case "mulino_work_read_ObligationReferences" -> assignmentCreationAttribution(row);
                 case "mulino_inventory_Restrictions" -> {
                     var decision=linked("mulino_quality_Decisions",row,row.path("decisionId").asText(null));
                     if(decision!=null&&requiredSame(row,decision,"segmentId","commandId")&&"placeHold".equals(decision.path("operation").asText())) {
@@ -559,6 +561,173 @@ final class ScenarioObservationProjection {
             &&row.hasNonNull("predecessorId")==effects.hasNonNull("predecessorId")
             &&(!row.hasNonNull("predecessorId")||row.path("predecessorId").equals(effects.path("predecessorId")))
             &&decimalSame(row,effects,"quantity","startQuantity");
+    }
+
+    private record TransferProof(String xid,JsonNode audit,JsonNode successor) {}
+
+    private ObjectNode transferProofHeader(ObjectNode row) {
+        var proof=Json.object().put("status","UNSUPPORTED").put("kind","POSTGRES_XMIN_ACCEPTED_TRANSFER")
+            .put("historyComplete",false).put("knownAt",knownAt.toString());
+        if(asOf!=null)proof.put("asOf",asOf.toString());row.set("atomicAttribution",proof);return proof;
+    }
+
+    /** Audit identity is its actual immutable ledger tuple, never an API/result string alone. */
+    private void acceptanceAuditAttribution(ObjectNode row) throws Exception {
+        var proof=transferProofHeader(row);
+        if(!"acceptHandover".equals(row.path("capabilityId").asText())){proof.put("gap","NOT_ACCEPT_HANDOVER_AUDIT");return;}
+        var command=physicalRow("mulino_commands_CommandRecords",row,row.path("commandId").asText(null));
+        var proven=proveAcceptedTransfer(command,proof);
+        if(proven==null)return;
+        if(!row.path("id").equals(proven.audit().path("id"))){proof.put("gap","NOT_ORIGINAL_ACCEPT_AUDIT");return;}
+        row.put("transactionId",proven.xid());proof.put("status","PROVEN_ACCEPT_TRANSACTION");
+    }
+
+    /** xmin can name creation only for the fresh revision-zero successor proven by this exact accept command. */
+    private void assignmentCreationAttribution(ObjectNode row) throws Exception {
+        var proof=transferProofHeader(row);
+        if(!freshTransferAssignment(row)){proof.put("gap","NOT_FRESH_OPEN_SUCCESSOR");return;}
+        var physical=physicalRow("mulino_work_read_ObligationReferences",row,row.path("id").asText(null));
+        if(physical==null||!supportedTuple(physical)){proof.put("gap","ASSIGNMENT_TUPLE_OR_XID_UNSUPPORTED");return;}
+        var commands=query("mulino_commands_CommandRecords","r.organizationId=? AND r.xmin=?::xid",
+            List.of(row.path("organizationId").asText(),physical.path("_tupleXmin").asText()),true);
+        // Count before capability/state/time filters, including future or unrelated changeset commands.
+        if(commands.size()!=1){proof.put("gap","ASSIGNMENT_COMMAND_NOT_UNIQUE");return;}
+        var proven=proveAcceptedTransfer(commands.get(0),proof);
+        if(proven==null)return;
+        if(!row.path("id").equals(proven.successor().path("id"))){proof.put("gap","NOT_ACCEPTED_TARGET_SUCCESSOR");return;}
+        row.put("createdTransactionId",proven.xid());proof.put("status","PROVEN_NEW_ASSIGNMENT_CREATION");
+    }
+
+    private boolean freshTransferAssignment(JsonNode row) {
+        return row.path("revision").isIntegralNumber()&&row.path("revision").asInt(-1)==0
+            &&row.path("valid").asBoolean(false)&&"OPEN".equals(row.path("status").asText())
+            &&row.hasNonNull("predecessorId")&&instantSame(row,"createdAt",row,"recordedAt")
+            &&atomicTimes(row,"createdAt","recordedAt","effectiveAt");
+    }
+
+    private JsonNode physicalRow(String table,JsonNode owner,String id) throws Exception {
+        if(id==null||id.isBlank()||!owner.hasNonNull("organizationId"))return null;
+        var rows=query(table,"r.organizationId=? AND r.ID=?",List.of(owner.path("organizationId").asText(),id),true);
+        return rows.size()==1?rows.get(0):null;
+    }
+    private boolean supportedTuple(JsonNode row) {
+        return row!=null&&unwrappedTupleXid(row.path("_tupleXmin").asText(),row.path("_snapshotXmax").asText());
+    }
+    private boolean sameTupleTransaction(JsonNode a,JsonNode b) {
+        return supportedTuple(a)&&supportedTuple(b)&&requiredSame(a,b,"organizationId","_tupleXmin","_snapshotXmax");
+    }
+    private boolean atomicTimes(JsonNode row,String... fields) {
+        for(String field:fields)if(!attributionTime(row,field))return false;return true;
+    }
+    private TransferProof transferGap(ObjectNode proof,String gap){proof.put("gap",gap);return null;}
+
+    private TransferProof proveAcceptedTransfer(JsonNode command,ObjectNode proof) throws Exception {
+        if(!supportedTuple(command))return transferGap(proof,"COMMAND_TUPLE_OR_XID_UNSUPPORTED");
+        String xid=command.path("_tupleXmin").asText(),org=command.path("organizationId").asText();
+        proof.set("commandRow",command.deepCopy());proof.put("tupleXmin",xid).put("snapshotXmax",command.path("_snapshotXmax").asText());
+        var commands=query("mulino_commands_CommandRecords","r.organizationId=? AND r.xmin=?::xid",List.of(org,xid),true);
+        if(commands.size()!=1||!commands.get(0).path("id").equals(command.path("id")))return transferGap(proof,"ACCEPT_COMMAND_NOT_UNIQUE");
+        var intent=parse(command,"canonicalIntentJson");var result=parse(command,"resultJson");
+        if(!"COMMITTED".equals(command.path("state").asText())||!"acceptHandover".equals(command.path("capabilityId").asText())
+            ||!"COMMAND".equals(intent.path("intentKind").asText())||!requiredSame(command,intent,"capabilityId","definitionVersion","capabilityVersion","commandIdempotencyKey")
+            ||!"RESPONSIBILITY".equals(command.path("effectClass").asText())||!atomicTimes(command,"createdAt","completedAt")
+            ||!"APPLIED".equals(result.path("outcome").asText())||!command.path("id").equals(result.path("commandId"))
+            ||!xid.equals(result.path("transactionId").asText())||!intent.path("expectedRevision").isIntegralNumber()
+            ||!intent.path("expectedRevision").canConvertToInt()||intent.path("expectedRevision").asInt()<0
+            ||!command.path("canonicalHash").asText().matches("[a-f0-9]{64}")
+            ||!command.path("canonicalHash").equals(result.path("canonicalIntentHash"))
+            ||!command.path("canonicalHash").asText().equals(canonicalCommandHash(intent)))return transferGap(proof,"ACCEPT_COMMAND_OR_RESULT_MISMATCH");
+        var handover=physicalRow("mulino_responsibility_Handovers",command,intent.path("slots").path("handoverId").asText(null));
+        if(handover==null||!sameTupleTransaction(command,handover)||!atomicTimes(handover,"createdAt","recordedAt")
+            ||!"TRANSFER".equals(handover.path("kind").asText())||!"ACCEPTED".equals(handover.path("status").asText())
+            ||!handover.path("revision").isIntegralNumber()||!handover.path("revision").canConvertToInt()
+            ||(long)handover.path("revision").asInt()!=(long)intent.path("expectedRevision").asInt()+1
+            ||!handover.path("recipientId").equals(command.path("actorId"))||!storedEffectRow(handover,result.path("effects").path("responsibility")))
+            return transferGap(proof,"ACCEPTED_PROPOSAL_RESULT_MISMATCH");
+        proof.set("handoverRow",handover.deepCopy());
+        var predecessor=physicalRow("mulino_work_read_ObligationReferences",command,handover.path("assignmentId").asText(null));
+        if(predecessor==null||!sameTupleTransaction(command,predecessor)||!atomicTimes(predecessor,"createdAt","recordedAt","effectiveAt")
+            ||!"TRANSFERRED".equals(predecessor.path("status").asText())||!predecessor.path("valid").isBoolean()||predecessor.path("valid").asBoolean()
+            ||!requiredSame(predecessor,handover,"workId")||!predecessor.path("ownerId").equals(handover.path("previousOwnerId")))
+            return transferGap(proof,"PREDECESSOR_TRANSFER_MISMATCH");
+        var successors=query("mulino_work_read_ObligationReferences","r.organizationId=? AND r.predecessorId=? AND r.workId=?",
+            List.of(org,predecessor.path("id").asText(),handover.path("targetWorkId").asText()),true);
+        if(successors.size()!=1)return transferGap(proof,"TARGET_SUCCESSOR_NOT_UNIQUE");
+        var successor=successors.get(0);
+        if(!freshTransferAssignment(successor)||!sameTupleTransaction(command,successor)||!requiredSame(predecessor,successor,"rootId","kind")
+            ||successor.path("workId").equals(predecessor.path("workId"))||!successor.path("ownerId").equals(handover.path("recipientId"))
+            ||!requiredSame(successor,handover,"nextAction")||!instantSame(successor,"nextCheckAt",handover,"nextCheckAt"))
+            return transferGap(proof,"SUCCESSOR_CREATION_MISMATCH");
+        var root=physicalRow("mulino_responsibility_Roots",command,successor.path("rootId").asText(null));
+        var beforeScope=physicalRow("mulino_responsibility_Scopes",command,predecessor.path("scopeId").asText(null));
+        var afterScope=physicalRow("mulino_responsibility_Scopes",command,successor.path("scopeId").asText(null));
+        if(root==null||beforeScope==null||afterScope==null||!atomicTimes(root,"createdAt","recordedAt")
+            ||!atomicTimes(beforeScope,"createdAt","recordedAt")||!atomicTimes(afterScope,"createdAt","recordedAt")
+            ||!root.path("id").equals(beforeScope.path("rootId"))||!root.path("id").equals(afterScope.path("rootId"))
+            ||!requiredSame(root,successor,"kind")||!parse(root,"scopeJson").isObject()
+            ||!parse(root,"scopeJson").equals(parse(successor,"scopeJson"))||!parse(root,"scopeJson").equals(parse(predecessor,"scopeJson"))
+            ||!parse(root,"scopeJson").equals(parse(beforeScope,"scopeJson"))||!parse(root,"scopeJson").equals(parse(afterScope,"scopeJson"))
+            ||!validTransferredRange(command,root,predecessor,successor,handover,beforeScope,afterScope))return transferGap(proof,"ROOT_OR_SCOPE_TRANSFER_MISMATCH");
+        var sourceWork=physicalRow("mulino_work_read_Works",command,predecessor.path("workId").asText(null));
+        var targetWork=physicalRow("mulino_work_read_Works",command,successor.path("workId").asText(null));
+        if(sourceWork==null||targetWork==null||!atomicTimes(sourceWork,"createdAt","recordedAt")||!atomicTimes(targetWork,"createdAt","recordedAt")
+            ||!sourceWork.path("ownerId").equals(handover.path("previousOwnerId"))
+            ||!requiredSame(targetWork,successor,"ownerId","supervisorId")||(!items.isEmpty()&&!items.contains(targetWork.path("itemId").asText()))
+            ||(!works.isEmpty()&&!works.contains(targetWork.path("id").asText()))||(!lots.isEmpty()&&!lots.contains(targetWork.path("lotId").asText())))
+            return transferGap(proof,"TRANSFER_WORK_SCOPE_UNAVAILABLE");
+        var audits=query("mulino_commands_CommandAudits","r.organizationId=? AND r.commandId=? AND r.xmin=?::xid",List.of(org,command.path("id").asText(),xid),true);
+        if(audits.size()!=1)return transferGap(proof,"ORIGINAL_ACCEPT_AUDIT_NOT_UNIQUE");
+        var audit=audits.get(0);var facts=parse(audit,"auditFactsJson");var authorized=parse(command,"authorizationScopeJson");
+        if(!sameTupleTransaction(command,audit)||!requiredSame(command,audit,"actorId","capabilityId","canonicalHash")
+            ||!"APPLIED".equals(audit.path("outcome").asText())||!atomicTimes(audit,"createdAt")||!instantSame(audit,"createdAt",command,"completedAt")
+            ||!command.path("id").equals(parse(audit,"effectRefs").path("commandId"))||!handover.path("id").equals(facts.path("targetId"))
+            ||!intent.path("expectedRevision").equals(facts.path("beforeRevision"))||!authorized.isObject()||!authorized.equals(facts.path("scope"))
+            ||!containsId(authorized.path("WORK"),targetWork.path("id"))||!containsId(authorized.path("ITEM"),targetWork.path("itemId"))
+            ||!containsId(authorized.path("ITEM"),sourceWork.path("itemId")))return transferGap(proof,"ACCEPT_AUDIT_BINDING_MISMATCH");
+        proof.set("auditRow",audit.deepCopy());proof.set("predecessorRow",predecessor.deepCopy());proof.set("successorRow",successor.deepCopy());
+        proof.set("rootRow",root.deepCopy());proof.set("predecessorScopeRow",beforeScope.deepCopy());proof.set("successorScopeRow",afterScope.deepCopy());
+        proof.set("sourceWorkRow",sourceWork.deepCopy());proof.set("targetWorkRow",targetWork.deepCopy());
+        return new TransferProof(xid,audit,successor);
+    }
+
+    private boolean validTransferredRange(JsonNode command,JsonNode root,JsonNode predecessor,JsonNode successor,JsonNode handover,JsonNode before,JsonNode after) {
+        try {
+            var start=new java.math.BigDecimal(before.path("startQuantity").asText());var full=new java.math.BigDecimal(before.path("quantity").asText());
+            var amount=handover.hasNonNull("quantity")?new java.math.BigDecimal(handover.path("quantity").asText()):full;
+            if(start.signum()<0||full.signum()<=0||(root.hasNonNull("quantity")&&start.add(full).compareTo(new java.math.BigDecimal(root.path("quantity").asText()))>0)
+                ||amount.signum()<=0||amount.compareTo(full)>0||!after.path("leaf").asBoolean(false)
+                ||new java.math.BigDecimal(after.path("quantity").asText()).compareTo(amount)!=0
+                ||new java.math.BigDecimal(after.path("startQuantity").asText()).compareTo(start.add(full).subtract(amount))!=0)return false;
+            if(amount.compareTo(full)==0&&!before.path("id").equals(after.path("id")))return false;
+            if(amount.compareTo(full)<0&&(!before.path("id").equals(after.path("parentScopeId"))||before.path("leaf").asBoolean(true)||!sameTupleTransaction(command,after)))return false;
+            return root.hasNonNull("quantity")?decimalSame(predecessor,before,"quantity")&&decimalSame(successor,after,"quantity")
+                &&requiredSame(root,predecessor,"unit")&&requiredSame(root,successor,"unit")&&requiredSame(root,before,"unit")&&requiredSame(root,after,"unit"):
+                !predecessor.hasNonNull("quantity")&&!successor.hasNonNull("quantity")&&!handover.hasNonNull("quantity")&&full.compareTo(java.math.BigDecimal.ONE)==0;
+        }catch(NumberFormatException invalid){return false;}
+    }
+    private static boolean containsId(JsonNode array,JsonNode id) {if(!array.isArray()||!id.isTextual())return false;for(var value:array)if(value.equals(id))return true;return false;}
+    private static boolean storedEffectRow(JsonNode row,JsonNode effect) {
+        if(!effect.isObject())return false;
+        for(var it=row.fields();it.hasNext();) {
+            var f=it.next();String key=f.getKey();if(key.startsWith("_"))continue;String field=key.equals("id")?"ID":key;
+            if(!effect.has(field))return false;
+            if(f.getValue().isNull()){if(!effect.path(field).isNull())return false;}
+            else if(key.endsWith("At")){if(!instantSame(row,key,effect,field))return false;}
+            else if(key.equals("quantity")){if(!decimalSame(row,effect,key))return false;}
+            else if(!f.getValue().equals(effect.path(field)))return false;
+        }
+        return true;
+    }
+    static String canonicalCommandHash(JsonNode intent) {
+        if(!intent.isObject())return "";
+        var canonical=(ObjectNode)intent.deepCopy();canonical.remove(List.of("commandIdempotencyKey","conversationRequestId","canonicalIntentHash","proposalRevision","approvalId"));
+        return Json.sha256Text(sortedCommandJson(canonical).toString());
+    }
+    private static JsonNode sortedCommandJson(JsonNode node) {
+        if(node.isArray()){var out=Json.array();for(var value:node)out.add(sortedCommandJson(value));return out;}
+        if(!node.isObject())return node;
+        var out=Json.object();var names=new TreeSet<String>();node.fieldNames().forEachRemaining(names::add);
+        for(String name:names)out.set(name,sortedCommandJson(node.path(name)));return out;
     }
 
     /** Immutable command proof belongs to this allocation, not merely to a command on the same ITEM. */
