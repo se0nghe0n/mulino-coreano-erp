@@ -1,9 +1,9 @@
 {
-  "schemaVersion": "5.1.0",
+  "schemaVersion": "5.2.0",
   "rationale": {
     "timestampWidening": "R1 absolute instant policy. Explicit CDS Timestamp columns are stored TIMESTAMPTZ; CQN roundtrip and time predicates prove UTC/offset/session timezones.",
     "notNullStrengthening": "Flyway enforces mandatory domain facts above nullable CDS default. Database nullability never weakens compiler requirements; only enumerated mandatory columns may differ.",
-    "scope": "Fresh V1–V41 PostgreSQL comparison: exact 1958 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
+    "scope": "Fresh V1–V43 PostgreSQL comparison: exact 1973 column names, sizes, decimal scales and PKs; only enumerated timestamp widening and NOT NULL strengthening."
   },
   "timestampWidening": [
     "mulino_commands_approvalconsumptions.consumedat",
@@ -24,6 +24,10 @@
     "mulino_definitions_definitionreviews.recordedat",
     "mulino_definitions_definitionvalidations.recordedat",
     "mulino_definitions_workdefinitionmigrations.recordedat",
+    "mulino_evaluation_evidencecaptures.asof",
+    "mulino_evaluation_evidencecaptures.evaluationhorizon",
+    "mulino_evaluation_evidencecaptures.knownat",
+    "mulino_evaluation_evidencecaptures.recordedat",
     "mulino_evaluation_inputsnapshots.asof",
     "mulino_evaluation_inputsnapshots.knownat",
     "mulino_evaluation_inputsnapshots.recordedat",
@@ -1149,9 +1153,9 @@
     "mulino_trade_shipment_shipments.state"
   ],
   "baseline": "4be9480d",
-  "observedColumnCount": 1958,
-  "observedArtifactSha256": "db7c5d17150f7922b2f7dc893dd5c47cafe13398df3e6f3feebeea4470523a2c",
-  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled; V40 adds nullable original claim capture and makes the existing verified observation root nullable before confirmation; V28 foreign keys and confirmed delivery integrity remain unchanged; V41 adds three nullable immutable source Work/Goal/condition pins without legacy backfill or duplicate allocations",
+  "observedColumnCount": 1973,
+  "observedArtifactSha256": "42f26d2c9699c1d4403cc3a459ef489f94d1b35b10e3509c8194e6607021ab72",
+  "scope": "S4 V1–V32 exact current CDS/Flyway comparison; earlier S3 1432 columns plus exact 435 additions; s5e V33–V35 (UD-1 nullable sales price/currency, UD-2 Works.nextAction/nextCheckAt, plan §8 definition lifecycle tables) add 71 columns; V38 adds one nullable historical consumptionPolicy column and requires supported policy for every new approval without retroactive backfill; V39 adds 14 trigger-owned recovery history columns with immutable source scope, ExecutionClock, source revision, transaction/sequence order and tombstones; legacy rows are not backfilled; V40 adds nullable original claim capture and makes the existing verified observation root nullable before confirmation; V28 foreign keys and confirmed delivery integrity remain unchanged; V41 adds three nullable immutable source Work/Goal/condition pins without legacy backfill or duplicate allocations; V43 adds 14 immutable shared evidence capture columns and one nullable InputSnapshots binding without historical backfill",
   "reviewedAdditions": {
     "mulino_commands_approvalconsumptions.consumedat": {
       "migration": "database/migrations/V8__commands.sql",
@@ -5961,6 +5965,89 @@
       "migration": "database/migrations/V41__immutable_source_goal_contributions.sql",
       "cds": "backend/db/work.cds",
       "nullableReason": "발행 정의의 source quantity condition에 고정하며 legacy 조건을 추정하지 않는다."
+    },
+    "mulino_evaluation_evidencecaptures.admissionpurpose": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.asof": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "timestampWideningReason": "capture의 asOf·knownAt·평가 horizon·저장 시각을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.contenthash": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.contentjson": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.evaluationhorizon": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "timestampWideningReason": "capture의 asOf·knownAt·평가 horizon·저장 시각을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.id": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.itemid": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.knownat": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "timestampWideningReason": "capture의 asOf·knownAt·평가 horizon·저장 시각을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.lotid": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "nullableReason": "선택 scope와 과거 snapshot의 원래 결손을 보존하며 현재 사실로 소급 보완하지 않는다."
+    },
+    "mulino_evaluation_evidencecaptures.organizationid": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.placeid": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "nullableReason": "선택 scope와 과거 snapshot의 원래 결손을 보존하며 현재 사실로 소급 보완하지 않는다."
+    },
+    "mulino_evaluation_evidencecaptures.recordedat": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "timestampWideningReason": "capture의 asOf·knownAt·평가 horizon·저장 시각을 절대 instant로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.scopejson": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다."
+    },
+    "mulino_evaluation_evidencecaptures.workid": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "nullableReason": "선택 scope와 과거 snapshot의 원래 결손을 보존하며 현재 사실로 소급 보완하지 않는다."
+    },
+    "mulino_evaluation_inputsnapshots.evidencecaptureid": {
+      "migration": "database/migrations/V43__shared_evidence_captures.sql",
+      "cds": "backend/db/evaluation.cds",
+      "reason": "실제 공통 원천 capture와 목표별 불변 envelope의 연결을 조직·scope·시점·원문으로 보존한다.",
+      "nullableReason": "선택 scope와 과거 snapshot의 원래 결손을 보존하며 현재 사실로 소급 보완하지 않는다."
     }
   },
   "exactColumnInventory": [
@@ -6155,10 +6242,25 @@
     "mulino_definitions_workdefinitionmigrations.reason",
     "mulino_definitions_workdefinitionmigrations.recordedat",
     "mulino_definitions_workdefinitionmigrations.workid",
+    "mulino_evaluation_evidencecaptures.admissionpurpose",
+    "mulino_evaluation_evidencecaptures.asof",
+    "mulino_evaluation_evidencecaptures.contenthash",
+    "mulino_evaluation_evidencecaptures.contentjson",
+    "mulino_evaluation_evidencecaptures.evaluationhorizon",
+    "mulino_evaluation_evidencecaptures.id",
+    "mulino_evaluation_evidencecaptures.itemid",
+    "mulino_evaluation_evidencecaptures.knownat",
+    "mulino_evaluation_evidencecaptures.lotid",
+    "mulino_evaluation_evidencecaptures.organizationid",
+    "mulino_evaluation_evidencecaptures.placeid",
+    "mulino_evaluation_evidencecaptures.recordedat",
+    "mulino_evaluation_evidencecaptures.scopejson",
+    "mulino_evaluation_evidencecaptures.workid",
     "mulino_evaluation_inputsnapshots.asof",
     "mulino_evaluation_inputsnapshots.assessmentid",
     "mulino_evaluation_inputsnapshots.contenthash",
     "mulino_evaluation_inputsnapshots.contentjson",
+    "mulino_evaluation_inputsnapshots.evidencecaptureid",
     "mulino_evaluation_inputsnapshots.goalid",
     "mulino_evaluation_inputsnapshots.id",
     "mulino_evaluation_inputsnapshots.knownat",
@@ -8417,5 +8519,29 @@
     "upgradeComparison": "backend/src/test/java/com/mulino/core/SourceGoalContributionMigrationPostgresTest.java#v40LegacyRemainsUnknownAndNewBindingsAreImmutable",
     "previousObservedArtifactSha256": "5705b287b0547e7dc9343fd296e4ce51877e460fcb48eb5a637258d4d98ae665",
     "legacySourcePinsBackfilled": false
+  },
+  "v43Evidence": {
+    "previousColumnCount": 1958,
+    "columnCount": 1973,
+    "addedColumns": [
+      "mulino_evaluation_evidencecaptures.admissionpurpose",
+      "mulino_evaluation_evidencecaptures.asof",
+      "mulino_evaluation_evidencecaptures.contenthash",
+      "mulino_evaluation_evidencecaptures.contentjson",
+      "mulino_evaluation_evidencecaptures.evaluationhorizon",
+      "mulino_evaluation_evidencecaptures.id",
+      "mulino_evaluation_evidencecaptures.itemid",
+      "mulino_evaluation_evidencecaptures.knownat",
+      "mulino_evaluation_evidencecaptures.lotid",
+      "mulino_evaluation_evidencecaptures.organizationid",
+      "mulino_evaluation_evidencecaptures.placeid",
+      "mulino_evaluation_evidencecaptures.recordedat",
+      "mulino_evaluation_evidencecaptures.scopejson",
+      "mulino_evaluation_evidencecaptures.workid",
+      "mulino_evaluation_inputsnapshots.evidencecaptureid"
+    ],
+    "migration": "database/migrations/V43__shared_evidence_captures.sql",
+    "schemaComparison": "backend/src/test/java/com/mulino/core/S1ReadIntegrationTest.java#freshFlywayMatchesAllCdsColumnsAndPrimaryKeysWithExplicitWidening",
+    "historicalCaptureBackfilled": false
   }
 }

@@ -51,7 +51,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
   public void requireFulfilled(DomainContext c,Map<String,Object> w,Map<String,Object> goal){
     var latest=latest(c,w.get("ID").toString(),goal.get("ID").toString());var current=calculate(c,w,goal,c.asOf(),CanonicalFactAdmission.Purpose.CLOSE_WORK);
     if(!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw new DomainError("HELD","POLICY_UNRESOLVED","Current evidence policy required for closure");
-    if(latest==null||latest.get("inputSnapshotHash")==null||Boolean.TRUE.equals(latest.get("held"))||current.held||!"SATISFIED".equals(latest.get("outcome"))||current.result.truth().state()!=PredicateTruth.State.SATISFIED||current.result.truth().conflict()||!Objects.equals(latest.get("inputSnapshotHash"),current.hash))throw new DomainError("HELD","ASSESSMENT_NOT_CURRENT","Current immutable goal assessment and inputs required");
+    if(latest==null||latest.get("inputSnapshotHash")==null||Boolean.TRUE.equals(latest.get("held"))||current.held||!"SATISFIED".equals(latest.get("outcome"))||current.result.truth().state()!=PredicateTruth.State.SATISFIED||current.result.truth().conflict()||!sameCurrentSources(c,latest,current))throw new DomainError("HELD","ASSESSMENT_NOT_CURRENT","Current immutable goal assessment and inputs required");
   }
   /** Scope selection uses immutable snapshot lineage; execution revalidates every admitted source. */
   public Map<String,List<String>> scopes(DomainContext c,String workId){
@@ -76,7 +76,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     var snapshot=proofSnapshot(c,latest);var slots=decode(goal.get("slotsJson"));
     if(!"CUMULATIVE_EVENT".equals(slots.get("quantityMode"))||slots.get("targetQuantity")==null||slots.get("unit")==null||slots.get("periodStart")==null||slots.get("periodEnd")==null||!Objects.equals(goal.get("ID"),snapshot.get("goalId")))throw shortfallUnavailable();
     var current=calculate(c,w,goal,c.asOf(),CanonicalFactAdmission.Purpose.OPEN_OBLIGATION);
-    if(current.held||current.result.truth().state()!=PredicateTruth.State.UNSATISFIED||current.result.truth().conflict()||!Objects.equals(current.hash,latest.get("inputSnapshotHash"))||!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw shortfallUnavailable();
+    if(current.held||current.result.truth().state()!=PredicateTruth.State.UNSATISFIED||current.result.truth().conflict()||!sameCurrentSources(c,latest,current)||!policies.current(c.organizationId(),"EVIDENCE",clock.instant()).stream().anyMatch(p->Objects.equals(p.get("ID"),current.policy)))throw shortfallUnavailable();
     // IdentityAuthorization's WORK list is any-of. Check each endpoint separately.
     var sourceFacts=map(map(snapshot.get("facts")).get("sources"));
     if(!(sourceFacts.get("evidence.CanonicalOccurrences") instanceof List<?> actuals)||actuals.isEmpty())throw shortfallUnavailable();
@@ -101,8 +101,22 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     var amount=TypedPredicateEvaluator.quantity(chosen.inputs(),unit,true);
     if(amount.uncertain()||amount.conflict()||amount.total().signum()<0||amount.total().compareTo(target)>=0)throw shortfallUnavailable();
     var scope=new LinkedHashMap<String,Object>(map(slots.get("scope")));scope.put("workId",workId);scope.put("goalVersionId",goal.get("ID"));scope.put("conditionId",property);
-    var proof=new LinkedHashMap<String,Object>();proof.put("assessmentId",latest.get("ID"));proof.put("inputSnapshotHash",current.hash);proof.put("definitionVersionId",goal.get("definitionVersionId"));proof.put("definitionHash",snapshot.get("definitionHash"));proof.put("policyVersionId",current.policy);proof.put("policy",snapshot.get("policy"));proof.put("goalSlots",slots);proof.put("targetQuantity",target);proof.put("recognizedQuantity",amount.total());proof.put("shortfallQuantity",target.subtract(amount.total()));proof.put("unit",unit);proof.put("conditionId",property);proof.put("inputs",normalize(chosen.inputs()));proof.put("asOf",c.asOf());proof.put("knownAt",c.knownAt());
+    var proof=new LinkedHashMap<String,Object>();proof.put("assessmentId",latest.get("ID"));proof.put("inputSnapshotHash",latest.get("inputSnapshotHash"));proof.put("definitionVersionId",goal.get("definitionVersionId"));proof.put("definitionHash",snapshot.get("definitionHash"));proof.put("policyVersionId",current.policy);proof.put("policy",snapshot.get("policy"));proof.put("goalSlots",slots);proof.put("targetQuantity",target);proof.put("recognizedQuantity",amount.total());proof.put("shortfallQuantity",target.subtract(amount.total()));proof.put("unit",unit);proof.put("conditionId",property);proof.put("inputs",normalize(chosen.inputs()));proof.put("asOf",c.asOf());proof.put("knownAt",c.knownAt());
     return new GoalShortfallProof.Proof(workId,goal.get("ID").toString(),property,target,amount.total(),target.subtract(amount.total()),unit,Map.copyOf(scope),Map.copyOf(proof));
+  }
+  /** Re-admit current sources for the requested purpose before checking the frozen proof.
+   * Request cutoffs describe capture provenance, not a source revision. Everything else,
+   * including Fact times, identities, revisions, raw sources and calculation, stays exact. */
+  private boolean sameCurrentSources(DomainContext c,Map<String,Object> assessment,Calculation current){
+    var frozen=proofSnapshot(c,assessment);var fresh=decode(current.snapshot);
+    if(!frozen.containsKey("captureBoundary"))return Objects.equals(assessment.get("inputSnapshotHash"),current.hash);
+    for(var snapshot:List.of(frozen,fresh)){
+      var boundary=new LinkedHashMap<>(map(snapshot.get("captureBoundary")));
+      if(!boundary.keySet().containsAll(Set.of("asOf","knownAt","evaluationHorizon")))return false;
+      boundary.remove("asOf");boundary.remove("knownAt");boundary.remove("evaluationHorizon");
+      snapshot.put("captureBoundary",boundary);
+    }
+    return encode(frozen).equals(encode(fresh));
   }
   private Map<String,Object> proofSnapshot(DomainContext c,Map<String,Object> assessment){
     var snapshots=repository.rows(c,"mulino.evaluation.InputSnapshots").stream().filter(x->Objects.equals(assessment.get("ID"),x.get("assessmentId"))).toList();
@@ -158,7 +172,7 @@ public class AssessmentService implements CommandHandler,WorkAssessmentGuard,Goa
     var boundary=new TreeMap<String,Object>();boundary.put("organizationId",c.organizationId());boundary.put("scope",captureScope);boundary.put("asOf",c.asOf());boundary.put("knownAt",c.knownAt());boundary.put("evaluationHorizon",evaluationHorizon);boundary.put("admissionPurpose","ASSESS_GOAL");boundary.put("admissionContract","canonical-admission-v1");boundary.put("definitionHash",d.contentHash());boundary.put("definitionId",d.id());boundary.put("evaluatorVersion",d.evaluatorVersion());boundary.put("policyHash",policy.getFirst().get("contentHash"));boundary.put("policyId",policy.getFirst().get("ID"));boundary.put("policyVersion",policy.getFirst().get("version"));
     for(String key:List.of("action","includeReserved","evaluationAt","eventKind","evidenceSource","periodStart","periodEnd","periodStartInclusive","periodEndInclusive"))if(slots.containsKey(key))boundary.put(key,slots.get(key));
     // Purpose is checked by the provider. Only ASSESS_GOAL creates persisted captures;
-    // read-only guard calculations must keep their existing envelope hash semantics.
+    // read-only guards compare re-admitted source content while preserving this provenance.
     snapshot.put("captureBoundary",boundary);String payload=encode(snapshot);
     return new Calculation(result,DefinitionRepository.sha256(payload),payload,policy.getFirst().get("ID").toString(),false,encode(Map.of("boundary",boundary,"facts",facts)));
   }

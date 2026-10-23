@@ -154,3 +154,40 @@ view가 필요하면 관찰 계약 owner가 독립 원천 identity와 의미를 
 원행을 숨기지 않았다. 기존 assertion/fixture도 변경하지 않았다.
 위 잔여와 두 통합 hook, 원래 scenario의 새 actual 검증이 남아 있으므로
 전체 Task/Step 완료를 주장하지 않는다.
+
+## 통합 후 close guard 회귀 수정
+
+primary의 frozen root `28ecbd76` full backend에서 S1 inventory 한 건과
+S2 close 두 건이 실패했다. 이 tree는 sync하지 않고 `86309e9a`에서
+독립 수정한다. 원래 90/100 판정·close guard·정정 이력은 유지한다.
+
+새 captureBoundary의 요청 asOf/knownAt/evaluationHorizon이 full envelope
+hash에 들어가므로, 실제 원천이 같아도 다음 요청의 full hash가 달랐다.
+저장 원문과 SHA-256은 계속 모든 capture 경계를 포함한다. guard는
+저장된 envelope의 원문 hash를 검증하고 현재 목적(CLOSE_WORK 또는
+OPEN_OBLIGATION)으로 원천을 다시 admit한 뒤, 오직 위 세 capture 시각을
+비교용 사본에서 제외한다. 조직·scope·정책·정의·selector와 facts 전체,
+원천 ID/revision/hash·사실 시각·조건·계산은 그대로 정확히 비교한다.
+public capture ID나 저장 hash를 대체하는 새 identity는 만들지 않는다.
+shortfall provenance도 새 요청 hash가 아닌 실제 저장된 envelope hash를
+참조한다. legacy 원문은 기존 full hash 비교를 유지하며 소급 수정하지
+않는다. 현재 권한·목적·정책 검증은 그대로 실행한다.
+
+S1은 Java assertion을 바꾸지 않았다. 완전한 CDS/Flyway 비교의 추가
+15개 column(실제 capture 14개와 nullable envelope binding 한 개),
+절대시각 widening 4개를 정책 inventory에 추가했다. NOT NULL 목록과
+기존 reviewed entry는 모두 보존했다. 1,973개 전체 구조·타입·길이·scale·
+PK가 일치하며 차이 목록은 비어 있다.
+
+집중 실제 PG 고유 검사 7개가 PASS다. 기존 S1 한 건과 S2 회귀 두 건,
+새 cutoff에도 capture/envelope bytes·hash를 보존하는 close 한 건,
+판정100 후 원래 knownAt 뒤에 기록된1이 새 요청에서 stale proof를 막는
+한 건, superseding document로 stale proof를 막는 한 건, 기존 정책
+변경 거부 한 건이다. 늦은 사실 반례를 명시적 두 시점으로 강화한 뒤
+그 한 건을 다시 PASS했다. 원래 T09/T11/T12 oracle와 fixture bytes는
+변경하지 않았다. full suite·native actual·새 package는 실행하지 않았다.
+
+근거는 `.local/shared-capture-regressions/handoff.json`과 같은 directory의
+root failure 발췌·schema 관찰·PG logs·hash·cleanup 기록이다. 중간 명령
+경로 오류와 test lambda overload compile 오류도 별도 로그로 보존했다.
+primary 통합과 결합 인수가 남아 있으므로 Task/Step은 OPEN이다.

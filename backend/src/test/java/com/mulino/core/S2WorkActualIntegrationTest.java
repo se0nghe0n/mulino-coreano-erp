@@ -108,9 +108,12 @@ class S2WorkActualIntegrationTest {
   String draft(Map<String,Object> goal){var result=run("createDraft",0,row("itemId",item,"definitionVersionId",definition,"kind","PURCHASE","ownerId",actor,"supervisorId",actor,"goal",goal));return String.valueOf(((Map<?,?>)result.get("effects")).get("workId"));}
 
   Map<String,Object> assess(String id){return runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->assessmentService.assess(context(),id));});}
+  Map<String,Object> assessAt(DomainContext c,String workId){return runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->assessmentService.assess(c,workId));});}
+  Map<String,Object> closeAt(DomainContext c,String workId){return runtime.requestContext().run(ctx->{return new org.springframework.transaction.support.TransactionTemplate(transactions).execute(tx->lifecycle.execute(c,command("closeWork",revision(workId),Map.of("workId",workId,"reason","FULFILLED"))));});}
   int revision(String id){return jdbc.queryForObject("SELECT revision FROM mulino_work_read_Works WHERE ID=?",Integer.class,id);}
-  void occurrence(String workId,String amount,String externalId){
-    String event=id(),claim=id(),canonical=id(),doc=id();byte[] bytes=(externalId+amount).getBytes();var blob=blobs.stage(bytes,com.mulino.adapters.blob.LocalBlobStore.hash(bytes));blobs.commit(blob);Instant now=Instant.now().minusSeconds(2);
+  void occurrence(String workId,String amount,String externalId){occurrence(workId,amount,externalId,Instant.now().minusSeconds(2));}
+  void occurrence(String workId,String amount,String externalId,Instant now){
+    String event=id(),claim=id(),canonical=id(),doc=id();byte[] bytes=(externalId+amount).getBytes();var blob=blobs.stage(bytes,com.mulino.adapters.blob.LocalBlobStore.hash(bytes));blobs.commit(blob);
     var d=row("organizationId",org,"ID",doc,"revision",1,"recordedAt",Timestamp.from(now),"recordedBy",actor,"subjectKind","WORK","subjectId",workId,"itemId",item,"workId",workId,"sha256",blob.sha256(),"blobId",blob.id().toString(),"byteLength",blob.size(),"mediaType","text/plain","sourceNamespace","native-fixture","sourceProfileId",profile,"availability","AVAILABLE","provenance","{}");insert("mulino_evidence_DocumentVersions",d);
     var e=row("organizationId",org,"ID",event,"revision",1,"recordedAt",Timestamp.from(now),"recordedBy",actor,"subjectKind","WORK","subjectId",workId,"itemId",item,"workId",workId,"effectiveFrom",Timestamp.from(now),"timeZone","UTC","timePrecision","SECOND","valueState","KNOWN","kind","RECEIPT","sourceNamespace","native-fixture","sourceProfileId",profile,"externalEventId",externalId,"sourceVersion","1","payloadHash",blob.sha256(),"payload","{}");insert("mulino_evidence_Events",e);
     var in=row("organizationId",org,"ID",id(),"revision",1,"recordedAt",Timestamp.from(now),"recordedBy",actor,"subjectKind","WORK","subjectId",workId,"itemId",item,"workId",workId,"eventId",event,"sourceNamespace","native-fixture","sourceProfileId",profile,"externalEventId",externalId,"sourceVersion","1","payloadHash",blob.sha256(),"state","RECEIVED","intakeOwnerId",actor,"supervisorId",actor,"nextAction","compare","nextCheckAt",Timestamp.from(now.plusSeconds(3600)));insert("mulino_evidence_InboxRecords",in);
@@ -127,6 +130,48 @@ class S2WorkActualIntegrationTest {
     assertDoesNotThrow(()->read("getInventory",null,null));
   }
   @Test @SuppressWarnings("unchecked") void realAssessment90CannotCloseBut100CanAndTwoReadEntrypointsShareWorld(){String id=draft(goalInputs());run("activateWork",0,Map.of("workId",id));occurrence(id,"90","receipt90");var first=(Map<String,Object>)assess(id).get("assessment");assertEquals("UNSATISFIED",first.get("outcome"));assertThrows(DomainError.class,()->run("closeWork",revision(id),Map.of("workId",id,"reason","FULFILLED")));assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,id));occurrence(id,"10","receipt10");var current=(Map<String,Object>)assess(id).get("assessment");assertEquals("SATISFIED",current.get("outcome"));run("closeWork",revision(id),Map.of("workId",id,"reason","FULFILLED"));assertEquals("CLOSED",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,id));assertEquals("UNSATISFIED",jdbc.queryForObject("SELECT outcome FROM mulino_work_read_AssessmentReferences WHERE ID=?",String.class,first.get("ID")));Instant asOf=Instant.now().plusSeconds(60),known=asOf;var query=row("scope",Map.of("organizationId",org,"itemId",item),"asOf",asOf.toString(),"knownAt",known.toString());query.put("id",item);var noun=runtime.requestContext().run(ctx->{return queries.query(QueryRequests.parse("getObject",new LinkedHashMap<>(query)));});query.put("id",id);var verb=runtime.requestContext().run(ctx->{return queries.query(QueryRequests.parse("getWork",new LinkedHashMap<>(query)));});var nounData=(Map<String,Object>)noun.get("data");var verbData=(Map<String,Object>)verb.get("data");assertTrue(((List<Map<String,Object>>)nounData.get("workReferences")).stream().anyMatch(w->id.equals(w.get("ID"))&&"CLOSED".equals(w.get("status"))));assertEquals(verbData.get("goals"),((List<Map<String,Object>>)nounData.get("goalReferences")).stream().filter(g->id.equals(g.get("workId"))).toList());assertEquals(verbData.get("assessments"),((List<Map<String,Object>>)nounData.get("assessmentReferences")).stream().filter(a->id.equals(a.get("workId"))).toList());assertFalse(((List<?>)verbData.get("assessmentInputSnapshots")).isEmpty());}
+  @Test void newReadCutoffsDoNotRewriteCapturesOrPreventClosureOfEquivalentSources(){
+    String workId=draft(goalInputs());run("activateWork",0,Map.of("workId",workId));occurrence(workId,"100","fixed100");
+    assertEquals("SATISFIED",((Map<?,?>)assess(workId).get("assessment")).get("outcome"));
+    assertEquals("SATISFIED",((Map<?,?>)assess(workId).get("assessment")).get("outcome"));
+    var frozen=jdbc.queryForList("SELECT * FROM mulino_evaluation_InputSnapshots WHERE organizationId=? ORDER BY ID",org);
+    var captures=jdbc.queryForList("SELECT * FROM mulino_evaluation_EvidenceCaptures WHERE organizationId=? ORDER BY ID",org);
+    assertEquals(2,frozen.size());assertEquals(2,captures.size());
+    assertNotEquals(frozen.get(0).get("contenthash"),frozen.get(1).get("contenthash"));
+    assertNotEquals(frozen.get(0).get("evidencecaptureid"),frozen.get(1).get("evidencecaptureid"));
+    run("closeWork",revision(workId),Map.of("workId",workId,"reason","FULFILLED"));
+    assertEquals("CLOSED",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,workId));
+    assertEquals(frozen,jdbc.queryForList("SELECT * FROM mulino_evaluation_InputSnapshots WHERE organizationId=? ORDER BY ID",org));
+    assertEquals(captures,jdbc.queryForList("SELECT * FROM mulino_evaluation_EvidenceCaptures WHERE organizationId=? ORDER BY ID",org));
+  }
+
+  @Test void newlyKnownFactCannotReuseSatisfiedProofEvenWhenQuantityRemainsSatisfied(){
+    String workId=draft(goalInputs());run("activateWork",0,Map.of("workId",workId));occurrence(workId,"100","original100");
+    DomainContext before=context();
+    var prior=(Map<?,?>)assessAt(before,workId).get("assessment");
+    assertEquals("SATISFIED",prior.get("outcome"));
+    // Actually recorded after the frozen knownAt, then observed by a later request.
+    occurrence(workId,"1","late1",before.knownAt().plusSeconds(1));
+    DomainContext later=new DomainContext(org,actor,actor,before.asOf().plusSeconds(5),before.knownAt().plusSeconds(5));
+    assertThrows(DomainError.class,()->closeAt(later,workId));
+    assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,workId));
+    assertEquals(prior.get("inputSnapshotHash"),jdbc.queryForObject("SELECT inputSnapshotHash FROM mulino_work_read_AssessmentReferences WHERE ID=?",String.class,prior.get("ID")));
+    assertEquals("SATISFIED",((Map<?,?>)assessAt(later,workId).get("assessment")).get("outcome"));
+    closeAt(later,workId);
+  }
+
+  @Test void supersededEvidenceCannotReuseSatisfiedProofAtANewerCutoff(){
+    String workId=draft(goalInputs());run("activateWork",0,Map.of("workId",workId));occurrence(workId,"100","corrected100");
+    var assessment=(Map<?,?>)assess(workId).get("assessment");assertEquals("SATISFIED",assessment.get("outcome"));
+    var frozen=jdbc.queryForMap("SELECT * FROM mulino_evaluation_InputSnapshots WHERE assessmentId=?",assessment.get("ID"));
+    var doc=jdbc.queryForMap("SELECT d.* FROM mulino_evidence_DocumentVersions d JOIN mulino_evidence_Verifications v ON v.organizationId=d.organizationId AND v.basisDocumentId=d.ID WHERE d.organizationId=?",org);
+    doc.put("supersedesid",doc.get("id"));doc.put("id",id());doc.put("revision",2);doc.put("recordedat",Timestamp.from(Instant.now()));insert("mulino_evidence_DocumentVersions",doc);
+    assertThrows(DomainError.class,()->run("closeWork",revision(workId),Map.of("workId",workId,"reason","FULFILLED")));
+    assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,workId));
+    assertEquals(frozen,jdbc.queryForMap("SELECT * FROM mulino_evaluation_InputSnapshots WHERE assessmentId=?",assessment.get("ID")));
+    assertNotEquals("SATISFIED",((Map<?,?>)assess(workId).get("assessment")).get("outcome"));
+  }
+
   @Test void actualCreditRangeCannotBeCopiedToAnotherParentOrOverrunOccurrence(){
     String source=draft(goalInputs()),parent=draft(goalInputs()),other=draft(goalInputs());run("activateWork",0,Map.of("workId",source));run("activateWork",0,Map.of("workId",parent));run("activateWork",0,Map.of("workId",other));occurrence(source,"90","credit-actual90");String actual=jdbc.queryForObject("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=? AND workId=?",String.class,org,source);
     run("createWorkLink",revision(source),row("sourceWorkId",source,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",actual,"quantity",Map.of("value","90","unit","BOX"),"startQuantity","0"));assertEquals(new java.math.BigDecimal("90.000000000000"),jdbc.queryForObject("SELECT SUM(quantity) FROM mulino_work_WorkContributions WHERE organizationId=?",java.math.BigDecimal.class,org));int before=revision(source);
