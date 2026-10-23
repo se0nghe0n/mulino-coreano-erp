@@ -100,10 +100,14 @@
                 }
               }
             },
-            "required": ["table", "sql", "boundValues"],
+            "required": [
+              "table",
+              "sql",
+              "boundValues"
+            ],
             "additionalProperties": false
           },
-          "description": "The actual read-only TradeItem unit lookup in this same DB snapshot. Bound values are organization ID, item ID, recorded-at cutoff and created-at cutoff. This trace is provenance, never a business oracle."
+          "description": "Actual TradeItems lookup in this same snapshot, with companion measurementMetadataRows. Bound values are organization ID, ITEM ID, recorded-at knownAt and created-at knownAt; semantic validation checks exact SQL, scope, timestamps and raw-row derivation. This is not a business-source substitute."
         },
         "revisionQuery": {
           "type": "object",
@@ -235,17 +239,17 @@
     },
     "data": {
       "type": "object",
-      "description": "Observer-derived values only. Every field must have a matching derivations entry that the harness recomputes from rawRows; free-form values are rejected."
+      "description": "Observer-derived values only. Every field requires a raw-row derivation. Only itemId and unit may read the strict TradeItems measurementMetadataRows companion; other fields must read requested rawRows. Free-form values are rejected."
     },
     "derivations": {
       "type": "object",
-      "description": "Fixed-grammar derivation of each data field from requested rawRows; recomputed by the harness.",
+      "description": "Fixed grammar recomputed from requested rawRows; only itemId/id and unit/baseUnit may instead read the strict actual measurementMetadataRows companion.",
       "additionalProperties": {
         "type": "object",
         "properties": {
           "rowPointer": {
             "type": "string",
-            "pattern": "^/rawRows/.+"
+            "pattern": "^(/rawRows/.+|/measurementMetadataRows)$"
           },
           "where": {
             "type": "object",
@@ -361,6 +365,46 @@
         "type": "object"
       },
       "description": "Explicit physical cells with rawRowPointer lineage. rawRows remains the original table-to-row object; model-binding validates this array separately."
+    },
+    "measurementMetadataRows": {
+      "type": "array",
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "organizationId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "baseUnit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "recordedAt": {
+            "type": "string",
+            "minLength": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "id",
+          "organizationId",
+          "baseUnit",
+          "recordedAt",
+          "createdAt"
+        ],
+        "additionalProperties": false
+      },
+      "description": "Actual scoped TradeItems companion rows read in this snapshot; zero or one row. This is measurement metadata, not an additional requested business source. Only data.itemId/id and data.unit/baseUnit may derive from it."
     }
   },
   "required": [
@@ -377,5 +421,42 @@
   ],
   "additionalProperties": false,
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://mulino.test/contracts/acceptance-observation.schema.json"
+  "$id": "https://mulino.test/contracts/acceptance-observation.schema.json",
+  "allOf": [
+    {
+      "if": {
+        "required": [
+          "measurementMetadataRows"
+        ]
+      },
+      "then": {
+        "properties": {
+          "snapshot": {
+            "required": [
+              "measurementMetadataQueries"
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "snapshot": {
+            "required": [
+              "measurementMetadataQueries"
+            ]
+          }
+        },
+        "required": [
+          "snapshot"
+        ]
+      },
+      "then": {
+        "required": [
+          "measurementMetadataRows"
+        ]
+      }
+    }
+  ]
 }

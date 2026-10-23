@@ -62,7 +62,7 @@ final class ScenarioJdbcObservation {
             binding=ScenarioRevisionBinding.binding(source.path("actionId").asText());
         }
         OffsetDateTime knownAt=OffsetDateTime.parse(Json.required(request,"knownAt"));
-        var raw=Json.object();var evidence=Json.object();var measurement=Json.object();var measurementQueries=Json.array();String mvcc;
+        var raw=Json.object();var evidence=Json.object();var measurement=Json.object();var measurementQueries=Json.array();ArrayNode measurementRows=null;String mvcc;
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             mvcc=ObserverSnapshot.token(c);
@@ -117,17 +117,37 @@ final class ScenarioJdbcObservation {
                 if(mapping(root).path("approximate").toString().contains("\""+name+"\""))e.put("approximateMapping",true);
                 evidence.set(name,e);
             }
-            measurement=projection.measurementMetadata();measurementQueries=projection.drainQueries();
+            measurement=projection.measurementMetadata();measurementRows=projection.measurementMetadataRows();measurementQueries=projection.drainQueries();
             c.commit();
         }
         var result=Json.object();result.put("snapshotRevision",revision!=null?revision:mvcc).put("asOf",Json.required(request,"asOf")).put("knownAt",Json.required(request,"knownAt")).put("scopeComplete",true);
         result.set("scope",scope);result.set("sourceEvidence",evidence);result.set("sourceQuery",evidence.path(request.path("sources").get(0).asText()).path("sourceQuery"));
         result.set("rawRows",raw);result.set("data",measurement);
+        if(measurementRows!=null)result.set("measurementMetadataRows",measurementRows);
+        if(!measurement.isEmpty()) {
+            var derivations=Json.object();
+            for(String field:List.of("itemId","unit"))if(measurement.has(field))derivations.set("/"+field,
+                Json.object().put("rowPointer","/measurementMetadataRows").put("aggregate","single").put("field",field.equals("itemId")?"id":"baseUnit"));
+            result.set("derivations",derivations);
+        }
         var snapshot=ObserverSnapshot.snapshot(mvcc,readMode,request);if(revisionQuery!=null)snapshot.set("revisionQuery",revisionQuery);
         if(!measurementQueries.isEmpty())snapshot.set("measurementMetadataQueries",measurementQueries);
         result.set("snapshot",snapshot);
         return result;
     }
+    /** The actual adapter's artifact wire binding, also used by PG tests before native semantic validation. */
+    static void bindArtifact(ObjectNode data,JsonNode observedNames,String ref) {
+        ((ObjectNode)data.path("snapshot")).put("artifactRef",ref);
+        var sources=Json.object();
+        for(var requested:observedNames) {
+            String name=requested.asText();var evidence=Json.object();
+            evidence.put("complete",true).put("rowPointer","/rawRows/"+name.replace("~","~0").replace("/","~1")).put("artifactRef",ref);
+            evidence.set("sourceQuery",data.path("sourceEvidence").path(name).hasNonNull("sourceQuery")?data.path("sourceEvidence").path(name).path("sourceQuery"):data.path("sourceQuery"));
+            sources.set(name,evidence);
+        }
+        data.set("sourceEvidence",sources);
+    }
+
     /** Organization-only technical observations; missing business/time bindings are refused. */
     private static ArrayNode virtual(Connection c,String source,List<String> orgs,OffsetDateTime knownAt,ObjectNode statement) throws SQLException {
         var out=Json.array();String in=String.join(",",Collections.nCopies(orgs.size(),"?"));

@@ -18,6 +18,7 @@ final class ScenarioObservationProjection {
     private final ArrayNode queries = Json.array();
     private final Map<String,ArrayNode> cache = new HashMap<>();
     private ArrayNode observationQueries;
+    private ArrayNode measurementRows;
 
     ScenarioObservationProjection(Connection connection, Path root, List<String> orgs, List<String> items,
                                   List<String> works, List<String> lots, OffsetDateTime knownAt) {
@@ -37,11 +38,15 @@ final class ScenarioObservationProjection {
         var rows=query("mulino_inventory_TradeItems","r.organizationId=? AND r.ID=? AND r.recordedAt<=? AND r.createdAt<=?",
             List.of(orgs.getFirst(),items.getFirst(),knownAt,knownAt));
         if(rows.size()>1)throw new UnsupportedOperationException("Ambiguous ITEM measurement metadata");
+        measurementRows=Json.array();
+        for(var actual:rows){var row=Json.object();for(String field:List.of("id","organizationId","baseUnit","recordedAt","createdAt"))row.set(field,actual.path(field));measurementRows.add(row);}
         if(rows.size()==1&&rows.get(0).path("baseUnit").isTextual()&&!rows.get(0).path("baseUnit").asText().isBlank()) {
             copy(out,"unit",rows.get(0),"baseUnit");copy(out,"itemId",rows.get(0),"id");
         }
         return out;
     }
+
+    ArrayNode measurementMetadataRows() {return measurementRows==null?null:measurementRows.deepCopy();}
 
     ArrayNode query(String table, String predicate, List<?> parameters) throws Exception {
         return query(table,predicate,parameters,false);

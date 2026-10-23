@@ -3,6 +3,7 @@ package org.mulino.verification;
 import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigDecimal;
 import java.util.*;
+import java.time.OffsetDateTime;
 
 /**
  * Binds every observer {@code data.data} field to the raw rows it came from.
@@ -25,10 +26,11 @@ public final class ObserverDerivations {
         Map<String,JsonNode> leaves=new TreeMap<>();leaves(values,"",leaves);
         for(String pointer:leaves.keySet())
             require(declared.containsKey(pointer),"Observer data field '"+pointer+"' has no raw-row derivation; free-form observer values are not independent evidence");
+        measurementRows(observation);
         for(var e:declared.entrySet()) {
             require(leaves.containsKey(e.getKey()),"Derivation '"+e.getKey()+"' has no observer data value");
             JsonNode expected=compute(e.getKey(),e.getValue(),sources,observation),actual=leaves.get(e.getKey());
-            require(equal(expected,actual),"Observer data field '"+e.getKey()+"' differs from its raw-row recomputation: declared "+actual+", recomputed "+expected);
+            require(e.getValue().path("rowPointer").asText().equals("/measurementMetadataRows")?expected.equals(actual):equal(expected,actual),"Observer data field '"+e.getKey()+"' differs from its raw-row recomputation: declared "+actual+", recomputed "+expected);
         }
     }
     /** Scalars under nested objects are the only observer values; row lists belong in rawRows. */
@@ -38,7 +40,11 @@ public final class ObserverDerivations {
     }
     static JsonNode compute(String key,JsonNode d,Set<String> sources,JsonNode observation) {
         String pointer=d.path("rowPointer").asText(),aggregate=d.path("aggregate").asText();
-        require(pointer.startsWith("/rawRows/") && sources.contains(unescape(pointer.substring("/rawRows/".length()))),"Derivation '"+key+"' must read one requested raw source");
+        if(pointer.equals("/measurementMetadataRows")) {
+            String field=key.equals("/itemId")?"id":key.equals("/unit")?"baseUnit":null;
+            require(field!=null&&field.equals(d.path("field").asText())&&aggregate.equals("single")&&d.size()==3,
+                "Measurement metadata may derive only itemId/id or unit/baseUnit with an unfiltered single row");
+        } else require(pointer.startsWith("/rawRows/") && sources.contains(unescape(pointer.substring("/rawRows/".length()))),"Derivation '"+key+"' must read one requested raw source");
         require(AGGREGATES.contains(aggregate),"Derivation '"+key+"' has unsupported aggregate "+aggregate);
         JsonNode rows=observation.at(pointer);require(rows.isArray(),"Derivation '"+key+"' raw source is not an array");
         JsonNode where=d.path("where");require(where.isMissingNode() || where.isObject(),"Derivation where must be an object");
@@ -67,6 +73,41 @@ public final class ObserverDerivations {
                 return first;
             }
         }
+    }
+
+    /** A fixed technical companion row, never an extra requested business source or an oracle exemption. */
+    private static void measurementRows(JsonNode observation) {
+        JsonNode rows=observation.path("measurementMetadataRows"),queries=observation.path("snapshot").path("measurementMetadataQueries");
+        if(rows.isMissingNode()&&queries.isMissingNode())return;
+        require(rows.isArray()&&rows.size()<=1,"Measurement metadata requires zero or one actual TradeItems row");
+        require(queries.isArray()&&queries.size()==1,"Measurement metadata requires exactly one actual SQL query");
+        require("REPEATABLE_READ".equals(observation.path("snapshot").path("isolation").asText()),"Measurement metadata must share the REPEATABLE_READ snapshot");
+        String org=singleScope(observation.path("scope"),"organizationId","organizationIds"),item=singleScope(observation.path("scope"),"itemId","itemIds");
+        var query=queries.get(0);var bound=query.path("boundValues");
+        require(query.size()==3&&"mulino_inventory_TradeItems".equals(query.path("table").asText())
+            &&query.path("sql").asText().equals("SELECT r.* FROM mulino_inventory_TradeItems r WHERE r.organizationId=? AND r.ID=? AND r.recordedAt<=? AND r.createdAt<=? ORDER BY r.ID")
+            &&bound.isArray()&&bound.size()==4,"Measurement metadata SQL must bind organization, ITEM and both knownAt fences");
+        require(bound.get(0).isTextual()&&bound.get(1).isTextual()&&org.equals(bound.get(0).asText())&&item.equals(bound.get(1).asText()),"Measurement metadata SQL scope differs from observation scope");
+        var known=instant(observation.path("knownAt"));
+        require(known.equals(instant(bound.get(2)))&&known.equals(instant(bound.get(3))),"Measurement metadata SQL time bounds differ from knownAt");
+        if(rows.isEmpty())return;
+        var row=rows.get(0);
+        require(row.isObject()&&row.size()==5&&row.has("baseUnit")&&row.path("id").isTextual()&&row.path("organizationId").isTextual()&&org.equals(row.path("organizationId").asText())&&item.equals(row.path("id").asText()),
+            "Measurement metadata row must be the actual scoped organization/ITEM");
+        require(!instant(row.path("recordedAt")).isAfter(known)&&!instant(row.path("createdAt")).isAfter(known),"Measurement metadata row is outside knownAt");
+        require(row.path("baseUnit").isNull()||row.path("baseUnit").isTextual(),"Measurement metadata baseUnit must retain its stored type");
+        if(observation.path("data").has("unit"))require(row.path("baseUnit").isTextual()&&!row.path("baseUnit").asText().isBlank(),"Measurement metadata has no known unit");
+    }
+
+    private static String singleScope(JsonNode scope,String singular,String plural) {
+        var ids=new HashSet<String>();
+        if(scope.has(singular)){require(scope.path(singular).isTextual()&&!scope.path(singular).asText().isBlank(),"Invalid measurement scope "+singular);ids.add(scope.path(singular).asText());}
+        if(scope.has(plural)){require(scope.path(plural).isArray(),"Invalid measurement scope "+plural);for(var id:scope.path(plural)){require(id.isTextual()&&!id.asText().isBlank(),"Invalid measurement scope ID");ids.add(id.asText());}}
+        require(ids.size()==1,"Measurement metadata requires exactly one organization and ITEM");return ids.iterator().next();
+    }
+    private static java.time.Instant instant(JsonNode value) {
+        try {require(value.isTextual(),"Measurement metadata timestamp must be text");return OffsetDateTime.parse(value.asText()).toInstant();}
+        catch(java.time.format.DateTimeParseException invalid){throw new IllegalArgumentException("Invalid measurement metadata timestamp",invalid);}
     }
     private static boolean equal(JsonNode expected,JsonNode actual) {
         if(expected.isTextual() && actual!=null && actual.isTextual() && isDecimal(expected.asText()) && isDecimal(actual.asText()))

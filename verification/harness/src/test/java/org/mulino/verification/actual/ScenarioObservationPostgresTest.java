@@ -12,6 +12,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mulino.verification.Json;
+import org.mulino.verification.ContractValidator;
+import org.mulino.verification.StepResult;
 
 /** Real JDBC/MVCC observer tests. CSN-shaped test tables isolate projection from product write validation. */
 @EnabledIfEnvironmentVariable(named="OBSERVER_PG_TEST",matches="true")
@@ -59,9 +61,22 @@ class ScenarioObservationPostgresTest {
     ObjectNode scope(){return Json.object().put("organizationId",org).put("itemId",item).put("workId",work).put("lotId",lot);}
     ObjectNode request(ObjectNode scope,String... sources){var r=Json.object().put("asOf",now).put("knownAt",now);r.set("scope",scope);r.set("sources",Json.MAPPER.valueToTree(sources));return r;}
     JsonNode capture(String... sources) throws Exception {
-        var result=ScenarioJdbcObservation.capture(config,root,request(scope(),sources));
+        var request=request(scope(),sources);var result=ScenarioJdbcObservation.capture(config,root,request);
+        String ref="verification/harness/target/evidence/observer-capture-"+UUID.randomUUID()+".json";
+        ScenarioJdbcObservation.bindArtifact(result,request.path("sources"),ref);
+        Json.write(root.resolve(ref),result);
+        validate(request,result);
         if(System.getenv("OBSERVER_TEST_EVIDENCE")!=null)Json.write(Path.of(System.getenv("OBSERVER_TEST_EVIDENCE")).resolve(testName+"-"+(++captures)+".json"),result);
         return result;
+    }
+    StepResult step(JsonNode result) {
+        var provenance=Json.object().put("adapter","actual-jdbc-observer-test").put("adapterVersion","1.0").put("buildVersion","FOCUSED_PG")
+            .putNull("authenticatedActor").put("source","POSTGRESQL_JDBC").put("independent",true).put("scopeComplete",true);
+        provenance.set("sourceQuery",result.path("sourceQuery"));provenance.set("snapshot",result.path("snapshot"));
+        return new StepResult("observe",StepResult.DriverStatus.EXECUTED,result,null,null,provenance,List.of(result.path("snapshot").path("artifactRef").asText()));
+    }
+    void validate(JsonNode request,JsonNode result)throws Exception {
+        var step=step(result);var validator=new ContractValidator(root);validator.result(step,"observe");validator.observation(request,step);
     }
     ObjectNode assessment(String id,String workId,String at,String conditions){return row(id).put("workId",workId).put("goalId",goal).put("recordedAt",at).put("definitionVersionId",definition).put("policyVersionId",policy).put("evaluatorVersion","core-v1").put("outcome","UNVERIFIED").put("conditionsJson",conditions).put("inputSnapshotHash","snapshot-hash");}
     String conditions(){return "[{\"conditionId\":\"root.0\",\"truth\":{\"state\":\"UNVERIFIED\",\"conflict\":true},\"evidenceRefs\":[\"original-evidence\"],\"inputs\":[{\"state\":\"UNKNOWN\",\"value\":null,\"sourceId\":\"actual-source\"}]}]";}

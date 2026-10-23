@@ -128,19 +128,8 @@ public final class CaseRunner {
             }
             if(result.driverStatus()==StepResult.DriverStatus.EXECUTED && kind.equals("observe")) {
                 JsonNode requested=resolve(a.path("observation"));
-                for(String field:List.of("asOf","knownAt","scope")) if(!result.data().path(field).equals(requested.path(field)))
-                    throw new IllegalArgumentException("Observer "+field+" differs from requested context");
                 observerSnapshot(a.path("observation").path("snapshotRef"),requested.path("snapshotRef"),result);
-                for(JsonNode source:requested.path("sources")) {
-                    String name=source.asText();JsonNode rows=result.data().path("rawRows").path(name),evidence=result.data().path("sourceEvidence").path(name);
-                    if(!rows.isArray() || !evidence.path("complete").asBoolean(false) || !evidence.path("rowPointer").asText().equals("/rawRows/"+name.replace("~","~0").replace("/","~1")))
-                        throw new IllegalArgumentException("Requested raw source incomplete/missing: "+name);
-                    String artifact=Json.required(evidence,"artifactRef");
-                    if(!result.artifactRefs().contains(artifact) || !java.nio.file.Files.isRegularFile(validator.path(artifact))) throw new IllegalArgumentException("Requested raw source artifact missing: "+name);
-                }
-                if(!result.data().path("snapshot").equals(result.provenance().path("snapshot")) || !result.data().path("sourceQuery").equals(result.provenance().path("sourceQuery")))
-                    throw new IllegalArgumentException("Observer data snapshot/sourceQuery differ from actual provenance");
-                ObserverDerivations.verify(requested.path("sources"),result.data());
+                validator.observation(requested,result);
             }
             synchronized(executionGate) {
                 ensureActive();

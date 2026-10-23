@@ -1515,5 +1515,27 @@ public final class ContractValidator {
         if(kind.equals("control")) require(result.data()!=null && result.data().path("acknowledged").asBoolean(false),"Control needs actual ACK");
         if(kind.equals("start")) require(result.data()!=null && result.data().hasNonNull("invocationHandle"),"Async submission needs actual invocationHandle ACK");
     }
+    /** Shared request-bound semantic gate used by the native runner and real PG capture tests. */
+    public void observation(JsonNode requested,StepResult result) throws IOException {
+        for(String field:List.of("asOf","knownAt","scope")) if(!result.data().path(field).equals(requested.path(field)))
+            throw new IllegalArgumentException("Observer "+field+" differs from requested context");
+        for(JsonNode source:requested.path("sources")) {
+            String name=source.asText();JsonNode rows=result.data().path("rawRows").path(name),evidence=result.data().path("sourceEvidence").path(name);
+            if(!rows.isArray() || !evidence.path("complete").asBoolean(false) || !evidence.path("rowPointer").asText().equals("/rawRows/"+name.replace("~","~0").replace("/","~1")))
+                throw new IllegalArgumentException("Requested raw source incomplete/missing: "+name);
+            String artifact=Json.required(evidence,"artifactRef");
+            if(!result.artifactRefs().contains(artifact) || !java.nio.file.Files.isRegularFile(path(artifact))) throw new IllegalArgumentException("Requested raw source artifact missing: "+name);
+        }
+        if(!result.data().path("snapshot").equals(result.provenance().path("snapshot")) || !result.data().path("sourceQuery").equals(result.provenance().path("sourceQuery")))
+            throw new IllegalArgumentException("Observer data snapshot/sourceQuery differ from actual provenance");
+        if(result.data().has("measurementMetadataRows")) {
+            String ref=Json.required(result.data().path("snapshot"),"artifactRef");
+            require(result.artifactRefs().contains(ref),"Measurement metadata snapshot artifact is not an actual result artifact");
+            var artifact=Json.read(path(ref));
+            for(String pointer:List.of("/measurementMetadataRows","/snapshot/measurementMetadataQueries","/snapshot/id","/scope","/knownAt","/asOf"))
+                require(result.data().at(pointer).equals(artifact.at(pointer)),"Measurement metadata differs from persisted snapshot artifact: "+pointer);
+        }
+        ObserverDerivations.verify(requested.path("sources"),result.data());
+    }
     static void require(boolean ok,String message) { if(!ok) throw new IllegalArgumentException(message); }
 }
