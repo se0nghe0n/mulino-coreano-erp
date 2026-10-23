@@ -62,4 +62,35 @@ class IdentityAuthorizationTest {
     assertThrows(AccessDeniedException.class,()->guard.creatingGrant(context,owner,Set.of("dispatchQuantity"),Set.of(new IdentityControlGuard.Scope("TARGET",target)),now,now.plusSeconds(1)));
     assertThrows(AccessDeniedException.class,()->guard.assigningCapability(context,actor,"getObject",new IdentityControlGuard.Scope("TARGET",target)));
   }
+  @Test void newTradeDimensionsRemainAllOfAndIdsWithinOneDimensionRemainAlternatives() {
+    when(repository.rows("GrantScopes",org)).thenReturn(List.of(
+        Map.of("grantId",grant,"scopeKind","TARGET","scopeId",target),
+        Map.of("grantId",grant,"scopeKind","SUPPLIER","scopeId",owner),
+        Map.of("grantId",grant,"scopeKind","SUPPLIER","scopeId",actor),
+        Map.of("grantId",grant,"scopeKind","CUSTOMER","scopeId",owner),
+        Map.of("grantId",grant,"scopeKind","LOT","scopeId",target)));
+    var targets=new HashMap<String,List<String>>(Map.of("TARGET",List.of(target),"SUPPLIER",List.of(owner),"CUSTOMER",List.of(owner),"LOT",List.of(target)));
+    assertTrue(auth.permittedScopes(context,"getObject",targets));
+    targets.put("SUPPLIER",List.of(actor));assertTrue(auth.permittedScopes(context,"getObject",targets));
+    for(String dimension:List.of("SUPPLIER","CUSTOMER","LOT")) {
+      var missing=new HashMap<>(targets);missing.remove(dimension);assertFalse(auth.permittedScopes(context,"getObject",missing));
+      var wrong=new HashMap<>(targets);wrong.put(dimension,List.of(grant));assertFalse(auth.permittedScopes(context,"getObject",wrong));
+    }
+  }
+  @Test void organizationAuthorityStillRejectsUnregisteredOrMalformedDimensions() {
+    when(repository.rows("GrantScopes",org)).thenReturn(List.of(Map.of("grantId",grant,"scopeKind","ORGANIZATION","scopeId",org)));
+    var assignment=new HashMap<>(current());assignment.putAll(Map.of("capabilityId","getObject","scopeKind","ORGANIZATION","scopeId",org));
+    when(repository.rows("CapabilityAssignments",org)).thenReturn(List.of(assignment));
+    assertFalse(auth.permittedScopes(context,"getObject",Map.of("UNKNOWN",List.of(target))));
+    assertFalse(auth.permittedScopes(context,"getObject",Map.of("SUPPLIER",List.of("alias"))));
+    assertFalse(auth.permittedScopes(context,"getObject",Map.of("ORGANIZATION",List.of(owner))));
+    assertTrue(auth.permittedScopes(context,"getObject",Map.of("SOURCE",List.of("namespace/raw-v1"))));
+  }
+  @Test void currentlyRevokedTradeAssignmentDeniesEvenWithHistoricalReadTime() {
+    var assignment=new HashMap<>(current());assignment.putAll(Map.of("capabilityId","getObject","scopeKind","SUPPLIER","scopeId",target,"revokedAt",now));
+    when(repository.rows("CapabilityAssignments",org)).thenReturn(List.of(assignment));
+    when(repository.rows("GrantScopes",org)).thenReturn(List.of(Map.of("grantId",grant,"scopeKind","SUPPLIER","scopeId",target)));
+    var historical=new DomainContext(org,actor,owner,now.minusSeconds(5),now.minusSeconds(5));
+    assertFalse(auth.permittedScopes(historical,"getObject",Map.of("SUPPLIER",List.of(target))));
+  }
 }

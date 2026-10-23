@@ -1,6 +1,7 @@
 package com.mulino.application.identity;
 import com.mulino.application.core.*;
 import com.mulino.domain.identity.IdentityRepository;
+import com.mulino.domain.identity.ScopeDimension;
 import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ public class IdentityCommands implements CommandHandler {
    else {if(row.get("scopeKind")==null||row.get("scopeId")==null)throw DomainError.forbidden();scopes.put((String)row.get("scopeKind"),List.of((String)row.get("scopeId")));}
    // A target row without its actor or scope cannot be authorized against a current scope: fail closed, not HTTP 500.
    if(recipient==null)throw DomainError.forbidden();
+   scopes.forEach((kind,ids)->ids.forEach(id->repo.requireScope(c.organizationId(),kind,id)));
    return new CommandPreparation(scopes,List.of(),Set.of(recipient),"IDENTITY_CONTROL",null,null,0,row==null?recipient:(String)row.get("ID"),row==null?null:((Number)row.get("revision")).intValue());
  }
  public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation){
@@ -34,6 +36,13 @@ public class IdentityCommands implements CommandHandler {
    var actor=repo.actor(c.organizationId(),recipient).orElseThrow(DomainError::forbidden);
    String noun=switch(Objects.toString(actor.get("kind"),"")){case "HUMAN"->"Human";case "AGENT"->"Agent";case "EXTERNAL"->"ExternalActor";default->throw DomainError.forbidden();};
    bindings.add(SubjectBinding.optional(noun,Set.of((String)actor.get("ID"))));
+   preparation.scopes().forEach((kind,ids)->{
+     for(String id:ids){var dimension=repo.requireScope(c.organizationId(),kind,id);
+       if(dimension.nounType()!=null){var existing=bindings.stream().filter(b->b.nounType().equals(dimension.nounType())).findFirst();
+         var targets=new HashSet<String>(existing.map(SubjectBinding::targetIds).orElse(Set.of()));targets.add(id);existing.ifPresent(bindings::remove);
+         bindings.add(SubjectBinding.optional(dimension.nounType(),targets));}
+     }
+   });
    return declaredBindings(intent,bindings);
  }
  public static List<SubjectBinding> declaredBindings(Map<String,Object> intent,List<SubjectBinding> trustedBindings){
@@ -45,13 +54,14 @@ public class IdentityCommands implements CommandHandler {
    var p=payload(i);String op=op(i),id;String actor;Instant now=auth.now();
    if(op.equals("createGrant")){
      actor=text(p,"actorId");Set<String> actions=new HashSet<>((List<String>)p.get("actions"));var scopes=scopes(p);Instant from=instant(p,"validFrom"),until=instant(p,"validUntil");
+     for(var scope:scopes)repo.requireScope(c.organizationId(),scope.kind(),scope.id());
      guard.creatingGrant(c,actor,actions,scopes,from,until);id=UUID.randomUUID().toString();
      repo.invalidate(c.organizationId(),actor,until,"GRANT_EXPIRY");
      repo.insert("Grants",Map.of("organizationId",c.organizationId(),"ID",id,"actorId",actor,"delegatorId",c.actorId(),"validFrom",from,"validUntil",until,"revision",1,"createdAt",now,"recordedAt",now));
      for(String a:actions)repo.insert("GrantActions",Map.of("organizationId",c.organizationId(),"grantId",id,"capabilityId",a));
      for(var s:scopes)repo.insert("GrantScopes",Map.of("organizationId",c.organizationId(),"grantId",id,"scopeKind",s.kind(),"scopeId",s.id()));
    }else if(op.equals("assignCapability")){
-     actor=text(p,"actorId");String capability=text(p,"assignedCapability"),kind=text(p,"scopeKind"),scope=text(p,"scopeId");management(c,capability,kind,scope);repo.actor(c.organizationId(),actor).orElseThrow(IdentityAuthorization::denied);
+     actor=text(p,"actorId");String capability=text(p,"assignedCapability"),kind=text(p,"scopeKind"),scope=text(p,"scopeId");repo.requireScope(c.organizationId(),kind,scope);management(c,capability,kind,scope);repo.actor(c.organizationId(),actor).orElseThrow(IdentityAuthorization::denied);
      if(!repo.rows("Memberships",c.organizationId()).stream().anyMatch(r->actor.equals(r.get("actorId"))&&IdentityAuthorization.active(r,now)))throw IdentityAuthorization.denied();
      Instant from=instant(p,"validFrom"),until=instant(p,"validUntil");if(!until.isAfter(from)||!until.isAfter(now))throw DomainError.invalid("Invalid authority interval");
      id=UUID.randomUUID().toString();repo.invalidate(c.organizationId(),actor,until,"CAPABILITY_EXPIRY");repo.insert("CapabilityAssignments",fields("organizationId",c.organizationId(),"ID",id,"actorId",actor,"capabilityId",capability,"scopeKind",kind,"scopeId",scope,"validFrom",from,"validUntil",until,"revision",1,"createdAt",now,"recordedAt",now));
@@ -72,5 +82,5 @@ public class IdentityCommands implements CommandHandler {
  public static String op(Map<String,Object> i){Object v=i.get("capabilityId");if(v==null)v=i.get("capability");return Objects.toString(v,"");}
  public static String text(Map<String,Object> p,String k){Object v=p.get(k);if(!(v instanceof String s)||s.isBlank())throw DomainError.invalid("Missing "+k);return s;}
  private static Instant instant(Map<String,Object> p,String k){try{return Instant.parse(text(p,k));}catch(Exception e){throw DomainError.invalid("Invalid "+k);}}
- private static Set<IdentityControlGuard.Scope> scopes(Map<String,Object> p){if(!(p.get("scopes") instanceof List<?> list)||list.isEmpty())throw DomainError.invalid("Missing scopes");var out=new HashSet<IdentityControlGuard.Scope>();for(Object v:list){var m=(Map<String,Object>)v;out.add(new IdentityControlGuard.Scope(text(m,"scopeKind"),text(m,"scopeId")));}return out;}
+ private static Set<IdentityControlGuard.Scope> scopes(Map<String,Object> p){if(!(p.get("scopes") instanceof List<?> list)||list.isEmpty())throw DomainError.invalid("Missing scopes");var out=new HashSet<IdentityControlGuard.Scope>();for(Object v:list){if(!(v instanceof Map<?,?> raw)||!raw.keySet().equals(Set.of("scopeKind","scopeId")))throw DomainError.invalid("Typed scope required");var m=(Map<String,Object>)raw;String kind=text(m,"scopeKind"),id=text(m,"scopeId");ScopeDimension.require(kind,id);out.add(new IdentityControlGuard.Scope(kind,id));}return out;}
 }

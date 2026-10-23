@@ -2,6 +2,7 @@ package com.mulino.application.identity;
 
 import com.mulino.application.core.*;
 import com.mulino.domain.identity.IdentityRepository;
+import com.mulino.domain.identity.ScopeDimension;
 import java.time.*;
 import java.util.*;
 import org.springframework.security.access.AccessDeniedException;
@@ -52,10 +53,11 @@ public class IdentityAuthorization implements ReadAuthorizer {
   private boolean permittedScopes(DomainContext context,String capability,Map<String,? extends Collection<String>> targets,Set<String> visited,List<Map<String,Object>> proof) {
     Instant now=clock.instant();
     String org=context.organizationId(),actor=context.actorId();
+    if(!ScopeDimension.validTargets(targets,org))return false;
     if(!visited.add(actor)||visited.size()>32)return false;
     var membership=repository.rows("Memberships",org).stream().filter(r -> actor.equals(r.get("actorId")) && active(r,now)).findFirst().orElse(null);
     if(membership==null)return false;
-    var assigned=repository.rows("CapabilityAssignments",org).stream().filter(r -> actor.equals(r.get("actorId")) && capability.equals(r.get("capabilityId")) && active(r,now)).toList();
+    var assigned=repository.rows("CapabilityAssignments",org).stream().filter(r -> actor.equals(r.get("actorId")) && capability.equals(r.get("capabilityId")) && active(r,now)&&validScope(r,org)).toList();
     var actions=repository.rows("GrantActions",org); var allScopes=repository.rows("GrantScopes",org);
     for(var grant:repository.rows("Grants",org)) {
       if(!actor.equals(grant.get("actorId")) || !active(grant,now)) continue;
@@ -69,7 +71,7 @@ public class IdentityAuthorization implements ReadAuthorizer {
       }
       if(actions.stream().noneMatch(r -> id.equals(r.get("grantId")) && capability.equals(r.get("capabilityId")))) continue;
       var scopes=allScopes.stream().filter(r -> id.equals(r.get("grantId"))).toList();
-      if(scopes.isEmpty()) continue;
+      if(scopes.isEmpty()||scopes.stream().anyMatch(scope->!validScope(scope,org))) continue;
       for(var assignment:assigned) {
         if(targets==null) {
           if(scopes.stream().anyMatch(scope -> overlaps(assignment,scope,org))){appendProof(proof,parentProof,actor,grant,assignment,membership);return true;}
@@ -95,6 +97,9 @@ public class IdentityAuthorization implements ReadAuthorizer {
     if(organizationScope(scope,org)) return true;
     Collection<String> ids=targets.get((String)scope.get("scopeKind"));
     return ids!=null&&ids.contains(scope.get("scopeId"));
+  }
+  private static boolean validScope(Map<String,Object> scope,String org) {
+    return scope.get("scopeKind") instanceof String kind&&scope.get("scopeId") instanceof String id&&ScopeDimension.valid(kind,id,org);
   }
   public void fence(DomainContext context,Collection<String> otherActors) {
     var actors=new HashSet<>(otherActors); actors.add(context.actorId());

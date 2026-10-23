@@ -27,6 +27,20 @@ public class IdentityRepository {
   public Optional<Map<String,Object>> actor(String org,String id) {
     return rows("Actors",org).stream().filter(r -> id.equals(r.get("ID"))).findFirst();
   }
+  /** Resolve concrete dimensions in their existing organization-scoped CQN entity.
+   * TARGET is deliberately polymorphic; SOURCE is an opaque namespace/profile ID.
+   * Neither can be inferred into a different type or expanded to organization scope. */
+  public ScopeDimension requireScope(String org,String kind,String id) {
+    ScopeDimension dimension=ScopeDimension.require(kind,id);
+    if(dimension==ScopeDimension.ORGANIZATION) {
+      if(!org.equals(id)) throw com.mulino.application.core.DomainError.forbidden();
+      if(db.run(Select.from(dimension.entity()).where(b->b.get("ID").eq(id))).first().isEmpty())
+        throw com.mulino.application.core.DomainError.forbidden();
+    } else if(dimension.entity()!=null && db.run(Select.from(dimension.entity())
+        .where(b->b.get("organizationId").eq(org).and(b.get("ID").eq(id)))).first().isEmpty())
+      throw com.mulino.application.core.DomainError.forbidden();
+    return dimension;
+  }
   /** All capability/grant writes and future guarded commands lock the same actor rows in ID order. */
   public void fence(String org,Collection<String> actors) {
     if(!TransactionSynchronizationManager.isActualTransactionActive())
