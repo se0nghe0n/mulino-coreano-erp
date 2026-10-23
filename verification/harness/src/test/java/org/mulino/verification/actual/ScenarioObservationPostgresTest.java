@@ -103,7 +103,14 @@ class ScenarioObservationPostgresTest {
     @Test void approvalConditionsAreStoredDataAndNoConsumptionPolicyIsInvented() throws Exception {
         base();String proposal=id();insert("mulino_trade_purchase_ProposalRevisions",row(id()).put("proposalId",proposal).put("revision",7).put("proposalHash","exact-hash").put("workId",work).put("itemId",item));
         insert("mulino_trade_purchase_Approvals",row(id()).put("proposalId",proposal).put("proposalRevision",7).put("proposalHash","exact-hash").put("policyHash","approval-policy").put("approverId",id()).put("conditionsJson","[{\"selector\":\"unsupported-selector\"}]").put("decidedAt",now).put("validUntil",later));
-        var result=capture("approvals").path("rawRows").path("approvals");assertEquals(1,result.size());var approval=result.get(0);assertEquals("unsupported-selector",approval.path("conditions").get(0).path("selector").asText());assertFalse(approval.has("consumptionPolicy"));assertEquals(7,approval.path("proposalRevision").asInt());assertEquals("approval-policy",approval.path("policyHash").asText());
+        var result=capture("approvals").path("rawRows").path("approvals");assertEquals(1,result.size());var approval=result.get(0);assertEquals("unsupported-selector",approval.path("conditions").get(0).path("selector").asText());assertTrue(approval.path("consumptionPolicy").isNull());assertEquals(7,approval.path("proposalRevision").asInt());assertEquals("approval-policy",approval.path("policyHash").asText());
+        // V38 preserves historical NULL while new decisions store the policy.
+        // This CSN-shaped fixture tests projection only; product immutability is
+        // separately exercised by PurchaseApprovalMigrationPostgresTest.
+        try(var statement=writer.prepareStatement("UPDATE mulino_trade_purchase_Approvals SET consumptionPolicy=? WHERE organizationId=?")) {
+            statement.setString(1,"SINGLE_ORDER_REVISION");statement.setString(2,org);assertEquals(1,statement.executeUpdate());
+        }
+        assertEquals("SINGLE_ORDER_REVISION",capture("approvals").path("rawRows").path("approvals").get(0).path("consumptionPolicy").asText());
     }
 
     @Test void workReasonsRequireTheExactStoredRevisionAndState() throws Exception {
