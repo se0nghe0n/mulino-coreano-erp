@@ -88,7 +88,7 @@ final class ScenarioJdbcObservation {
                         ObjectNode statement=statements.get(key);
                         if(tableRows==null) {
                             statement=Json.object().put("table",table);
-                            if(Set.of("@conditionResults","@observationCoverage","@assessmentInputs").contains(table)) {
+                            if(Set.of("@conditionResults","@observationCoverage","@assessmentInputs","@supervisionIssues").contains(table)) {
                                 tableRows=projection.virtual(table);statement.set("queries",projection.drainQueries());
                             } else {
                                 if(!items.isEmpty()||!works.isEmpty()||!lots.isEmpty())throw new UnsupportedOperationException("No item/work/lot binding for virtual source "+table);
@@ -111,7 +111,7 @@ final class ScenarioJdbcObservation {
                     for(JsonNode row:tableRows){ObjectNode copy=(ObjectNode)row.deepCopy();if(tables.size()>1)copy.put("_table",table);rows.add(copy);}
                 }
                 raw.set(name,rows);
-                var query=Json.object();query.put("statementId","s5a-"+name+"-v1").put("sql",queries.toString()).put("mappingVersion","1.2.0");var p=Json.object();p.set("scope",scope);p.put("knownAt",knownAt.toString());query.set("parameters",p);
+                var query=Json.object();query.put("statementId","s5a-"+name+"-v1").put("sql",queries.toString()).put("mappingVersion","1.2.1");var p=Json.object();p.set("scope",scope);p.put("knownAt",knownAt.toString());query.set("parameters",p);
                 var e=Json.object();e.put("complete",true).put("rowPointer","/rawRows/"+name.replace("~","~0").replace("/","~1"));e.set("sourceQuery",query);
                 if(mapping(root).path("approximate").toString().contains("\""+name+"\""))e.put("approximateMapping",true);
                 evidence.set(name,e);
@@ -144,7 +144,6 @@ final class ScenarioJdbcObservation {
                 for(JsonNode n:out){ObjectNode row=(ObjectNode)n;String cds=cdsEntity(row.path("tableName").asText());if(cds!=null){row.put("entity",cds);row.put("table",cds.endsWith("s")?cds.substring(0,cds.length()-1):cds);}}
                 statement.put("sql",sql);
             }
-            case "@supervisionIssues" -> throw new UnsupportedOperationException("Recovery rows have no recordedAt history for the requested knownAt");
             case "@domainRecords" -> throw new UnsupportedOperationException("Domain digest has no complete per-table scope/time binding");
             default -> throw new UnsupportedOperationException("virtual observation source "+source+" not implemented");
         }

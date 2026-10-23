@@ -174,6 +174,7 @@ final class ScenarioObservationProjection {
                 var out=Json.array();for(var row:read("mulino_work_read_AssessmentReferences"))out.addAll(conditionRows(row,parse(row,"conditionsJson")));yield out;
             }
             case "@observationCoverage" -> verifiedObservations();
+            case "@supervisionIssues" -> emptySupervisionIssues();
             case "@assessmentInputs" -> {
                 var out=Json.array();for(var snapshot:read("mulino_evaluation_InputSnapshots")) {
                     var content=parse(snapshot,"contentJson");var conditions=conditionRows(snapshot,content.path("conditions"));
@@ -183,6 +184,32 @@ final class ScenarioObservationProjection {
             }
             default -> throw new UnsupportedOperationException("No scoped virtual projection for "+source);
         };
+    }
+
+    /**
+     * Absence in an organization superset proves absence in every narrower scope in this MVCC snapshot.
+     * Neither recovery table stores recordedAt history. A nonempty superset cannot prove historical
+     * issues (or their absence), even when its current rows have another work, state or future due time.
+     */
+    private ArrayNode emptySupervisionIssues() throws SQLException {
+        long total=0;
+        for(String table:List.of("mulino_runtime_RecoverySchedules","mulino_runtime_IntakeRecoveries")) {
+            var predicate=new StringBuilder();var parameters=new ArrayList<Object>();
+            in(predicate,"r.organizationId",orgs,parameters);
+            String sql="SELECT count(*) FROM "+table+" r WHERE "+predicate;
+            long count;
+            try(var statement=connection.prepareStatement(sql)) {
+                for(int i=0;i<parameters.size();i++)statement.setObject(i+1,parameters.get(i));
+                try(var rows=statement.executeQuery()){rows.next();count=rows.getLong(1);}
+            }
+            var proof=Json.object().put("table",table).put("sql",sql).put("observedRowCount",count)
+                .put("proofKind","CURRENT_SNAPSHOT_ORGANIZATION_SUPERSET_EMPTY")
+                .put("note","Counts all rows of the requested organizations in the same read-only REPEATABLE_READ snapshot. Zero proves this narrower scope empty in that snapshot only; it does not reconstruct knownAt history, deleted rows, states or business issues.");
+            proof.set("boundValues",Json.MAPPER.valueToTree(parameters));queries.add(proof);
+            total+=count;
+        }
+        if(total!=0)throw new UnsupportedOperationException("Recovery organization superset is nonempty in the current snapshot; no recordedAt history proves the requested supervisionIssues scope/knownAt");
+        return Json.array();
     }
 
     /** Verified DB identity chain; no claim payload alone can certify a state observation or quantity. */

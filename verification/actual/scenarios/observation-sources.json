@@ -1,7 +1,7 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.2.0",
-  "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED.",
+  "schemaVersion": "1.2.1",
+  "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED. The supervisionIssues organization-superset-empty proof is current-snapshot-only; it does not reconstruct historical knownAt state.",
   "sources": {
     "segments": [
       "mulino_inventory_QuantitySegments"
@@ -447,7 +447,7 @@
     "@transactions": "one row per PostgreSQL xmin that last wrote an organization CommandRecords row",
     "@dbPrivileges": "information_schema.role_table_grants of mulino_* tables",
     "@conditionResults": "Scoped AssessmentReferences.conditionsJson entries, preserving original conditionId/evaluatorVersion/inputs; result/conflict from truth and evidenceIds from evidenceRefs. No identity aliases or default quantities.",
-    "@supervisionIssues": "Refused: recovery rows do not store the recordedAt history required by knownAt.",
+    "@supervisionIssues": "Empty only when independent counts of both original recovery tables for every requested organization are zero in the same read-only REPEATABLE_READ snapshot. This organization-superset-empty proof also covers narrower item/work/lot scopes, but reconstructs neither knownAt history nor deleted rows. Any organization row refuses the observation regardless of status, due time or relation.",
     "@domainRecords": "Refused: no complete per-table item/work/lot/time binding is available.",
     "@observationCoverage": "STATE_OBSERVATION Events joined to their actual Claims, VERIFIED Verifications, CanonicalOccurrences and available DocumentVersions. Closed coverage endpoints come from the matching persisted payload; this is not responsibility CompletionCoverages.",
     "@assessmentInputs": "One row per stored input snapshot condition (or unchanged snapshot if no conditions), with original contentJson/hash/ID and conditionId/inputs/evidenceIds from that snapshot. Missing facts stay absent."
@@ -459,7 +459,7 @@
     "deletion_log": "no deletion reconciliation log exists for the same reason (plan §7.4 not implemented); T24 reads documentId, originalHash, blobState, policyVersion, reviewerId",
     "migrationMappings": "the migration mapping is kept in the WORK_MIGRATION review payload (DefinitionReviews.payloadJson), not as one row per field",
     "migrationRegressions": "the product does not execute regression fixtures (plan §8 regression results deferred)",
-    "timeBoundSupervisionIssues": "RecoverySchedules and IntakeRecoveries have no recordedAt history; knownAt observation is refused.",
+    "timeBoundSupervisionIssues": "Nonempty RecoverySchedules/IntakeRecoveries have no recordedAt history; their scope/knownAt issues remain unsupported. Only current-snapshot organization-superset emptiness is observable.",
     "scopedDomainRecords": "The legacy all-table digest cannot prove every requested scope/time boundary and is refused."
   }
 }

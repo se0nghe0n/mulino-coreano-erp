@@ -152,8 +152,64 @@ class ScenarioObservationPostgresTest {
         var decision=capture("conditions").path("rawRows").path("conditions").get(0);assertEquals("UNKNOWN",decision.path("status").asText());assertTrue(decision.path("quantity").isNull());assertEquals("SELL",decision.path("action").asText());
     }
 
+    @Test void emptyRecoverySupersetAllowsNarrowScopeAlongsideOtherObservedSources() throws Exception {
+        base();insert("mulino_work_read_AssessmentReferences",assessment(id(),work,now,conditions()));
+        insert("mulino_work_read_AssessmentReferences",assessment(id(),work,later,conditions()));
+        var result=capture("supervisionIssues","works","goalVersions","conditionResults");
+        var raw=result.path("rawRows");assertTrue(raw.path("supervisionIssues").isArray());assertTrue(raw.path("supervisionIssues").isEmpty());
+        assertEquals(1,raw.path("works").size());assertEquals(1,raw.path("goalVersions").size());assertEquals(1,raw.path("conditionResults").size());
+        var proofs=Json.parse(result.path("sourceEvidence").path("supervisionIssues").path("sourceQuery").path("sql").asText()).get(0).path("queries");
+        assertEquals(2,proofs.size());var tables=new HashSet<String>();
+        for(var proof:proofs) {
+            tables.add(proof.path("table").asText());assertEquals(0,proof.path("observedRowCount").asLong());
+            assertEquals("CURRENT_SNAPSHOT_ORGANIZATION_SUPERSET_EMPTY",proof.path("proofKind").asText());
+            assertEquals(List.of(org),Json.MAPPER.convertValue(proof.path("boundValues"),List.class));
+            assertEquals("SELECT count(*) FROM "+proof.path("table").asText()+" r WHERE r.organizationId IN (?)",proof.path("sql").asText());
+            assertTrue(proof.path("note").asText().contains("does not reconstruct knownAt history"));
+        }
+        assertEquals(Set.of("mulino_runtime_RecoverySchedules","mulino_runtime_IntakeRecoveries"),tables);
+        assertEquals(now,result.path("knownAt").asText());assertEquals("REPEATABLE_READ",result.path("snapshot").path("isolation").asText());
+    }
+
+    @Test void recoveryRowsOfUnrequestedOrganizationsDoNotInvalidateEmptyProof() throws Exception {
+        base();String foreign=id();
+        insert("mulino_runtime_RecoverySchedules",Json.object().put("ID",id()).put("organizationId",foreign).put("recoveryStatus","HELD_MANUAL"));
+        insert("mulino_runtime_IntakeRecoveries",Json.object().put("ID",id()).put("organizationId",foreign).put("state","HELD_SOURCE"));
+        assertTrue(capture("supervisionIssues","works").path("rawRows").path("supervisionIssues").isEmpty());
+        var both=scope();both.remove("organizationId");both.set("organizationIds",Json.array().add(org).add(foreign));
+        assertThrows(UnsupportedOperationException.class,()->ScenarioJdbcObservation.capture(config,root,request(both,"supervisionIssues")));
+    }
+
+    @Test void anyRecoveryRowInRequestedOrganizationRemainsFailClosedWithoutHistory() throws Exception {
+        base();
+        for(String table:List.of("mulino_runtime_RecoverySchedules","mulino_runtime_IntakeRecoveries")) {
+            for(String state:List.of("HELD_MANUAL","QUEUED","DONE")) {
+                // Deliberately unrelated Work and a future check: neither proves historical absence.
+                var recovery=Json.object().put("ID",id()).put("organizationId",org).put("nextCheckAt",later);
+                if(table.endsWith("RecoverySchedules"))recovery.put("recoveryStatus",state).put("workId",id());
+                else recovery.put("state",state).put("linkedWorkId",id()).put("createdWorkId",id());
+                insert(table,recovery);
+                var denied=assertThrows(UnsupportedOperationException.class,()->capture("supervisionIssues","works"),table+" "+state);
+                assertTrue(denied.getMessage().contains("superset is nonempty"));
+                try(var statement=writer.createStatement()){statement.executeUpdate("DELETE FROM "+table);}
+            }
+        }
+    }
+
+    @Test void emptySupersetProofUsesItsOriginalReadOnlySnapshotAcrossConcurrentInsert() throws Exception {
+        base();
+        try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+            c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
+            ObserverSnapshot.token(c); // Establish the snapshot before the independent writer commits.
+            insert("mulino_runtime_IntakeRecoveries",Json.object().put("ID",id()).put("organizationId",org).put("state","HELD_SOURCE"));
+            var projection=new ScenarioObservationProjection(c,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
+            assertTrue(projection.virtual("@supervisionIssues").isEmpty());assertEquals(2,projection.drainQueries().size());c.rollback();
+        }
+        assertThrows(UnsupportedOperationException.class,()->capture("supervisionIssues"));
+    }
+
     @Test void unsupportedVirtualScopeFailsClosedAndNoDatabaseWritesAreAllowed() throws Exception {
-        base();assertThrows(UnsupportedOperationException.class,()->capture("transactions"));assertThrows(UnsupportedOperationException.class,()->capture("unmappedSource"));
+        base();assertThrows(UnsupportedOperationException.class,()->capture("domain_records"));assertThrows(UnsupportedOperationException.class,()->capture("transactions"));assertThrows(UnsupportedOperationException.class,()->capture("unmappedSource"));
         var descendants=scope().put("includeDescendants",true);assertThrows(UnsupportedOperationException.class,()->ScenarioJdbcObservation.capture(config,root,request(descendants,"works")));
         try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
