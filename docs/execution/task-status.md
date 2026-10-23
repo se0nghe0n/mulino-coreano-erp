@@ -1006,3 +1006,9 @@ T17 15 FAIL이다. T17의 controller 재실행은 Workflow 밖에서 수행돼
 T11의 assertion71개도 미관찰로 남긴다.
 [통합·검증·실행 경계](resume-standard-tier-integration.md)를 따른다.
 Task와 현재 Step은 OPEN이며 Ultrafast는 사용하지 않는다.
+
+T11의 실제 waitJson.verifier/overdueAction을 관찰값에 연결한24c96df0를
+648ca638에 통합했다. 입력22개·assertion110개를 보존했으며 root의
+observer PG64개와 unit6개가 모두 PASS했다. prepare 문제0과 자체 PG
+정리를 확인했다. [대기 필드 기록](t11-wait-projection.md)을 따른다.
+실제 T11 결과를 이번 집중 검증으로 PASS로 바꾸지 않았다.

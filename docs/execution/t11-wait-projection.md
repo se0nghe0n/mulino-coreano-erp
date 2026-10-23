@@ -64,3 +64,17 @@ PostgreSQL 검사는 CSN 형태의 disposable source-row 검사다.
 첫 PG 실행에 로컬에 없는 `postgres:18.3`을 지정해 registry pull이
 시작됐으나 exit 130으로 중단했다. 실제 검사는 기존 로컬 이미지에
 `--pull=never`를 지정했다. push·merge·Grok 알림은 수행하지 않는다.
+
+## Task branch 결합
+
+coordinator가24c96df0를648ca638에 통합했다. 원래 T11 입력22개와
+assertion110개, 원본 report의 실제 waitJson을 독립 대조했다.
+root에서 기존 Goal/Input 관계와 함께 observer PG64개·unit6개가 모두
+PASS했다. 실패·오류·SKIP0, Maven exit0이며 source3,161개 drift0과
+실행 class hash 일치, 자체 PG container 부재를 확인했다.
+prepare는41 case·802 subcase·24,260 assertion·문제0·asset12 PASS다.
+`.local/resume-20261023/t11-wait-integrated/`에 실행 증거를 남겼다.
+
+이는 집중 결합 검증이다. 원래 T11 시나리오 결과는 아직 갱신하지
+않았으며 전체 Task와 현재 Step은 OPEN이다. 별도 Haiku T09/T17 실행은
+7e1236bf로 고정돼 이 후속 변경을 포함하지 않는다.
