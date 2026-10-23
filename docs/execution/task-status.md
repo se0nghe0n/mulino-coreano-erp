@@ -868,3 +868,18 @@ unsupported evaluator의 HELD는 공개 VERSION_UNSUPPORTED 계약과 같으며
 원행 observer의 한정 보완은 별도 Sol Ultrafast worktree에서 진행하며
 T17 원천 writer와 파일 소유권을 분리했다. 새 source의 결합 검증과 Haiku
 재실행 전에는 이55개 결과를 최신 제품 전체 인수로 승격하지 않는다.
+
+## 2026-10-23 원천·관찰·구매 승인 소비 정책 통합
+
+T17 source 입력, scoped DB projection과 그 빈 recovery source 회귀,
+구매 승인 소비 정책 저장·집행을 통합했다. T17 후속 입력은 새로운
+합성 선택임을 명시하고 원래 257개 업무 assertion을 보존했다.
+기존 사업 grant 불변은 이전 layer의 사실이며, 후속 layer에는 기존
+scope·기간을 유지한 최소 category capability 8건이 명시적으로 추가됐다.
+
+제품 결합 47개와 최종 harness 629개(실제 observer PG13 포함)가 통과했다.
+T17 opt-in22개도 별도 fresh HTTP/Spring/PostgreSQL 실행에서 모두 통과했다.
+새 V38 열 때문에 실패한 관찰 테스트 1건의 첫 로그와 수정 후 결과를
+모두 보존했다. [통합 기록](resume-source-observer-policy.md)을 따른다.
+전체 Task와 현재 Step는 OPEN이며 다음 실제 실행은 Haiku 5.5의
+native dynamic Workflow로 6개 case·70개 subcase를 병렬 실행한다.
