@@ -63,3 +63,20 @@ genealogy의 fail-closed를 검사했다. product evaluator를 호출해 기대�
 실제 상충 근거 설치와 ITEM grain을 맞춘다. 두 변경을 통합한 뒤
 원본 의미를 보존한 HTTP/PG와 Haiku dynamic Workflow로 인수한다.
 Task·Step·S5/S6는 OPEN이다.
+
+## 설치 receipt의 identity-only 참조
+
+원래 assertion의 근거를 실제 설치 ID에 연결하도록 ReferenceResolver는
+`/data/sourceFactEvidence/conditions/N/documentId`, `canonicalOccurrenceId`,
+`decisionReceipts/0/canonicalOccurrenceId`,
+`decisionReceipts/1/canonicalOccurrenceId`만 추가로 허용한다. 모두
+실행된 setup의 canonical UUID여야 한다. 상태·수량·evaluator 결과는
+expected로 복사할 수 없다. 원래 단일 alias를 새 문서의 근거처럼
+해석하지 않는다. index와 원래 pointer/given의 일치는 T17 oracle에서
+별도로 검증한다.
+
+기존 resolver19개와 새 경계3개, 총22개가 실패·오류·skip0으로
+통과했다. 첫 실행의1개 실패는 null 거부를 RuntimeException으로만
+기대한 검사 오류였다. 원래 null의 AssertionError 거부를 유지한 채
+타입별 경계를 정확히 검사했고 첫 원문도 보존했다. 이 참조 허용은
+업무 status oracle의 변경이나 실제 T17 인수가 아니다.

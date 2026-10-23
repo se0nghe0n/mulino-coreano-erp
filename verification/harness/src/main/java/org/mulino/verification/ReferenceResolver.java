@@ -29,7 +29,7 @@ public final class ReferenceResolver {
             require(ref.isObject() && ref.size()==2 && ref.has("actionId") && ref.has("pointer"),"Result reference requires only actionId/pointer");
             if(identity) require(identityPointer(ref.path("pointer").asText()),"Assertion references must bind identity, not observed business values");
             JsonNode value=new AssertionEngine().select(ref,results,false);
-            if(identity || ASSESSMENT_ROW_ID.equals(ref.path("pointer").asText()) || DELIVERY_RESPONSE_IDS.contains(ref.path("pointer").asText()) || REGULATORY_RESPONSE_IDS.contains(ref.path("pointer").asText())) checkIdentityValue(ref.path("pointer").asText(),value);
+            if(identity || conditionSourceIdentity(ref.path("pointer").asText()) || ASSESSMENT_ROW_ID.equals(ref.path("pointer").asText()) || DELIVERY_RESPONSE_IDS.contains(ref.path("pointer").asText()) || REGULATORY_RESPONSE_IDS.contains(ref.path("pointer").asText())) checkIdentityValue(ref.path("pointer").asText(),value);
             return value.deepCopy();
         }
         if(node.isObject() && node.has("$encode")) {
@@ -60,14 +60,21 @@ public final class ReferenceResolver {
         "/response/effects/dispatchId","/response/effects/cargoScopeId","/response/effects/deliveryId");
     private static final Set<String> REGULATORY_RESPONSE_IDS=Set.of(
         "/response/effects/procedureId","/response/effects/procedureVersionId");
+    /** Only actual identity leaves of the typed fixture source receipt; never its business values. */
+    private static boolean conditionSourceIdentity(String pointer) {
+        return pointer.matches("/data/sourceFactEvidence/conditions/(?:0|[1-9][0-9]*)/(?:documentId|canonicalOccurrenceId|decisionReceipts/[01]/canonicalOccurrenceId)");
+    }
     private static String identityField(String pointer) {return pointer.substring(pointer.lastIndexOf('/')+1);}
     public static boolean identityPointer(String pointer) {
-        if(ASSESSMENT_ROW_ID.equals(pointer) || DELIVERY_RESPONSE_IDS.contains(pointer) || REGULATORY_RESPONSE_IDS.contains(pointer)) return true;
+        if(conditionSourceIdentity(pointer) || ASSESSMENT_ROW_ID.equals(pointer) || DELIVERY_RESPONSE_IDS.contains(pointer) || REGULATORY_RESPONSE_IDS.contains(pointer)) return true;
         if(!pointer.startsWith("/")) return false;
         String field=identityField(pointer);
         return ID_FIELDS.contains(field) || IDS_FIELDS.contains(field) || HASH_FIELDS.contains(field) || REVISION_FIELDS.contains(field);
     }
     private static void checkIdentityValue(String pointer,JsonNode value) {
+        if(conditionSourceIdentity(pointer)) {
+            require(nonemptyString(value) && canonicalUuid(value.textValue()),"Condition source receipt identity must be a canonical UUID");return;
+        }
         if(ASSESSMENT_ROW_ID.equals(pointer)) {
             require(nonemptyString(value) && canonicalUuid(value.textValue()),"Assessment row identity must be a canonical UUID");
             return;
