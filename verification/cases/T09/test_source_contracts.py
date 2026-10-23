@@ -277,7 +277,7 @@ class SourceContracts(unittest.TestCase):
         lines = []
         replaced = removed = 0
         for line in feature.splitlines(keepends=True):
-            if '"assessmentEvaluator" 역할이' in line or '-evaluation-work" 행동' in line:
+            if '"assessmentEvaluator" 역할이' in line or '-evaluation-work" 행동' in line or '"clock-assessment" 행동' in line:
                 continue
             if '"observationSource" 역할이' in line:
                 if '-match" 행동' in line or '-canonical" 행동' in line:

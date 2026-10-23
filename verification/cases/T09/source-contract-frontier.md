@@ -191,3 +191,78 @@ Spring/PostgreSQL 검증은 ApplicationQueries registry를 통한 Work/ID
 outbox 무변경을 포함한다. 실제 원문→대조→canonical 연결 전후의
 명시 공개 assessGoal은 완전 구간만 SATISFIED이고 점 관측은 UNVERIFIED다.
 정확한 최종 command·exit·log는 worker의 인계 결과에 기록한다.
+
+## 2026-10-23 공통 검사와 두 조회 경로의 후속 정렬
+
+이 절은 위의 registry/resolver 미지원과 T09 시간 순서 경계를 대체한다.
+coordinator가 공통 registry/resolver·관련 검사를 이번 소유에 추가했고,
+T01 공급 조회 회귀와 직접 판정 조회의 미검증 scope 거부를 지시했다.
+
+- `assessGoal`은 기존 `AssessmentService.capabilities()`의 COMMAND이며
+  공개 slot은 `workId` 하나다. acceptance registry에 실제 handler의
+  semantic/schema version 1.0.0으로 등록했다. 공통 definition이나
+  installer를 고쳐 지원을 주장하지 않았다.
+- resolver는 기존 suffix allowlist에 `ID`를 일반 추가하지 않았다.
+  새 허용 경로는 정확히 `/response/data/ID` 하나이며 canonical UUID를
+  요구한다. 이 경로는 입력 참조에도 UUID를 확인한다. 다른 중첩 ID 경로,
+  임의 문자열/수량/Boolean, 미완료 결과, 불완전 scope는 거부한다.
+  input encoder/transform을 assertion에 쓰는 금지와 기존 크기·깊이·
+  미래/병렬 receipt-source 검사는 유지된다.
+- registry에서 파생되는 T20/C3/V4의 tools 목록은 실제 `assessGoal` 한 개만
+  추가했다. C3/V4 binding과 V4의 allowlist hash를 기존 생성기로
+  재생성했다. 업무 oracle나 실제 실행 결과를 만들어 넣지 않았다.
+- action 없는 `getAssessment`만 불변 판정 전용 snapshot으로 읽는다.
+  `filters.action=SELL`인 공급 조회는 원래 Work/Supply/world 경로를
+  유지한다. T01 case에서 noun/answer 요청을 직접 읽어 실제
+  ApplicationQueries에서 실행한 PostgreSQL test가 동일 snapshot 왕복과
+  잘못된 snapshot 거부를 확인한다. T01 fixture는 바꾸지 않았다.
+- 직접 판정 조회의 placeId/customerId selector는 현재 전용 계약이
+  없으므로 TYPE_INVALID로 명시 거부한다. 이를 반환 scope에만 넣고
+  무시하지 않는다. action 있는 공급 조회의 장소/고객 의미는 기존
+  WorkSupplyRead가 담당하며 현재 all-of 인가는 유지된다.
+
+### T09의 두 시간은 API 추가 없이 원래 순서 안에서 처리한다
+
+계획 §3.1은 발생/유효 시점과 기록 시점을 구별하고 §3.4는 조회의
+asOf/knownAt을 반환한다. §5.1의 STATE_AT은 목표 evaluationAt을,
+EXISTS_IN/THROUGHOUT은 목표 period를 평가한다. AssessmentService는
+현재 명령 시계에서 판정을 쓰며 query는 새 판정을 만들지 않는다.
+
+`cumulative-versus-state`의 마지막 실제 수령은 01:30이고
+`exists-versus-end-throughout`의 마지막 실물 출고는 01:00이다.
+둘 다 02:00 목표 평가시점 뒤에 새 사실을 쓰지 않는다. 기존 04:00
+clock-known은 유지하면서 그 앞에 단조 전진하는 02:00 clock-assessment와
+Work revision 조회/명시 평가를 배치했다. 기존 query는 순서·asOf=02:00·
+knownAt=04:00을 유지하고 해당 판정 ID를 읽는다. 조회 시각 04:00에
+02:00까지 유효하고 이미 기록된 판정을 읽는 것이므로 과거 시점의
+명령을 위조하거나 시계를 되돌리지 않는다.
+
+저장 판정의 knownAt은 실제 평가 당시 02:00이며 이를 04:00으로
+다시 쓰지 않는다. 조회 envelope의 knownAt=04:00과 저장 판정의 입력
+인지 경계는 다른 값으로 보존한다. 이후 늦은 증거가 들어오는 별도
+사례에 이 순서가 동일한 재평가 결과를 보장한다는 주장은 하지 않는다.
+이번 두 case는 평가 뒤 source/receipt/movement/policy/goal 쓰기가
+없다는 입력 순서와, original query·oracle·원래 action 순서 보존을
+결정적 검사로 확인했다. 새 AssessmentService/typed 시간 API는 추가하지
+않았으며 이번 두 case를 위해 필요하지 않다.
+
+### 미발행 조건 ID는 그대로 남긴다
+
+T12의 `arrived-at-W`는 19개 selector에서, `due-by-T`는 1개에서 쓰인다.
+현재 발행된 도착 template `arrived`는 Receipt.quantity의 최소1 합계
+predicate이고, 실제 Goal은 AssessmentService.goalPredicate가 원래
+predicate와 목표100 predicate를 all로 묶는다. 저장되는 조건 ID는
+TypedPredicateEvaluator의 root/root.0/root.1이며 단순 label alias가 아니다.
+장소/기간/출처 제한은 AssessmentFactProvider의 입력 선별에 있다.
+
+따라서 `arrived-at-W`를 root.0으로 바꾸면 최소1과 목표100을 혼동한다.
+root 전체로 바꾸더라도 기존 단일 조건별 snapshot/evidence 필드와
+동일하다는 증거가 없다. `due-by-T`는 발행 predicate에 없고 서비스의
+별도 deadlineViolated 판정이므로 root로 대체할 수도 없다. 기존
+selector·업무 기대값은 변경하지 않았으며, 이 부분은 coordinator의
+조건 계약 판단과 독립 SQL lineage 정렬 대상으로 남긴다.
+
+최종 한정 검증은 backend 37개, 공통 harness 50개, 소유 Python 18개가
+통과했다. `./verify prepare`는 41 case/802 subcase/24,248 assertion,
+12개 자산 검사 모두 통과했으며 이는 runtime 인수 성공이 아니다.
+실제 시나리오·T17 installer 변경·push·merge는 수행하지 않았다.

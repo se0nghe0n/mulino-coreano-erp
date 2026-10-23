@@ -57,4 +57,17 @@ public class ContractValidatorTest {
             assertion.set("expected",Json.parse("{\"$result\":{\"actionId\":\"after\",\"pointer\":\"/response/"+field+"\"}}"));Json.write(p,c);new ContractValidator(root).caseFile(p);
         }
     }
+    @Test void assessmentCommandRegistrationMatchesExistingHandlerAndSlotContract() throws Exception {
+        var registry=Json.read(root.resolve("contracts/acceptance-capabilities.json"));
+        var matches=new java.util.ArrayList<JsonNode>();registry.path("capabilities").forEach(c->{if(c.path("id").asText().equals("assessGoal"))matches.add(c);});
+        assertEquals(1,matches.size());var command=matches.getFirst();
+        assertEquals("COMMAND",command.path("kind").asText());assertTrue(command.path("implemented").asBoolean());
+        assertEquals("1.0.0",command.path("schemaVersion").asText());assertEquals("1.0.0",command.path("semanticVersion").asText());
+        assertEquals(Json.parse("[\"workId\"]"),Json.read(root.resolve("contracts/capability-slots.json")).path("capabilities").path("assessGoal").path("slots"));
+        var handler=Files.readString(root.resolve("backend/src/main/java/com/mulino/application/evaluation/AssessmentService.java"));
+        assertTrue(handler.contains("implements CommandHandler,WorkAssessmentGuard"));assertTrue(handler.contains("return Set.of(\"assessGoal\")"));
+        var inputs=Json.read(root.resolve("contracts/request-contracts.json")).path("commandSlots").path("capabilities").path("assessGoal");
+        assertEquals(Json.parse("[\"workId\"]"),inputs.path("allowed"));assertEquals(inputs.path("allowed"),inputs.path("required"));
+    }
+
 }

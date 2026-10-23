@@ -29,7 +29,7 @@ public final class ReferenceResolver {
             require(ref.isObject() && ref.size()==2 && ref.has("actionId") && ref.has("pointer"),"Result reference requires only actionId/pointer");
             if(identity) require(identityPointer(ref.path("pointer").asText()),"Assertion references must bind identity, not observed business values");
             JsonNode value=new AssertionEngine().select(ref,results,false);
-            if(identity) checkIdentityValue(ref.path("pointer").asText(),value);
+            if(identity || ASSESSMENT_ROW_ID.equals(ref.path("pointer").asText())) checkIdentityValue(ref.path("pointer").asText(),value);
             return value.deepCopy();
         }
         if(node.isObject() && node.has("$encode")) {
@@ -55,13 +55,19 @@ public final class ReferenceResolver {
     private static final Set<String> IDS_FIELDS=Set.of("ids","workIds","obligationIds");
     private static final Set<String> HASH_FIELDS=Set.of("hash","proposalHash","evidenceHash","definitionHash","policyHash","artifactHash","requestHash","inputHash","sha256");
     private static final Set<String> REVISION_FIELDS=Set.of("revision","proposalRevision","snapshotRevision","definitionRevision","policyRevision","grantRevision","workRevision","approvalRevision");
+    private static final String ASSESSMENT_ROW_ID="/response/data/ID";
     private static String identityField(String pointer) {return pointer.substring(pointer.lastIndexOf('/')+1);}
     public static boolean identityPointer(String pointer) {
+        if(ASSESSMENT_ROW_ID.equals(pointer)) return true;
         if(!pointer.startsWith("/")) return false;
         String field=identityField(pointer);
         return ID_FIELDS.contains(field) || IDS_FIELDS.contains(field) || HASH_FIELDS.contains(field) || REVISION_FIELDS.contains(field);
     }
     private static void checkIdentityValue(String pointer,JsonNode value) {
+        if(ASSESSMENT_ROW_ID.equals(pointer)) {
+            require(nonemptyString(value) && canonicalUuid(value.textValue()),"Assessment row identity must be a canonical UUID");
+            return;
+        }
         String field=identityField(pointer);
         if(ID_FIELDS.contains(field)) require(nonemptyString(value),"Actual identity ID must be nonempty string, not quantity/Boolean/object");
         else if(IDS_FIELDS.contains(field)) {
@@ -70,6 +76,10 @@ public final class ReferenceResolver {
         } else if(HASH_FIELDS.contains(field)) require(value.isTextual() && value.asText().matches("[a-fA-F0-9]{64}"),"Actual identity hash must be SHA-256 hex string");
         else if(REVISION_FIELDS.contains(field)) require(nonemptyString(value) || (value.isIntegralNumber() && value.canConvertToLong() && value.longValue()>=0),"Actual identity revision must be nonempty string or nonnegative integer");
         else throw new IllegalArgumentException("Unsupported assertion identity field "+field);
+    }
+    private static boolean canonicalUuid(String value) {
+        try {return java.util.UUID.fromString(value).toString().equalsIgnoreCase(value);}
+        catch(IllegalArgumentException invalid){return false;}
     }
     private static boolean nonemptyString(JsonNode value) {return value.isTextual() && !value.asText().isBlank() && value.asText().length()<=512;}
     private JsonNode transform(JsonNode t) {

@@ -106,4 +106,45 @@ public final class ReferenceResolverTest {
             response.put(field,false);assertThrows(IllegalArgumentException.class,()->resolver.identity(Json.parse("{\"$result\":{\"actionId\":\"created\",\"pointer\":\"/response/"+field+"\"}}")));
         }
     }
+    @Test void onlyExactPublicAssessmentRowPathAddsAnIdentityAndRequiresUuid() {
+        String id="71183868-30ae-4fa0-9a90-823cfe08b647";
+        var response=Json.object();response.set("data",Json.object().put("ID",id));
+        var result=Json.object().put("driverStatus","EXECUTED");result.set("provenance",Json.object().put("scopeComplete",true));result.set("response",response);
+        var resolver=new ReferenceResolver(Map.of("assessment",result),Json.object());
+        var ref=Json.parse("{\"$result\":{\"actionId\":\"assessment\",\"pointer\":\"/response/data/ID\"}}");
+        assertTrue(ReferenceResolver.identityPointer("/response/data/ID"));
+        assertEquals(id,resolver.identity(ref).asText());assertEquals(id,resolver.resolve(ref).asText());
+        for(String path:List.of("/response/ID","/data/ID","/response/data/nested/ID","/response/body/result/data/ID","/response/data/ID/","/response/data/ID~0","/response/data/value","/response/data/quantity"))
+            assertFalse(ReferenceResolver.identityPointer(path),path);
+        for(JsonNode invalid:List.<JsonNode>of(Json.MAPPER.valueToTree("not-a-uuid"),Json.MAPPER.valueToTree("1-1-1-1-1"),Json.MAPPER.valueToTree("a".repeat(513)),Json.MAPPER.valueToTree(false),Json.MAPPER.valueToTree(1),Json.object(),Json.array())) {
+            ((ObjectNode)response.path("data")).set("ID",invalid);
+            assertThrows(IllegalArgumentException.class,()->resolver.identity(ref));
+            assertThrows(IllegalArgumentException.class,()->resolver.resolve(ref));
+        }
+        ((ObjectNode)response.path("data")).putNull("ID");
+        assertThrows(AssertionError.class,()->resolver.identity(ref));
+    }
+    @Test void assessmentIdentityDoesNotAdmitInputEncodersOrTransformsIntoAssertions() {
+        var result=Json.parse("{\"driverStatus\":\"EXECUTED\",\"provenance\":{\"scopeComplete\":true},\"response\":{\"data\":{\"ID\":\"71183868-30ae-4fa0-9a90-823cfe08b647\",\"outcome\":\"SATISFIED\"}}}");
+        var resolver=new ReferenceResolver(Map.of("assessment",result),Json.object());
+        var encoded=Json.parse("{\"$encode\":{\"source\":{\"assessmentId\":{\"$result\":{\"actionId\":\"assessment\",\"pointer\":\"/response/data/ID\"}}},\"encoding\":\"json\"}}");
+        assertTrue(resolver.resolve(encoded).asText().contains("71183868-30ae-4fa0-9a90-823cfe08b647"));
+        assertThrows(IllegalArgumentException.class,()->resolver.identity(encoded));
+        ((ObjectNode)encoded.path("$encode").path("source").path("assessmentId").path("$result")).put("pointer","/response/data/outcome");
+        assertThrows(IllegalArgumentException.class,()->resolver.resolve(encoded));
+        var transform=Json.parse("{\"$transform\":{\"source\":{\"$result\":{\"actionId\":\"assessment\",\"pointer\":\"/response/data/ID\"}},\"operation\":\"opaqueByteXor\",\"index\":0,\"xor\":1}}");
+        assertThrows(IllegalArgumentException.class,()->resolver.identity(transform));
+    }
+
+    @Test void exactAssessmentPathStillRequiresAnExecutedAvailableResult() {
+        var ref=Json.parse("{\"$result\":{\"actionId\":\"assessment\",\"pointer\":\"/response/data/ID\"}}");
+        assertThrows(AssertionError.class,()->new ReferenceResolver(Map.of(),Json.object()).identity(ref));
+        for(String status:List.of("NOT_IMPLEMENTED","STARTED","PENDING","FAILED")) {
+            var result=Json.parse("{\"driverStatus\":\""+status+"\",\"provenance\":{\"scopeComplete\":true},\"response\":{\"data\":{\"ID\":\"71183868-30ae-4fa0-9a90-823cfe08b647\"}}}");
+            assertThrows(AssertionError.class,()->new ReferenceResolver(Map.of("assessment",result),Json.object()).identity(ref));
+        }
+        var incomplete=Json.parse("{\"driverStatus\":\"EXECUTED\",\"provenance\":{\"scopeComplete\":false},\"response\":{\"data\":{\"ID\":\"71183868-30ae-4fa0-9a90-823cfe08b647\"}}}");
+        assertThrows(AssertionError.class,()->new ReferenceResolver(Map.of("assessment",incomplete),Json.object()).identity(ref));
+    }
+
 }

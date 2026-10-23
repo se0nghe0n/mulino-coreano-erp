@@ -121,9 +121,9 @@ public class WorkAssertionTest {
         assertThrows(AssertionError.class, () -> engine.check(scope,rows,aliases));
     }
     @Test void contaminatedEvaluatorVersionFailsAuthoredSnapshotTuple() throws Exception {
-        var rows = new HashMap<String, JsonNode>();rows.put("work",identity("workId","work-id"));rows.put("assessment",identity("id","assessment-id"));
+        var rows = new HashMap<String, JsonNode>();rows.put("work",identity("workId","work-id"));rows.put("assessment",Json.parse("{\"driverStatus\":\"EXECUTED\",\"provenance\":{\"scopeComplete\":true},\"response\":{\"data\":{\"ID\":\"00000000-0000-4000-8000-000000000001\"}}}"));
         rows.put("after-db",captured("""
-          {"rawRows":{"assessments":[{"id":"assessment-id","definitionVersion":"definition-v1","policyVersion":"SYNTHETIC-policy-v1","evaluatorVersion":"evaluator-v1"}]}}
+          {"rawRows":{"assessments":[{"id":"00000000-0000-4000-8000-000000000001","definitionVersion":"definition-v1","policyVersion":"SYNTHETIC-policy-v1","evaluatorVersion":"evaluator-v1"}]}}
           """));
         var a=assertion("T12","conflicting-claims","versions-pinned");engine.check(a,rows,aliases);
         ((ObjectNode)rows.get("after-db").at("/data/rawRows/assessments/0")).put("evaluatorVersion","evaluator-v2");

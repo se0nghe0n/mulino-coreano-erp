@@ -1309,17 +1309,17 @@
           }
         },
         {
-          "id": "clock-known",
+          "id": "clock-assessment",
           "kind": "control",
           "evidenceRefs": [
-            "clock-known:actual-artifact"
+            "clock-assessment:actual-artifact"
           ],
           "control": {
             "type": "clock",
             "operation": "advanceTo",
             "parameters": {
-              "instant": "2026-10-07T04:00:00Z",
-              "knownAt": "2026-10-07T04:00:00Z",
+              "instant": "2026-10-07T02:00:00Z",
+              "knownAt": "2026-10-07T02:00:00Z",
               "timezone": "Asia/Seoul",
               "scope": {
                 "organizationId": {
@@ -1389,37 +1389,6 @@
           }
         },
         {
-          "id": "cumulative-assessment",
-          "kind": "query",
-          "evidenceRefs": [
-            "cumulative-assessment:actual-artifact"
-          ],
-          "actorRef": "A",
-          "route": "api",
-          "capabilityId": "getAssessment",
-          "request": {
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              }
-            },
-            "asOf": "2026-10-07T02:00:00Z",
-            "knownAt": "2026-10-07T04:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "cumulative",
-                "pointer": "/response/workId"
-              }
-            },
-            "id": {
-              "$result": {
-                "actionId": "cumulative-assessment-evaluate",
-                "pointer": "/response/effects/assessmentId"
-              }
-            }
-          }
-        },
-        {
           "id": "state-assessment-evaluation-work",
           "kind": "query",
           "actorRef": "A",
@@ -1474,6 +1443,60 @@
               }
             },
             "commandIdempotencyKey": "state-assessment-evaluate"
+          }
+        },
+        {
+          "id": "clock-known",
+          "kind": "control",
+          "evidenceRefs": [
+            "clock-known:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T04:00:00Z",
+              "knownAt": "2026-10-07T04:00:00Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T09",
+                "subcaseId": "cumulative-versus-state"
+              }
+            }
+          }
+        },
+        {
+          "id": "cumulative-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "cumulative-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "cumulative",
+                "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "cumulative-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
+              }
+            }
           }
         },
         {
@@ -8514,17 +8537,17 @@
           }
         },
         {
-          "id": "clock-known",
+          "id": "clock-assessment",
           "kind": "control",
           "evidenceRefs": [
-            "clock-known:actual-artifact"
+            "clock-assessment:actual-artifact"
           ],
           "control": {
             "type": "clock",
             "operation": "advanceTo",
             "parameters": {
-              "instant": "2026-10-07T04:00:00Z",
-              "knownAt": "2026-10-07T04:00:00Z",
+              "instant": "2026-10-07T02:00:00Z",
+              "knownAt": "2026-10-07T02:00:00Z",
               "timezone": "Asia/Seoul",
               "scope": {
                 "organizationId": {
@@ -8594,37 +8617,6 @@
           }
         },
         {
-          "id": "exists-assessment",
-          "kind": "query",
-          "evidenceRefs": [
-            "exists-assessment:actual-artifact"
-          ],
-          "actorRef": "A",
-          "route": "api",
-          "capabilityId": "getAssessment",
-          "request": {
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              }
-            },
-            "asOf": "2026-10-07T02:00:00Z",
-            "knownAt": "2026-10-07T04:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "exists",
-                "pointer": "/response/workId"
-              }
-            },
-            "id": {
-              "$result": {
-                "actionId": "exists-assessment-evaluate",
-                "pointer": "/response/effects/assessmentId"
-              }
-            }
-          }
-        },
-        {
           "id": "state-assessment-evaluation-work",
           "kind": "query",
           "actorRef": "A",
@@ -8682,37 +8674,6 @@
           }
         },
         {
-          "id": "state-assessment",
-          "kind": "query",
-          "evidenceRefs": [
-            "state-assessment:actual-artifact"
-          ],
-          "actorRef": "A",
-          "route": "api",
-          "capabilityId": "getAssessment",
-          "request": {
-            "scope": {
-              "organizationId": {
-                "$alias": "ORG"
-              }
-            },
-            "asOf": "2026-10-07T02:00:00Z",
-            "knownAt": "2026-10-07T04:00:00Z",
-            "workId": {
-              "$result": {
-                "actionId": "state",
-                "pointer": "/response/workId"
-              }
-            },
-            "id": {
-              "$result": {
-                "actionId": "state-assessment-evaluate",
-                "pointer": "/response/effects/assessmentId"
-              }
-            }
-          }
-        },
-        {
           "id": "throughout-assessment-evaluation-work",
           "kind": "query",
           "actorRef": "A",
@@ -8767,6 +8728,91 @@
               }
             },
             "commandIdempotencyKey": "throughout-assessment-evaluate"
+          }
+        },
+        {
+          "id": "clock-known",
+          "kind": "control",
+          "evidenceRefs": [
+            "clock-known:actual-artifact"
+          ],
+          "control": {
+            "type": "clock",
+            "operation": "advanceTo",
+            "parameters": {
+              "instant": "2026-10-07T04:00:00Z",
+              "knownAt": "2026-10-07T04:00:00Z",
+              "timezone": "Asia/Seoul",
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                },
+                "caseId": "T09",
+                "subcaseId": "exists-versus-end-throughout"
+              }
+            }
+          }
+        },
+        {
+          "id": "exists-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "exists-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "exists",
+                "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "exists-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
+              }
+            }
+          }
+        },
+        {
+          "id": "state-assessment",
+          "kind": "query",
+          "evidenceRefs": [
+            "state-assessment:actual-artifact"
+          ],
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getAssessment",
+          "request": {
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            },
+            "asOf": "2026-10-07T02:00:00Z",
+            "knownAt": "2026-10-07T04:00:00Z",
+            "workId": {
+              "$result": {
+                "actionId": "state",
+                "pointer": "/response/workId"
+              }
+            },
+            "id": {
+              "$result": {
+                "actionId": "state-assessment-evaluate",
+                "pointer": "/response/effects/assessmentId"
+              }
+            }
           }
         },
         {

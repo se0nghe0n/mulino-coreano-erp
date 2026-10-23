@@ -14,10 +14,13 @@ public class WorkReadHandler implements QueryHandler {
   public WorkReadHandler(WorkReadRepository repository,ReadAuthorizer auth,org.springframework.beans.factory.ObjectProvider<com.mulino.application.work.WorkAssessmentRead> assessmentRead) {this.repository=repository;this.auth=auth;this.assessmentRead=assessmentRead;}
   @org.springframework.beans.factory.annotation.Autowired
   private org.springframework.beans.factory.ObjectProvider<com.mulino.application.inventory.InventoryQueries> inventoryRead;
+  @org.springframework.beans.factory.annotation.Autowired
+  private org.springframework.beans.factory.ObjectProvider<com.mulino.application.inventory.WorkSupplyRead> supplyRead;
   public Set<String> operations(){return Set.of("getWork","searchWorks","getObligations","getAssessment");}
   public QueryResult query(DomainContext c,QueryRequest q){
-    // The advertised "getAssessment" provider delegates to immutable evaluation reads.
-    if(q.operation().equals("getAssessment")){
+    // Action-scoped supply assessment keeps the shared noun/Work world snapshot.
+    // Only immutable goal assessments use the dedicated read port.
+    if(q.operation().equals("getAssessment")&&!q.filters().containsKey("action")){
       var reader=assessmentRead.getIfAvailable();if(reader==null)throw DomainError.unsupported();
       return reader.query(c,q);
     }
@@ -35,6 +38,7 @@ public class WorkReadHandler implements QueryHandler {
       data.put("obligations",obligations(c,Set.of(q.id())));
       data.put("workLinks",workLinks(c,Set.of(q.id())));data.put("contributions",contributions(c,Set.of(q.id())));
       if(assessmentRead.getIfAvailable()!=null)data.put("assessmentInputSnapshots",assessmentSnapshots(c,q.id()));
+      if(q.operation().equals("getAssessment")&&q.filters().containsKey("action")&&supplyRead!=null&&supplyRead.getIfAvailable()!=null)data.putAll(supplyRead.getObject().read(c,scope(c,q.scope(),work),q.filters()));
       if(work.get("waitJson")!=null)data.put("wait",decode(work.get("waitJson")));
       data.remove("waitJson");
       return QueryResult.of(data,scope(c,q.scope(),work));

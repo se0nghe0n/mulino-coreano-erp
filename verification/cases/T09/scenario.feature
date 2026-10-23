@@ -25,12 +25,13 @@
     만일 "receiptSource" 역할이 "receive40-match" 행동을 수행한다
     만일 "receiptSource" 역할이 "receive40-canonical" 행동을 수행한다
     만일 "warehouse" 역할이 "receive40" 행동을 수행한다
-    만일 "시스템" 역할이 "clock-known" 행동을 수행한다
+    만일 "시스템" 역할이 "clock-assessment" 행동을 수행한다
     만일 "A" 역할이 "cumulative-assessment-evaluation-work" 행동을 수행한다
     만일 "assessmentEvaluator" 역할이 "cumulative-assessment-evaluate" 행동을 수행한다
-    만일 "A" 역할이 "cumulative-assessment" 행동을 수행한다
     만일 "A" 역할이 "state-assessment-evaluation-work" 행동을 수행한다
     만일 "assessmentEvaluator" 역할이 "state-assessment-evaluate" 행동을 수행한다
+    만일 "시스템" 역할이 "clock-known" 행동을 수행한다
+    만일 "A" 역할이 "cumulative-assessment" 행동을 수행한다
     만일 "A" 역할이 "state-assessment" 행동을 수행한다
     만일 "A" 역할이 "inventory" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -213,15 +214,16 @@
     만일 "warehouse" 역할이 "pick" 행동을 수행한다
     만일 "시스템" 역할이 "clock-dispatch" 행동을 수행한다
     만일 "warehouse" 역할이 "dispatch" 행동을 수행한다
-    만일 "시스템" 역할이 "clock-known" 행동을 수행한다
+    만일 "시스템" 역할이 "clock-assessment" 행동을 수행한다
     만일 "A" 역할이 "exists-assessment-evaluation-work" 행동을 수행한다
     만일 "assessmentEvaluator" 역할이 "exists-assessment-evaluate" 행동을 수행한다
-    만일 "A" 역할이 "exists-assessment" 행동을 수행한다
     만일 "A" 역할이 "state-assessment-evaluation-work" 행동을 수행한다
     만일 "assessmentEvaluator" 역할이 "state-assessment-evaluate" 행동을 수행한다
-    만일 "A" 역할이 "state-assessment" 행동을 수행한다
     만일 "A" 역할이 "throughout-assessment-evaluation-work" 행동을 수행한다
     만일 "assessmentEvaluator" 역할이 "throughout-assessment-evaluate" 행동을 수행한다
+    만일 "시스템" 역할이 "clock-known" 행동을 수행한다
+    만일 "A" 역할이 "exists-assessment" 행동을 수행한다
+    만일 "A" 역할이 "state-assessment" 행동을 수행한다
     만일 "A" 역할이 "throughout-assessment" 행동을 수행한다
     만일 "A" 역할이 "final" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다

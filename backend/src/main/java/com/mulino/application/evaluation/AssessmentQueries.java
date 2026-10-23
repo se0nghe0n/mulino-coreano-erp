@@ -16,8 +16,6 @@ public class AssessmentQueries implements com.mulino.application.work.WorkAssess
  private final WorkReadRepository works;
  private final ReadAuthorizer auth;
  private final ObjectMapper json=new ObjectMapper();
- @org.springframework.beans.factory.annotation.Autowired
- private org.springframework.beans.factory.ObjectProvider<com.mulino.application.inventory.WorkSupplyRead> supplyRead;
  public AssessmentQueries(AssessmentRepository repository,WorkReadRepository works,ReadAuthorizer auth){this.repository=repository;this.works=works;this.auth=auth;}
  /** Optional getWork sub-read: a denied read must not poison the shared read transaction. */
  @Transactional(readOnly=true,noRollbackFor=DomainError.class)
@@ -28,8 +26,8 @@ public class AssessmentQueries implements com.mulino.application.work.WorkAssess
  }
  @Transactional(readOnly=true)
  public QueryResult query(DomainContext c,QueryRequest q){
-  if(!Set.of("organizationId","workId","itemId","lotId","status","placeId","customerId").containsAll(q.scope().keySet())||
-     !Set.of("workId","itemId","lotId","status","sort","action","customerId").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported assessment selector");
+  if(!Set.of("organizationId","workId","itemId","lotId").containsAll(q.scope().keySet())||
+     !Set.of("workId","itemId","lotId","status","sort").containsAll(q.filters().keySet()))throw DomainError.invalid("Unsupported assessment selector");
   if(q.filters().containsKey("sort")&&!"ID".equals(q.filters().get("sort")))throw DomainError.invalid("Only stable ID sort supported");
   if(q.scope().containsKey("organizationId")&&!c.organizationId().equals(q.scope().get("organizationId")))throw DomainError.forbidden();
   var rows=repository.rows(c,"mulino.work.read.AssessmentReferences").stream().filter(a->visible(c,a)).toList();
@@ -65,10 +63,6 @@ public class AssessmentQueries implements com.mulino.application.work.WorkAssess
    if(pending)unknowns.add("ASSESSMENT_PENDING");
    if(Boolean.TRUE.equals(assessment.get("held")))unknowns.add("PINNED_CONTRACT_UNAVAILABLE");
    if(Boolean.TRUE.equals(assessment.get("conflict")))conflicts.add("EVIDENCE_CONFLICT");
-  }
-  if(q.filters().containsKey("action")&&supplyRead!=null&&supplyRead.getIfAvailable()!=null){
-   var supplyScope=new LinkedHashMap<String,Object>(q.scope());supplyScope.putAll(scope);
-   data.putAll(supplyRead.getObject().read(c,supplyScope,q.filters()));
   }
   var evidence=new TreeSet<String>();
   if(data.get("conditionResults") instanceof List<?> conditions)for(Object condition:conditions)

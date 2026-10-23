@@ -64,6 +64,22 @@ def apply(case, fixture):
                             'provenance': {'workId': 'CONTEXT'}, 'expectedRevision': revision, 'commandIdempotencyKey': eid}})
                 q['id'] = ref(eid, '/response/effects/assessmentId')
             output.append(action)
+        if case['caseId'] == 'T09' and sub['id'] in ('cumulative-versus-state', 'exists-versus-end-throughout'):
+            # All physical source writes are complete by 01:30 / 01:00. Assess
+            # explicitly at the already authored 02:00 goal horizon, then let
+            # the unchanged 04:00 query read that immutable earlier assessment.
+            # No relevant late source is introduced between these two clocks.
+            evaluation_ids = {q['id']+suffix for q in queries for suffix in ('-evaluation-work', '-evaluate')}
+            evaluations = [a for a in output if a['id'] in evaluation_ids]
+            output = [a for a in output if a['id'] not in evaluation_ids and a['id'] != 'clock-assessment']
+            at = next(i for i, a in enumerate(output) if a['id'] == 'clock-known')
+            horizon = queries[0]['request']['asOf']
+            clock = copy.deepcopy(output[at])
+            clock['id'] = 'clock-assessment'
+            clock['control']['parameters']['instant'] = horizon
+            clock['control']['parameters']['knownAt'] = horizon
+            clock['evidenceRefs'] = ['clock-assessment:actual-artifact']
+            output[at:at] = [clock, *evaluations]
         sub['actions'] = output
     return case
 
@@ -92,7 +108,7 @@ def original_view(case_id, value):
     """For pre-existing source preservation tests, remove this additive layer."""
     value = reverse(case_id, value)
     for sub in value['subcases']:
-        sub['actions'] = [a for a in sub['actions'] if not ((a.get('actorRef') == ACTOR and a.get('capabilityId') == 'assessGoal') or a['id'].endswith('-evaluation-work'))]
+        sub['actions'] = [a for a in sub['actions'] if not ((a.get('actorRef') == ACTOR and a.get('capabilityId') == 'assessGoal') or a['id'].endswith('-evaluation-work') or a['id'] == 'clock-assessment')]
         for action in sub['actions']:
             if action.get('capabilityId') == 'getAssessment':
                 action['request'].pop('id', None)

@@ -425,4 +425,18 @@ class AssessmentPostgresTest {
   }finally{SecurityContextHolder.clearContext();}
  }
 
+ @Test void directAssessmentRejectsUnsupportedPlaceAndCustomerScopes()throws Exception {
+  readableWork();authorizeAssessmentRead();
+  try{
+   String assessment=((Map<?,?>)assess(t).get("assessment")).get("ID").toString();
+   var before=databaseState();
+   for(String target:List.of(work,assessment))for(String key:List.of("placeId","customerId")){
+    assertEquals("TYPE_INVALID",assertThrows(DomainError.class,()->readAssessment(target,t,t.plusSeconds(1000),Map.of(key,id()),null)).code());
+   }
+   var input=Map.<String,Object>of("id",work,"filters",Map.of("customerId",id()),"asOf",t.toString(),"knownAt",t.plusSeconds(1000).toString());
+   assertEquals("TYPE_INVALID",assertThrows(DomainError.class,()->runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getAssessment",input));})).code());
+   assertEquals(before,databaseState());
+  }finally{SecurityContextHolder.clearContext();}
+ }
+
 }

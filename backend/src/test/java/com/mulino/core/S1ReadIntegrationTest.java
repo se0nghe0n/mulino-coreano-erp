@@ -100,6 +100,39 @@ class S1ReadIntegrationTest {
     assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_ObligationReferences WHERE organizationId=? AND status='OPEN'",Integer.class,org));
     assertEquals(new java.math.BigDecimal("100.000000000000"),jdbc.queryForObject("SELECT sum(quantity) FROM mulino_inventory_QuantitySegments WHERE organizationId=?",java.math.BigDecimal.class,org));
   }
+  @Test @SuppressWarnings("unchecked") void originalT01SupplyRequestSharesTheNounSnapshot()throws Exception {
+    var cases=json.readTree(Path.of("../verification/cases/T01/case.json").toFile());
+    com.fasterxml.jackson.databind.JsonNode sub=null;
+    for(var candidate:cases.path("subcases"))if(candidate.path("id").asText().equals("supply-basis"))sub=candidate;
+    assertNotNull(sub);
+    Map<String,Object> nounInput=null,answerInput=null;
+    var aliases=Map.of("ORG",org,"P",item,"L",lot,"O1",work);
+    Map<String,Object> noun=null;
+    for(var action:sub.path("actions"))if(action.path("id").asText().equals("noun")) {
+      nounInput=(Map<String,Object>)bindT01Input(action.path("request"),aliases,null);
+      var input=nounInput;noun=runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getObject",input));});
+    }
+    assertNotNull(noun);
+    for(var action:sub.path("actions"))if(action.path("id").asText().equals("answer"))
+      answerInput=(Map<String,Object>)bindT01Input(action.path("request"),aliases,noun.get("snapshotRevision"));
+    assertNotNull(answerInput);
+    assertEquals(Map.of("organizationId",org),answerInput.get("scope"));
+    assertEquals(Map.of("action","SELL"),answerInput.get("filters"));
+    var before=jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE organizationId=?",Integer.class,org);
+    var input=answerInput;var answer=runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getAssessment",input));});
+    for(String key:List.of("snapshotRevision","asOf","knownAt","scope","evidenceRefs"))assertEquals(noun.get(key),answer.get(key),key);
+    var data=(Map<?,?>)answer.get("data");assertEquals(work,data.get("workId"));assertEquals("SELL",data.get("action"));assertTrue(data.containsKey("eligibleSegmentIds"));
+    for(String key:List.of("workIds","goalReferences","assessmentReferences","heldQuantity","unit"))assertEquals(((Map<?,?>)noun.get("data")).get(key),data.get(key),key);
+    assertEquals(before,jdbc.queryForObject("SELECT count(*) FROM mulino_work_read_AssessmentReferences WHERE organizationId=?",Integer.class,org));
+    input.put("snapshotRef","wrong-snapshot");
+    assertEquals("SNAPSHOT_CHANGED",assertThrows(DomainError.class,()->runtime.requestContext().run(c->{return queries.query(QueryRequests.parse("getAssessment",input));})).code());
+  }
+  private Object bindT01Input(com.fasterxml.jackson.databind.JsonNode node,Map<String,String> aliases,Object snapshot){
+    if(node.isObject()&&node.has("$alias"))return aliases.get(node.path("$alias").asText());
+    if(node.isObject()&&node.has("$result")){assertEquals("noun",node.path("$result").path("actionId").asText());assertEquals("/response/snapshotRevision",node.path("$result").path("pointer").asText());return snapshot;}
+    if(node.isObject()){var out=new LinkedHashMap<String,Object>();node.fields().forEachRemaining(e->out.put(e.getKey(),bindT01Input(e.getValue(),aliases,snapshot)));return out;}
+    return json.convertValue(node,Object.class);
+  }
   Map<String,Object> readType(String operation,String target,String type){var body=row("scope",Map.of("organizationId",org,"objectType",type),"asOf",AS_OF.toString(),"knownAt",KNOWN.toString());if(target!=null)body.put("id",target);return runtime.requestContext().run(c->{return queries.query(QueryRequests.parse(operation,body));});}
   /** S3-3: plan record nouns (Obligation, CommandRecord, ...) are getObject nouns with the same scope and owner rules. */
   @Test @SuppressWarnings("unchecked") void recordNounsReadThroughGetObjectWithTheSameScopeRules(){

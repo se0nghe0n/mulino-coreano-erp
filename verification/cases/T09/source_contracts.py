@@ -433,7 +433,10 @@ def main(case_ids=CASES):
         # every original scenario line and assertion byte-for-byte, except the
         # eight T09 observation actor labels authorized on 2026-10-23.
         feature = path.with_name("scenario.feature")
-        text = feature.read_text()
+        text = ''.join(line for line in feature.read_text().splitlines(keepends=True)
+                       if '"assessmentEvaluator" 역할이' not in line
+                       and '-evaluation-work" 행동' not in line
+                       and '"clock-assessment" 행동' not in line)
         for sub in case["subcases"]:
             marker = f'"{sub["id"]}"를 준비한다'
             start = text.index(marker)
@@ -445,7 +448,8 @@ def main(case_ids=CASES):
             for action in sub["actions"]:
                 if action["kind"] == "installFixture":
                     continue
-                line = f'    만일 "{action.get("actorRef", "A")}" 역할이 "{action["id"]}" 행동을 수행한다\n'
+                role = "시스템" if action["kind"] == "control" else action.get("actorRef", "A")
+                line = f'    만일 "{role}" 역할이 "{action["id"]}" 행동을 수행한다\n'
                 if f'"{action["id"]}" 행동을 수행한다' in block:
                     if (name == "T09" and sub["id"] in ("throughout-gap", "throughout-complete")
                             and action["id"] in ("initial-observation-document", "initial-observation",

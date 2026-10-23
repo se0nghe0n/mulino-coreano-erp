@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.*;
 
 @Service
 public class ApplicationQueries {
-  private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","traceLot","getTrace");
+  private static final Set<String> WORLD=Set.of("getObject","getWork","getInventory","getObligations","getAssessment","traceLot","getTrace");
   private final Map<String,QueryHandler> handlers=new HashMap<>();
   private final Set<String> worldOperations=new HashSet<>(WORLD);
   private final Set<String> objectTypes=new HashSet<>(Set.of("Product","TradeItem","ManufacturingLot","QuantitySegment","LogisticsUnit","Place","Manufacturer"));
@@ -64,7 +64,7 @@ public class ApplicationQueries {
     TreeSet<String> conflicts=new TreeSet<>(result.conflicts());
     Object shared=data;
     Map<String,Object> snapshotScope=scope;
-    if(worldOperations.contains(request.operation())&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
+    if(worldOperations.contains(request.operation())&&(!request.operation().equals("getAssessment")||request.filters().containsKey("action"))&&data instanceof Map<?,?>&&scope.get("itemId")!=null){
       var worldScope=new LinkedHashMap<String,Object>();for(String key:List.of("organizationId","itemId","lotId","placeId","customerId"))if(scope.containsKey(key))worldScope.put(key,scope.get(key));
       snapshotScope=worldScope;
       Map<String,Object> world=work.world(context,worldScope);

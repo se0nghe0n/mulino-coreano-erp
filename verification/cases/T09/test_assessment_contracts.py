@@ -71,8 +71,34 @@ class AssessmentContracts(unittest.TestCase):
             relative = f'verification/cases/{case_id}/scenario.feature'
             before = subprocess.check_output(['git', 'show', baseline+':'+relative], cwd=ROOT).decode()
             lines = (ROOT/relative).read_text().splitlines(keepends=True)
-            restored = ''.join(line for line in lines if '"assessmentEvaluator" 역할이' not in line and '-evaluation-work" 행동' not in line)
+            restored = ''.join(line for line in lines if '"assessmentEvaluator" 역할이' not in line and '-evaluation-work" 행동' not in line and '"clock-assessment" 행동' not in line)
             self.assertEqual(before, restored, relative)
+
+    def test_original_goal_horizon_is_assessed_before_later_knowledge_query(self):
+        case = json.loads((ROOT/'verification/cases/T09/case.json').read_text())
+        for sub in case['subcases']:
+            if sub['id'] not in ('cumulative-versus-state', 'exists-versus-end-throughout'):
+                continue
+            now = json.loads((ROOT/sub['fixtureRef']).read_text())['clock']['asOf']
+            evaluation_times = {}
+            for action in sub['actions']:
+                if action['kind'] == 'control' and action['control']['type'] == 'clock':
+                    next_time = action['control']['parameters']['instant']
+                    self.assertLessEqual(now, next_time, 'The product clock never moves backwards')
+                    now = next_time
+                if action.get('capabilityId') == 'assessGoal':
+                    evaluation_times[action['id']] = now
+                if action.get('capabilityId') == 'getAssessment':
+                    self.assertEqual('2026-10-07T02:00:00Z', action['request']['asOf'])
+                    self.assertEqual('2026-10-07T04:00:00Z', action['request']['knownAt'])
+                    self.assertEqual(action['request']['asOf'], evaluation_times[action['id']+'-evaluate'])
+            actions = sub['actions']
+            first = next(i for i,a in enumerate(actions) if a['id']=='clock-assessment')
+            late = next(i for i,a in enumerate(actions) if a['id']=='clock-known')
+            self.assertTrue(all(a.get('capabilityId') in ('getWork','assessGoal') for a in actions[first+1:late]))
+            # The later knowledge boundary introduces no source, receipt,
+            # movement, policy or goal writes that would change these facts.
+            self.assertTrue(all(a['kind'] in ('query','observe') for a in actions[late+1:]))
 
     def test_queries_bind_explicit_evaluation_and_current_revision(self):
         sys.path.insert(0, str(ROOT / "verification/cases"))
@@ -90,7 +116,10 @@ class AssessmentContracts(unittest.TestCase):
                 for index, action in enumerate(acts):
                     if action.get('capabilityId') != 'getAssessment':
                         continue
-                    read, evaluate = acts[index-2:index]
+                    read = next(a for a in acts if a['id'] == action['id']+'-evaluation-work')
+                    evaluate = next(a for a in acts if a['id'] == action['id']+'-evaluate')
+                    self.assertLess(acts.index(read), acts.index(evaluate))
+                    self.assertLess(acts.index(evaluate), index)
                     self.assertEqual('getWork', read['capabilityId'])
                     self.assertEqual('assessGoal', evaluate['capabilityId'])
                     self.assertEqual(ACTOR, evaluate['actorRef'])
