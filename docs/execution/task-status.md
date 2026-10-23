@@ -1130,3 +1130,27 @@ T11 영향 범위 12개 subcase·107개 assertion을 실행했다. assertion은
 정리를 coordinator가 직접 확인했다. [실행 기록](capture-case-acceptance.md)에
 raw complete flags와 잔여 실패·HTTP500을 기록했다. 전체 인수는 OPEN이며
 수정된 backend 전체 검증, T17 공개 조회와 T11 재평가 제어 구현을 계속한다.
+
+## 2026-10-23 공통 캡처 전체 회귀와 공개 capability 결합 확인
+
+수정 source `5bcb46b5`의 backend 전체 실행은 773 PASS, 실패·오류·skip0,
+Maven exit0이다. source3175개 drift0이며 생성 container와 receipt blob을
+포함한 정리 대상42개 부재를 확인했다. 첫 전체 실행의 3개 실패 원로그도
+보존했다. 증거는 `.local/resume-20261023/shared-capture-corrected/`다.
+앞서 source `28ecbd76`의 harness는 881 executions 중 801 PASS·80 opt-in
+SKIP, 실패·오류0이었다. 이 두 baseline과 실행 수를 합쳐 unique coverage로
+표시하지 않는다.
+
+기존 등록된 책임 command6개의 공개 inventory와 의존 generator 수정을
+`908fe638`·`96891bc4`에 통합했다. 원래114 entries와 actor/grant·fixture·
+양·시각은 그대로이며, T20/C3/V4의36개 공개 도구 목록 기대만 정확한6개로
+확장했다. 나머지16012 assertion과 전체 ID·개수는 보존했다. coordinator의
+계약 unit3개·보존 Python5개와 prepare asset checks12개가 통과했다.
+prepare는41 case·802 subcase·24260 assertions, preparationProblems0이다.
+기존 slot findings413과 전체 runtime gate OPEN은 유지한다. 실행 증거는
+`.local/resume-20261023/public-inventory-integrated/`에 있다.
+
+T11 terminal의 명시 SQL null을 누락 필드와 구별하는 필터 수정은
+`f5e3c478`에 별도로 기록했다. 새 반례6개·기존32개, 합38개 집중 검사와
+prepare가 통과했다. 누락·미실행 관찰과 수량 null은 계속 실패한다.
+이 검사와 공개 목록 변경을 실제 native 업무 재인수로 표시하지 않는다.
