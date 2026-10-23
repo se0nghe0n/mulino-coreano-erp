@@ -1,6 +1,6 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.11.0",
+  "schemaVersion": "1.12.0",
   "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED. Recovery issues are independent SQL projections of trigger-owned, application-clock history; incomplete legacy history is unsupported.",
   "measurementMetadata": "data.unit and itemId derive only via unfiltered single-row derivations from measurementMetadataRows: actual TradeItems id, organizationId, baseUnit, recordedAt and createdAt read for exactly one requested organization and ITEM, with recordedAt and createdAt <= knownAt in the same read-only REPEATABLE_READ snapshot. snapshot.measurementMetadataQueries records exact SQL and bound values. Semantic validation checks scope/time/SQL, exact item/unit identities, and persisted snapshot artifact equality. This companion is never an invented requested business source: all other derivations must use requested rawRows with complete sourceEvidence. Missing unit or row yields no value; ambiguous rows are unsupported.",
   "sources": {
@@ -442,11 +442,11 @@
   "derived": {
     "mulino_inventory_QuantitySegments": "active (retiredAt null), locationId=placeId, physicalScope=controlScope",
     "mulino_inventory_QuantityMovements": "segmentId=targetId, else sourceId (the segment the movement lands on); originId is exactly the stored sourceId, including an explicit null opening balance origin",
-    "mulino_work_read_ObligationReferences": "current=valid, responsibleWorkId=workId, obligationId=rootId, sourceKind/sourceId from responsibility Roots",
+    "mulino_work_read_ObligationReferences": "current=valid independently of status (including RESOLVED/WAIVED), responsibleWorkId=workId, obligationId=rootId. Existing sourceKind/sourceId are retained or read verbatim from the actual same-organization visible responsibility Root. sourceOccurrenceId is a generic typed responsibility-cause identity: the real source row ID, interpreted with sourceKind, sourceId and sourceVersion; never a synthetic Event/CanonicalOccurrence ID. Exactly one root must match kind/scope and createdAt/recordedAt <= knownAt. The exact same-organization source row must exist in its kind-specific table at knownAt, with the stored sourceVersion matching the real canonicalHash (DECISION) or revision (raw evidence kinds). DECISION is the sum of commands Approvals (decidedAt) and COMMITTED CommandRecords (createdAt/completedAt); both candidates with the same ID are ambiguous. WORK_NEXT_ACTION uses the actual Work source and its fixed initial contract version 1, not the current mutable Work revision. sourceOccurrenceProof retains actual root/source rows and table identity or an explicit gap; all SQL and bound values are included in sourceQuery in the same read-only REPEATABLE_READ snapshot. Missing, foreign, future, mismatched or ambiguous proof omits only sourceOccurrenceId/sourceVersion and never removes rows or changes valid/current/status. DELIVERY_RESTRICTION_RESPONSE and RECALL_INVESTIGATION additionally bind root scope domainSourceId/originalWorkId/physicalScopeId to an actual Delivery/Investigation, requested ITEM/LOT, and the exact committed command capability, canonical slots and result commandId/effect ID. Domain IDs never substitute for the causal source ID.",
     "mulino_commands_CommandRecords": "status=state, stableRequestOwnerId=stableRequestOwner",
     "mulino_inventory_SegmentAllocations": "status=state; FEFOExceptionReason only from the exact same-organization COMMITTED reserve/replace CommandRecords result, matching allocation ID, segment, line, unit, quantity and range start, within knownAt; lastCommandId/transactionId only for a unique same-organization physically same-xmin COMMITTED reserve/replace/release whose canonical request, exact result and asOf/knownAt prove this current tuple write. atomicAttribution records proof or explicit gap, historyComplete=false. Supported only before cluster snapshot xmax reaches 1 billion (no guessed xmin epoch); creation commandId is unchanged. PostgreSQL XIDs are database/snapshot-local technical evidence, not durable business identities.",
     "mulino_inventory_Restrictions": "reason from the exact same-organization placeHold decisionId, matching segmentId and original commandId; releaseReason independently from releaseDecisionId with matching segment and restriction. Missing/foreign/future/mismatched links remain unavailable",
-    "mulino_work_read_Works": "state=status; waitReason=waitJson.reason; verifierId=waitJson.verifier; overdueAction=waitJson.overdueAction. verifierId and overdueAction use only the current stored Work waitJson; missing values are not filled from actors, supervisors or transition snapshots.",
+    "mulino_work_read_Works": "state=status; waitReason=waitJson.reason; verifierId=waitJson.verifier; overdueAction=waitJson.overdueAction. verifierId and overdueAction use only the current stored Work waitJson; missing values are not filled from actors, supervisors or transition snapshots. parentWorkId comes only from exactly one visible same-organization mulino_work_WorkLinks row with kind=FOLLOWUP and targetWorkId=the child ID, createdAt <= knownAt. sourceWorkId names one actual visible parent Work of the same ITEM; parent/child createdAt and recordedAt must be <= knownAt. Direction, table identity and original parent/link rows are retained in followupParentProof. No link, foreign/future/dangling/mismatched parent or competing links leave the field absent without hiding Works or changing their states. There is no FollowupLinks product table.",
     "any row with commandId": "commandIdempotencyKey, capabilityId, stableRequestOwnerId from the CommandRecords row; a row whose commandId is null or names no CommandRecords row (fixture-installed) carries commandIdempotencyKey NO_COMMAND_RECORD",
     "any row without a commandId column": "commandIdempotencyKey, capabilityId, stableRequestOwnerId of the earliest COMMITTED CommandRecords row whose resultJson (effects, *Id fields) names the row id (approximate creating command); otherwise commandIdempotencyKey NO_COMMAND_RECORD",
     "mulino_work_read_GoalReferences": "quantity=targetQuantity (target only); placeId/periodStart/periodEnd from immutable slotsJson; intervalStart/intervalEnd/startInclusive/endInclusive from period fields; eventKinds is the stored single eventKind list; distinctContributionScope=contributionScope, evaluationTime=evaluationAt, eligibilityAction=action, includeReservations=includeReserved. No nested expression search, default endpoints or policy versions",
@@ -477,5 +477,70 @@
     "migrationMappings": "the migration mapping is kept in the WORK_MIGRATION review payload (DefinitionReviews.payloadJson), not as one row per field",
     "migrationRegressions": "the product does not execute regression fixtures (plan §8 regression results deferred)",
     "scopedDomainRecords": "The legacy all-table digest cannot prove every requested scope/time boundary and is refused."
+  },
+  "obligationSourceTypes": {
+    "OCCURRENCE": {
+      "table": "mulino_evidence_CanonicalOccurrences",
+      "version": "revision",
+      "knownAtFields": [
+        "createdAt",
+        "recordedAt"
+      ]
+    },
+    "EVENT": {
+      "table": "mulino_evidence_Events",
+      "version": "revision",
+      "knownAtFields": [
+        "createdAt",
+        "recordedAt"
+      ]
+    },
+    "CLAIM": {
+      "table": "mulino_evidence_Claims",
+      "version": "revision",
+      "knownAtFields": [
+        "createdAt",
+        "recordedAt"
+      ]
+    },
+    "DOCUMENT": {
+      "table": "mulino_evidence_DocumentVersions",
+      "version": "revision",
+      "knownAtFields": [
+        "createdAt",
+        "recordedAt"
+      ]
+    },
+    "DECISION": {
+      "alternatives": [
+        {
+          "table": "mulino_commands_Approvals",
+          "version": "canonicalHash",
+          "knownAtFields": [
+            "decidedAt"
+          ]
+        },
+        {
+          "table": "mulino_commands_CommandRecords",
+          "version": "canonicalHash",
+          "knownAtFields": [
+            "createdAt",
+            "completedAt"
+          ],
+          "state": "COMMITTED"
+        }
+      ],
+      "cardinality": "exactly one across alternatives"
+    },
+    "WORK": {
+      "table": "mulino_work_read_Works",
+      "version": "WORK_NEXT_ACTION fixed initial version 1 (V34)",
+      "knownAtFields": [
+        "createdAt",
+        "recordedAt"
+      ],
+      "scope": "root scopeJson.workId = sourceId"
+    },
+    "semantics": "Typed causal identity only. No verification, permission, legitimate quantity or goal conclusion is inferred from the existence of a source. asOf is not used to reconstruct mutable historical source versions."
   }
 }

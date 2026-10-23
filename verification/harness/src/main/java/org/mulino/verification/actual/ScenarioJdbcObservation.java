@@ -212,10 +212,9 @@ final class ScenarioJdbcObservation {
                 case "mulino_inventory_QuantitySegments" -> {row.put("active",row.path("retiredAt").isNull()||row.path("retiredAt").isMissingNode());row.set("locationId",row.path("placeId"));row.set("physicalScope",row.path("controlScope"));}
                 case "mulino_commands_CommandRecords" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));row.set("status",row.path("state"));}
                 case "mulino_inventory_SegmentAllocations","mulino_inventory_Restrictions","mulino_inventory_DispositionBases" -> {if(!row.has("status"))row.set("status",row.path("state"));}
-                case "mulino_work_read_Works" -> row.set("state",row.path("status"));
+                case "mulino_work_read_Works" -> {row.set("state",row.path("status"));projection.followupParent(row);}
                 case "mulino_work_read_ObligationReferences" -> {row.set("current",row.path("valid"));row.set("responsibleWorkId",row.path("workId"));row.set("obligationId",row.path("rootId"));
-                    JsonNode root=row.hasNonNull("rootId")?projection.linked("mulino_responsibility_Roots",row,row.path("rootId").asText()):null;
-                    if(root!=null){if(!row.has("sourceKind"))row.set("sourceKind",root.path("sourceKind"));if(!row.has("sourceId"))row.set("sourceId",root.path("sourceId"));}}
+                    projection.obligationSource(row);}
                 case "mulino_inventory_QuantityMovements" -> {if(!row.has("segmentId"))row.set("segmentId",row.hasNonNull("targetId")?row.path("targetId"):row.path("sourceId"));row.set("originId",row.path("sourceId"));}
                 case "mulino_runtime_Outbox" -> {row.set("stableRequestOwnerId",row.path("stableRequestOwner"));}
                 case "mulino_definitions_DefinitionVersions" -> {row.set("hash",row.path("contentHash"));row.set("definitionId",row.path("id"));}

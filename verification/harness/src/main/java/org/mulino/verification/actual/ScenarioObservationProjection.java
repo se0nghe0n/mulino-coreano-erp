@@ -100,6 +100,99 @@ final class ScenarioObservationProjection {
         return row;
     }
 
+    /** sourceOccurrenceId is the typed responsibility cause, not necessarily an evidence Event/CanonicalOccurrence. */
+    void obligationSource(ObjectNode row) throws Exception {
+        var proof=Json.object().put("status","UNAVAILABLE").put("identitySemantics","TYPED_RESPONSIBILITY_CAUSE");
+        row.set("sourceOccurrenceProof",proof);
+        var cause=row.hasNonNull("rootId")?linked("mulino_responsibility_Roots",row,row.path("rootId").asText()):null;
+        // Preserve the established root aliases even when the stronger source proof is unavailable.
+        if(cause!=null)for(String key:List.of("sourceKind","sourceId"))if(!row.has(key))row.set(key,cause.path(key));
+        if(cause==null||!knownRecord(cause,"createdAt","recordedAt")) {proof.put("gap","ROOT_UNAVAILABLE");return;}
+        proof.set("root",cause.deepCopy());
+        var scope=parse(cause,"scopeJson");
+        if(!requiredSame(row,cause,"kind","sourceKind","sourceId")||!scope.isObject()||!scope.equals(parse(row,"scopeJson"))) {
+            proof.put("gap","ROOT_BINDING_MISMATCH");return;
+        }
+        String kind=cause.path("sourceKind").asText(),id=cause.path("sourceId").asText();
+        if(id.isBlank()||!cause.hasNonNull("sourceVersion")) {proof.put("gap","SOURCE_IDENTITY_MISSING");return;}
+        String table=switch(kind) {
+            case "OCCURRENCE" -> "mulino_evidence_CanonicalOccurrences";
+            case "EVENT" -> "mulino_evidence_Events";
+            case "CLAIM" -> "mulino_evidence_Claims";
+            case "DOCUMENT" -> "mulino_evidence_DocumentVersions";
+            case "WORK" -> "mulino_work_read_Works";
+            case "DECISION" -> "mulino_commands_Approvals";
+            default -> null;
+        };
+        if(table==null){proof.put("gap","SOURCE_KIND_UNSUPPORTED");return;}
+        // DECISION is the product's sum type: an immutable Approval or a CommandRecord.
+        // Approvals have decidedAt, not createdAt/recordedAt. Other kinds never query these tables.
+        var matches=query(table,"r.organizationId=? AND r.ID=?",List.of(row.path("organizationId").asText(),id));
+        if(kind.equals("DECISION")) {
+            var commands=query("mulino_commands_CommandRecords","r.organizationId=? AND r.ID=?",List.of(row.path("organizationId").asText(),id));
+            if(matches.isEmpty()){table="mulino_commands_CommandRecords";matches=commands;}
+            else if(!commands.isEmpty()){proof.put("gap","DECISION_IDENTITY_AMBIGUOUS");return;}
+        }
+        if(matches.size()!=1){proof.put("gap","SOURCE_NOT_UNIQUE_OR_MISSING");return;}
+        var source=matches.get(0);
+        String[] times=table.equals("mulino_commands_Approvals")?new String[]{"decidedAt"}:
+            table.equals("mulino_commands_CommandRecords")?new String[]{"createdAt","completedAt"}:new String[]{"createdAt","recordedAt"};
+        if(!knownRecord(source,times)){proof.put("gap","SOURCE_OUTSIDE_KNOWN_AT");return;}
+        if(table.equals("mulino_commands_CommandRecords")&&!"COMMITTED".equals(source.path("state").asText())) {
+            proof.put("gap","SOURCE_COMMAND_NOT_COMMITTED");return;
+        }
+        String version=kind.equals("WORK")?"1":kind.equals("DECISION")?source.path("canonicalHash").asText():source.path("revision").asText();
+        if(version.isBlank()||!version.equals(cause.path("sourceVersion").asText())
+            ||(kind.equals("DECISION")&&!version.matches("[a-f0-9]{64}"))) {
+            proof.put("gap","SOURCE_VERSION_MISMATCH");return;
+        }
+        if(kind.equals("WORK")&&(!"WORK_NEXT_ACTION".equals(cause.path("kind").asText())||!id.equals(scope.path("workId").asText()))) {
+            proof.put("gap","INITIAL_WORK_SOURCE_MISMATCH");return;
+        }
+        if(Set.of("DELIVERY_RESTRICTION_RESPONSE","RECALL_INVESTIGATION").contains(cause.path("kind").asText())
+            &&!tradeObligationSource(row,cause,source,table,scope,proof))return;
+        // The companion type and version remain explicit; a Command UUID is never labeled an Event UUID.
+        copy(row,"sourceOccurrenceId",source,"id");copy(row,"sourceVersion",cause,"sourceVersion");
+        proof.put("status","PROVEN_TYPED_SOURCE").put("sourceTable",table);proof.set("sourceRow",source.deepCopy());
+    }
+
+    private boolean knownRecord(JsonNode row,String... fields) {
+        for(String field:fields) {
+            if(!row.hasNonNull(field))return false;
+            try {if(OffsetDateTime.parse(row.path(field).asText()).isAfter(knownAt))return false;}
+            catch(java.time.DateTimeException invalid){return false;}
+        }
+        return true;
+    }
+
+    /** These two domain hooks persist the command as cause and a different, exact domainSourceId as scope. */
+    private boolean tradeObligationSource(JsonNode row,JsonNode cause,JsonNode command,String sourceTable,
+                                         JsonNode scope,ObjectNode proof) throws Exception {
+        if(!sourceTable.equals("mulino_commands_CommandRecords")||!"DECISION".equals(cause.path("sourceKind").asText())) {
+            proof.put("gap","TRADE_CAUSE_NOT_COMMAND");return false;
+        }
+        boolean delivery="DELIVERY_RESTRICTION_RESPONSE".equals(cause.path("kind").asText());
+        String table=delivery?"mulino_trade_sales_Deliveries":"mulino_trade_recall_Investigations";
+        String domainId=scope.path("domainSourceId").asText();
+        var domainRows=query(table,"r.organizationId=? AND r.ID=? AND r.createdAt<=? AND r.recordedAt<=?",
+            List.of(row.path("organizationId").asText(),domainId,knownAt,knownAt));
+        if(domainRows.size()!=1){proof.put("gap","DOMAIN_SOURCE_UNAVAILABLE");return false;}
+        var domain=domainRows.get(0);var intent=parse(command,"canonicalIntentJson");var result=parse(command,"resultJson");
+        var slots=intent.path("slots");String capability=delivery?"recordDelivery":"openInvestigation";
+        if(!scope.path("originalWorkId").equals(domain.path("workId"))
+            ||!scope.path("physicalScopeId").equals(domain.path(delivery?"rangeRootId":"segmentId"))
+            ||(!items.isEmpty()&&!items.contains(domain.path("itemId").asText()))
+            ||(!lots.isEmpty()&&!lots.contains(domain.path("lotId").asText()))
+            ||!capability.equals(command.path("capabilityId").asText())||!capability.equals(intent.path("capabilityId").asText())
+            ||!"APPLIED".equals(result.path("outcome").asText())||!command.path("id").equals(result.path("commandId"))
+            ||!domainId.equals(result.path("effects").path(delivery?"deliveryId":"investigationId").asText())
+            ||(delivery?!domain.path("observationId").equals(slots.path("observationId")):
+                !requiredSame(domain,slots,"workId","itemId","lotId","segmentId"))) {
+            proof.put("gap","DOMAIN_CAUSAL_BINDING_MISMATCH");return false;
+        }
+        proof.put("domainSourceTable",table);proof.set("domainSourceRow",domain.deepCopy());return true;
+    }
+
     /** Work-owned rows use their actual Work relation for item/lot restrictions, never a requested value as a fact. */
     String predicate(String table, Set<String> columns, List<Object> params) {
         var sql=new StringBuilder(); in(sql,"r.organizationId",orgs,params);
@@ -281,6 +374,22 @@ final class ScenarioObservationProjection {
                 default -> {}
             }
         }
+    }
+
+    /** FOLLOWUP is a stored WorkLinks kind; there is no product FollowupLinks table. */
+    void followupParent(ObjectNode child) throws Exception {
+        var links=query("mulino_work_WorkLinks","r.organizationId=? AND r.targetWorkId=? AND r.kind='FOLLOWUP' AND r.createdAt<=?",
+            List.of(child.path("organizationId").asText(),child.path("id").asText(),knownAt));
+        var proof=Json.object().put("status","UNAVAILABLE");child.set("followupParentProof",proof);
+        if(links.size()!=1){proof.put("gap",links.isEmpty()?"NO_VISIBLE_FOLLOWUP_LINK":"AMBIGUOUS_FOLLOWUP_CHILD");return;}
+        var link=links.get(0);var parent=linked("mulino_work_read_Works",child,link.path("sourceWorkId").asText(null));
+        if(parent==null||!knownRecord(child,"createdAt","recordedAt")||!knownRecord(parent,"createdAt","recordedAt")
+            ||child.path("id").equals(parent.path("id"))||!requiredSame(child,parent,"itemId")) {
+            proof.put("gap","FOLLOWUP_PARENT_UNAVAILABLE_OR_MISMATCHED");return;
+        }
+        copy(child,"parentWorkId",link,"sourceWorkId");
+        proof.put("status","PROVEN_FOLLOWUP_LINK").put("sourceTable","mulino_work_WorkLinks");
+        proof.set("linkRow",link.deepCopy());proof.set("parentRow",parent.deepCopy());
     }
 
     private void assessmentGoal(ObjectNode row) throws Exception {
