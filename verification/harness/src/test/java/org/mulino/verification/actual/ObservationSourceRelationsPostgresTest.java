@@ -10,6 +10,7 @@ import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mulino.verification.Json;
+import org.mulino.verification.ContractValidator;
 
 /** Real JDBC observer proof; composition reuses setup without rerunning the base class's inherited tests. */
 @EnabledIfEnvironmentVariable(named="OBSERVER_PG_TEST",matches="true")
@@ -21,7 +22,16 @@ class ObservationSourceRelationsPostgresTest {
         f.insert("mulino_inventory_QuantitySegments",f.row(segment).put("itemId",f.item).put("lotId",f.lot).put("quantity","100").put("unit","KG"));
     }
     @AfterEach void cleanup()throws Exception {f.cleanup();}
-    JsonNode capture(String...sources)throws Exception {return f.capture(sources);}
+    JsonNode capture(String...sources)throws Exception {
+        var result=f.capture(sources);
+        // The JDBC reader returns rows before the adapter persists its artifact. Bind a real
+        // test artifact before checking the complete wire contract; never alter observed facts.
+        String ref="verification/harness/target/evidence/relation-schema-"+UUID.randomUUID()+".json";
+        ((ObjectNode)result.path("snapshot")).put("artifactRef",ref);
+        result.path("sourceEvidence").forEach(e->((ObjectNode)e).put("artifactRef",ref));
+        Json.write(f.root.resolve(ref),result);assertTrue(java.nio.file.Files.isRegularFile(f.root.resolve(ref)));
+        new ContractValidator(f.root).schema("contracts/acceptance-observation.schema.json",result);return result;
+    }
     void change(String table,String id,String field,Object value)throws Exception {
         try(var s=f.writer.prepareStatement("UPDATE "+table+" SET "+field+"=? WHERE ID=?")) {
             if(field.endsWith("At"))s.setObject(1,java.time.OffsetDateTime.parse(value.toString()));else s.setObject(1,value);
@@ -33,6 +43,20 @@ class ObservationSourceRelationsPostgresTest {
         var r=capture("deliveries");assertTrue(r.at("/rawRows/deliveries").isEmpty());assertEquals("KG",r.at("/data/unit").asText());
         assertEquals(f.item,r.at("/data/itemId").asText());assertEquals("REPEATABLE_READ",r.at("/snapshot/isolation").asText());
         assertTrue(r.at("/snapshot/measurementMetadataQueries").toString().contains("r.ID=?"));assertTrue(r.at("/snapshot/measurementMetadataQueries").toString().contains(f.item));
+    }
+    @Test void measurementQueryTraceKeepsStrictRequiredFieldsAndRejectsUndeclaredMetadata()throws Exception {
+        f.insert("mulino_inventory_TradeItems",f.row(f.item).put("baseUnit","KG"));
+        var actual=capture("deliveries");var validator=new ContractValidator(f.root);
+        for(String missing:List.of("table","sql","boundValues")) {
+            var invalid=(ObjectNode)actual.deepCopy();((ObjectNode)invalid.at("/snapshot/measurementMetadataQueries/0")).remove(missing);
+            assertThrows(IllegalArgumentException.class,()->validator.schema("contracts/acceptance-observation.schema.json",invalid),missing);
+        }
+        var extra=(ObjectNode)actual.deepCopy();((ObjectNode)extra.at("/snapshot/measurementMetadataQueries/0")).put("undeclaredProof",true);
+        assertThrows(IllegalArgumentException.class,()->validator.schema("contracts/acceptance-observation.schema.json",extra));
+        var wrong=(ObjectNode)actual.deepCopy();((ObjectNode)wrong.at("/snapshot/measurementMetadataQueries/0")).put("boundValues","not-an-array");
+        assertThrows(IllegalArgumentException.class,()->validator.schema("contracts/acceptance-observation.schema.json",wrong));
+        var unknown=(ObjectNode)actual.deepCopy();((ObjectNode)unknown.path("snapshot")).put("undeclaredProof",true);
+        assertThrows(IllegalArgumentException.class,()->validator.schema("contracts/acceptance-observation.schema.json",unknown));
     }
     @ParameterizedTest @ValueSource(strings={"foreign","futureRecorded","futureCreated","missing","ambiguous"})
     void missingOrForeignFutureAndAmbiguousItemMetadataNeverDefaultsToFixtureUnit(String variant)throws Exception {

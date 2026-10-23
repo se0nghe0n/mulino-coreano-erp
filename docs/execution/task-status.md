@@ -11,12 +11,13 @@
 
 | 검증 층 | 실제 결과와 기준선 |
 |---|---|
-| Backend 전체 | 5bcb46b5: 773 PASS, 실패·오류·skip0, exit0, source3175개 drift0, 정리42개 확인 |
+| Backend 전체 | 64054871: 807 PASS, 실패·오류·skip0, exit0, source3189개 drift0, 정리45개·별도 기록 경로5개 부재 확인 |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | e4946ddf: 925 executions 중845 PASS·80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
+| Harness 전체 | 64054871+관찰 계약 보정 patch: 926 executions 중846 PASS·80 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
 | Prepare | 41 case·802 subcase·24260 assertions, preparationProblems0·asset checks12 PASS, 기존 slot findings413 유지 |
 | 실제 T09/T11 부분 | 5bcb46b5: native Haiku 12 subcase·107 assertions, 100 PASS·7 FAIL·미관찰0; subcase7 PASS·5 FAIL |
 | 실제 T17 전체 | 27ec8cc3: native Haiku 15 subcase·257 assertions, 79 PASS·178 FAIL·미관찰0; 모든 subcase FAIL |
+| 최근 native 재실행 | 64054871: Haiku 14 node, 36 subcase 모두 필수 관찰 schema 오류로 FAIL; assertion 실행0·미관찰461, DB12개 정리. 업무 PASS/FAIL로 재분류하지 않는다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
 
 Harness 수는 실행 횟수이며 상속된 observer 회귀의 반복 실행을 포함한다.
@@ -24,17 +25,23 @@ Harness 수는 실행 횟수이며 상속된 observer 회귀의 반복 실행을
 T17 공개 조회(64b0cfb7), T11 V44 동일 시각 정정과 재평가 보류·해제
 (9bbe2b88·74d48220·06704d35), Work PG 자원 분리(e4946ddf)를 통합했다.
 새 observer 주문 line 관계(e5a672d6)도 결합 harness에서 검증했다.
-T11 집중 backend28개는 PASS이며 RuntimePostgresTest7개는 잘못된
-선택 이름으로 실행되지 않았으므로 새 전체 backend에서 확인한다.
-T17 PG helper의 자원 분리와 미대사 외부 관측 outcome 수정은 진행 중이다.
-이 통합본의 전체 backend와 native 실제 시나리오는 아직 NOT_RUN이다.
+T17 PG helper 자원 분리(62db16ff)와 미대사 관측의
+ACCEPTED_PENDING_EXTERNAL 응답(64054871)까지 통합했고 전체 backend를
+통과했다. 이전 선택 이름 오류로 미실행이던 RuntimePostgresTest7개도
+집중 결합28개와 전체807개에서 실행했다.
+새 native 실행에서 measurementMetadataQueries의 wire schema 등록 누락이
+드러나 모든 assertion이 미실행이었다. 계약 필드만 명시하고 실제 JDBC
+capture37개가 전체 schema를 검사하도록 보강했다. 같은 native 원문이
+옛 schema에서 거부되고 보정 schema에서 통과한다. 업무 oracle은 그대로이며
+새 기준선의 native 재실행이 남아 있다.
 
 증거와 실패는 [공통 캡처 부분 인수](capture-case-acceptance.md),
 [T17 실제 인수](t17-five-shard-acceptance.md),
 [독립 관찰 원천](observer-source-relations.md),
 [공개 capability](public-capability-inventory.md),
 [T17 공개 조회](t17-public-world-read.md),
-[T11 실제 정정·재평가 제어](t11-deferred-reassessment.md)에 연결한다.
+[T11 실제 정정·재평가 제어](t11-deferred-reassessment.md),
+[관찰 wire 계약 보정](observer-measurement-schema.md)에 연결한다.
 최근 전체 harness 원로그·JUnit·source drift·DB 정리 증거는
 `.local/resume-20261023/world-deferred-combined/`에 보존한다.
 

@@ -76,6 +76,35 @@
           ],
           "description": "RESULT_REVISION: snapshotRef is an API-issued projection revision that the observer recomputed from rows. RUNTIME_TASK_SNAPSHOT: snapshotRef is the host terminal snapshot of an awaitRuntimeTask; the observer bound its read to that task's host snapshot artifact (runtimeTaskSnapshot) and no revision equality applies. CURRENT_*: the case asked for a fresh read; no revision equality applies."
         },
+        "measurementMetadataQueries": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "object",
+            "properties": {
+              "table": {
+                "const": "mulino_inventory_TradeItems"
+              },
+              "sql": {
+                "type": "string",
+                "minLength": 1
+              },
+              "boundValues": {
+                "type": "array",
+                "minItems": 4,
+                "maxItems": 4,
+                "items": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "required": ["table", "sql", "boundValues"],
+            "additionalProperties": false
+          },
+          "description": "The actual read-only TradeItem unit lookup in this same DB snapshot. Bound values are organization ID, item ID, recorded-at cutoff and created-at cutoff. This trace is provenance, never a business oracle."
+        },
         "revisionQuery": {
           "type": "object",
           "properties": {
