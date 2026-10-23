@@ -8288,6 +8288,26 @@
           }
         },
         {
+          "id": "resume-without-proof-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume-without-proof-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "resume-without-proof",
           "kind": "invoke",
           "evidenceRefs": [
@@ -8312,12 +8332,12 @@
               "workId": {
                 "$alias": "SOURCE"
               },
-              "resumeEvidenceIds": []
+              "evidence": {}
             },
             "expectedRevision": {
               "$result": {
-                "actionId": "wait",
-                "pointer": "/response/revision"
+                "actionId": "resume-without-proof-current-work",
+                "pointer": "/response/data/revision"
               }
             },
             "commandIdempotencyKey": "T11-wait-timeout-resume-without-proof",
@@ -8328,7 +8348,7 @@
             ],
             "provenance": {
               "workId": "CONTEXT",
-              "resumeEvidenceIds": "USER"
+              "evidence": "USER"
             }
           }
         },
@@ -9800,6 +9820,26 @@
           }
         },
         {
+          "id": "close-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "close-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "close",
           "kind": "invoke",
           "evidenceRefs": [
@@ -9826,7 +9866,12 @@
               },
               "reason": "FULFILLED"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "close-current-work",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-pending-correction-close",
             "evidenceRefs": [
               {
@@ -13022,6 +13067,29 @@
           }
         },
         {
+          "id": "parent-one-link-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent-one",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "parent-one-link-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "parent-one-link",
           "kind": "invoke",
           "evidenceRefs": [
@@ -13066,9 +13134,14 @@
                 "value": "30",
                 "unit": "BOX"
               },
-              "physicalScope": "serial-boxes-001-030"
+              "startQuantity": "0"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "parent-one-link-current-work",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-shared-distinct60-parent-one-link",
             "evidenceRefs": [
               {
@@ -13081,9 +13154,32 @@
               "activityId": "CONTEXT",
               "occurrenceId": "CONTEXT",
               "quantity": "USER",
-              "physicalScope": "USER"
+              "startQuantity": "USER"
             }
           }
+        },
+        {
+          "id": "parent-two-link-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent-one",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "parent-two-link-current-work:actual-artifact"
+          ]
         },
         {
           "id": "parent-two-link",
@@ -13130,9 +13226,14 @@
                 "value": "30",
                 "unit": "BOX"
               },
-              "physicalScope": "serial-boxes-031-060"
+              "startQuantity": "30"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "parent-two-link-current-work",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-shared-distinct60-parent-two-link",
             "evidenceRefs": [
               {
@@ -13145,7 +13246,7 @@
               "activityId": "CONTEXT",
               "occurrenceId": "CONTEXT",
               "quantity": "USER",
-              "physicalScope": "USER"
+              "startQuantity": "USER"
             }
           }
         },

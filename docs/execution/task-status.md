@@ -1083,3 +1083,11 @@ suite driver에기존 제어기능의공급을선언했다. 지원하지않는 o
 원본 T11 기대와requiredAdapters는바꾸지않았다. 원로그와검증은
 `.local/resume-20261023/control-adapter-contract/`이며 실제 재실행은
 Haiku Workflow가소유한다. 과거 NOT_RUN을소급해PASS로변경하지않는다.
+
+T11 입력은 unsupported 생성 명령을 철회한684b0c22까지의 최종 delta만
+통합했다. shared의 실제60 BOX를30+30 범위로 연결하고 빈 resume 근거와
+close의 현재 revision을 공개 계약에 맞췄다. root Python13개와 prepare
+asset checks12개가 PASS했다. 원본110 assertions·fixture12개·기존
+grants와 ledger는 보존했다. parent 세 변형의 부족10 생성 경계는
+OPEN이며 기존 slot findings414개도 숨기지 않았다.
+[T11 실제 입력 계약](t11-runtime-input-contracts.md)을 따른다.

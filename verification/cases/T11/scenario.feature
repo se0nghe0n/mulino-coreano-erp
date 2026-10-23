@@ -208,6 +208,7 @@
     만일 "시스템" 역할이 "due-wait-advance" 행동을 수행한다
     만일 "시스템" 역할이 "due-wait" 행동을 수행한다
     만일 "시스템" 역할이 "due-wait-terminal" 행동을 수행한다
+    만일 "A" 역할이 "resume-without-proof-current-work" 행동을 수행한다
     만일 "A" 역할이 "resume-without-proof" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -250,6 +251,7 @@
     만일 "시스템" 역할이 "confirmed-before-correction-db" 행동을 수행한다
     만일 "시스템" 역할이 "delay-reassessment" 행동을 수행한다
     만일 "A" 역할이 "correction" 행동을 수행한다
+    만일 "A" 역할이 "close-current-work" 행동을 수행한다
     만일 "A" 역할이 "close" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다
@@ -342,7 +344,9 @@
     만일 "receiptSource" 역할이 "receive60-match" 행동을 수행한다
     만일 "receiptSource" 역할이 "receive60-canonical" 행동을 수행한다
     만일 "A" 역할이 "receive60" 행동을 수행한다
+    만일 "A" 역할이 "parent-one-link-current-work" 행동을 수행한다
     만일 "A" 역할이 "parent-one-link" 행동을 수행한다
+    만일 "A" 역할이 "parent-two-link-current-work" 행동을 수행한다
     만일 "A" 역할이 "parent-two-link" 행동을 수행한다
     만일 "A" 역할이 "after-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "after-db" 행동을 수행한다

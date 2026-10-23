@@ -20,7 +20,7 @@ def blocks(text):
 
 class ParentRanges(unittest.TestCase):
     def setUp(self):
-        self.old=layer.baseline();self.current=json.loads((HERE/'case.json').read_text())
+        self.old=layer.baseline();self.current=layer.runtime_layer().restore(json.loads((HERE/'case.json').read_text()))
 
     def test_strict_inverse_and_authoring_fixed_point(self):
         self.assertEqual(self.current,layer.apply(self.old));self.assertEqual(self.current,layer.apply(self.current))
@@ -43,7 +43,7 @@ class ParentRanges(unittest.TestCase):
 
     def test_feature_additions_preserve_every_original_line(self):
         import subprocess
-        current=(HERE/"scenario.feature").read_text()
+        current=layer.runtime_layer().restore_feature((HERE/"scenario.feature").read_text())
         self.assertEqual(layer.authored_feature(),current)
         old=subprocess.check_output(["git","show",layer.BASE+":verification/cases/T11/scenario.feature"],cwd=layer.ROOT).decode()
         self.assertEqual(old,layer.restore_feature(current))

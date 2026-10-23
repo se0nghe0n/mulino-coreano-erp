@@ -74,7 +74,15 @@ def authored(original):
     return result, changes
 
 
+def runtime_layer():
+    import importlib.util
+    spec=importlib.util.spec_from_file_location('t11_runtime_inputs',HERE/'author_runtime_inputs.py')
+    layer=importlib.util.module_from_spec(spec);spec.loader.exec_module(layer);return layer
+
+
 def apply(value):
+    runtime=runtime_layer()
+    if value == runtime.authored(runtime.baseline())[0]:return copy.deepcopy(value)
     old = baseline(); new, _ = authored(old)
     if value == new:
         return copy.deepcopy(value)
@@ -84,6 +92,8 @@ def apply(value):
 
 
 def restore(value):
+    runtime=runtime_layer()
+    if value == runtime.authored(runtime.baseline())[0]:value=runtime.restore(value)
     old = baseline(); new, _ = authored(old)
     if value != new:
         raise ValueError('T11 strict inverse refuses unrecorded input/oracle drift')
@@ -110,6 +120,8 @@ def authored_feature():
 
 
 def restore_feature(value):
+    runtime=runtime_layer()
+    if value == runtime.feature():value=runtime.restore_feature(value)
     if value != authored_feature():
         raise ValueError('T11 strict inverse refuses unrecorded feature drift')
     return subprocess.check_output(['git', 'show', BASE+':verification/cases/T11/scenario.feature'], cwd=ROOT).decode()
@@ -117,6 +129,9 @@ def restore_feature(value):
 
 def main():
     path = HERE/'case.json'
+    runtime=runtime_layer()
+    if json.loads(path.read_text()) == runtime.authored(runtime.baseline())[0]:
+        runtime.main();return
     old = baseline(); value = apply(json.loads(path.read_text())); _, changes = authored(old)
     path.write_text(json.dumps(value, ensure_ascii=False, indent=2)+'\n')
     (HERE/'scenario.feature').write_text(authored_feature())

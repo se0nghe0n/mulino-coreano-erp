@@ -1,0 +1,573 @@
+{
+  "recordType": "T11_RUNTIME_INPUT_AUTHORING",
+  "baseline": "477bba574e9ac6c4be32b236d93164f763b12401",
+  "assertionsUnchanged": 110,
+  "beforeSha256": "19d04b6e6e284cee63e654a818985d6a00d58730bc12d93a842736b24295ab2c",
+  "afterSha256": "683bc75f86d5b6845f1b7bb19e0c5158370609d15606c0cf0ac7227ab28b0734",
+  "changes": [
+    {
+      "subcaseId": "wait-timeout",
+      "actionId": "resume-without-proof",
+      "before": {
+        "id": "resume-without-proof",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "resume-without-proof:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "resumeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "resumeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "resumeEvidenceIds": []
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "wait",
+              "pointer": "/response/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-wait-timeout-resume-without-proof",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "resumeEvidenceIds": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "resume-without-proof",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "resume-without-proof:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "resumeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "resumeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "evidence": {}
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "resume-without-proof-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-wait-timeout-resume-without-proof",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "evidence": "USER"
+          }
+        }
+      },
+      "insertedBefore": [
+        {
+          "id": "resume-without-proof-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "resume-without-proof-current-work:actual-artifact"
+          ]
+        }
+      ],
+      "insertedAfter": []
+    },
+    {
+      "subcaseId": "pending-correction",
+      "actionId": "close",
+      "before": {
+        "id": "close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-pending-correction-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "close",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "close:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "closeWork",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "closeWork",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "reason": "FULFILLED"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "close-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-pending-correction-close",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "workId": "CONTEXT",
+            "reason": "USER"
+          }
+        }
+      },
+      "insertedBefore": [
+        {
+          "id": "close-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "close-current-work:actual-artifact"
+          ]
+        }
+      ],
+      "insertedAfter": []
+    },
+    {
+      "subcaseId": "shared-distinct60",
+      "actionId": "parent-one-link",
+      "before": {
+        "id": "parent-one-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "parent-one-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "SHARES_ACTIVITY",
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent-one",
+                "pointer": "/response/workId"
+              }
+            },
+            "activityId": {
+              "$result": {
+                "actionId": "receive60-event",
+                "pointer": "/response/id"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive60-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-001-030"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-shared-distinct60-parent-one-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "targetWorkId": "CONTEXT",
+            "activityId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "parent-one-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "parent-one-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "SHARES_ACTIVITY",
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent-one",
+                "pointer": "/response/workId"
+              }
+            },
+            "activityId": {
+              "$result": {
+                "actionId": "receive60-event",
+                "pointer": "/response/id"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive60-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "startQuantity": "0"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "parent-one-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-shared-distinct60-parent-one-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "targetWorkId": "CONTEXT",
+            "activityId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": [
+        {
+          "id": "parent-one-link-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent-one",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "parent-one-link-current-work:actual-artifact"
+          ]
+        }
+      ],
+      "insertedAfter": []
+    },
+    {
+      "subcaseId": "shared-distinct60",
+      "actionId": "parent-two-link",
+      "before": {
+        "id": "parent-two-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "parent-two-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "SHARES_ACTIVITY",
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent-two",
+                "pointer": "/response/workId"
+              }
+            },
+            "activityId": {
+              "$result": {
+                "actionId": "receive60-event",
+                "pointer": "/response/id"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive60-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "physicalScope": "serial-boxes-031-060"
+          },
+          "expectedRevision": 1,
+          "commandIdempotencyKey": "T11-shared-distinct60-parent-two-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "targetWorkId": "CONTEXT",
+            "activityId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "physicalScope": "USER"
+          }
+        }
+      },
+      "after": {
+        "id": "parent-two-link",
+        "kind": "invoke",
+        "evidenceRefs": [
+          "parent-two-link:actual-artifact"
+        ],
+        "actorRef": "A",
+        "route": "api",
+        "capabilityId": "createWorkLink",
+        "request": {
+          "intentKind": "COMMAND",
+          "definitionVersion": "definition-v1",
+          "capabilityId": "createWorkLink",
+          "subjectRefs": [
+            {
+              "type": "TradeItem",
+              "id": {
+                "$alias": "P"
+              }
+            }
+          ],
+          "slots": {
+            "linkKind": "SHARES_ACTIVITY",
+            "targetWorkId": {
+              "$result": {
+                "actionId": "parent-two",
+                "pointer": "/response/workId"
+              }
+            },
+            "activityId": {
+              "$result": {
+                "actionId": "receive60-event",
+                "pointer": "/response/id"
+              }
+            },
+            "occurrenceId": {
+              "$result": {
+                "actionId": "receive60-canonical",
+                "pointer": "/response/id"
+              }
+            },
+            "quantity": {
+              "value": "30",
+              "unit": "BOX"
+            },
+            "startQuantity": "30"
+          },
+          "expectedRevision": {
+            "$result": {
+              "actionId": "parent-two-link-current-work",
+              "pointer": "/response/data/revision"
+            }
+          },
+          "commandIdempotencyKey": "T11-shared-distinct60-parent-two-link",
+          "evidenceRefs": [
+            {
+              "$alias": "DOC"
+            }
+          ],
+          "provenance": {
+            "linkKind": "USER",
+            "targetWorkId": "CONTEXT",
+            "activityId": "CONTEXT",
+            "occurrenceId": "CONTEXT",
+            "quantity": "USER",
+            "startQuantity": "USER"
+          }
+        }
+      },
+      "insertedBefore": [
+        {
+          "id": "parent-two-link-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$result": {
+                "actionId": "parent-one",
+                "pointer": "/response/workId"
+              }
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "parent-two-link-current-work:actual-artifact"
+          ]
+        }
+      ],
+      "insertedAfter": []
+    }
+  ],
+  "originalGrantsUnchanged": true,
+  "newSourceFacts": false,
+  "authorityFrontier": "No already-public, originally-authorized command creates proven goal shortfall10. Parent subcases remain byte/equality identical to baseline; no alternate duty is fabricated.",
+  "supersedesInputCommit": "850496aa",
+  "parentSubcasesRestoredToBaseline": [
+    "parent90-cancelled",
+    "parent90-impossible",
+    "parent90-superseded"
+  ]
+}
