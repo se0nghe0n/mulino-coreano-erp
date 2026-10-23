@@ -374,3 +374,43 @@ harness에서 별도 opt-in인 PG5개는 SKIP이고 실제 HTTP/Spring/PG 실행
 Haiku5.5 native dynamic Workflow로 병렬 실행 중이다. T17은 공개 slot와
 ALT 품목 LOT 연결의 남은 입력 계약을 별도 수정하며 이번 wave에서 제외한다.
 기존 실패를 비대상으로 바꾸지 않으며 전체 Step는 열려 있다.
+
+
+## source baf6ea4d의 T17 입력·인도 연결
+
+37e26e85에서 공개 입력 오류12건 중9건과 OTHERPACK의 LOT/품목 관계를
+교정했다. 원래257개 업무 조건은 보존하고25개 원천 보조 행동을 더했다.
+baf6ea4d는 실제 effects 응답의 dispatchId·cargoScopeId·deliveryId만
+canonical UUID로 바인딩한다. 원천/기대값 분리와 현재 권한·실행 완료
+검사는 유지한다.15개 assertion은 구조 경로만 역변환 ledger로 대조한다.
+
+harness612PASS·PG opt-in8SKIP, 별도 실제 HTTP/Spring/PG8PASS,
+입력17PASS와 prepare41/802/24,260·문제0개를 확인했다. 첫 full harness의
+낡은 self-test capture4개 실패도 보존하며 현재 effects 모양으로 교정했다.
+증거는 `.local/resume-20261023/t17-public-integration-proof.json`이다.
+실제 T17의15개·257개 assertion을 별도 Haiku5.5 native dynamic Workflow로
+실행했으며 source35234fa6의55개 결과와 합산하지 않는다.
+
+이 wave의 source에는 미지원 FEFOExceptionReason·대체 evidenceId·해제
+reason이 남아 있다. 후속6a95d072·f85c7b73·20c26668에서 실제 FEFO 후보
+검사·대체 원문/현재 권한·사유 감사와 공개 slot/runtime 계약을 통합했다.
+reason을 무시하는 allowlist, 권한 확대, 미검증 원천의 VERIFIED seed로
+해결하지 않는다. 새 source의 harness612PASS·PG opt-in8SKIP, 입력17PASS와
+prepare 문제0개를 확인했다. 기존 이행 전체를 포함한 backend110개와
+새로 package한 source20c26668의 실제 HTTP/Spring/PG8개도 PASS다.
+보류 근거·기간·권한, DISPATCH 원천, 원래 claim pending outcome과
+포장 대체 판단은 아직 별도 실패 경계다.
+526beabf의 판정 충돌 HELD 정렬은 실제 복수 head/no-write 회귀를 포함한
+backend42개로 검증했다. 전체 인수 gate는 계속 false다.
+
+Haiku wf_1c670b00-ec4의 실제 source baf6ea4d 결과는15FAIL·0PASS다.
+assertion은6PASS·18FAIL·233미관찰이며6PASS가 전체 subcase 성공은 아니다.
+coordinator가3개 실제 Haiku metadata, 고유 run 원본과 fixture/hash를
+대조했다. 별도 빌드 jar의 ZIP entry bytes는 root 기준 jar와 전부 같았다.
+출고7건의 INSUFFICIENT_ELIGIBLE_QUANTITY는 SELL만 있고 DISPATCH 원천이
+없는 fixture에서 나온 정상 guard이며 child의 code/message 불일치 해석을
+채택하지 않는다. category·dueAt의 입력 오류와 조건/효과 원행 mapping,
+claim pending outcome을 각각 수정 대상으로 남긴다. 독립 증거는
+`.local/resume-20261023/t17-public-wave-coordinator-proof.json`이다.
+후속 원천 수정에서 추가하는 DISPATCH/보류 기간은 명시적인 새 합성
+fixture 결정이며 기존 given 또는 실제 운영 허용이라고 주장하지 않는다.

@@ -780,3 +780,62 @@ T09/T11/T12/T13의 고유55개·예상529개 assertion을 병렬 실행 중이�
 T17은 남은 공개 slot12건과 ALT 품목의 LOT 참조를 별도 Sol Ultrafast
 작업으로 수정한다. 이 실행 결과를 이전 source의 PASS 수와 합산하지 않는다.
 실모델 client 인수·규제·BTP 및 전체 Task/현재 Step는 계속 열려 있다.
+
+
+## 2026-10-23 T17 공개 입력과 실제 인도 원천의 통합
+
+worker9ac38382를37e26e85로 통합했다. T17 공개 slot 위반12건 중9건을
+교정하고 OTHERPACK의 ALT 품목은 별도 L_ALT에 연결했다. 기존 업무
+actor·grant·수량·시각·조건을 보존한다. 정상 인도는 원문 접수·관측·대조·
+canonical 확인을 거치며 미검증 claim은 canonical로 승격하지 않는다.
+원래257개 업무 oracle은 역변환으로 대조했고 보조 원천 행동25개를 더했다.
+
+baf6ea4d는 실제 응답 effects의 dispatchId·cargoScopeId·deliveryId 세
+UUID 경로만 input encoding과 assertion identity에 연결했다. 원래13개와
+추가2개를 합친15개 assertion의 구조 경로만 교정했다. 수량·상태·판정을
+관찰값에서 기대값으로 복사하는 것은 계속 거부한다. 첫 결합 검사에서
+낡은 self-test 응답4곳을 발견해 현재 effects 구조로 고쳤으며 부정
+mutation 검사는 유지했다. 원래 실패 로그도 보존한다.
+
+결합 harness620개 중612PASS·별도 PG opt-in8개 SKIP·실패0개다.
+현재 source를 새로 package한 실제 HTTP/Spring/PostgreSQL8개는 모두
+PASS이며 입력 검사17개도 통과했다. prepare는41 case·802 subcase·
+24,260 assertion·문제0개다. 상세 증거는
+`.local/resume-20261023/t17-public-integration-proof.json`이다.
+
+526beabf에서 판정 head 충돌의 outcome을 공개 어휘의 HELD로 맞췄다.
+복수 head의 임의 선택이나 이력 쓰기를 막는 실제 PG 회귀를 포함해
+판정24개·명사 조회14개·어휘4개가 한 번의 backend 실행에서 통과했다.
+앞선 backend156개 전체를 이 변경 후 다시 실행했다고 표시하지 않는다.
+
+baf6ea4d 고정 T17의15개·예상257개 assertion을 Haiku5.5 native
+dynamic Workflow로 실행했다. 기존 source35234fa6의55개 wave와
+결과를 섞지 않는다. 이 wave의 source에는 공개되지 않은 slot3건이
+아직 남아 있으며 후속 제품 변경의 실행 결과로 바꾸지 않는다.
+
+후속 worker4aeefb08·37fbaa69는6a95d072·f85c7b73으로 통합했다.
+FEFO는 현재 적격·미예약·권한 있는 창고 후보만 비교하고 명시 사유도
+적격성·겹침·line 잔여를 우회하지 않는다. 대체 evidence는 실제 원문·
+조직·대상·타입·현재 접근과 hash를 검증하며 원 배분 교체와 한 거래다.
+해제 사유는 bounded 문자열로 받고 같은 command 효과·감사 연결에 남긴다.
+20c26668에서 runtime skill의 같은 세 계약과 package hash를 동기화했다.
+이 source의 harness612PASS·PG opt-in8SKIP, 입력17PASS와 prepare
+41/802/24,260·문제0개를 확인했다. 이행68개·판정24개·명사 조회14개·
+어휘4개를 한 번에 실행한 backend110개도 모두 PASS다.20c26668을 새로
+package한 실제 HTTP/Spring/PG8개도 전부 통과했다. 결합 증거는
+`.local/resume-20261023/fulfillment-business-integration-proof.json`이다.
+
+별도 Haiku wf_1c670b00-ec4의 baf6ea4d 실행은 고유15개 모두 FAIL이다.
+257개 assertion 중6PASS·18FAIL·233미관찰이며6PASS를 subcase 성공으로
+세지 않는다. 실제3개 Haiku metadata·source·fixture·실행 jar와 원본을
+대조했다. root 기준 jar와 전체 ZIP entry bytes는 같고 container metadata만
+달라 hash가 달랐다. 출고7건은 SELL만 명시된 원천의 DISPATCH 허용이
+없어 거부됐으며 code/message 불일치가 아니다. 보류 category·dueAt 입력,
+conditions와 effectLedger 관찰 경로, claim pending outcome도 남았다.
+증거는 `.local/resume-20261023/t17-public-wave-coordinator-proof.json`이다.
+
+보류/출고 원천과 실제 입력의 후속 수정은 새 Sol Ultrafast worktree에서
+진행한다. 필요한 DISPATCH 결정과 보류 기간은 새 합성 fixture 입력으로
+명시하며 원래 given이나 사용자 운영 승인으로 소급 표시하지 않는다.
+원래 수량·시각·업무 grant·257개 조건과 UNKNOWN/CONFLICT를 보존한다.
+전체 Task/현재 Step와 실모델 client·규제·BTP 인수는 계속 열려 있다.
