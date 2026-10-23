@@ -116,7 +116,8 @@ def receipt_chain(prefix, actor, binding, quantity, occurred_at, *,
     # deliberately cannot verify an unidentified receipt range.
     if not lot_required:
         actions.append(command(prefix, actor, "confirmReceipt", {
-            "receiptId": result(prefix + "-provisional", "effects/receiptId")}))
+            "receiptId": result(prefix + "-provisional", "effects/receiptId")},
+            revision=result(prefix + "-provisional", "revision")))
         return actions
     actions.append(command(prefix + "-match", source_actor, "matchSourceIdentity", {
         "claimId": result(prefix + "-event", "claimId"),
@@ -134,7 +135,8 @@ def receipt_chain(prefix, actor, binding, quantity, occurred_at, *,
                  "lotId": binding["lotId"], "canonicalOccurrenceId": result(prefix + "-canonical")}
     if receiving_custodian_id:
         confirmed["receivingCustodianId"] = receiving_custodian_id
-    actions.append(command(prefix, actor, "confirmReceipt", confirmed))
+    actions.append(command(prefix, actor, "confirmReceipt", confirmed,
+                           revision=result(prefix + "-provisional", "revision")))
     return actions
 
 
@@ -301,12 +303,17 @@ def connect_sources(case, fixture):
                 original["occurredAt"], transit_segment_id=original.get("segmentId"),
                 source_actor=SOURCE_ACTOR, lot_required="lotId" in original,
                 original_metadata=original)
-            # The public receipt observation stores revision 1 although its response
-            # revision is 0 (no stock yet). confirmReceipt compares that row revision.
             chain[-1]["request"]["commandIdempotencyKey"] = action["request"]["commandIdempotencyKey"]
             chain[-1]["evidenceRefs"] = action["evidenceRefs"]
             output.extend(chain)
         sub["actions"] = output
+        # A provisional observation starts at revision 0. Bind the actual public
+        # response instead of confusing it with a confirmed receipt's revision 1.
+        action_ids = {a["id"] for a in output}
+        for action in output:
+            provisional = action["id"] + "-provisional"
+            if action.get("capabilityId") == "confirmReceipt" and provisional in action_ids:
+                action["request"]["expectedRevision"] = result(provisional, "revision")
         # Existing observation claims retain their missing document, reported scope,
         # conflicting amounts and timestamps while binding actual referenced IDs.
         for action in output:

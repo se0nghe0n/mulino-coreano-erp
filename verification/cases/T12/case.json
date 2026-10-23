@@ -2629,7 +2629,12 @@
               "lotId": "CONTEXT",
               "canonicalOccurrenceId": "CONTEXT"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receipt-provisional",
+                "pointer": "/response/revision"
+              }
+            },
             "commandIdempotencyKey": "T12-wrong-warehouse-receipt"
           }
         },
@@ -4944,7 +4949,12 @@
               "lotId": "CONTEXT",
               "canonicalOccurrenceId": "CONTEXT"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receipt-provisional",
+                "pointer": "/response/revision"
+              }
+            },
             "commandIdempotencyKey": "T12-deadline-revision-and-correction-receipt"
           }
         },

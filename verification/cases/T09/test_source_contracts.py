@@ -155,6 +155,9 @@ class SourceContracts(unittest.TestCase):
                 sub = next(s for s in case['subcases'] if s['id'] == entry['subcase'])
                 aid = entry['action']
                 graph = [a for a in sub['actions'] if a['id'] == aid or a['id'].startswith(aid + '-')]
+                self.assertEqual({'$result': {'actionId': aid + '-provisional',
+                                             'pointer': '/response/revision'}},
+                                 graph[-1]['request']['expectedRevision'])
                 # No current business assertion supplies a source fact or input.
                 expected = ['attachEvidence', 'recordActivity', 'receiveProvisional']
                 if sub['id'] != 'receipt-missing-lot':
@@ -181,7 +184,6 @@ class SourceContracts(unittest.TestCase):
                     else:
                         self.assertEqual([], known, (case_id, sub['id'], action['id']))
                 self.assertEqual({'$result': {'actionId': aid + '-provisional', 'pointer': '/response/effects/receiptId'}}, graph[-1]['request']['slots']['receiptId'])
-                self.assertEqual(1, graph[-1]['request']['expectedRevision'])
                 if sub['id'] == 'receipt-missing-lot':
                     self.assertNotIn('lotId', observation)
                     self.assertNotIn('lotId', graph[-1]['request']['slots'])
@@ -218,8 +220,16 @@ class SourceContracts(unittest.TestCase):
         roles = additions = 0
         normalized = copy.deepcopy(current)
         for old, new, restored in zip(before['subcases'], current['subcases'], normalized['subcases']):
+            # The subsequent receipt revision repair has its own strict check.
+            original_actions = {a['id']: a for a in old['actions']}
+            for action in restored['actions']:
+                if action.get('capabilityId') == 'confirmReceipt':
+                    self.assertEqual({'$result': {'actionId': action['id'] + '-provisional',
+                                                 'pointer': '/response/revision'}},
+                                     action['request']['expectedRevision'])
+                    action['request']['expectedRevision'] = original_actions[action['id']]['request']['expectedRevision']
             if old['id'] not in ('throughout-gap', 'throughout-complete'):
-                self.assertEqual(old, new)
+                self.assertEqual(old, restored)
                 continue
             originals = {a['id']: a for a in old['actions']}
             new_actions = {a['id']: a for a in new['actions']}

@@ -615,7 +615,12 @@
               "lotId": "CONTEXT",
               "canonicalOccurrenceId": "CONTEXT"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receive60-provisional",
+                "pointer": "/response/revision"
+              }
+            },
             "commandIdempotencyKey": "T09-cumulative-versus-state-receive60"
           }
         },
@@ -1292,7 +1297,12 @@
               "lotId": "CONTEXT",
               "canonicalOccurrenceId": "CONTEXT"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receive40-provisional",
+                "pointer": "/response/revision"
+              }
+            },
             "commandIdempotencyKey": "T09-cumulative-versus-state-receive40"
           }
         },
@@ -5120,7 +5130,12 @@
             "provenance": {
               "receiptId": "CONTEXT"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "receipt-provisional",
+                "pointer": "/response/revision"
+              }
+            },
             "commandIdempotencyKey": "T09-receipt-missing-lot-receipt"
           }
         },
