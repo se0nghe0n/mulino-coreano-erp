@@ -100,4 +100,31 @@ class ObservationSourceRelationsPostgresTest {
         pendingTransition(2,true);var request=f.request(f.scope(),"assessmentInputs").put("asOf",f.before);assertTrue(ScenarioJdbcObservation.capture(f.config,f.root,request).at("/rawRows/assessmentInputs").isEmpty());
         change("mulino_work_read_GoalReferences",f.goal,"workId",ScenarioObservationPostgresTest.id());assertThrows(UnsupportedOperationException.class,()->capture("assessmentInputs"));
     }
+
+    record OrderFixture(String order,String revision,String line,String customer) {}
+    OrderFixture salesOrder()throws Exception {
+        String order=ScenarioObservationPostgresTest.id(),revision=ScenarioObservationPostgresTest.id(),line=ScenarioObservationPostgresTest.id(),customer=ScenarioObservationPostgresTest.id();
+        f.insert("mulino_trade_sales_Orders",f.row(order).put("effectiveAt",f.before).put("workId",f.work).put("currentRevision",2));
+        f.insert("mulino_trade_sales_OrderRevisions",f.row(revision).put("effectiveAt",f.before).put("orderId",order).put("workId",f.work).put("customerId",customer).put("revisionNumber",2));
+        f.insert("mulino_trade_sales_OrderLines",f.row(line).put("effectiveAt",f.before).put("orderId",order).put("revisionId",revision).put("workId",f.work).put("customerId",customer).put("itemId",f.item).put("deliveryEndpoint","DELIVERED"));
+        return new OrderFixture(order,revision,line,customer);
+    }
+    @Test void salesOrderEndpointIsItsOneActualCurrentImmutableLineAndKeepsTheHeaderGrain()throws Exception {
+        var order=salesOrder();String oldRevision=ScenarioObservationPostgresTest.id();
+        f.insert("mulino_trade_sales_OrderRevisions",f.row(oldRevision).put("effectiveAt",f.before).put("orderId",order.order()).put("workId",f.work).put("customerId",order.customer()).put("revisionNumber",1));
+        f.insert("mulino_trade_sales_OrderLines",f.row(ScenarioObservationPostgresTest.id()).put("effectiveAt",f.before).put("orderId",order.order()).put("revisionId",oldRevision).put("workId",f.work).put("customerId",order.customer()).put("itemId",f.item).put("deliveryEndpoint","DISPATCHED"));
+        var rows=capture("orders").at("/rawRows/orders");assertEquals(1,rows.size());var header=rows.get(0);
+        assertEquals(order.order(),header.path("id").asText());assertEquals("DELIVERED",header.path("deliveryEndpoint").asText());assertEquals(order.revision(),header.path("currentRevisionId").asText());assertEquals(1,header.path("currentLines").size());assertEquals(order.line(),header.at("/currentLines/0/id").asText());
+    }
+    @ParameterizedTest @ValueSource(strings={"foreignRevision","futureRevision","futureEffectiveRevision","revisionWork","foreignLine","futureLine","futureEffectiveLine","lineWork","lineItem","lineCustomer","missingRevision"})
+    void salesOrderEndpointNeverComesFromAForeignFutureMismatchedOrMissingLine(String variant)throws Exception {
+        var o=salesOrder();String table=variant.contains("Line")||variant.startsWith("line")?"mulino_trade_sales_OrderLines":"mulino_trade_sales_OrderRevisions";String id=table.endsWith("OrderLines")?o.line():o.revision();
+        String field=variant.equals("missingRevision")?"revisionNumber":variant.startsWith("foreign")?"organizationId":variant.startsWith("futureEffective")?"effectiveAt":variant.startsWith("future")?"recordedAt":variant.equals("lineItem")?"itemId":variant.equals("lineCustomer")?"customerId":"workId";
+        change(table,id,field,variant.equals("missingRevision")?3:variant.startsWith("future")?f.later:ScenarioObservationPostgresTest.id());
+        var rows=capture("orders").at("/rawRows/orders");assertEquals(1,rows.size());assertFalse(rows.get(0).hasNonNull("deliveryEndpoint"));
+    }
+    @Test void salesOrderMultipleCurrentLinesRemainDistinctWithoutAnArbitraryFlatEndpoint()throws Exception {
+        var o=salesOrder();f.insert("mulino_trade_sales_OrderLines",f.row(ScenarioObservationPostgresTest.id()).put("effectiveAt",f.before).put("orderId",o.order()).put("revisionId",o.revision()).put("workId",f.work).put("customerId",o.customer()).put("itemId",f.item).put("deliveryEndpoint","DISPATCHED"));
+        var header=capture("orders").at("/rawRows/orders/0");assertEquals(2,header.path("currentLines").size());assertEquals("MULTIPLE_LINES",header.path("orderLineBinding").asText());assertFalse(header.has("deliveryEndpoint"));
+    }
 }

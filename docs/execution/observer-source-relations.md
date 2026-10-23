@@ -41,3 +41,23 @@ untracked였으므로 별도 hash로 명시했다. 제품 write/인가/schema와
 인수 완료가 아니다. claim 원천의 typed grain, 주문 line 관계, condition
 진단 의미, 책임 종류와 실제 평가/recall 생성 등은 별도 미완료로 유지한다.
 실제 Haiku 재실행은 아직 NOT_RUN이며 Task·Step은 OPEN이다.
+
+## 현재 주문 line의 끝점 연결
+
+후속 mapping1.7.0은 sales Orders의 원래 header 행을 유지하고 실제
+currentRevision → OrderRevisions.revisionNumber → OrderLines.revisionId를
+연결한다. 조직·Work·customer·요청 ITEM과 knownAt/asOf를 검증한 실제
+currentLines와 currentRevisionId를 제공한다. 현재 line이 정확히 하나일
+때만 그 line의 deliveryEndpoint를 header에 표시한다. 과거 revision이나
+다른 조직·Work·ITEM·customer·미래 행을 대체 원천으로 쓰지 않는다.
+
+원천이 없거나 revision이 모호하면 orderLineBinding으로 관계 상태를
+표시하고 끝점을 만들지 않는다. 여러 현재 line은 모두 보존하고 단일
+끝점을 임의 선택하지 않는다. purchase Order의 의미는 바꾸지 않았다.
+
+이 변경의 새 반례13개를 포함한 집중186 executions가 실패·오류·skip0으로
+통과했다. 새 relation class36개와 기존 base64개·capture67개·engine19개다.
+상속 반복64개를 포함하며 unique test 수나 native 인수로 표시하지 않는다.
+원로그·source/class hash·원본 case 보존·생성 DB 정리는
+`.local/resume-20261023/observer-sales-order-lines/`에 남긴다. 이후 통합
+prepare와 실제 Haiku 인수는 별도로 수행하며 Task·Step은 OPEN이다.

@@ -219,6 +219,7 @@ final class ScenarioObservationProjection {
                         copy(row,"releaseReason",release,"reason");
                 }
                 case "mulino_inventory_SegmentAllocations" -> allocationBasis(row);
+                case "mulino_trade_sales_Orders" -> salesOrderLines(row);
                 case "mulino_work_read_GoalReferences" -> {
                     var slots=parse(row,"slotsJson");field(row,"slots",slots);
                     goalFields(row,slots);
@@ -265,6 +266,25 @@ final class ScenarioObservationProjection {
                 default -> {}
             }
         }
+    }
+
+    /** The header has no delivery endpoint column. A flat endpoint requires one actual current scoped line. */
+    private void salesOrderLines(ObjectNode order) throws Exception {
+        if(asOf==null||!order.path("currentRevision").isIntegralNumber())return;
+        var revisions=query("mulino_trade_sales_OrderRevisions","r.organizationId=? AND r.orderId=? AND r.revisionNumber=? AND r.recordedAt<=? AND r.effectiveAt<=?",
+            List.of(order.path("organizationId").asText(),order.path("id").asText(),order.path("currentRevision").asInt(),knownAt,asOf));
+        if(revisions.size()!=1){order.put("orderLineBinding",revisions.isEmpty()?"UNAVAILABLE":"AMBIGUOUS_REVISION");return;}
+        var revision=revisions.get(0);
+        if(!requiredSame(order,revision,"workId")){order.put("orderLineBinding","SCOPE_MISMATCH");return;}
+        var lines=query("mulino_trade_sales_OrderLines","r.organizationId=? AND r.orderId=? AND r.revisionId=? AND r.recordedAt<=? AND r.effectiveAt<=?",
+            List.of(order.path("organizationId").asText(),order.path("id").asText(),revision.path("id").asText(),knownAt,asOf));
+        for(var line:lines)if(!requiredSame(order,line,"workId")||!requiredSame(revision,line,"customerId")
+            ||(!items.isEmpty()&&!items.contains(line.path("itemId").asText()))) {
+            order.put("orderLineBinding","SCOPE_MISMATCH");return;
+        }
+        copy(order,"currentRevisionId",revision,"id");field(order,"currentLines",lines);
+        order.put("orderLineBinding",lines.isEmpty()?"UNAVAILABLE":lines.size()==1?"SINGLE_LINE":"MULTIPLE_LINES");
+        if(lines.size()==1)copy(order,"deliveryEndpoint",lines.get(0),"deliveryEndpoint");
     }
 
     /** Immutable command proof belongs to this allocation, not merely to a command on the same ITEM. */

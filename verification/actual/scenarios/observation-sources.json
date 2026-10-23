@@ -1,6 +1,6 @@
 {
   "recordType": "S5A_SCENARIO_OBSERVATION_SOURCES",
-  "schemaVersion": "1.6.0",
+  "schemaVersion": "1.7.0",
   "note": "Adapter convention, not a contract: each case observation source name is read from these product tables (organization-scoped, recordedAt <= knownAt). Rows carry CSN element names; 'id' is the row ID. A multi-table source adds '_table'. Derived fields are listed per table and computed in ScenarioJdbcObservation. A requested source missing here makes the observation NOT_IMPLEMENTED. Recovery issues are independent SQL projections of trigger-owned, application-clock history; incomplete legacy history is unsupported.",
   "measurementMetadata": "data.unit and itemId come only from a unique actual TradeItems row for exactly one requested organization and ITEM, with recordedAt and createdAt <= knownAt, in the same read-only REPEATABLE_READ snapshot. The independent SQL and bound values are in snapshot.measurementMetadataQueries. Empty or unavailable rows never supply a fixture/default unit; multiple matching rows are unsupported.",
   "sources": {
@@ -416,7 +416,7 @@
     "adjustmentProposals": "settlement Adjustments carry mode (PROPOSE/CONFIRM), status and proposalId",
     "cancellationRequests": "purchase Cancellations (externalAcceptance UNKNOWN until reconciled)",
     "qcDecisions": "quality Decisions (operation, restriction/disposition basis, evidence)",
-    "orders": "sales Orders and purchase Orders (rows carry _table)",
+    "orders": "sales Orders and purchase Orders (rows carry _table). Sales headers retain their grain; currentRevisionId/currentLines follow their exact same-organization currentRevision -> OrderRevisions.revisionNumber -> OrderLines.revisionId relation at knownAt/asOf, matching Work/customer/requested ITEM. deliveryEndpoint is exposed only for one actual scoped current line; absent, ambiguous or mismatched relations and multiple lines never choose an arbitrary endpoint",
     "definitionRevisions": "DefinitionVersions (version, state, contentHash)",
     "contracts": "CapabilityContracts of a definition version",
     "businessOutbox": "runtime Outbox is the only business outbox",
