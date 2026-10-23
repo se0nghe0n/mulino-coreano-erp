@@ -194,6 +194,18 @@ entity Stocktakes {
  observedQuantity : Decimal(38,12); unit : String(40); occurredAt : Timestamp;
  evidenceRef : String(240); commandId : UUID;
 }
+entity PlaceStocktakes {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; itemId : UUID; placeId : UUID; lotId : UUID;
+ observedQuantity : Decimal(38,12); bookQuantity : Decimal(38,12); unit : String(40);
+ occurredAt : Timestamp; snapshotAt : Timestamp; evidenceRef : String(240); commandId : UUID;
+ observationStatus : String(40); sourceMembersJson : LargeString;
+}
+entity PlaceStocktakeMembers {
+ key organizationId : UUID; key ID : UUID; revision : Integer;
+ createdAt : Timestamp; recordedAt : Timestamp; stocktakeId : UUID; segmentId : UUID;
+ segmentRevision : Integer; bookQuantity : Decimal(38,12); unit : String(40);
+}
 entity IdentifierConflicts {
  key organizationId : UUID; key ID : UUID; revision : Integer;
  createdAt : Timestamp; recordedAt : Timestamp; itemId : UUID;

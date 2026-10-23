@@ -11,13 +11,16 @@ import org.springframework.stereotype.Component;
 @Component
 public final class InventoryCommands implements CommandHandler {
   private final InventoryRepository repository; private final StockPrimitives stock; private final ReadAuthorizer authorizer; private final InventoryRestrictionGuard restrictions; private final com.mulino.application.trade.TradeImpact impact;
-  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;this.impact=null;}
+  private final PlaceStocktakePrimitives placeCounts;
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions){this(repository,stock,authorizer,restrictions,null,null);}
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions,com.mulino.application.trade.TradeImpact impact){this(repository,stock,authorizer,restrictions,impact,null);}
   @org.springframework.beans.factory.annotation.Autowired
-  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions,com.mulino.application.trade.TradeImpact impact){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;this.impact=impact;}
+  public InventoryCommands(InventoryRepository repository,StockPrimitives stock,ReadAuthorizer authorizer,InventoryRestrictionGuard restrictions,com.mulino.application.trade.TradeImpact impact,ExecutionClock clock){this.repository=repository;this.stock=stock;this.authorizer=authorizer;this.restrictions=restrictions;this.impact=impact;this.placeCounts=new PlaceStocktakePrimitives(repository,stock,clock);}
   public Set<String> capabilities(){return Set.of("splitQuantity","mergeQuantity","moveQuantity","recordStocktake","adjustQuantity","disposeQuantity");}
   @Override public List<SubjectBinding> subjectBindings(DomainContext c,Map<String,Object> intent,CommandPreparation preparation) {
     String capability=text(intent,"capabilityId",100);if(!capabilities().contains(capability))throw DomainError.unsupported();
     var slots=slots(intent);
+    if(placeCount(capability,slots))return List.of(SubjectBinding.optional("TradeItem",Set.of(uuid(slots,"itemId"))),SubjectBinding.optional("Place",Set.of(uuid(slots,"placeId"))));
     var targets=capability.equals("mergeQuantity")?Set.copyOf(strings(slots,"segmentIds")):Set.of(uuid(slots,"segmentId"));
     var items=new HashSet<String>();
     for(String id:targets)items.add((String)repository.current(c,"QuantitySegments",id).get("itemId"));
@@ -30,6 +33,7 @@ public final class InventoryCommands implements CommandHandler {
     if(!allowed.containsAll(slots.keySet()))throw DomainError.invalid("Unsupported stock command slot");
     if(!Objects.equals(intent.get("intentKind"),capability.equals("recordStocktake")?"RECORD":"COMMAND"))throw DomainError.invalid("Stock command intent kind mismatch");
     text(slots,"evidenceRef",240);
+    if(placeCount(capability,slots))return preparePlaceCount(c,slots,at);
     List<String> ids=capability.equals("mergeQuantity")?strings(slots,"segmentIds"):List.of(uuid(slots,"segmentId"));
     if(ids.size()>100||new HashSet<>(ids).size()!=ids.size())throw DomainError.invalid("Distinct bounded segments required");
     var sources=ids.stream().sorted().map(id->stock.leaf(c,id,at)).toList();var first=sources.getFirst();
@@ -78,6 +82,11 @@ public final class InventoryCommands implements CommandHandler {
   }
   public Map<String,Object> execute(DomainContext c,Map<String,Object> intent) {
     prepare(c,intent);var s=slots(intent);String capability=text(intent,"capabilityId",100),command=CommandExecution.commandId(),evidence=text(s,"evidenceRef",240);Instant at=time(c,s);
+    if(placeCount(capability,s)) {
+      String id=placeCounts.record(c,uuid(s,"itemId"),uuid(s,"placeId"),s.containsKey("lotId")?uuid(s,"lotId"):null,
+          s.get("observedQuantity"),text(s,"unit",40),at,evidence,command);
+      return Map.of("outcome","APPLIED","revision",0,"effects",Map.of("placeStocktakeId",id,"quantityEffects",List.of()));
+    }
     List<String> ids=switch(capability) {
       case "splitQuantity"->stock.split(c,uuid(s,"segmentId"),strings(s,"quantities"),text(s,"unit",40),at,evidence,command);
       case "mergeQuantity"->List.of(stock.merge(c,strings(s,"segmentIds"),at,evidence,command));
@@ -105,4 +114,22 @@ public final class InventoryCommands implements CommandHandler {
   public static List<String> strings(Map<String,Object> m,String k){if(!(m.get(k) instanceof List<?> values)||values.isEmpty()||values.stream().anyMatch(v->!(v instanceof String)))throw DomainError.invalid("String list required for "+k);return values.stream().map(v->(String)v).toList();}
   public static Instant time(DomainContext c,Map<String,Object> slots){try{Instant at=Instant.parse(text(slots,"occurredAt",80));if(at.isAfter(c.knownAt()))throw DomainError.invalid("Future actual occurrence rejected");return at;}catch(java.time.format.DateTimeParseException e){throw DomainError.invalid("UTC occurredAt required");}}
   private void validateObserved(DomainContext c,Map<String,Object> first,Object value,String unit){if(value instanceof String text&&text.matches("0(?:\\.0{1,12})?"))stock.quantity(c,first,text.replaceFirst("^0","1"),unit);else stock.quantity(c,first,value,unit);}
+  private static boolean placeCount(String capability,Map<String,Object> slots) {
+    return capability.equals("recordStocktake")&&(slots.containsKey("itemId")||slots.containsKey("placeId")||slots.containsKey("lotId"));
+  }
+  private CommandPreparation preparePlaceCount(DomainContext c,Map<String,Object> slots,Instant occurredAt) {
+    if(slots.containsKey("segmentId"))throw DomainError.invalid("Choose a segment stocktake or a place/item stocktake");
+    String item=uuid(slots,"itemId"),place=uuid(slots,"placeId"),lot=slots.containsKey("lotId")?uuid(slots,"lotId"):null,unit=text(slots,"unit",40);
+    var base=new LinkedHashMap<String,List<String>>();base.put("ITEM",List.of(item));base.put("PLACE",List.of(place));base.put("TARGET",List.of(place));if(lot!=null)base.put("LOT",List.of(lot));
+    authorizer.authorizeScopes(c,"recordStocktake",base);
+    var scope=placeCounts.scope(c,item,place,lot,unit);placeCounts.observed(c,scope,slots.get("observedQuantity"));
+    if(occurredAt.isAfter(scope.snapshotAt()))throw DomainError.invalid("Stocktake observation is in the future");
+    var targets=new ArrayList<String>();targets.add(place);
+    for(var member:scope.members()) {
+      var exact=new LinkedHashMap<>(base);exact.put("TARGET",List.of(member.get("ID").toString()));authorizer.authorizeScopes(c,"recordStocktake",exact);
+      targets.add(member.get("ID").toString());
+    }
+    var all=new LinkedHashMap<>(base);all.put("TARGET",List.copyOf(targets));
+    return CommandPreparation.ordinary(all,placeCounts.fences(scope),"RECORD_STOCKTAKE",place,null);
+  }
 }
