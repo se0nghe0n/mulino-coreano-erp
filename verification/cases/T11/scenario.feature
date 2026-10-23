@@ -306,6 +306,7 @@
     만일 "warehouse" 역할이 "dispatch" 행동을 수행한다
     만일 "A" 역할이 "shipped-db-snapshot" 행동을 수행한다
     만일 "시스템" 역할이 "shipped-db" 행동을 수행한다
+    만일 "A" 역할이 "close-with-duty-current-work" 행동을 수행한다
     만일 "A" 역할이 "close-with-duty" 행동을 수행한다
     만일 "A" 역할이 "transfer-source-work" 행동을 수행한다
     만일 "A" 역할이 "transfer-proposal" 행동을 수행한다

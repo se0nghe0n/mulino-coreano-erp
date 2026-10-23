@@ -11262,7 +11262,7 @@
     {
       "id": "cancel-after-shipment",
       "title": "업무 상태의 독립 판정 cancel-after-shipment",
-      "fixtureRef": "verification/cases/T11/fixtures/cancel-after-shipment.json",
+      "fixtureRef": "verification/cases/T11/fixtures/native-r2/cancel-after-shipment.json",
       "requiredAdapters": [
         "fixture",
         "api",
@@ -11487,7 +11487,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               }
             },
@@ -11533,7 +11533,7 @@
               "allocationId": {
                 "$result": {
                   "actionId": "reserve",
-                  "pointer": "/response/allocationId"
+                  "pointer": "/response/effects/allocationId"
                 }
               },
               "occurredAt": "2026-10-07T02:00:00Z",
@@ -11637,6 +11637,26 @@
           }
         },
         {
+          "id": "close-with-duty-current-work",
+          "kind": "query",
+          "actorRef": "A",
+          "route": "api",
+          "capabilityId": "getWork",
+          "request": {
+            "workId": {
+              "$alias": "SOURCE"
+            },
+            "scope": {
+              "organizationId": {
+                "$alias": "ORG"
+              }
+            }
+          },
+          "evidenceRefs": [
+            "close-with-duty-current-work:actual-artifact"
+          ]
+        },
+        {
           "id": "close-with-duty",
           "kind": "invoke",
           "evidenceRefs": [
@@ -11663,7 +11683,12 @@
               },
               "reason": "CANCELLED"
             },
-            "expectedRevision": 1,
+            "expectedRevision": {
+              "$result": {
+                "actionId": "close-with-duty-current-work",
+                "pointer": "/response/data/revision"
+              }
+            },
             "commandIdempotencyKey": "T11-cancel-after-shipment-close-with-duty",
             "evidenceRefs": [
               {
@@ -13927,7 +13952,7 @@
     {
       "id": "closed-followup",
       "title": "종료 뒤 새 이상은 원 업무와 판정 대신 followup에 책임을 연결한다",
-      "fixtureRef": "verification/cases/T11/fixtures/closed-followup.json",
+      "fixtureRef": "verification/cases/T11/fixtures/native-r2/closed-followup.json",
       "requiredAdapters": [
         "fixture",
         "api",

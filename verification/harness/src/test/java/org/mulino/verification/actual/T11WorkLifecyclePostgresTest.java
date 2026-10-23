@@ -56,12 +56,16 @@ class T11WorkLifecyclePostgresTest {
  @Test void rawTemperatureCreatesOneReviewDutyAndPreservesClosedWorld()throws Exception{
   try(var w=new T11ParentHttp("closed-followup","lifecycle")){
    var occurrences=w.rows("mulino_evidence_CanonicalOccurrences");var movements=w.rows("mulino_inventory_QuantityMovements");var before=w.rows("mulino_work_read_Works");var assessments=w.rows("mulino_work_read_AssessmentReferences");
+   assertEquals(1,assessments.size(),"The immutable original assessment must exist before equality checks");
+   var historical=assessments.getFirst();assertEquals(w.aliases.path("OLDASSESS").asText(),historical.get("id"));assertEquals(w.aliases.path("PARENT").asText(),historical.get("workid"));assertEquals("evaluator-v1",historical.get("evaluatorversion"));assertEquals("SATISFIED",historical.get("outcome"));
+   var inputs=w.rows("mulino_evaluation_InputSnapshots");assertEquals(1,inputs.size());assertEquals(historical.get("id"),inputs.getFirst().get("assessmentid"));assertEquals(Json.sha256Text(inputs.getFirst().get("contentjson").toString()),historical.get("inputsnapshothash"));
    w.through("followup");var response=w.results.get("followup").path("response");assertEquals("APPLIED",response.path("outcome").asText(),response.toPrettyString());
    String child=response.path("workId").asText();
    var replay=(com.fasterxml.jackson.databind.node.ObjectNode)w.results.get("followup").path("request").deepCopy();replay.put("commandIdempotencyKey","same-source-second-key");
    var repeated=w.send("followup-second-key","A","/api/ontology/commands/createFollowup",replay);assertEquals("APPLIED",repeated.path("outcome").asText(),repeated.toPrettyString());assertEquals(child,repeated.path("workId").asText());
    replay.put("commandIdempotencyKey","different-response-second-key");((com.fasterxml.jackson.databind.node.ObjectNode)replay.path("slots").path("draft").path("goal")).put("targetQuantity","99");var conflicting=w.send("followup-different-goal","A","/api/ontology/commands/createFollowup",replay);assertEquals("IDEMPOTENCY_CONFLICT",conflicting.path("error").path("code").asText());assertEquals(before.size()+1,w.rows("mulino_work_read_Works").size());
    assertEquals(before.getFirst(),w.rows("mulino_work_read_Works").stream().filter(x->Objects.equals(before.getFirst().get("id"),x.get("id"))).findFirst().orElseThrow());assertEquals(assessments,w.rows("mulino_work_read_AssessmentReferences"));
+   assertEquals(inputs,w.rows("mulino_evaluation_InputSnapshots"));
    var assignments=w.rows("mulino_work_read_ObligationReferences");assertEquals(1,assignments.size());assertEquals("UNVERIFIED_SOURCE_REVIEW",assignments.getFirst().get("kind"));assertEquals(child,assignments.getFirst().get("workid"));
    var roots=w.rows("mulino_responsibility_Roots");assertEquals(1,roots.size());assertEquals("EVENT",roots.getFirst().get("sourcekind"));assertEquals(w.results.get("temperature").path("response").path("id").asText(),roots.getFirst().get("sourceid"));
    assertEquals(occurrences,w.rows("mulino_evidence_CanonicalOccurrences"));assertEquals(movements,w.rows("mulino_inventory_QuantityMovements"));

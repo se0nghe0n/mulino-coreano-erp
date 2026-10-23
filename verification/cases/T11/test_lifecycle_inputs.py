@@ -34,6 +34,17 @@ class LifecycleInputs(unittest.TestCase):
   self.assertEqual(layer.ref('temperature','/response/id'),slots['sourceEventId']);self.assertNotIn('sourceOccurrenceId',slots)
   self.assertEqual('STATE_AT',slots['draft']['goal']['quantityMode']);self.assertEqual('100',slots['draft']['goal']['targetQuantity'])
   self.assertEqual('TEMPERATURE_REVIEW',slots['draft']['kind'])
+ def test_cancel_pick_and_dispatch_use_the_actual_reservation_effect(self):
+  actions={a['id']:a for a in self.subs['cancel-after-shipment']['actions']}
+  for action in ('pick','dispatch'):
+   self.assertEqual(layer.ref('reserve','/response/effects/allocationId'),actions[action]['request']['slots']['allocationId'])
+  old=next(s for s in self.old['subcases'] if s['id']=='cancel-after-shipment')
+  authored,_=layer.authored(self.old)
+  current=next(s for s in authored['subcases'] if s['id']=='cancel-after-shipment')
+  # The fourteen independent assertions are unchanged by the new pointer repair.
+  expected=copy.deepcopy(old['assertions'])
+  next(a for a in expected if a['id']=='recipient-authenticated-acceptance')['expected'][0][1]='acceptHandover'
+  self.assertEqual(expected,current['assertions']);self.assertEqual(14,len(expected))
  def test_shared_physical_range_preserves_exact_nonoverlapping_thirties(self):
   a=next(a for a in self.subs['shared-distinct60']['assertions'] if a['id']=='shared-scope-partition')
   self.assertEqual(['workId','quantity','physicalRange'],a['source']['field'])

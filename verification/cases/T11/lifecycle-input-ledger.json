@@ -1976,6 +1976,7 @@
         "dispatch",
         "shipped-db-snapshot",
         "shipped-db",
+        "close-with-duty-current-work",
         "close-with-duty",
         "transfer-source-work",
         "transfer-proposal",
@@ -1986,6 +1987,304 @@
         "after-db"
       ],
       "actions": [
+        {
+          "actionId": "pick",
+          "before": {
+            "id": "pick",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "pick:actual-artifact"
+            ],
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "pickQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "pickQuantity",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "allocationId": {
+                  "$result": {
+                    "actionId": "reserve",
+                    "pointer": "/response/allocationId"
+                  }
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-pick",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "allocationId": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "pick",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "pick:actual-artifact"
+            ],
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "pickQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "pickQuantity",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "allocationId": {
+                  "$result": {
+                    "actionId": "reserve",
+                    "pointer": "/response/effects/allocationId"
+                  }
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "reserve",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-pick",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "allocationId": "CONTEXT"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "dispatch",
+          "before": {
+            "id": "dispatch",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "dispatch:actual-artifact"
+            ],
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "dispatchQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "dispatchQuantity",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "allocationId": {
+                  "$result": {
+                    "actionId": "reserve",
+                    "pointer": "/response/allocationId"
+                  }
+                },
+                "occurredAt": "2026-10-07T02:00:00Z",
+                "transitPlaceId": {
+                  "$alias": "TRANSIT"
+                },
+                "evidenceRef": {
+                  "$alias": "DOC"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "pick",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-dispatch",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "allocationId": "CONTEXT",
+                "occurredAt": "USER",
+                "transitPlaceId": "CONTEXT",
+                "evidenceRef": "CONTEXT"
+              }
+            }
+          },
+          "after": {
+            "id": "dispatch",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "dispatch:actual-artifact"
+            ],
+            "actorRef": "warehouse",
+            "route": "api",
+            "capabilityId": "dispatchQuantity",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "dispatchQuantity",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "allocationId": {
+                  "$result": {
+                    "actionId": "reserve",
+                    "pointer": "/response/effects/allocationId"
+                  }
+                },
+                "occurredAt": "2026-10-07T02:00:00Z",
+                "transitPlaceId": {
+                  "$alias": "TRANSIT"
+                },
+                "evidenceRef": {
+                  "$alias": "DOC"
+                }
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "pick",
+                  "pointer": "/response/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-dispatch",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "allocationId": "CONTEXT",
+                "occurredAt": "USER",
+                "transitPlaceId": "CONTEXT",
+                "evidenceRef": "CONTEXT"
+              }
+            }
+          }
+        },
+        {
+          "actionId": "close-with-duty",
+          "before": {
+            "id": "close-with-duty",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "close-with-duty:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "closeWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "closeWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "reason": "CANCELLED"
+              },
+              "expectedRevision": 1,
+              "commandIdempotencyKey": "T11-cancel-after-shipment-close-with-duty",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "reason": "USER"
+              }
+            }
+          },
+          "after": {
+            "id": "close-with-duty",
+            "kind": "invoke",
+            "evidenceRefs": [
+              "close-with-duty:actual-artifact"
+            ],
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "closeWork",
+            "request": {
+              "intentKind": "COMMAND",
+              "definitionVersion": "definition-v1",
+              "capabilityId": "closeWork",
+              "subjectRefs": [
+                {
+                  "type": "TradeItem",
+                  "id": {
+                    "$alias": "P"
+                  }
+                }
+              ],
+              "slots": {
+                "workId": {
+                  "$alias": "SOURCE"
+                },
+                "reason": "CANCELLED"
+              },
+              "expectedRevision": {
+                "$result": {
+                  "actionId": "close-with-duty-current-work",
+                  "pointer": "/response/data/revision"
+                }
+              },
+              "commandIdempotencyKey": "T11-cancel-after-shipment-close-with-duty",
+              "evidenceRefs": [
+                {
+                  "$alias": "DOC"
+                }
+              ],
+              "provenance": {
+                "workId": "CONTEXT",
+                "reason": "USER"
+              }
+            }
+          }
+        },
         {
           "actionId": "transfer",
           "before": {
@@ -2176,6 +2475,30 @@
                 "reason": "USER"
               }
             }
+          }
+        },
+        {
+          "actionId": "close-with-duty-current-work",
+          "before": null,
+          "after": {
+            "id": "close-with-duty-current-work",
+            "kind": "query",
+            "actorRef": "A",
+            "route": "api",
+            "capabilityId": "getWork",
+            "request": {
+              "workId": {
+                "$alias": "SOURCE"
+              },
+              "scope": {
+                "organizationId": {
+                  "$alias": "ORG"
+                }
+              }
+            },
+            "evidenceRefs": [
+              "close-with-duty-current-work:actual-artifact"
+            ]
           }
         },
         {
@@ -2385,7 +2708,12 @@
             }
           }
         }
-      ]
+      ],
+      "fixtureRef": {
+        "before": "verification/cases/T11/fixtures/cancel-after-shipment.json",
+        "after": "verification/cases/T11/fixtures/native-r2/cancel-after-shipment.json",
+        "completionLedger": "verification/cases/T11/native-r2-fixture-ledger.json"
+      }
     },
     {
       "subcaseId": "shared-distinct60",
@@ -2772,7 +3100,12 @@
           }
         }
       ],
-      "assertions": []
+      "assertions": [],
+      "fixtureRef": {
+        "before": "verification/cases/T11/fixtures/closed-followup.json",
+        "after": "verification/cases/T11/fixtures/native-r2/closed-followup.json",
+        "completionLedger": "verification/cases/T11/native-r2-fixture-ledger.json"
+      }
     }
   ]
 }

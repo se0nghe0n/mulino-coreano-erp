@@ -55,6 +55,7 @@ final class ScenarioFixtureInstaller {
     private String defaultOrgAlias;
     private Connection c;
     private final Set<String> ensured=new HashSet<>();
+    private ObjectNode historicalAssessmentInstallation,lifecycleBaselineInstallation;
 
     private ScenarioFixtureInstaller(ActualConfiguration config,Path root,JsonNode bundle,boolean partial) throws Exception {
         this.config=config;this.root=root;this.bundle=bundle;this.partial=partial;this.fixture=merged(bundle);
@@ -93,12 +94,17 @@ final class ScenarioFixtureInstaller {
             c=connection;c.setAutoCommit(false);
             try {
                 for(String org:externals.keySet()) insert("mulino_identity_Organizations",row("ID",aliases.path(org).asText(),"externalAlias",externals.get(org),"createdAt",asOf,"recordedAt",asOf));
-                actors();definitionsAndPolicies();regulatoryPolicies();items();places();parties();lots();segments();works();sourceProfiles();T01SourceFacts.prepare(fixture,aliases);evidence();sales();allocations();tradeAliases();grants();
+                actors();definitionsAndPolicies();regulatoryPolicies();items();places();parties();lots();segments();works();
+                if(T11HistoricalAssessmentFixture.enabled(fixture))historicalAssessmentInstallation=T11HistoricalAssessmentFixture.install(c,fixture,aliases);
+                sourceProfiles();T01SourceFacts.prepare(fixture,aliases);evidence();
+                if(T11LifecycleBaselineFixture.enabled(fixture))lifecycleBaselineInstallation=T11LifecycleBaselineFixture.installDuty(c,fixture,aliases);
+                sales();allocations();tradeAliases();grants();
                 if(!partial&&!omitted.isEmpty())throw new UnsupportedOperationException("scenario fixture facts not installable: "+String.join("; ",omitted.subList(0,Math.min(12,omitted.size()))));
                 c.commit();
             } catch(Exception failure){c.rollback();for(Path b:writtenBlobs)java.nio.file.Files.deleteIfExists(b);throw failure;}
         }
         ObjectNode sourceFactEvidence=T01SourceFacts.enabled(fixture)?new T01SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias),conventions).install():null;
+        if(T11LifecycleBaselineFixture.enabled(fixture))sourceFactEvidence=new T11LifecycleBaselineFixture(config,fixture,aliases,externals.get(defaultOrgAlias)).installSources();
         if(T17SourceFacts.enabled(fixture)) {
             sourceFactEvidence=new T17SourceFacts(config,fixture,aliases,externals.get(defaultOrgAlias)).install();
             omitted.remove("baseline.t17SourceFacts");
@@ -112,6 +118,8 @@ final class ScenarioFixtureInstaller {
         result.put("installer","scenario-fixture-installer-v2").put("recordedAtRule","every installed row recordedAt=createdAt=fixture clock asOf (starting clock); evidence declared recordedAt later than the fixture knownAt is recorded at that declared instant (late-known)");
         result.put("fixtureComplete",omitted.isEmpty());result.set("omittedFacts",Json.MAPPER.valueToTree(omitted));result.set("notRepresentedFacts",Json.MAPPER.valueToTree(notRepresented));var types=Json.object();fixture.path("aliases").fields().forEachRemaining(e->{if(aliases.has(e.getKey()))types.put(aliases.path(e.getKey()).asText(),e.getValue().path("type").asText());});result.set("idTypes",types);result.set("installerConventions",Json.MAPPER.valueToTree(conventions));
         if(sourceFactEvidence!=null)result.set("sourceFactEvidence",sourceFactEvidence);
+        if(historicalAssessmentInstallation!=null)result.set("historicalAssessmentInstallation",historicalAssessmentInstallation);
+        if(lifecycleBaselineInstallation!=null)result.set("lifecycleBaselineInstallation",lifecycleBaselineInstallation);
         result.put("committed",true).put("businessExecutionClaimed",false);return result;
     }
 
@@ -130,11 +138,17 @@ final class ScenarioFixtureInstaller {
         for(JsonNode actor:fixture.path("actors")){String d=actor.path("grant").path("delegatorAlias").asText(null);if(d!=null&&!orgOf.containsKey(d))orgOf.put(d,aliases.path(externals.containsKey(actor.path("organizationAlias").asText())?actor.path("organizationAlias").asText():defaultOrgAlias).asText());}
     }
     private void survey() {
-        fixture.path("aliases").fields().forEachRemaining(e->{String t=e.getValue().path("type").asText();if(!SUPPORTED_TYPES.contains(t)&&!(t.equals("SourceFact")&&T01SourceFacts.enabled(fixture)))omitted.add("aliasType "+t+" ("+e.getKey()+")");});
+        if(T11HistoricalAssessmentFixture.enabled(fixture))T11HistoricalAssessmentFixture.validate(fixture);
+        if(T11LifecycleBaselineFixture.enabled(fixture))T11LifecycleBaselineFixture.validate(fixture);
+        fixture.path("aliases").fields().forEachRemaining(e->{String t=e.getValue().path("type").asText();if(!SUPPORTED_TYPES.contains(t)&&!(t.equals("SourceFact")&&T01SourceFacts.enabled(fixture))
+            &&!(t.equals("Assessment")&&e.getKey().equals("OLDASSESS")&&T11HistoricalAssessmentFixture.enabled(fixture))
+            &&!(t.equals("ObligationAssignment")&&e.getKey().equals("ASSIGN")&&T11LifecycleBaselineFixture.enabled(fixture)))omitted.add("aliasType "+t+" ("+e.getKey()+")");});
         fixture.path("baseline").fields().forEachRemaining(e->{
             String k=e.getKey();JsonNode v=e.getValue();
             if(DESCRIPTIVE_BASELINE.contains(k)||v.isNull()||v.isBoolean()&&!v.asBoolean()||v.isContainerNode()&&v.isEmpty())return;
             if(CONSUMED_BASELINE.contains(k)||T01SourceFacts.consumes(fixture,k))return;
+            if(T11HistoricalAssessmentFixture.enabled(fixture)&&Set.of("assessments","historicalGoalCompletion").contains(k))return;
+            if(T11LifecycleBaselineFixture.enabled(fixture)&&Set.of("obligations","assignments","nativeR2LifecycleCompletion").contains(k))return;
             if(T17SourceFacts.enabled(fixture)&&Set.of("conditions","t17SourceFacts").contains(k)){T17SourceFacts.validate(fixture);omitted.add("baseline."+k);return;}
             omitted.add("baseline."+k);
         });
@@ -900,6 +914,7 @@ final class ScenarioFixtureInstaller {
      * authored, so the root cites the fixture document (sourceKind DOCUMENT, version 1) as a synthetic source.
      */
     private void obligation(String alias) throws Exception {
+        if(alias.equals("ROOT")&&T11LifecycleBaselineFixture.enabled(fixture))return; // Exact original ROOT/ASSIGN were installed together.
         JsonNode a=facts(alias);String org=orgOf.get(alias),work=workFor(a,org),doc=document(a,org);
         String owner=human(org,firstAlias(a,"ownerAlias")),supervisor=human(org,firstAlias(a,"supervisorAlias"));if(supervisor==null)supervisor=owner;
         if(work==null||doc==null||owner==null||!a.hasNonNull("kind")||!a.hasNonNull("nextAction")||!a.hasNonNull("nextCheckAt")){omitted.add("Obligation "+alias+" (work/document/owner/kind/next action not resolvable)");return;}

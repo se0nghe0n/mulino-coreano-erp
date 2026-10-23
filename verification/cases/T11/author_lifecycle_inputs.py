@@ -24,6 +24,7 @@ def authored(old):
  new=copy.deepcopy(old);changes=[]
  for sub in new['subcases']:
   sid=sub['id'];before=copy.deepcopy(sub);out=[]
+  if sid in ('cancel-after-shipment','closed-followup'):sub['fixtureRef']='verification/cases/T11/fixtures/native-r2/'+sid+'.json'
   for a in sub['actions']:
    aid=a['id'];r=a.get('request',{});s=r.get('slots',{});pre=[];post=[]
    if sid in PARENTS:
@@ -46,13 +47,18 @@ def authored(old):
     r['slots']={'workId':s['workId'],'sourceEventId':ref('temperature','/response/id'),'reason':'종료 뒤 원천 온도 관측의 대응 책임을 별도 업무에 연결한다','draft':draft}
     r['provenance']={k:'USER' if k in ('reason','draft') else 'CONTEXT' for k in r['slots']};r['expectedRevision']=ref('followup-original-work','/response/data/revision')
    elif sid=='cancel-after-shipment':
+    if aid in ('pick','dispatch'):
+     assert s['allocationId']==ref('reserve','/response/allocationId')
+     s['allocationId']=ref('reserve','/response/effects/allocationId')
     if aid=='transfer':
      pre.append(query('transfer-source-work',alias('SOURCE')))
      pre.append(command('transfer-proposal','transferObligation',{'workId':alias('SOURCE'),'targetWorkId':alias('TARGET'),'assignmentId':alias('ASSIGN'),'recipientId':alias('B'),'nextAction':s['nextAction'],'nextCheckAt':s['nextCheckAt'],'expiresAt':s['nextCheckAt']},ref('transfer-source-work','/response/data/revision')))
      a=command('transfer','acceptHandover',{'handoverId':ref('transfer-proposal','/response/effects/responsibility/ID')},0,actor='B',key=r['commandIdempotencyKey'])
-    elif aid=='close':
-     for k in ('decisionEvidenceId','reasonText'):s.pop(k);r['provenance'].pop(k)
-     pre.append(query('cancel-current-work',alias('SOURCE')));r['expectedRevision']=ref('cancel-current-work','/response/data/revision')
+    elif aid in ('close','close-with-duty'):
+     if aid=='close':
+      for k in ('decisionEvidenceId','reasonText'):s.pop(k);r['provenance'].pop(k)
+     q='cancel-current-work' if aid=='close' else 'close-with-duty-current-work'
+     pre.append(query(q,alias('SOURCE')));r['expectedRevision']=ref(q,'/response/data/revision')
    out.extend(pre+[a]+post)
   sub['actions']=out
   for assertion in sub['assertions']:
@@ -105,7 +111,9 @@ def audit_changes(changes):
   for aid in dict.fromkeys([*old,*new]):
    if old.get(aid)!=new.get(aid):actions.append({'actionId':aid,'before':old.get(aid),'after':new.get(aid)})
   assertions=[{'assertionId':a['id'],'before':a,'after':b} for a,b in zip(before['assertions'],after['assertions']) if a!=b]
-  output.append({'subcaseId':change['subcaseId'],'beforeActionIds':list(old),'afterActionIds':list(new),'actions':actions,'assertions':assertions})
+  entry={'subcaseId':change['subcaseId'],'beforeActionIds':list(old),'afterActionIds':list(new),'actions':actions,'assertions':assertions}
+  if before['fixtureRef']!=after['fixtureRef']:entry['fixtureRef']={'before':before['fixtureRef'],'after':after['fixtureRef'],'completionLedger':'verification/cases/T11/native-r2-fixture-ledger.json'}
+  output.append(entry)
  return output
 
 def main():
