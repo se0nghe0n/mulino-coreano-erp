@@ -58,7 +58,7 @@ try:
         time.sleep(.25)
     else:raise RuntimeError('Backend readiness')
     env.update(ACTUAL_BASE_URL='http://127.0.0.1:'+matches[-1],ACTUAL_DISPOSABLE_DATABASE='true',ACTUAL_BUILD_COMMIT=record['sourceCommit'],T11_PG_TEST='true',T11_TEST_EVIDENCE=str(OUT/'http-pg'))
-    result=run('t11-http-pg',['./mvnw','-B','-ntp','-f','verification/harness/pom.xml','-Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json','-Dverification.actual.blobRoot='+str(tmp/'blobs'),'-Dtest=T11ParentContributionPostgresTest','test'],check=False)
+    result=run('t11-http-pg',['./mvnw','-B','-ntp','-f','verification/harness/pom.xml','-Dverification.actual.identityBinding=verification/actual/scenarios/identity-binding.json','-Dverification.actual.blobRoot='+str(tmp/'blobs'),'-Dtest='+env.get('T11_TEST_SELECT','T11ParentContributionPostgresTest'),'test'],check=False)
 except Exception as failure:
     record['environmentFailure']=str(failure)
 finally:

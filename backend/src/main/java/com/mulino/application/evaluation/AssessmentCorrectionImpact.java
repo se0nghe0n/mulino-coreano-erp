@@ -99,7 +99,7 @@ public class AssessmentCorrectionImpact implements EvidenceCorrectionImpact {
       var goals=repository.rows(c,"mulino.work.read.GoalReferences").stream().filter(g->Objects.equals(g.get("ID"),work.get("currentGoalVersionId"))).toList();
       for(var goal:goals)try{var slots=json.readValue(Objects.toString(goal.get("slotsJson"),"{}"),Map.class);if(slots.get("placeId")!=null&&!Objects.equals(slots.get("placeId"),occurrence.get("placeId")))continue;if(!com.mulino.domain.evaluation.CanonicalEventSemantics.affects(slots,occurrence.get("kind")))continue;ids.add(work.get("ID").toString());}catch(java.io.IOException e){throw DomainError.invalid("Invalid current goal scope");}
     }
-    for(var credit:repository.rows(c,"mulino.work.WorkContributions"))if(Objects.equals(occurrence.get("ID"),credit.get("occurrenceId")))ids.add(credit.get("targetWorkId").toString());
+    for(var credit:repository.rows(c,"mulino.work.WorkContributions"))if(Objects.equals(occurrence.get("ID"),credit.get("occurrenceId"))){ids.add(credit.get("targetWorkId").toString());if(credit.get("sourceWorkId")!=null&&credit.get("sourceGoalVersionId")!=null)ids.add(credit.get("sourceWorkId").toString());}
   }
   return ids;
  }

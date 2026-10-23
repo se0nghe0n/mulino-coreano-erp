@@ -29,6 +29,9 @@ entity WorkContributions {
  targetWorkId : UUID not null;
  goalId : UUID not null;
  conditionId : String(100) not null;
+ sourceWorkId : UUID;
+ sourceGoalVersionId : UUID;
+ sourceConditionId : String(100);
  startQuantity : Decimal(38,12) not null;
  quantity : Decimal(38,12) not null;
  unit : String(20) not null;

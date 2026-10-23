@@ -72,6 +72,20 @@ public class AssessmentQueries implements com.mulino.application.work.WorkAssess
  }
  private Map<String,Object> requireWork(DomainContext c,String id){return works.rows("Works",c).stream().filter(w->id.equals(w.get("ID"))).findFirst().orElseThrow(DomainError::forbidden);}
  private void authorize(DomainContext c,Map<String,Object> work){auth.authorizeScopes(c,"getAssessment",Map.of("TARGET",List.of(work.get("ID").toString()),"WORK",List.of(work.get("ID").toString()),"ITEM",List.of(work.get("itemId").toString())));}
- private boolean visible(DomainContext c,Map<String,Object> row){return atOrBefore(row.get("effectiveAt"),c.asOf())&&atOrBefore(row.get("asOf"),c.asOf())&&atOrBefore(row.get("knownAt"),c.knownAt());}
+ private boolean visible(DomainContext c,Map<String,Object> row){
+  if(!atOrBefore(row.get("effectiveAt"),c.asOf())||!atOrBefore(row.get("asOf"),c.asOf())||!atOrBefore(row.get("knownAt"),c.knownAt()))return false;
+  if(row.get("contentJson")==null)return true;
+  // New allocation snapshots include both immutable goal pins. Current read
+  // authority over the requested Work alone must not reveal the other endpoint.
+  try{
+   var credits=json.readTree(row.get("contentJson").toString()).path("facts").path("sources").path("work.Contributions");
+   for(var credit:credits)for(String field:List.of("sourceWorkId","targetWorkId"))if(credit.hasNonNull(field)){
+    var linked=requireWork(c,credit.path(field).asText());
+    auth.authorizeScopes(c,"getWork",Map.of("TARGET",List.of(linked.get("ID").toString()),"WORK",List.of(linked.get("ID").toString()),"ITEM",List.of(linked.get("itemId").toString())));
+   }
+   return true;
+  }catch(DomainError denied){if(!"FORBIDDEN".equals(denied.code()))throw denied;return false;}
+  catch(java.io.IOException invalid){throw new IllegalStateException("Invalid immutable input snapshot",invalid);}
+ }
  private boolean atOrBefore(Object value,Instant boundary){return value==null||!(value instanceof Instant i?i:Instant.parse(value.toString())).isAfter(boundary);}
 }

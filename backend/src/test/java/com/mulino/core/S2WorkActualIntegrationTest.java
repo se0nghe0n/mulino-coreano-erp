@@ -38,6 +38,7 @@ class S2WorkActualIntegrationTest {
   @Autowired com.mulino.application.work.WorkLifecycle lifecycle;
   @Autowired com.mulino.domain.work.WorkRepository workRepository;
   @Autowired com.mulino.application.evaluation.AssessmentService assessmentService;
+  @Autowired com.mulino.application.evaluation.AssessmentCorrectionImpact correctionImpact;
   @Autowired com.mulino.adapters.blob.LocalBlobStore blobs;
 
   @Autowired JdbcTemplate jdbc;
@@ -176,5 +177,86 @@ class S2WorkActualIntegrationTest {
     actualSource.remove("sourceWorkId");intent.put("commandIdempotencyKey","implicit-unauthorized-source");var implicit=runtime.requestContext().run(ctx->{return commands.execute(intent);});assertEquals("REJECTED",implicit.get("outcome"));assertEquals("FORBIDDEN",((Map<?,?>)implicit.get("error")).get("code"));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkLinks WHERE organizationId=?",Integer.class,org));
     actualSource.put("sourceWorkId",w1);actualSource.put("activityId",a1);actualSource.put("occurrenceId",o1);intent.put("subjectRefs",List.of(Map.of("type","Work","id",w1),Map.of("type","Work","id",w3)));intent.put("commandIdempotencyKey","authorized-actual-source");var applied=runtime.requestContext().run(ctx->{return commands.execute(intent);});assertEquals("APPLIED",applied.get("outcome"),applied.toString());assertEquals(w1,jdbc.queryForObject("SELECT sourceWorkId FROM mulino_work_WorkLinks WHERE organizationId=?",String.class,org));assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkContributions WHERE organizationId=?",Integer.class,org));assertEquals(1,revision(w2));
     run("createWorkLink",revision(w3),row("sourceWorkId",w3,"targetWorkId",w1,"linkKind","DEPENDS_ON"));actualSource.remove("sourceWorkId");actualSource.put("linkKind","DEPENDS_ON");intent.put("expectedRevision",revision(w1));intent.put("commandIdempotencyKey","implicit-authoritative-source-cycle");var cycle=runtime.requestContext().run(ctx->{return commands.execute(intent);});assertEquals("REJECTED",cycle.get("outcome"));assertEquals("TYPE_INVALID",((Map<?,?>)cycle.get("error")).get("code"));assertEquals("Blocking dependency cycle",((Map<?,?>)cycle.get("error")).get("message"));assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkLinks WHERE organizationId=?",Integer.class,org));assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkContributions WHERE organizationId=?",Integer.class,org));assertEquals(2,revision(w1));assertEquals(1,revision(w2));}
+
+  @Test void pinnedRangesUseOneCanonicalAndSourceRevisionDoesNotRebind() throws Exception {
+    String parent=draft(goalInputs());var thirty=new LinkedHashMap<>(goalInputs());thirty.put("targetQuantity","30");var sixty=new LinkedHashMap<>(goalInputs());sixty.put("targetQuantity","60");
+    String child30=draft(thirty),child60=draft(sixty);
+    for(String w:List.of(parent,child30,child60))run("activateWork",0,Map.of("workId",w));
+    occurrence(parent,"90","single-parent-occurrence");String canonical=jdbc.queryForObject("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",String.class,org);
+    run("createWorkLink",revision(child30),row("sourceWorkId",child30,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","30","unit","BOX"),"startQuantity","0"));
+    assertEquals("UNSATISFIED",((Map<?,?>)assess(parent).get("assessment")).get("outcome"));
+    assertEquals("SATISFIED",((Map<?,?>)assess(child30).get("assessment")).get("outcome"));
+    var original=jdbc.queryForMap("SELECT * FROM mulino_work_WorkContributions WHERE organizationId=?",org);
+    assertEquals(child30,original.get("sourceworkid"));assertEquals("Receipt.quantity",original.get("sourceconditionid"));
+    var at=((Timestamp)original.get("recordedat")).toInstant();
+    assertEquals(1,runtime.requestContext().run(ctx->{return workRepository.contributions(new DomainContext(org,actor,actor,context().asOf(),at),child30,original.get("sourcegoalversionid").toString());}).size());
+    assertTrue(runtime.requestContext().run(ctx->{return workRepository.contributions(new DomainContext(org,actor,actor,context().asOf(),at.minusNanos(1_000)),child30,original.get("sourcegoalversionid").toString());}).isEmpty());
+    run("createWorkLink",revision(child60),row("sourceWorkId",child60,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","60","unit","BOX"),"startQuantity","30"));
+    assertEquals("SATISFIED",((Map<?,?>)assess(child60).get("assessment")).get("outcome"));
+    // No source fact is copied. A new goal on the same Work cannot inherit the old pin.
+    run("reviseGoal",revision(child30),row("workId",child30,"goal",thirty,"reason","new immutable goal"));
+    assertEquals("UNVERIFIED",((Map<?,?>)assess(child30).get("assessment")).get("outcome"));
+    assertEquals(original,jdbc.queryForMap("SELECT * FROM mulino_work_WorkContributions WHERE ID=?",original.get("id")));
+    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",Integer.class,org));
+    assertEquals(2,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkContributions WHERE organizationId=?",Integer.class,org));
+    run("reviseGoal",revision(parent),row("workId",parent,"goal",goalInputs(),"reason","new target goal"));
+    String newTarget=jdbc.queryForObject("SELECT currentGoalVersionId FROM mulino_work_read_Works WHERE ID=?",String.class,parent);
+    assertTrue(runtime.requestContext().run(ctx->{return workRepository.contributions(context(),parent,newTarget);}).isEmpty());
+  }
+
+  @Test void invalidPinnedRangeRollsBackLinkAndRevisions() {
+    String parent=draft(goalInputs()),child=draft(goalInputs());for(String w:List.of(parent,child))run("activateWork",0,Map.of("workId",w));
+    occurrence(parent,"90","rollback-range");String canonical=jdbc.queryForObject("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",String.class,org);int before=revision(child);
+    var mismatched=new LinkedHashMap<>(goalInputs());mismatched.put("periodStart","2026-11-01T00:00:00Z");mismatched.put("periodEnd","2026-12-01T00:00:00Z");mismatched.put("dueAt","2026-12-01T00:00:00Z");
+    run("reviseGoal",before,row("workId",child,"goal",mismatched,"reason","different period"));before=revision(child);
+    assertThrows(DomainError.class,()->run("createWorkLink",revision(child),row("sourceWorkId",child,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","30","unit","BOX"),"startQuantity","0")));
+    assertEquals(before,revision(child));assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkLinks WHERE organizationId=?",Integer.class,org));
+    assertEquals(0,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkContributions WHERE organizationId=?",Integer.class,org));
+  }
+
+  @Test void contributionLineageAndSnapshotsRequireCurrentAuthorityForBothWorks(){
+    String parent=draft(goalInputs()),child=draft(goalInputs());for(String w:List.of(parent,child))run("activateWork",0,Map.of("workId",w));occurrence(parent,"90","private-parent");
+    String canonical=jdbc.queryForObject("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",String.class,org);
+    run("createWorkLink",revision(child),row("sourceWorkId",child,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","30","unit","BOX"),"startQuantity","0"));assess(child);
+    jdbc.update("DELETE FROM mulino_identity_GrantActions WHERE organizationId=? AND capabilityId IN ('getWork','getAssessment')",org);
+    String grant=id();insert("mulino_identity_Grants",row("organizationId",org,"ID",grant,"actorId",actor,"delegatorId",actor,"validFrom",Timestamp.from(Instant.now().minusSeconds(60)),"validUntil",Timestamp.from(Instant.now().plusSeconds(3600))));
+    for(String capability:List.of("getWork","getAssessment"))insert("mulino_identity_GrantActions",row("organizationId",org,"grantId",grant,"capabilityId",capability));
+    insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grant,"scopeKind","WORK","scopeId",child));insert("mulino_identity_GrantScopes",row("organizationId",org,"grantId",grant,"scopeKind","ITEM","scopeId",item));
+    var request=row("id",child,"scope",Map.of("organizationId",org,"itemId",item),"asOf",Instant.now().plusSeconds(60).toString(),"knownAt",Instant.now().plusSeconds(60).toString());
+    var result=runtime.requestContext().run(ctx->{return queries.query(QueryRequests.parse("getWork",request));});var data=(Map<?,?>)result.get("data");
+    assertEquals(List.of(),data.get("contributions"));assertEquals(List.of(),data.get("workLinks"));assertEquals(List.of(),data.get("assessmentInputSnapshots"));
+    var assessment=runtime.requestContext().run(ctx->{return queries.query(QueryRequests.parse("getAssessment",request));});assertEquals(List.of(),((Map<?,?>)assessment.get("data")).get("inputSnapshots"));
+  }
+
+  @Test void correctedSourceInvalidatesBothPinsAndRetainsClosedChildHistory() throws Exception {
+    String parent=draft(goalInputs());var thirty=new LinkedHashMap<>(goalInputs());thirty.put("targetQuantity","30");String child=draft(thirty);
+    for(String w:List.of(parent,child))run("activateWork",0,Map.of("workId",w));occurrence(parent,"90","corrected-parent");
+    String canonical=jdbc.queryForObject("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",String.class,org);
+    run("createWorkLink",revision(child),row("sourceWorkId",child,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","30","unit","BOX"),"startQuantity","0"));
+    var assessment=(Map<?,?>)assess(child).get("assessment");assertEquals("SATISFIED",assessment.get("outcome"));run("closeWork",revision(child),Map.of("workId",child,"reason","FULFILLED"));
+    var allocation=jdbc.queryForMap("SELECT * FROM mulino_work_WorkContributions WHERE organizationId=?",org);
+    var doc=jdbc.queryForMap("SELECT d.* FROM mulino_evidence_DocumentVersions d JOIN mulino_evidence_Verifications v ON v.organizationId=d.organizationId AND v.basisDocumentId=d.ID WHERE v.canonicalOccurrenceId=?",canonical);
+    String prior=doc.get("id").toString(),next=id();doc.put("id",next);doc.put("revision",2);doc.put("supersedesid",prior);doc.put("recordedat",Timestamp.from(Instant.now()));
+    runtime.requestContext().run(ctx->{new org.springframework.transaction.support.TransactionTemplate(transactions).executeWithoutResult(tx->{insert("mulino_evidence_DocumentVersions",doc);correctionImpact.apply(context(),new com.mulino.application.evidence.EvidenceCorrectionImpact.Correction(prior,next,Set.of(),Set.of()));});return null;});
+    assertEquals(true,jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",Boolean.class,parent));
+    assertEquals(true,jdbc.queryForObject("SELECT pendingInvalidation FROM mulino_work_read_Works WHERE ID=?",Boolean.class,child));
+    assertEquals("CLOSED",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,child));
+    assertEquals("SATISFIED",jdbc.queryForObject("SELECT outcome FROM mulino_work_read_AssessmentReferences WHERE ID=?",String.class,assessment.get("ID")));
+    assertEquals(allocation,jdbc.queryForMap("SELECT * FROM mulino_work_WorkContributions WHERE organizationId=?",org));
+    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkLinks WHERE organizationId=? AND sourceWorkId=? AND kind='FOLLOWUP'",Integer.class,org,child));
+  }
+
+  @Test void changedEvidencePolicyCannotCloseOrCreateAnotherAllocation(){
+    String parent=draft(goalInputs());var thirty=new LinkedHashMap<>(goalInputs());thirty.put("targetQuantity","30");String child=draft(thirty),other=draft(thirty);
+    for(String w:List.of(parent,child,other))run("activateWork",0,Map.of("workId",w));occurrence(parent,"90","policy-bound-range");
+    String canonical=jdbc.queryForObject("SELECT ID FROM mulino_evidence_CanonicalOccurrences WHERE organizationId=?",String.class,org);
+    run("createWorkLink",revision(child),row("sourceWorkId",child,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","30","unit","BOX"),"startQuantity","0"));
+    assertEquals("SATISFIED",((Map<?,?>)assess(child).get("assessment")).get("outcome"));
+    jdbc.update("DELETE FROM mulino_governance_ActivePolicies WHERE organizationId=? AND kind='EVIDENCE'",org);
+    assertThrows(DomainError.class,()->run("closeWork",revision(child),Map.of("workId",child,"reason","FULFILLED")));
+    assertThrows(DomainError.class,()->run("createWorkLink",revision(other),row("sourceWorkId",other,"targetWorkId",parent,"linkKind","CONTRIBUTES_TO","occurrenceId",canonical,"quantity",Map.of("value","30","unit","BOX"),"startQuantity","30")));
+    assertEquals(1,jdbc.queryForObject("SELECT count(*) FROM mulino_work_WorkContributions WHERE organizationId=?",Integer.class,org));
+    assertEquals("ACTIVE",jdbc.queryForObject("SELECT status FROM mulino_work_read_Works WHERE ID=?",String.class,child));
+  }
 
 }

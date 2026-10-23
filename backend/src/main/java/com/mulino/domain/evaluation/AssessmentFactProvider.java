@@ -105,11 +105,16 @@ public class AssessmentFactProvider {
             Instant retired=instant(observed.get().get("retiredAt"));if(until==null||retired.isBefore(until))until=retired;
           }
         }
-        if(coverageAttribute||allocations.isEmpty())facts.add(new Fact(coverageAttribute?Objects.toString(occurrence.get("physicalScopeId"),occurrence.get("ID").toString()):occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,until,instant(occurrence.get("recordedAt")),refs));
+        // A directly admitted canonical quantity is the superset of its allocations.
+        // Keep it once even after the first partial allocation; allocation IDs remain
+        // in the immutable input snapshot for lineage and correction invalidation.
+        if(coverageAttribute||allocations.isEmpty()||Objects.equals(work.get("ID"),occurrence.get("workId")))facts.add(new Fact(coverageAttribute?Objects.toString(occurrence.get("physicalScopeId"),occurrence.get("ID").toString()):occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),Objects.toString(occurrence.get("physicalScopeId"),null),value,Objects.toString(occurrence.get("unit"),null),state,verified,effective,until,instant(occurrence.get("recordedAt")),refs));
         else for(var credit:allocations){
           var creditRefs=new ArrayList<>(refs);creditRefs.add(credit.get("ID").toString());
-          boolean validCredit=occurrence.get("physicalScopeId")!=null&&Objects.equals(credit.get("unit"),occurrence.get("unit"))&&(admission.recognizedQuantity()==null||allocations.stream().map(x->(java.math.BigDecimal)x.get("quantity")).reduce(java.math.BigDecimal.ZERO,java.math.BigDecimal::add).compareTo(admission.recognizedQuantity())<=0);
-          facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),occurrence.get("physicalScopeId")+"|"+credit.get("ID"),attribute.name().equals("quantity")?credit.get("quantity"):value,Objects.toString(credit.get("unit")),validCredit?state:State.CONFLICT,verified&&validCredit,effective,until,instant(occurrence.get("recordedAt")),creditRefs));
+          boolean boundCondition=!attribute.name().equals("quantity")||Objects.equals(property,credit.get("boundConditionId"))
+            ||"TARGET".equals(credit.get("attributionRole"))&&credit.get("sourceGoalVersionId")==null&&"quantity".equals(credit.get("boundConditionId"));
+          boolean validCredit=boundCondition&&!"UNKNOWN".equals(credit.get("attributionState"))&&occurrence.get("physicalScopeId")!=null&&Objects.equals(credit.get("unit"),occurrence.get("unit"))&&(admission.recognizedQuantity()==null||((java.math.BigDecimal)credit.get("startQuantity")).add((java.math.BigDecimal)credit.get("quantity")).compareTo(admission.recognizedQuantity())<=0);
+          facts.add(new Fact(occurrence.get("ID").toString(),Objects.toString(occurrence.get("revision")),DefinitionRepository.sha256(occurrence.toString()),occurrence.get("ID").toString(),occurrence.get("physicalScopeId")+"|"+credit.get("ID"),attribute.name().equals("quantity")?credit.get("quantity"):value,Objects.toString(credit.get("unit")),"UNKNOWN".equals(credit.get("attributionState"))?State.UNKNOWN:validCredit?state:State.CONFLICT,verified&&validCredit,effective,until,instant(occurrence.get("recordedAt")),creditRefs));
         }
       }
       // Existing segment facts represent actual state only; action eligibility and contribution adapters are S3/S4.
