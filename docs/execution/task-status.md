@@ -13,13 +13,13 @@
 |---|---|
 | Backend 전체 | d0885a80 초기 실행899개는664 PASS·3 FAIL·232 ERROR, skip0·exit1이었다. 같은 제품 bytes의 JWT 환경 보정232 PASS·witness40 PASS·rollback focused2 및 인접19 PASS를 testcase ID로 대조해 원래899개가 모두 PASS임을 확인했다. 초기 명령 exit1은 보존하고 개별 재실행의 결합 결과로 기록한다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
-| Harness 전체 | fa316f01: 1025 executions 중938 PASS·87 opt-in SKIP, 실패·오류0, exit0, source drift0·생성 DB 정리 |
-| Prepare | fa316f01: 41 case·802 subcase·24304 assertions, PREPARED·preparationProblems0·exit0이다. 조건 검증44개를 추가했고 기존 업무 oracle은 유지했다. |
-| 최근 실제 T09 | 1692f74f: 원본9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. primary가 실제 Haiku5 node·assistant85 records·동일 product class330개와 소유 DB3개 부재를 대조했다. |
-| 최근 실제 T11 | f8bb11e9: 110 assertions 중35 PASS·4 FAIL·71 미관찰이다. |
-| 최근 실제 T17 | f8bb11e9: 257 assertions 중165 PASS·92 FAIL·미관찰0이다. |
-| 최근 native 재실행 | wf_88ab8831-3ac: 36 subcase 중11 PASS·25 FAIL, 461 assertions 중286 PASS·104 FAIL·71 미관찰이다. 실제 Haiku14 node·228 assistant records, 동일 product class330개와 소유 DB12개 부재를 대조했다. |
-| 현재 제품 통합 | 제품 d0885a80·조건/observer/witness fa316f01에 이어 typed rollback hook 수정을1f17ee35로 통합했다. 실제 의무 생성 직후의 rollback과 두 transaction 중복 oracle을 보존했고 제품 변경은 없다. formal recall 입력은 Sol/xhigh/priority writer가 수정한다. 새 결합 harness·prepare가 통과했고 Haiku controller에12개 tree·36 subcase·505 assertions의 native Workflow 실행을 위임했다. |
+| Harness 전체 | de794494: 1089 executions 중995 PASS·94 opt-in SKIP, 실패·오류0, exit0, source drift0·소유 DB 정리 확인 |
+| Prepare | de794494: 41 case·802 subcase·24312 assertions, PREPARED·preparationProblems0·exit0이다. 원301 T17에 책임 범위 검사8개를 추가했고 기존 fixed oracle은 유지한다. |
+| 최근 실제 T09 | fa316f01: 9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. 최신 결합 Haiku 실행의 동일 product class335개와 소유 DB12개 부재를 primary가 대조했다. |
+| 최근 실제 T11 | fa316f01: 110 assertions 중94 PASS·2 FAIL·14 미관찰이다. |
+| 최근 실제 T17 | fa316f01: 301 assertions 중268 PASS·33 FAIL·미관찰0이다. |
+| 최근 native 재실행 | wf_17cd7443-f63: 36 subcase 중20 PASS·16 FAIL, 505 assertions 중456 PASS·35 FAIL·14 미관찰이다. 실제 Haiku14 node·120 assistant records와 source/JAR/cleanup을 primary가 대조했다. |
+| 현재 제품 통합 | 제품 d0885a80에 rollback hook1f17ee35, recall 입력fb58d866, 원천·FOLLOWUP observer140c9b5a, 독립 EVIDENCE policy03aa82e5, 책임 범위de794494를 통합했다. 원301 T17 assertion의 inverse·7개 policy fixture 추가·전체15 fixture inverse bytes·결합 Python47 PASS를 확인했다. T11 명시 Given·승계 원자성 observer와 T17 공개 read 계약은 별도 writer가 수정한다. |
 | 추가 통합 | allocation 원행 명령 귀속 04bd203a와 규제 중첩 CONFLICT 4d547915를 통합했다. worker 집중 검사 각각66·15 PASS, primary 규제 결합15 PASS·소유 DB/key/blob 정리 확인. 새 native 인수는 미실행이다. |
 | S5 실 client·운영 인수 | 위 scripted SIT/Workflow 실행을 모델 업무 client 인수로 승격하지 않는다. 모델 corpus/client와 S6·BTP 등의 미실행 gate는 OPEN이다. |
 | 구독 client tier | Sol/high/priority로 갱신, 계약35건 PASS와 실제 무모델 preflight exit0. turnStarted=false·모델 호출0이며 과거 Ultrafast artifact 보존 |
@@ -125,6 +125,25 @@ socket을 지정한 재실행에서 15 PASS·실패/오류/skip0을 확인했다
 구별한다.
 최근 전체 harness 원로그·JUnit·source drift·DB 정리 증거는
 `.local/resume-20261023/world-deferred-combined/`에 보존한다.
+
+최신 [두 번째 Haiku 결합 실행](haiku-fix-r2-acceptance.md)은
+기존461 ID·순서와 추가44개를 모두 대조했다. 실제456 PASS·35 FAIL·
+14 미관찰이며 전체 profile gateComplete는 false다. 이전 실패 원문은
+보존한다. 이후 [formal recall 입력](t17-formal-recall-input.md),
+[typed 원천과 후속 관계](obligation-source-occurrence-projection.md),
+[독립 evidence policy](t17-delivery-assessment-policy.md),
+[책임 관찰 범위](t17-response-obligation-scope.md)를 통합했다.
+이 수정들의 집중 PASS를 새 native 업무 인수로 승격하지 않는다.
+
+새 전체 harness의 원문·JUnit·source drift·소유 자원 정리는
+`.local/resume-20261024/fix-until-done/source-policy-scope-harness/`에 있다.
+최신995 PASS·94 opt-in SKIP는 source de794494의 결합 결과다.
+T11과 공개 read 계약의 후속 writer 변경은 이 검사에 포함되지 않았다.
+원본301 assertion 전체 보존, policy inverse15 fixture bytes와 root 합성
+증거는 `fix-until-done/source-policy-integration/`에 있다.
+책임 범위의 추가8개와 Python47 PASS는
+`fix-until-done/response-scope-integration/`에 있다.
+이 두 상대 경로의 기준도 `.local/resume-20261024/`다.
 
 ## Task와 기준선
 
