@@ -180,6 +180,7 @@ final class T09SaleSourceFacts {
         var sql=Json.object();
         for(String table:List.of("mulino_inventory_QuantitySegments","mulino_inventory_ManufacturingLots",
             "mulino_inventory_DispositionBases","mulino_inventory_SegmentAllocations","mulino_inventory_QuantityMovements",
+            "mulino_inventory_Dispatches","mulino_inventory_CargoScopes","mulino_governance_PolicyVersions",
             "mulino_quality_Decisions","mulino_evidence_DocumentVersions","mulino_evidence_Events",
             "mulino_evidence_Claims","mulino_evidence_SourceProfiles","mulino_evidence_Reconciliations","mulino_evidence_Verifications",
             "mulino_evidence_CanonicalOccurrences","mulino_trade_regulatory_Policies",

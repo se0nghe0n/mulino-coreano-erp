@@ -312,3 +312,117 @@ ReferenceResolver 19개와 prepare 결과는 각각
 `.local/t09-protocol-resolver.log`, `.local/t09-protocol-prepare.log`에 남긴다.
 Task와 현재 Step은 OPEN이며 coordinator 통합 전 bounded handoff다.
 최종 `ReferenceResolverTest`는 19 PASS, `./verify prepare`는 exit 0이다.
+
+## 같은 subtask의 allocation 응답 envelope 연결
+
+Coordinator가 두 SELECTED 흐름의 동일 identity에 대한 공개 응답
+selector 수정을 추가로 허용했다. `pick60`, `dispatch60`, `pick`,
+`dispatch` 네 요청에서만 `/response/allocationId`를
+`/response/effects/allocationId`로 바꾼다. request의 actor, grant,
+quantity, 시각, business intent와 나머지 slot은 그대로다.
+
+근거는 앞선 최종 실행의 `completeCumulativeSources-http.json`과
+`completeExistsSourcesAndInternalAuthorizationSeam-http.json`이다.
+각 raw 파일의 SHA-256, source action과 before/after는 strict ledger의
+`protocolSelectors`에 기록한다. 제품 근거는 SYNC baseline의
+`FulfillmentCommands.execute/response`다. `response`는 identity key를
+`effects`에 넣고 outcome/revision/effects envelope를 반환한다.
+backend와 ReferenceResolver는 수정하지 않는다. 새 dispatch/cargo
+identity pointer가 필요한 원래 request는 현재 두 흐름에 없다.
+
+strict inverse는 네 pointer를 모두 원래 값으로 복원한다. 생성기는
+이전 source 계층, 이전 revision 계층과 현재 계층을 구별한다.
+보존 검사는 현재 계층의 정확한 네 delta를 제거한 뒤 원래 actions를
+비교하고, 위조 sibling pointer와 미신고 변경을 거부한다.
+94개 assertion의 raw bytes와 다른 7개 subcase는 보존한다.
+
+한정 PG 검사는 출고 직후 별도 SQL snapshot을 남긴다. 실제 pick/dispatch
+응답, CONSUMED allocation과 pickedAt, dispatch/cargo의 같은 ID·Work·고객·
+[0,60)/[0,100) BOX 연결, warehouse 0과 원래 transit 잔량을 포함한
+transit 100을 검사한 뒤
+원래 후속 수령/판정 순서를 계속한다. 원래 oracle가 실패하면 그 내용을
+보존하고 해당 test도 FAIL로 반환한다.
+
+
+세 category capability는 실행 경로에서 필요하므로 유지한다.
+`QualityCommands.prepare`는 `policy.rule(c, cap).rule()`의
+`categoryCapabilities`에서 현재 category의 `decisionCapability`를 읽고,
+HUMAN actor 확인 후 `auth.authorizeScopes(c, decisionCapability, ...)`를
+실행한다. 공개 명령 이름이 `recordDispositionBasis`여도 이 추가 권한
+검사를 통과해야 한다. 현재 fixture 정책의 매핑은
+`verification/actual/scenarios/installer-conventions.json`의
+`recordDispositionBasis.categoryCapabilities`에 있으며 QC=`decideQuality`,
+CUSTOMER=`confirmCustomerConditions`, COMMERCIAL=`confirmCommercialDisposition`다.
+새 source actor에서 각각을 뺀 독립 반례를 기존 10개 test 안에서 실행해
+해당 category 원천 기록이 FORBIDDEN인지 확인하고, 실제 PolicyVersions도
+SQL 증거에 포함한다. 기본 fixture/기존 actor/grant는 변경하지 않는다.
+
+### envelope 연결 후 최종 인수 frontier
+
+최종 전체 실행은
+`.local/t09-sale-source-pg-290b210e-9f33-4063-b208-ad02d3908019/`다.
+10개 중 8 PASS / 2 FAIL, ERROR/SKIP 0, exit 1이다. 두 FAIL은 원래
+후속 oracle를 실제로 실행한 결과다. 더 이상 reserve/pick/dispatch의
+요청 envelope 해석이나 revision 불일치에서 중단되지 않는다.
+
+두 흐름 모두 reserve APPLIED, 동일 요청 replay APPLIED와 allocation
+한 개를 확인했다. 원래 pick/dispatch도 APPLIED다. 각각 정확한 60/100
+BOX에 대해 CONSUMED allocation, dispatch, cargo의 실제 ID·범위·고객·
+Work 연결을 SQL로 대조했다. 최종 물리량은 cumulative warehouse 40 /
+transit 60, exists warehouse 0 / transit 100이다. cumulative는 출고 직후
+원래 미수령 40과 출고한 60이 transit에 함께 있고, 그 뒤 원래 receive40이
+40을 warehouse로 옮긴다. 초기 물량이나 원래 수령/출고 시각을 바꾸지 않았다.
+warehouse 공개 getEvidence는 cumulative 200 / exists 403을 유지한다.
+
+새 최소 권한 검증은 세 category capability를 하나씩 제거한 독립
+instance에서 해당 `recordDispositionBasis`가 모두 FORBIDDEN이고
+allocation 무효과임을 확인했다. 파일은 각각
+`missing-category-capability-qc.json`, `-customer.json`, `-commercial.json`이다.
+실제 `mulino_governance_PolicyVersions`의 COMMAND 정책에서 세 매핑을
+확인했다. `QualityCommands.java:40-43`의 추가 category authorization
+때문에 세 capability를 유지한다. 새 fixture/grant의 확대나 삭제는 없다.
+
+원래 선택 oracle 47개는 25 PASS / 22 FAIL / 0 NOT_RUN이다.
+cumulative 28개는 15 PASS / 13 FAIL, exists 19개는 10 PASS / 9 FAIL이다.
+나머지 7개 subcase의 47개 oracle는 실행하지 않았다. 원래 94개 assertion
+raw bytes는 모두 보존한다. 범위 내 네 request pointer 외의 변경이 없는
+증거는 `.local/t09-envelope-preservation.json`이다.
+
+남은 업무/조회 계약 차이는 다음과 같다.
+
+- 원래 receive60/receive40은 모두 APPLIED지만 effects.contributedQuantity는
+  각각 0, excessQuantity는 60/40이다. 독립 SQL observation의 contributions는
+  비어 있다. 원래 누적 100 oracle를 약하게 만들거나 PO를 새로 만들지 않았다.
+- `getInventory` heldQuantity는 두 흐름 모두 100을 반환한다. 원래 oracle의
+  40/0과 다르지만 SQL의 warehouse 현재량 40/0은 맞다.
+- 원래 assertion이 요구하는 evaluatedQuantity, occurrenceId, movementId,
+  goal의 quantity/placeId/periodStart/periodEnd 등과 snapshotId 일부가
+  실제 응답에 없다. assertion bytes나 projection을 고치지 않았다.
+
+두 `original-oracles-*.json`은 모든 실패 ID와 메시지를 보존한다.
+각 `*-http-oracles.json`에도 94개 전체의 PASS/FAIL/NOT_RUN이 있으며,
+`physical-dispatch-*.json`에는 후속 평가 전의 실제 물리 효과가 있다.
+집계와 raw SHA-256은 `.local/t09-envelope-acceptance-summary.json`에 있다.
+첫 envelope 실행인
+`.local/t09-sale-source-pg-ccfcfa65-f34a-404f-85cf-62b76fceb6ef/`의 RED도
+남겼다. 이 실행은 cumulative transit에 원래 남은 40을 제외했던 신규
+검증 헬퍼의 기대를 드러냈고, 원래 입력을 유지한 채 헬퍼를 수정했다.
+
+자체 JAR SHA-256은
+`8adfbb5e5881049b020a56d77b350c4fea99f7f0c511c7b1864dc4eeaed6fdb9`다.
+source는 `1c2f40b2`와 build-identity.json의 변경 hash로 고정했다.
+실행용 Java/JSON과 generator source hash가 현재 파일과 같은지 확인했다.
+보존 test는 worker commit의 Git 가시성 대신 같은 이전 파일의 SHA-256을
+대조하도록 바꿔 통합 후에도 재현되게 했고 Python 28개를 다시 통과했다.
+자체 Spring 종료, 두 disposable PostgreSQL container와 임시 key 삭제도
+확인했다. backend, schema, migrations, ReferenceResolver는 수정하지 않았다.
+
+정적 검사는 T09 Python 28 PASS와 T11 parent 6 PASS다.
+기록은 `.local/t09-envelope-python-final.log`,
+`.local/t09-envelope-t11-parent.log`다. resolver와 prepare는 각각
+`.local/t09-envelope-resolver.log`, `.local/t09-envelope-prepare.log`에 남긴다.
+Task와 현재 Step은 OPEN이다. 남은 업무/조회 계약은 coordinator에게 넘긴다.
+
+최종 ReferenceResolver는 19 PASS, 생성기 재현과 prepare는 exit 0이다.
+휴대성 보완 뒤 Python 기록은 `.local/t09-envelope-python-portable.log`,
+최종 prepare 기록은 `.local/t09-envelope-prepare-final.log`다.

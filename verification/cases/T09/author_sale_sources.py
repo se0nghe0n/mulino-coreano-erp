@@ -167,7 +167,25 @@ def fixture_inputs(f):
     return f
 
 
-def authored(protocol=True):
+def envelope_selectors():
+    records=[]
+    for subcase, reserve, suffix, method, digest in [
+        (SELECTED[0], 'reserve60', '60', 'completeCumulativeSources', '11658a882fa3b233902765189597f1d5422f9beb1ed56e6f2c06f3d35d4db1cd'),
+        (SELECTED[1], 'reserve', '', 'completeExistsSourcesAndInternalAuthorizationSeam', 'b93126b6bbb3890eed919026742322f366b83e9ce1a3cb7c289df8c5ab5c90e5')]:
+        for action in ('pick'+suffix, 'dispatch'+suffix):
+            records.append(dict(subcase=subcase, actionId=action,
+                field='request.slots.allocationId.$result.pointer',
+                before='/response/allocationId', after='/response/effects/allocationId',
+                sourceActionId=reserve,
+                proofSource='.local/t09-sale-source-pg-2fec7e58-328b-4dfc-9bd3-55f9aa1cca75/'+method+'-http.json',
+                proofSourceSha256=digest,
+                productSymbol='backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:execute,response',
+                observed='APPLIED reservation: allocationId exists only in effects; same canonical allocation identity',
+                unchanged=['business slots and values','actorRef','quantity','clock','oracle','expectedRevision']))
+    return records
+
+
+def authored(protocol=True, envelopes=True):
     case=json.loads(baseline('verification/cases/T09/case.json'))
     fixtures={}
     for sub in case['subcases']:
@@ -185,6 +203,15 @@ def authored(protocol=True):
             at = sub['actions'].index(reserve)
             sub['actions'].insert(at, read)
             reserve['request']['expectedRevision'] = ref(read['id'], 'data/revision')
+        if envelopes:
+            for change in envelope_selectors():
+                if change['subcase'] != sub['id']: continue
+                action=next(a for a in sub['actions'] if a['id']==change['actionId'])
+                target=action
+                fields=change['field'].split('.')
+                for field in fields[:-1]: target=target[field]
+                assert target[fields[-1]] == change['before']
+                target[fields[-1]]=change['after']
     return case,fixtures
 
 
@@ -211,8 +238,9 @@ def restore_fixture(value):
 def apply(value):
     new,_=authored()
     old=json.loads(baseline('verification/cases/T09/case.json'))
-    previous,_=authored(protocol=False)
-    if value != old and value != new and value != previous: raise ValueError('T09 sale-source authoring baseline drift')
+    previous,_=authored(protocol=False, envelopes=False)
+    prior_revision,_=authored(envelopes=False)
+    if value != old and value != new and value != previous and value != prior_revision: raise ValueError('T09 sale-source authoring baseline drift')
     return new
 
 
@@ -263,7 +291,7 @@ def expected_ledger():
             queryActionId='t09-sale-source-reserve60-current-segment',
             proofSource='.local/t09-sale-source-pg-54af05c6-d17c-4f1b-b4b6-4dc967c691c5/completeCumulativeSources-http.json',
             observed='Actual confirmReceipt leaf revision 0; original reserve metadata 1 is stale',
-            unchanged=['slots','actorRef','quantity','clock','oracle','pick selector','dispatch selector'])],
+            unchanged=['slots','actorRef','quantity','clock','oracle','pick revision','dispatch revision'])]+envelope_selectors(),
         generatedActionIds={s['id']:[a['id'] for a in s['actions'] if a['id'].startswith('t09-sale-source-')] for s in case['subcases'] if s['id'] in SELECTED})
 
 
@@ -284,8 +312,9 @@ def main():
         before=baseline(path)
         after=json.dumps(value,ensure_ascii=False,indent=2)+'\n'
         current=(ROOT/path).read_text()
-        previous=json.dumps(authored(protocol=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
-        if current not in (before,after,previous): raise ValueError('Undeclared file drift: '+path)
+        previous=json.dumps(authored(protocol=False,envelopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        prior_revision=json.dumps(authored(envelopes=False)[0],ensure_ascii=False,indent=2)+'\n' if path.endswith('/case.json') else before
+        if current not in (before,after,previous,prior_revision): raise ValueError('Undeclared file drift: '+path)
         records.append(dict(path=path,beforeSha256=hashlib.sha256(before.encode()).hexdigest(),
                             afterSha256=hashlib.sha256(after.encode()).hexdigest()))
         (ROOT/path).write_text(after)

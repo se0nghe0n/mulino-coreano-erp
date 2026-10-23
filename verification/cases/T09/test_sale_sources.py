@@ -28,6 +28,14 @@ class SaleSources(unittest.TestCase):
                 action=next(a for a in original_actions if a['id']=='reserve60')
                 self.assertEqual(ref('t09-sale-source-reserve60-current-segment','data/revision'),action['request']['expectedRevision'])
                 action['request']['expectedRevision']=1
+            for change in envelope_selectors():
+                if change['subcase'] != before['id']: continue
+                action=next(a for a in original_actions if a['id']==change['actionId'])
+                target=action
+                fields=change['field'].split('.')
+                for field in fields[:-1]: target=target[field]
+                self.assertEqual(change['after'],target[fields[-1]])
+                target[fields[-1]]=change['before']
             self.assertEqual(before['actions'],original_actions)
             if before['id'] not in SELECTED:self.assertEqual(before,after)
             else:
@@ -60,7 +68,7 @@ class SaleSources(unittest.TestCase):
         with self.assertRaises(ValueError):restore_feature((HERE/'scenario.feature').read_text().replace('reserve60','forged',1))
 
     def test_protocol_revision_change_is_only_observed_metadata(self):
-        new,_=authored();old,_=authored(protocol=False)
+        new,_=authored(envelopes=False);old,_=authored(protocol=False,envelopes=False)
         for previous,current in zip(old['subcases'],new['subcases']):
             if current['id']!=SELECTED[0]:
                 self.assertEqual(previous,current);continue
@@ -74,9 +82,30 @@ class SaleSources(unittest.TestCase):
             reserve['request']['expectedRevision']=1
             restored['actions']=[a for a in restored['actions'] if a['id']!=query_id]
             self.assertEqual(previous,restored)
-        mutated=copy.deepcopy(new)
+        mutated=copy.deepcopy(authored()[0])
         next(a for a in mutated['subcases'][0]['actions'] if a['id']=='reserve60')['request']['expectedRevision']=0
         with self.assertRaises(ValueError):restore(mutated)
+
+    def test_exact_envelope_changes_and_inverse(self):
+        current,_=authored();previous,_=authored(envelopes=False)
+        # Exact file hash from 1c2f40b2's strict ledger; no dependency on a
+        # worker-only commit remaining reachable after coordinator integration.
+        previous_bytes=(json.dumps(previous,ensure_ascii=False,indent=2)+'\n').encode()
+        self.assertEqual('c0a6985876e4f8e4506945a65c1da0ead5836fe1493882feed935f475142c3eb',hashlib.sha256(previous_bytes).hexdigest())
+        reverted=copy.deepcopy(current)
+        self.assertEqual(4,len(envelope_selectors()))
+        for change in envelope_selectors():
+            sub=next(s for s in reverted['subcases'] if s['id']==change['subcase'])
+            action=next(a for a in sub['actions'] if a['id']==change['actionId'])
+            pointer=action['request']['slots']['allocationId']['$result']
+            self.assertEqual(change['sourceActionId'],pointer['actionId'])
+            self.assertEqual(change['after'],pointer['pointer'])
+            pointer['pointer']=change['before']
+            altered=copy.deepcopy(current)
+            target=next(s for s in altered['subcases'] if s['id']==change['subcase'])
+            next(a for a in target['actions'] if a['id']==change['actionId'])['request']['slots']['allocationId']['$result']['pointer']='/response/effects/counterfeitId'
+            with self.assertRaises(ValueError):restore(altered)
+        self.assertEqual(previous,reverted)
 
     def test_ledger_itself_rejects_tampering(self):
         ledger=expected_ledger()

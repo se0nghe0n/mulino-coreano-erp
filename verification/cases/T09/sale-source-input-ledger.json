@@ -13,7 +13,7 @@
     {
       "path": "verification/cases/T09/case.json",
       "beforeSha256": "ec7615fe952fdaac614e62d2f8b49fba56b87c506ff2dbf49ae5f5fb3e600885",
-      "afterSha256": "c0a6985876e4f8e4506945a65c1da0ead5836fe1493882feed935f475142c3eb"
+      "afterSha256": "4087ddd2e1e0eba0c24794852235e013c68be7f2e1624d488f9e351468976af4"
     },
     {
       "path": "verification/cases/T09/fixtures/cumulative-versus-state.json",
@@ -83,8 +83,88 @@
         "quantity",
         "clock",
         "oracle",
-        "pick selector",
-        "dispatch selector"
+        "pick revision",
+        "dispatch revision"
+      ]
+    },
+    {
+      "subcase": "cumulative-versus-state",
+      "actionId": "pick60",
+      "field": "request.slots.allocationId.$result.pointer",
+      "before": "/response/allocationId",
+      "after": "/response/effects/allocationId",
+      "sourceActionId": "reserve60",
+      "proofSource": ".local/t09-sale-source-pg-2fec7e58-328b-4dfc-9bd3-55f9aa1cca75/completeCumulativeSources-http.json",
+      "proofSourceSha256": "11658a882fa3b233902765189597f1d5422f9beb1ed56e6f2c06f3d35d4db1cd",
+      "productSymbol": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:execute,response",
+      "observed": "APPLIED reservation: allocationId exists only in effects; same canonical allocation identity",
+      "unchanged": [
+        "business slots and values",
+        "actorRef",
+        "quantity",
+        "clock",
+        "oracle",
+        "expectedRevision"
+      ]
+    },
+    {
+      "subcase": "cumulative-versus-state",
+      "actionId": "dispatch60",
+      "field": "request.slots.allocationId.$result.pointer",
+      "before": "/response/allocationId",
+      "after": "/response/effects/allocationId",
+      "sourceActionId": "reserve60",
+      "proofSource": ".local/t09-sale-source-pg-2fec7e58-328b-4dfc-9bd3-55f9aa1cca75/completeCumulativeSources-http.json",
+      "proofSourceSha256": "11658a882fa3b233902765189597f1d5422f9beb1ed56e6f2c06f3d35d4db1cd",
+      "productSymbol": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:execute,response",
+      "observed": "APPLIED reservation: allocationId exists only in effects; same canonical allocation identity",
+      "unchanged": [
+        "business slots and values",
+        "actorRef",
+        "quantity",
+        "clock",
+        "oracle",
+        "expectedRevision"
+      ]
+    },
+    {
+      "subcase": "exists-versus-end-throughout",
+      "actionId": "pick",
+      "field": "request.slots.allocationId.$result.pointer",
+      "before": "/response/allocationId",
+      "after": "/response/effects/allocationId",
+      "sourceActionId": "reserve",
+      "proofSource": ".local/t09-sale-source-pg-2fec7e58-328b-4dfc-9bd3-55f9aa1cca75/completeExistsSourcesAndInternalAuthorizationSeam-http.json",
+      "proofSourceSha256": "b93126b6bbb3890eed919026742322f366b83e9ce1a3cb7c289df8c5ab5c90e5",
+      "productSymbol": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:execute,response",
+      "observed": "APPLIED reservation: allocationId exists only in effects; same canonical allocation identity",
+      "unchanged": [
+        "business slots and values",
+        "actorRef",
+        "quantity",
+        "clock",
+        "oracle",
+        "expectedRevision"
+      ]
+    },
+    {
+      "subcase": "exists-versus-end-throughout",
+      "actionId": "dispatch",
+      "field": "request.slots.allocationId.$result.pointer",
+      "before": "/response/allocationId",
+      "after": "/response/effects/allocationId",
+      "sourceActionId": "reserve",
+      "proofSource": ".local/t09-sale-source-pg-2fec7e58-328b-4dfc-9bd3-55f9aa1cca75/completeExistsSourcesAndInternalAuthorizationSeam-http.json",
+      "proofSourceSha256": "b93126b6bbb3890eed919026742322f366b83e9ce1a3cb7c289df8c5ab5c90e5",
+      "productSymbol": "backend/src/main/java/com/mulino/application/inventory/FulfillmentCommands.java:execute,response",
+      "observed": "APPLIED reservation: allocationId exists only in effects; same canonical allocation identity",
+      "unchanged": [
+        "business slots and values",
+        "actorRef",
+        "quantity",
+        "clock",
+        "oracle",
+        "expectedRevision"
       ]
     }
   ],

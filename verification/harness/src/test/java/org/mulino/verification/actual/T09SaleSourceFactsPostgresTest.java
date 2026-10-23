@@ -118,6 +118,9 @@ class T09SaleSourceFactsPostgresTest {
         JsonNode r=f.reserve();
         applied(r);assertEquals(1,f.rows("mulino_inventory_SegmentAllocations").size());
         var replay=f.reserve();applied(replay);assertFalse(r.at("/response/effects/allocationId").asText().isEmpty());assertEquals(r.at("/response/effects/allocationId"),replay.at("/response/effects/allocationId"));assertEquals(1,f.rows("mulino_inventory_SegmentAllocations").size());
+        reached(sid.equals("cumulative-versus-state")?"dispatch60":"dispatch");
+        auditPhysicalDispatch(sid);
+        f.save(out.resolve("physical-dispatch-"+sid+".json"));
         reached("after-db");
         BigDecimal remaining=BigDecimal.ZERO;
         for(var row:f.rows("mulino_inventory_QuantitySegments"))if(row.get("retiredat")==null&&f.aliases.path("W").asText().equals(row.get("placeid")))remaining=remaining.add((BigDecimal)row.get("quantity"));
@@ -129,6 +132,34 @@ class T09SaleSourceFactsPostgresTest {
             checks.add(row);
         }
         Json.write(out.resolve("original-oracles-"+sid+".json"),checks);
+        assertTrue(java.util.stream.StreamSupport.stream(checks.spliterator(),false).allMatch(x->"PASS".equals(x.path("status").asText())),checks.toPrettyString());
+    }
+    void auditPhysicalDispatch(String sid) throws Exception {
+        String suffix=sid.equals("cumulative-versus-state")?"60":"";
+        BigDecimal quantity=new BigDecimal(suffix.isEmpty()?"100":"60");
+        applied(f.results.get("pick"+suffix));applied(f.results.get("dispatch"+suffix));
+        var allocations=f.rows("mulino_inventory_SegmentAllocations");assertEquals(1,allocations.size());
+        var a=allocations.getFirst();assertEquals("CONSUMED",a.get("state"));assertNotNull(a.get("pickedat"));
+        var dispatches=f.rows("mulino_inventory_Dispatches");assertEquals(1,dispatches.size());var d=dispatches.getFirst();
+        var cargo=f.rows("mulino_inventory_CargoScopes");assertEquals(1,cargo.size());var c=cargo.getFirst();
+        assertEquals(a.get("id"),d.get("allocationid"));assertEquals(d.get("id"),c.get("dispatchid"));assertEquals(d.get("cargoscopeid"),c.get("id"));
+        assertEquals(f.results.get("dispatch"+suffix).at("/response/effects/dispatchId").asText(),d.get("id"));
+        for(var row:List.of(a,d,c)) {
+            assertEquals(0,quantity.compareTo((BigDecimal)row.get("quantity")));
+            assertEquals(0,BigDecimal.ZERO.compareTo((BigDecimal)row.get("startquantity")));assertEquals("BOX",row.get("unit"));
+            assertEquals(f.work(),row.get("workid"));assertEquals(f.aliases.path("CUSTOMER").asText(),row.get("customerid"));
+        }
+        BigDecimal warehouse=BigDecimal.ZERO,transit=BigDecimal.ZERO;
+        for(var row:f.rows("mulino_inventory_QuantitySegments"))if(row.get("retiredat")==null) {
+            if(f.aliases.path("W").asText().equals(row.get("placeid")))warehouse=warehouse.add((BigDecimal)row.get("quantity"));
+            if(f.aliases.path("TRANSIT").asText().equals(row.get("placeid")))transit=transit.add((BigDecimal)row.get("quantity"));
+        }
+        assertEquals(0,warehouse.compareTo(BigDecimal.ZERO));BigDecimal originalTotal=BigDecimal.ZERO;
+        for(var input:f.fixture.path("baseline").path("segments"))originalTotal=originalTotal.add(new BigDecimal(input.path("quantity").asText()));
+        assertEquals(0,transit.compareTo(originalTotal));
+        var leaf=f.rows("mulino_inventory_QuantitySegments").stream().filter(x->d.get("transitsegmentid").equals(x.get("id"))).findFirst().orElseThrow();
+        assertEquals(0,quantity.compareTo((BigDecimal)leaf.get("quantity")));assertEquals(f.aliases.path("TRANSIT").asText(),leaf.get("placeid"));
+        assertEquals(1,f.rows("mulino_inventory_QuantityMovements").stream().filter(x->"DISPATCH".equals(x.get("kind"))).count());
     }
     @Test void completeCumulativeSources() throws Exception {complete("cumulative-versus-state");}
     @Test void completeExistsSourcesAndInternalAuthorizationSeam() throws Exception {complete("exists-versus-end-throughout");}
@@ -173,6 +204,19 @@ class T09SaleSourceFactsPostgresTest {
             var r=f.results.get("t09-sale-source-sell-qc-document");assertEquals("FORBIDDEN",r.at("/response/error/code").asText(),r.toString());
             assertTrue(f.rows("mulino_inventory_DispositionBases").isEmpty());noAllocation();
             f.save(out.resolve(mode+".json"));
+        }
+        for(var entry:Map.of("qc","decideQuality","customer","confirmCustomerConditions","commercial","confirmCommercialDisposition").entrySet()) {
+            install("exists-versus-end-throughout",false,fixture->{
+                var actor=fixture.path("actors").path("t09SaleSource");
+                for(var list:List.of(actor.path("roleCapabilities"),actor.path("grant").path("actions"))) {
+                    var array=(com.fasterxml.jackson.databind.node.ArrayNode)list;
+                    for(int i=array.size()-1;i>=0;i--)if(entry.getValue().equals(array.get(i).asText()))array.remove(i);
+                }
+            });
+            String prefix="t09-sale-source-sell-"+entry.getKey();reached(prefix+"-work");
+            var result=f.execute(java.util.stream.StreamSupport.stream(f.sub.path("actions").spliterator(),false).filter(x->(prefix+"-basis").equals(x.path("id").asText())).findFirst().orElseThrow());
+            assertEquals("FORBIDDEN",result.at("/response/error/code").asText(),result.toString());noAllocation();
+            f.save(out.resolve("missing-category-capability-"+entry.getKey()+".json"));
         }
     }
 
