@@ -157,6 +157,11 @@ catalog에서 `gpt-6.1-sol`의 `serviceTier=ultrafast` 지원을 확인했다.
 다시 지정했다. 이 시나리오 실행의 모델·작업 방식은 앞선 Sol 지시보다
 우선한다. 중단한 변경과 실행 증거는 보존하고 전체 인수 기준은 유지한다.
 
+2026-10-23 사용자가 `dont use ultrafast`로 Ultrafast 사용을 중단했다.
+이후 새 Codex 위임은 `serviceTier=default`를 명시한다. 이 서비스 tier
+선택이 위의 Ultrafast 지시보다 우선하며 모델 선택과 Haiku dynamic
+Workflow 방식은 유지한다. 종료된 실행의 실제 tier 기록은 바꾸지 않는다.
+
 ## 병렬 작업과 Git
 
 독립 작업은 native subagent로 병렬화한다. code writer마다 같은

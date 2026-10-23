@@ -963,3 +963,32 @@ T11 자식30/60 폐쇄는 통과했으나 부족10 의무와 별도 미배분90 
 pick 응답 selector를 보완 중이다. Haiku의 T01·T13·T17 native Workflow는
 별도21850e42에서 실행하며 아직 결과를 합산하지 않았다. 전체 Task와
 현재 Step은 OPEN이고 실모델 client 호출은 0회다.
+
+## 2026-10-23 목표 부족 의무·판매 원천과 실제 병렬 결과
+
+T11의 명시적 부족10 의무, stable root·실제 successor 재사용과 V42의
+첫 증거 UPDATE 거부를 통합했다. 원래110개 oracle과 미배분90의 별도
+책임을 유지한다. T09는 새 fictional 원천으로 실제 reserve·pick·dispatch
+60/100과 replay 단일 allocation을 확인했고 원래94개 oracle을 보존했다.
+
+고정 e8c66499의 전체 backend740 PASS·실패/오류/SKIP0, harness660 PASS·
+80 opt-in SKIP·실패/오류0이며 실제 PG observer42개를 포함한다.
+source3,158개 hash는 같고 prepare 문제는0이다. 종료 시 Surefire fork
+강제 종료 경고와 dump를 보존했고 생성 container36개의 부재를 확인했다.
+[통합·증거 기록](resume-shortfall-sale-source-integration.md)을 따른다.
+
+별도21850e42의 Haiku5.5 native Workflow는 완료 후 독립 감사했다.
+44개 subcase는22 PASS·19 FAIL·3 NOT_RUN이고 예상517개 assertion은
+301 PASS·189 FAIL·27 미관찰이다. 최상위 gate는 false다.
+[실제 병렬 실행 기록](resume-delivery-contribution-wave.md)을 따른다.
+
+품목 범위 공개 eligibility를905e04b8에 통합하고 영향 범위148개가 모두
+PASS했다. source3,161개 drift0과 자체 container4개 정리를 확인했다.
+T09의 기존 Work 장소를 조회3개에 연결한46b1a8eb도 통합했다.
+worker의 원래 선택47개 oracle은27 PASS·20 FAIL이고 나머지47개는
+NOT_RUN이다. 원래94개 assertion bytes와 fixture·grant는 보존했다.
+목표/입력 projection과 별도 원천 공백을 계속 처리한다.
+
+사용자가 Ultrafast를 중단했다. 현재 coordinator의 serviceTier는 default며
+이후 새 Codex 위임도 default를 지정한다. 이전 실행의 tier 기록은
+바꾸지 않는다. 전체 Task와 현재 Step은 OPEN이며 제품 실모델 호출은0회다.
