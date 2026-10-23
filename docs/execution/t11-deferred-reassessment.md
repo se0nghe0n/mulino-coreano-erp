@@ -121,3 +121,32 @@ artifactCoverageStatus는 NOT_RUN이다. 자체 npm ci(Node24)·Java21 CDS
 `sql-proof/`, command/exit·source/class/JAR hash·원본 byte 대조·정리 증거는
 같은 artifact directory의 handoff 및 inventory JSON에 남긴다. 원래 native
 T11 재실행·full backend·full harness는 primary 소유라 실행하지 않았다.
+
+## 같은 JVM의 fixture 자원 소유권 보정
+
+810807a9의 Deferred test가 S2의 static PG/key/blob과 stop을 공유한
+문제를 두 실행 순서에서 재현했다. Surefire의 기본 single reused fork를
+유지했고 fork/skip/disable 설정을 추가하지 않았다.
+
+RED 정순은 Deferred4 PASS 뒤 S2의 17개 method ERROR와 cleanup ERROR,
+역순은 S2의 17개 PASS 뒤 Deferred4 method ERROR와 cleanup ERROR다.
+JUnit은 class cleanup ERROR도 추가 testcase로 집계해 총22로 기록한다.
+이는 assertion 실패가 아닌 이미 종료된 static host/삭제된 경로의
+재사용 오류다. 원로그와 원래 JUnit을 보존했다.
+
+`WorkPostgresTestResources`가 class별 독립 PG/key/blob을 소유한다.
+S2의 host는 lazy nested holder에서만 시작하므로 Deferred가 기존
+seed helper를 compose해도 S2 자원을 생성하거나 닫지 않는다.
+Deferred는 자기 DynamicPropertySource·HTTP signing key·SQL proof·
+AfterAll에 자기 자원만 쓴다. helper는 resource owner/container ID/
+공개 key 경로/blob 경로와 JVM PID, close 후 부재만 기록한다.
+key 원문이나 private key는 기록하지 않는다.
+
+별도 Maven 실행의 alphabetical과 reversealphabetical이 각각 실제
+21 PASS / 0 FAIL / 0 ERROR / 0 SKIP다. 각 실행 안 두 class의 JVM PID는
+같고 자원 ID/경로는 다르며 두 class가 각자의 자원만 정리했다.
+S2의 17개 test와 seed/grant/기타 helper bytes, Deferred4의 자원 치환
+이외 전체 bytes를 baseline810807a9와 대조해 동일함을 확인했다.
+제품 코드·V44·원래 case·business assertions·fixture 권한은 수정하지
+않았다. 새 증거는 `.local/t11-fixture-resource-isolation/`에 보존한다.
+Task/Step은 OPEN이며 결합 전체 검증은 primary가 소유한다.

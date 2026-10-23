@@ -20,7 +20,8 @@ import org.springframework.test.context.*;
 @ActiveProfiles({"local","verification"})
 @SuppressWarnings({"unchecked","rawtypes"})
 class DeferredReassessmentPostgresTest {
- @DynamicPropertySource static void properties(DynamicPropertyRegistry r){S2WorkActualIntegrationTest.properties(r);}
+ private static final WorkPostgresTestResources OWNED=new WorkPostgresTestResources("deferred-reassessment");
+ @DynamicPropertySource static void properties(DynamicPropertyRegistry r){OWNED.properties(r);}
  @Autowired AutowireCapableBeanFactory factory;
  @org.springframework.boot.test.web.server.LocalServerPort int port;
  @Autowired VerificationClock clock;
@@ -62,10 +63,10 @@ class DeferredReassessmentPostgresTest {
  void assess(String w){var r=execute("assessGoal",w,f.revision(w),Map.of("workId",w),"assess:"+w);assertEquals("APPLIED",r.get("outcome"),r.toString());}
  void tick(String id){scheduler.tick(Map.of("schedulerId",id));var tasks=(List<Map<String,Object>>)scheduler.records(id).get("tasks");assertEquals("SUCCEEDED",tasks.getLast().get("terminalStatus"),tasks.toString());}
  @AfterEach void clear(org.junit.jupiter.api.TestInfo info)throws Exception{
-  try{String destination=System.getProperty("defer.evidence");if(destination!=null&&f!=null){var proof=new LinkedHashMap<String,Object>();proof.put("organizationId",f.org);proof.put("clock",clock.instant().toString());for(String table:List.of("mulino_evidence_Events","mulino_evaluation_InputSnapshots","mulino_work_read_AssessmentReferences","mulino_work_read_Works","mulino_runtime_RecoverySchedules","mulino_work_read_ObligationReferences","mulino_commands_CommandRecords"))proof.put(table,f.jdbc.queryForList("SELECT row_to_json(t)::text FROM "+table+" t WHERE organizationId=? ORDER BY ID",String.class,f.org));proof.put("scheduler",scheduler.records(null));proof.put("containerId",S2WorkActualIntegrationTest.PG.getContainerId());proof.put("publicKeyPath",S2WorkActualIntegrationTest.KEY_PATH.toString());proof.put("blobRoot",S2WorkActualIntegrationTest.BLOB_PATH.toString());var path=java.nio.file.Path.of(destination);java.nio.file.Files.createDirectories(path);java.nio.file.Files.writeString(path.resolve(info.getTestMethod().orElseThrow().getName()+".json"),f.json.writerWithDefaultPrettyPrinter().writeValueAsString(proof));}}
+  try{String destination=System.getProperty("defer.evidence");if(destination!=null&&f!=null){var proof=new LinkedHashMap<String,Object>();proof.put("organizationId",f.org);proof.put("clock",clock.instant().toString());for(String table:List.of("mulino_evidence_Events","mulino_evaluation_InputSnapshots","mulino_work_read_AssessmentReferences","mulino_work_read_Works","mulino_runtime_RecoverySchedules","mulino_work_read_ObligationReferences","mulino_commands_CommandRecords"))proof.put(table,f.jdbc.queryForList("SELECT row_to_json(t)::text FROM "+table+" t WHERE organizationId=? ORDER BY ID",String.class,f.org));proof.put("scheduler",scheduler.records(null));proof.put("containerId",OWNED.pg.getContainerId());proof.put("publicKeyPath",OWNED.publicKeyPath.toString());proof.put("blobRoot",OWNED.blobRoot.toString());var path=java.nio.file.Path.of(destination);java.nio.file.Files.createDirectories(path);java.nio.file.Files.writeString(path.resolve(info.getTestMethod().orElseThrow().getName()+".json"),f.json.writerWithDefaultPrettyPrinter().writeValueAsString(proof));}}
   finally{SecurityContextHolder.clearContext();}
  }
- @AfterAll static void cleanup()throws Exception{S2WorkActualIntegrationTest.stop();}
+ @AfterAll static void cleanup()throws Exception{OWNED.close();}
 
  @Test void fixedClockHttpCorrection98CommitsWithoutInventingAssessment()throws Exception{
   String w=work(),source=source(w);var original=f.jdbc.queryForMap("SELECT * FROM mulino_evidence_Events WHERE ID=?",source);
@@ -80,7 +81,7 @@ class DeferredReassessmentPostgresTest {
  }
  Map<String,Object> http(String path,Map<String,Object> body,int status)throws Exception{
   var encoder=Base64.getUrlEncoder().withoutPadding();var claims=f.row("iss","https://mulino.local.invalid","aud","mulino-platform","sub","writer-a","organizationId",f.org,"stableRequestOwner","UNTRUSTED-CLIENT-CLAIM","iat",Instant.now().getEpochSecond(),"exp",Instant.now().plusSeconds(120).getEpochSecond());
-  String input=encoder.encodeToString("{\"alg\":\"RS256\",\"typ\":\"JWT\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8))+"."+encoder.encodeToString(f.json.writeValueAsBytes(claims));var signature=java.security.Signature.getInstance("SHA256withRSA");signature.initSign(S2WorkActualIntegrationTest.KEY.getPrivate());signature.update(input.getBytes(java.nio.charset.StandardCharsets.US_ASCII));String token=input+"."+encoder.encodeToString(signature.sign());
+  String input=encoder.encodeToString("{\"alg\":\"RS256\",\"typ\":\"JWT\"}".getBytes(java.nio.charset.StandardCharsets.UTF_8))+"."+encoder.encodeToString(f.json.writeValueAsBytes(claims));var signature=java.security.Signature.getInstance("SHA256withRSA");signature.initSign(OWNED.key.getPrivate());signature.update(input.getBytes(java.nio.charset.StandardCharsets.US_ASCII));String token=input+"."+encoder.encodeToString(signature.sign());
   var request=java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://127.0.0.1:"+port+path)).timeout(Duration.ofSeconds(15)).header("Content-Type","application/json").header("Authorization","Bearer "+token).POST(java.net.http.HttpRequest.BodyPublishers.ofString(f.json.writeValueAsString(body))).build();var result=java.net.http.HttpClient.newHttpClient().send(request,java.net.http.HttpResponse.BodyHandlers.ofString());assertEquals(status,result.statusCode(),result.body());return f.json.readValue(result.body(),Map.class);
  }
  @Test void committedCorrectionHoldsOnlyMatchingOrganizationAndReleaseRunsActualScheduler()throws Exception{
