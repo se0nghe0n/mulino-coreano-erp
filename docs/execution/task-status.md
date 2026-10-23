@@ -1059,3 +1059,18 @@ prepare는41 case·802 subcase·24,260 assertions·문제0·asset12 PASS다.
 Haiku native Workflow wf_62923727-846이 준비된5개 tree에서 원래 T17의
 15 subcase·257 assertions를 최대 동시3개로 실행 중이다. 실행 결과와
 모델 metadata는 아직 회수 전이며 Task와 현재 Step은 OPEN이다.
+
+receipt 응답의 저장된 canonical identity를 연결한caf9dac6를f4852678에
+통합했다. 확정·동일 명령 replay·독립 중복은 실제 Receipts에 저장된
+canonical ID를 반환하고 임시 수령은 이 ID를 만들지 않는다. 구매 연결
+없는60 BOX의 구매 기여0·미배분60과 별도 OPEN 책임은 그대로다.
+root의 실제 PostgreSQL 검사3개는실패·오류·skip0으로 통과했다.
+소스3,164개 hash drift0과 자체 blob·container2개 부재를 확인했다.
+첫 정리 확인은 Ryuk 종료 전이어서 실패했으며 이후 같은 ID의 부재를
+확인했다. 원로그와 증거는
+`.local/resume-20261023/receipt-identity-integrated/proof.json`이다.
+
+별도 T11 입력commit850496aa는 공개 inventory에 없는openObligation을
+호출해prepare가 실패하므로 통합하지 않았다. 원래 grants와110개
+assertions를 보존하면서 공개 계약을 다시 연결하는 수정이 진행 중이다.
+이 집중 검증을 실제 T09/T11 시나리오 PASS로 표시하지 않는다.
