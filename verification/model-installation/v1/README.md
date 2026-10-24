@@ -223,3 +223,18 @@ stocktake 등 제품/schema 작업은 다른 owner 범위로 남긴다.
 전의 inputs를 사용한 과거 PostgreSQL 증거다. 이 변경은 DB 설치를 다시
 실행하거나 그 증거를 새 archive에 재귀속하지 않으며, 새 M01–M60
 scenario 수용을 의미하지 않는다.
+
+## 2026-10-24 current source 설치 증거다
+
+현재 packaged MODEL 입력 조사와 fresh DB 설치의 결과는
+[실행 기록](../../../docs/execution/model-corpus-current-installation.md)에
+연결한다. 이 검사는 `dda42dd6` code baseline과 현재 input archive hash를
+고정한 별도 run이다. 42개 database-only install과 M05/M50의 실제 HTTP
+helper 설치를 구분한다. 모든 설치 결과의 `fixtureComplete`는 false이며
+model call·scenario run은 0, 전체 acceptance는 `NOT_RUN`이다.
+
+current summary와 raw command/log는 ignored local path
+`.local/model-corpus-current/`에만 있다. 이 path는 repository에 포함하지
+않았고 공개 download로 취급하지 않는다. 기존 `proof-index.json`은
+`a7f18cc8` baseline의 과거 archive 증거로 남긴다. current installation
+summary가 이 historical proof를 교체하거나 재귀속하지 않는다.

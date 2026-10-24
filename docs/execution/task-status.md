@@ -3,6 +3,26 @@
 기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
 
+## 2026-10-24 현재 packaged MODEL 입력의 한정 설치 결과다
+
+현재 code baseline `dda42dd63e550741bd370a136760f39b062d1f20`에서
+M01–M60 입력 60개를 조사했다. 44개는 explicit source mapping이 있고
+disposable PostgreSQL 설치에 성공했다. 이 중 42개는 current migration SQL을
+적용한 database-only probe이고 M05/M50은 packaged backend의 실제 HTTP
+helper다. HTTP helper는 Flyway 45개 migration을 실행했다. 총 source receipt와
+inverse는 각각 64,527개지만 database-only readback은 설치 transaction
+안의 commit 전 검사다. 44개 모두 `fixtureComplete=false`이고 model call 및
+scenario run은 0이다. 전체 acceptance는 `NOT_RUN`이다.
+
+다른 16개 case는 기대 Boolean을 채우지 않고 explicit typed source graph
+부족으로 계속 차단했다. 원본 DOC1/DOC2 bytes도 없으며, `SupplierReply`
+receipt는 아직 관찰되지 않았다. source/hash, M05/M50 HTTP 결과, package와
+남은 입력을 [현재 MODEL 입력 설치 증거](model-corpus-current-installation.md)에
+기록한다. 원본 218개 protected hash는 drift가 0이며 이전 `proof-index.json`은
+`a7f18cc8`/구 archive의 역사 증거로 보존한다. 제품 acceptance, native model
+scenario, S5/S6와 전체 Task는 OPEN이다. 이전 실행 단락의 `RUNNING`은 그
+시점의 기록이며 현재 workflow 상태를 뜻하지 않는다.
+
 ## 2026-10-24 cloud 재개의 한정 통합이다
 
 `3de8cc99` 이후 MODEL 입력 60개의 오래된 catalog pin을 `36ebefd7`로,
