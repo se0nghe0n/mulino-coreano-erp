@@ -5,9 +5,7 @@ import com.fasterxml.jackson.databind.node.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mulino.verification.Json;
-import org.mulino.verification.actual.ActualConfiguration;
 import java.nio.file.*;
-import java.net.URI;
 import java.sql.*;
 import java.util.*;
 import java.nio.charset.StandardCharsets;
@@ -68,15 +66,23 @@ class ModelFixtureInstallerTest {
         assertThrows(IllegalArgumentException.class,()->ModelFixtureInputCorrection.apply(original,j("version","model-unit-normalization-v1","fromUnit","BOX","toUnit","EA","factor","11"),hash));assertEquals(hash,Json.sha256(file));
     }
     @Test void actualPostgresInstallsTypedIdentityInventorySourceAndResponsibilityAndRollsBackInvalidFacts() throws Exception {
-        String url=System.getenv("MODEL_INSTALLER_TEST_JDBC_URL");assumeTrue(url!=null,"Focused actual PostgreSQL probe requires its own disposable database");
+        String url=System.getenv(ModelFixtureTestDatabaseConfiguration.JDBC_URL);assumeTrue(url!=null,"Focused actual PostgreSQL probe skipped: set MODEL_INSTALLER_TEST_JDBC_URL only for an isolated disposable PostgreSQL cluster");
+        ModelFixtureTestDatabaseConfiguration database=ModelFixtureTestDatabaseConfiguration.fromEnvironment(System.getenv());
+        ObjectNode databaseProof=database.prepareFreshDatabase(root);
         Setup setup=new Setup();setup.positive();setup.source(root);Path blobs=temp.resolve("blobs");Files.createDirectories(blobs.resolve("objects"));
-        var config=new ActualConfiguration(URI.create("http://127.0.0.1:1"),url,"postgres","",temp.resolve("unused.pem"),"fixture-issuer","fixture-audience","a7f18cc8");
+        var config=database.actualConfiguration(temp.resolve("unused.pem"));
         var installer=new ModelFixtureInstaller(root,config,blobs);setup.seal();var plan=ModelFixtureInstaller.inventory(setup.fixture,setup.inputs,setup.hash);
         assertTrue(plan.path("installable").asBoolean(),plan.path("issues").toPrettyString());
-        ObjectNode installed=installer.install(setup.bundle(),setup.inputs);
+        try(Connection c=database.openConnection();Statement s=c.createStatement();ResultSet rs=s.executeQuery("SELECT count(*) FROM mulino_identity_Organizations")) {
+            assertTrue(rs.next());assertEquals(0L,rs.getLong(1),"Focused installer requires an empty disposable identity database before fixture effects");
+        } catch(SQLException failure) { throw database.redacted(failure); }
+        ObjectNode installed;
+        try { installed=installer.install(setup.bundle(),setup.inputs); }
+        catch(SQLException failure) { throw database.redacted(failure); }
+        installed.set("focusedDatabaseProof",databaseProof);
         assertTrue(installed.path("committed").asBoolean());assertEquals(setup.ids.get("A"),installed.path("aliasMap").path("A").asText());
         assertFalse(installed.path("sourceFactReceipts").isEmpty());assertEquals(installed.path("sourceFactReceipts").size(),installed.path("inverse").size());
-        try(Connection c=DriverManager.getConnection(url,"postgres","")) {
+        try(Connection c=database.openConnection()) {
             assertEquals("60.000000000000",scalar(c,"SELECT quantity FROM mulino_inventory_QuantitySegments WHERE ID=?",setup.ids.get("A")));
             assertEquals(setup.ids.get("human"),scalar(c,"SELECT custodianId FROM mulino_inventory_QuantitySegments WHERE ID=?",setup.ids.get("A")));
             assertEquals("UNKNOWN",scalar(c,"SELECT availability FROM mulino_evidence_DocumentVersions WHERE ID=?",setup.ids.get("doc")));
@@ -93,8 +99,8 @@ class ModelFixtureInstallerTest {
             assertEquals("0",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",invalid.ids.get("org")));
             Setup unknown=new Setup();unknown.positive();unknown.record("UnpublishedFact","bad",j("x","y"),"","");var unknownFailure=assertThrows(ModelFixtureInstaller.MappingException.class,()->installer.install(unknown.bundle(),unknown.inputs));
             assertEquals("0",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",unknown.ids.get("org")));
-            var rollback=j("invalidSqlState",invalidFailure.getSQLState(),"invalidRawFailure",invalidFailure.getMessage(),"invalidOrganizationRowsAfter",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",invalid.ids.get("org")),"unknownOrganizationRowsAfter",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",unknown.ids.get("org")),"unknownMappingInventory",unknownFailure.inventory(),"blobFilesBeforeInvalid",blobCount);try(var stream=Files.list(blobs.resolve("objects"))){rollback.put("blobFilesAfterInvalid",stream.count());}installed.set("focusedRollbackProof",rollback);
-        }
+            var rollback=j("invalidSqlState",invalidFailure.getSQLState(),"invalidFailureType",invalidFailure.getClass().getSimpleName(),"invalidOrganizationRowsAfter",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",invalid.ids.get("org")),"unknownOrganizationRowsAfter",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",unknown.ids.get("org")),"unknownMappingInventory",unknownFailure.inventory(),"blobFilesBeforeInvalid",blobCount);try(var stream=Files.list(blobs.resolve("objects"))){rollback.put("blobFilesAfterInvalid",stream.count());}installed.set("focusedRollbackProof",rollback);
+        } catch(SQLException failure) { throw database.redacted(failure); }
         Path output=root.resolve("verification/harness/target/model-fixture-postgresql-proof.json");Json.MAPPER.writerWithDefaultPrettyPrinter().writeValue(output.toFile(),installed);
     }
     static String scalar(Connection c,String sql,String id) throws Exception {try(var s=c.prepareStatement(sql)){s.setString(1,id);try(var rs=s.executeQuery()){assertTrue(rs.next());return rs.getString(1);}}}
