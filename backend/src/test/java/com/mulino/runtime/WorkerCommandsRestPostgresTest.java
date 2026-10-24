@@ -5,7 +5,6 @@ import com.mulino.application.runtime.*;
 import com.mulino.application.core.*;
 import com.mulino.domain.definitions.*;
 import com.sap.cds.services.runtime.CdsRuntime;
-import java.nio.file.*;
 import java.sql.Timestamp;
 import java.time.*;
 import java.util.*;
@@ -14,17 +13,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.*;
-import org.testcontainers.postgresql.PostgreSQLContainer;
 import tools.jackson.databind.ObjectMapper;
 
 /** Real HTTP/JWT/CAP/PostgreSQL worker boundary; all policy and data are synthetic. */
 @SpringBootTest(webEnvironment=SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles({"local","verification"})
 class WorkerCommandsRestPostgresTest {
- static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
- static final Instant T=Instant.parse("2026-10-07T09:00:00Z");static final Path KEY;static final java.security.KeyPair KEYPAIR;static final Path BLOBS;
- static{try{BLOBS=Files.createTempDirectory("runtime-intake-blobs-",java.nio.file.attribute.PosixFilePermissions.asFileAttribute(java.nio.file.attribute.PosixFilePermissions.fromString("rwx------")));PG.start();var generator=java.security.KeyPairGenerator.getInstance("RSA");generator.initialize(2048);KEYPAIR=generator.generateKeyPair();KEY=Files.createTempFile("runtime-intake-public-",".pem");Files.writeString(KEY,"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(KEYPAIR.getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");}catch(Exception e){throw new ExceptionInInitializerError(e);}}
- @DynamicPropertySource static void props(DynamicPropertyRegistry r){r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);r.add("JWT_PUBLIC_KEY",KEY::toString);r.add("JWT_ISSUER",()->"https://runtime-fixture.invalid");r.add("JWT_AUDIENCE",()->"mulino-test");r.add("mulino.verification.instant",()->T.toString());r.add("mulino.evidence.blob-root",BLOBS::toString);}
+ static final Instant T=Instant.parse("2026-10-07T09:00:00Z");
+ static final WorkerCommandsPostgresTestResources RESOURCES=
+  WorkerCommandsPostgresTestResources.open(System.getenv());
+ static final java.security.KeyPair KEYPAIR=RESOURCES.keyPair;
+ @DynamicPropertySource static void props(DynamicPropertyRegistry r){RESOURCES.properties(r);}
  @Autowired JdbcTemplate db;@Autowired RuntimeIntakeProcessor processor;@Autowired CdsRuntime cds;@Autowired VerificationClock clock;@Autowired RuntimeService runtime;@Autowired ApplicationCommands commands;
  String org,actor,stableOwner,item,definition,work,profile,grant,event,inbox;ObjectMapper json=new ObjectMapper();
  static String id(){return UUID.randomUUID().toString();}
@@ -78,7 +77,7 @@ class WorkerCommandsRestPostgresTest {
   String body=header+"."+payload;var signer=java.security.Signature.getInstance("SHA256withRSA");signer.initSign(KEYPAIR.getPrivate());signer.update(body.getBytes(java.nio.charset.StandardCharsets.US_ASCII));return body+"."+encoder.encodeToString(signer.sign());
  }
  java.net.http.HttpResponse<String> post(Map<String,Object> body,String bearer)throws Exception{
-  var request=java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://localhost:"+port+"/api/runtime/worker/commands")).header("Content-Type","application/json");
+  var request=java.net.http.HttpRequest.newBuilder(java.net.URI.create("http://127.0.0.1:"+port+"/api/runtime/worker/commands")).header("Content-Type","application/json");
   if(bearer!=null)request.header("Authorization","Bearer "+bearer);
   return java.net.http.HttpClient.newHttpClient().send(request.POST(java.net.http.HttpRequest.BodyPublishers.ofString(json.writeValueAsString(body))).build(),java.net.http.HttpResponse.BodyHandlers.ofString());
  }
@@ -145,7 +144,7 @@ class WorkerCommandsRestPostgresTest {
   insert("mulino_identity_GrantActions",map("organizationId",org,"grantId",grant,"capabilityId","getWork"));
   forbidden(map("intent",intent,"claim",reference()),token(actor,org));
  }
- @AfterAll static void cleanup()throws Exception{PG.stop();Files.deleteIfExists(KEY);try(var paths=Files.walk(BLOBS)){for(var path:paths.sorted(Comparator.reverseOrder()).toList())Files.delete(path);}}
+ @AfterAll static void cleanup()throws Exception{RESOURCES.close();}
  @Test void verificationIssueReturnsPersistedLeaseAndValidWorkerCommits()throws Exception{
   String key="http-issued";var issued=issueClaim(key,5,token(actor,org));assertEquals(200,issued.statusCode(),issued.body());
   var response=json.readValue(issued.body(),Map.class);var ref=(Map<String,Object>)response.get("claim");
