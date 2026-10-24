@@ -1,5 +1,23 @@
 # 전체 구현 Task의 실행 기록
 
+## 2026-10-24 ordinary regression 통합 결과다
+
+local tested source `8bd6779702f00d4f6c7e42f16cb219055aa8660d`에서
+`./verify harness`는 956 tests 중 실패·오류 0, skip 258, exit 0으로
+끝났다. 698개가 실제 실행됐고 source drift 및 application model call은
+0이다. 이 결과는 전체 MODEL scenario나 사용자 Step acceptance가 아니다.
+Prepare는 41 case·802 subcase·24,437 assertion을 준비했으나
+`gateComplete=false`, runtime `NOT_RUN`, artifact coverage `NOT_RUN`,
+semantic review 필요 상태다. Canonical code commit
+`50b2d0131392088719f262913abd5dd62bdf7f0b`의 tree는 local tested tree와
+동일하다. 게시 증거는 후속 문서 commit에 묶는다. Native GPT-6-Luna worker 작업은
+구현·검토이며 application-model workflow 인수가 아니다. Backend focused
+unit, SupplierReply PG, permitted-context HTTP/PG 결과와 2개 observer
+optional skip의 경계는
+[ordinary regression 증거](ordinary-regression-20261024.md)에 기록한다.
+M01–M60은 44개 설치 가능 입력·16개 unresolved로 남고, 전체 corpus
+scenario 및 application-model workflow는 미실행이다. 전체 Task와 Step는 OPEN이다.
+
 기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
 
