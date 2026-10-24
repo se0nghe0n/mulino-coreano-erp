@@ -100,6 +100,18 @@ class ModelFixtureInstallerTest {
             Setup unknown=new Setup();unknown.positive();unknown.record("UnpublishedFact","bad",j("x","y"),"","");var unknownFailure=assertThrows(ModelFixtureInstaller.MappingException.class,()->installer.install(unknown.bundle(),unknown.inputs));
             assertEquals("0",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",unknown.ids.get("org")));
             var rollback=j("invalidSqlState",invalidFailure.getSQLState(),"invalidFailureType",invalidFailure.getClass().getSimpleName(),"invalidOrganizationRowsAfter",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",invalid.ids.get("org")),"unknownOrganizationRowsAfter",scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID=?",unknown.ids.get("org")),"unknownMappingInventory",unknownFailure.inventory(),"blobFilesBeforeInvalid",blobCount);try(var stream=Files.list(blobs.resolve("objects"))){rollback.put("blobFilesAfterInvalid",stream.count());}installed.set("focusedRollbackProof",rollback);
+            long organizationCountBeforeReuse=Long.parseLong(scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID<>?",UUID.randomUUID().toString()));
+            String quantityBeforeReuse=scalar(c,"SELECT quantity FROM mulino_inventory_QuantitySegments WHERE ID=?",setup.ids.get("A"));
+            long sourceCountBeforeReuse=Long.parseLong(scalar(c,"SELECT count(*) FROM mulino_evidence_DocumentVersions WHERE organizationId=?",setup.ids.get("org")));
+            SQLException reuseFailure=assertThrows(SQLException.class,()->database.prepareFreshDatabase(root));
+            assertEquals("55000",reuseFailure.getSQLState());
+            long organizationCountAfterReuse=Long.parseLong(scalar(c,"SELECT count(*) FROM mulino_identity_Organizations WHERE ID<>?",UUID.randomUUID().toString()));
+            String quantityAfterReuse=scalar(c,"SELECT quantity FROM mulino_inventory_QuantitySegments WHERE ID=?",setup.ids.get("A"));
+            long sourceCountAfterReuse=Long.parseLong(scalar(c,"SELECT count(*) FROM mulino_evidence_DocumentVersions WHERE organizationId=?",setup.ids.get("org")));
+            assertEquals(organizationCountBeforeReuse,organizationCountAfterReuse,"Refusing a reused database must not change organizations");
+            assertEquals(quantityBeforeReuse,quantityAfterReuse,"Refusing a reused database must not change fixture quantity");
+            assertEquals(sourceCountBeforeReuse,sourceCountAfterReuse,"Refusing a reused database must not change source-document count");
+            installed.set("focusedDatabaseReuseProof",j("outcome","REJECTED_NONEMPTY_DATABASE","sqlState",reuseFailure.getSQLState(),"organizationRowsBefore",organizationCountBeforeReuse,"organizationRowsAfter",organizationCountAfterReuse,"fixtureQuantityBefore",quantityBeforeReuse,"fixtureQuantityAfter",quantityAfterReuse,"sourceDocumentRowsBefore",sourceCountBeforeReuse,"sourceDocumentRowsAfter",sourceCountAfterReuse));
         } catch(SQLException failure) { throw database.redacted(failure); }
         Path output=root.resolve("verification/harness/target/model-fixture-postgresql-proof.json");Json.MAPPER.writerWithDefaultPrettyPrinter().writeValue(output.toFile(),installed);
     }
