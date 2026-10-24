@@ -9,10 +9,19 @@
 T20/C3/V4의 공개 조회 목록 36개와 파생 hash를 `8759fd2a`로 정합했다.
 통합 source의 Python preparation asset 13개와 별도 보존 suite 6개는
 모두 통과했고 tracked source 4,867개의 drift는 0이다. 원본 218개
-artifact와 업무 fixture·grant·oracle은 보존했다. Maven Central DNS로
-Java focused test가 시작되지 못했으므로 전체 prepare, PG, model과
-scenario 인수는 NOT_RUN이다. [실행 경계](model-archive-cloud-integration.md)를
-따르며 아래 과거 실행을 이 source의 새 인수로 바꾸지 않는다.
+artifact와 업무 fixture·grant·oracle은 보존했다. `62b3c91b` 기준에서
+cloud Java 검증을 회복했다. focused harness class 2개는 총11개 검사 중
+10 PASS·0 failure·0 error·1 PostgreSQL probe SKIP, exit 0이며,
+`./verify prepare`도 exit 0으로 PREPARED를 반환했다. 준비 결과는 41 case·
+802 subcase·24,437 assertion, preparation problem 0, asset group 13개 PASS,
+tracked file 4,868개 drift 0이다. 직접 DNS/cache로 막힌 첫 Maven 시도와
+Temurin runtime TLS 실패는 역사적 환경 실패로 보존했으며 현재 Java 검증을
+차단하는 상태로 표시하지 않는다.
+prepare 결과는 product runtime·실제 DB 설치·scenario·client/model 인수가
+아니다. `runtimeStatus=NOT_RUN`, `gateComplete=false`, artifact coverage
+`NOT_RUN`, semantic oracle equivalence `REQUIRES_CASE_REVIEW`, known open
+gap 196, gated runtime profile 2개다. [실행 경계](model-archive-cloud-integration.md)
+에 근거와 재현 환경을 기록하며 아래 과거 실행을 이 source의 새 인수로 바꾸지 않는다.
 
 ## 현재 통합 gate (2026-10-24)
 
@@ -25,7 +34,7 @@ scenario 인수는 NOT_RUN이다. [실행 경계](model-archive-cloud-integratio
 | Backend 전체 | e995595a: 945 PASS·실패/오류/skip0·exit0이다. source drift0, 실행 전후 product class342개 hash 일치, 자기 container47개와 key·임시 경로 부재를 확인했다. 101개 JUnit report hash도 대조했다. 후속 bdb25025의 새 query 변경은 이 실행에 포함되지 않는다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
 | Harness 전체 | a7f18cc8 r2는1185 PASS·17 FAIL·8 ERROR·skip0·exit1이다. 원문과 정리를 보존했다. 후속 수정과 S5 discovery·extractor process·descendant 관찰을 합친 bdb25025에서 새 전체 opt-in r3를 실행 중이다. 아직 PASS로 세지 않는다. |
-| Prepare | e995595a: 41 case·802 subcase·24437 assertions, PREPARED·preparationProblems0·exit0이다. T17 원301·read 엄격125·책임 범위8을 합성했고 기존 fixed oracle을 보존한다. |
+| Prepare | e995595a의 41 case·802 subcase·24,437 assertions PREPARED 결과는 과거 실행으로 보존한다. 최신 62b3c91b에서 `./verify prepare`도 exit 0·PREPARED이며 41 case·802 subcase·24,437 assertions·preparationProblems0·asset group 13 PASS·tracked drift0이다. gateComplete=false, runtimeStatus=NOT_RUN, artifact coverage NOT_RUN, semantic oracle review required이며 전체 런타임 인수가 아니다. |
 | 최근 실제 T09 | fa316f01: 9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. 최신 결합 Haiku 실행의 동일 product class335개와 소유 DB12개 부재를 primary가 대조했다. |
 | 최근 실제 T11 | fa316f01: 110 assertions 중94 PASS·2 FAIL·14 미관찰이다. |
 | 최근 실제 T17 | fa316f01: 301 assertions 중268 PASS·33 FAIL·미관찰0이다. |
