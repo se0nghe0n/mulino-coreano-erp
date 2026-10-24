@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.*;
 import org.junit.jupiter.api.Test;
 import org.mulino.verification.Json;
 import java.nio.file.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import static org.junit.jupiter.api.Assertions.*;
@@ -54,6 +55,14 @@ class NativeHostExtractionProcessTest {
             assertEquals(text,result.observation().path("semantics").path("sourceResponse").asText());
         }
     }
+    @Test void childStdoutUsesUtf8ForUnicodeWithItsEnvironmentCleared() throws Exception {
+        String text="수령 café 😀";var result=extract(capture(text));
+        var command=result.custody().path("command");
+        byte[] stdout=Files.readAllBytes(root.resolve(command.path("stdout").path("path").asText()));
+        assertEquals("EMPTY_NO_PRODUCT_CREDENTIALS",command.path("environmentPolicy").asText());
+        assertTrue(contains(stdout,text.getBytes(StandardCharsets.UTF_8)),"child JSON stdout must contain the exact UTF-8 response bytes");
+        assertEquals(text,result.observation().path("semantics").path("sourceResponse").asText());
+    }
     @Test void contradictionBetweenFinalSummaryAndRawEventCannotBecomeHostEvidence() throws Exception {
         var raw=capture("조회했습니다.");((ObjectNode)raw.path("result")).put("finalResponse","요청을 실행했습니다.");
         var result=extract(raw);assertFalse(result.observation().path("host").path("complete").asBoolean());
@@ -75,5 +84,12 @@ class NativeHostExtractionProcessTest {
             var failure=assertThrows(IllegalStateException.class,()->NativeHostExtractionProcess.extract(external,new NativeIntegrationEvidence(root)));
             assertEquals("EVIDENCE_PATH_ESCAPE",failure.getMessage());
         }finally{Files.deleteIfExists(external);}
+    }
+    private static boolean contains(byte[] input,byte[] value) {
+        outer: for(int i=0;i<=input.length-value.length;i++) {
+            for(int j=0;j<value.length;j++)if(input[i+j]!=value[j])continue outer;
+            return true;
+        }
+        return false;
     }
 }

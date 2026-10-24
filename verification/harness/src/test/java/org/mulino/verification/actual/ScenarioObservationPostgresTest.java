@@ -22,11 +22,13 @@ class ScenarioObservationPostgresTest {
     final String org=id(), item=id(), work=id(), lot=id(), definition=id(), policy=id(), goal=id();
     final String now="2026-10-07T02:00:00Z", before="2026-10-07T00:00:00Z", later="2026-10-08T00:00:00Z";
     Connection writer;ActualConfiguration config;String schema;String testName;int captures;
+    ObserverPostgresTestDatabaseConfiguration database;
     static String id(){return UUID.randomUUID().toString();}
     @BeforeEach void setup(TestInfo info) throws Exception {
         testName=info.getTestMethod().orElseThrow().getName()+"-"+info.getDisplayName().replaceAll("[^A-Za-z0-9_-]","_");
-        String url=System.getenv("OBSERVER_PG_URL");schema="obs_"+UUID.randomUUID().toString().replace("-","");
-        writer=DriverManager.getConnection(url,"observer","observer-local");
+        database=ObserverPostgresTestDatabaseConfiguration.fromEnvironment(System.getenv());
+        schema="obs_"+UUID.randomUUID().toString().replace("-","");
+        writer=database.openVerifiedConnection();
         try(var s=writer.createStatement()){s.execute("CREATE SCHEMA "+schema);s.execute("SET search_path TO "+schema);}
         var csn=Json.read(root.resolve("backend/src/main/resources/edmx/csn.json"));
         for(var it=csn.path("definitions").fields();it.hasNext();) {
@@ -39,7 +41,7 @@ class ScenarioObservationPostgresTest {
             }
             try(var s=writer.createStatement()){s.execute("CREATE TABLE "+entry.getKey().replace('.','_')+" ("+String.join(",",columns)+")");}
         }
-        config=new ActualConfiguration(java.net.URI.create("http://127.0.0.1:1"),url+(url.contains("?")?"&":"?")+"currentSchema="+schema,"observer","observer-local",Path.of("unused"),"unused","unused","594958ee");
+        config=new ActualConfiguration(java.net.URI.create("http://127.0.0.1:1"),database.schemaJdbcUrl(schema),database.username(),database.password(),Path.of("unused"),"unused","unused","594958ee");
     }
     @AfterEach void cleanup() throws Exception {
         if(writer!=null){try(var s=writer.createStatement()){s.execute("DROP SCHEMA "+schema+" CASCADE");}writer.close();}
@@ -179,7 +181,7 @@ class ScenarioObservationPostgresTest {
 
     @Test void supplierReadOnlySnapshotExcludesLaterCommitAndDoesNotWrite() throws Exception {
         var f=supplier("ACCEPT","100",org,item,work,lot);
-        try(var reader=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+        try(var reader=database.openSchemaConnection(schema)) {
             reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(reader);
             supplier("CHANGE","80",org,item,work,lot);
             var projection=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
@@ -253,7 +255,7 @@ class ScenarioObservationPostgresTest {
     }
     @Test void goalInputProjectionRetainsReadOnlyRepeatableReadAndKnownAtFence() throws Exception {
         var snapshot=inputFixture();
-        try(var reader=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+        try(var reader=database.openSchemaConnection(schema)) {
             reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(reader);
             insert("mulino_evaluation_InputSnapshots",snapshot.deepCopy().put("ID",id()));
             var projection=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
@@ -421,7 +423,7 @@ class ScenarioObservationPostgresTest {
 
     @Test void emptySupersetProofUsesItsOriginalReadOnlySnapshotAcrossConcurrentInsert() throws Exception {
         base();
-        try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+        try(var c=database.openSchemaConnection(schema)) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             ObserverSnapshot.token(c); // Establish the snapshot before the independent writer commits.
             insert("mulino_runtime_IntakeRecoveries",Json.object().put("ID",id()).put("organizationId",org).put("state","HELD_SOURCE"));
@@ -470,7 +472,7 @@ class ScenarioObservationPostgresTest {
         base();installHistory();String source=schedule(now,id(),work);
         for(String field:List.of("organizationId","itemId","workId","lotId"))assertTrue(at(now,scope().put(field,id())).path("rawRows").path("supervisionIssues").isEmpty(),field);
         assertTrue(at(before,scope()).path("rawRows").path("supervisionIssues").isEmpty());
-        try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+        try(var c=database.openSchemaConnection(schema)) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(c);
             change(later,"DELETE FROM mulino_runtime_RecoverySchedules WHERE ID=?",source);
             var p=new ScenarioObservationProjection(c,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(later));assertEquals(1,p.virtual("@supervisionIssues").size());
@@ -526,7 +528,7 @@ class ScenarioObservationPostgresTest {
             // pgjdbc sends the JVM default zone in its startup packet, overriding the options zone.
             for(String zone:List.of("UTC","America/New_York")) {
                 java.util.TimeZone.setDefault(java.util.TimeZone.getTimeZone(zone));
-                try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password());var st=c.createStatement();var rs=st.executeQuery("SHOW TIME ZONE")){assertTrue(rs.next());assertEquals(zone,rs.getString(1));}
+                try(var c=database.openSchemaConnection(schema);var st=c.createStatement();var rs=st.executeQuery("SHOW TIME ZONE")){assertTrue(rs.next());assertEquals(zone,rs.getString(1));}
                 var rows=at(now,scope()).path("rawRows").path("supervisionIssues");
                 assertEquals(1,rows.size());assertEquals(source,rows.get(0).path("id").asText());assertEquals("Stored human action",rows.get(0).path("nextAction").asText());
             }
@@ -556,7 +558,7 @@ class ScenarioObservationPostgresTest {
     @Test void unsupportedVirtualScopeFailsClosedAndNoDatabaseWritesAreAllowed() throws Exception {
         base();assertThrows(UnsupportedOperationException.class,()->capture("domain_records"));assertThrows(UnsupportedOperationException.class,()->capture("transactions"));assertThrows(UnsupportedOperationException.class,()->capture("unmappedSource"));
         var descendants=scope().put("includeDescendants",true).put("workId",id());assertThrows(UnsupportedOperationException.class,()->ScenarioJdbcObservation.capture(config,root,request(descendants,"works")));
-        try(var c=DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())) {
+        try(var c=database.openSchemaConnection(schema)) {
             c.setAutoCommit(false);c.setReadOnly(true);c.setTransactionIsolation(Connection.TRANSACTION_REPEATABLE_READ);
             var p=new ScenarioObservationProjection(c,root,List.of(org),List.of(item),List.of(work),List.of(lot),OffsetDateTime.parse(now));
             var first=p.read("mulino_work_read_Works");try(var s=writer.createStatement()){s.execute("UPDATE mulino_work_read_Works SET status='CLOSED'");}
