@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "recipe",
+    "actorId",
+    "asOf",
+    "knownAt",
+    "request",
+    "rows",
+    "objectRowPointer",
+    "relationDataset",
+    "revision",
+    "recipeSources"
+  ],
+  "properties": {
+    "recipe": {
+      "const": "APPLICATION_QUERIES_V1_SIMPLE_OBJECT"
+    },
+    "actorId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "asOf": {
+      "type": "string",
+      "minLength": 1
+    },
+    "knownAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request": {
+      "type": "object"
+    },
+    "rows": {
+      "type": "object",
+      "required": [
+        "object",
+        "relations"
+      ],
+      "properties": {
+        "object": {
+          "type": "object"
+        },
+        "relations": {
+          "type": "array"
+        }
+      }
+    },
+    "objectRowPointer": {
+      "type": "string",
+      "pattern": "^/rawRows/"
+    },
+    "relationDataset": {
+      "const": "mulino_inventory_ObjectRelations"
+    },
+    "revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "recipeSources": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "sha256",
+          "sizeBytes"
+        ]
+      }
+    }
+  }
+}

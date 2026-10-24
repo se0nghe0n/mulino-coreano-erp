@@ -134,3 +134,14 @@ MODEL_INSTALLER_TEST_JDBC_URL=jdbc:postgresql://127.0.0.1:<owned-port>/<owned-db
 case는 `proof-index.json`, `corrected-mapping-inventory.json`,
 `missing-input-inventory.json`에 기록한다. SUPPLIER scope와 aggregate
 stocktake 등 제품/schema 작업은 다른 owner 범위로 남긴다.
+
+## 통합 consumer schema의 명시 버전 차이다
+
+독립 observer 통합 b277a55e는 승인된 physical-columns와 projection-revision
+consumer schema 두 개를 확장했다. 원 original-input-lock.json은 바꾸지
+않았다. schema-upgrades/manifest.json은 정확한 이전/새 SHA와 이전 raw
+byte snapshot 두 개를 고정한다. 나머지 216개 artifact는 현재 byte가 원본과
+동일하다. corpus·fixture·binding·업무 oracle 및 semantic158은 그대로다.
+새 검사기는 이 두 schema의 정확한 버전 쌍만 허용하며 다른 경로·과거
+byte·새 byte·원래 SHA가 달라지면 실패한다. inventory.verify의 반환값은
+현재 byte가 같은 216개이며, 과거 schema snapshot 2개는 별도다.

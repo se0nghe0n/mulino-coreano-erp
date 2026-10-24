@@ -7,9 +7,26 @@ HERE = pathlib.Path(__file__).resolve().parent
 def sha(p): return hashlib.sha256(p.read_bytes()).hexdigest()
 def verify():
     lock = json.loads((HERE/'original-input-lock.json').read_text())
-    drift = [x['path'] for x in lock['artifacts'] if sha(ROOT/x['path']) != x['sha256']]
+    allowed = {'verification/model-binding/physical-columns.schema.json',
+               'verification/model-binding/projection-revision-observation.schema.json'}
+    ledger = json.loads((HERE/'schema-upgrades/manifest.json').read_text())
+    upgrades = {x['path']:x for x in ledger['upgrades']}
+    if ledger['version'] != 'MODEL_CONSUMER_SCHEMA_UPGRADE_V1' or set(upgrades) != allowed or len(ledger['upgrades']) != 2:
+        raise SystemExit('Unknown model consumer schema version ledger')
+    drift = []
+    for x in lock['artifacts']:
+        if x['path'] not in allowed:
+            if sha(ROOT/x['path']) != x['sha256']: drift.append(x['path'])
+            continue
+        change = upgrades[x['path']]
+        snapshot = 'verification/model-installation/v1/schema-upgrades/'+pathlib.Path(x['path']).name+'.before.json'
+        if (change['beforeSnapshot'] != snapshot or change['beforeSha256'] != x['sha256']
+            or not (ROOT/snapshot).resolve().is_relative_to(ROOT.resolve())
+            or sha(ROOT/snapshot) != x['sha256'] or sha(ROOT/x['path']) != change['afterSha256']):
+            drift.append(x['path'])
     if drift: raise SystemExit('Original input drift: '+', '.join(drift))
-    return len(lock['artifacts'])
+    # Historical schema bytes are separately preserved; this count is current-byte equality only.
+    return len(lock['artifacts']) - len(upgrades)
 def main():
     parser=argparse.ArgumentParser(); parser.add_argument('--output',type=pathlib.Path); args=parser.parse_args()
     count=verify(); corpus=json.loads((ROOT/'verification/model-corpus/corpus.json').read_text()); cases={x['id']:x for x in corpus['cases']}

@@ -26,7 +26,7 @@ class ModelFixtureInstallerTest {
             var inventory=ModelFixtureInstaller.inventory(f,ModelFixtureInstaller.emptyInputs(hash),hash);
             assertFalse(inventory.path("installable").asBoolean());assertFalse(inventory.path("issues").isEmpty());assertEquals(before,f.toString());inventories.add(Json.object().put("caseId","M%02d".formatted(n)).put("fixtureSha256",hash).set("inventory",inventory));
         }
-        for(JsonNode artifact:lock.path("artifacts"))assertEquals(artifact.path("sha256").asText(),Json.sha256(root.resolve(artifact.path("path").asText())),artifact.path("path").asText());
+        for(JsonNode artifact:lock.path("artifacts"))ModelFixtureInputIntegrity.require(root,artifact);
         Path output=root.resolve("verification/harness/target/model-fixture-inventory.json");Files.createDirectories(output.getParent());Json.MAPPER.writerWithDefaultPrettyPrinter().writeValue(output.toFile(),inventories);
     }
     @Test void unknownOriginalFactsAndHashMismatchFailBeforeDatabaseAccess() {
