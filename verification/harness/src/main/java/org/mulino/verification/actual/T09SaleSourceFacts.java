@@ -219,8 +219,12 @@ final class T09SaleSourceFacts {
             "mulino_evidence_Claims","mulino_evidence_SourceProfiles","mulino_evidence_Reconciliations","mulino_evidence_Verifications",
             "mulino_evidence_CanonicalOccurrences","mulino_trade_regulatory_Policies",
             "mulino_trade_regulatory_Procedures","mulino_trade_regulatory_ProcedureVersions",
-            "mulino_trade_regulatory_DecisionVersions","mulino_identity_Grants","mulino_identity_CapabilityAssignments")) {
-            var values=Json.array();for(var row:rows(table)) {var v=Json.object();row.forEach((k,x)->{if(x==null)v.putNull(k);else v.put(k,x.toString());});values.add(v);}sql.set(table,values);
+            "mulino_trade_regulatory_DecisionVersions","mulino_identity_Grants","mulino_identity_CapabilityAssignments",
+            T09CaptureReplayRows.ASSESSMENT_TABLE,T09CaptureReplayRows.TABLE)) {
+            var values=Json.array();for(var row:rows(table)) {var v=Json.object();row.forEach((k,x)->{
+                if(T09CaptureReplayRows.TYPED_TABLES.contains(table))v.set(k,T09CaptureReplayRows.databaseValue(x));
+                else if(x==null)v.putNull(k);else v.put(k,x.toString());
+            });values.add(v);}sql.set(table,values);
         }
         data.set("rawRows",sql);Json.write(path,data);
         Json.write(path.resolveSibling(path.getFileName().toString().replace(".json","-oracles.json")),oracleReport());

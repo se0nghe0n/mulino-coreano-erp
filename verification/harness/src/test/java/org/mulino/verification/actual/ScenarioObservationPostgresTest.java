@@ -201,28 +201,77 @@ class ScenarioObservationPostgresTest {
         Assumptions.assumeTrue(directory!=null,"Optional source-row replay requires T09_GOAL_INPUT_SOURCE");
         for(String file:List.of("completeCumulativeSources-http.json","completeExistsSourcesAndInternalAuthorizationSeam-http.json")) {
             var artifact=Json.read(Path.of(directory).resolve(file));
-            var tables=Map.of("goalReferences","mulino_work_read_GoalReferences","assessmentReferences","mulino_work_read_AssessmentReferences","assessmentInputSnapshots","mulino_evaluation_InputSnapshots");
-            var seen=new HashSet<String>();String organization=null;int snapshots=0;
+            var tables=Map.of("goalReferences","mulino_work_read_GoalReferences","assessmentInputSnapshots","mulino_evaluation_InputSnapshots");
+            var replayRows=new LinkedHashMap<String,LinkedHashMap<String,ObjectNode>>();String organization=null;
+            var httpAssessments=new LinkedHashMap<String,List<JsonNode>>();
             for(var receipt:artifact.path("httpReceipts"))for(var entry:tables.entrySet())for(var source:receipt.path("response").path("data").path(entry.getKey())) {
-                if(!seen.add(entry.getKey()+source.path("ID").asText()))continue;
                 var row=Json.object();var names=ScenarioJdbcObservation.names(root,entry.getValue());
                 for(var fields=source.fields();fields.hasNext();) {
                     var field=fields.next();String name=field.getKey();
-                    if(name.equals("conditionResults"))name="conditionsJson";
                     if(Set.of("slots","scope","provenance","conditions").contains(name))name+="Json";
                     if(!names.containsValue(name))continue;
                     row.set(name,field.getValue().isContainerNode()?Json.MAPPER.valueToTree(field.getValue().toString()):field.getValue());
                 }
-                insert(entry.getValue(),row);organization=source.path("organizationId").asText();
-                if(entry.getKey().equals("assessmentInputSnapshots"))snapshots++;
+                String rowId=source.path("ID").asText();assertFalse(rowId.isBlank(),"Source row has no ID: "+entry.getKey());
+                var sourceRows=replayRows.computeIfAbsent(entry.getKey(),ignored->new LinkedHashMap<>());
+                var previous=sourceRows.putIfAbsent(rowId,row);
+                if(previous!=null)assertEquals(previous,row,"Repeated HTTP row changed: "+entry.getKey()+"/"+rowId);
+                else insert(entry.getValue(),row);
+                String rowOrganization=source.path("organizationId").asText();assertFalse(rowOrganization.isBlank(),"Source row has no organizationId: "+entry.getKey());
+                if(organization==null)organization=rowOrganization;else assertEquals(organization,rowOrganization,"T09 source replay crossed organizations");
             }
-            assertNotNull(organization);assertTrue(snapshots>0);
+            for(var receipt:artifact.path("httpReceipts"))for(var source:receipt.path("response").path("data").path("assessmentReferences")) {
+                String rowId=source.path("ID").asText();assertFalse(rowId.isBlank(),"HTTP assessment has no ID");
+                httpAssessments.computeIfAbsent(rowId,ignored->new ArrayList<>()).add(source.deepCopy());
+                String rowOrganization=source.path("organizationId").asText();assertFalse(rowOrganization.isBlank(),"HTTP assessment has no organizationId");
+                if(organization==null)organization=rowOrganization;else assertEquals(organization,rowOrganization,"HTTP assessment crossed organizations");
+            }
+            var snapshots=replayRows.getOrDefault("assessmentInputSnapshots",new LinkedHashMap<>());
+            assertNotNull(organization);assertFalse(snapshots.isEmpty());assertFalse(httpAssessments.isEmpty());
+            var assessmentNames=ScenarioJdbcObservation.names(root,T09CaptureReplayRows.ASSESSMENT_TABLE);
+            var assessments=T09CaptureReplayRows.persistedRows(artifact,T09CaptureReplayRows.ASSESSMENT_TABLE,organization,assessmentNames);
+            var snapshotsByAssessment=new LinkedHashMap<String,ObjectNode>();
+            for(var snapshot:snapshots.values()) {
+                String assessmentId=snapshot.path("assessmentId").asText();assertFalse(assessmentId.isBlank(),"Immutable input has no assessment ID");
+                assertNull(snapshotsByAssessment.putIfAbsent(assessmentId,snapshot),"Multiple input snapshots share one assessment");
+            }
+            for(var entry:httpAssessments.entrySet()) {
+                var persisted=assessments.get(entry.getKey());assertNotNull(persisted,"HTTP assessment is absent from persisted source rows: "+entry.getKey());
+                var snapshot=snapshotsByAssessment.get(entry.getKey());
+                for(var projection:entry.getValue())T09CaptureReplayRows.validateAssessmentProjection(projection,persisted,snapshot,assessmentNames);
+            }
+            for(var assessment:assessments.values())insert(T09CaptureReplayRows.ASSESSMENT_TABLE,assessment);
+            var captures=T09CaptureReplayRows.referencedCaptures(artifact,snapshots.values(),ScenarioJdbcObservation.names(root,T09CaptureReplayRows.TABLE));
+            var capturesById=new LinkedHashMap<String,ObjectNode>();
+            for(var capture:captures){insert(T09CaptureReplayRows.TABLE,capture);capturesById.put(capture.path("ID").asText(),capture);}
+            for(var snapshot:snapshots.values()) {
+                assertEquals(inputHash(snapshot.path("contentJson").asText()),snapshot.path("contentHash").asText(),"Envelope hash changed before replay");
+                if(!snapshot.hasNonNull("evidenceCaptureId"))continue; // Keep legacy envelopes without backfill.
+                var capture=capturesById.get(snapshot.path("evidenceCaptureId").asText());assertNotNull(capture,"Referenced source capture was not exported");
+                assertEquals(snapshot.path("organizationId"),capture.path("organizationId"));
+                assertEquals(java.time.OffsetDateTime.parse(snapshot.path("asOf").asText()).toInstant(),java.time.OffsetDateTime.parse(capture.path("asOf").asText()).toInstant());
+                assertEquals(java.time.OffsetDateTime.parse(snapshot.path("knownAt").asText()).toInstant(),java.time.OffsetDateTime.parse(capture.path("knownAt").asText()).toInstant());
+                assertEquals(inputHash(capture.path("contentJson").asText()),capture.path("contentHash").asText(),"Capture hash differs from persisted bytes");
+                var envelope=Json.parse(snapshot.path("contentJson").asText());var captured=Json.parse(capture.path("contentJson").asText());
+                assertEquals(envelope.path("captureBoundary"),captured.path("boundary"),"Capture boundary differs from immutable envelope");
+                assertEquals(envelope.path("facts"),captured.path("facts"),"Capture facts differ from immutable envelope");
+                assertEquals(snapshot.path("organizationId"),captured.at("/boundary/organizationId"),"Capture boundary organization differs");
+            }
             var result=ScenarioJdbcObservation.capture(config,root,request(Json.object().put("organizationId",organization),"goalVersions","assessmentInputs").put("knownAt","2026-10-07T04:00:00Z"));
-            var actualIds=new HashSet<String>();for(var input:result.path("rawRows").path("assessmentInputs")) {
-                actualIds.add(input.path("snapshotId").asText());assertEquals(input.path("id"),input.path("snapshotId"));
+            var actualEnvelopeIds=new HashSet<String>();for(var input:result.path("rawRows").path("assessmentInputs")) {
+                String envelopeId=input.path("inputEnvelopeId").asText(input.path("id").asText());
+                var snapshot=snapshots.get(envelopeId);assertNotNull(snapshot,"Projection invented an input envelope: "+envelopeId);
+                actualEnvelopeIds.add(envelopeId);
+                if(snapshot.hasNonNull("evidenceCaptureId"))assertEquals(snapshot.path("evidenceCaptureId"),input.path("snapshotId"),"snapshotId must identify the actual shared capture");
+                else assertEquals(snapshot.path("ID"),input.path("snapshotId"),"Legacy envelope identity must remain unchanged");
+                assertEquals(snapshot.path("ID"),input.path("id"),"Projected id remains the envelope ID");
+                if(input.hasNonNull("inputEnvelopeId"))assertEquals(snapshot.path("ID"),input.path("inputEnvelopeId"));
+                assertEquals(snapshot.path("contentJson"),input.path("contentJson"));
+                assertEquals(snapshot.path("contentHash"),input.path("contentHash"));
                 assertEquals(input.path("contentHash").asText(),inputHash(input.path("contentJson").asText()));
+                assertEquals(Json.parse(snapshot.path("contentJson").asText()),input.path("inputSnapshot"));
             }
-            assertEquals(snapshots,actualIds.size());
+            assertEquals(snapshots.keySet(),actualEnvelopeIds,"Every captured envelope must be represented without assuming one output row per envelope");
             if(System.getenv("OBSERVER_TEST_EVIDENCE")!=null)Json.write(Path.of(System.getenv("OBSERVER_TEST_EVIDENCE")).resolve(file+"-fresh-pg-projection.json"),result);
         }
     }
