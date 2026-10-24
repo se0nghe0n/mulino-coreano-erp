@@ -93,6 +93,12 @@ python3 verification/model-installation/v1/build_inputs.py
 python3 verification/model-installation/v1/package_inputs.py
 ```
 
+Archive를 먼저 푼 뒤 generator를 실행한다. 이 순서는 현재 fixture mapping에서
+다시 만들지 않는 과거 M50 generated source 파일 12개를 보존한다. 빈
+`generated/`에서 새로 만들면 committed package와 달리 그 12개가 빠진다.
+generator는 archive에서 풀어 read-only로 저장된 input을 덮어쓰기 전에
+user-write 권한을 추가한다.
+
 `package_inputs.py`가 출력한 SHA와 index를 대조한다. 생성 과정도 원본
 lock을 전후 확인한다. 설치 hook에는 다음 system property를 지정한다.
 
@@ -100,6 +106,18 @@ lock을 전후 확인한다. 설치 hook에는 다음 system property를 지정�
 -Dverification.model.installationInputs=verification/model-installation/v1/inputs
 -Dverification.actual.blobRoot=<해당 attempt 소유의 blob root>
 ```
+
+`./verify prepare`는 committed archive의 index/hash, M01–M60 전체 입력,
+현재 acceptance contract와 template SHA, 원본 fixture SHA를 함께 검사한다.
+동일 검사는 다음 명령으로 독립 실행할 수 있다.
+
+```sh
+python3 verification/model-installation/v1/test_archive_contract_pins.py
+```
+
+회귀 검사는 오래된 pin, 누락 입력, 손상 JSON을 거부하고 원본 218개
+artifact lock을 대조한다. 이 준비 검사는 archive 정합성만 확인하며
+MODEL fixture 설치, DB 효과 또는 60개 scenario의 수용을 증명하지 않는다.
 
 실제 focused probe는 `ModelFixtureProbe inventory Mxx output.json`,
 `inventory-all ALL output.json`, `install Mxx output.json`을 쓴다.
@@ -124,3 +142,8 @@ MODEL_INSTALLER_TEST_JDBC_URL=jdbc:postgresql://127.0.0.1:<owned-port>/<owned-db
 case는 `proof-index.json`, `corrected-mapping-inventory.json`,
 `missing-input-inventory.json`에 기록한다. SUPPLIER scope와 aggregate
 stocktake 등 제품/schema 작업은 다른 owner 범위로 남긴다.
+
+기존 `proof-index.json`과 `focused-evidence.tar.gz`는 이 archive pin 변경
+전의 inputs를 사용한 과거 PostgreSQL 증거다. 이 변경은 DB 설치를 다시
+실행하거나 그 증거를 새 archive에 재귀속하지 않으며, 새 M01–M60
+scenario 수용을 의미하지 않는다.

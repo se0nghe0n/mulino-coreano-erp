@@ -6,6 +6,10 @@ from inventory import ROOT, HERE, verify, sha
 FLAGS={'originalInputProvided':False,'originalAuthorityClaimed':False,'operatingApprovalClaimed':False}
 def encoded(value):return json.dumps(value,ensure_ascii=False,separators=(',',':')).encode()
 def digest(value):return hashlib.sha256(encoded(value)).hexdigest()
+def write_generated(path,data):
+ path.parent.mkdir(parents=True,exist_ok=True)
+ if path.exists():path.chmod(path.stat().st_mode|0o200)
+ path.write_bytes(data)
 class Build:
  def __init__(self,path):
   self.file=path;self.f=json.loads(path.read_text());self.hash=sha(path);self.d=self.f['baseline']['domainFacts'];self.ids=dict(self.f['aliases']);self.case=path.parent.name
@@ -28,7 +32,7 @@ class Build:
  def at(self,seconds):return (datetime.datetime.fromisoformat(self.now.replace('Z','+00:00'))+datetime.timedelta(seconds=seconds)).isoformat().replace('+00:00','Z')
  def source(self,name,segment,kind,payload,quantity,unit,subject='SEGMENT',policy=None,at=None,canonicalAlias=None,place='W'):
   at=at or self.now;policy=policy or self.sourcepolicy;p=copy.deepcopy(payload);p.update(subjectKind=subject,subjectId=self.id(segment),itemId=self.id('P'),placeId=self.id(place),workId=self.id('O1'),effectiveFrom=at,quantity=quantity,unit=unit)
-  self.outdir.mkdir(parents=True,exist_ok=True);file=self.outdir/(name+'.json');file.write_bytes(encoded(p));hash=sha(file)
+  self.outdir.mkdir(parents=True,exist_ok=True);file=self.outdir/(name+'.json');write_generated(file,encoded(p));hash=sha(file)
   scope=dict(recordedBy='synthetic:sourceActor',subjectKind=subject,subjectId=segment,itemId='P',placeId=place,workId='O1')
   doc=name+':doc';event=name+':event';claim=name+':claim';canonical=canonicalAlias or name+':canonical';verification=name+':verification'
   self.row('Document',doc,dict(**scope,sha256=hash,byteLength=file.stat().st_size,mediaType='application/json',sourceNamespace=self.namespace,sourceProfileId='synthetic:sourceProfile',sourceReference=name,availability='AVAILABLE',provenance=dict(source='coordinator-selected-synthetic-input',**FLAGS)))
@@ -206,6 +210,6 @@ def main():
  ids=args.cases or [f'M{i:02}' for i in range(1,61)]
  for cid in ids:
   if not(cid.startswith('M') and len(cid)==3 and cid[1:].isdigit() and 1<=int(cid[1:])<=60):raise SystemExit('Invalid case ID')
-  builder=Build(ROOT/f'verification/model-binding/cases/{cid}/fixture.json');out=builder.build();path=HERE/'inputs'/f'{cid}-isolated.json';path.parent.mkdir(exist_ok=True);path.write_text(json.dumps(out,ensure_ascii=False,indent=2)+'\n');print(cid,len(out['records']),sha(path))
+  builder=Build(ROOT/f'verification/model-binding/cases/{cid}/fixture.json');out=builder.build();path=HERE/'inputs'/f'{cid}-isolated.json';write_generated(path,(json.dumps(out,ensure_ascii=False,indent=2)+'\n').encode());print(cid,len(out['records']),sha(path))
  verify()
 if __name__=='__main__':main()

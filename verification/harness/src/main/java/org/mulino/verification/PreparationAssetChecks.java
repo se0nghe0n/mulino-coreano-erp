@@ -17,7 +17,8 @@ import java.util.concurrent.TimeUnit;
  * contracts/domain-vocabulary.json and contracts/audit-observation-fields.json; the assembler loads the same review()),
  * the derived observation-binding drift checks (T08, V4, V6, V7 content and every bindings file's hash stamps) and the
  * generator reproduction tests (T01/T20/T25/C3/T26, V4/T06/T22/T24/T23/V8 and the round 12 author) and the request
- * contracts (check_request_contracts.py: command intents, query envelope and grant composition of contracts/request-contracts.json).
+ * contracts (check_request_contracts.py: command intents, query envelope and grant composition of contracts/request-contracts.json),
+ * and the M01-M60 installation archive's contract pins and original fixture locks.
  * None of them writes the repository: generators run in temporary copies. A missing interpreter or script
  * fails closed. Output lines starting with KNOWN_OPEN are recorded gaps with a named owner; they are
  * copied into the record and the preparation report instead of being hidden in the output tail.
@@ -40,7 +41,9 @@ final class PreparationAssetChecks {
         new Check("generators-reproduce","verification/mcp-tests/test_generators_reproduce.py",
             List.of("-m","unittest","discover","-s","verification/mcp-tests","-p","test_generators_reproduce.py")),
         new Check("case-generators-reproduce","verification/requirements/test_case_generators_reproduce.py",
-            List.of("-m","unittest","discover","-s","verification/requirements","-p","test_case_generators_reproduce.py")));
+            List.of("-m","unittest","discover","-s","verification/requirements","-p","test_case_generators_reproduce.py")),
+        new Check("model-installation-archive-pins","verification/model-installation/v1/test_archive_contract_pins.py",
+            List.of("verification/model-installation/v1/test_archive_contract_pins.py")));
     private PreparationAssetChecks() {}
 
     static ArrayNode run(Path root,List<String> problems) {
