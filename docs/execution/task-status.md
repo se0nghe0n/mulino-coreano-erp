@@ -23,6 +23,27 @@ prepare 결과는 product runtime·실제 DB 설치·scenario·client/model 인�
 gap 196, gated runtime profile 2개다. [실행 경계](model-archive-cloud-integration.md)
 에 근거와 재현 환경을 기록하며 아래 과거 실행을 이 source의 새 인수로 바꾸지 않는다.
 
+## 2026-10-24 disposable PostgreSQL 집중 검증이다
+
+Local tested source commit `e2f71ce0d0c7e6e2299bb6bb6cea325feedab234`에서
+한 focused actual
+PostgreSQL installer method를 fresh owner-owned PG18.6 cluster에서 실행해
+1 PASS·0 failure/error/skip·exit0을 확인했다. 45 current migration,
+`btree_gist`1.8, 33 source receipts/inverses, committed synthetic setup,
+`23514` invalid-fact rollback 및 `55000` nonempty-DB reuse rejection을
+확인했다. 재사용 거부 전후 organization 1 row, quantity
+`60.000000000000`, source documents 2 rows가 보존됐다. server stop, port
+closed, runtime directory 제거, tracked source drift 0 및 original 218 artifact
+보존을 대조했다. Guard unit test `ModelFixtureTestDatabaseConfigurationTest`
+별도 실행은 5/5 PASS다. 자세한 evidence와 SHA는
+[focused PG 증거](model-archive-cloud-integration.md)에 연결한다.
+
+이 PASS는 standalone generic synthetic setup 하나다. M01–M60 corpus
+scenario, complete backend/application/client/model, S5/S6나 전체 Task를
+닫지 않는다. 초기 startup failure, blank-password error, 재사용 검사
+이전의 별도 test pass는 결과별로 보존하며 final run에 합산하지 않는다.
+전체 Task와 현재 구현 Step은 OPEN이다.
+
 ## 현재 통합 gate (2026-10-24)
 
 전체 Task와 현재 구현 Step은 OPEN이다. 아래는 최근 실행의 실제 기준선이며
@@ -35,6 +56,7 @@ gap 196, gated runtime profile 2개다. [실행 경계](model-archive-cloud-inte
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
 | Harness 전체 | a7f18cc8 r2는1185 PASS·17 FAIL·8 ERROR·skip0·exit1이다. 원문과 정리를 보존했다. 후속 수정과 S5 discovery·extractor process·descendant 관찰을 합친 bdb25025에서 새 전체 opt-in r3를 실행 중이다. 아직 PASS로 세지 않는다. |
 | Prepare | e995595a의 41 case·802 subcase·24,437 assertions PREPARED 결과는 과거 실행으로 보존한다. 최신 62b3c91b에서 `./verify prepare`도 exit 0·PREPARED이며 41 case·802 subcase·24,437 assertions·preparationProblems0·asset group 13 PASS·tracked drift0이다. gateComplete=false, runtimeStatus=NOT_RUN, artifact coverage NOT_RUN, semantic oracle review required이며 전체 런타임 인수가 아니다. |
+| Focused disposable PostgreSQL | Local tested source `e2f71ce0`: actual installer method 1 PASS·failure/error/skip 0·exit0. Fresh PG18.6, 45 migrations, rollback, reuse rejection, cleanup을 확인했으나 전체 acceptance로 승격하지 않는다. Guard unit 5/5 PASS는 별도 run이다. |
 | 최근 실제 T09 | fa316f01: 9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. 최신 결합 Haiku 실행의 동일 product class335개와 소유 DB12개 부재를 primary가 대조했다. |
 | 최근 실제 T11 | fa316f01: 110 assertions 중94 PASS·2 FAIL·14 미관찰이다. |
 | 최근 실제 T17 | fa316f01: 301 assertions 중268 PASS·33 FAIL·미관찰0이다. |

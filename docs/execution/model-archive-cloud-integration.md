@@ -94,12 +94,88 @@ Java image의 기존 trust 설정을 사용했다. 제품 source와 dependency �
 0 error·1 skip, exit 0이다. 유일한 skip은 이 test가 소유한 disposable
 PostgreSQL database가 설정되지 않아 실제 probe를 실행하지 않은 결과다.
 두 class는 focused/mock harness 계약 검사이며 실제 client/model acceptance나
-실제 PostgreSQL 설치 결과가 아니다.
+실제 PostgreSQL 설치 결과가 아니다. 아래의 후속 PostgreSQL probe는 이
+두 class 실행과 별개의 한-method 검사이며 두 결과를 합산하지 않는다.
 
-정확한 argv, exit, 소요 시간, source commit과 원로그 SHA는
-`.local/model-archive-integration/combined-checks.json`에 보존했다.
-같은 디렉터리의 `archive-worker/`, `query-worker/`에 각 worker의
-RED·재현·역복원 로그를 복사했고 기존 원본도 보존했다.
+## 소유한 PostgreSQL에서의 한정 probe다
+
+2026-10-24 local tested source commit
+`e2f71ce0d0c7e6e2299bb6bb6cea325feedab234`와 tree
+`d42793c02e60cde908b344ca64455098615a9b88`에서 fresh disposable
+PostgreSQL 18.6 cluster의 `ModelFixtureInstallerTest` actual PostgreSQL
+method 하나를 실행했다. Exact test selector는 `-Dtest=ModelFixtureInstallerTest#actualPostgresInstallsTypedIdentityInventorySourceAndResponsibilityAndRollsBackInvalidFacts`다. JUnit 결과는 1 test, 1 PASS·0 failure·0 error·0 skip, Maven exit 0이다. 이는 cloud-run local commit이며 canonical remote SHA로 부르지 않는다.
+
+Test는 `MODEL_INSTALLER_TEST_DISPOSABLE=true`, 전용 loopback JDBC URL,
+동일한 16-character lowercase hex suffix의 dedicated database/user 및
+nonblank 임시 password를 요구한다. URL은 userinfo/query/fragment, 원격·
+다중 host와 default port 5432를 거부한다. URL이 있으면 configuration
+validation이 DB connect 전에 실행된다. fresh `public` schema가 비어 있고
+current database/user가 일치하는지 확인한다. SCRAM authentication에서
+잘못된 password의 SQLSTATE `28P01`도 확인했다. Coordinator-owned runtime은
+`127.0.0.1` TCP만 listen하고 Unix-domain listener를 끄며, host security나
+TLS 설정은 바꾸지 않았다.
+
+Probe는 current source의 V1–V45 migration 45개 hash가 file과 일치함을
+대조하고 version의 숫자 순으로 적용했다. JDBC simple query mode에서
+migration file마다 독립 transaction을 썼고 Flyway를 호출하지 않았다.
+`btree_gist` 1.8을 확인했다. Synthetic setup의 install은 commit됐다.
+Proof에는 33 `sourceFactReceipts`와 33 논리 inverse가 기록됐다. Invalid
+fact는 SQLSTATE `23514`로 거부됐고 invalid/unknown organization row는
+각각 0이었다. Invalid input 전후 blob file 수는 1→1이었다.
+
+최종 reuse regression은 `REJECTED_NONEMPTY_DATABASE`/`55000`을 확인했다.
+거부 전후 organization row는 1→1, fixture quantity는
+`60.000000000000`→`60.000000000000`, source document row는 2→2로
+보존됐다. Product proof는 `committed=true`와 `fixtureComplete=true`지만
+`acceptanceStatus=NOT_RUN`이다. Inverse 항목은 논리 기록이지 append-only
+product row의 물리 rollback이 아니다. Owned disposable DB를 버려 정리한다.
+
+최종 attempt `e28adc8d2ad3ce7d`는 server stop, port closed, temporary
+runtime directory removed를 모두 기록했다. 4,870 tracked regular file에서
+source drift가 0이고 protected original fixture artifact 218개의 hash도
+모두 일치했다. 별도 unit run의 `ModelFixtureTestDatabaseConfigurationTest`
+는 5/5 PASS다. JUnit XML은
+`.local/model-pg-probe/guard-unit-evidence/`에 복사했다.
+SHA256은 `dedd084054fd4d434c3901a3e6181c46d0b4c1b1dd7828f630861c82c601209e`다.
+
+각 시도는 별개로 기록하며 합산하지 않는다. `attempt-1fb5bb6bd1236619`는
+sandbox의 AF_UNIX socket 제한으로 server start가 실패해 DB test를 실행하지
+않았고 resources는 정리됐다. `attempt-ee33ff490c033a20`은 source
+`df7323e5`에서 server 및 SCRAM bootstrap을 통과했으나 blank password가
+거부돼 test가 1 error로 끝났다. 모든 temporary resources는 정리됐다.
+`attempt-c60e8d8d96c4d035`는 nonblank password로 한 test를 통과했지만
+후속 reused-database assertion 전의 source를 썼다. 최종
+`attempt-e28adc8d2ad3ce7d`만 nonempty-DB rejection과 기존 row/quantity/
+document 보존을 포함한 현재 한정 PASS다.
+
+최종 evidence는 `.local/model-pg-probe/attempt-e28adc8d2ad3ce7d/`의
+`summary.json`, JUnit XML, `model-fixture-postgresql-proof.json`에 있다.
+Proof SHA256은
+`550cc22cba1b5f1863ad382bd67ccdab6e9eb432275463ffc696b863bde3525c`다.
+Focused Maven log SHA256은
+`6fbed13631961848069a32c26e4da548c9e70cf4acc7bcd78eab2cf30310b60d`,
+JUnit XML SHA256은
+`8945958e7c6db5854e292057b86b69fee6d7ceefa27857334d1712a7637f0f7d`다.
+`.local/model-pg-probe/final-focused-proof-summary.json`은 proof, current
+migration inventory, reuse rejection, cleanup, JUnit counts, 4,870개 tracked
+source의 drift 0, 45 migration hash, protected fixture checks의 cross-check를
+모은다. Maven Central binary provenance는
+`.local/model-pg-probe/tooling/binary-provenance.json`에 기록했다. Ignored
+local artifacts와 cluster runtime은 repository에 publish하지 않았다.
+
+이 결과는 standalone generic synthetic setup 하나이며 M01–M60 scenario
+installer, corpus scenario, backend/application/HTTP/client/model acceptance,
+S5/S6 또는 전체 Task의 인수가 아니다. Model call 수는 0이다. `./verify
+prepare`의 41 case·802 subcase·24,437 assertion은 준비물만 검사한다.
+
+8759fd2a 기준의 초기 Python asset 검사 argv, exit, 소요 시간, source commit과
+원로그 SHA는 `.local/model-archive-integration/combined-checks.json`에 있다.
+62b3c91b 기준 Java focused test와 전체 prepare의 명령과 결과는 같은
+디렉터리의 `dependency-diagnosis/java-prepare-commands.json`과
+`java-prepare-summary.json`에 있다. 후속 actual PG method의 argv와 결과는
+`.local/model-pg-probe/attempt-*/summary.json`에 기록했다.
+`.local/model-archive-integration/archive-worker/`와 `query-worker/`에
+각 worker의 RED·재현·역복원 로그를 복사했고 기존 원본도 보존했다.
 
 ## 실행 흔적과 재현 환경이다
 
@@ -148,8 +224,10 @@ export MAVEN_ARGS="-s $MAVEN_SETTINGS -Dmaven.repo.local=$MAVEN_REPOSITORY -Dmav
 이 증거는 무시된 로컬 실행 기록이며 제품 변경이나 dependency 변경을 포함하지 않는다.
 
 첫 cache·DNS 실패와 Temurin runtime의 TLS 실패는 각 원로그에 그대로
-보존했다. 지금은 Java focused checks와 `./verify prepare`가 회복됐지만,
-backend 전체, disposable DB 설치/probe, 업무 scenario, 실제 client/model 및
-S6/BTP는 여전히 `NOT_RUN`이다. 특히 두 gated profile은 regulatory evidence
-검토와 scheduler natural-cycle 기록이 없어 gate를 통과하지 않는다. 최신
-prepare는 완료됐지만 전체 Task, 현재 Step, S5와 S6는 `OPEN`이다.
+보존했다. Java focused checks와 `./verify prepare`가 회복됐고 별도로
+소유한 fresh PG18.6의 단일 installer/rollback/reuse test도 PASS다. 이는
+backend 전체, M01–M60 설치/scenario, 업무 scenario, 실제 client/model 및
+S6/BTP의 acceptance가 아니므로 해당 범위는 `NOT_RUN`이다. 특히 두 gated
+profile은 regulatory evidence 검토와 scheduler natural-cycle 기록이 없어
+gate를 통과하지 않는다. 최신 prepare와 이 focused PG probe가 완료됐어도
+전체 Task, 현재 Step, S5와 S6는 `OPEN`이다.
