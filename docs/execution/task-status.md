@@ -3,6 +3,17 @@
 기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
 
+## 2026-10-24 cloud 재개의 한정 통합이다
+
+`3de8cc99` 이후 MODEL 입력 60개의 오래된 catalog pin을 `36ebefd7`로,
+T20/C3/V4의 공개 조회 목록 36개와 파생 hash를 `8759fd2a`로 정합했다.
+통합 source의 Python preparation asset 13개와 별도 보존 suite 6개는
+모두 통과했고 tracked source 4,867개의 drift는 0이다. 원본 218개
+artifact와 업무 fixture·grant·oracle은 보존했다. Maven Central DNS로
+Java focused test가 시작되지 못했으므로 전체 prepare, PG, model과
+scenario 인수는 NOT_RUN이다. [실행 경계](model-archive-cloud-integration.md)를
+따르며 아래 과거 실행을 이 source의 새 인수로 바꾸지 않는다.
+
 ## 현재 통합 gate (2026-10-24)
 
 전체 Task와 현재 구현 Step은 OPEN이다. 아래는 최근 실행의 실제 기준선이며

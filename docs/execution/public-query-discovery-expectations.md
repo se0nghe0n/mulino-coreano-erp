@@ -43,7 +43,7 @@ V4 allowlist SHA256은 다음 값으로 갱신됐다.
 - 현재: `329289bc6d7ec4b20af96366e4d73cfdb366963fc6c8f62ace64b6d9bcb94faf`
 
 C3와 V4의 `observation-bindings.json`은 각 case의 파생
-`caseHash`만 갱신했다. actor, grant, scope, quantity, clock, oracle,
+`caseHash`만 갱신했다. actor, grant, scope, quantity, clock, 업무 oracle,
 assertion ID/order/count, fixture와 feature는 변경하지 않았다.
 
 `test_public_inventory_preservation.py`는 query 직전 case로 메타데이터를
@@ -86,7 +86,7 @@ case-generator suite는 5 pass/1 fail(V4)이었다. 생성기를 실행한 뒤 �
 `.local/model-archive-query-discovery/`에 보존했다. Java/Maven, `./verify
 prepare`, backend/PG/native MCP·client, 실제 model, full scenarios는 이
 좁은 변경에서 실행하지 않았다. coordinator의 기준선에는 Maven Central
-BOM DNS로 full backend build가 막힌 기록이 있으며 이 결과를 runtime PASS로
+BOM DNS로 focused harness test가 시작되지 못한 기록이 있으며 runtime PASS로
 대체하지 않는다.
 
 변경 파일은 T20/C3/V4의 `case.json`, C3/V4의 파생
