@@ -1316,3 +1316,89 @@ JUnit·동결 source·정리 증거는
 .local/resume-20261023/observer-relations-full-corrected/에 남긴다.
 이는 제품 write 변경이나 원래 T17/T11 업무 인수의 새 실행이 아니다.
 Task와 현재 Step은 OPEN이며 남은 구현·실제 인수를 계속한다.
+
+## 2026-10-24 현재 상태와 worktree 정리
+
+Codex workspace의 credit이 소진되어 Sol 수정 작업이 중단됐고, 이후
+provider 인계도 context 한도로 두 번 실패했다. Claude coordinator가
+현재 상태를 기록하고 로컬 worktree를 정리했다. Task와 현재 Step은
+계속 OPEN이다.
+
+### 통합된 변경
+
+마지막 push(`3de8cc99`) 뒤 Task branch에 아래 6개를 통합했다.
+
+- `6929b2a5` MODEL 권한 입력의 capability snapshot 명시 고정
+- `bd7c7fad` 공개 조회 목록 discovery 검증의 정확한 확장
+- `3b53b3b4` 장소·품목 실사 관측과 장부 비교의 분리 기록
+- `0db9b837` 구매 제안의 불변 Goal 결합
+- `b277a55e` 독립 SQL 관찰과 business revision 재계산
+- `3c92f9c5` 구매 PG Given의 기존 목표 포인터 연결
+
+구매 Goal 수정은 Goal 변경 뒤 옛 승인으로 발주할 수 없음과 과거
+revision·재실행 결과 보존을 확인했다. 후속 집중 실행은 원본
+`PurchaseCommandPostgresTest` 41개를 포함해 133개 PASS다. 원 JUnit hash는
+`.local/resume-20261024/fix-until-done/purchase-goal-pin-integration/
+seed-followup-audit.json`에 있다. 이 6개를 합친 전체 backend·harness
+결합 실행은 NOT_RUN이며 다음 gate다.
+
+### M58 schema 버전 차이와 temporal gap
+
+`b277a55e`가 승인된 consumer schema 두 개(physical-columns,
+projection-revision-observation)를 확장해 원 input lock과 달라졌다. 원
+lock은 바꾸지 않고 `verification/model-installation/v1/schema-upgrades/`에
+이전/새 SHA와 이전 byte snapshot을 고정했다. `inventory.verify()`는 현재
+byte가 같은 216개를 반환한다. 이 정리 commit에서 `NativePhysicalCatalog`의
+grant scopeId type을 String으로 맞추고 PlaceStocktake 두 table을 추가했다.
+coordinator가 `ModelFixtureInputIntegrityTest` 2개와
+`ModelFixtureInstallerTest` 7개(opt-in skip1)를 실행해 실패0, exit0을
+확인했다. 전체 harness 회귀는 NOT_RUN이다.
+
+M58 actual PG 첫 설치는 성공했다. H1이 ACTIVE rev1에서 RELEASED rev2가
+됐고 AL160·order30은 DB constraint를 그대로 통과했다. 다만 공통
+synthetic 입력의 `A.validFrom` 기본값이 asOf여서 H1 과거 hold
+source(asOf-2s)와 release(asOf-1s)보다 늦다. 원본 A에는 validFrom과
+createdAt이 없다. 동일 A identity를 과거 source와 연결하려면 새 synthetic
+`A.validFrom=H1.validFrom=asOf-2s`를 선택해야 한다. 수량·장소·revision·
+UUID·active와 원 fixture clock은 바꾸지 않고 before/after/inverse ledger를
+둔다. 이를 원래 clock으로 주장하지 않는다. **이 선택의 허용은 사용자
+결정 대기다.** 이어서 H1/H2 관계·source·원 allocationSummary0 conflict
+receipt와 권한 미변경 raw403·evaluateEligibility·effect0 독립 검증을
+계속해야 한다.
+
+### worktree 정리
+
+이 Task의 coordinator·worker·시나리오 shard가 만든 T3 worktree 220개를
+제거했고, 이미 사라진 `/private/tmp` worktree 11개는 prune했다. 제거
+전 모든 HEAD가 branch에서 도달 가능함을 확인했다. 미commit 변경이 있던
+4개는 각자 branch에 보존 commit을 남겼다.
+
+- `fix/actual-source-mapping` `a2d8ef22`
+- `feat/install-model-fixtures` `37ba6ef3`
+- `fix/c3-v4-inventory-auth` `9dee1ac7`
+- `fix/immutable-business-observation-history-20261024` `dc767ced`
+
+ignored 실행 증거(`.local`, `backend/.local`, model-installation
+`generated`·`inputs`, `.superpowers`)와 group 폴더의 증거는 같은 volume
+안에서 이동해 `.local/worktree-archive-20261024/`(약 9.4GB)에 보존했다.
+`manifest.json`이 원 경로·branch·HEAD·이동 항목을 기록한다. 이전 기록이
+가리키는 worktree `.local` 경로는 이 archive 아래
+`<worktree 이름>/.local/`로 옮겨졌다.
+
+worker branch 94개는 삭제하지 않았다. `git cherry` 기준 Task branch에
+없는 patch가 남은 branch는 9개다. 위 보존 commit 4개 외에
+`fix/recovery-observations`(3), `feat/install-model-fixtures`(보존 commit
+외 1), `fix/t17-response-obligation-scope-20261024`,
+`fix/t17-read-quantity-contract`, `fix/t17-goal-assessment`,
+`fix/t17-formal-recall`이 있다. 통합 여부는 다음 수정 차례에 판정한다.
+2026-10-06의 `Developer/` 아래 옛 worktree 3개는 이 Task가 만들지 않아
+그대로 뒀다.
+
+### 다음 작업
+
+1. M58 synthetic `A.validFrom` 선택을 사용자에게 확인한다.
+2. 6개 통합 commit과 schema 버전 차이를 합친 backend·harness 전체 결합
+   실행을 수행한다.
+3. 미통합 patch 9개 branch를 검토해 통합하거나 폐기를 기록한다.
+4. 실패가 해소될 때까지 수정 worker를 재개한다. Codex credit 복구가
+   선행 조건이다.
