@@ -73,7 +73,12 @@ class NativeHostExtractionProcessTest {
         successful.custody().path("command").path("argv").forEach(x->base.add(x.asText()));
         for(String mutation:List.of("hash","extra")) {
             var args=new ArrayList<>(base);if(mutation.equals("hash"))args.set(args.size()-1,"0".repeat(64));else args.add("ignored");
-            var process=new ProcessBuilder(args).redirectErrorStream(true).start();assertTrue(process.waitFor(10,TimeUnit.SECONDS));
+            var processBuilder=new ProcessBuilder(args).redirectErrorStream(true);
+            // Seed a hostile inherited JVM option, then apply the same empty-environment
+            // boundary as NativeHostExtractionProcess before launching the real entrypoint.
+            processBuilder.environment().put("JAVA_TOOL_OPTIONS","-Dmulino.nativeHostExtractionTest.hostile=true");
+            processBuilder.environment().clear();
+            var process=processBuilder.start();assertTrue(process.waitFor(10,TimeUnit.SECONDS));
             String output=new String(process.getInputStream().readAllBytes(),java.nio.charset.StandardCharsets.UTF_8);
             assertEquals(2,process.exitValue());assertEquals(mutation.equals("hash")?"HOST_EXTRACTION_INPUT_CHANGED":"HOST_EXTRACTION_ARGUMENTS_INVALID",output.strip());
         }
