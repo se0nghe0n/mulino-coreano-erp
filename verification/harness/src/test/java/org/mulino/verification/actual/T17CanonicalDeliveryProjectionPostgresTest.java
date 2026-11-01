@@ -19,7 +19,7 @@ class T17CanonicalDeliveryProjectionPostgresTest {
     final Path root=Path.of(System.getProperty("repo.root"));
     final String org=id(), item=id(), work=id(), lot=id();
     final String now="2026-10-07T02:00:00Z", before="2026-10-07T00:00:00Z", later="2026-10-08T00:00:00Z";
-    Connection writer;ActualConfiguration config;String schema;String testName;int captures;
+    Connection writer;ActualConfiguration config;ObserverPostgresTestDatabaseConfiguration database;String schema;String testName;int captures;
     @org.junit.jupiter.api.io.TempDir Path blobs;String previousBlobRoot;
     final Map<String,ObjectNode> graph=new LinkedHashMap<>();
     static String id(){return UUID.randomUUID().toString();}
@@ -27,8 +27,9 @@ class T17CanonicalDeliveryProjectionPostgresTest {
         testName=info.getTestMethod().orElseThrow().getName()+"-"+info.getDisplayName().replaceAll("[^A-Za-z0-9_-]","_");
         previousBlobRoot=System.getProperty("verification.actual.blobRoot");
         System.setProperty("verification.actual.blobRoot",blobs.toString());Files.createDirectories(blobs.resolve("objects"));
-        String url=System.getenv("OBSERVER_PG_URL");schema="obs_"+UUID.randomUUID().toString().replace("-","");
-        writer=DriverManager.getConnection(url,"observer","observer-local");
+        database=ObserverPostgresTestDatabaseConfiguration.fromEnvironment(System.getenv());
+        schema="obs_"+UUID.randomUUID().toString().replace("-","");
+        writer=database.openVerifiedConnection();
         try(var s=writer.createStatement()){s.execute("CREATE SCHEMA "+schema);s.execute("SET search_path TO "+schema);}
         var csn=Json.read(root.resolve("backend/src/main/resources/edmx/csn.json"));
         for(var it=csn.path("definitions").fields();it.hasNext();) {
@@ -41,7 +42,7 @@ class T17CanonicalDeliveryProjectionPostgresTest {
             }
             try(var s=writer.createStatement()){s.execute("CREATE TABLE "+entry.getKey().replace('.','_')+" ("+String.join(",",columns)+")");}
         }
-        config=new ActualConfiguration(java.net.URI.create("http://127.0.0.1:1"),url+(url.contains("?")?"&":"?")+"currentSchema="+schema,"observer","observer-local",Path.of("unused"),"unused","unused","648ca638-source-row-test");
+        config=new ActualConfiguration(java.net.URI.create("http://127.0.0.1:1"),database.schemaJdbcUrl(schema),database.username(),database.password(),Path.of("unused"),"unused","unused","648ca638-source-row-test");
     }
     @AfterEach void cleanup() throws Exception {
         if(previousBlobRoot==null)System.clearProperty("verification.actual.blobRoot");else System.setProperty("verification.actual.blobRoot",previousBlobRoot);

@@ -2,6 +2,7 @@ package org.mulino.verification.nativeclient;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.mulino.verification.Json;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.*;
 
@@ -26,7 +27,10 @@ public final class NativeHostExtractionMain {
             result.set("implementationClasses",implementationClasses());
             // Detect replacement during parsing/extraction as well as before it.
             NativeClientPolicy.require(Json.sha256(capture).equals(args[2]),"HOST_EXTRACTION_INPUT_CHANGED");
-            System.out.println(result);
+            byte[] wireJson=result.toString().getBytes(StandardCharsets.UTF_8);
+            System.out.write(wireJson,0,wireJson.length);
+            System.out.write('\n');
+            System.out.flush();
         } catch(Exception invalid) {
             String code=invalid.getMessage();
             if(code==null||!code.matches("[A-Z0-9_]{1,100}"))code="HOST_EXTRACTION_INVALID_INPUT";

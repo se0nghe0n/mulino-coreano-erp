@@ -167,6 +167,9 @@ final class ModelFixturePlan {
                 requireKeys(e.getValue(),Set.of("mondayArrived","tuesdayDispatched","wednesdayArrived","onHand","arrived"),pointer);
                 for(String part:List.of("mondayArrived","wednesdayArrived","tuesdayDispatched")){String type=part.equals("tuesdayDispatched")?"Movement":"Receipt";JsonNode record=findRecord(pointer,part,type);if(record==null)problem(pointer+"/"+part,"EXPLICIT_C2_SOURCE_CHAIN_REQUIRED");else add(type,record.path("alias").asText(),pointer,part,Json.object());}return;
             }
+            if(e.getKey().equals("currentOwnerRef")&&fixture.path("fixtureId").asText().equals("M47-isolated")) {
+                mapM47CurrentOwnerClaim(e.getValue(),pointer);return;
+            }
             if(Set.of("supplierReply","shipment","regulatory","invoice","proposal").contains(e.getKey())&&selectedCaseFact(e.getKey(),e.getValue(),pointer))return;
             if(e.getKey().equals("deliveryReport")&&fixture.path("fixtureId").asText().equals("M51-isolated")) {
                 requireKeys(e.getValue(),Set.of("quantity","stillTransport","sourceNamespace","verifiedPhysicalScope"),pointer);JsonNode record=findRecord(pointer,"","CanonicalOccurrence");if(record==null)problem(pointer,"EXPLICIT_DELIVERY_REPORT_SOURCE_REQUIRED");else add("CanonicalOccurrence",record.path("alias").asText(),pointer,"",Json.object().put("quantity",e.getValue().path("quantity").asText()));return;
@@ -199,6 +202,44 @@ final class ModelFixturePlan {
             boolean match=false;for(JsonNode o:fixture.path("baseline").path("domainFacts").path("obligations"))if(o.path("kind").equals(responsibility.path("scope").path("kind"))&&o.path("ownerRef").equals(responsibility.path("ownerAlias"))&&o.path("nextAction").equals(responsibility.path("nextAction"))&&o.path("nextCheckAt").equals(responsibility.path("nextCheckAt")))match=true;
             if(!match)problem("/responsibilities","RESPONSIBILITY_HAS_NO_EXACT_ORIGINAL_OBLIGATION");
         }
+    }
+    /** M47 repeats the already-authored SalesOrder owner as a current-owner snapshot.
+     *  Link the equality to the mapped Work owner's typed field; never add a row or authority. */
+    private void mapM47CurrentOwnerClaim(JsonNode original,String pointer) {
+        if(!original.isTextual()||original.asText().isBlank()) {problem(pointer,"EXPLICIT_OWNER_ALIAS_REQUIRED");return;}
+        JsonNode order=fixture.at("/baseline/domainFacts/objects/S1");
+        String owner=original.asText(),orderOwner=order.path("ownerRef").asText();
+        if(!order.path("type").asText().equals("SalesOrder")||orderOwner.isBlank()) {problem(pointer,"EXPLICIT_S1_OWNER_SOURCE_REQUIRED");return;}
+        String ownerId=ref(owner,pointer);Row work=byAlias.get("S1:deliveryWork");
+        if(work==null||!work.type().equals("Work")) {problem(pointer,"CURRENT_OWNER_TYPED_WORK_BINDING_REQUIRED");return;}
+        JsonNode obligations=fixture.at("/baseline/domainFacts/obligations");int matchedObligation=-1;
+        for(int i=0;i<obligations.size();i++) {
+            JsonNode obligation=obligations.get(i);
+            if(obligation.path("kind").asText().equals("DELIVERY_REMAINING")&&obligation.path("scopeRef").asText().equals("S1")) {
+                if(matchedObligation>=0) {problem(pointer,"AMBIGUOUS_EXPLICIT_CURRENT_OWNER_OBLIGATION");return;}
+                matchedObligation=i;
+            }
+        }
+        if(matchedObligation<0) {problem(pointer,"EXPLICIT_OPEN_DELIVERY_OBLIGATION_OWNER_REQUIRED");return;}
+        String obligationOwner=obligations.get(matchedObligation).path("ownerRef").asText();
+        String mappedWorkOwner=work.fields().path("ownerId").asText();
+        String typedWorkOwnerId=aliases.path(mappedWorkOwner).asText(mappedWorkOwner);
+        String mismatch=m47CurrentOwnerMismatchReason(owner,orderOwner,ownerId,typedWorkOwnerId,obligationOwner);
+        if(mismatch!=null) {problem(pointer,mismatch);return;}
+        var claim=Json.object().put("sourcePointer",pointer).put("relation","EXACT_DUPLICATE_OWNER_SNAPSHOT")
+            .put("linkedFactType","Work").put("linkedFactAlias",work.alias()).put("linkedField","ownerId")
+            .put("linkedFactSourcePointer","/baseline/domainFacts/objects/S1/ownerRef")
+            .put("obligationSourcePointer","/baseline/domainFacts/obligations/"+matchedObligation+"/ownerRef")
+            .put("additionalProductFactClaimed",false).put("originalAuthorityClaimed",false)
+            .set("originalClaim",original.deepCopy());
+        claims.add(claim);
+        warnings.add(issue(pointer,"DUPLICATE_OWNER_SNAPSHOT_BOUND_TO_EXPLICIT_S1_OWNER_NO_ADDITIONAL_ROW"));
+    }
+    static String m47CurrentOwnerMismatchReason(String currentOwnerRef,String orderOwnerRef,String resolvedCurrentOwnerId,String typedWorkOwnerId,String obligationOwnerRef) {
+        if(!currentOwnerRef.equals(orderOwnerRef))return "CURRENT_OWNER_DIFFERS_FROM_EXPLICIT_S1_OWNER";
+        if(!resolvedCurrentOwnerId.equals(typedWorkOwnerId))return "CURRENT_OWNER_DIFFERS_FROM_TYPED_WORK_OWNER";
+        if(!currentOwnerRef.equals(obligationOwnerRef))return "CURRENT_OWNER_DIFFERS_FROM_EXPLICIT_OPEN_OBLIGATION_OWNER";
+        return null;
     }
     private void requirePart(String pointer,String part,String need) {
         JsonNode match=null;for(JsonNode r:inputs.path("records"))if(r.path("sourcePointer").asText().equals(pointer)&&r.path("part").asText().equals(part)){if(match!=null)problem(pointer,"DUPLICATE_SOURCE_BINDING:"+part);match=r;}

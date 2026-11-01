@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
 /** Real PostgreSQL, current IdentityAuthorization and public noun dispatch; no model/scenario runner. */
 @SpringBootTest @ActiveProfiles("local") @SuppressWarnings("unchecked")
 class BusinessDiscoveryPostgresTest {
- static final WorkPostgresTestResources HOST=new WorkPostgresTestResources("business-discovery");
+ static final WorkPostgresTestResources HOST=WorkPostgresTestResources.forBusinessDiscovery("business-discovery");
  static final Instant T=Instant.parse("2026-10-07T09:00:00Z"),K=T.plusSeconds(1);
  @DynamicPropertySource static void properties(DynamicPropertyRegistry r){HOST.properties(r);}
  @Autowired JdbcTemplate db;

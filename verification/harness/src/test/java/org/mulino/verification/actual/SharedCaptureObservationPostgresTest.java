@@ -3,8 +3,10 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import java.util.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import org.mulino.verification.Json;
 
+@EnabledIfEnvironmentVariable(named="OBSERVER_PG_TEST",matches="true")
 class SharedCaptureObservationPostgresTest extends ScenarioObservationPostgresTest {
  ObjectNode captureRow;ObjectNode boundary;ObjectNode facts;
  void captureSource()throws Exception{
@@ -37,9 +39,9 @@ class SharedCaptureObservationPostgresTest extends ScenarioObservationPostgresTe
   int wiredPending=0;for(var input:capture("assessmentInputs").at("/rawRows/assessmentInputs"))if(input.path("status").asText().equals("PENDING"))wiredPending++;
   assertEquals(1,wiredPending,"ScenarioJdbcObservation must pass the original request asOf to the projection");
   com.fasterxml.jackson.databind.JsonNode rows;
-  try(var reader=java.sql.DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())){reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(reader);rows=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),java.time.OffsetDateTime.parse(now),java.time.OffsetDateTime.parse(now)).virtual("@assessmentInputs");reader.commit();}
+  try(var reader=database.openSchemaConnection(schema)){reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);ObserverSnapshot.token(reader);rows=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),java.time.OffsetDateTime.parse(now),java.time.OffsetDateTime.parse(now)).virtual("@assessmentInputs");reader.commit();}
   int pending=0;for(var input:rows)if(input.path("status").asText().equals("PENDING")){pending++;assertEquals("WORK_PENDING_INPUT",input.path("rowKind").asText());assertFalse(input.has("snapshotId"));assertFalse(input.has("movementId"));}
   assertEquals(1,pending);
-  try(var reader=java.sql.DriverManager.getConnection(config.jdbcUrl(),config.username(),config.password())){reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);var earlier=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),java.time.OffsetDateTime.parse(now),java.time.OffsetDateTime.parse(before)).virtual("@assessmentInputs");for(var input:earlier)assertNotEquals("PENDING",input.path("status").asText());reader.commit();}
+  try(var reader=database.openSchemaConnection(schema)){reader.setAutoCommit(false);reader.setReadOnly(true);reader.setTransactionIsolation(java.sql.Connection.TRANSACTION_REPEATABLE_READ);var earlier=new ScenarioObservationProjection(reader,root,List.of(org),List.of(item),List.of(work),List.of(lot),java.time.OffsetDateTime.parse(now),java.time.OffsetDateTime.parse(before)).virtual("@assessmentInputs");for(var input:earlier)assertNotEquals("PENDING",input.path("status").asText());reader.commit();}
  }
 }

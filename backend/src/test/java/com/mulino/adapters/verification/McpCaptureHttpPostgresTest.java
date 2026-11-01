@@ -24,7 +24,9 @@ import org.testcontainers.postgresql.PostgreSQLContainer;
 @ActiveProfiles({"local","verification"})
 class McpCaptureHttpPostgresTest {
   static final PostgreSQLContainer PG=new PostgreSQLContainer("postgres@sha256:4ef4dbc939d61acea57712655ddb4b4ab27419c913f94cca0cd57cb3ea3c2280");
-  static final Instant T=Instant.now();
+  static final Optional<McpCaptureHttpPostgresTarget> EXTERNAL_TARGET=
+      McpCaptureHttpPostgresTarget.fromEnvironment(System.getenv());
+  static final Instant T=McpCaptureHttpFixtureClock.now();
   static final Path DIRECTORY;
   static final KeyPair KEYS;
   static final String ISSUER="https://capture-fixture.invalid",AUDIENCE="mulino-capture-probe";
@@ -34,19 +36,26 @@ class McpCaptureHttpPostgresTest {
       created=Files.createTempDirectory("mulino-auth-capture-");DIRECTORY=created;
       var generator=KeyPairGenerator.getInstance("RSA");generator.initialize(2048);KEYS=generator.generateKeyPair();
       Files.writeString(DIRECTORY.resolve("public.pem"),"-----BEGIN PUBLIC KEY-----\n"+Base64.getMimeEncoder(64,new byte[]{10}).encodeToString(KEYS.getPublic().getEncoded())+"\n-----END PUBLIC KEY-----\n");
-      PG.start();
+      if(EXTERNAL_TARGET.isPresent()) EXTERNAL_TARGET.orElseThrow().verifyFreshDatabase();
+      else PG.start();
     } catch(Exception failure) {
-      PG.stop();
+      if(EXTERNAL_TARGET.isEmpty()&&PG.isRunning())PG.stop();
       if(created!=null)try(var paths=Files.walk(created)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}
       catch(Exception cleanup){failure.addSuppressed(cleanup);}
       throw new ExceptionInInitializerError(failure);
     }
   }
   @DynamicPropertySource static void properties(DynamicPropertyRegistry r) {
-    r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);
+    if(EXTERNAL_TARGET.isPresent()) {
+      var target=EXTERNAL_TARGET.orElseThrow();
+      r.add("spring.datasource.url",target::jdbcUrl);r.add("spring.datasource.username",target::username);r.add("spring.datasource.password",target::password);
+    } else {
+      r.add("spring.datasource.url",PG::getJdbcUrl);r.add("spring.datasource.username",PG::getUsername);r.add("spring.datasource.password",PG::getPassword);
+    }
     r.add("JWT_PUBLIC_KEY",()->DIRECTORY.resolve("public.pem").toString());r.add("JWT_ISSUER",()->ISSUER);r.add("JWT_AUDIENCE",()->AUDIENCE);
     r.add("mulino.verification.mcp-capture-enabled",()->"true");r.add("mulino.verification.instant",T::toString);
     r.add("mulino.evidence.blob-root",()->DIRECTORY.resolve("blobs").toString());
+    r.add("server.address",()->"127.0.0.1");
   }
   @Autowired JdbcTemplate db;
   @LocalServerPort int port;
@@ -141,6 +150,7 @@ class McpCaptureHttpPostgresTest {
   }
   @Test void revokedGrantIsObservedWhileActionRemainsForbiddenAndReceiptReadsHaveNoDbWrites()throws Exception {
     db.update("UPDATE mulino_identity_Grants SET revokedAt=?,revision=2 WHERE ID=?",Timestamp.from(T),grant);
+    assertEquals(T,db.queryForObject("SELECT revokedAt FROM mulino_identity_Grants WHERE ID=?",Timestamp.class,grant).toInstant());
     String token=own(),nonce=id();var rpc=rpc("tools/call","getAccessContext",Map.of());var response=post(rpc,token,nonce,"tools/call");
     assertTrue(response.body().contains("FORBIDDEN"),response.body());var before=allTableRows();var value=receipt(rpc,response,nonce,token);
     assertEquals(before,allTableRows());assertEquals(T.toString(),Instant.parse(value.path("grants").get(0).path("revokedAt").asText()).toString());
@@ -185,8 +195,14 @@ class McpCaptureHttpPostgresTest {
     return rows;
   }
   @AfterAll static void cleanup()throws Exception {
-    PG.stop();try(var paths=Files.walk(DIRECTORY)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}
-    assertFalse(PG.isRunning());assertFalse(Files.exists(DIRECTORY));
-    Path output=Path.of("target/auth-capture-probe");Files.createDirectories(output);Files.writeString(output.resolve("cleanup.json"),"{\"postgresStopped\":true,\"ephemeralFilesRemoved\":true}");
+    if(EXTERNAL_TARGET.isEmpty()) {
+      PG.stop();assertFalse(PG.isRunning());
+    }
+    try(var paths=Files.walk(DIRECTORY)){for(Path p:paths.sorted(Comparator.reverseOrder()).toList())Files.deleteIfExists(p);}
+    assertFalse(Files.exists(DIRECTORY));
+    String cleanup=EXTERNAL_TARGET.isEmpty()
+        ? "{\"testcontainersStopped\":true,\"ephemeralFilesRemoved\":true}"
+        : "{\"externalPostgresLifecycle\":\"COORDINATOR_OWNED_PENDING_CLEANUP\",\"ephemeralFilesRemoved\":true}";
+    Path output=Path.of("target/auth-capture-probe");Files.createDirectories(output);Files.writeString(output.resolve("cleanup.json"),cleanup);
   }
 }

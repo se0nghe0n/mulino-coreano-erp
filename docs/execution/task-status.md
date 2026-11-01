@@ -1,7 +1,133 @@
 # 전체 구현 Task의 실행 기록
 
+## 2026-11-01 fork Task branch 통합과 local worktree 정리
+
+로컬 Task branch와 fork의 `feat/ontology-implementation`이 `3de8cc99`
+뒤에 갈라졌다. 로컬에만 있는 commit은 8개(`6929b2a5`–`ac02897c`)였고,
+fork에만 있는 commit은 17개(`ec643ab4`–`0d976b75`)였다. force push 없이
+push하려고 fork를 로컬에 merge했다. 충돌 7개는 아래처럼 해결했다.
+
+- 공개 QUERY discovery는 fork `07ab3925`를 따른다. catalog는 base
+  byte(`329289bc…`)를 유지한다. T20·C3·V4 case와 binding은 fork
+  version을 쓰고, 보존 test는 원격에서 도달 가능한 기준선을 쓴다.
+  로컬 `bd7c7fad`의 catalog 재배열은 되돌렸다. 두 쪽 case는 목록 순서와
+  파생 hash를 빼면 JSON이 같다. T20의 자동 merge는 17개 이름을
+  중복시켰다(154개). 그래서 fork version으로 교체했다.
+- MODEL authority pin은 사용자 선택에 따라 로컬 `6929b2a5`의 v1
+  snapshot(`dd4987f1…`) 설계를 유지한다. archive와 index는 로컬 것이다.
+  fork `ec643ab4`의 `test_archive_contract_pins.py`는 이 설계에 맞게
+  바꿨다. snapshot path·SHA를 요구하고, 현재 catalog pin과 snapshot
+  변경을 거부하며, 218개 lock 중 schema 2개는 upgrade ledger 쌍으로만
+  허용한다. fork의 44개 설치 증거(`037a7548`)는 현재 catalog pin을 쓴
+  이전 archive의 증거다. 통합 archive `14675e88…`의 MODEL 설치는
+  `NOT_RUN`이다.
+
+검증한 항목은 다음과 같다.
+
+- 통합 tree에서 archive를 풀고 `build_inputs.py`·`package_inputs.py`를
+  다시 실행했다. archive와 index 둘 다 같은 byte였다.
+- `test_archive_contract_pins.py`는 7 PASS였고, MCP generator 3,
+  보존 6, case generator 6도 PASS였다.
+- `./verify prepare`는 exit 0이었다. asset check 13개가 PASS였다
+  (`model-installation-archive-pins` 포함). `gateComplete=false`다.
+- backend `test-compile`은 성공했다. harness focused 49는 실패 0,
+  skip 2였다.
+- `./verify harness`는 993 tests에서 실패 0, 오류 0, skip 266, exit 0이었다.
+- backend `test`는 1,044개 중 Docker가 필요 없는 295개가 통과했고 실패는
+  0이었다. 나머지 749개는 이 Mac에 Docker가 없어 Testcontainers
+  PostgreSQL을 시작하지 못하고 오류로 끝났다. 오류 class 57개 모두 원인이
+  Docker 부재였다. backend PG 회귀는 `NOT_RUN`이다.
+
+runtime·PG·실모델 인수는 이 통합에서 실행하지 않았다.
+
+사용자 요청으로 local worktree 3개를 제거했다. 2026-10-06에 만든
+`mulino-coreano-erp-57`, `mulino-native-resumed-qm-20261006`,
+`mulino-portfolio-current-20261006`이다. 세 곳 모두 미commit 변경이 없었다.
+HEAD는 원격 branch에서 도달할 수 있었다. ignored `.superpowers/`는
+`.local/worktree-archive-20261101/`로 옮겼다. build cache는 버렸다.
+branch는 삭제하지 않았다. 남은 worktree는 이 main checkout 하나다.
+
+## 2026-10-24 ordinary regression 통합 결과다
+
+local tested source `8bd6779702f00d4f6c7e42f16cb219055aa8660d`에서
+`./verify harness`는 956 tests 중 실패·오류 0, skip 258, exit 0으로
+끝났다. 698개가 실제 실행됐고 source drift 및 application model call은
+0이다. 이 결과는 전체 MODEL scenario나 사용자 Step acceptance가 아니다.
+Prepare는 41 case·802 subcase·24,437 assertion을 준비했으나
+`gateComplete=false`, runtime `NOT_RUN`, artifact coverage `NOT_RUN`,
+semantic review 필요 상태다. Canonical code commit
+`50b2d0131392088719f262913abd5dd62bdf7f0b`의 tree는 local tested tree와
+동일하다. 게시 증거는 후속 문서 commit에 묶는다. Native GPT-6-Luna worker 작업은
+구현·검토이며 application-model workflow 인수가 아니다. Backend focused
+unit, SupplierReply PG, permitted-context HTTP/PG 결과와 2개 observer
+optional skip의 경계는
+[ordinary regression 증거](ordinary-regression-20261024.md)에 기록한다.
+M01–M60은 44개 설치 가능 입력·16개 unresolved로 남고, 전체 corpus
+scenario 및 application-model workflow는 미실행이다. 전체 Task와 Step는 OPEN이다.
+
 기록일: 2026-10-08. 상태는 실행 증거로 갱신한다. 계획 문서 검토
 완료와 새 시스템 구현 완료는 서로 다른 판정이다.
+
+## 2026-10-24 현재 packaged MODEL 입력의 한정 설치 결과다
+
+현재 code baseline `dda42dd63e550741bd370a136760f39b062d1f20`에서
+M01–M60 입력 60개를 조사했다. 44개는 explicit source mapping이 있고
+disposable PostgreSQL 설치에 성공했다. 이 중 42개는 current migration SQL을
+적용한 database-only probe이고 M05/M50은 packaged backend의 실제 HTTP
+helper다. HTTP helper는 Flyway 45개 migration을 실행했다. 총 source receipt와
+inverse는 각각 64,527개지만 database-only readback은 설치 transaction
+안의 commit 전 검사다. 44개 모두 `fixtureComplete=false`이고 model call 및
+scenario run은 0이다. 전체 acceptance는 `NOT_RUN`이다.
+
+다른 16개 case는 기대 Boolean을 채우지 않고 explicit typed source graph
+부족으로 계속 차단했다. 원본 DOC1/DOC2 bytes도 없으며, `SupplierReply`
+receipt는 아직 관찰되지 않았다. source/hash, M05/M50 HTTP 결과, package와
+남은 입력을 [현재 MODEL 입력 설치 증거](model-corpus-current-installation.md)에
+기록한다. 원본 218개 protected hash는 drift가 0이며 이전 `proof-index.json`은
+`a7f18cc8`/구 archive의 역사 증거로 보존한다. 제품 acceptance, native model
+scenario, S5/S6와 전체 Task는 OPEN이다. 이전 실행 단락의 `RUNNING`은 그
+시점의 기록이며 현재 workflow 상태를 뜻하지 않는다.
+
+## 2026-10-24 cloud 재개의 한정 통합이다
+
+`3de8cc99` 이후 MODEL 입력 60개의 오래된 catalog pin을 `36ebefd7`로,
+T20/C3/V4의 공개 조회 목록 36개와 파생 hash를 `8759fd2a`로 정합했다.
+통합 source의 Python preparation asset 13개와 별도 보존 suite 6개는
+모두 통과했고 tracked source 4,867개의 drift는 0이다. 원본 218개
+artifact와 업무 fixture·grant·oracle은 보존했다. `62b3c91b` 기준에서
+cloud Java 검증을 회복했다. focused harness class 2개는 총11개 검사 중
+10 PASS·0 failure·0 error·1 PostgreSQL probe SKIP, exit 0이며,
+`./verify prepare`도 exit 0으로 PREPARED를 반환했다. 준비 결과는 41 case·
+802 subcase·24,437 assertion, preparation problem 0, asset group 13개 PASS,
+tracked file 4,868개 drift 0이다. 직접 DNS/cache로 막힌 첫 Maven 시도와
+Temurin runtime TLS 실패는 역사적 환경 실패로 보존했으며 현재 Java 검증을
+차단하는 상태로 표시하지 않는다.
+prepare 결과는 product runtime·실제 DB 설치·scenario·client/model 인수가
+아니다. `runtimeStatus=NOT_RUN`, `gateComplete=false`, artifact coverage
+`NOT_RUN`, semantic oracle equivalence `REQUIRES_CASE_REVIEW`, known open
+gap 196, gated runtime profile 2개다. [실행 경계](model-archive-cloud-integration.md)
+에 근거와 재현 환경을 기록하며 아래 과거 실행을 이 source의 새 인수로 바꾸지 않는다.
+
+## 2026-10-24 disposable PostgreSQL 집중 검증이다
+
+Local tested source commit `e2f71ce0d0c7e6e2299bb6bb6cea325feedab234`에서
+한 focused actual
+PostgreSQL installer method를 fresh owner-owned PG18.6 cluster에서 실행해
+1 PASS·0 failure/error/skip·exit0을 확인했다. 45 current migration,
+`btree_gist`1.8, 33 source receipts/inverses, committed synthetic setup,
+`23514` invalid-fact rollback 및 `55000` nonempty-DB reuse rejection을
+확인했다. 재사용 거부 전후 organization 1 row, quantity
+`60.000000000000`, source documents 2 rows가 보존됐다. server stop, port
+closed, runtime directory 제거, tracked source drift 0 및 original 218 artifact
+보존을 대조했다. Guard unit test `ModelFixtureTestDatabaseConfigurationTest`
+별도 실행은 5/5 PASS다. 자세한 evidence와 SHA는
+[focused PG 증거](model-archive-cloud-integration.md)에 연결한다.
+
+이 PASS는 standalone generic synthetic setup 하나다. M01–M60 corpus
+scenario, complete backend/application/client/model, S5/S6나 전체 Task를
+닫지 않는다. 초기 startup failure, blank-password error, 재사용 검사
+이전의 별도 test pass는 결과별로 보존하며 final run에 합산하지 않는다.
+전체 Task와 현재 구현 Step은 OPEN이다.
 
 ## 현재 통합 gate (2026-10-24)
 
@@ -14,7 +140,8 @@
 | Backend 전체 | e995595a: 945 PASS·실패/오류/skip0·exit0이다. source drift0, 실행 전후 product class342개 hash 일치, 자기 container47개와 key·임시 경로 부재를 확인했다. 101개 JUnit report hash도 대조했다. 후속 bdb25025의 새 query 변경은 이 실행에 포함되지 않는다. |
 | 공개 capability 결합 | 908fe638·96891bc4: 계약3·보존 Python5 PASS, 기존114+정확한6 entries, 권한/fixture 보존 |
 | Harness 전체 | a7f18cc8 r2는1185 PASS·17 FAIL·8 ERROR·skip0·exit1이다. 원문과 정리를 보존했다. 후속 수정과 S5 discovery·extractor process·descendant 관찰을 합친 bdb25025에서 새 전체 opt-in r3를 실행 중이다. 아직 PASS로 세지 않는다. |
-| Prepare | e995595a: 41 case·802 subcase·24437 assertions, PREPARED·preparationProblems0·exit0이다. T17 원301·read 엄격125·책임 범위8을 합성했고 기존 fixed oracle을 보존한다. |
+| Prepare | e995595a의 41 case·802 subcase·24,437 assertions PREPARED 결과는 과거 실행으로 보존한다. 최신 62b3c91b에서 `./verify prepare`도 exit 0·PREPARED이며 41 case·802 subcase·24,437 assertions·preparationProblems0·asset group 13 PASS·tracked drift0이다. gateComplete=false, runtimeStatus=NOT_RUN, artifact coverage NOT_RUN, semantic oracle review required이며 전체 런타임 인수가 아니다. |
+| Focused disposable PostgreSQL | Local tested source `e2f71ce0`: actual installer method 1 PASS·failure/error/skip 0·exit0. Fresh PG18.6, 45 migrations, rollback, reuse rejection, cleanup을 확인했으나 전체 acceptance로 승격하지 않는다. Guard unit 5/5 PASS는 별도 run이다. |
 | 최근 실제 T09 | fa316f01: 9 subcase·94 assertions 모두 PASS, 실패·미관찰0이다. 최신 결합 Haiku 실행의 동일 product class335개와 소유 DB12개 부재를 primary가 대조했다. |
 | 최근 실제 T11 | fa316f01: 110 assertions 중94 PASS·2 FAIL·14 미관찰이다. |
 | 최근 실제 T17 | fa316f01: 301 assertions 중268 PASS·33 FAIL·미관찰0이다. |

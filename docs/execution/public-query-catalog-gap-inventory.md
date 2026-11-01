@@ -114,3 +114,11 @@ case tree와 같음을 확인했다. metadata 확장이 없던 첫 prepare FAIL�
 exact-delta.json과 각 raw log다. 새 목록을 runtime PASS로 세지 않는다.
 모델 installer는 당시의 120개 snapshot에 명시적으로 고정하여 이 변경이
 기존 교정 권한을 자동으로 늘리지 않는다.
+
+2026-11-01 fork 통합에서 이 방식은 fork `07ab3925`로 대체됐다. 같은
+결과를 다른 방식으로 얻는다. catalog 순서는 바꾸지 않고 generator가
+catalog 순서로 기대값을 다시 만든다. 보존 검사는 원격에서 도달 가능한
+`d4907967`·`020be0cf`를 기준선으로 쓴다. 이 문서의 `ce0eecc1`은 원격
+branch에서 도달할 수 없었다. 두 방식의 T20·C3·V4 case는 목록 순서와 파생
+hash만 다르고 JSON 의미는 같다. 위 catalog 재배열은 통합 tree에 남지
+않는다. MODEL installer는 계속 120개 snapshot에 고정한다.

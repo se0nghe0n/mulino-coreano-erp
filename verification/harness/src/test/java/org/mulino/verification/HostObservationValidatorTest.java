@@ -116,6 +116,35 @@ public final class HostObservationValidatorTest {
         assertTrue(rejectSurface(c->((ObjectNode)c.host.path("extractor").path("rawRows").path("probes").get(0)).put("outcome","DENIED")).contains("outcome"));
         assertTrue(rejectSurface(c->{((ObjectNode)c.control.path("parameters")).put("targetPolicy","ANY");c.host.set("requestedInputs",c.control.path("parameters").deepCopy());}).contains("synthetic"));
     }
+    @Test void writeSurfaceAllowlistMustMatchAndRemainHashBoundAsSyntheticEvidence() throws Exception {
+        String allowlist="contracts/acceptance-capabilities.json";
+        JsonNode rows=Json.read(root.resolve(dir+"enumerateWriteSurface-rows.json"));
+        JsonNode provenance=rows.path("driverProvenance");
+        assertEquals("CAPTURED_SELFTEST",rows.path("evidenceClass").asText());
+        assertEquals("CANNED_CONTRACT_SELFTEST",provenance.path("source").asText());
+        assertEquals("SELFTEST",provenance.path("buildVersion").asText());
+        assertFalse(provenance.path("independent").asBoolean());
+        assertTrue(provenance.path("authenticatedActor").isNull());
+        assertEquals("CAPTURED_CONTRACT_SELFTEST_ONLY",rows.path("command").path("argv").get(0).asText());
+        assertEquals(Json.sha256(root.resolve(allowlist)),rows.path("operationEvidence").path("allowlistSha256").asText(),
+            "the fixed selftest pin follows the current allowlist bytes");
+
+        Capture stale=capture("enumerateWriteSurface");
+        String historicalHash="dd4987f1ce7050dd510da42e4ab4cf5706d19413e6181bbc29924a251505c3a4";
+        ((ObjectNode)stale.control.path("parameters")).put("allowlistSha256",historicalHash);
+        stale.host.set("requestedInputs",stale.control.path("parameters").deepCopy());
+        ObjectNode staleRows=(ObjectNode)stale.host.path("extractor").path("rawRows");
+        ((ObjectNode)staleRows.path("operationEvidence")).put("allowlistSha256",historicalHash);
+        stale.host.set("operationEvidence",staleRows.path("operationEvidence").deepCopy());
+        StepResult staleResult=rebind(stale);
+        String mismatch=assertThrows(IllegalArgumentException.class,()->HostObservationValidator.validate(new ContractValidator(root),stale.control,staleResult)).getMessage();
+        assertTrue(mismatch.contains("Requested allowlistSha256 differs from the committed allowlist bytes"),mismatch);
+
+        Capture missing=capture("enumerateWriteSurface");
+        ((ArrayNode)missing.host.path("inputArtifacts")).remove(0);
+        String unbound=assertThrows(IllegalArgumentException.class,()->check(missing)).getMessage();
+        assertTrue(unbound.contains("allowlist is not bound by hash in inputArtifacts"),unbound);
+    }
     @Test void preparationRejectsAProcessOperationOutsideTheHostVocabulary() throws Exception {
         ContractValidator v=new ContractValidator(root);
         assertEquals(List.of(),v.hostOperationProblems(Json.read(root.resolve("verification/cases/V4/case.json"))),"enumerateWriteSurface is defined");

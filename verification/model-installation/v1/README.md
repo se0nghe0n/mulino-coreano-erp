@@ -103,6 +103,12 @@ python3 verification/model-installation/v1/build_inputs.py
 python3 verification/model-installation/v1/package_inputs.py
 ```
 
+Archive를 먼저 푼 뒤 generator를 실행한다. 이 순서는 현재 fixture mapping에서
+다시 만들지 않는 과거 M50 generated source 파일 12개를 보존한다. 빈
+`generated/`에서 새로 만들면 committed package와 달리 그 12개가 빠진다.
+generator는 archive에서 풀어 read-only로 저장된 input을 덮어쓰기 전에
+user-write 권한을 추가한다.
+
 `package_inputs.py`가 출력한 SHA와 index를 대조한다. 생성 과정도 원본
 lock을 전후 확인한다. 설치 hook에는 다음 system property를 지정한다.
 
@@ -111,22 +117,115 @@ lock을 전후 확인한다. 설치 hook에는 다음 system property를 지정�
 -Dverification.actual.blobRoot=<해당 attempt 소유의 blob root>
 ```
 
+`./verify prepare`는 committed archive의 index/hash, M01–M60 전체 입력,
+v1 authority snapshot(`capability-contract-a7f18cc8.json`, `dd4987f1…`)과
+template SHA, 원본 fixture SHA를 함께 검사한다. 현재 public catalog의
+SHA로 바꾼 authority/template pin은 거부한다. 현재 catalog가 달라져도
+v1 READ 권한을 자동으로 넓히지 않기 위해서다.
+동일 검사는 다음 명령으로 독립 실행할 수 있다.
+
+```sh
+python3 verification/model-installation/v1/test_archive_contract_pins.py
+```
+
+회귀 검사는 현재 catalog pin, snapshot 변경, 누락 입력, 손상 JSON을
+거부하고 원본 218개 artifact lock을 대조한다. lock 중 승인된 consumer
+schema 2개는 `schema-upgrades/manifest.json`의 정확한 이전/새 SHA 쌍으로만
+허용한다. 이 준비 검사는 archive 정합성만 확인하며
+MODEL fixture 설치, DB 효과 또는 60개 scenario의 수용을 증명하지 않는다.
+
 실제 focused probe는 `ModelFixtureProbe inventory Mxx output.json`,
 `inventory-all ALL output.json`, `install Mxx output.json`을 쓴다.
 JDK21과 harness dependency classpath를 사용한다. 실제 설치에는 기존
 ActualConfiguration의 loopback URL, DB, disposable 표시와 JWT 입력이
 필요하다. 인증 원문은 artifact에 넣지 않는다. M05/M50 helper는 실제 HTTP
-요청도 하므로 그 DB에 연결된 해당 attempt server가 필요하다.
+요청도 하므로 그 DB에 연결된 해당 attempt server가 필요하다. 이는 scenario
+installer에 대한 계약이며, 아래 focused PostgreSQL test의 환경 변수와
+구별한다.
 
-focused unit/실제 PG 검사는 다음과 같다. 실제 PG가 없으면 해당 test는
-SKIPPED이며 PASS 증거로 쓸 수 없다.
+focused unit/실제 PG 검사는 아래 command로 실행한다. Repository는
+complete database/role provisioner를 제공하지 않는다. Operator는 먼저
+별도 isolated fresh PostgreSQL 18.6 SCRAM cluster, dedicated database와
+owner role, 그리고 non-5432 port를 준비한다. Role은 migrations와
+`btree_gist` extension 생성에 필요한 권한을 가진다. Test suffix, port,
+JDK 21 runtime, temporary Maven settings/repository/compiler, 그리고
+nonblank `MODEL_INSTALLER_TEST_DB_PASSWORD`를 secure environment로
+주입한다. Actual PostgreSQL test는 JDBC URL이 없으면 `SKIPPED`이며 PASS
+증거가 아니다. URL이 있으면 guard가 opt-in, credential과 URL의 전용
+identity를 DB connect 전에 검증한다. 실제 DB identity, 버전과 빈 schema는
+접속한 뒤 migration write 전에 대조한다.
 
 ```sh
-JAVA_HOME=/Library/Java/JavaVirtualMachines/openjdk-21.jdk/Contents/Home \
-MODEL_INSTALLER_TEST_JDBC_URL=jdbc:postgresql://127.0.0.1:<owned-port>/<owned-db> \
-./mvnw -q -f verification/harness/pom.xml \
--Dtest=ModelFixtureInstallerTest,NativeProductIntegrationTest test
+(
+  set -eu
+  : "${TEST_SUFFIX:?Set the pre-created test DB/user suffix}"
+  : "${PG_PORT:?Set the fresh cluster port}"
+  : "${SYSTEM_JAVA_HOME:?Set a JDK 21 runtime}"
+  : "${MAVEN_SETTINGS:?Set current temporary proxy settings}"
+  : "${MAVEN_REPOSITORY:?Set a writable Maven repository}"
+  : "${TEMURIN_JAVAC:?Set the checksum-verified JDK 21 javac}"
+  : "${MODEL_INSTALLER_TEST_DB_PASSWORD:?Securely inject a temporary password}"
+  export MODEL_INSTALLER_TEST_DISPOSABLE=true
+  export MODEL_INSTALLER_TEST_JDBC_URL="jdbc:postgresql://127.0.0.1:${PG_PORT}/mulino_model_fixture_${TEST_SUFFIX}"
+  export MODEL_INSTALLER_TEST_DB_USER="model_fixture_${TEST_SUFFIX}"
+  export MODEL_INSTALLER_TEST_DB_PASSWORD
+  unset MAVEN_ARGS
+  cleanup() {
+    unset MODEL_INSTALLER_TEST_DISPOSABLE MODEL_INSTALLER_TEST_JDBC_URL \
+      MODEL_INSTALLER_TEST_DB_USER MODEL_INSTALLER_TEST_DB_PASSWORD
+  }
+  trap cleanup 0
+  test_selector=ModelFixtureInstallerTest#actualPostgresInstallsTypedIdentityInventory
+  test_selector="${test_selector}SourceAndResponsibilityAndRollsBackInvalidFacts"
+  if JAVA_HOME="$SYSTEM_JAVA_HOME" ./mvnw -B -ntp \
+      -s "$MAVEN_SETTINGS" -Dmaven.repo.local="$MAVEN_REPOSITORY" \
+      -Dmaven.compiler.fork=true \
+      -Dmaven.compiler.executable="$TEMURIN_JAVAC" \
+      -f verification/harness/pom.xml -Dtest="$test_selector" test; then
+    test_status=0
+  else
+    test_status=$?
+  fi
+  exit "$test_status"
+)
 ```
+
+이 command는 cloud runtime의 JDK 21 `java`와 checksum이 확인된 Temurin
+`javac`를 분리해 사용한다. 현재 Maven proxy와 toolchain 설정은
+[cloud 실행 기록](../../../docs/execution/model-archive-cloud-integration.md)에
+있다. 이 설정은 server 구성을 바꾸지 않는다. Test는 database/role을
+생성하거나 drop하지 않고 PostgreSQL을 stop하지도 않는다. Operator는
+전용 cluster를 멈추고 port가 닫혔으며 runtime/credential directory가
+삭제됐는지 확인한 뒤 cluster를 폐기한다.
+`MODEL_INSTALLER_TEST_DISPOSABLE` 값은 정확히 `true`여야 한다. 이
+marker는 operator assertion일 뿐 server identity를 증명하지 않는다.
+`MODEL_INSTALLER_TEST_JDBC_URL`은 URL userinfo, query, fragment 없이
+`localhost`, `127.0.0.1` 또는 `::1`의 loopback TCP 주소와 명시 포트를
+지정한다. 기본 PostgreSQL port `5432`는 거부된다. URL database는
+`mulino_model_fixture_<16 lowercase hex>`이고
+`MODEL_INSTALLER_TEST_DB_USER`는 같은 suffix의
+`model_fixture_<16 lowercase hex>`여야 한다. Password는 비어 있지 않은
+임시 값으로 별도 environment injection을 한다. 이 설정은 test opt-in일
+뿐 database나 role을 생성하지 않는다. 매 시도마다 새 suffix의 dedicated
+user/database를 별도 isolated cluster에 준비한다. Test role은 DB owner이고
+migrations 및 `btree_gist` extension 생성에 필요한 권한이 있어야 한다.
+Shared, pre-migrated, production cluster/database는 지정하지 않는다.
+
+Actual test는 current database/user identity와 PostgreSQL 18.6을
+대조하고, `public` schema에 relation, routine, type이 없어야 통과한다.
+Fresh database에 연속된 current migration 45개를 version 숫자 순서로
+적용한다. JDBC simple query mode에서 file마다 별도 transaction을 쓴다.
+Flyway는 호출하지 않는다. 종료 전에 `btree_gist` 설치를 확인한다.
+SQL exception 상세는 redaction하고 SQLSTATE를 보존한다.
+
+Cloud run은 Maven Central의
+`io.zonky.test.postgres:embedded-postgres-binaries-linux-amd64:18.6.0`
+Linux amd64 artifact를 사용했다. Published SHA-1은
+`0a36625fa44dc0d65cb1cee6041e468d96bdbb8d`이고 local SHA-256은
+`008ee189eaa7ca2b58bd01dd950291e638b998392cf982297acd4779ec898ac1`이다.
+18.6 binary는 synthetic disposable cluster에만 썼으며
+binary/runtime는 repository artifact가 아니다. 이 probe는 M01–M60
+scenario install이나 전체 PostgreSQL/application acceptance가 아니다.
 
 실제 모델, UAT, corpus scenario, Workflow 및 API 구매는 실행하지 않았다.
 실제 scenario 실행은 coordinator의 Haiku5.5 native dynamic Workflow
@@ -145,3 +244,28 @@ byte snapshot 두 개를 고정한다. 나머지 216개 artifact는 현재 byte�
 새 검사기는 이 두 schema의 정확한 버전 쌍만 허용하며 다른 경로·과거
 byte·새 byte·원래 SHA가 달라지면 실패한다. inventory.verify의 반환값은
 현재 byte가 같은 216개이며, 과거 schema snapshot 2개는 별도다.
+
+기존 `proof-index.json`과 `focused-evidence.tar.gz`는 이 archive pin 변경
+전의 inputs를 사용한 과거 PostgreSQL 증거다. 이 변경은 DB 설치를 다시
+실행하거나 그 증거를 새 archive에 재귀속하지 않으며, 새 M01–M60
+scenario 수용을 의미하지 않는다.
+
+## 2026-10-24 current source 설치 증거다
+
+현재 packaged MODEL 입력 조사와 fresh DB 설치의 결과는
+[실행 기록](../../../docs/execution/model-corpus-current-installation.md)에
+연결한다. 이 검사는 `dda42dd6` code baseline과 그때의 input archive hash를
+고정한 별도 run이다. 42개 database-only install과 M05/M50의 실제 HTTP
+helper 설치를 구분한다. 모든 설치 결과의 `fixtureComplete`는 false이며
+model call·scenario run은 0, 전체 acceptance는 `NOT_RUN`이다.
+
+이 run의 archive는 현재 catalog SHA `329289bc…`에 pin한 별도 line의
+package다. 통합 뒤의 committed archive(`14675e88…`)는 v1 snapshot pin을
+쓰므로 그 설치 증거를 이 archive로 재귀속하지 않는다. 통합 archive의
+MODEL 설치는 `NOT_RUN`이다.
+
+current summary와 raw command/log는 ignored local path
+`.local/model-corpus-current/`에만 있다. 이 path는 repository에 포함하지
+않았고 공개 download로 취급하지 않는다. 기존 `proof-index.json`은
+`a7f18cc8` baseline의 과거 archive 증거로 남긴다. current installation
+summary가 이 historical proof를 교체하거나 재귀속하지 않는다.
